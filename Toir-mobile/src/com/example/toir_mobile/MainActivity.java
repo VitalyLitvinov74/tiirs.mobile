@@ -2,8 +2,11 @@ package com.example.toir_mobile;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import ru.toir.client.dbadapter.TOiRDBAdapter;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -11,6 +14,26 @@ public class MainActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+
+		TOiRDBAdapter adapter = new TOiRDBAdapter(getApplicationContext());
+		
+		adapter.open();
+	
+		System.out.println("db.version=" + adapter.getDbVersion());
+
+		if(!adapter.isActual()){
+			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}else {
+			Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}
+
+		adapter.close();
+
 	}
 
 	@Override
