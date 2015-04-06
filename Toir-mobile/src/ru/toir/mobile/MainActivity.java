@@ -32,6 +32,11 @@ public class MainActivity extends ActionBarActivity {
 		}
 
 		adapter.close();
+		
+		TOiRServerAPI toirServerApi = new TOiRServerAPI(getApplicationContext());
+		Toast toast = Toast.makeText(this, "SERVER API = " + toirServerApi.getVersion(), Toast.LENGTH_SHORT);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
 
 	}
 
