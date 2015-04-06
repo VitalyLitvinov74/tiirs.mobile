@@ -1,4 +1,4 @@
-package ru.toir.client.dbadapter;
+package ru.toir.mobile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -124,61 +124,38 @@ public class TOiRDBAdapter{
 
 		/**
 		 * <p>Создаёт новую базу данных</p>
-		 * <p>Алгоритм работы работы следующий: в папке с обновлениями структуры базы данных
-		 * ищутся все файлы до текущей версии с которой работает приложение. Последовательно
-		 * выполняются. Если всё скрипты выполнились успешно, версия базы меняется до запрошенной.
-		 * Если нет, остаётся равной 0, то есть база не создаётся.</p>
-		 * <p></p>
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase db){
 			System.out.println("TOiRDbHelper.onCreate: db.version=" + db.getVersion());
 			
-			AssetManager am = context.getAssets();
-			boolean transactionSuccefful = true;
-			db.beginTransaction();
-			for(int i = 1; i <= DATABASE_VERSION; i++){
-				try{
-					InputStream is = am.open(updatePath + "/update" + i + ".sql");
-					BufferedReader br = new BufferedReader(new InputStreamReader(is));
-					String line;
-					try{
-						while((line = br.readLine()) != null){
-							try{
-								db.execSQL(line);
-							}catch(SQLException e){
-								transactionSuccefful = false;
-								System.out.println(e.toString());
-							}
-						}
-					}catch(SQLException e){
-						System.out.println(e.toString());
-					}
-				}catch(IOException e){
-					System.out.println(e.toString());
-				}
-			}
-			if(transactionSuccefful){
-				db.setTransactionSuccessful();
-			}
-			db.endTransaction();
+			loadAndExecSQLUpdate(db, 0, DATABASE_VERSION);
 		}
 
 		/**
 		 * <p>Обновляет текущую базу данных</p>
-		 * <p>Алгоритм работы работы следующий: в папке с обновлениями структуры базы данных
-		 * ищутся все файлы от текущей версии базы до текущей версии с которой работает приложение. Последовательно
-		 * выполняются. Если всё скрипты выполнились успешно, версия базы меняется до запрошенной.
-		 * Если нет, остаётся равной 0, то есть база не создаётся.</p>
-		 * <p></p>
 		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
 			System.out.println("TOiRDbHelper.onUpgrade: db.version=" + db.getVersion());
 			System.out.println("TOiRDbHelper.onUpgrade: oldVersion=" + oldVersion + ", newVersion=" + newVersion);
 			
-			boolean transactionSuccefful = true;
+			loadAndExecSQLUpdate(db, oldVersion, newVersion);
+		}
+		
+		/**
+		 * <p>Метод загружает файлы с обновлениями структуры базы данных, и выполняет SQL инструкции из этих файлов</p>
+		 * <p>Алгоритм работы работы следующий: в папке с обновлениями структуры базы данных
+		 * ищутся все файлы от текущей версии базы данных до текущей версии с которой работает приложение.
+		 * Последовательно выполняются. Если всё скрипты выполнились успешно, версия базы меняется до запрошенной.
+		 * Если нет, остаётся равной oldVersion, то есть база не создаётся или не обновляется.</p>
+		 * @param db SQLiteDatabase объект базы данных которую нужно обновить
+		 * @param oldVersion int текущая версия базы данных
+		 * @param newVersion int версия до которой нужно обновить базу данных
+		 */
+		private void loadAndExecSQLUpdate(SQLiteDatabase db, int oldVersion, int newVersion){
 			AssetManager am = context.getAssets();
+			boolean transactionSuccefful = true;
 
 			db.beginTransaction();
 			for(int i = oldVersion + 1; i <= newVersion; i++){
@@ -186,19 +163,16 @@ public class TOiRDBAdapter{
 					InputStream is = am.open(updatePath + "/update" + i + ".sql");
 					BufferedReader br = new BufferedReader(new InputStreamReader(is));
 					String line;
-					try{
-						while((line = br.readLine()) != null){
-							try{
-								db.execSQL(line);
-							}catch(SQLException e){
-								transactionSuccefful = false;
-								System.out.println(e.toString());
-							}
+					while((line = br.readLine()) != null){
+						try{
+							db.execSQL(line);
+						}catch(SQLException e){
+							transactionSuccefful = false;
+							System.out.println(e.toString());
 						}
-					}catch(SQLException e){
-						System.out.println(e.toString());
 					}
 				}catch(IOException e){
+					transactionSuccefful = false;
 					System.out.println(e.toString());
 				}
 			}
