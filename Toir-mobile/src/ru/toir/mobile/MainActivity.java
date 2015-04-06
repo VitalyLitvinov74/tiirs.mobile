@@ -1,7 +1,9 @@
 package ru.toir.mobile;
 
 import android.support.v7.app.ActionBarActivity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +21,7 @@ public class MainActivity extends ActionBarActivity {
 		
 		adapter.open();
 	
-		System.out.println("db.version=" + adapter.getDbVersion());
+		Log.d("test", "db.version=" + adapter.getDbVersion());
 
 		if(!adapter.isActual()){
 			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
@@ -29,6 +31,29 @@ public class MainActivity extends ActionBarActivity {
 			Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
+			
+			Cursor c = adapter.getUsers(1);
+			if(c.moveToFirst()){
+				Log.d("test", c.getString(Users.NAME_COLUMN));
+			}
+			long id = adapter.insertUsers("demon", "demonlogin", "demonpass", 666);
+			if(id !=-1 ){
+				Log.d("test", "id пользоватея = " + id);
+				int ucount = adapter.updateUsers(id, "1", "2", "3", 4);
+				if(ucount == 1){
+					int dcount = adapter.deleteUsers(id);
+					if(dcount == 1){
+						Log.d("test", "пользователь удалён");
+					}else {
+						Log.d("test", "пользователь не удалён!");
+					}
+				}else{
+					Log.d("test", "пользователь не обновлён!");
+				}
+				
+			}else {
+				Log.d("test", "пользователь не создан!");
+			}
 		}
 
 		adapter.close();

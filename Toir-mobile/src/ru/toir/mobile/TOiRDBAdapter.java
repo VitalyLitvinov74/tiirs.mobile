@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -26,15 +27,6 @@ public class TOiRDBAdapter{
 	 */
 	private static final int DATABASE_VERSION = 1;
 	
-	// константы для тестовой таблицы
-	private static final String TABLE_TEST = "testtable";
-	public static final String TABLE_TEST_ID = "_id";
-	public static final int TABLE_TEST_ID_COLUMN = 0;
-	public static final String TABLE_TEST_NAME = "name";
-	public static final int TABLE_TEST_NAME_COLUMN = 1;
-	public static final String TABLE_TEST_VALUE = "value";
-	public static final int TABLE_TEST_VALUE_COLUMN = 2;
-	
 	// база приложения
 	private SQLiteDatabase db;
 	
@@ -43,6 +35,7 @@ public class TOiRDBAdapter{
 	
 	// вспомогательный класс для работы с базой
 	private TOiRDbHelper dbHelper;
+
 	/**
 	 * <p>Конструктор адаптера</p>
 	 * @param _context Контекст приложения
@@ -102,11 +95,64 @@ public class TOiRDBAdapter{
 	}
 	
 	/**
-	 * <p>Возвращает все записи из таблицы test</p>
+	 * <p>Возвращает все записи из таблицы users</p>
 	 * @return Cursor
 	 */
-	public Cursor getAllTestEntry(){
-		return db.query(TABLE_TEST, new String[]{TABLE_TEST_ID, TABLE_TEST_NAME, TABLE_TEST_VALUE}, null, null, null, null, null);
+	public Cursor getUsers(){
+		return db.query(Users.TABLE_NAME, new String[]{Users.ID_NAME, Users.NAME_NAME, Users.LOGIN_NAME, Users.PASS_NAME, Users.TYPE_NAME}, null, null, null, null, null);
+	}
+	
+	/**
+	 * <p>Возвращает запись из таблицы users</p>
+	 * @param id
+	 * @return Cursor
+	 */
+	public Cursor getUsers(int id){
+		return db.query(Users.TABLE_NAME, new String[]{Users.ID_NAME, Users.NAME_NAME, Users.LOGIN_NAME, Users.PASS_NAME, Users.TYPE_NAME}, Users.ID_NAME + "=?", new String[]{Integer.toString(id)}, null, null, null);
+	}
+	
+	/**
+	 * <p>Добавляет запись в таблицу users</p>
+	 * @param name
+	 * @param login
+	 * @param pass
+	 * @param type
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public long insertUsers(String name, String login, String pass, int type){
+		ContentValues values = new ContentValues();
+		values.put(Users.NAME_NAME, name);
+		values.put(Users.LOGIN_NAME, login);
+		values.put(Users.PASS_NAME, pass);
+		values.put(Users.TYPE_NAME, type);
+		return db.insert(Users.TABLE_NAME, null, values);
+	}
+	
+	/**
+	 * <p>Удаляет запись</p>
+	 * @param id ид для удаления
+	 * @return int количество удалённых записей
+	 */
+	public int deleteUsers(long id){
+		return db.delete(Users.TABLE_NAME, Users.ID_NAME + "=?", new String[]{Long.toString(id)});
+	}
+	
+	/**
+	 * <p>Обновляет запись в таблице users</p>
+	 * @param id
+	 * @param name
+	 * @param login
+	 * @param pass
+	 * @param type
+	 * @return int количество обновлённых записей
+	 */
+	public int updateUsers(long id, String name, String login, String pass, int type){
+		ContentValues values = new ContentValues();
+		values.put(Users.NAME_NAME, name);
+		values.put(Users.LOGIN_NAME, login);
+		values.put(Users.PASS_NAME, pass);
+		values.put(Users.TYPE_NAME, type);
+		return db.update(Users.TABLE_NAME, values, Users.ID_NAME + "=?", new String[]{Long.toString(id)});
 	}
 	
 	/**
@@ -118,8 +164,15 @@ public class TOiRDBAdapter{
 		
 		private String updatePath = "updatedb";
 		
-		public TOiRDbHelper(Context _context, String _name, CursorFactory _factory, int _version){
-			super(_context, _name, _factory, _version);
+		/**
+		 * <p>Конструктор</p>
+		 * @param _context
+		 * @param _name
+		 * @param _factory
+		 * @param _version
+		 */
+		public TOiRDbHelper(Context context, String name, CursorFactory factory, int version){
+			super(context, name, factory, version);
 		}
 
 		/**
@@ -128,7 +181,6 @@ public class TOiRDBAdapter{
 		@Override
 		public void onCreate(SQLiteDatabase db){
 			System.out.println("TOiRDbHelper.onCreate: db.version=" + db.getVersion());
-			
 			loadAndExecSQLUpdate(db, 0, DATABASE_VERSION);
 		}
 
@@ -139,7 +191,6 @@ public class TOiRDBAdapter{
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
 			System.out.println("TOiRDbHelper.onUpgrade: db.version=" + db.getVersion());
 			System.out.println("TOiRDbHelper.onUpgrade: oldVersion=" + oldVersion + ", newVersion=" + newVersion);
-			
 			loadAndExecSQLUpdate(db, oldVersion, newVersion);
 		}
 		
