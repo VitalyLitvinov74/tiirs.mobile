@@ -1,8 +1,8 @@
 package ru.toir.mobile;
 
 /**
- * <p>Класс реализует пользователей</p>
  * @author koputo
+ * <p>Класс реализует пользователей</p>
  *
  */
 public class Users {

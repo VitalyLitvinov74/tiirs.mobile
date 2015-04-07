@@ -15,7 +15,9 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * <p>Класс для работы с базой данных ТОиР</p> 
+ * @author koputo
+ * <p>Класс для работы с базой данных ТОиР</p>
+ *
  */
 public class TOiRDBAdapter{
 	/**
