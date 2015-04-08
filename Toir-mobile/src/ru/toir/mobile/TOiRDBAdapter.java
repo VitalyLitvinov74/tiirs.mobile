@@ -42,9 +42,9 @@ public class TOiRDBAdapter{
 	 * <p>Конструктор адаптера</p>
 	 * @param _context Контекст приложения
 	 */
-	public TOiRDBAdapter(Context _context){
-		context = _context;
-		dbHelper = new TOiRDbHelper(context, DATABASE_NAME, null, DATABASE_VERSION); 
+	public TOiRDBAdapter(Context context){
+		this.context = context;
+		dbHelper = new TOiRDbHelper(new TOiRDatabaseContext(context), DATABASE_NAME, null, DATABASE_VERSION); 
 	}
 	
 	/**
