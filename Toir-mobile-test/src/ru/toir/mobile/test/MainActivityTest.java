@@ -6,6 +6,7 @@ package ru.toir.mobile.test;
 import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Button;
+import android.widget.TextView;
 import ru.toir.mobile.MainActivity;
 
 /**
@@ -32,12 +33,12 @@ public class MainActivityTest extends
 		activity = getActivity();
 	}
 	/**
-	 * проверяем что активити создана и имеет кнопку "Обновить"
+	 * проверяем что активити создана и имеет TextView
 	 */
 	public void testControlCreated() {
 		assertNotNull(activity);
-		Button button;
-		button = (Button) activity.findViewById(ru.toir.mobile.R.id.updateApkButton);
-		assertNotNull(button);
+		TextView textView;
+		textView = (TextView) activity.findViewById(ru.toir.mobile.R.id.textView1);
+		assertNotNull(textView);
 	}
 }
