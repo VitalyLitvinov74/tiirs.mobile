@@ -95,7 +95,23 @@ public class TOiRDBAdapter{
 	public void close(){
 		db.close();
 	}
-	
+
+	/**
+	 * <p>Функция делает новую запись в БД </p>
+	 */
+	public long insert(String table_name, String nullColumnHack, ContentValues values){
+		return db.insert(table_name, null, values);
+	}
+	/**
+	 * <p>Функция удаляет записи из БД</p>
+	 * @param id ид для удаления (0 - все)
+	 * @return int количество удалённых записей
+	 */
+	public int delete(String table_name,  String id_field, long id){
+		if (id==0) return db.delete(table_name, null, null);
+		else return db.delete(table_name, id_field + "=?", new String[]{Long.toString(id)});
+	}
+
 	/**
 	 * <p>Возвращает все записи из таблицы users</p>
 	 * @return Cursor
