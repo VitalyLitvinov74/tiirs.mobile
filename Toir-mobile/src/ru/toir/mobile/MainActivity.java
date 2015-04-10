@@ -25,9 +25,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-
-		TOiRDBAdapter adapter = new TOiRDBAdapter(getApplicationContext());
-		
+		TOiRDBAdapter adapter = new TOiRDBAdapter(getApplicationContext());	
 		adapter.open();
 	
 		Log.d("test", "db.version=" + adapter.getDbVersion());
@@ -36,11 +34,20 @@ public class MainActivity extends Activity {
 			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
+
+			Equipment equip = new Equipment(adapter);
+			Long	equip_id=0L;
+			equip_id=equip.insertEquipment("Метран 300-ПР","doc/metran300pr.pdf",105,2013,"Метран",null,5);
+			Log.d("test", "id оборудования = " + equip_id);
+			Toast toast2 = Toast.makeText(this, "Id оборудования="+ equip_id, Toast.LENGTH_SHORT);
+			toast2.setGravity(Gravity.CENTER, 0, 0);
+			toast2.show();
 		}else {
 			Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
 			
+			//equip.deleteEquipment(equip_id);			
 			Cursor c = adapter.getUsers(1);
 			if(c.moveToFirst()){
 				Log.d("test", c.getString(Users.NAME_COLUMN));
@@ -72,7 +79,6 @@ public class MainActivity extends Activity {
 		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
 		
-
 		RFID rfid = new RFID(new RFIDDriverText());
 		if(rfid.init()){
 			String rfidData= rfid.read();
