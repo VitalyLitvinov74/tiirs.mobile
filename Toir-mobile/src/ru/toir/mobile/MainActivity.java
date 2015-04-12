@@ -1,11 +1,8 @@
 package ru.toir.mobile;
 
 //import android.support.v7.app.ActionBarActivity;
-import java.io.File;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,42 +31,10 @@ public class MainActivity extends Activity {
 			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
-
-			Equipment equip = new Equipment(adapter);
-			Long	equip_id=0L;
-			equip_id=equip.insertEquipment("Метран 300-ПР","doc/metran300pr.pdf",105,2013,"Метран",null,5);
-			Log.d("test", "id оборудования = " + equip_id);
-			Toast toast2 = Toast.makeText(this, "Id оборудования="+ equip_id, Toast.LENGTH_SHORT);
-			toast2.setGravity(Gravity.CENTER, 0, 0);
-			toast2.show();
 		}else {
 			Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
-			
-			//equip.deleteEquipment(equip_id);			
-			Cursor c = adapter.getUsers(1);
-			if(c.moveToFirst()){
-				Log.d("test", c.getString(Users.NAME_COLUMN));
-			}
-			long id = adapter.insertUsers("demon", "demonlogin", "demonpass", 666);
-			if(id !=-1 ){
-				Log.d("test", "id пользоватея = " + id);
-				int ucount = adapter.updateUsers(id, "1", "2", "3", 4);
-				if(ucount == 1){
-					int dcount = adapter.deleteUsers(id);
-					if(dcount == 1){
-						Log.d("test", "пользователь удалён");
-					}else {
-						Log.d("test", "пользователь не удалён!");
-					}
-				}else{
-					Log.d("test", "пользователь не обновлён!");
-				}
-				
-			}else {
-				Log.d("test", "пользователь не создан!");
-			}
 		}
 
 		adapter.close();
