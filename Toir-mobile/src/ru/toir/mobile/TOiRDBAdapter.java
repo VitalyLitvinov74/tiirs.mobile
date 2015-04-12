@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -13,13 +12,14 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * @author koputo
  * <p>Класс для работы с базой данных ТОиР</p>
- *
  */
 public class TOiRDBAdapter{
+	private static final String TAG = "TOiRDBAdapter";
 	/**
 	 * <p>Имя файла базы данных</p>
 	 */
@@ -33,20 +33,37 @@ public class TOiRDBAdapter{
 	private SQLiteDatabase db;
 	
 	// контекст приложения
-	protected Context context;
+	private Context context;
 	
 	// вспомогательный класс для работы с базой
 	private TOiRDbHelper dbHelper;
-
+	
 	/**
 	 * <p>Конструктор адаптера</p>
 	 * @param _context Контекст приложения
 	 */
 	public TOiRDBAdapter(Context context){
-		this.context = context;
-		dbHelper = new TOiRDbHelper(new TOiRDatabaseContext(context), DATABASE_NAME, null, DATABASE_VERSION); 
+		Log.d(TAG, "TOiRDBAdapter()");
+		this.context = new TOiRDatabaseContext(context);
+		dbHelper = new TOiRDbHelper(this.context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 	
+	/**
+	 * <p>Возвращает имя файла базы данных</p>
+	 * @return String
+	 */
+	public static String getDbName() {
+		return DATABASE_NAME;
+	}
+	
+	/**
+	 * <p>Возвращает имя файла базы данных</p>
+	 * @return String
+	 */
+	public String getDbPath(String dbName) {
+		return context.getDatabasePath(dbName).toString();
+	}
+
 	/**
 	 * <p>Возвращает текущую версию базы</p>
 	 * @return int Текущая версия базы
@@ -94,6 +111,7 @@ public class TOiRDBAdapter{
 	 */
 	public void close(){
 		db.close();
+		db = null;
 	}
 
 	/**
@@ -102,6 +120,7 @@ public class TOiRDBAdapter{
 	public long insert(String table_name, String nullColumnHack, ContentValues values){
 		return db.insert(table_name, null, values);
 	}
+
 	/**
 	 * <p>Функция удаляет записи из БД</p>
 	 * @param id ид для удаления (0 - все)
@@ -179,7 +198,7 @@ public class TOiRDBAdapter{
 	 *
 	 */
 	private class TOiRDbHelper extends SQLiteOpenHelper{
-		
+		private static final String TAG = "TOiRDbHelper";
 		private String updatePath = "updatedb";
 		
 		/**
@@ -192,13 +211,13 @@ public class TOiRDBAdapter{
 		public TOiRDbHelper(Context context, String name, CursorFactory factory, int version){
 			super(context, name, factory, version);
 		}
-
+		
 		/**
 		 * <p>Создаёт новую базу данных</p>
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase db){
-			System.out.println("TOiRDbHelper.onCreate: db.version=" + db.getVersion());
+			Log.d(TAG, "TOiRDbHelper.onCreate: db.version=" + db.getVersion());
 			loadAndExecSQLUpdate(db, 0, DATABASE_VERSION);
 		}
 
@@ -207,8 +226,8 @@ public class TOiRDBAdapter{
 		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-			System.out.println("TOiRDbHelper.onUpgrade: db.version=" + db.getVersion());
-			System.out.println("TOiRDbHelper.onUpgrade: oldVersion=" + oldVersion + ", newVersion=" + newVersion);
+			Log.d(TAG, "TOiRDbHelper.onUpgrade: db.version=" + db.getVersion());
+			Log.d(TAG, "TOiRDbHelper.onUpgrade: oldVersion=" + oldVersion + ", newVersion=" + newVersion);
 			loadAndExecSQLUpdate(db, oldVersion, newVersion);
 		}
 		
@@ -237,12 +256,12 @@ public class TOiRDBAdapter{
 							db.execSQL(line);
 						}catch(SQLException e){
 							transactionSuccefful = false;
-							System.out.println(e.toString());
+							Log.d(TAG, e.toString());
 						}
 					}
 				}catch(IOException e){
 					transactionSuccefful = false;
-					System.out.println(e.toString());
+					Log.d(TAG, e.toString());
 				}
 			}
 			if(transactionSuccefful){
