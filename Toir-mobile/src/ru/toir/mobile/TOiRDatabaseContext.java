@@ -31,7 +31,10 @@ public class TOiRDatabaseContext extends ContextWrapper {
 		super(base);
 		try {
 			databasePrefix = ((RenamingDelegatingContext) base).getDatabasePrefix();
-		} catch(Exception e) {
+		} catch(NoClassDefFoundError e) {
+			databasePrefix = "";
+		}
+		catch(Exception e) {
 			databasePrefix = "";
 		}
 	}
