@@ -7,7 +7,6 @@ import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.Users;
 import android.content.Context;
-import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import android.util.Log;
@@ -34,7 +33,7 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка создания "пустого" пользователя 
 	 */
 	public void testCreateEmptyUser() {
-		Users user = new Users();
+		Users user = new Users(adapter);
 		assertEquals(0, user.getId());
 		assertEquals("", user.getName());
 		assertEquals("", user.getLogin());
@@ -46,7 +45,7 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка создания пользователя 
 	 */
 	public void testCreateFilledUser() {
-		Users user = new Users(666, "testName", "testLogin", "testPass", 13);
+		Users user = new Users(adapter, 666, "testName", "testLogin", "testPass", 13);
 		assertEquals(666, user.getId());
 		assertEquals("testName", user.getName());
 		assertEquals("testLogin", user.getLogin());
@@ -66,16 +65,20 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка чтения пользователя из базы
 	 */
 	public void testSelectUser() {
-		Cursor user = adapter.getUsers(1);
-		assertEquals(true, user.moveToFirst());
+		Users user = new Users(adapter, 1);
+		assertEquals(1, user.getId());
 	}
 
 	/**
 	 * проверка записи в таблицу users
 	 */
 	public void testInsertUsers() {
-		long id = adapter.insertUsers("demon", "demonlogin", "demonpass", 666);
-		assertEquals(id, 2);
+		Users user = new Users(adapter);
+		user.setName("demon");
+		user.setLogin("demonlogin");
+		user.setPass("demonpass");
+		user.setType(666);
+		assertEquals(2, user.saveUsers());
 	}
 
 	/**

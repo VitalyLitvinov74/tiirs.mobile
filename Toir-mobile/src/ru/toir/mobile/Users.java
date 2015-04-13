@@ -60,17 +60,16 @@ public class Users {
 	 * <p>Создаёт обект Users, используя данные из базы</p>
 	 * @param id
 	 */
-	public Users(long id) {
+	public Users(TOiRDBAdapter adapter, long id) {
+		this.adapter = adapter;
 		Cursor user = adapter.read(TABLE_NAME, new String[]{ID_NAME, NAME_NAME, LOGIN_NAME, PASS_NAME, TYPE_NAME},
-				ID_NAME + "=?",
-				new String[]{String.valueOf(id)}, null, null, null);
+				ID_NAME + "=?",	new String[]{String.valueOf(id)}, null, null, null);
 		if (user.moveToFirst()) {
 			this.id = id;
 			this.name = user.getString(NAME_COLUMN);
 			this.login = user.getString(LOGIN_COLUMN);
 			this.pass = user.getString(PASS_COLUMN);
 			this.type = user.getInt(TYPE_COLUMN);
-		} else {
 		}
 	}
 
@@ -119,8 +118,9 @@ public class Users {
 	
 	/**
 	 * <p>Метод добавляет новую или обновляет уже существующую запись в базе.</p>
+	 * 
 	 */
-	public void saveUsers() {
+	public long saveUsers() {
 		ContentValues values = new ContentValues();
 		
 		values.put(Users.NAME_NAME, name);
@@ -129,9 +129,11 @@ public class Users {
 		values.put(Users.TYPE_NAME, type);
 		
 		if (this.id == 0) {
-			this.id = adapter.insert(TABLE_NAME, null, values);
+			// возвращаем id
+			return this.id = adapter.insert(TABLE_NAME, null, values);
 		} else {
-			adapter.update(TABLE_NAME, values, ID_NAME + "=?", new String[]{String.valueOf(this.id)});
+			// возвращаем количество обновлённых записей (1 - всё нормально, 0 - запись не найдена)
+			return adapter.update(TABLE_NAME, values, ID_NAME + "=?", new String[]{String.valueOf(this.id)});
 		}
 	}
 	
