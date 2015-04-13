@@ -5,7 +5,6 @@ package ru.toir.mobile.test;
 
 import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Button;
 import android.widget.TextView;
 import ru.toir.mobile.MainActivity;
 
