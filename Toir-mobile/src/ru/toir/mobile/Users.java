@@ -1,5 +1,8 @@
 package ru.toir.mobile;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 /**
  * @author koputo
  * <p>Класс реализует пользователей</p>
@@ -23,10 +26,13 @@ public class Users {
 	public static final String TYPE_NAME = "type";
 	public static final int TYPE_COLUMN = 4;
 	
+	private TOiRDBAdapter adapter;
+	
 	/**
 	 * @return
 	 */
-	public Users(){
+	public Users(TOiRDBAdapter adapter) {
+		this.adapter = adapter;
 		id = 0;
 		name = "";
 		login = "";
@@ -41,7 +47,8 @@ public class Users {
 	 * @param pass
 	 * @param type
 	 */
-	public Users(long id, String name, String login, String pass, int type){
+	public Users(TOiRDBAdapter adapter, long id, String name, String login, String pass, int type) {
+		this.adapter = adapter;
 		this.id = id;
 		this.name = name;
 		this.login = login;
@@ -49,6 +56,85 @@ public class Users {
 		this.type = type;
 	}
 
+	/**
+	 * <p>Создаёт обект Users, используя данные из базы</p>
+	 * @param id
+	 */
+	public Users(long id) {
+		Cursor user = adapter.read(TABLE_NAME, new String[]{ID_NAME, NAME_NAME, LOGIN_NAME, PASS_NAME, TYPE_NAME},
+				ID_NAME + "=?",
+				new String[]{String.valueOf(id)}, null, null, null);
+		if (user.moveToFirst()) {
+			this.id = id;
+			this.name = user.getString(NAME_COLUMN);
+			this.login = user.getString(LOGIN_COLUMN);
+			this.pass = user.getString(PASS_COLUMN);
+			this.type = user.getInt(TYPE_COLUMN);
+		} else {
+		}
+	}
+
+	/**
+	 * <p>Возвращает все записи из таблицы users</p>
+	 * @return Cursor
+	 */
+	public Cursor getUsers() {
+		return adapter.read(TABLE_NAME, new String[]{ID_NAME, NAME_NAME, LOGIN_NAME, PASS_NAME, TYPE_NAME}, null, null, null, null, null);
+	}
+	
+	/**
+	 * <p>Возвращает запись из таблицы users</p>
+	 * @param id
+	 * @return Cursor
+	 */
+	public Cursor getUsers(long id) {
+		return adapter.read(TABLE_NAME, new String[]{ID_NAME, NAME_NAME, LOGIN_NAME, PASS_NAME, TYPE_NAME}, ID_NAME + "=?", new String[]{String.valueOf(id)}, null, null, null);
+	}
+	
+	/**
+	 * <p>Добавляет запись в таблицу users</p>
+	 * @param name
+	 * @param login
+	 * @param pass
+	 * @param type
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public long insertUsers(String name, String login, String pass, int type) {
+		ContentValues values = new ContentValues();
+		values.put(Users.NAME_NAME, name);
+		values.put(Users.LOGIN_NAME, login);
+		values.put(Users.PASS_NAME, pass);
+		values.put(Users.TYPE_NAME, type);
+		return adapter.insert(Users.TABLE_NAME, null, values);
+	}
+	
+	/**
+	 * <p>Удаляет запись</p>
+	 * @param id ид для удаления
+	 * @return int количество удалённых записей
+	 */
+	public int deleteUsers(long id) {
+		return adapter.delete(TABLE_NAME, ID_NAME + "=?", new String[]{String.valueOf(id)});
+	}
+	
+	/**
+	 * <p>Метод добавляет новую или обновляет уже существующую запись в базе.</p>
+	 */
+	public void saveUsers() {
+		ContentValues values = new ContentValues();
+		
+		values.put(Users.NAME_NAME, name);
+		values.put(Users.LOGIN_NAME, login);
+		values.put(Users.PASS_NAME, pass);
+		values.put(Users.TYPE_NAME, type);
+		
+		if (this.id == 0) {
+			this.id = adapter.insert(TABLE_NAME, null, values);
+		} else {
+			adapter.update(TABLE_NAME, values, ID_NAME + "=?", new String[]{String.valueOf(this.id)});
+		}
+	}
+	
 	/**
 	 * @return
 	 */

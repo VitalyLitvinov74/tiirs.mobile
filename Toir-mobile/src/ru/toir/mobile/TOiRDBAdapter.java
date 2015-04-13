@@ -20,6 +20,7 @@ import android.util.Log;
  */
 public class TOiRDBAdapter{
 	private static final String TAG = "TOiRDBAdapter";
+	
 	/**
 	 * <p>Имя файла базы данных</p>
 	 */
@@ -29,13 +30,19 @@ public class TOiRDBAdapter{
 	 */
 	private static final int DATABASE_VERSION = 1;
 	
-	// база приложения
+	/**
+	 * база приложения
+	 */
 	private SQLiteDatabase db;
 	
-	// контекст приложения
+	/**
+	 * контекст приложения
+	 */
 	private Context context;
 	
-	// вспомогательный класс для работы с базой
+	/**
+	 * вспомогательный класс для работы с базой
+	 */
 	private TOiRDbHelper dbHelper;
 	
 	/**
@@ -116,9 +123,12 @@ public class TOiRDBAdapter{
 
 	/**
 	 * <p>Функция делает новую запись в БД </p>
+	 * @param String имя таблицы
+	 * @param String 
+	 * @param ContentValues список значений
 	 */
 	public long insert(String table_name, String nullColumnHack, ContentValues values){
-		return db.insert(table_name, null, values);
+		return db.insert(table_name, nullColumnHack, values);
 	}
 
 	/**
@@ -126,70 +136,47 @@ public class TOiRDBAdapter{
 	 * @param id ид для удаления (0 - все)
 	 * @return int количество удалённых записей
 	 */
-	public int delete(String table_name,  String id_field, long id){
-		if (id==0) return db.delete(table_name, null, null);
-		else return db.delete(table_name, id_field + "=?", new String[]{Long.toString(id)});
-	}
-
 	/**
-	 * <p>Возвращает все записи из таблицы users</p>
-	 * @return Cursor
-	 */
-	public Cursor getUsers(){
-		return db.query(Users.TABLE_NAME, new String[]{Users.ID_NAME, Users.NAME_NAME, Users.LOGIN_NAME, Users.PASS_NAME, Users.TYPE_NAME}, null, null, null, null, null);
-	}
-	
-	/**
-	 * <p>Возвращает запись из таблицы users</p>
-	 * @param id
-	 * @return Cursor
-	 */
-	public Cursor getUsers(int id){
-		return db.query(Users.TABLE_NAME, new String[]{Users.ID_NAME, Users.NAME_NAME, Users.LOGIN_NAME, Users.PASS_NAME, Users.TYPE_NAME}, Users.ID_NAME + "=?", new String[]{Integer.toString(id)}, null, null, null);
-	}
-	
-	/**
-	 * <p>Добавляет запись в таблицу users</p>
-	 * @param name
-	 * @param login
-	 * @param pass
-	 * @param type
-	 * @return long id столбца или -1 если не удалось добавить запись
-	 */
-	public long insertUsers(String name, String login, String pass, int type){
-		ContentValues values = new ContentValues();
-		values.put(Users.NAME_NAME, name);
-		values.put(Users.LOGIN_NAME, login);
-		values.put(Users.PASS_NAME, pass);
-		values.put(Users.TYPE_NAME, type);
-		return db.insert(Users.TABLE_NAME, null, values);
-	}
-	
-	/**
-	 * <p>Удаляет запись</p>
-	 * @param id ид для удаления
+	 * <p>Метод удаляет записи из БД</p>
+	 * <p>Если selection = null то удаляем все записи в таблице</p>
+	 * @param String table
+	 * @param String whereClause
+	 * @param String[] whereArgs
 	 * @return int количество удалённых записей
 	 */
-	public int deleteUsers(long id){
-		return db.delete(Users.TABLE_NAME, Users.ID_NAME + "=?", new String[]{Long.toString(id)});
+	public int delete(String table, String whereClause, String[] whereArgs){
+		if (whereClause == null) {
+			return db.delete(table, null, null);
+		}
+		else {
+			return db.delete(table, whereClause, whereArgs);
+		}
 	}
 	
 	/**
-	 * <p>Обновляет запись в таблице users</p>
-	 * @param id
-	 * @param name
-	 * @param login
-	 * @param pass
-	 * @param type
-	 * @return int количество обновлённых записей
+	 * <p>Метод читает данные из базы по указанных параметрам.</p>
+	 * @param table таблица из которой читаем
+	 * @param columns массив столбцов для выборки
+	 * @param selection условия отбора (можно использовать знак вопроса(?) для замены из списка параметров отбора)
+	 * @param selectionArgs параметры для условий отбора
+	 * @param groupBy группировка
+	 * @param having
+	 * @param orderBy сортировка
+	 * @return
 	 */
-	public int updateUsers(long id, String name, String login, String pass, int type){
-		ContentValues values = new ContentValues();
-		values.put(Users.NAME_NAME, name);
-		values.put(Users.LOGIN_NAME, login);
-		values.put(Users.PASS_NAME, pass);
-		values.put(Users.TYPE_NAME, type);
-		return db.update(Users.TABLE_NAME, values, Users.ID_NAME + "=?", new String[]{Long.toString(id)});
+	public Cursor read(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
+		return db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+	}
+	
+	/**
+	 * @param table
+	 * @param values
+	 * @param whereClause
+	 * @param whereArgs
+	 * @return
+	 */
+	public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
+		return db.update(table, values, whereClause, whereArgs);
 	}
 	
 	/**

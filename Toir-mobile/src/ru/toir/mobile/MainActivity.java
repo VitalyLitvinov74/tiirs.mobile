@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import ru.toir.mobile.rfid.RFID;
-import ru.toir.mobile.rfid.driver.RFIDDriverText;
 
 //public class MainActivity extends ActionBarActivity {
 public class MainActivity extends Activity {
@@ -43,17 +42,6 @@ public class MainActivity extends Activity {
 		Toast toast = Toast.makeText(this, "SERVER API = " + toirServerApi.getVersion(), Toast.LENGTH_SHORT);
 		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
-		
-		RFID rfid = new RFID(new RFIDDriverText());
-		if(rfid.init()){
-			String rfidData= rfid.read();
-			if(rfidData == null){
-				Log.d("test", "Не удалось прочитать содержимое метки!");
-			}else{
-				Log.d("test", "Содержимое метки: " + rfidData);
-			}
-			rfid.close();
-		}
 	}
 	
 	@Override
@@ -83,6 +71,18 @@ public class MainActivity extends Activity {
 		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
 	}
 	
+	public void updateApkOnClick(View view) {
+		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.1.0.apk";
+		//String fileName = "http://apkupdate.lan/download.php";
+		
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		//Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+		//intent.setDataAndType(Uri.parse(fileName), "application/vnd.android.package-archive");
+		intent.setData(Uri.parse(fileName));
+
+		startActivity(intent);
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
