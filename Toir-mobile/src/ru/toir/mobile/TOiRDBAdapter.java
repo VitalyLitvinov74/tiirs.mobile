@@ -16,7 +16,7 @@ import android.util.Log;
 
 /**
  * @author koputo
- * <p>Класс для работы с базой данных ТОиР</p>
+ * <p>Класс для работы создания/обновления базы данных ТОиР</p>
  */
 public class TOiRDBAdapter{
 	private static final String TAG = "TOiRDBAdapter";
@@ -25,6 +25,7 @@ public class TOiRDBAdapter{
 	 * <p>Имя файла базы данных</p>
 	 */
 	private static final String DATABASE_NAME = "toir.db";
+
 	/**
 	 * <p>Версия базы данных с которой работает приложение</p>
 	 */
@@ -52,6 +53,7 @@ public class TOiRDBAdapter{
 	public TOiRDBAdapter(Context context){
 		Log.d(TAG, "TOiRDBAdapter()");
 		this.context = new TOiRDatabaseContext(context);
+		this.context = context;
 		dbHelper = new TOiRDbHelper(this.context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 	
@@ -64,7 +66,7 @@ public class TOiRDBAdapter{
 	}
 	
 	/**
-	 * <p>Возвращает имя файла базы данных</p>
+	 * <p>Возвращает путь и имя файла базы данных</p>
 	 * @return String
 	 */
 	public String getDbPath(String dbName) {
@@ -83,7 +85,7 @@ public class TOiRDBAdapter{
 	 * <p>Возвращает текущую версию базы с которой работет приложение</p>
 	 * @return int Текущая версия базы с которой работает приложение
 	 */
-	public int getAppDbVersion(){
+	public static int getAppDbVersion(){
 		return DATABASE_VERSION;
 	}
 	

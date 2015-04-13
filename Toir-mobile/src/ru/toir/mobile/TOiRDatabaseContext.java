@@ -19,13 +19,16 @@ import android.util.Log;
  * <p>Класс переопределяет контекст для создания и работы базы данных</p>
  */
 public class TOiRDatabaseContext extends ContextWrapper {
-	// в тестах используется префикс для создания файлов 
-	private String databasePrefix;
+	
 	private static final String TAG = "TOiRDatabaseContext";
+	// в тестах используется префикс для создания файлов
+	private String databasePrefix;
 
 	/**
-	 * @param base
-	 * <p>При создании объекта, проверяем на выполнение тестов, в зависимости от этого меняем префикс для базы данных.</p>
+	 * @param base Родительский контекст
+	 * <p>При создании объекта, проверяем родителя объекта, в зависимости от этого меняем префикс для файлов базы данных.</p>
+	 * <p>Это частный случай, так как пока в планах нет необходимости использовать класс RenamingDelegatingContext для работы.
+	 * Используется только в тестах, для переименования базы, чтоб не затирать рабочую.</p>
 	 */
 	public TOiRDatabaseContext(Context base) {
 		super(base);
@@ -40,7 +43,9 @@ public class TOiRDatabaseContext extends ContextWrapper {
 	}
 	
 	/**
-	 * удаляем базу
+	 * <p>Удаляем базу</p>
+	 * <p>В оригинальном методе, удаление реализованно по другому. Сделал как проще на текущий момент.</p>
+	 * @param name Имя базы данных
 	 */
 	@Override
     public boolean deleteDatabase(String name) {
@@ -56,6 +61,7 @@ public class TOiRDatabaseContext extends ContextWrapper {
 	 * @param name
 	 * @param mode
 	 * @param factory
+	 * @since v1
 	 */
 	@Override
 	public SQLiteDatabase openOrCreateDatabase(String name, int mode,
@@ -78,6 +84,7 @@ public class TOiRDatabaseContext extends ContextWrapper {
 	 * @param mode
 	 * @param factory
 	 * @param errorHandler
+	 * @since v11
 	 */
 	@Override
 	public SQLiteDatabase openOrCreateDatabase(String name, int mode,
@@ -89,6 +96,7 @@ public class TOiRDatabaseContext extends ContextWrapper {
 	 * @param name
 	 * <p>Возвращает абсолютный путь к базе данных.</p>
 	 * <p>Сейчас принудительно база создаётся на внешнем накопителе.</p>
+	 * <b>Обязательно реализовать проверку доступности внешнего накопителя!!!!</b>
 	 */
 	@Override
 	public File getDatabasePath(String name) {

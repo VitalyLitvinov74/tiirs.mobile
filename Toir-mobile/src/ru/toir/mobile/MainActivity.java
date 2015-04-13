@@ -20,12 +20,13 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		TOiRDBAdapter adapter = new TOiRDBAdapter(getApplicationContext());	
-		adapter.open();
-	
-		Log.d("test", "db.version=" + adapter.getDbVersion());
 
+		// создаём базу данных, в качестве контекста передаём свой, с переопределёнными путями к базе 
+		TOiRDBAdapter adapter = new TOiRDBAdapter(new TOiRDatabaseContext(getApplicationContext()));	
+		adapter.open();
+		Log.d("test", "db.version=" + adapter.getDbVersion());
+		// эту проверку необходимо перенести в более подходящее место
+		// чтоб в конечном итоге пользователю предлогалось обновить приложение при расхождении версий
 		if(!adapter.isActual()){
 			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
@@ -35,7 +36,6 @@ public class MainActivity extends Activity {
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
 		}
-
 		adapter.close();
 		
 		TOiRServerAPI toirServerApi = new TOiRServerAPI(getApplicationContext());
@@ -66,19 +66,27 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	/**
+	 * Обработчик клика в главную активность приложения 
+	 * @param view
+	 */
 	public void onClick(View view) {
 		Intent rfidRead = new Intent(this, RFIDActivity.class);
 		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
 	}
 	
+	/**
+	 * Обработчик клика кнопки обновления приложения (пока для тестов)
+	 * @param view
+	 */
 	public void updateApkOnClick(View view) {
 		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.1.0.apk";
 		//String fileName = "http://apkupdate.lan/download.php";
 		
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		//Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-		//intent.setDataAndType(Uri.parse(fileName), "application/vnd.android.package-archive");
-		intent.setData(Uri.parse(fileName));
+		intent.setDataAndType(Uri.parse(fileName), "application/vnd.android.package-archive");
+		//intent.setData(Uri.parse(fileName));
 
 		startActivity(intent);
 	}

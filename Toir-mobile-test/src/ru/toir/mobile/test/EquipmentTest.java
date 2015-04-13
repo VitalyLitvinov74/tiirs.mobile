@@ -3,9 +3,9 @@
  */
 package ru.toir.mobile.test;
 
+import ru.toir.mobile.EquipmentDBAdapter;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
-import ru.toir.mobile.UsersDBAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
@@ -14,27 +14,27 @@ import android.util.Log;
 
 /**
  * @author koputo
- * <p>Тестирование адаптера к таблице users</p>
+ * <p>Тестирование адаптера к таблице equipment</p>
  *
  */
-public class UsersTest extends AndroidTestCase {
-	private static final String TAG = "UsersTest";
+public class EquipmentTest extends AndroidTestCase {
+	private static final String TAG = "EquipmentTest";
 	private static final String TEST_FILE_PREFIX = "test_";
-	private UsersDBAdapter adapter;
+	private EquipmentDBAdapter adapter;
 	private Context context;
 	
 	/**
 	 * Конструктор 
 	 */
-	public UsersTest() {
-		Log.d(TAG, "UsersTest()");
+	public EquipmentTest() {
+		Log.d(TAG, "EquipmentTest()");
 	}
 	
 	/**
-	 * проверка создания пользователя 
+	 * проверка создания оборудования 
 	 */
-	public void testCreateUser() {
-		long id = adapter.insertUsers("testName", "testLogin", "testPass", 13);
+	public void testCreateEquipment() {
+		long id = adapter.insertEquipment("testEq", "/files/doc.pdf", 666, 2000, "testManufacturer", "/files/photo/foto.jpg", 13);
 		assertEquals(2, id);
 	}
 	
@@ -46,32 +46,12 @@ public class UsersTest extends AndroidTestCase {
 	}
 
 	/**
-	 * проверка чтения пользователя из базы
+	 * проверка чтения оборудования из базы
 	 */
-	public void testSelectUser() {
-		Cursor user = adapter.getUsers(1);
+	public void testSelectEquipment() {
+		Cursor user = adapter.getEquipment(1);
 		assertEquals(true, user.moveToFirst());
-		assertEquals(1, user.getLong(UsersDBAdapter.FIELD_ID_COLUMN));
-	}
-
-	/**
-	 * проверка удаления базы данных
-	 * 
-	 * тест надуманный, использовался при "постижении" контекстов выполнения приложения
-	 * в тестах базы по факту не нужен
-	 */
-	public void testDeleteDatabase() {
-		// закрываем базу
-		adapter.close();
-		adapter = null;
-		assertEquals(true, context.deleteDatabase(TOiRDBAdapter.getDbName()));
-		
-		// чтобы выполнились последующие тесты, создаём заново базу
-		new TOiRDBAdapter(context).open().close();
-
-		// для того чтобы выполнился tearDown, создаём заново адаптер
-		adapter = new UsersDBAdapter(context);
-		adapter.open();
+		assertEquals(1, user.getLong(EquipmentDBAdapter.FIELD_ID_COLUMN));
 	}
 
 	/* (non-Javadoc)
@@ -96,7 +76,7 @@ public class UsersTest extends AndroidTestCase {
 		new TOiRDBAdapter(context).open().close();
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
-        adapter = new UsersDBAdapter(context);
+        adapter = new EquipmentDBAdapter(context);
 		adapter.open();
 	}
 
