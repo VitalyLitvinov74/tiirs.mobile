@@ -76,10 +76,10 @@ public class MainActivity extends Activity {
 	}
 	
 	/**
-	 * Обработчик клика кнопки обновления приложения (пока для тестов)
+	 * Обработчик клика меню обновления приложения
 	 * @param view
 	 */
-	public void updateApkOnClick(View view) {
+	public void onActionUpdate(MenuItem menuItem) {
 		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.1.0.apk";
 		//String fileName = "http://apkupdate.lan/download.php";
 		
@@ -105,6 +105,8 @@ public class MainActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+			return true;
+		}else if(id == R.id.action_update) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
