@@ -10,11 +10,18 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 import ru.toir.mobile.rfid.RFID;
+import android.widget.AdapterView;
 
 //public class MainActivity extends ActionBarActivity {
 public class MainActivity extends Activity {
+	ListView lv;
+	private static final String TAG = "MainActivity";
+
 	private static final int RETURN_CODE_READ_RFID = 1;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,27 @@ public class MainActivity extends Activity {
 		Toast toast = Toast.makeText(this, "SERVER API = " + toirServerApi.getVersion(), Toast.LENGTH_SHORT);
 		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
+		
+		lv = (ListView)findViewById(R.id.usersListView);
+		lv.setAdapter(new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext())));
+
+		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Log.d(TAG, "position=" + position + ", id=" + id);
+
+				TableRow tr = (TableRow) view;
+				Log.d(TAG, ((TextView)tr.getChildAt(1)).getText().toString());
+				
+				/*
+				UsersDBAdapter udba = (UsersDBAdapter)parent.getAdapter();
+				Users iuser = new Users(0, "jaga", "san", "fuck", 777);
+				udba.insertUsers(iuser);
+				*/
+			}
+		});
 	}
 	
 	@Override
@@ -80,6 +108,7 @@ public class MainActivity extends Activity {
 	 * @param view
 	 */
 	public void onActionUpdate(MenuItem menuItem) {
+
 		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.1.0.apk";
 		//String fileName = "http://apkupdate.lan/download.php";
 		
