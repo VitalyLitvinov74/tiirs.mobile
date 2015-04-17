@@ -28,6 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public DatabaseHelper(Context context, String name, CursorFactory factory,
 			int version) {
 		super(context, name, factory, version);
+		Log.d(TAG, "DatabaseHelper()");
 	}
 
 	/**

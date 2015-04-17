@@ -5,6 +5,7 @@ package ru.toir.mobile.test;
 
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.Users;
 import ru.toir.mobile.UsersDBAdapter;
 import android.content.Context;
 import android.database.Cursor;
@@ -34,7 +35,7 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка создания пользователя 
 	 */
 	public void testCreateUser() {
-		long id = adapter.insertUsers("testName", "testLogin", "testPass", 13);
+		long id = adapter.addItem("testName", "testLogin", "testPass", 13);
 		assertEquals(2, id);
 	}
 	
@@ -48,10 +49,20 @@ public class UsersTest extends AndroidTestCase {
 	/**
 	 * проверка чтения пользователя из базы
 	 */
-	public void testSelectUser() {
-		Cursor user = adapter.getUsers(1);
+	public void testSelectUserById() {
+		long id = 1;
+		Cursor user = adapter.getItem(id);
 		assertEquals(true, user.moveToFirst());
-		assertEquals(1, user.getLong(UsersDBAdapter.FIELD_ID_COLUMN));
+		assertEquals(id, user.getLong(UsersDBAdapter.FIELD_ID_COLUMN));
+	}
+	
+	/**
+	 * проверка чтения пользователя из из курсора
+	 */
+	public void testSelectUserFromCursor() {
+		String name = "admin";
+		Users user = adapter.getItem((int)0);
+		assertEquals(name, user.getName());
 	}
 
 	/**
