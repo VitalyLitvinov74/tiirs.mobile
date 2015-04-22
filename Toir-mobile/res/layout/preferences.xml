@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<PreferenceCategory
+	    android:title="@string/pref_cat_main">
+		<EditTextPreference
+			android:key="updateUrl"
+			android:title="@string/pref_update_url"
+			android:dialogTitle="@string/pref_update_url_dialog_title" />
+		 
+	</PreferenceCategory>
+</PreferenceScreen>

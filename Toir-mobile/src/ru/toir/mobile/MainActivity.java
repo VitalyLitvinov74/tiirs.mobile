@@ -3,8 +3,10 @@ package ru.toir.mobile;
 //import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -108,16 +110,31 @@ public class MainActivity extends Activity {
 	 * @param view
 	 */
 	public void onActionUpdate(MenuItem menuItem) {
-
-		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.1.0.apk";
-		//String fileName = "http://apkupdate.lan/download.php";
 		
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		//Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		
+		// урл по которому забираем файл обновления
+		String updateUrl = sp.getString("updateUrl", "");
+		
+		if (updateUrl.equals("")) {
+			Toast toast = Toast.makeText(this, "Не указан URL для обновления!", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+			return;
+		}
+		
+		// путь для сохранения файла (переписать для выбора пути доступного по "умолчанию")
+		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.apk";
+		
+		Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
 		intent.setDataAndType(Uri.parse(fileName), "application/vnd.android.package-archive");
-		//intent.setData(Uri.parse(fileName));
-
 		startActivity(intent);
+	}
+	
+	public void onActionSettings(MenuItem menuItem) {
+		Log.d(TAG, "onActionSettings");
+		Intent i = new Intent(MainActivity.this, TOiRPreferences.class);
+		startActivity(i);
 	}
 
 	@Override
