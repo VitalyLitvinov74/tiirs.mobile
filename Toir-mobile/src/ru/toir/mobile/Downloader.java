@@ -10,13 +10,17 @@ import java.net.URL;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Downloader extends AsyncTask<String, Integer, String> {
 	
 	ProgressDialog dialog;
 	Context context;
+	File outputFile;
 	
 	public Downloader(Context d) {
 		context = d;
@@ -54,8 +58,8 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 			if (c.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				int fileLength = c.getContentLength();
 				Log.d("test", "fileLength = " + fileLength);
-				File of = new File(params[1]);
-				fos = new FileOutputStream(of);
+				outputFile = new File(params[1]);
+				fos = new FileOutputStream(outputFile);
 				fis = c.getInputStream();
 				
 				byte[] buffer = new byte[1024];
@@ -115,6 +119,14 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
 		dialog.dismiss();
+		if (result == null) {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
+			context.startActivity(intent);
+		} else {
+			Toast.makeText(context, "Ошибка при обновлении!", Toast.LENGTH_LONG).show();
+		}
+
 	}
 	/* (non-Javadoc)
 	 * @see android.os.AsyncTask#onProgressUpdate(Progress[])
