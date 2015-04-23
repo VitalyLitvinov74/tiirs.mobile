@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -13,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 public class Downloader extends AsyncTask<String, Integer, String> {
@@ -25,16 +25,16 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 	public Downloader(Context d) {
 		context = d;
 		dialog = new ProgressDialog(context);
+		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				cancel(true);
+			}
+		});
 		dialog.setMessage("Загрузка обновления");
 		dialog.setIndeterminate(true);
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		dialog.setCancelable(true);
-		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-		    @Override
-		    public void onCancel(DialogInterface dialog) {
-		    	Log.d("test", "onCancel");
-		    }
-		});
+		dialog.setCancelable(false);
 	}
 	
 	/* (non-Javadoc)
@@ -44,35 +44,33 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 	protected String doInBackground(String... params) {
 
 		URL url;
-		HttpURLConnection c = null;
-		FileOutputStream fos = null;
-		InputStream fis = null;
+		HttpURLConnection connection = null;
+		OutputStream outputStream = null;
+		InputStream  inputStream= null;
 		
 		try {
 			url = new URL(params[0]);
-			c = (HttpURLConnection) url.openConnection();
-			c.setRequestMethod("GET");
-			c.setDoOutput(true);
-			c.connect();
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setDoOutput(true);
+			connection.connect();
 			
-			if (c.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				int fileLength = c.getContentLength();
-				Log.d("test", "fileLength = " + fileLength);
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				int fileLength = connection.getContentLength();
 				outputFile = new File(params[1]);
-				fos = new FileOutputStream(outputFile);
-				fis = c.getInputStream();
+				outputStream = new FileOutputStream(outputFile);
+				inputStream = connection.getInputStream();
 				
 				byte[] buffer = new byte[1024];
 				int readLen = 0;
 				long total = 0;
-				while ((readLen = fis.read(buffer)) != -1) {
+				while ((readLen = inputStream.read(buffer)) != -1) {
 					if (isCancelled()) {
-						fis.close();
-						return "Canceled";
+						break;
 					}
 					
 					total += readLen;
-					fos.write(buffer, 0, readLen);
+					outputStream.write(buffer, 0, readLen);
 					
 					if (fileLength > 0) {
 	                    publishProgress((int) (total * 100 / fileLength));
@@ -88,17 +86,16 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 		}
 		finally {
 			try {
-				if (fos != null) {
-					fos.close();
+				if (outputStream != null) {
+					outputStream.close();
 				}
-				if (fis != null) {
-					fis.close();
+				if (inputStream != null) {
+					inputStream.close();
 				}
 			} catch(IOException e) {
-				
 			}
-			if (c != null) {
-				c.disconnect();
+			if (connection != null) {
+				connection.disconnect();
 			}
 		}
 	}
