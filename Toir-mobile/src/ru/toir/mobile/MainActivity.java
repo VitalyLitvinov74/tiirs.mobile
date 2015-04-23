@@ -3,6 +3,8 @@ package ru.toir.mobile;
 //import android.support.v7.app.ActionBarActivity;
 import java.io.File;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -129,9 +131,12 @@ public class MainActivity extends Activity {
 		File file = new File(path);
 		file.mkdirs();
 		File outputFile = new File(path, "Toir-mobile.apk");
-		Downloader d = new Downloader();
-		d.execute(updateUrl, outputFile.toString());
 
+		Downloader d = new Downloader(MainActivity.this);
+		d.execute(updateUrl, outputFile.toString());
+		Log.d("test", "after run Downloader");
+
+		/*
 		String result = null;
 		try {
 			result = d.get();
@@ -145,7 +150,7 @@ public class MainActivity extends Activity {
 		} else {
 			Toast.makeText(getApplicationContext(), "Ошибка при обновлении!", Toast.LENGTH_LONG).show();
 		}
-
+		*/
 	}
 	
 	public void onActionSettings(MenuItem menuItem) {
