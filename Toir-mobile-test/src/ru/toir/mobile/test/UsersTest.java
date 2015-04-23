@@ -5,8 +5,8 @@ package ru.toir.mobile.test;
 
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
-import ru.toir.mobile.Users;
-import ru.toir.mobile.UsersDBAdapter;
+import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.tables.Users;
 import android.content.Context;
 import android.database.Cursor;
 import android.test.AndroidTestCase;

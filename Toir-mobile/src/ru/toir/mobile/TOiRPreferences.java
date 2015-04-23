@@ -23,7 +23,7 @@ public class TOiRPreferences extends Activity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.layout.preferences);
+			addPreferencesFromResource(R.xml.preferences);
 		}
 		
 	}

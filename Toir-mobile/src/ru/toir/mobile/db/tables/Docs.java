@@ -1,4 +1,4 @@
-package ru.toir.mobile;
+package ru.toir.mobile.db.tables;
 /**
  * Класс для работы с документацией, хранящейся на мобильном клиенте 
  */

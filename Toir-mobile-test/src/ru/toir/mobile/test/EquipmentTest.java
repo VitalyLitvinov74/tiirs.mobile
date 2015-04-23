@@ -3,9 +3,9 @@
  */
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.EquipmentDBAdapter;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.test.AndroidTestCase;

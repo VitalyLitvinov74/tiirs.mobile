@@ -1,4 +1,4 @@
-package ru.toir.mobile;
+package ru.toir.mobile.db.tables;
 /**
  * Класс для работы с типами документов
  * Как и все справочники все функции только для чтения 

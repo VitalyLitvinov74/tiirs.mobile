@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.rfid.RFID;
 import android.widget.AdapterView;
 
@@ -78,23 +79,31 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		String msg = null;
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case RETURN_CODE_READ_RFID:
 			if (resultCode == RESULT_OK) {
 				Uri tagData = data.getData();
-				Log.d("test", "Прочитаны данные из метки: " + tagData.toString());
-			}
-			else if (resultCode == RESULT_CANCELED) {
-				Log.d("test", "Чтение метки отменено пользователем!");
-			}
-			else if(resultCode == RFID.RESULT_RFID_READ_ERROR) {
-				Log.d("test", "Не удалось прочитать содержимое метки!");
+				Log.d(TAG, "Прочитаны данные из метки: " + tagData.toString());
+			} else if (resultCode == RESULT_CANCELED) {
+				msg = "Чтение метки отменено пользователем!";
+			} else if(resultCode == RFID.RESULT_RFID_READ_ERROR) {
+				msg = "Не удалось прочитать содержимое метки!";
+			} else if(resultCode == RFID.RESULT_RFID_INIT_ERROR) {
+				msg = "Не удалось инициализировать драйвер считывателя!";
+			} else if(resultCode == RFID.RESULT_RFID_CLASS_NOT_FOUND) {
+				msg = "Не найден драйвер считывателя!";
 			}
 			break;
 
 		default:
+			msg = "Не известный код возврата.";
 			break;
+		}
+		
+		if (msg != null) {
+			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 		}
 	}
 	

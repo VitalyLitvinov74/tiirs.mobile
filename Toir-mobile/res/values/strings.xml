@@ -11,5 +11,9 @@
     <string name="pref_cat_main">Основные</string>
     <string name="pref_update_url">Сервер обновления</string>
     <string name="pref_update_url_dialog_title">Введите URL сервера обновления</string>
+    <string name="pref_server_url">Сервер системы</string>
+    <string name="pref_server_url_dialog_title">Введите URL сервера системы</string>
+    <string name="pref_rfid_driver">Драйвер считывателя RFID</string>
+    
 
 </resources>

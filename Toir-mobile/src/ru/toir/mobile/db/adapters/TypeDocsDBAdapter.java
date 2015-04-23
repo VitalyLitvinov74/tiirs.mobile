@@ -1,5 +1,7 @@
-package ru.toir.mobile;
+package ru.toir.mobile.db.adapters;
 
+import ru.toir.mobile.DatabaseHelper;
+import ru.toir.mobile.TOiRDBAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;

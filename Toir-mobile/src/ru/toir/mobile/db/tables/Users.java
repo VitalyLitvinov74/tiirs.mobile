@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ru.toir.mobile;
+package ru.toir.mobile.db.tables;
 
 /**
  * @author koputo

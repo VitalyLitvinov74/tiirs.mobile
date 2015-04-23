@@ -11,6 +11,8 @@ import ru.toir.mobile.rfid.driver.RFIDDriver;
  */
 public class RFID {
 	public static final int RESULT_RFID_READ_ERROR = android.app.Activity.RESULT_FIRST_USER;
+	public static final int RESULT_RFID_INIT_ERROR = android.app.Activity.RESULT_FIRST_USER + 1;
+	public static final int RESULT_RFID_CLASS_NOT_FOUND = android.app.Activity.RESULT_FIRST_USER + 2;
 	RFIDDriver driver;
 	
 	/**

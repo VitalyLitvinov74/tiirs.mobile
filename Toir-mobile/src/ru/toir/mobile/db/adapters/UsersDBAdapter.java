@@ -1,5 +1,9 @@
-package ru.toir.mobile;
+package ru.toir.mobile.db.adapters;
 
+import ru.toir.mobile.DatabaseHelper;
+import ru.toir.mobile.R;
+import ru.toir.mobile.TOiRDBAdapter;
+import ru.toir.mobile.db.tables.Users;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
