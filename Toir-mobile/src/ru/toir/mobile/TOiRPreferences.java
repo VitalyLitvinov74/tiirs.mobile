@@ -1,10 +1,10 @@
 package ru.toir.mobile;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
-public class TOiRPreferences extends PreferenceActivity {
+public class TOiRPreferences extends Activity {
 
 	/* (non-Javadoc)
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)

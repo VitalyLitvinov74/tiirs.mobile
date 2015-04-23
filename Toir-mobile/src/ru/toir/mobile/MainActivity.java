@@ -1,11 +1,13 @@
 package ru.toir.mobile;
 
 //import android.support.v7.app.ActionBarActivity;
+import java.io.File;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -123,12 +125,27 @@ public class MainActivity extends Activity {
 			return;
 		}
 		
-		// путь для сохранения файла (переписать для выбора пути доступного по "умолчанию")
-		String fileName = "file:///storage/sdcard0/Download/Toir-mobile.apk";
-		
-		Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-		intent.setDataAndType(Uri.parse(fileName), "application/vnd.android.package-archive");
-		startActivity(intent);
+		String path = Environment.getExternalStorageDirectory() + "/Download/";
+		File file = new File(path);
+		file.mkdirs();
+		File outputFile = new File(path, "Toir-mobile.apk");
+		Downloader d = new Downloader();
+		d.execute(updateUrl, outputFile.toString());
+
+		String result = null;
+		try {
+			result = d.get();
+		} catch(Exception e) {
+			
+		}
+		if (result == null) {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
+			startActivity(intent);
+		} else {
+			Toast.makeText(getApplicationContext(), "Ошибка при обновлении!", Toast.LENGTH_LONG).show();
+		}
+
 	}
 	
 	public void onActionSettings(MenuItem menuItem) {
