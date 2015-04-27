@@ -97,13 +97,13 @@ public class UsersTest extends AndroidTestCase {
 		super.setUp();
 		Log.d(TAG, "setUp");
 		
-		// создаём тестовый контекст (в котором используются правильные пути к базе с префиксом к создаваемым файлам)
+		// контекст с переименованием файлов для тестов
 		context = new TOiRDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
 		
-		// удаляем базу
+		// удаляем предыдущую тестовую базу
 		context.deleteDatabase(TOiRDBAdapter.getDbName());
 		
-		// создаём базу
+		// создаём тестовую базу
 		new TOiRDBAdapter(context).open().close();
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
@@ -120,6 +120,5 @@ public class UsersTest extends AndroidTestCase {
 		Log.d(TAG, "tearDown");
 		adapter.close();
 		adapter = null;
-		context.deleteDatabase(TOiRDBAdapter.getDbName());
 	}
 }

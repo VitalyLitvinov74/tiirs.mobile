@@ -1,13 +1,11 @@
 package ru.toir.mobile;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
@@ -15,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachov
  * <p>Класс для работы создания/обновления базы данных ТОиР</p>
  */
 public class TOiRDBAdapter{
@@ -48,11 +46,10 @@ public class TOiRDBAdapter{
 	
 	/**
 	 * <p>Конструктор адаптера</p>
-	 * @param _context Контекст приложения
+	 * @param context Контекст приложения
 	 */
 	public TOiRDBAdapter(Context context){
 		Log.d(TAG, "TOiRDBAdapter()");
-		this.context = new TOiRDatabaseContext(context);
 		this.context = context;
 		dbHelper = new TOiRDbHelper(this.context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -124,64 +121,6 @@ public class TOiRDBAdapter{
 	}
 
 	/**
-	 * <p>Функция делает новую запись в БД </p>
-	 * @param String имя таблицы
-	 * @param String 
-	 * @param ContentValues список значений
-	 */
-	public long insert(String table_name, String nullColumnHack, ContentValues values){
-		return db.insert(table_name, nullColumnHack, values);
-	}
-
-	/**
-	 * <p>Функция удаляет записи из БД</p>
-	 * @param id ид для удаления (0 - все)
-	 * @return int количество удалённых записей
-	 */
-	/**
-	 * <p>Метод удаляет записи из БД</p>
-	 * <p>Если selection = null то удаляем все записи в таблице</p>
-	 * @param String table
-	 * @param String whereClause
-	 * @param String[] whereArgs
-	 * @return int количество удалённых записей
-	 */
-	public int delete(String table, String whereClause, String[] whereArgs){
-		if (whereClause == null) {
-			return db.delete(table, null, null);
-		}
-		else {
-			return db.delete(table, whereClause, whereArgs);
-		}
-	}
-	
-	/**
-	 * <p>Метод читает данные из базы по указанных параметрам.</p>
-	 * @param table таблица из которой читаем
-	 * @param columns массив столбцов для выборки
-	 * @param selection условия отбора (можно использовать знак вопроса(?) для замены из списка параметров отбора)
-	 * @param selectionArgs параметры для условий отбора
-	 * @param groupBy группировка
-	 * @param having
-	 * @param orderBy сортировка
-	 * @return
-	 */
-	public Cursor read(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
-		return db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
-	}
-	
-	/**
-	 * @param table
-	 * @param values
-	 * @param whereClause
-	 * @param whereArgs
-	 * @return
-	 */
-	public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
-		return db.update(table, values, whereClause, whereArgs);
-	}
-	
-	/**
 	 * <p>Вспомогательный класс для работы с базой данных</p>
 	 * @author koputo
 	 *
@@ -192,10 +131,10 @@ public class TOiRDBAdapter{
 		
 		/**
 		 * <p>Конструктор</p>
-		 * @param _context
-		 * @param _name
-		 * @param _factory
-		 * @param _version
+		 * @param context
+		 * @param name
+		 * @param factory
+		 * @param version
 		 */
 		public TOiRDbHelper(Context context, String name, CursorFactory factory, int version){
 			super(context, name, factory, version);
