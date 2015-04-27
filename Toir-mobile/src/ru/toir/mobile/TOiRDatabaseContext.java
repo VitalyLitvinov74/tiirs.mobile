@@ -4,7 +4,6 @@
 package ru.toir.mobile;
 
 import java.io.File;
-
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.DatabaseErrorHandler;
@@ -26,18 +25,19 @@ public class TOiRDatabaseContext extends ContextWrapper {
 
 	/**
 	 * @param base Родительский контекст
-	 * <p>При создании объекта, проверяем родителя объекта, в зависимости от этого меняем префикс для файлов базы данных.</p>
+	 * <p>При создании объекта, проверяем наличие метода getDatabasePrefix из RenamingDelegatingContext,
+	 * если он есть, меняем префикс для файлов базы данных который вернёт этот метод.</p>
 	 * <p>Это частный случай, так как пока в планах нет необходимости использовать класс RenamingDelegatingContext для работы.
 	 * Используется только в тестах, для переименования базы, чтоб не затирать рабочую.</p>
 	 */
 	public TOiRDatabaseContext(Context base) {
 		super(base);
+		
+		Class<?> testClass = base.getClass();
 		try {
+			testClass.getMethod("getDatabasePrefix");
 			databasePrefix = ((RenamingDelegatingContext) base).getDatabasePrefix();
-		} catch(NoClassDefFoundError e) {
-			databasePrefix = "";
-		}
-		catch(Exception e) {
+		} catch(NoSuchMethodException e) {
 			databasePrefix = "";
 		}
 	}
