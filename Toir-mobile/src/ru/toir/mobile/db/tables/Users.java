@@ -14,6 +14,7 @@ public class Users {
 	private String login;
 	private String pass;
 	private int type;
+	private String tag_id;
 
 	/**
 	 * 
@@ -22,12 +23,13 @@ public class Users {
 
 	}
 
-	public Users(long _id, String name, String login, String pass, int type) {
+	public Users(long _id, String name, String login, String pass, int type, String tag_id) {
 		this._id = _id;
 		this.name = name;
 		this.login = login;
 		this.pass = pass;
 		this.type = type;
+		this.tag_id = tag_id;
 	}
 
 	/**
@@ -98,6 +100,27 @@ public class Users {
 	 */
 	public void setType(int type) {
 		this.type = type;
+	}
+
+
+	@Override
+	public String toString() {
+
+		return "_id=" + _id + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id;
+	}
+
+	/**
+	 * @return the tag_id
+	 */
+	public String getTag_id() {
+		return tag_id;
+	}
+
+	/**
+	 * @param tag_id the tag_id to set
+	 */
+	public void setTag_id(String tag_id) {
+		this.tag_id = tag_id;
 	}
 
 }

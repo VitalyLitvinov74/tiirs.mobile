@@ -1,6 +1,5 @@
 package ru.toir.mobile;
 
-//import android.support.v7.app.ActionBarActivity;
 import java.io.File;
 import android.app.Activity;
 import android.content.Intent;
@@ -14,31 +13,47 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rfid.RFID;
-import android.widget.AdapterView;
 
-//public class MainActivity extends ActionBarActivity {
 public class MainActivity extends Activity {
-	ListView lv;
+	
 	private static final String TAG = "MainActivity";
-
 	private static final int RETURN_CODE_READ_RFID = 1;
+	private boolean isLogged = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// инициализация приложения
+		init();
+		
+		// если пользователь не "вошел" в программу, принудительно показываем экран считывания метки
+		if (!isLogged) {
+			startAuthorise();
+		}
+		
+	}
+
+	/**
+	 * Инициализация приложения при запуске
+	 */
+	public void init() {
+		if (!initDB()) {
+			// принудительное обновление приложения
+		}
+	}
+	
+	public boolean initDB() {
+		boolean success = false;
 		// создаём базу данных, в качестве контекста передаём свой, с переопределёнными путями к базе 
 		TOiRDBAdapter adapter = new TOiRDBAdapter(new TOiRDatabaseContext(getApplicationContext()));	
 		adapter.open();
 		Log.d("test", "db.version=" + adapter.getDbVersion());
-		// эту проверку необходимо перенести в более подходящее место
-		// чтоб в конечном итоге пользователю предлогалось обновить приложение при расхождении версий
 		if(!adapter.isActual()){
 			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
@@ -47,44 +62,35 @@ public class MainActivity extends Activity {
 			Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
+			success = true;
 		}
 		adapter.close();
-		
-		TOiRServerAPI toirServerApi = new TOiRServerAPI(getApplicationContext());
-		Toast toast = Toast.makeText(this, "SERVER API = " + toirServerApi.getVersion(), Toast.LENGTH_SHORT);
-		toast.setGravity(Gravity.CENTER, 0, 0);
-		toast.show();
-		
-		lv = (ListView)findViewById(R.id.usersListView);
-		lv.setAdapter(new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext())));
-
-		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.d(TAG, "position=" + position + ", id=" + id);
-
-				TableRow tr = (TableRow) view;
-				Log.d(TAG, ((TextView)tr.getChildAt(1)).getText().toString());
-				
-				/*
-				UsersDBAdapter udba = (UsersDBAdapter)parent.getAdapter();
-				Users iuser = new Users(0, "jaga", "san", "fuck", 777);
-				udba.insertUsers(iuser);
-				*/
-			}
-		});
+		adapter = null;
+		return success;
 	}
 	
+	/**
+	 * 
+	 */
+	public void startAuthorise() {
+		Intent rfidRead = new Intent(this, RFIDActivity.class);
+		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
+	}
+	
+	/**
+	 * 
+	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
 		String msg = null;
+		Uri tagData = null;
+		
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case RETURN_CODE_READ_RFID:
 			if (resultCode == RESULT_OK) {
-				Uri tagData = data.getData();
+				tagData = data.getData();
 				Log.d(TAG, "Прочитаны данные из метки: " + tagData.toString());
 			} else if (resultCode == RESULT_CANCELED) {
 				msg = "Чтение метки отменено пользователем!";
@@ -104,6 +110,21 @@ public class MainActivity extends Activity {
 		
 		if (msg != null) {
 			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+		}
+		
+		if (tagData != null) {
+			// проверяем наличие пользователя в локальной базе
+			String tagId = tagData.toString();
+			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			Users user = users.getUserByTagId(tagId);
+			if (user == null) {
+				startAuthorise();
+			} else {
+				Log.d(TAG, user.toString());
+				isLogged = true;
+			}
+		} else {
+			startAuthorise();
 		}
 	}
 	

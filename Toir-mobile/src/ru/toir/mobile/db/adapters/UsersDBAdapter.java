@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import android.content.ContentValues;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TableRow;
-import android.widget.TextView;
 
 /**
  * @author koputo
@@ -34,6 +32,16 @@ public class UsersDBAdapter extends BaseAdapter {
 	public static final int FIELD_PASS_COLUMN = 3;
 	public static final String FIELD_TYPE_NAME = "type";
 	public static final int FIELD_TYPE_COLUMN = 4;
+	public static final String FIELD_TAGID_NAME = "tag_id";
+	public static final int FIELD_TAGID_COLUMN = 5;
+	
+	String[] columns = {
+			FIELD_ID_NAME,
+			FIELD_NAME_NAME,
+			FIELD_LOGIN_NAME,
+			FIELD_PASS_NAME,
+			FIELD_TYPE_NAME,
+			FIELD_TAGID_NAME};
 	
 	private DatabaseHelper dbHelper;
 	private SQLiteDatabase db;
@@ -67,18 +75,44 @@ public class UsersDBAdapter extends BaseAdapter {
 	public void close() {
 		dbHelper.close();
 	}
+	
+	public Users getUserByLoginAndPass(String login, String pass) {
+		
+		Users user = null;
+		Cursor cur;
+		cur = db.query(TABLE_NAME, columns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
+		if (cur.moveToFirst()) {
+			user = new Users(cur.getLong(FIELD_ID_COLUMN),
+					cur.getString(FIELD_NAME_COLUMN),
+					cur.getString(FIELD_LOGIN_COLUMN),
+					cur.getString(FIELD_PASS_COLUMN),
+					cur.getInt(FIELD_TYPE_COLUMN),
+					cur.getString(FIELD_TAGID_COLUMN));
+		}
+		return user;
+	}
+
+	public Users getUserByTagId(String tagId) {
+		
+		Users user = null;
+		Cursor cur;
+		cur = db.query(TABLE_NAME, columns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
+		if (cur.moveToFirst()) {
+			user = new Users(cur.getLong(FIELD_ID_COLUMN),
+					cur.getString(FIELD_NAME_COLUMN),
+					cur.getString(FIELD_LOGIN_COLUMN),
+					cur.getString(FIELD_PASS_COLUMN),
+					cur.getInt(FIELD_TYPE_COLUMN),
+					cur.getString(FIELD_TAGID_COLUMN));
+		}
+		return user;
+	}
 
 	/**
 	 * <p>Возвращает все записи из таблицы users</p>
 	 * @return Cursor
 	 */
 	public Cursor getAllItems() {
-		String[] columns = {
-				FIELD_ID_NAME,
-				FIELD_NAME_NAME,
-				FIELD_LOGIN_NAME,
-				FIELD_PASS_NAME,
-				FIELD_TYPE_NAME};
 		return db.query(TABLE_NAME, columns, null, null, null, null, null);
 	}
 	
@@ -88,12 +122,6 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getItem(long id) {
-		String[] columns = {
-				FIELD_ID_NAME,
-				FIELD_NAME_NAME,
-				FIELD_LOGIN_NAME,
-				FIELD_PASS_NAME,
-				FIELD_TYPE_NAME};
 		return db.query(TABLE_NAME, columns, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)}, null, null, null);
 	}
 	
@@ -204,7 +232,8 @@ public class UsersDBAdapter extends BaseAdapter {
 					cursor.getString(FIELD_NAME_COLUMN),
 					cursor.getString(FIELD_LOGIN_COLUMN),
 					cursor.getString(FIELD_PASS_COLUMN),
-					cursor.getInt(FIELD_TYPE_COLUMN));
+					cursor.getInt(FIELD_TYPE_COLUMN),
+					cursor.getString(FIELD_TAGID_COLUMN));
 			return user;
 		} else {
 			throw new CursorIndexOutOfBoundsException("Cant move cursor to postion");
@@ -219,7 +248,9 @@ public class UsersDBAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		TableRow row;
+
+		TableRow row = null;
+		/*
 		// список задников для строк в списке
 		int[] background = {R.drawable.fancy_list_background1, R.drawable.fancy_list_background2};
 		
@@ -248,8 +279,8 @@ public class UsersDBAdapter extends BaseAdapter {
 		tv.setText(String.valueOf(getItem(position).getType()));
 		
 		// устанавливаем задник в зависимости от чёт/нечет положения строки в списке
-		row.setBackgroundResource(background[position % background.length]);
-		
+		//row.setBackgroundResource(background[position % background.length]);
+		*/
 		return row;
 	}
 	
@@ -266,7 +297,4 @@ public class UsersDBAdapter extends BaseAdapter {
 		open();
 		cursor = getAllItems();
 	}
-
-
-
 }
