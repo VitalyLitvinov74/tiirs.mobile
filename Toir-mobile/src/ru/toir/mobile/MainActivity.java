@@ -28,6 +28,13 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
+		if ( savedInstanceState!=null ) {
+			isLogged = savedInstanceState.getBoolean("isLogged");
+			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
+		}
+		
 
 		// инициализация приложения
 		init();
@@ -73,6 +80,7 @@ public class MainActivity extends Activity {
 	 * 
 	 */
 	public void startAuthorise() {
+		isLogged = false;
 		Intent rfidRead = new Intent(this, RFIDActivity.class);
 		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
 	}
@@ -189,5 +197,26 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
+	 */
+	/*
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		isLogged = savedInstanceState.getBoolean("isLogged");
+		Log.d(TAG, "onRestoreInstanceState: isLogged=" + isLogged);
+	}
+	*/
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
+		outState.putBoolean("isLogged", isLogged);
 	}
 }

@@ -1,23 +1,26 @@
 package ru.toir.mobile;
 
+import java.io.File;
+
 import ru.toir.mobile.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
 
 /**
- * 
- */
-
-/**
- * @author koputo
+ * @author Dmitriy Logachov
  *
  */
 public class RFIDActivity extends Activity {
@@ -32,6 +35,10 @@ public class RFIDActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.rfid_read);
+	
+	}
+	
+	public void readTagOnClick(View view){
 		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		driverClassName = sp.getString("RFIDDriver", "RFIDDriverNull");
@@ -44,9 +51,6 @@ public class RFIDActivity extends Activity {
 			finish();
 		}
 		
-	}
-	
-	public void readTagOnClick(View view){
 		try{
 			driver = (RFIDDriver)driverClass.newInstance();
 			RFID rfid = new RFID(driver);
@@ -76,5 +80,47 @@ public class RFIDActivity extends Activity {
 		setResult(RESULT_CANCELED);
 		finish();
 	}
+	
+	/**
+	 * Обработчик клика меню обновления приложения
+	 * @param view
+	 */
+	public void onActionUpdate(MenuItem menuItem) {
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		
+		// урл по которому забираем файл обновления
+		String updateUrl = sp.getString("updateUrl", "");
+		
+		if (updateUrl.equals("")) {
+			Toast toast = Toast.makeText(this, "Не указан URL для обновления!", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+			return;
+		}
+		
+		String path = Environment.getExternalStorageDirectory() + "/Download/";
+		File file = new File(path);
+		file.mkdirs();
+		File outputFile = new File(path, "Toir-mobile.apk");
+
+		Downloader d = new Downloader(RFIDActivity.this);
+		d.execute(updateUrl, outputFile.toString());
+	}
+	
+	public void onActionSettings(MenuItem menuItem) {
+		Log.d(TAG, "onActionSettings");
+		Intent i = new Intent(RFIDActivity.this, TOiRPreferences.class);
+		startActivity(i);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+
 
 }
