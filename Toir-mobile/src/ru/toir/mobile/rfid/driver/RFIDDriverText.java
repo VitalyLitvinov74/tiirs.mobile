@@ -62,33 +62,25 @@ public class RFIDDriverText implements RFIDDriver{
 	 */
 	@Override
 	public void getMenu(Menu menu) {
+		String[] tags = {"01234567","0000001","0000002","0000003","0000004"};
+		MenuItem item;
+		int i = 0;
 		
-		MenuItem item = menu.add(0, 0, 1, "Метка 01234567");
-		
-		item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				Log.d("test", "01234567");
-				// отменяем выполнение задачи
-				task.cancel(true);
-				callback.Callback("01234567");
-				return true;
-			}
-		});
-		
-		item = menu.add(0, 0, 1, "Метка 00000001");
-		item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				Log.d("test", "00000001");
-				// отменяем выполнение задачи
-				task.cancel(true);
-				callback.Callback("00000001");
-				return true;
-			}
-		});
+		for (String tag: tags) {
+			item = menu.add(0, i, i + 1, tag);
+			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					String tag = String.valueOf(item.getTitle());
+					Log.d("test", tag);
+					// отменяем выполнение задачи
+					task.cancel(true);
+					callback.Callback(tag);
+					return true;
+				}
+			});
+			i++;
+		}
 	}
 	
 	public class ReadTagAsyncTask extends AsyncTask<String, Integer, String> {

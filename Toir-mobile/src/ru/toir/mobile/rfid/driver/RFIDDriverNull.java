@@ -1,7 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
 import android.view.Menu;
-import android.view.MenuItem;
 
 /**
  * @author koputo
