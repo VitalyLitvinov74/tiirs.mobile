@@ -37,8 +37,6 @@ public class RFIDActivityTest extends
 	public void testControlCreated() {
 		assertNotNull(activity);
 		Button button;
-		button = (Button) activity.findViewById(ru.toir.mobile.R.id.readTagButton);
-		assertNotNull(button);
 		button = (Button) activity.findViewById(ru.toir.mobile.R.id.cancelButton);
 		assertNotNull(button);
 	}
