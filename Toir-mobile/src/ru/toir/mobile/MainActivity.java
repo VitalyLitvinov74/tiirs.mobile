@@ -27,22 +27,22 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		
 		
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
-		if ( savedInstanceState!=null ) {
+		if ( savedInstanceState != null ) {
 			isLogged = savedInstanceState.getBoolean("isLogged");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
 		
-
+		if (isLogged) {
+			setContentView(R.layout.main_layout);
+		} else {
+			setContentView(R.layout.login_layout);
+		}
+		
 		// инициализация приложения
 		init();
-		
-		// если пользователь не "вошел" в программу, принудительно показываем экран считывания метки
-		if (!isLogged) {
-			startAuthorise();
-		}
 		
 	}
 
@@ -126,13 +126,16 @@ public class MainActivity extends Activity {
 			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			Users user = users.getUserByTagId(tagId);
 			if (user == null) {
-				startAuthorise();
+				//startAuthorise();
+				// сообщение о том что войти не удалось
 			} else {
 				Log.d(TAG, user.toString());
 				isLogged = true;
+				setContentView(R.layout.main_layout);
 			}
 		} else {
-			startAuthorise();
+			//startAuthorise();
+			// сообщение о том что войти не удалось
 		}
 	}
 	
@@ -140,7 +143,7 @@ public class MainActivity extends Activity {
 	 * Обработчик клика в главную активность приложения 
 	 * @param view
 	 */
-	public void onClick(View view) {
+	public void onClickLogin(View view) {
 		Intent rfidRead = new Intent(this, RFIDActivity.class);
 		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
 	}
