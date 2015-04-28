@@ -3,7 +3,9 @@
  */
 package ru.toir.mobile.rfid;
 
+import android.view.Menu;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
+import ru.toir.mobile.rfid.driver.TOIRCallback;
 
 /**
  * @author koputo
@@ -26,16 +28,16 @@ public class RFID {
 	 * <p>Инициализация драйвера</p>
 	 * @return boolean
 	 */
-	public boolean init(){
-		return driver.init();
+	public boolean init(TOIRCallback callback){
+		return driver.init(callback);
 	}
 	
 	/**
 	 * <p>Считывание метки</p>
 	 * @return byte[]
 	 */
-	public String read(){
-		return driver.read();
+	public void read(){
+		driver.read();
 	}
 	
 	/**
@@ -52,6 +54,13 @@ public class RFID {
 	 */
 	public void close(){
 		driver.close();
+	}
+	
+	/**
+	 * <p>Меню которое предоставляет драйвер</p>
+	 */
+	public void getMenu(Menu menu) {
+		driver.getMenu(menu);
 	}
 
 }

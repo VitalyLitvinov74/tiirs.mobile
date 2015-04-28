@@ -99,7 +99,11 @@ public class MainActivity extends Activity {
 		case RETURN_CODE_READ_RFID:
 			if (resultCode == RESULT_OK) {
 				tagData = data.getData();
-				Log.d(TAG, "Прочитаны данные из метки: " + tagData.toString());
+				if (tagData == null) {
+					msg = "Данные не получены!";
+				} else {
+					Log.d(TAG, "Прочитаны данные из метки: " + tagData.toString());
+				}
 			} else if (resultCode == RESULT_CANCELED) {
 				msg = "Чтение метки отменено пользователем!";
 			} else if(resultCode == RFID.RESULT_RFID_READ_ERROR) {
@@ -116,26 +120,21 @@ public class MainActivity extends Activity {
 			break;
 		}
 		
+		// что-то пошло не так при считывании метки
 		if (msg != null) {
 			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-		}
-		
-		if (tagData != null) {
+		} else {
 			// проверяем наличие пользователя в локальной базе
 			String tagId = tagData.toString();
 			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			Users user = users.getUserByTagId(tagId);
 			if (user == null) {
-				//startAuthorise();
-				// сообщение о том что войти не удалось
+				Toast.makeText(this, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
 			} else {
 				Log.d(TAG, user.toString());
 				isLogged = true;
 				setContentView(R.layout.main_layout);
 			}
-		} else {
-			//startAuthorise();
-			// сообщение о том что войти не удалось
 		}
 	}
 	

@@ -21,22 +21,12 @@
         android:text="@string/pleasePutTag" />
 
     <Button
-        android:id="@+id/readTagButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="53dp"
-        android:layout_toLeftOf="@+id/pleasePutTag"
-        android:onClick="readTagOnClick"
-        android:text="@string/readTag" />
-
-    <Button
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/readTagButton"
-        android:layout_alignBottom="@+id/readTagButton"
-        android:layout_toRightOf="@+id/progressBar1"
+        android:layout_below="@+id/progressBar1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="54dp"
         android:onClick="cancelOnClick"
         android:text="@string/cancel" />
 

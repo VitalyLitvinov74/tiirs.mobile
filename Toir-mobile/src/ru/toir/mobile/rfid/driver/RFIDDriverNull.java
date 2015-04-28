@@ -1,16 +1,20 @@
 package ru.toir.mobile.rfid.driver;
 
+import android.view.Menu;
+import android.view.MenuItem;
+
 /**
  * @author koputo
  * <p>Драйвер считывателя RFID который ни чего не делает.</p>
  */
 public class RFIDDriverNull implements RFIDDriver{
+
 	/**
 	 * <p>Инициализируем драйвер</p>
 	 * @return
 	 */
 	@Override
-	public boolean init(){
+	public boolean init(TOIRCallback callback){
 		return false;
 	}
 	
@@ -19,8 +23,7 @@ public class RFIDDriverNull implements RFIDDriver{
 	 * @return
 	 */
 	@Override
-	public String read() {
-		return null;
+	public void read() {
 	}
 	
 	/**
@@ -38,6 +41,14 @@ public class RFIDDriverNull implements RFIDDriver{
 	 */
 	@Override
 	public void close() {
+		// TODO Auto-generated method stub
+	}
+
+	/* (non-Javadoc)
+	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#getMenu()
+	 */
+	@Override
+	public void getMenu(Menu menu) {
 		// TODO Auto-generated method stub
 	}
 }
