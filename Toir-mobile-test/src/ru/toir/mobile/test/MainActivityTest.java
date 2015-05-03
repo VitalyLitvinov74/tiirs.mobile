@@ -36,8 +36,10 @@ public class MainActivityTest extends
 	 */
 	public void testControlCreated() {
 		assertNotNull(activity);
+		/*
 		TextView textView;
 		textView = (TextView) activity.findViewById(ru.toir.mobile.R.id.idTextView);
 		assertNotNull(textView);
+		*/
 	}
 }

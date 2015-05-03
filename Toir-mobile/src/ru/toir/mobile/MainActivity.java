@@ -1,13 +1,14 @@
 package ru.toir.mobile;
 
 import java.io.File;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -16,13 +17,16 @@ import android.view.View;
 import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.fragments.PageAdapter;
 import ru.toir.mobile.rfid.RFID;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 	
 	private static final String TAG = "MainActivity";
 	private static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
+	ViewPager viewPager;
+	PageAdapter pageAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +38,10 @@ public class MainActivity extends Activity {
 			isLogged = savedInstanceState.getBoolean("isLogged");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
-		
+
+		Log.d(TAG, "onCreate");
 		if (isLogged) {
-			setContentView(R.layout.main_layout);
+			setMainLayout();
 		} else {
 			setContentView(R.layout.login_layout);
 		}
@@ -133,13 +138,23 @@ public class MainActivity extends Activity {
 			} else {
 				Log.d(TAG, user.toString());
 				isLogged = true;
-				setContentView(R.layout.main_layout);
+				setMainLayout();
 			}
 		}
 	}
 	
 	/**
-	 * Обработчик клика в главную активность приложения 
+	 * Устанавливам основной экран приложения
+	 */
+	void setMainLayout() {
+		setContentView(R.layout.main_layout);
+		viewPager = (ViewPager) findViewById(R.id.pager);
+		pageAdapter = new PageAdapter(getSupportFragmentManager());
+		viewPager.setAdapter(pageAdapter);
+	}
+	
+	/**
+	 * Обработчик клика кнопки "Войти" 
 	 * @param view
 	 */
 	public void onClickLogin(View view) {
