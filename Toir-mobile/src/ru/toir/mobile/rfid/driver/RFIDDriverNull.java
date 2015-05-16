@@ -14,7 +14,7 @@ public class RFIDDriverNull implements RFIDDriver{
 	 */
 	@Override
 	public boolean init(TOIRCallback callback){
-		return false;
+		return true;
 	}
 	
 	/**
