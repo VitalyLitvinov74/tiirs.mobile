@@ -26,6 +26,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 3 :
 			fragment = new RFIDTestFragment();
 			break;
+		case 4 :
+			fragment = new ChartsFragment();
+			break;
 		default :
 			fragment = null;
 			break;
@@ -36,7 +39,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	@Override
 	public int getCount() {
 		// пока три вкладки
-		return 4;
+		return 5;
 	}
 
 	/* (non-Javadoc)
@@ -57,6 +60,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		case 3 :
 			title = "Тест RFID";
+			break;
+		case 4 :
+			title = "Тест графиков";
 			break;
 		default :
 			title = "";
