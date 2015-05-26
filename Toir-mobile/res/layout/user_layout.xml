@@ -18,7 +18,7 @@
             android:layout_height="30dp"
             android:background="@color/black" >
 
-            <EditText
+            <TextView
                 android:id="@+id/editText1"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
@@ -95,6 +95,29 @@
                             android:layout_height="wrap_content" >
 
                             <TableRow
+                                android:id="@+id/TableRow08"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:background="@color/black" >
+
+                                <ImageView
+                                    android:id="@+id/ImageView04"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/forbidden_32" />
+
+                                <TextView
+                                    android:id="@+id/TextView01"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:paddingTop="1dp"
+                                    android:text="Старый наряд: выполнен 10-12-2014 01:11"
+                                    android:textSize="12sp" />
+                            </TableRow>
+
+                            <TableRow
                                 android:id="@+id/TableRow03"
                                 android:layout_width="wrap_content"
                                 android:layout_height="fill_parent"
@@ -108,7 +131,7 @@
                                     android:layout_gravity="center"
                                     android:src="@drawable/checkmark_32" />
 
-                                <EditText
+                                <TextView
                                     android:id="@+id/EditText03"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -131,7 +154,7 @@
                                     android:layout_gravity="center"
                                     android:src="@drawable/forbidden_32" />
 
-                                <EditText
+                                <TextView
                                     android:id="@+id/EditText02"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -155,7 +178,7 @@
                                     android:layout_gravity="center"
                                     android:src="@drawable/information_32" />
 
-                                <EditText
+                                <TextView
                                     android:id="@+id/EditText01"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -179,7 +202,7 @@
                                     android:layout_gravity="center"
                                     android:src="@drawable/checkmark_32" />
 
-                                <EditText
+                                <TextView
                                     android:id="@+id/editText5"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -189,7 +212,29 @@
                                     android:textSize="12sp" />
 
                             </TableRow>
-                        </TableLayout>
+                            <TableRow
+                                android:id="@+id/tableRow23"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:background="@color/black" >
+
+                                <ImageView
+                                    android:id="@+id/imageView22"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/error_32" />
+
+                                <TextView
+                                    android:id="@+id/editText25"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:paddingTop="1dp"
+                                    android:text="Старый наряд: выполнен 10-12-2014 01:11"
+                                    android:textSize="12sp" />
+                            </TableRow>                            
+                         </TableLayout>
 
                     </LinearLayout>
 
@@ -211,7 +256,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="1dp"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    android:background="@color/black" >
 
                     <TableRow
                         android:id="@+id/TableRow07"
@@ -220,7 +266,7 @@
                         android:background="@color/black"
                         android:gravity="top" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/EditText07"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -238,7 +284,7 @@
                         android:background="@color/black"
                         android:gravity="top" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/EditText06"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -255,7 +301,7 @@
                         android:background="@color/black"
                         android:gravity="top" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/EditText05"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -274,13 +320,12 @@
                         android:background="@color/black"
                         android:gravity="top" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/EditText04"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@color/black"
                             android:text="Текущий статус: задание"
-                            android:textAllCaps="false"
                             android:textSize="12sp" />
                     </TableRow>
 
@@ -292,7 +337,7 @@
                         android:background="@color/black"
                         android:gravity="top" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/editText3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -315,18 +360,15 @@
                         android:layout_height="wrap_content"
                         android:background="@color/black" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/editText6"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@color/black"
                             android:text="Текущие координаты:"
-                            android:textSize="12sp" >
+                            android:textSize="12sp" />
 
-                            <requestFocus />
-                        </EditText>
-
-                        <EditText
+                        <TextView
                             android:id="@+id/editText7"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -342,7 +384,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/black" >
 
-                        <EditText
+                        <TextView
                             android:id="@+id/EditText08"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -352,7 +394,7 @@
                             android:textAllCaps="false"
                             android:textSize="12sp" />
 
-                        <EditText
+                        <TextView
                             android:id="@+id/editText8"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
