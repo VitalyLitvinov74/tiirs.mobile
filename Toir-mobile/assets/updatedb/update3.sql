@@ -1,8 +1,10 @@
 drop table if exists 'users';
 create table 'users' ('uuid' text not null primary key, 'name' TEXT, 'login' TEXT, 'pass' TEXT, 'type' INTEGER, 'tag_id' TEXT NOT NULL UNIQUE);
 insert into 'users' values ('4462ed77-9bf0-4542-b127-f4ecefce49da', 'admin', 'admin', 'admin', 3, '01234567');
+drop table if exists 'tasks_status';
 drop table if exists 'task_status';
 create table 'task_status' ('uuid' text not null primary key, 'title' text not null);
+drop table if exists 'tasks';
 drop table if exists 'task';
 create table 'task' ('uuid' text not null primary key, 'user_uuid' text not null, 'create_date' text not null, 'modify_date' text not null, 'close_date' text not null default '0000-00-00 00:00:00', 'task_status_uuid' text not null);
 drop table if exists 'priority';
