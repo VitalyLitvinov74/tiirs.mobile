@@ -35,8 +35,8 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка создания пользователя 
 	 */
 	public void testCreateUser() {
-		long id = adapter.addItem("testName", "testLogin", "testPass", 13);
-		assertEquals(2, id);
+		long id = adapter.addItem("4462ed77-9bf0-4542-b127-f4ecefce49da", "testName", "testLogin", "testPass", 13);
+		assertEquals(-1, id);
 	}
 	
 	/**
@@ -50,10 +50,10 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка чтения пользователя из базы
 	 */
 	public void testSelectUserById() {
-		long id = 1;
-		Cursor user = adapter.getItem(id);
+		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+		Cursor user = adapter.getItem(uuid);
 		assertEquals(true, user.moveToFirst());
-		assertEquals(id, user.getLong(UsersDBAdapter.FIELD_ID_COLUMN));
+		assertEquals(uuid, user.getString(user.getColumnIndex(UsersDBAdapter.FIELD_UUID_NAME)));
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class UsersTest extends AndroidTestCase {
 	 */
 	public void testSelectUserFromCursor() {
 		String name = "admin";
-		Users user = adapter.getItem((int)0);
+		Users user = adapter.getItem(1);
 		assertEquals(name, user.getName());
 	}
 

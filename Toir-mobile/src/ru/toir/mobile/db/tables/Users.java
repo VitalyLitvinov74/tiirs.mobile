@@ -9,7 +9,7 @@ package ru.toir.mobile.db.tables;
  */
 public class Users {
 	
-	private long _id;
+	private String uuid;
 	private String name;
 	private String login;
 	private String pass;
@@ -23,8 +23,8 @@ public class Users {
 
 	}
 
-	public Users(long _id, String name, String login, String pass, int type, String tag_id) {
-		this._id = _id;
+	public Users(String uuid, String name, String login, String pass, int type, String tag_id) {
+		this.uuid = uuid;
 		this.name = name;
 		this.login = login;
 		this.pass = pass;
@@ -33,17 +33,17 @@ public class Users {
 	}
 
 	/**
-	 * @return the _id
+	 * @return the uuid
 	 */
-	public long get_id() {
-		return _id;
+	public String getUuid() {
+		return uuid;
 	}
 
 	/**
 	 * @param _id the _id to set
 	 */
-	public void set_id(long _id) {
-		this._id = _id;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class Users {
 	@Override
 	public String toString() {
 
-		return "_id=" + _id + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id;
+		return "uuid=" + uuid + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id;
 	}
 
 	/**

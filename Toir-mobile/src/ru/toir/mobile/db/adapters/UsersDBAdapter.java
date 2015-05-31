@@ -6,37 +6,29 @@ import ru.toir.mobile.db.tables.Users;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TableRow;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachov
  * <p>Класс адаптера к таблице users</p>
  *
  */
 public class UsersDBAdapter extends BaseAdapter {
 	public static final String TABLE_NAME = "users";
 	
-	public static final String FIELD_ID_NAME = "_id";
-	public static final int FIELD_ID_COLUMN = 0;
+	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_NAME_NAME = "name";
-	public static final int FIELD_NAME_COLUMN = 1;
 	public static final String FIELD_LOGIN_NAME = "login";
-	public static final int FIELD_LOGIN_COLUMN = 2;
 	public static final String FIELD_PASS_NAME = "pass";
-	public static final int FIELD_PASS_COLUMN = 3;
 	public static final String FIELD_TYPE_NAME = "type";
-	public static final int FIELD_TYPE_COLUMN = 4;
 	public static final String FIELD_TAGID_NAME = "tag_id";
-	public static final int FIELD_TAGID_COLUMN = 5;
 	
 	String[] columns = {
-			FIELD_ID_NAME,
+			FIELD_UUID_NAME,
 			FIELD_NAME_NAME,
 			FIELD_LOGIN_NAME,
 			FIELD_PASS_NAME,
@@ -82,12 +74,12 @@ public class UsersDBAdapter extends BaseAdapter {
 		Cursor cur;
 		cur = db.query(TABLE_NAME, columns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
 		if (cur.moveToFirst()) {
-			user = new Users(cur.getLong(FIELD_ID_COLUMN),
-					cur.getString(FIELD_NAME_COLUMN),
-					cur.getString(FIELD_LOGIN_COLUMN),
-					cur.getString(FIELD_PASS_COLUMN),
-					cur.getInt(FIELD_TYPE_COLUMN),
-					cur.getString(FIELD_TAGID_COLUMN));
+			user = new Users(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_NAME_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_LOGIN_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_PASS_NAME)),
+					cur.getInt(cur.getColumnIndex(FIELD_TYPE_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)));
 		}
 		return user;
 	}
@@ -98,12 +90,12 @@ public class UsersDBAdapter extends BaseAdapter {
 		Cursor cur;
 		cur = db.query(TABLE_NAME, columns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
 		if (cur.moveToFirst()) {
-			user = new Users(cur.getLong(FIELD_ID_COLUMN),
-					cur.getString(FIELD_NAME_COLUMN),
-					cur.getString(FIELD_LOGIN_COLUMN),
-					cur.getString(FIELD_PASS_COLUMN),
-					cur.getInt(FIELD_TYPE_COLUMN),
-					cur.getString(FIELD_TAGID_COLUMN));
+			user = new Users(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_NAME_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_LOGIN_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_PASS_NAME)),
+					cur.getInt(cur.getColumnIndex(FIELD_TYPE_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)));
 		}
 		return user;
 	}
@@ -121,8 +113,8 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @param id
 	 * @return Cursor
 	 */
-	public Cursor getItem(long id) {
-		return db.query(TABLE_NAME, columns, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)}, null, null, null);
+	public Cursor getItem(String id) {
+		return db.query(TABLE_NAME, columns, FIELD_UUID_NAME + "=?", new String[]{id}, null, null, null);
 	}
 	
 	/**
@@ -133,9 +125,10 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @param type
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long addItem(String name, String login, String pass, int type) {
+	public long addItem(String uuid, String name, String login, String pass, int type) {
 		long id;
 		ContentValues values = new ContentValues();
+		values.put(UsersDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(UsersDBAdapter.FIELD_NAME_NAME, name);
 		values.put(UsersDBAdapter.FIELD_LOGIN_NAME, login);
 		values.put(UsersDBAdapter.FIELD_PASS_NAME, pass);
@@ -153,6 +146,7 @@ public class UsersDBAdapter extends BaseAdapter {
 	public long addItem(Users user) {
 		long id;
 		ContentValues values = new ContentValues();
+		values.put(UsersDBAdapter.FIELD_UUID_NAME, user.getUuid());
 		values.put(FIELD_NAME_NAME, user.getName());
 		values.put(FIELD_LOGIN_NAME, user.getLogin());
 		values.put(FIELD_PASS_NAME, user.getPass());
@@ -178,9 +172,9 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @param id ид для удаления
 	 * @return boolean
 	 */
-	public boolean removeItem(long id) {
+	public boolean removeItem(String uuid) {
 		boolean isDeleted;
-		isDeleted = db.delete(TABLE_NAME, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)}) > 0;
+		isDeleted = db.delete(TABLE_NAME, FIELD_UUID_NAME + "=?", new String[]{uuid}) > 0;
 		refresh();
 		return isDeleted;
 	}
@@ -194,7 +188,7 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @param type
 	 * @return boolean
 	 */
-	public boolean updateItem(long id, String name, String login, String pass, int type) {
+	public boolean updateItem(String uuid, String name, String login, String pass, int type) {
 		ContentValues values = new ContentValues();
 		boolean isUpdated;
 		
@@ -203,7 +197,7 @@ public class UsersDBAdapter extends BaseAdapter {
 		values.put(FIELD_PASS_NAME, pass);
 		values.put(FIELD_TYPE_NAME, type);
 		
-		isUpdated = db.update(TABLE_NAME, values, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)}) > 0;
+		isUpdated = db.update(TABLE_NAME, values, FIELD_UUID_NAME + "=?", new String[]{uuid}) > 0;
 		return isUpdated;
 	}
 	
@@ -216,7 +210,7 @@ public class UsersDBAdapter extends BaseAdapter {
 		values.put(FIELD_PASS_NAME, user.getPass());
 		values.put(FIELD_TYPE_NAME, user.getType());
 		
-		isUpdated = db.update(TABLE_NAME, values, FIELD_ID_NAME + "=?", new String[]{String.valueOf(user.get_id())}) > 0;
+		isUpdated = db.update(TABLE_NAME, values, FIELD_UUID_NAME + "=?", new String[]{user.getUuid()}) > 0;
 		return isUpdated;
 	}
 
@@ -227,61 +221,17 @@ public class UsersDBAdapter extends BaseAdapter {
 
 	@Override
 	public Users getItem(int position) {
-		if (cursor.moveToPosition(position)) {
-			Users user = new Users(cursor.getLong(FIELD_ID_COLUMN),
-					cursor.getString(FIELD_NAME_COLUMN),
-					cursor.getString(FIELD_LOGIN_COLUMN),
-					cursor.getString(FIELD_PASS_COLUMN),
-					cursor.getInt(FIELD_TYPE_COLUMN),
-					cursor.getString(FIELD_TAGID_COLUMN));
-			return user;
-		} else {
-			throw new CursorIndexOutOfBoundsException("Cant move cursor to postion");
-		}
+		return null;
 	}
 
 	@Override
 	public long getItemId(int position) {
-		Users usersOnPosition = getItem(position);
-		return usersOnPosition.get_id();
+		return position;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-
-		TableRow row = null;
-		/*
-		// список задников для строк в списке
-		int[] background = {R.drawable.fancy_list_background1, R.drawable.fancy_list_background2};
-		
-		if (convertView == null) {
-			row = (TableRow) View.inflate(context, R.layout.user_item, null);
-		} else {
-			row = (TableRow) convertView;
-		}
-		
-		// достаём из row textedit'ы и устанавливаем для них значения
-		TextView tv;
-		
-		tv = (TextView)row.getChildAt(FIELD_ID_COLUMN);
-		tv.setText(String.valueOf(getItem(position).get_id()));
-		
-		tv = (TextView)row.getChildAt(FIELD_NAME_COLUMN);
-		tv.setText(getItem(position).getName());
-		
-		tv = (TextView)row.getChildAt(FIELD_LOGIN_COLUMN);
-		tv.setText(getItem(position).getLogin());
-		
-		tv = (TextView)row.getChildAt(FIELD_PASS_COLUMN);
-		tv.setText(getItem(position).getPass());
-		
-		tv = (TextView)row.getChildAt(FIELD_TYPE_COLUMN);
-		tv.setText(String.valueOf(getItem(position).getType()));
-		
-		// устанавливаем задник в зависимости от чёт/нечет положения строки в списке
-		//row.setBackgroundResource(background[position % background.length]);
-		*/
-		return row;
+		return null;
 	}
 	
 	private void refresh() {
