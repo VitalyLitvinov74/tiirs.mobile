@@ -15,6 +15,7 @@ public class Users {
 	private String pass;
 	private int type;
 	private String tag_id;
+	private boolean active;
 
 	/**
 	 * 
@@ -23,13 +24,14 @@ public class Users {
 
 	}
 
-	public Users(String uuid, String name, String login, String pass, int type, String tag_id) {
+	public Users(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
 		this.uuid = uuid;
 		this.name = name;
 		this.login = login;
 		this.pass = pass;
 		this.type = type;
 		this.tag_id = tag_id;
+		this.active = active;
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class Users {
 	@Override
 	public String toString() {
 
-		return "uuid=" + uuid + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id;
+		return "uuid=" + uuid + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id + ", active=" + active;
 	}
 
 	/**
@@ -121,6 +123,20 @@ public class Users {
 	 */
 	public void setTag_id(String tag_id) {
 		this.tag_id = tag_id;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

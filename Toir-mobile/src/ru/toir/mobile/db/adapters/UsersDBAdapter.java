@@ -26,6 +26,7 @@ public class UsersDBAdapter extends BaseAdapter {
 	public static final String FIELD_PASS_NAME = "pass";
 	public static final String FIELD_TYPE_NAME = "type";
 	public static final String FIELD_TAGID_NAME = "tag_id";
+	public static final String FIELD_ACTIVE_NAME = "active";
 	
 	String[] columns = {
 			FIELD_UUID_NAME,
@@ -79,7 +80,8 @@ public class UsersDBAdapter extends BaseAdapter {
 					cur.getString(cur.getColumnIndex(FIELD_LOGIN_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_PASS_NAME)),
 					cur.getInt(cur.getColumnIndex(FIELD_TYPE_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)));
+					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)),
+					(cur.getInt(cur.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
 		}
 		return user;
 	}
@@ -95,7 +97,8 @@ public class UsersDBAdapter extends BaseAdapter {
 					cur.getString(cur.getColumnIndex(FIELD_LOGIN_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_PASS_NAME)),
 					cur.getInt(cur.getColumnIndex(FIELD_TYPE_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)));
+					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)),
+					(cur.getInt(cur.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
 		}
 		return user;
 	}
@@ -138,6 +141,42 @@ public class UsersDBAdapter extends BaseAdapter {
 		return id;
 	}
 	
+	/**
+	 * <p>Добавляет/изменяет запись в таблице users</p>
+	 * @param name
+	 * @param login
+	 * @param pass
+	 * @param type
+	 * @param tag_id
+	 * @param active
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public long replaceItem(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
+		long id;
+		ContentValues values = new ContentValues();
+		values.put(UsersDBAdapter.FIELD_UUID_NAME, uuid);
+		values.put(UsersDBAdapter.FIELD_NAME_NAME, name);
+		values.put(UsersDBAdapter.FIELD_LOGIN_NAME, login);
+		values.put(UsersDBAdapter.FIELD_PASS_NAME, pass);
+		values.put(UsersDBAdapter.FIELD_TYPE_NAME, type);
+		values.put(UsersDBAdapter.FIELD_TAGID_NAME, tag_id);
+		values.put(UsersDBAdapter.FIELD_ACTIVE_NAME, active);
+		id  = db.replace(UsersDBAdapter.TABLE_NAME, null, values);
+		refresh();
+		return id;
+	}
+	
+	/**
+	 * <p>Добавляет/изменяет запись в таблице users</p>
+	 * @param user
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public long replaceItem(Users user) {
+		long id  = replaceItem(user.getUuid(), user.getName(), user.getLogin(), user.getPass(), user.getType(), user.getTag_id(), user.isActive());
+		refresh();
+		return id;
+	}
+
 	/**
 	 * <p>Добавляет запись в таблицу users</p>
 	 * @param user Users
