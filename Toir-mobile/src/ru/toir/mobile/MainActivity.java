@@ -32,7 +32,6 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
 		if ( savedInstanceState != null ) {
 			isLogged = savedInstanceState.getBoolean("isLogged");

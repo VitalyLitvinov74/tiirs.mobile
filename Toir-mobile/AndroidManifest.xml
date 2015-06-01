@@ -36,6 +36,7 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
         </activity>
+        <service android:name=".rest.ProcessorService"></service>
     </application>
 
 </manifest>

@@ -1,6 +1,6 @@
 drop table if exists 'users';
 create table 'users' ('uuid' text not null primary key, 'name' TEXT, 'login' TEXT, 'pass' TEXT, 'type' INTEGER, 'tag_id' TEXT NOT NULL UNIQUE, 'active' integer not null default 0);
-insert into 'users' values ('4462ed77-9bf0-4542-b127-f4ecefce49da', 'admin', 'admin', 'admin', 3, '01234567');
+insert into 'users' values ('4462ed77-9bf0-4542-b127-f4ecefce49da', 'admin', 'admin', 'admin', 3, '01234567', 1);
 drop table if exists 'tasks_status';
 drop table if exists 'task_status';
 create table 'task_status' ('uuid' text not null primary key, 'title' text not null);

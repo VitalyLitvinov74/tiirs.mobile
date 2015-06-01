@@ -5,12 +5,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+
+/**
+ * @author Dmitriy Logachov
+ *
+ */
 
 public class UsersProcessor {
 	private Context mContext;
@@ -23,7 +30,7 @@ public class UsersProcessor {
 	public boolean GetUser(Bundle bundle) {
 		// TODO обернуть всё в один try/catch
 		URI requestUri = null;
-		String tag = bundle.getString("tag");
+		String tag = bundle.getString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG);
 		String jsonString = null;
 		JSONObject jsonArray = null;
 		try {
@@ -61,8 +68,8 @@ public class UsersProcessor {
 				user.setPass(value.getString(UsersDBAdapter.FIELD_PASS_NAME));
 				user.setType(value.getInt(UsersDBAdapter.FIELD_TYPE_NAME));
 				user.setTag_id(value.getString(UsersDBAdapter.FIELD_TAGID_NAME));
-				user.setActive(value.getBoolean(UsersDBAdapter.FIELD_ACTIVE_NAME));
-				UsersDBAdapter adapter = new UsersDBAdapter(mContext);
+				user.setActive(value.getInt(UsersDBAdapter.FIELD_ACTIVE_NAME) == 0 ? false : true);
+				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
 				adapter.replaceItem(user);
 
 			} catch (JSONException e) {
