@@ -24,6 +24,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="200"
                 android:ems="10"
+                android:gravity="center_vertical|center_horizontal"
                 android:minHeight="20dp"
                 android:text="Информация о пользователе"
                 android:textSize="14sp" />

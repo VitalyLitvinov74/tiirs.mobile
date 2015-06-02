@@ -32,7 +32,6 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
 		if ( savedInstanceState != null ) {
 			isLogged = savedInstanceState.getBoolean("isLogged");
@@ -98,7 +97,6 @@ public class MainActivity extends FragmentActivity {
 		
 		String msg = null;
 		Uri tagData = null;
-		Toast.makeText(this, "onActivityResult", Toast.LENGTH_SHORT);		
 		
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
@@ -161,7 +159,6 @@ public class MainActivity extends FragmentActivity {
 	public void onClickLogin(View view) {
 		Intent rfidRead = new Intent(this, RFIDActivity.class);
 		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
-		Toast.makeText(this, "База", Toast.LENGTH_SHORT);
 	}
 	
 	/**

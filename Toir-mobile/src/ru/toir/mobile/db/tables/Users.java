@@ -9,12 +9,13 @@ package ru.toir.mobile.db.tables;
  */
 public class Users {
 	
-	private long _id;
+	private String uuid;
 	private String name;
 	private String login;
 	private String pass;
 	private int type;
 	private String tag_id;
+	private boolean active;
 
 	/**
 	 * 
@@ -23,27 +24,28 @@ public class Users {
 
 	}
 
-	public Users(long _id, String name, String login, String pass, int type, String tag_id) {
-		this._id = _id;
+	public Users(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
+		this.uuid = uuid;
 		this.name = name;
 		this.login = login;
 		this.pass = pass;
 		this.type = type;
 		this.tag_id = tag_id;
+		this.active = active;
 	}
 
 	/**
-	 * @return the _id
+	 * @return the uuid
 	 */
-	public long get_id() {
-		return _id;
+	public String getUuid() {
+		return uuid;
 	}
 
 	/**
 	 * @param _id the _id to set
 	 */
-	public void set_id(long _id) {
-		this._id = _id;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class Users {
 	@Override
 	public String toString() {
 
-		return "_id=" + _id + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id;
+		return "uuid=" + uuid + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id + ", active=" + active;
 	}
 
 	/**
@@ -121,6 +123,20 @@ public class Users {
 	 */
 	public void setTag_id(String tag_id) {
 		this.tag_id = tag_id;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }
