@@ -14,7 +14,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int arg0) {
 		Fragment fragment;
 		switch (arg0) {
-		case 0 :
+		case 5 :
 			fragment = new UserInfoFragment();
 			break;
 		case 1 :
@@ -22,6 +22,15 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		case 2 :
 			fragment = new ReferenceFragment();
+			break;
+		case 3 :
+			fragment = new RFIDTestFragment();
+			break;
+		case 4 :
+			fragment = new ChartsFragment();
+			break;
+		case 0 :
+			fragment = new GPSFragment();
 			break;
 		default :
 			fragment = null;
@@ -33,7 +42,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	@Override
 	public int getCount() {
 		// пока три вкладки
-		return 3;
+		return 6;
 	}
 
 	/* (non-Javadoc)
@@ -43,7 +52,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
 		CharSequence title;
 		switch (position) {
-		case 0 :
+		case 5 :
 			title = "Информация о пользователе";
 			break;
 		case 1 :
@@ -51,6 +60,15 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		case 2 :
 			title = "Справочники";
+			break;
+		case 3 :
+			title = "Тест RFID";
+			break;
+		case 4 :
+			title = "Тест графиков";
+			break;
+		case 0 :
+			title = "Тест GPS";
 			break;
 		default :
 			title = "";

@@ -3,11 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/textView1"
+        <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Список нарядов"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" >
 
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@color/black" >
+
+            <TextView
+                android:id="@+id/editText1"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="200"
+                android:ems="10"
+                android:gravity="center_vertical|center_horizontal"
+                android:minHeight="18dp"
+                android:paddingBottom="0dp"
+                android:paddingTop="0dp"
+                android:text="Информация о нарядах"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/button1"
+                style="@color/orange"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button2"
+                android:minHeight="20dp"
+                android:minWidth="54dip"
+                android:text="Сервис"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/button2"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button3"
+                android:minHeight="20dp"
+                android:text="Помощь"
+                android:textSize="12sp" />
+        </TableRow>
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brown" >
+
+        </ListView>
+       
+        </TableLayout>
 </RelativeLayout>

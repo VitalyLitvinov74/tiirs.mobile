@@ -131,7 +131,9 @@ public class MainActivity extends FragmentActivity {
 			// проверяем наличие пользователя в локальной базе
 			String tagId = tagData.toString();
 			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			users.open();
 			Users user = users.getUserByTagId(tagId);
+			users.close();
 			if (user == null) {
 				Toast.makeText(this, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
 			} else {

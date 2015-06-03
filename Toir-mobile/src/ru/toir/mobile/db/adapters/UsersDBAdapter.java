@@ -6,18 +6,14 @@ import ru.toir.mobile.db.tables.Users;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 
 /**
  * @author Dmitriy Logachov
  * <p>Класс адаптера к таблице users</p>
  *
  */
-public class UsersDBAdapter extends BaseAdapter {
+public class UsersDBAdapter {
 	public static final String TABLE_NAME = "users";
 	
 	public static final String FIELD_UUID_NAME = "uuid";
@@ -28,18 +24,18 @@ public class UsersDBAdapter extends BaseAdapter {
 	public static final String FIELD_TAGID_NAME = "tag_id";
 	public static final String FIELD_ACTIVE_NAME = "active";
 	
-	String[] columns = {
+	String[] mColumns = {
 			FIELD_UUID_NAME,
 			FIELD_NAME_NAME,
 			FIELD_LOGIN_NAME,
 			FIELD_PASS_NAME,
 			FIELD_TYPE_NAME,
-			FIELD_TAGID_NAME};
+			FIELD_TAGID_NAME,
+			FIELD_ACTIVE_NAME};
 	
-	private DatabaseHelper dbHelper;
-	private SQLiteDatabase db;
-	private final Context context;
-	private Cursor cursor;
+	private DatabaseHelper mDbHelper;
+	private SQLiteDatabase mDb;
+	private final Context mContext;
 	
 	/**
 	 * @param context
@@ -47,18 +43,15 @@ public class UsersDBAdapter extends BaseAdapter {
 	 */
 	public UsersDBAdapter(Context context) {
 		super();
-		this.context = context;
-		init();
+		mContext = context;
 	}
 	
 	/**
-	 * Получаем объект базы данных
-	 * @return UsersDBAdapter
-	 * @throws SQLException
+	 * Открываем базу данных
 	 */
-	public UsersDBAdapter open() throws SQLException {
-		this.dbHelper = new DatabaseHelper(this.context, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
-		this.db = dbHelper.getWritableDatabase();
+	public UsersDBAdapter open() {
+		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
 	
@@ -66,14 +59,15 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		dbHelper.close();
+		mDb.close();
+		mDbHelper.close();
 	}
 	
 	public Users getUserByLoginAndPass(String login, String pass) {
 		
 		Users user = null;
 		Cursor cur;
-		cur = db.query(TABLE_NAME, columns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
 		if (cur.moveToFirst()) {
 			user = new Users(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_NAME_NAME)),
@@ -90,7 +84,7 @@ public class UsersDBAdapter extends BaseAdapter {
 		
 		Users user = null;
 		Cursor cur;
-		cur = db.query(TABLE_NAME, columns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
 		if (cur.moveToFirst()) {
 			user = new Users(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_NAME_NAME)),
@@ -104,20 +98,12 @@ public class UsersDBAdapter extends BaseAdapter {
 	}
 
 	/**
-	 * <p>Возвращает все записи из таблицы users</p>
-	 * @return Cursor
-	 */
-	public Cursor getAllItems() {
-		return db.query(TABLE_NAME, columns, null, null, null, null, null);
-	}
-	
-	/**
 	 * <p>Возвращает запись из таблицы users</p>
-	 * @param id
+	 * @param uuid
 	 * @return Cursor
 	 */
-	public Cursor getItem(String id) {
-		return db.query(TABLE_NAME, columns, FIELD_UUID_NAME + "=?", new String[]{id}, null, null, null);
+	public Cursor getItem(String uuid) {
+		return mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
 	}
 	
 	/**
@@ -129,6 +115,7 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long addItem(String uuid, String name, String login, String pass, int type) {
+		// TODO так как в чистом виде мы записи в эту таблицу не будем добавлять, возможно этот метод не нужен
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(UsersDBAdapter.FIELD_UUID_NAME, uuid);
@@ -136,13 +123,13 @@ public class UsersDBAdapter extends BaseAdapter {
 		values.put(UsersDBAdapter.FIELD_LOGIN_NAME, login);
 		values.put(UsersDBAdapter.FIELD_PASS_NAME, pass);
 		values.put(UsersDBAdapter.FIELD_TYPE_NAME, type);
-		id  = db.insert(UsersDBAdapter.TABLE_NAME, null, values);
-		refresh();
+		id  = mDb.insert(UsersDBAdapter.TABLE_NAME, null, values);
 		return id;
 	}
 	
 	/**
 	 * <p>Добавляет/изменяет запись в таблице users</p>
+	 * @param uuid
 	 * @param name
 	 * @param login
 	 * @param pass
@@ -154,15 +141,14 @@ public class UsersDBAdapter extends BaseAdapter {
 	public long replaceItem(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(UsersDBAdapter.FIELD_UUID_NAME, uuid);
-		values.put(UsersDBAdapter.FIELD_NAME_NAME, name);
-		values.put(UsersDBAdapter.FIELD_LOGIN_NAME, login);
-		values.put(UsersDBAdapter.FIELD_PASS_NAME, pass);
-		values.put(UsersDBAdapter.FIELD_TYPE_NAME, type);
-		values.put(UsersDBAdapter.FIELD_TAGID_NAME, tag_id);
-		values.put(UsersDBAdapter.FIELD_ACTIVE_NAME, active);
-		id  = db.replace(UsersDBAdapter.TABLE_NAME, null, values);
-		refresh();
+		values.put(FIELD_UUID_NAME, uuid);
+		values.put(FIELD_NAME_NAME, name);
+		values.put(FIELD_LOGIN_NAME, login);
+		values.put(FIELD_PASS_NAME, pass);
+		values.put(FIELD_TYPE_NAME, type);
+		values.put(FIELD_TAGID_NAME, tag_id);
+		values.put(FIELD_ACTIVE_NAME, active);
+		id  = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
 	
@@ -173,7 +159,6 @@ public class UsersDBAdapter extends BaseAdapter {
 	 */
 	public long replaceItem(Users user) {
 		long id  = replaceItem(user.getUuid(), user.getName(), user.getLogin(), user.getPass(), user.getType(), user.getTag_id(), user.isActive());
-		refresh();
 		return id;
 	}
 
@@ -183,6 +168,7 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long addItem(Users user) {
+		// TODO так как в чистом виде мы записи в эту таблицу не будем добавлять, возможно этот метод не нужен
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(UsersDBAdapter.FIELD_UUID_NAME, user.getUuid());
@@ -190,8 +176,7 @@ public class UsersDBAdapter extends BaseAdapter {
 		values.put(FIELD_LOGIN_NAME, user.getLogin());
 		values.put(FIELD_PASS_NAME, user.getPass());
 		values.put(FIELD_TYPE_NAME, user.getType());
-		id = db.insert(TABLE_NAME, null, values);
-		refresh();
+		id = mDb.insert(TABLE_NAME, null, values);
 		return id;
 	}
 	
@@ -200,9 +185,9 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @return boolean
 	 */
 	public boolean removeAllItems() {
+		// TODO так как в чистом виде мы записи удалять не будем, возможно этот метод не нужен
 		boolean isDeleted;
-		isDeleted = db.delete(TABLE_NAME, null, null) > 0;
-		refresh();
+		isDeleted = mDb.delete(TABLE_NAME, null, null) > 0;
 		return isDeleted;
 	}
 
@@ -212,9 +197,9 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @return boolean
 	 */
 	public boolean removeItem(String uuid) {
+		// TODO так как в чистом виде мы записи удалять не будем, возможно этот метод не нужен
 		boolean isDeleted;
-		isDeleted = db.delete(TABLE_NAME, FIELD_UUID_NAME + "=?", new String[]{uuid}) > 0;
-		refresh();
+		isDeleted = mDb.delete(TABLE_NAME, FIELD_UUID_NAME + "=?", new String[]{uuid}) > 0;
 		return isDeleted;
 	}
 	
@@ -228,6 +213,7 @@ public class UsersDBAdapter extends BaseAdapter {
 	 * @return boolean
 	 */
 	public boolean updateItem(String uuid, String name, String login, String pass, int type) {
+		// TODO так как в чистом виде мы записи обновлять не будем, возможно этот метод не нужен
 		ContentValues values = new ContentValues();
 		boolean isUpdated;
 		
@@ -236,11 +222,12 @@ public class UsersDBAdapter extends BaseAdapter {
 		values.put(FIELD_PASS_NAME, pass);
 		values.put(FIELD_TYPE_NAME, type);
 		
-		isUpdated = db.update(TABLE_NAME, values, FIELD_UUID_NAME + "=?", new String[]{uuid}) > 0;
+		isUpdated = mDb.update(TABLE_NAME, values, FIELD_UUID_NAME + "=?", new String[]{uuid}) > 0;
 		return isUpdated;
 	}
 	
 	public boolean updateItem(Users user) {
+		// TODO так как в чистом виде мы записи обновлять не будем, возможно этот метод не нужен
 		ContentValues values = new ContentValues();
 		boolean isUpdated;
 		
@@ -249,41 +236,7 @@ public class UsersDBAdapter extends BaseAdapter {
 		values.put(FIELD_PASS_NAME, user.getPass());
 		values.put(FIELD_TYPE_NAME, user.getType());
 		
-		isUpdated = db.update(TABLE_NAME, values, FIELD_UUID_NAME + "=?", new String[]{user.getUuid()}) > 0;
+		isUpdated = mDb.update(TABLE_NAME, values, FIELD_UUID_NAME + "=?", new String[]{user.getUuid()}) > 0;
 		return isUpdated;
-	}
-
-	@Override
-	public int getCount() {
-		return cursor.getCount();
-	}
-
-	@Override
-	public Users getItem(int position) {
-		return null;
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		return null;
-	}
-	
-	private void refresh() {
-		cursor = getAllItems();
-		notifyDataSetChanged();
-	}
-	
-	public void onDestroy() {
-		dbHelper.close();
-	}
-	
-	private void init() {
-		open();
-		cursor = getAllItems();
 	}
 }

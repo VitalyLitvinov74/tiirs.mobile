@@ -70,7 +70,9 @@ public class UsersProcessor {
 				user.setTag_id(value.getString(UsersDBAdapter.FIELD_TAGID_NAME));
 				user.setActive(value.getInt(UsersDBAdapter.FIELD_ACTIVE_NAME) == 0 ? false : true);
 				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
+				adapter.open();
 				adapter.replaceItem(user);
+				adapter.close();
 
 			} catch (JSONException e) {
 				e.printStackTrace();

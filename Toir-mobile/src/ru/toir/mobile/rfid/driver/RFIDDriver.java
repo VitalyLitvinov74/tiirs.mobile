@@ -35,6 +35,5 @@ public interface RFIDDriver {
 	/**
 	 * <p>Меню которое предоставляет драйвер</p>
 	 */
-	public void getMenu(Menu menu);
-
+	public void getMenu(Menu menu);	
 }

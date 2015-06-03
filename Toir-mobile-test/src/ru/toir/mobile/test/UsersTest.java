@@ -6,7 +6,6 @@ package ru.toir.mobile.test;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.tables.Users;
 import android.content.Context;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
@@ -61,8 +60,11 @@ public class UsersTest extends AndroidTestCase {
 	 */
 	public void testSelectUserFromCursor() {
 		String name = "admin";
-		Users user = adapter.getItem(1);
-		assertEquals(name, user.getName());
+		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+		Cursor user = adapter.getItem(uuid);
+		assertEquals(true, user.moveToFirst());
+		assertEquals(uuid, user.getString(user.getColumnIndex(UsersDBAdapter.FIELD_UUID_NAME)));
+		assertEquals(name, user.getString(user.getColumnIndex(UsersDBAdapter.FIELD_NAME_NAME)));
 	}
 
 	/**

@@ -15,6 +15,14 @@
     <string name="pref_server_url_dialog_title">Введите URL сервера системы</string>
     <string name="pref_rfid_driver">Драйвер считывателя RFID</string>
     <string name="login">Войти</string>
-    
-
+    <string name="init_success">Инициализация успешна</string>
+    <string name="init_fail">Инициализация неудачна</string>
+    <string name="find_fail">Метка не найдена</string>
+    <string name="read_fail">Чтение закончилось неудачей</string>
+    <string name="write_15693_fail">Запись закончилась неудачей</string>
+    <string name="write_15693_success">Запись успешна</string>   
+    <string name="init">Инициализировать</string>
+    <string name="find">Найти</string>
+    <string name="read_15693">Считать метку</string>
+    <string name="write_15693">Записать метку</string>
 </resources>
