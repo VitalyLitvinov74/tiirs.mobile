@@ -38,8 +38,7 @@ public class UserInfoFragment extends Fragment {
 		// hardcoded for test, tagID for user must be global
 		String tagId = "01234567";
 		
-		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
-		users.open();
+		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		Users user = users.getUserByTagId(tagId);
 		users.close();
 		if (user == null) {

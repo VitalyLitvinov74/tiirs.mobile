@@ -62,8 +62,7 @@ public class MainActivity extends FragmentActivity {
 	public boolean initDB() {
 		boolean success = false;
 		// создаём базу данных, в качестве контекста передаём свой, с переопределёнными путями к базе 
-		TOiRDBAdapter adapter = new TOiRDBAdapter(new TOiRDatabaseContext(getApplicationContext()));	
-		adapter.open();
+		TOiRDBAdapter adapter = new TOiRDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
 		Log.d("test", "db.version=" + adapter.getDbVersion());
 		if(!adapter.isActual()){
 			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
@@ -130,8 +129,7 @@ public class MainActivity extends FragmentActivity {
 		} else {
 			// проверяем наличие пользователя в локальной базе
 			String tagId = tagData.toString();
-			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
-			users.open();
+			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
 			Users user = users.getUserByTagId(tagId);
 			users.close();
 			if (user == null) {

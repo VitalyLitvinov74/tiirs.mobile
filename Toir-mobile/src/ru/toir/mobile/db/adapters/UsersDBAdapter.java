@@ -118,12 +118,12 @@ public class UsersDBAdapter {
 		// TODO так как в чистом виде мы записи в эту таблицу не будем добавлять, возможно этот метод не нужен
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(UsersDBAdapter.FIELD_UUID_NAME, uuid);
-		values.put(UsersDBAdapter.FIELD_NAME_NAME, name);
-		values.put(UsersDBAdapter.FIELD_LOGIN_NAME, login);
-		values.put(UsersDBAdapter.FIELD_PASS_NAME, pass);
-		values.put(UsersDBAdapter.FIELD_TYPE_NAME, type);
-		id  = mDb.insert(UsersDBAdapter.TABLE_NAME, null, values);
+		values.put(FIELD_UUID_NAME, uuid);
+		values.put(FIELD_NAME_NAME, name);
+		values.put(FIELD_LOGIN_NAME, login);
+		values.put(FIELD_PASS_NAME, pass);
+		values.put(FIELD_TYPE_NAME, type);
+		id  = mDb.insert(TABLE_NAME, null, values);
 		return id;
 	}
 	
