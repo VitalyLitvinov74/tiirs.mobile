@@ -1,6 +1,8 @@
 
 package ru.toir.mobile.rfid.driver;
 
+import android.content.Context;
+
 // Wrapper for native library
 public class RealRFID {
 	int mFd = 0;

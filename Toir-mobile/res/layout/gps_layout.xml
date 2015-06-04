@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray" >
+    android:background="@color/gray"
+    android:orientation="vertical" >
 
     <org.osmdroid.views.MapView
         android:id="@+id/mapview"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:clickable="true"/>   
-</RelativeLayout>
+        android:layout_height="203dp"
+        android:layout_weight="10"
+        android:clickable="true" >
+
+    </org.osmdroid.views.MapView>
+
+    <TextView
+        android:id="@+id/gpsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:lines="3"
+        android:text="GPS messages"
+        android:textColor="@color/black"
+        android:textColorLink="@color/black"
+        android:textSize="11sp"
+        android:typeface="normal" />
+
+</LinearLayout>

@@ -1,7 +1,16 @@
 package ru.toir.mobile.serial;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import ru.toir.mobile.utils.DataUtils;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class M1CardAPI {
