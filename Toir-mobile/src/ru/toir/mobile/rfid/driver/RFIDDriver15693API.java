@@ -2,8 +2,6 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.serial.SerialPortManager;
-
-import android.os.SystemClock;
 import android.util.Log;
 
 public class RFIDDriver15693API {

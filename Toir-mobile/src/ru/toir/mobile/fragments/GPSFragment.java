@@ -1,31 +1,15 @@
 package ru.toir.mobile.fragments;
 
-import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRApplication;
-import ru.toir.mobile.utils.ToastUtil;
-
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
-
 import android.os.Bundle;
-import android.app.Activity;
-import android.graphics.drawable.Drawable;
-
-import org.osmdroid.views.overlay.ItemizedOverlay;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
 
 import ru.toir.mobile.gps.LocationGpsOnlyService;
