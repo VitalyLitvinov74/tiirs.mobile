@@ -1,13 +1,10 @@
 package ru.toir.mobile.rfid.asynctask;
 
 import ru.toir.mobile.rfid.driver.RFIDDriver15693API;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import ru.toir.mobile.serial.M1CardAPI;
-import ru.toir.mobile.serial.M1CardAPI.Result;
 
 public class AsyncRFID15693Card extends Handler {
 	private static final int INIT = 0;

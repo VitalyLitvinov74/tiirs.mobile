@@ -7,7 +7,6 @@ import android.os.Message;
 //import android.os.SystemClock;
 import android.util.Log;
 import ru.toir.mobile.rfid.driver.RFIDAPI;
-import ru.toir.mobile.serial.SerialPortManager;
 
 public class AsyncRFID extends Handler {
 

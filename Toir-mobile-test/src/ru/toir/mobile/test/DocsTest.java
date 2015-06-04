@@ -1,12 +1,8 @@
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.TOiRDBAdapter;
-import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.DocsDBAdapter;
-import android.content.Context;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
 import android.util.Log;
 
 	/**
@@ -16,9 +12,7 @@ import android.util.Log;
 	 */
 	public class DocsTest extends AndroidTestCase {
 		private static final String TAG = "DocsTest";
-		private static final String TEST_FILE_PREFIX = "test_";
 		private DocsDBAdapter adapter;
-		private Context context;
 		
 		/**
 		 * Конструктор 

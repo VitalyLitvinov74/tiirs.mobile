@@ -3,12 +3,7 @@ package ru.toir.mobile.gps;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRApplication;
-import ru.toir.mobile.utils.ToastUtil;
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
