@@ -8,22 +8,17 @@ import android.os.Bundle;
 
 /**
  * @author Dmitriy Logachov
- *
+ * 
  */
 public class UsersServiceProvider implements IServiceProvider {
 
-	/**
-	 * @param context
-	 * @param providerId
-	 * @param resultAction
-	 */
 	private final Context mContext;
-	
+
 	public static class Methods {
 		public static final int GET_USER = 1;
-		public static final String  GET_USER_PARAMETER_TAG = "tag";
+		public static final String GET_USER_PARAMETER_TAG = "tag";
 	}
-	
+
 	public UsersServiceProvider(Context context) {
 		mContext = context;
 	}
@@ -36,9 +31,14 @@ public class UsersServiceProvider implements IServiceProvider {
 		}
 		return false;
 	}
-	
+
 	private boolean getUser(Bundle extras) {
-		return new UsersProcessor(mContext).GetUser(extras);
+		try {
+			return new UsersProcessor(mContext).GetUser(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

@@ -45,7 +45,6 @@ public class RFIDDriverText implements RFIDDriver{
 	 */
 	@Override
 	public boolean write(byte[] outBuffer){
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -54,7 +53,6 @@ public class RFIDDriverText implements RFIDDriver{
 	 */
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 	}
 
 	/** 

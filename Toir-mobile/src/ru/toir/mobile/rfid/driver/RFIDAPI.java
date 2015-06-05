@@ -411,7 +411,6 @@ public class RFIDAPI {
 			try {
 				tempRecv = rec.getBytes("GBK");
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.out.println("from A602 bytes="+bytes);

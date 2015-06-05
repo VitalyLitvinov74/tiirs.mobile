@@ -1,17 +1,17 @@
 package ru.toir.mobile.rest;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -21,45 +21,46 @@ import android.util.Log;
 
 public class UsersProcessor {
 	private Context mContext;
-	private static final String USERS_GET_USER_URL = "http://apkupdate.lan/user.php?tag=";
+	private static final String USERS_GET_USER_URL = "/user.php?tag=";
+	private String mServerUrl;
+	
 
-	public UsersProcessor(Context context) {
+	public UsersProcessor(Context context) throws Exception {
 		mContext = context;
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		// урл к которому будем обращаться с запросами
+		mServerUrl = sp.getString(context.getString(R.string.serverUrl), "");
+		
+		if (mServerUrl.equals("")) {
+			throw new Exception("URL сервера не указан!");
+		}
 	}
 	
+	/**
+	 * 
+	 * @param bundle
+	 * @return
+	 */
 	public boolean GetUser(Bundle bundle) {
-		// TODO обернуть всё в один try/catch
 		URI requestUri = null;
 		String tag = bundle.getString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG);
 		String jsonString = null;
 		JSONObject jsonArray = null;
 		try {
-			requestUri = new URI(USERS_GET_USER_URL + tag);
+			requestUri = new URI(mServerUrl + USERS_GET_USER_URL + tag);
 			Log.d("test", "requestUri = " + requestUri.toString());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return false;
-		}
 			
-		Request request = new Request(Method.GET, requestUri, null, null);
-		Response response = new RestClient().execute(request);
-		if (response.mStatus == 200) {
-			try {
+			Request request = new Request(Method.GET, requestUri, null, null);
+			Response response = new RestClient().execute(request);
+			if (response.mStatus == 200) {
+
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-				return false;
-			}
 
-			try {
 				jsonArray = new JSONObject(jsonString);
-			} catch (JSONException e) {
-				e.printStackTrace();
-				return false;
-			}
-			
-			try {
+				
 				JSONObject value = jsonArray.getJSONObject("data");
 				Users user = new Users();
 				user.setUuid(value.getString(UsersDBAdapter.FIELD_UUID_NAME));
@@ -72,14 +73,13 @@ public class UsersProcessor {
 				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
 				adapter.replaceItem(user);
 				adapter.close();
-
-			} catch (JSONException e) {
-				e.printStackTrace();
+				
+				return true;
+			} else {
 				return false;
 			}
-			
-			return true;
-		} else {
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}

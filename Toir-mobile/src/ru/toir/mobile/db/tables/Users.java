@@ -4,7 +4,7 @@
 package ru.toir.mobile.db.tables;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachov
  *
  */
 public class Users {
@@ -21,7 +21,6 @@ public class Users {
 	 * 
 	 */
 	public Users() {
-
 	}
 
 	public Users(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {

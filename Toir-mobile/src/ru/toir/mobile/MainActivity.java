@@ -18,6 +18,8 @@ import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.rest.TokenServiceHelper;
+import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rfid.RFID;
 
 public class MainActivity extends FragmentActivity {
@@ -37,7 +39,16 @@ public class MainActivity extends FragmentActivity {
 			isLogged = savedInstanceState.getBoolean("isLogged");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
-
+		
+		/*
+		UsersServiceHelper ush = new UsersServiceHelper(getApplicationContext(), "action");
+		ush.GetUser("01234567");
+		*/
+		/*
+		TokenServiceHelper tsh = new TokenServiceHelper(getApplicationContext(), "action");
+		tsh.GetTokenByUsernameAndPassword("test", "00000001");
+		*/
+		
 		Log.d(TAG, "onCreate");
 		if (isLogged) {
 			setMainLayout();
@@ -170,7 +181,7 @@ public class MainActivity extends FragmentActivity {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
 		// урл по которому забираем файл обновления
-		String updateUrl = sp.getString("updateUrl", "");
+		String updateUrl = sp.getString(getString(R.string.updateUrl), "");
 		
 		if (updateUrl.equals("")) {
 			Toast toast = Toast.makeText(this, "Не указан URL для обновления!", Toast.LENGTH_SHORT);

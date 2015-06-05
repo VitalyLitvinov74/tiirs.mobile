@@ -53,7 +53,6 @@ public class TOiRApplication extends Application {
 			rootPath = info.applicationInfo.dataDir;
 			//Log.i("rootPath", "################rootPath=" + rootPath);
 		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
