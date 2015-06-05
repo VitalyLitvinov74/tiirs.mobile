@@ -14,7 +14,7 @@ import java.util.List;
  * 
  */
 public class RestClient {
-
+	
 	public Response execute(Request request) {
 		HttpURLConnection conn = null;
 		Response response = null;
@@ -37,6 +37,7 @@ public class RestClient {
 				break;
 			case POST:
 				byte[] payload = request.getBody();
+				conn.setRequestMethod("POST");
 				conn.setDoOutput(true);
 				conn.setFixedLengthStreamingMode(payload.length);
 				conn.getOutputStream().write(payload);
