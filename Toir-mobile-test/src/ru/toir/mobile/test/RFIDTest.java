@@ -15,7 +15,6 @@ public class RFIDTest extends AndroidTestCase {
 	 * 
 	 */
 	public RFIDTest() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void testPreConditions() {

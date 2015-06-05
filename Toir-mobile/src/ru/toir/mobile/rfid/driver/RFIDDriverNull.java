@@ -40,7 +40,6 @@ public class RFIDDriverNull implements RFIDDriver{
 	 */
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 	}
 
 	/* (non-Javadoc)
@@ -48,6 +47,5 @@ public class RFIDDriverNull implements RFIDDriver{
 	 */
 	@Override
 	public void getMenu(Menu menu) {
-		// TODO Auto-generated method stub
 	}
 }

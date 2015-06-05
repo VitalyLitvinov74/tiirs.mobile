@@ -132,7 +132,6 @@ public class SerialPortManager {
 				/* Open the serial port */
 				mSerialPort = new SerialPort(new File(PATH), BAUDRATE, 0);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
 			}
