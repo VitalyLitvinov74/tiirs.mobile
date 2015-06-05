@@ -18,6 +18,7 @@ import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rfid.RFID;
 
@@ -42,6 +43,10 @@ public class MainActivity extends FragmentActivity {
 		/*
 		UsersServiceHelper ush = new UsersServiceHelper(getApplicationContext(), "action");
 		ush.GetUser("01234567");
+		*/
+		/*
+		TokenServiceHelper tsh = new TokenServiceHelper(getApplicationContext(), "action");
+		tsh.GetTokenByUsernameAndPassword("test", "00000001");
 		*/
 		
 		Log.d(TAG, "onCreate");

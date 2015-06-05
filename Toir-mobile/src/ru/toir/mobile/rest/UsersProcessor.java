@@ -1,9 +1,6 @@
 package ru.toir.mobile.rest;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.toir.mobile.R;
@@ -28,7 +25,7 @@ public class UsersProcessor {
 	private String mServerUrl;
 	
 
-	public UsersProcessor(Context context) {
+	public UsersProcessor(Context context) throws Exception {
 		mContext = context;
 		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -37,7 +34,7 @@ public class UsersProcessor {
 		mServerUrl = sp.getString(context.getString(R.string.serverUrl), "");
 		
 		if (mServerUrl.equals("")) {
-			// TODO бросить exception !!!
+			throw new Exception("URL сервера не указан!");
 		}
 	}
 	
@@ -47,7 +44,6 @@ public class UsersProcessor {
 	 * @return
 	 */
 	public boolean GetUser(Bundle bundle) {
-		// TODO обернуть всё в один try/catch
 		URI requestUri = null;
 		String tag = bundle.getString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG);
 		String jsonString = null;
@@ -55,30 +51,16 @@ public class UsersProcessor {
 		try {
 			requestUri = new URI(mServerUrl + USERS_GET_USER_URL + tag);
 			Log.d("test", "requestUri = " + requestUri.toString());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return false;
-		}
 			
-		Request request = new Request(Method.GET, requestUri, null, null);
-		Response response = new RestClient().execute(request);
-		if (response.mStatus == 200) {
-			try {
+			Request request = new Request(Method.GET, requestUri, null, null);
+			Response response = new RestClient().execute(request);
+			if (response.mStatus == 200) {
+
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-				return false;
-			}
 
-			try {
 				jsonArray = new JSONObject(jsonString);
-			} catch (JSONException e) {
-				e.printStackTrace();
-				return false;
-			}
-			
-			try {
+				
 				JSONObject value = jsonArray.getJSONObject("data");
 				Users user = new Users();
 				user.setUuid(value.getString(UsersDBAdapter.FIELD_UUID_NAME));
@@ -91,14 +73,13 @@ public class UsersProcessor {
 				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
 				adapter.replaceItem(user);
 				adapter.close();
-
-			} catch (JSONException e) {
-				e.printStackTrace();
+				
+				return true;
+			} else {
 				return false;
 			}
-			
-			return true;
-		} else {
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}

@@ -31,14 +31,6 @@ public class UsersTest extends AndroidTestCase {
 	}
 	
 	/**
-	 * проверка создания пользователя 
-	 */
-	public void testCreateUser() {
-		long id = adapter.addItem("4462ed77-9bf0-4542-b127-f4ecefce49da", "testName", "testLogin", "testPass", 13);
-		assertEquals(-1, id);
-	}
-	
-	/**
 	 * проверка на создание адаптера базы
 	 */
 	public void testAdapterCreated() {
