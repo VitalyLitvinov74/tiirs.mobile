@@ -6,12 +6,15 @@ import java.net.URISyntaxException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -21,10 +24,22 @@ import android.util.Log;
 
 public class UsersProcessor {
 	private Context mContext;
-	private static final String USERS_GET_USER_URL = "http://apkupdate.lan/user.php?tag=";
+	private static final String USERS_GET_USER_URL = "/user.php?tag=";
+	private String mServerUrl;
+	
 
 	public UsersProcessor(Context context) {
 		mContext = context;
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		// урл к которому будем обращаться с запросами
+		mServerUrl = sp.getString(context.getString(R.string.serverUrl), "");
+		
+		if (mServerUrl.equals("")) {
+			// TODO бросить exception !!!
+		}
+
 	}
 	
 	public boolean GetUser(Bundle bundle) {
@@ -34,7 +49,7 @@ public class UsersProcessor {
 		String jsonString = null;
 		JSONObject jsonArray = null;
 		try {
-			requestUri = new URI(USERS_GET_USER_URL + tag);
+			requestUri = new URI(mServerUrl + USERS_GET_USER_URL + tag);
 			Log.d("test", "requestUri = " + requestUri.toString());
 		} catch (URISyntaxException e) {
 			e.printStackTrace();

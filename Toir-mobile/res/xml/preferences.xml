@@ -5,15 +5,15 @@
 	    android:title="@string/pref_cat_main">
 		
 		<EditTextPreference
-			android:key="updateUrl"
+			android:key="@string/updateUrl"
 			android:title="@string/pref_update_url"
 			android:dialogTitle="@string/pref_update_url_dialog_title" />
 		<EditTextPreference
-			android:key="serverUrl"
+			android:key="@string/serverUrl"
 			android:title="@string/pref_server_url"
 			android:dialogTitle="@string/pref_server_url_dialog_title" />
 		<ListPreference
-		    android:key="RFIDDriver"
+		    android:key="@string/RFIDDriver"
 			android:title="@string/pref_rfid_driver"
 			android:entries="@array/drvNameList"
 			android:entryValues="@array/drvClassNameList" />

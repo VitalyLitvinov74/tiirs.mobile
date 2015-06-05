@@ -33,7 +33,7 @@ public class RFIDActivity extends Activity {
 		
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		driverClassName = sp.getString("RFIDDriver", "RFIDDriverNull");
+		driverClassName = sp.getString(getString(R.string.RFIDDriver), "RFIDDriverNull");
 
 		// пытаемся получить класс драйвера
 		try {
