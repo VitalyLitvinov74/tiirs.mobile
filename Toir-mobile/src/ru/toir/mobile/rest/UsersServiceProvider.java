@@ -12,11 +12,6 @@ import android.os.Bundle;
  */
 public class UsersServiceProvider implements IServiceProvider {
 
-	/**
-	 * @param context
-	 * @param providerId
-	 * @param resultAction
-	 */
 	private final Context mContext;
 	
 	public static class Methods {

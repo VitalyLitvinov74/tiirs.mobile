@@ -22,6 +22,10 @@ public class UsersServiceHelper extends ServiceHelperBase {
 		super(context, ProcessorService.Providers.USERS_PROVIDER, resultAction);
 	}
 	
+	/**
+	 * 
+	 * @param tag
+	 */
 	public void GetUser(String tag) {
 		Bundle bundle = new Bundle();
 		bundle.putString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG, tag);

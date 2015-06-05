@@ -39,9 +39,13 @@ public class UsersProcessor {
 		if (mServerUrl.equals("")) {
 			// TODO бросить exception !!!
 		}
-
 	}
 	
+	/**
+	 * 
+	 * @param bundle
+	 * @return
+	 */
 	public boolean GetUser(Bundle bundle) {
 		// TODO обернуть всё в один try/catch
 		URI requestUri = null;

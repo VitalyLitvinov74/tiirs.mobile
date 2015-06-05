@@ -30,12 +30,15 @@ public class ProcessorService extends Service {
 	private final HashMap<String, AsyncServiceTask> mTasks = new  HashMap<String, AsyncServiceTask>();
 	public class Providers {
 		public static final int USERS_PROVIDER = 1;
+		public static final int TOKEN_PROVIDER = 2;
 	}
 	
 	private IServiceProvider GetProvider(int provider) {
 		switch (provider) {
 		case Providers.USERS_PROVIDER:
 			return new UsersServiceProvider(this);
+		case Providers.TOKEN_PROVIDER:
+			return new TokenServiceProvider(this);
 		}
 		return null;
 	}
