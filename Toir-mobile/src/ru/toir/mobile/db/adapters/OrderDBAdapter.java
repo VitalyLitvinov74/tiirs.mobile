@@ -1,5 +1,8 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Users;
@@ -62,15 +65,18 @@ public class OrderDBAdapter {
 		mDbHelper.close();
 	}
 
-	public Orders[] getOrdersByTagId(String tagId) {		
-		Orders	ord[]=null;
+	public ArrayList<Orders> getOrdersByTagId(String tagId, Integer status) {		
+		Orders	ord = new Orders();
+//		ArrayList<Orders> arrayList = new ArrayList<Orders>(Arrays.asList(ord));
+		ArrayList<Orders> arrayList = new ArrayList<Orders>();
 		Cursor cur;
 		Integer	cnt=0;
+		// можем или отобрать все наряды, или те, что есть с определенным статусом 
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{tagId}, null, null, null);		
 		cur.moveToFirst();
 		while (true)		
 			{
-			ord[cnt] = new Orders(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
+			ord = new Orders(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_USER_UUID_NAME)),
 					cur.getLong(cur.getColumnIndex(FIELD_CREATE_DATE_NAME)),
 					cur.getLong(cur.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
@@ -79,9 +85,11 @@ public class OrderDBAdapter {
 					cur.getLong(cur.getColumnIndex(FIELD_SEND_NAME)),
 					cur.getInt(cur.getColumnIndex(FIELD_COUNT_NAME)),
 					cur.getInt(cur.getColumnIndex(FIELD_SUCCESS_NAME)));
+			arrayList.add(ord);
 			if (cur.isLast()) break;
-			cur.moveToNext();			
-			}
-		return ord;
+			cur.moveToNext();
+			cnt++;
+		}
+		return arrayList;
 	}
 }

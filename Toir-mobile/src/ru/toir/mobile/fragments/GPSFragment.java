@@ -32,13 +32,16 @@ import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
 
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.adapters.OrderDBAdapter;
-import ru.toir.mobile.db.adapters.GPSDBAdapter;
-import ru.toir.mobile.db.tables.GpsTrack;
-import ru.toir.mobile.db.tables.Users;
-import ru.toir.mobile.db.tables.Orders;
+import ru.toir.mobile.db.adapters.*;
+//import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+//import ru.toir.mobile.db.adapters.UsersDBAdapter;
+//import ru.toir.mobile.db.adapters.OrderDBAdapter;
+//import ru.toir.mobile.db.adapters.GPSDBAdapter;
+import ru.toir.mobile.db.tables.*;
+//import ru.toir.mobile.db.tables.GpsTrack;
+//import ru.toir.mobile.db.tables.Users;
+//import ru.toir.mobile.db.tables.Orders;
+//import ru.toir.mobile.db.tables.EquipmentOp;
 import ru.toir.mobile.gps.TestGPSListener;
 import android.location.LocationManager;
 import android.location.Location;
@@ -92,17 +95,29 @@ public class GPSFragment extends Fragment {
 		String tagId = "01234567";
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		OrderDBAdapter dbOrder = new OrderDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentDBAdapter equips = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+		EquipmentOpDBAdapter equips = new EquipmentOpDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid (если он будет храниться глобально, то запрашивать постоянно уже не надо будет)
+		
 		Users user = users.getUserByTagId(tagId);
-		Orders order[] = dbOrder.getOrdersByTagId(tagId);
-		//Equipment equip = equips.getEquipsByOrderId(orderId);
-
+		// запращиваем перечень задач нарядов (активных)
+		//ArrayList<Orders> ordersList = dbOrder.getOrdersByTagId(tagId,1);
+		Integer cnt=0,cnt2=0;
+		if (false)
+		//while (cnt<ordersList.size())
+				{
+				 // запращиваем перечень оборудования статус - hardcoded!
+			/*
+				 ArrayList<EquipmentOp> equipOpList = equips.getEquipsByOrderId(ordersList.get(cnt).getUuid(),"1");
+				 cnt2=0;
+				 while (cnt<equipOpList.size())
+					{
+					 equipOpList.get(cnt2).getUuid();
+					}*/				 
+				}
 		equips.close();
 		users.close();
-		dbOrder.close();
-        
+		dbOrder.close();       
         onInit(rootView);
-		//location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);			
 		return rootView;
 	}
 	
