@@ -78,7 +78,7 @@ public class TaskDBAdapter {
 					cur.getString(cur.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)),
 					cur.getLong(cur.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
 					cur.getInt(cur.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-					cur.getInt(cur.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)));
+					cur.getInt(cur.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)) == 0 ? false : true);
 			if (cur.isLast()) break;
 			cur.moveToNext();			
 			}
@@ -99,7 +99,7 @@ public class TaskDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(String uuid, String users_uuid, long create_date, long modify_date, long close_date,
-			String task_status_uuid, long attempt_send_date, int attempt_count, int successefull_send) {
+			String task_status_uuid, long attempt_send_date, int attempt_count, boolean successefull_send) {
 		// TODO нужно сделать контроль, выполнилось выражение или нет
 		long id;
 		ContentValues values = new ContentValues();
@@ -111,7 +111,7 @@ public class TaskDBAdapter {
 		values.put(FIELD_TASK_STATUS_UUID_NAME, task_status_uuid);
 		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
 		values.put(FIELD_ATTEMPT_COUNT_NAME, attempt_count);
-		values.put(FIELD_SUCCESSEFULL_SEND_NAME, successefull_send);
+		values.put(FIELD_SUCCESSEFULL_SEND_NAME, successefull_send ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -127,6 +127,6 @@ public class TaskDBAdapter {
 	public long replace(Task task) {
 		return replace(task.getUuid(), task.getUsers_uuid(), task.getCreate_date(),
 				task.getModify_date(), task.getClose_date(), task.getTask_status_uuid(),
-				task.getAttempt_send_date(), task.getAttempt_count(), task.getSuccessefull_send());
+				task.getAttempt_send_date(), task.getAttempt_count(), task.isSuccessefull_send());
 	}
 }
