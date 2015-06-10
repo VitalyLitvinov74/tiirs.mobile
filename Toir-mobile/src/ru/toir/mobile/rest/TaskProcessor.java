@@ -14,9 +14,11 @@ import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -83,6 +85,8 @@ public class TaskProcessor {
 						ParseEquipment(elementArray);
 					} else if (next.equals(EquipmentOperationDBAdapter.TABLE_NAME)) {
 						ParseEquipmentOperation(elementArray);
+					} else if (next.equals(TaskStatusDBAdapter.TABLE_NAME)) {
+						ParseTaskStatus(elementArray);
 					}
 					
 				}
@@ -96,6 +100,34 @@ public class TaskProcessor {
 		}
 	}
 
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseTaskStatus(JSONArray array) {
+		int elementCount = array.length();
+		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				TaskStatus item = new TaskStatus();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(TaskStatusDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(TaskStatusDBAdapter.FIELD_TITLE_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * 
 	 * @param array
