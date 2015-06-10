@@ -19,6 +19,7 @@ import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
@@ -31,6 +32,7 @@ import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationPatternStep;
+import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
@@ -119,6 +121,8 @@ public class TaskProcessor {
 						ParseOperationResult(elementArray);
 					} else if (next.equals(OperationPatternStepDBAdapter.TABLE_NAME)) {
 						ParseOperationPatternStep(elementArray);
+					} else if (next.equals(OperationPatternStepResultDBAdapter.TABLE_NAME)) {
+						ParseOperationPatternStepResult(elementArray);
 					}
 				}
 				return true;
@@ -129,6 +133,37 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseOperationPatternStepResult(JSONArray array) {
+		int elementCount = array.length();
+		OperationPatternStepResultDBAdapter adapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				OperationPatternStepResult item = new OperationPatternStepResult();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_UUID_NAME));
+				item.setOperation_pattern_step_uuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_OPERATION_PATTERN_STEP_UUID_NAME));
+				item.setNext_operation_pattern_step_uuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME));
+				item.setTitle(value.getString(OperationPatternStepResultDBAdapter.FIELD_TITLE_NAME));
+				item.setMeasure_type_uuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_MEASURE_TYPE_UUID_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
 	}
 	
 	/**
