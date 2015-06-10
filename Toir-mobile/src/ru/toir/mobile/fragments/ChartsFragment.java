@@ -1,6 +1,7 @@
 package ru.toir.mobile.fragments;
 
 import ru.toir.mobile.R;
+import ru.toir.mobile.utils.ToastUtil;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,6 @@ public class ChartsFragment extends Fragment {
         mChart.setCenterTextTypeface(tf);
         mChart.setCenterText("Revenues");
         mChart.setCenterTextSize(22f);
-        //mChart.setCenterTextTypeface(tf);
          
         // radius of the center hole in percent of maximum adius
         mChart.setHoleRadius(45f); 
