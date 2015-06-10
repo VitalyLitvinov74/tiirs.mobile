@@ -18,6 +18,7 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
@@ -29,6 +30,7 @@ import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.OperationPattern;
+import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
@@ -115,6 +117,8 @@ public class TaskProcessor {
 						ParseMeasureType(elementArray);
 					} else if (next.equals(OperationResultDBAdapter.TABLE_NAME)) {
 						ParseOperationResult(elementArray);
+					} else if (next.equals(OperationPatternStepDBAdapter.TABLE_NAME)) {
+						ParseOperationPatternStep(elementArray);
 					}
 				}
 				return true;
@@ -132,6 +136,38 @@ public class TaskProcessor {
 	 * @param array
 	 * @return
 	 */
+	private boolean ParseOperationPatternStep(JSONArray array) {
+		int elementCount = array.length();
+		OperationPatternStepDBAdapter adapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				OperationPatternStep item = new OperationPatternStep();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(OperationPatternStepDBAdapter.FIELD_UUID_NAME));
+				item.setOperation_pattern_uuid(value.getString(OperationPatternStepDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME));
+				item.setDescription(value.getString(OperationPatternStepDBAdapter.FIELD_DESCRIPTION_NAME));
+				item.setImage(value.getString(OperationPatternStepDBAdapter.FIELD_IMAGE_NAME));
+				item.setFirst_step(value.getInt(OperationPatternStepDBAdapter.FIELD_FIRST_STEP_NAME) == 0 ? false : true);
+				item.setLast_step(value.getInt(OperationPatternStepDBAdapter.FIELD_LAST_STEP_NAME) == 0 ? false : true);
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
 	private boolean ParseOperationResult(JSONArray array) {
 		int elementCount = array.length();
 		OperationResultDBAdapter adapter = new OperationResultDBAdapter(new TOiRDatabaseContext(
@@ -142,7 +178,7 @@ public class TaskProcessor {
 				OperationResult item = new OperationResult();
 				JSONObject value = array.getJSONObject(i);
 				item.setUuid(value.getString(OperationResultDBAdapter.FIELD_UUID_NAME));
-				item.setOperation_type_uuid(value.getString(OperationResultDBAdapter.FIELD_UUID_NAME));
+				item.setOperation_type_uuid(value.getString(OperationResultDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME));
 				item.setTitle(value.getString(OperationResultDBAdapter.FIELD_TITLE_NAME));
 				adapter.replace(item);
 			}
