@@ -17,7 +17,7 @@ public class UserInfoFragment extends Fragment {
 
 	private TextView user_name;
 	private TextView user_id;
-	private TextView user_uuid;
+	//private TextView user_uuid;
 	private TextView user_type;
 
 	/* (non-Javadoc)
@@ -44,7 +44,9 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
 		} else {
 			user_name.setText(user.getName());
-			user_id.setText(user.toString());
+			user_id.setText(user.getTag_id());
+			//user_uuid.setText(user.getUuid());
+			//user_type.setText(user.getType());
 		}
 
 	}

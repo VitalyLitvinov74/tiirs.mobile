@@ -1,16 +1,14 @@
 package ru.toir.mobile.serial;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
+//import java.io.ByteArrayOutputStream;
+//import java.io.IOException;
 import ru.toir.mobile.utils.DataUtils;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.os.SystemClock;
-import android.text.TextUtils;
+//import android.os.Bundle;
+//import android.os.Handler;
+//import android.os.Looper;
+//import android.os.Message;
+//import android.os.SystemClock;
+//import android.text.TextUtils;
 import android.util.Log;
 
 public class M1CardAPI {
@@ -21,10 +19,10 @@ public class M1CardAPI {
 	private static final String FIND_CARD_ORDER = "01";
 	private static final String PASSWORD_SEND_ORDER = "02";
 	private static final String PASSWORD_VALIDATE_ORDER = "03";
-	private static final String READ_DATA_ORDER = "04";
+	//private static final String READ_DATA_ORDER = "04";
 	private static final String WRITE_DATA_ORDER = "05";
 	private static final String ENTER = "\r\n";
-	private static final String TURN_OFF = "c050602\r\n";
+	//private static final String TURN_OFF = "c050602\r\n";
 	private static final String FIND_CARD = DATA_PREFIX + FIND_CARD_ORDER + ENTER;
 	private static final String SEND_PASSWORD = DATA_PREFIX + PASSWORD_SEND_ORDER + "ffffffffffffffffffffffff" + ENTER;
 	// private static final String FIND_SUCCESS = "c05060501" + ENTER + "0x00,";
@@ -88,7 +86,6 @@ public class M1CardAPI {
 		return keyTypeStr;
 	}
 
-	// ת���������ĵ�ַΪ��λ
 	private String getZoneId(int position) {
 		return DataUtils.byte2Hexstr((byte) position);
 	}
@@ -132,7 +129,6 @@ public class M1CardAPI {
 		Log.i("whw", "!!!!!!!!!!!!!!keyType=" + keyType);
 		byte[] command1 = null;
 		if (password == null) {
-			// �·���֤����
 			command1 = SEND_PASSWORD.getBytes();
 		} else {
 			String passwordHexStr = DataUtils.toHexString(password);
@@ -145,7 +141,6 @@ public class M1CardAPI {
 		int tempLength = receive(command1, buffer);
 		String verifyStr = new String(buffer, 0, tempLength);
 		Log.i("whw", "validatePassword verifyStr=" + verifyStr);
-		// ��֤����
 		byte[] command2 = (DATA_PREFIX + PASSWORD_VALIDATE_ORDER
 				+ getKeyTypeStr(keyType) + getZoneId(position) + ENTER)
 				.getBytes();
@@ -161,9 +156,8 @@ public class M1CardAPI {
 	}
 
 	/**
-	 * ��ȡָ����Ŵ洢�����ݣ�����һ��Ϊ16�ֽ� Reads the specified number stored data, length of
+	 * Reads the specified number stored data, length of
 	 * 16 bytes
-	 * 
 	 * @param position
 	 *            block number
 	 * @return
@@ -203,12 +197,11 @@ public class M1CardAPI {
 			}
 			pieceDatas[i] = DataUtils.hexStringTobyte(msg);
 		}
-
 		return pieceDatas;
 	}
 
 	/**
-	 * ��ָ���Ŀ��д�����ݣ�����Ϊ16�ֽ� Write data to the specified block, length is 16 bytes
+	 * Write data to the specified block, length is 16 bytes
 	 * argument should be data[i].length == num
 	 * @param data
 	 * @param startPosition
@@ -240,8 +233,7 @@ public class M1CardAPI {
 	}
 	
 	/**
-	 * ��ָ���Ŀ��д�����ݣ�����Ϊ16�ֽ� Write data to the specified block, length is 16 bytes
-	 * 
+	 * Write data to the specified block, length is 16 bytes
 	 * @param data
 	 * @param position
 	 * @return
@@ -261,7 +253,7 @@ public class M1CardAPI {
 		return false;
 	}
 
-	// �ر����߳�
+	// не используется
 	public String turnOff() {
 		// byte[] command = TURN_OFF.getBytes();
 		// int length = receive(command, buffer);
@@ -274,49 +266,26 @@ public class M1CardAPI {
 	}
 
 	public static class Result {
-		/**
-		 * �ɹ� successful
-		 */
+		// успешно
 		public static final int SUCCESS = 1;
-		/**
-		 * Ѱ��ʧ�� Find card failure
-		 */
+		// карта не найдена
 		public static final int FIND_FAIL = 2;
-		/**
-		 * ��֤ʧ�� Validation fails
-		 */
+		// ошибка проверки
 		public static final int VALIDATE_FAIL = 3;
-		/**
-		 * ����ʧ�� Read card failure
-		 */
+		// ошибка чтения
 		public static final int READ_FAIL = 4;
-		/**
-		 * д��ʧ�� Write card failure
-		 */
+		// ошибка записи
 		public static final int WRITE_FAIL = 5;
-		/**
-		 * ��ʱ timeout
-		 */
+		// таймаут
 		public static final int TIME_OUT = 6;
-		/**
-		 * �����쳣 other exception
-		 */
+		// other exception
 		public static final int OTHER_EXCEPTION = 7;
 
-		/**
-		 * ȷ���� 1: �ɹ� 2��Ѱ��ʧ�� 3����֤ʧ�� 4:д��ʧ�� 5����ʱ 6�������쳣
-		 */
+		// код подтверждения
 		public int confirmationCode;
-
-		/**
-		 * �����:��ȷ����Ϊ1ʱ�����ж��Ƿ��н�� Results: when the code is 1, then determine
-		 * whether to have the result
-		 */
+		// Result: when the code is 1, then determine whether to have the result
 		public Object resultInfo;
-
-		/**
-		 * ���� The card number
-		 */
+		// номер карты
 		public String num;
 	}
 

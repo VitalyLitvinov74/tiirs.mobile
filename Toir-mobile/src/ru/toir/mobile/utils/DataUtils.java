@@ -3,33 +3,15 @@ package ru.toir.mobile.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-//import java.io.UnsupportedEncodingException;
-//import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-//import android.content.Context;
-//import android.os.Handler;
-//import android.os.SystemClock;
+import java.util.Locale;
 import android.text.TextUtils;
-//import android.util.Log;
-//import android.widget.Toast;
 
 
 public class DataUtils {
 
-	private char[] getChar(int position) {
-		String str = String.valueOf(position);
-		if (str.length() == 1) {
-			str = "0" + str;
-		}
-		char[] c = { str.charAt(0), str.charAt(1) };
-		return c;
-	}
-
 	/**
-	 * 16�����ַ���ת��������
-	 * 
 	 * @param hex
 	 * @return
 	 */
@@ -40,11 +22,12 @@ public class DataUtils {
 		int len = hex.length() / 2;
 		byte[] result = new byte[len];
 		char[] achar = hex.toCharArray();
-		String temp = "";
+		//String temp = "";
 		for (int i = 0; i < len; i++) {
 			int pos = i * 2;
 			result[i] = (byte) (toByte(achar[pos]) << 4 | toByte(achar[pos + 1]));
-			temp += result[i] + ",";
+			// removed temp variable (10.06.2015)
+			//temp += result[i] + ",";
 		}
 		// uiHandler.obtainMessage(206, hex + "=read=" + new String(result))
 		// .sendToTarget();
@@ -57,7 +40,7 @@ public class DataUtils {
 	}
 
 	/**
-	 * ����ת��16�����ַ���
+	 * convert to HEX
 	 * 
 	 * @param b
 	 * @return
@@ -80,7 +63,7 @@ public class DataUtils {
 	}
 
 	/**
-	 * ʮ�������ַ���ת�����ַ���
+	 * function converts HEX to string
 	 */
 	public static String hexStr2Str(String hexStr) {
 		String str = "0123456789ABCDEF";
@@ -96,7 +79,7 @@ public class DataUtils {
 	}
 
 	/**
-	 * �ַ���ת����ʮ�������ַ���
+	 * function convert string to HEX
 	 */
 	public static String str2Hexstr(String str) {
 		char[] chars = "0123456789ABCDEF".toCharArray();
@@ -117,7 +100,8 @@ public class DataUtils {
 		if (temp.length() < 2) {
 			temp = "0" + temp;
 		}
-		temp = temp.toUpperCase();
+		// was default locale (10.06.2015)
+		temp = temp.toUpperCase(Locale.ENGLISH);
 		return temp;
 	}
 
@@ -131,13 +115,11 @@ public class DataUtils {
 	}
 
 	/**
-	 * 16�����ַ����ָ�����ɿ飬ÿ��32��16�����ַ�����16�ֽ�
-	 * 
+	 * internal function of RFID library 
 	 * @param str
 	 * @return
 	 */
 	public static String[] hexStr2StrArray(String str) {
-		// 32��ʮ�������ַ�����ʾ16�ֽ�
 		int len = 32;
 		int size = str.length() % len == 0 ? str.length() / len : str.length()
 				/ len + 1;
@@ -157,8 +139,7 @@ public class DataUtils {
 	}
 
 	/**
-	 * ��16�����ַ���ѹ�����ֽ����飬�ڰ��ֽ�����ת����16�����ַ���
-	 * 
+	 * gzip array of bytes
 	 * @param hexstr
 	 * @return
 	 * @throws IOException
@@ -172,8 +153,7 @@ public class DataUtils {
 	}
 
 	/**
-	 * ��16�����ַ�����ѹ��ѹ�����ֽ����飬�ڰ��ֽ�����ת����16�����ַ���
-	 * 
+	 * unzip function for array
 	 * @param hexstr
 	 * @return
 	 * @throws IOException
@@ -196,7 +176,6 @@ public class DataUtils {
 		size[0] = (byte) (s >>> 8);
 		short temp = (short) (s << 8);
 		size[1] = (byte) (temp >>> 8);
-
 		// size[0] = (byte) ((s >> 8) & 0xff);
 		// size[1] = (byte) (s & 0x00ff);
 		return size;
@@ -218,5 +197,4 @@ public class DataUtils {
 		temp |= (b2 & 0xff);
 		return temp;
 	}
-
 }

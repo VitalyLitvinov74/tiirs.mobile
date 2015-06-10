@@ -30,4 +30,11 @@ public class TypeDocs {
 		public int getType() {
 			return type;
 		}
+		
+		/**
+		 * @return id
+		 */
+		public long getId() {
+			return _id;
+		}
 }

@@ -43,18 +43,18 @@ public class RFIDTestFragment extends Fragment {
 	int positionCount = 0;
 	private Button init;
 	private Button find;
-	private TextView dsfid;
-	private TextView uid;
+//	private TextView dsfid;
+//	private TextView uid;
 	private Button read;
 	private EditText readPosition;
-	private TextView readInfo;
+//	private TextView readInfo;
 	private Button write;
 	private EditText writePosition;
 	private EditText writeText;
 	
 	private Button readMore;
 	private EditText readMorePosition;
-	private TextView readMoreInfo;
+//	private TextView readMoreInfo;
 	
 	private Button writeMore;
 	private EditText writeMorePosition;
@@ -66,18 +66,18 @@ public class RFIDTestFragment extends Fragment {
 	private void initView(View view) {
 		init = (Button) view.findViewById(R.id.init);
 		find = (Button) view.findViewById(R.id.find);
-		dsfid = (TextView) view.findViewById(R.id.dsfid);
-		uid = (TextView) view.findViewById(R.id.uid);
+//		dsfid = (TextView) view.findViewById(R.id.dsfid);
+//		uid = (TextView) view.findViewById(R.id.uid);
 		read = (Button) view.findViewById(R.id.read_15693);
 		readPosition = (EditText) view.findViewById(R.id.read_position_15693);
-		readInfo = (TextView) view.findViewById(R.id.read_info_15693);
+//		readInfo = (TextView) view.findViewById(R.id.read_info_15693);
 		write = (Button) view.findViewById(R.id.write_15693);
 		writePosition = (EditText) view.findViewById(R.id.write_position_15693);
 		writeText = (EditText) view.findViewById(R.id.write_text_15693);
 			
 		readMore = (Button) view.findViewById(R.id.read_more_15693);
 		readMorePosition = (EditText) view.findViewById(R.id.read_more_position_15693);
-		readMoreInfo = (TextView) view.findViewById(R.id.read_more_info_15693);
+//		readMoreInfo = (TextView) view.findViewById(R.id.read_more_info_15693);
 		
 		writeMore = (Button) view.findViewById(R.id.write_more_15693);
 		writeMorePosition = (EditText) view.findViewById(R.id.write_more_position_15693);

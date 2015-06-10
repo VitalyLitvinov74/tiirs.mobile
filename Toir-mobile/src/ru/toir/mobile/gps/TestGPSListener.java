@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
-import ru.toir.mobile.db.tables.Users;
+//import ru.toir.mobile.db.tables.Users;
 import android.content.Context;
 
 public class TestGPSListener implements LocationListener,GpsStatus.Listener{

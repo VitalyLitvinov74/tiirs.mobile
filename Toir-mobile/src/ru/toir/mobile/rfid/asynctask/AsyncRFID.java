@@ -1,6 +1,5 @@
 package ru.toir.mobile.rfid.asynctask;
 
-//import java.io.UnsupportedEncodingException;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -284,9 +283,8 @@ public class AsyncRFID extends Handler {
 //				.sendToTarget();
 	}
 
-
-	private OnInitListener onInitListener;
 	private OnReleaseListener onReleaseListener;
+	private OnInitListener onInitListener;
 	private OnGetRandomNumListener onGetRandomNumListener;
 	private OnAuthenticationListener onAuthenticationListener;
 	private OnDeleteFileListener onDeleteFileListener;

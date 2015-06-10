@@ -292,10 +292,11 @@ public class RFIDDriver15693API {
 		}
 		return null;
 	}
-
-	private void sendCommand(byte[] command) {
+	
+	// removed (10.06.2015)
+	/*private void sendCommand(byte[] command) {
 		SerialPortManager.getInstance().write(command);
-	}
+	}*/
 	
 	private int receive(byte[] command, byte[] buffer) {
 		int length = -1;

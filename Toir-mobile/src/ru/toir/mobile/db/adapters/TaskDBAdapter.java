@@ -68,11 +68,13 @@ public class TaskDBAdapter {
 		Cursor cursor;
 
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{tagId}, null, null, null);		
-		cursor.moveToFirst();
-		while (true)		
+		if (cursor.getCount()>0)
 			{
-			Task task;
-			task = new Task(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+			cursor.moveToFirst();
+			while (true)		
+				{
+				Task task;
+				task = new Task(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)),
 					cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)),
 					cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
@@ -81,9 +83,10 @@ public class TaskDBAdapter {
 					cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
 					cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
 					cursor.getInt(cursor.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)) == 0 ? false : true);
-			arrayList.add(task);
-			if (cursor.isLast()) break;
-			cursor.moveToNext();			
+				arrayList.add(task);
+				if (cursor.isLast()) break;
+				cursor.moveToNext();			
+				}
 			}
 		return arrayList;
 	}
