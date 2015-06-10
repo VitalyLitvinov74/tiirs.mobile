@@ -37,4 +37,20 @@ public class GpsTrack {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
+
+	public String getUUID() {
+		return uuid;
+	}
+	public String getUser_UUID() {
+		return user_uuid;
+	}
+	public String getDate() {
+		return cur_date;
+	}
+	public String getLatitude() {
+		return latitude;
+	}
+	public String getLongitude() {
+		return longitude;
+	}
 }

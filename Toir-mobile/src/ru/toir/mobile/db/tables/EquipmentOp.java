@@ -41,4 +41,39 @@ public class EquipmentOp {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
+
+	/**
+	 * @return the task_uuid
+	 */
+	public String getTaskUUID() {
+		return task_uuid;
+	}
+	
+	/**
+	 * @return the equipment_uuid
+	 */
+	public String getEquipmentUUID() {
+		return equipment_uuid;
+	}
+
+	/**
+	 * @return the operation_type_uuid
+	 */
+	public String getOperationTypeUUID() {
+		return operation_type_uuid;
+	}
+
+	/**
+	 * @return the operation_pattern_uuid
+	 */
+	public String getOperationPatternUUID() {
+		return operation_pattern_uuid;
+	}
+
+	/**
+	 * @return the equipment_status_uuid
+	 */
+	public String getEquipmentStatusUUID() {
+		return equipment_status_uuid;
+	}
 }

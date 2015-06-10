@@ -1,21 +1,21 @@
 package ru.toir.mobile.rfid.driver;
 
 /**
- * cpuїЁІвКФЦґРРІЅЦиИзПВЈє
- * µЪ1ІЅ GetChallenge »сИЎ4ЧЦЅЪЛж»ъКэ 
- * µЪ2ІЅ authentication 4ЧЦЅЪЛж»ъКэ+4ЧЦЅЪ0 ГЬФїКЗ8ёцЧЦЅЪ0xFFЈ¬ЅшРРНвІїИПЦ¤  
- * µЪ3ІЅ DeleteFile ЙѕіэMFДїВјПВЛщУРОДјю     
- * µЪ4ІЅ InitMF ЅЁБўMFДїВј   //Мш№э ДїЗ°ОЮ·ЁґґЅЁ
- * µЪ5ІЅ InitADF ЅЁБўDFДїВј //Мш№э ФЭК±ОґІвКФ
- * µЪ6ІЅ InitKEF ЅЁБўГЬФїОДјю //ЅЁБўMFДїВјПВГЬФїОДјю
- * µЪ7ІЅ appendKEY МнјУГЬФї //ДїЗ°Ц»РиТЄМнјУНвІїИПЦ¤ГЬФї ОЄБЛ·Ѕ±гјЗТдЈ¬ФЭК±ИЎ8ёцЧЦЅЪ0xFF
- * µЪ8ІЅ InitBEF ЅЁБў¶юЅшЦЖОДјю //
- * µЪ9ІЅ Select_BinaryFile СЎФс¶юЅшЦЖОДјю //СЎФсОДјюФЭК±Мш№э І»У°Пм¶БРґ
- * µЪ10ІЅ UpdateBinary Рґ¶юЅшЦЖОДјю
- * µЪ11ІЅ ReadBinary ¶БИЎ¶юЅшЦЖОДјю  і¤¶ИЙиОЄ0 јґ±нКѕ¶БИЎХыМхјЗВјЈ¬ДїЗ°І»Ц§іЦИОТві¤¶И¶БИЎ
- * µЪ12ІЅ InitREF ЅЁБўјЗВјОДјю ДїЗ°Ц»ЧцБЛЅЁБўС­»·¶Ёі¤јЗВјОДјю
- * µЪ13ІЅ AppendRecord ФцјУС­»·¶Ёі¤јЗВјОДјю  і¤¶И±ШРлёъТСЅЁБўµДОДјюЦРЛщ№ж¶ЁµДі¤¶ИТ»ЦВ
- * µЪ14ІЅ ReadRecord ¶БИЎјЗВјОДјю   і¤¶ИЙиОЄ0 јґ±нКѕ¶БИЎХыМхјЗВјЈ¬ДїЗ°І»Ц§іЦИОТві¤¶И¶БИЎ
+ * 
+ * µЪ1ІЅ GetChallenge 
+ * µЪ2ІЅ authentication  
+ * µЪ3ІЅ DeleteFile     
+ * µЪ4ІЅ InitMF
+ * µЪ5ІЅ InitADF
+ * µЪ6ІЅ InitKEF
+ * µЪ7ІЅ appendKEY
+ * µЪ8ІЅ InitBEF
+ * µЪ9ІЅ Select_BinaryFile
+ * µЪ10ІЅ UpdateBinary
+ * µЪ11ІЅ ReadBinary
+ * µЪ12ІЅ InitREF
+ * µЪ13ІЅ AppendRecord
+ * µЪ14ІЅ ReadRecord
  */
 import java.io.UnsupportedEncodingException;
 import android.os.SystemClock;
@@ -71,12 +71,13 @@ public class RFIDAPI {
 
 	public final int PROCLAIMED = 0;//ГчОД
 	public final int CIPHERTEXT = 1;//ГЬОД
-	private RealRFID rfid = null;
+	//private RealRFID rfid = null;
 	private static final byte[] SWITCH_COMMAND = "D&C00040104".getBytes();
 
 	public RFIDAPI() {
 		//String className,String MethodSend,String MethodRecv
-		rfid = new RealRFID();
+		// commented (10.06.2015)
+		//rfid = new RealRFID();
 		String className = new String("android_serialport_api/RFIDAPI");
 		String MethodSend = new String("BluetoothSend");
 		String MethodRecv = new String("BluetoothRecv");
@@ -99,7 +100,6 @@ public class RFIDAPI {
 		RealRFID.DeInitClassName();
 	}
 	
-//ґґЅЁMFОДјю
 	public int InitMF()
 	{
 		byte TransCode = (byte) 0xFF;
@@ -108,7 +108,7 @@ public class RFIDAPI {
 
 		return RealRFID.InitMF(TransCode, Authority, FileId);
 	}
-//ґґЅЁDFОДјю
+
 	public int InitADF()
 	{
 		byte FileId = (byte) 0x95;
@@ -118,7 +118,7 @@ public class RFIDAPI {
 		
 		return  RealRFID.InitADF(FileId,Authority,NameLen,ADFName);
 	}
-	//ґґЅЁMFОДјюПВГЬФїОДјю
+
 	public int InitMKEF()
 	{
 		char FileId = (0x00<<8)|0x00;
@@ -128,7 +128,7 @@ public class RFIDAPI {
 		
 		return RealRFID.InitBEF(FileId, FileType, Authority, FileLen);
 	}
-//ґґЅЁ¶юЅшЦЖОДјю
+
 	public int InitBEF()
 	{
 		char FileId = (0x00<<8)|0x16;
@@ -138,22 +138,21 @@ public class RFIDAPI {
 		
 		return RealRFID.InitBEF(FileId, FileType, Authority, FileLen);
 	}
-//ґґЅЁС­»·јЗВјОДјю
+
 	public int InitREF()
 	{
 		char FileId = (0x00<<8)|0x18;
 		byte FileType = 0x2E;
 		char Authority = 0xF0F0;
-		char FileLen = 0x0A17;//±нКѕґґЅЁ0x0AМхјЗВјЈ¬ГїТ»МхјЗВјµДі¤¶ИКЗ0x17
-		
+		char FileLen = 0x0A17;		
 		return RealRFID.InitREF(FileId,FileType,Authority,FileLen);
 	}
-//¶Б¶юЅшЦЖОДјю
+
 	/**
 	 * 
 	 * @param RecBuf
-	 * @param Count і¤¶ИІ»ТЄґуУЪТСЅЁБўµД¶юЅшЦЖОДјюµДі¤¶ИЈ¬ ФЭК±¶ЁОЄ0x27
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * @param Count
+	 * @return
 	 */
 	public int ReadBinary(byte[] RecBuf,int Count)
 	{
@@ -161,7 +160,7 @@ public class RFIDAPI {
 		byte Offset = 0x00;
 		return RealRFID.ReadBinary(FileId, Offset, Count, RecBuf);
 	}
-//ёьРВ¶юЅшЦЖОДјю
+
 	public int UpdateBinary(byte[] SendBuf,int Count)
 	{
 		byte FileId = (0x00<<8)|0x16;
@@ -169,7 +168,7 @@ public class RFIDAPI {
 		int level = 0x00;
 		return RealRFID.UpdateBinary(FileId,Offset,level,SendBuf,Count);
 	}
-//¶БС­»·јЗВјОДјю
+
 	public int ReadRecord(byte[] RecBuf,int Count)
 	{
 		byte FileId = (0x00<<8)|0x18;
@@ -178,12 +177,12 @@ public class RFIDAPI {
 
 		return RealRFID.ReadRecord(FileId, level, Index, RecBuf, 0);
 	}
-//ФцјУС­»·¶Ёі¤јЗВјОДјю
+
 	/**
 	 * 
 	 * @param SendBuf  
-	 * @param Count  і¤¶ИЧоґуІ»ДЬі¬№эТСЅЁБўОДјю№ж¶ЁµДµҐМхјЗВјµДі¤¶И ФЭК±ОЄ0x17
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * @param Count
+	 * @return
 	 */
 	public int AppendRecord(
         byte[] SendBuf,
@@ -201,12 +200,13 @@ public class RFIDAPI {
 
 		return RealRFID.AppendRecord(FileId,level,tempBuf,tempBuf.length);
 	}
-//ёьРВС­»·јЗВјОДјю
+
+	
 	/**
 	 * 
 	 * @param SendBuf
-	 * @param Count і¤¶ИЧоґуІ»ДЬі¬№эТСЅЁБўОДјю№ж¶ЁµДµҐМхјЗВјµДі¤¶И ФЭК±ОЄ0x17
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * @param Count
+	 * @return
 	 */
 	public int UpdateRecord(byte[] SendBuf,int Count)
 	{
@@ -223,10 +223,10 @@ public class RFIDAPI {
        	
 		return RealRFID.UpdateRecord(FileId, level, Index, tempBuf, tempBuf.length);
 	}
-//СЎФс¶юЅшЦЖОДјю
+	
 	/**
-	 * µ±ДїВјПВґжФЪ¶аёц¶юЅшЦЖОДјюК±Ј¬РиТЄСЎФс¶ФУ¦µД¶юЅшЦЖОДјюЈ¬И»єуІЕДЬЅшРР¶БРґ
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * 
+	 * @return
 	 */
 	public int Select_BinaryFile() {
 		int FileType = 0x02;
@@ -236,10 +236,10 @@ public class RFIDAPI {
 
 		return RealRFID.SelectFile(FileType, Idlen, FileId);
 	}
-//СЎФсС­»·јЗВјОДјю	
+	
 	/**
-	 * µ±ДїВјПВґжФЪ¶аёцС­»·јЗВјОДјюК±Ј¬РиТЄСЎФс¶ФУ¦µДјЗВјОДјюЈ¬И»єуІЕДЬЅшРР¶БРґ
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * 
+	 * @return
 	 */
 	public int Select_RecordFile() {
 		int FileType = 0x02;
@@ -250,10 +250,9 @@ public class RFIDAPI {
 		return RealRFID.SelectFile(FileType,Idlen,FileId);
 	}
 	
-	//СЎФсMFДїВј
 	/**
-	 * СЎФсЦчДїВјЈ¬УЙУЪЦ»УРТ»ёцЦчДїВјЈ¬їЙІ»УГСЎФс
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * 
+	 * @return
 	 */
 	public int Select_MasterFile() {
 		int FileType = 0x00;
@@ -264,10 +263,9 @@ public class RFIDAPI {
 		return RealRFID.SelectFile(FileType,Idlen,FileId);
 	}
 	
-	//СЎФсDFОДјю	
 	/**
-	 * µ±РиТЄФЪТСґґЅЁµДDFДїВјПВІЩЧчК±РиТЄПИСЎФс¶ФУ¦DFДїВј
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * 
+	 * @return
 	 */
 	public int Select_DedicatedFile() {
 		int FileType = 0x04;
@@ -278,18 +276,17 @@ public class RFIDAPI {
 		return RealRFID.SelectFile(FileType,Idlen,FileId);
 	}
 	
-//»сИЎЛж»ъКэ
 	public int GetChallenge(int Count,byte[] RecBuf)
 	{
 		return RealRFID.GetChallenge(Count, RecBuf);
 	}
-	//НвІїИПЦ¤
+
 	/**
-	 * 4ЧЦЅЪЛж»ъКэјУЙП4ЧЦЅЪ0x00Ул8ЧЦЅЪГЬФї¶ФУ¦Ј¬»тХЯ8ЧЦЅЪЛж»ъКэУл16ЧЦЅЪГЬФї¶ФУ¦
-	 * @param random Лж»ъКэ
-	 * @param Keycode  ГЬФї
-	 * @param KeyLen  ГЬФїі¤¶И
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * 
+	 * @param random
+	 * @param Keycode
+	 * @param KeyLen
+	 * @return
 	 */
 	public int authentication(byte[] random , byte[] Keycode,int KeyLen)
 	{
@@ -300,10 +297,10 @@ public class RFIDAPI {
 		//int KeyLen = 8;
 		return RealRFID.authentication(KeyID, random,Keycode,KeyLen);
 	}
-//»сИЎ·µ»ШЦµ
+
 	/**
-	 * Count і¤¶И
-	 * RecBuf »сИЎCPUїЁµДКэѕЭ
+	 * Count
+	 * RecBuf
 	 */
 	public int GetResponse(
         int Count,
@@ -312,69 +309,66 @@ public class RFIDAPI {
 	{
 		return RealRFID.GetResponse(Count, RecBuf);
 	}
-//ЙѕіэОДјю
+
 	/**
-	 * ЙѕіэMFЦчОДјюОДјю
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * @return
 	 */
 	public int DeleteFile()
 	{
 		return RealRFID.DeleteFile();
 	}
-	//1Ј®	ЕдЦГ¶БїЁЖчДЈКЅ
+
 	public int setReaderMode(byte[] RecBuf)
 	{
 		return RealRFID.setReaderMode(RecBuf);
 	}
-	//ёщѕЭїЁЖ¬АаРНЕдЦГ¶БїЁР­ТйДЈКЅ
+
 	public int setProtocolMode(byte[] RecBuf)
 	{
 		return RealRFID.setProtocolMode(RecBuf);
 	}
-//ЙиЦГ¶БїЁЖчµДРЈСйВл·ЅКЅ ЧФ¶ЇЅУКХі¬К±ЕР±р
+
 	public int setCheckMode(byte[] RecBuf)
 	{
 		return RealRFID.setCheckMode(RecBuf);
 	}
-//С°їЁ
+
 	public int SearchCard(byte[] RecBuf)
 	{
 		return RealRFID.SearchCard(RecBuf);
 	}
-//ЕцЧІСЎїЁ
+
 	public int Anticoll(byte[] RecBuf)
 	{
 		return RealRFID.Anticoll(RecBuf);
 	}
-//СЎїЁ
+
 	/**
 	 * 
-	 * @param Count їЁєЕД¬ИП4О»Ј¬јУ1О»РЈСйО»
-	 * @param SendBuf КдИлµДїЁєЕ
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * @param Count
+	 * @param SendBuf
+	 * @return
 	 */
 	public int SelectCard(int Count,byte[] SendBuf)
 	{
 		return RealRFID.SelectCard(Count,SendBuf);
 	}
-//ёґО»
+	
 	/**
-	 * 
-	 * @param Count ·µ»ШДЪИЭµДі¤¶И Д¬ИП16ЧЦЅЪ
-	 * @param RecBuf ёґО»·µ»ШµДДЪИЭ
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 *  
+	 * @param Count
+	 * @param RecBuf
+	 * @return
 	 */
 	public int ResetCard(byte[] RecBuf)
 	{
 		return RealRFID.ResetCard(RecBuf);
 	}
 
-	//МнјУГЬФї
 	/**
- 	 * 
-	 * @param Keycode 8ЧЦЅЪ»т10ЧЦЅЪГЬФї
-	 * @param KeyLen ГЬФїі¤¶И
-	 * @return ·µ»Ш0x04±нКѕХэИ·
+	 * @param Keycode
+	 * @param KeyLen
+	 * @return
 	 */
 	public int appendKEY(byte[] Keycode,int KeyLen)
 	{
@@ -388,8 +382,7 @@ public class RFIDAPI {
 		Key_MsgData[2] = (byte)0xF0;
 		Key_MsgData[3] = (byte)0xAA;
 		Key_MsgData[4] = 0x55;
-		System.arraycopy(Keycode, 0, Key_MsgData, 5, KeyLen);
-		
+		System.arraycopy(Keycode, 0, Key_MsgData, 5, KeyLen);		
 		return RealRFID.WriteKEY(KEY_InMode,KEY_Opt,KEY_ID,Key_MsgData,Key_Msglen);
 	}
 	

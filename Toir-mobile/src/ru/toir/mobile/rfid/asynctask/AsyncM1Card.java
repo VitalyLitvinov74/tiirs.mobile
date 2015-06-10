@@ -19,10 +19,9 @@ public class AsyncM1Card extends Handler {
 	private static final String NUM = "num";
 	private static final String KEY_TYPE_KEY = "keyType";
 	private static final String PASSWORD_KEY = "password";
-	private static final String DATA_KEY = "data";
+//	private static final String DATA_KEY = "data";
 
 	private Handler mWorkerThreadHandler;
-
 	private M1CardAPI reader;
 
 	public AsyncM1Card(Looper looper) {
@@ -99,7 +98,6 @@ public class AsyncM1Card extends Handler {
 		public void onReadAtPositionSuccess(String cardNum, byte[][] data);
 
 		/**
-		 * И·ИПВл 1: іЙ№¦ 2ЈєС°їЁК§°Ь 3ЈєСйЦ¤К§°Ь 4:РґїЁК§°Ь 5Јєі¬К± 6ЈєЖдЛьТміЈ
 		 * 
 		 * @param comfirmationCode
 		 */
@@ -110,7 +108,6 @@ public class AsyncM1Card extends Handler {
 		public void onWriteAtPositionSuccess(String num);
 
 		/**
-		 * И·ИПВл 1: іЙ№¦ 2ЈєС°їЁК§°Ь 3ЈєСйЦ¤К§°Ь 4:РґїЁК§°Ь 5Јєі¬К± 6ЈєЖдЛьТміЈ
 		 * 
 		 * @param comfirmationCode
 		 */
@@ -168,17 +165,16 @@ public class AsyncM1Card extends Handler {
 	}
 
 	/**
-	 * ПтЦё¶ЁµДїйєЕРґИлКэѕЭЈ¬і¤¶ИОЄ16ЧЦЅЪ Write data to the specified block, length is 16 bytes
+	 * Write data to the specified block, length is 16 bytes
 	 * args should be data[i].length == num.
 	 * @param position
-	 *            РґИлКэѕЭµДїйєЕ Write data block number
+	 *            Write data block number
 	 * @param password
-	 *            ГЬВлїЙТФОЄnullЈ¬ТІїЙТФОЄі¤¶И6ЧЦЅЪµДГЬВл Password can be null, or length of 6
+	 *            Password can be null, or length of 6
 	 *            bytes of password
 	 * @param keyType
-	 *            ГЬВлАаРНЈєГЬВлA»тГЬВлB Password: A password or password B
+	 *            Password: A password or password B
 	 * @param data
-	 *            РґИлµДКэѕЭІ»ДЬОЄїХЈ¬dataµДі¤¶ИОЄ16ЧЦЅЪЈ¬ТтТ»ёцїйЦ»ДЬґж·Е16ЧЦЅЪµДКэѕЭ,ЅЁТйІ»Чг16ЧЦЅЪ УГ0І№Жл Write
 	 *            data can not be empty, the length of the data of 16 bytes,
 	 *            because of a piece of only 16 bytes of data, suggest that less
 	 *            than 16 bytes 0 is lacking
@@ -200,10 +196,10 @@ public class AsyncM1Card extends Handler {
 	/**
 	 * 
 	 * @param position
-	 *            РґИлКэѕЭµДїйєЕ Write data block number
+	 *            Write data block number
 	 * @param num : the number of block
 	 * @param password
-	 *            ГЬВлїЙТФОЄnullЈ¬ТІїЙТФОЄі¤¶И6ЧЦЅЪµДГЬВл Password can be null, or length of 6
+	 *            Password can be null, or length of 6
 	 *            bytes of code
 	 */
 	public void read(int position, int num, int keyType, byte[] password) {
@@ -227,7 +223,7 @@ public class AsyncM1Card extends Handler {
 		byte[][] data = (byte[][])msg.obj;
 		Result result = null;
 		int time = 0;
-		// С°їЁИэґО»тСйЦ¤3ґО¶јІ»НЁ№э·µ»Ш
+
 		while (time < 3) {
 			result = reader.readCardNum();
 			if (result.confirmationCode == Result.FIND_FAIL) {
@@ -270,7 +266,7 @@ public class AsyncM1Card extends Handler {
 		byte[] password = readBundle.getByteArray(PASSWORD_KEY);
 		Result result = null;
 		int time = 0;
-		// С°їЁИэґО»тСйЦ¤3ґО¶јІ»НЁ№э·µ»Ш
+
 		while (time < 3) {
 			result = reader.readCardNum();
 			if (result.confirmationCode == Result.FIND_FAIL) {

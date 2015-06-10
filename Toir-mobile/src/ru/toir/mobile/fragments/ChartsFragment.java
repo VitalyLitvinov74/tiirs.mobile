@@ -1,8 +1,6 @@
 package ru.toir.mobile.fragments;
 
 import ru.toir.mobile.R;
-import ru.toir.mobile.utils.ToastUtil;
-
 import java.util.ArrayList;
 
 import android.graphics.Typeface;

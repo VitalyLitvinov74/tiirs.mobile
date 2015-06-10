@@ -18,7 +18,7 @@ import org.osmdroid.api.IMapController;
 import ru.toir.mobile.db.adapters.EquipmentOpDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
-import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.db.tables.*;
 import ru.toir.mobile.gps.TestGPSListener;
 import android.location.LocationManager;
 import android.location.Location;
@@ -71,23 +71,20 @@ public class GPSFragment extends Fragment {
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		EquipmentOpDBAdapter equips = new EquipmentOpDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid (если он будет храниться глобально, то запрашивать постоянно уже не надо будет)
-		
-		Users user = users.getUserByTagId(tagId);
+		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid (если он будет храниться глобально, то запрашивать постоянно уже не надо будет)		
+		//Users user = users.getUserByTagId(tagId);
 		// запращиваем перечень задач нарядов (активных)
-		//ArrayList<Orders> ordersList = dbOrder.getOrdersByTagId(tagId,1);
+		ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(tagId);
 		Integer cnt=0,cnt2=0;
-		if (false)
-		//while (cnt<ordersList.size())
+		while (cnt<ordersList.size())
 				{
 				 // запращиваем перечень оборудования статус - hardcoded!
-			/*
 				 ArrayList<EquipmentOp> equipOpList = equips.getEquipsByOrderId(ordersList.get(cnt).getUuid(),"1");
 				 cnt2=0;
 				 while (cnt<equipOpList.size())
 					{
 					 equipOpList.get(cnt2).getUuid();
-					}*/				 
+					}
 				}
 
 		equips.close();

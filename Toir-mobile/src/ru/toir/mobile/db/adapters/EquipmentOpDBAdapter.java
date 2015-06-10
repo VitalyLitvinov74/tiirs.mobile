@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.UUID;
 
 import android.content.ContentValues;
@@ -68,26 +68,27 @@ public class EquipmentOpDBAdapter {
 	}
 
 	public ArrayList<EquipmentOp> getEquipsByOrderId(String orderId, String status) {
-		// TODO исправить алгоритм для возврата списка
-		EquipmentOp	equipOp[]=null;
-		Cursor cur;
-		Integer	cnt=0;
+		ArrayList<EquipmentOp> arrayList = new ArrayList<EquipmentOp>();
+		Cursor cursor;
 		// можем или отобрать все оборудование или только с нужным статусом 
-		cur = db.query(TABLE_NAME, mColumns, FIELD_TASK_NAME + "=?", new String[]{orderId}, null, null, null);		
-		cur.moveToFirst();
-		while (true)		
+		cursor = db.query(TABLE_NAME, mColumns, FIELD_TASK_NAME + "=?", new String[]{orderId}, null, null, null);
+		if (cursor.getCount()>0)
 			{
-			 equipOp[cnt] = new EquipmentOp(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_TASK_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_EQUIPMENT_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_OPERATION_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_PATTERN_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_STATUS_NAME)));
-			if (cur.isLast()) break;
-			cur.moveToNext();
-			cnt++;
-		}
-		ArrayList<EquipmentOp> arrayList = new ArrayList<EquipmentOp>(Arrays.asList(equipOp));
+			cursor.moveToFirst();
+			while (true)		
+				{
+				 EquipmentOp equipOp;
+				 equipOp = new EquipmentOp(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					 cursor.getString(cursor.getColumnIndex(FIELD_TASK_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_PATTERN_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_STATUS_NAME)));
+				 arrayList.add(equipOp);
+				 if (cursor.isLast()) break;
+				 cursor.moveToNext();
+				}
+			}
 		return arrayList;
 	}
 	
