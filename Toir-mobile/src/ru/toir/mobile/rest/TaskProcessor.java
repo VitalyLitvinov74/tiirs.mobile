@@ -14,11 +14,13 @@ import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
@@ -91,7 +93,10 @@ public class TaskProcessor {
 						ParseTaskStatus(elementArray);
 					} else if (next.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
 						ParseCriticalType(elementArray);
+					} else if (next.equals(OperationTypeDBAdapter.TABLE_NAME)) {
+						ParseOperationType(elementArray);
 					}
+					
 				}
 				return true;
 			} else {
@@ -101,6 +106,34 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseOperationType(JSONArray array) {
+		int elementCount = array.length();
+		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				OperationType item = new OperationType();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(OperationTypeDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(OperationTypeDBAdapter.FIELD_TITLE_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
 	}
 	
 	/**
