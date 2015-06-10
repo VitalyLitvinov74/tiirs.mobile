@@ -18,7 +18,7 @@ public class UserInfoFragment extends Fragment {
 	private TextView user_name;
 	private TextView user_id;
 	//private TextView user_uuid;
-	//private TextView user_type;
+	private TextView user_type;
 
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
