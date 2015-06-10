@@ -18,6 +18,7 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
+import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
@@ -28,6 +29,7 @@ import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.OperationPattern;
+import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
@@ -111,6 +113,8 @@ public class TaskProcessor {
 						ParseDocumentationType(elementArray);
 					} else if (next.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
 						ParseMeasureType(elementArray);
+					} else if (next.equals(OperationResultDBAdapter.TABLE_NAME)) {
+						ParseOperationResult(elementArray);
 					}
 				}
 				return true;
@@ -121,6 +125,35 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseOperationResult(JSONArray array) {
+		int elementCount = array.length();
+		OperationResultDBAdapter adapter = new OperationResultDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				OperationResult item = new OperationResult();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(OperationResultDBAdapter.FIELD_UUID_NAME));
+				item.setOperation_type_uuid(value.getString(OperationResultDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(OperationResultDBAdapter.FIELD_TITLE_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
 	}
 	
 	/**
