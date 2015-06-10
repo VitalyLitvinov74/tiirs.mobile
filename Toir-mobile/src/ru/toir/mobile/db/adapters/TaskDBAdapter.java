@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Task;
@@ -62,27 +64,29 @@ public class TaskDBAdapter {
 		mDbHelper.close();
 	}
 
-	public Task[] getOrdersByTagId(String tagId) {		
-		Task	ord[]=null;
-		Cursor cur;
-		Integer	cnt=0;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{tagId}, null, null, null);		
-		cur.moveToFirst();
+	public ArrayList<Task> getOrdersByTagId(String tagId) {		
+		ArrayList<Task> arrayList = new ArrayList<Task>();
+		Cursor cursor;
+
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{tagId}, null, null, null);		
+		cursor.moveToFirst();
 		while (true)		
 			{
-			ord[cnt] = new Task(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_USER_UUID_NAME)),
-					cur.getLong(cur.getColumnIndex(FIELD_CREATE_DATE_NAME)),
-					cur.getLong(cur.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
-					cur.getLong(cur.getColumnIndex(FIELD_CLOSE_DATE_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)),
-					cur.getLong(cur.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
-					cur.getInt(cur.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-					cur.getInt(cur.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)) == 0 ? false : true);
-			if (cur.isLast()) break;
-			cur.moveToNext();			
+			Task task;
+			task = new Task(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)) == 0 ? false : true);
+			arrayList.add(task);
+			if (cursor.isLast()) break;
+			cursor.moveToNext();			
 			}
-		return ord;
+		return arrayList;
 	}
 	
 	/**

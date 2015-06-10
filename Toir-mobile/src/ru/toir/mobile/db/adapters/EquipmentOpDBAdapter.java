@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 import android.content.ContentValues;
@@ -8,6 +10,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
+import ru.toir.mobile.db.tables.EquipmentOp;
 import ru.toir.mobile.TOiRDBAdapter;
 
 /**
@@ -20,15 +23,19 @@ public class EquipmentOpDBAdapter {
 	public static final String TABLE_NAME = "equipment_operation";
 	
 	public static final String FIELD_UUID_NAME = "uuid";
-	public static final int FIELD_UUID_COLUMN = 0;
 	public static final String FIELD_TASK_NAME = "task_uuid";
-	public static final int FIELD_TASK_COLUMN = 1;
 	public static final String FIELD_EQUIPMENT_NAME = "equipment_uuid";
-	public static final int FIELD_EQUIPMENT_COLUMN = 2;
 	public static final String FIELD_OPERATION_NAME = "operation_type_uuid";
-	public static final int FIELD_OPERATION_COLUMN = 3;
 	public static final String FIELD_PATTERN_NAME = "operation_pattern_uuid";
-	public static final int FIELD_PATTERN_COLUMN = 4;
+	public static final String FIELD_STATUS_NAME = "operation_status_uuid";
+		
+	String[] mColumns = {
+			FIELD_UUID_NAME,
+			FIELD_TASK_NAME,
+			FIELD_EQUIPMENT_NAME,
+			FIELD_OPERATION_NAME,
+			FIELD_PATTERN_NAME,
+			FIELD_STATUS_NAME};
 
 	private DatabaseHelper dbHelper;
 	private SQLiteDatabase db;
@@ -58,6 +65,30 @@ public class EquipmentOpDBAdapter {
 	 */
 	public void close() {
 		dbHelper.close();
+	}
+
+	public ArrayList<EquipmentOp> getEquipsByOrderId(String orderId, String status) {
+		// TODO исправить алгоритм для возврата списка
+		EquipmentOp	equipOp[]=null;
+		Cursor cur;
+		Integer	cnt=0;
+		// можем или отобрать все оборудование или только с нужным статусом 
+		cur = db.query(TABLE_NAME, mColumns, FIELD_TASK_NAME + "=?", new String[]{orderId}, null, null, null);		
+		cur.moveToFirst();
+		while (true)		
+			{
+			 equipOp[cnt] = new EquipmentOp(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_TASK_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_EQUIPMENT_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_OPERATION_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_PATTERN_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_STATUS_NAME)));
+			if (cur.isLast()) break;
+			cur.moveToNext();
+			cnt++;
+		}
+		ArrayList<EquipmentOp> arrayList = new ArrayList<EquipmentOp>(Arrays.asList(equipOp));
+		return arrayList;
 	}
 	
 	/**
