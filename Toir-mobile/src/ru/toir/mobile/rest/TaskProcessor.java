@@ -12,8 +12,10 @@ import org.json.JSONObject;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
@@ -54,8 +56,7 @@ public class TaskProcessor {
 	public boolean GetTask(Bundle bundle) {
 		// TODO добавить в запрос переменную tag_id
 		URI requestUri = null;
-		String tag = bundle
-				.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
+		//String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
 		String jsonString = null;
 		JSONObject jsonRootObject = null;
 		try {
@@ -80,7 +81,10 @@ public class TaskProcessor {
 						ParseTask(elementArray);
 					} else if (next.equals(EquipmentDBAdapter.TABLE_NAME)) {
 						ParseEquipment(elementArray);
+					} else if (next.equals(EquipmentOperationDBAdapter.TABLE_NAME)) {
+						ParseEquipmentOperation(elementArray);
 					}
+					
 				}
 				return true;
 			} else {
@@ -92,6 +96,38 @@ public class TaskProcessor {
 		}
 	}
 
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseEquipmentOperation(JSONArray array) {
+		int elementCount = array.length();
+		EquipmentOperationDBAdapter adapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				EquipmentOperation item = new EquipmentOperation();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(EquipmentOperationDBAdapter.FIELD_UUID_NAME));
+				item.setTask_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_TASK_UUID_NAME));
+				item.setEquipment_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID_NAME));
+				item.setOperation_type_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME));
+				item.setOperation_pattern_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME));
+				item.setOperation_status_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_OPERATION_STATUS_UUID_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * 
 	 * @param array

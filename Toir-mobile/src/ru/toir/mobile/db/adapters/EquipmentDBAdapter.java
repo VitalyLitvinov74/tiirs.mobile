@@ -95,6 +95,7 @@ public class EquipmentDBAdapter {
 	 * @return
 	 */
 	public long replace(String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id){
+		// TODO нужно сделать контроль, выполнилось выражение или нет
 		ContentValues values = new ContentValues();
 		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);

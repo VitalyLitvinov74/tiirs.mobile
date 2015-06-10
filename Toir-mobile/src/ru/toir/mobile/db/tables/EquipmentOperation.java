@@ -13,19 +13,19 @@ public class EquipmentOperation {
 	private String equipment_uuid;
 	private String operation_type_uuid;
 	private String operation_pattern_uuid;
-	private String equipment_status_uuid;
+	private String operation_status_uuid;
 
 	public EquipmentOperation() {
 	}
 
-	public EquipmentOperation(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String equipment_status_uuid) 
+	public EquipmentOperation(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid) 
 	{
 		this.uuid = uuid;
 		this.task_uuid = task_uuid;
 		this.equipment_uuid = equipment_uuid;
 		this.operation_type_uuid = operation_type_uuid;
 		this.operation_pattern_uuid = operation_pattern_uuid;
-		this.equipment_status_uuid = equipment_status_uuid;
+		this.operation_status_uuid = operation_status_uuid;
 	}
 
 	/**
@@ -101,14 +101,14 @@ public class EquipmentOperation {
 	/**
 	 * @return the equipment_status_uuid
 	 */
-	public String getEquipment_status_uuid() {
-		return equipment_status_uuid;
+	public String getOperation_status_uuid() {
+		return operation_status_uuid;
 	}
 
 	/**
 	 * @param equipment_status_uuid the equipment_status_uuid to set
 	 */
-	public void setEquipment_status_uuid(String equipment_status_uuid) {
-		this.equipment_status_uuid = equipment_status_uuid;
+	public void setOperation_status_uuid(String equipment_status_uuid) {
+		this.operation_status_uuid = equipment_status_uuid;
 	}
 }
