@@ -10,7 +10,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.db.tables.EquipmentOp;
+import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.TOiRDBAdapter;
 
 /**
@@ -18,7 +18,7 @@ import ru.toir.mobile.TOiRDBAdapter;
  * <p>Класс для работы с оборудованием</p>
  *
  */
-public class EquipmentOpDBAdapter {
+public class EquipmentOperationDBAdapter {
 		
 	public static final String TABLE_NAME = "equipment_operation";
 	
@@ -45,7 +45,7 @@ public class EquipmentOpDBAdapter {
 	 * @param context
 	 * @return EquipmentOpDBAdapter
 	 */
-	public EquipmentOpDBAdapter(Context context){
+	public EquipmentOperationDBAdapter(Context context){
 		this.context = context;
 	}
 	
@@ -54,7 +54,7 @@ public class EquipmentOpDBAdapter {
 	 * @return EquipmentOpDBAdapter
 	 * @throws SQLException
 	 */
-	public EquipmentOpDBAdapter open() throws SQLException {
+	public EquipmentOperationDBAdapter open() throws SQLException {
 		this.dbHelper = new DatabaseHelper(this.context, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
 		this.db = dbHelper.getWritableDatabase();
 		return this;
@@ -67,9 +67,9 @@ public class EquipmentOpDBAdapter {
 		dbHelper.close();
 	}
 
-	public ArrayList<EquipmentOp> getEquipsByOrderId(String orderId, String status) {
+	public ArrayList<EquipmentOperation> getEquipsByOrderId(String orderId, String status) {
 		// TODO исправить алгоритм для возврата списка
-		EquipmentOp	equipOp[]=null;
+		EquipmentOperation	equipOp[]=null;
 		Cursor cur;
 		Integer	cnt=0;
 		// можем или отобрать все оборудование или только с нужным статусом 
@@ -77,7 +77,7 @@ public class EquipmentOpDBAdapter {
 		cur.moveToFirst();
 		while (true)		
 			{
-			 equipOp[cnt] = new EquipmentOp(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
+			 equipOp[cnt] = new EquipmentOperation(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_TASK_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_EQUIPMENT_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_OPERATION_NAME)),
@@ -87,7 +87,7 @@ public class EquipmentOpDBAdapter {
 			cur.moveToNext();
 			cnt++;
 		}
-		ArrayList<EquipmentOp> arrayList = new ArrayList<EquipmentOp>(Arrays.asList(equipOp));
+		ArrayList<EquipmentOperation> arrayList = new ArrayList<EquipmentOperation>(Arrays.asList(equipOp));
 		return arrayList;
 	}
 	
@@ -115,12 +115,12 @@ public class EquipmentOpDBAdapter {
 	public long insertOpEquipment(String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid){
 		ContentValues values = new ContentValues();
 		String uuid = UUID.randomUUID().toString();
-		values.put(EquipmentOpDBAdapter.FIELD_UUID_NAME, uuid);
-		values.put(EquipmentOpDBAdapter.FIELD_TASK_NAME, task_uuid);
-		values.put(EquipmentOpDBAdapter.FIELD_EQUIPMENT_NAME, equipment_uuid);
-		values.put(EquipmentOpDBAdapter.FIELD_OPERATION_NAME, operation_type_uuid);
-		values.put(EquipmentOpDBAdapter.FIELD_PATTERN_NAME, operation_pattern_uuid);
-		return db.insert(EquipmentOpDBAdapter.TABLE_NAME, null, values);
+		values.put(EquipmentOperationDBAdapter.FIELD_UUID_NAME, uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_TASK_NAME, task_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_NAME, equipment_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_NAME, operation_type_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_PATTERN_NAME, operation_pattern_uuid);
+		return db.insert(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
 	}
 	
 	/**

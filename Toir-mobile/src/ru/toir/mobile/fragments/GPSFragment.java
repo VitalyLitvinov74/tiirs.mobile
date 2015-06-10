@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.os.Bundle;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
-import ru.toir.mobile.db.adapters.EquipmentOpDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.Users;
@@ -70,7 +70,7 @@ public class GPSFragment extends Fragment {
 		String tagId = "01234567";
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentOpDBAdapter equips = new EquipmentOpDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+		EquipmentOperationDBAdapter equips = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid (если он будет храниться глобально, то запрашивать постоянно уже не надо будет)
 		
 		Users user = users.getUserByTagId(tagId);
