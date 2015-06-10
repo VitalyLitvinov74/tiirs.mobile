@@ -43,7 +43,6 @@ public class TaskDBAdapter {
 	 * @return OrderDBAdapter
 	 */
 	public TaskDBAdapter(Context context) {
-		super();
 		mContext = context;
 	}
 	

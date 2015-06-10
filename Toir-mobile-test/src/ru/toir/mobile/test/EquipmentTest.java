@@ -31,14 +31,6 @@ public class EquipmentTest extends AndroidTestCase {
 	}
 	
 	/**
-	 * проверка создания оборудования 
-	 */
-	public void testCreateEquipment() {
-		long id = adapter.insertEquipment("testEq", "/files/doc.pdf", 666, 2000, "testManufacturer", "/files/photo/foto.jpg", 13);
-		assertEquals(2, id);
-	}
-	
-	/**
 	 * проверка на создание адаптера базы
 	 */
 	public void testAdapterCreated() {
@@ -49,9 +41,9 @@ public class EquipmentTest extends AndroidTestCase {
 	 * проверка чтения оборудования из базы
 	 */
 	public void testSelectEquipment() {
-		Cursor user = adapter.getEquipment(1);
-		assertEquals(true, user.moveToFirst());
-		assertEquals(1, user.getLong(EquipmentDBAdapter.FIELD_ID_COLUMN));
+		Cursor cursor = adapter.getItem("0000-00-00-00-0000");
+		assertEquals(true, cursor.moveToFirst());
+		assertEquals(1, cursor.getString(cursor.getColumnIndex(EquipmentDBAdapter.FIELD_UUID_NAME)));
 	}
 
 	/* (non-Javadoc)

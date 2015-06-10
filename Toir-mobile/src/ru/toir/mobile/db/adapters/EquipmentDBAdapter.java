@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
+import ru.toir.mobile.db.tables.Equipment;
 
 /**
  * @author olejek
@@ -15,35 +16,35 @@ import ru.toir.mobile.TOiRDBAdapter;
  */
 public class EquipmentDBAdapter {
 		
+	private DatabaseHelper mDbHelper;
+	private SQLiteDatabase mDb;
+	private final Context mContext;
+
 	public static final String TABLE_NAME = "equipment";
 	
-	public static final String FIELD_ID_NAME = "_id";
-	public static final int FIELD_ID_COLUMN = 0;
-	public static final String FIELD_NAME_NAME = "name";
-	public static final int FIELD_NAME_COLUMN = 1;
-	public static final String FIELD_LINK_NAME = "link";
-	public static final int FIELD_LINK_COLUMN = 2;
-	public static final String FIELD_TYPE_NAME = "type";
-	public static final int FIELD_TYPE_COLUMN = 3;
-	public static final String FIELD_YEAR_NAME = "year";
-	public static final int FIELD_YEAR_COLUMN = 4;
-	public static final String FIELD_MANUFACTURER_NAME = "manufacturer";
-	public static final int FIELD_MANUFACTURER_COLUMN = 5;	
-	public static final String FIELD_PHOTO_NAME = "photo";
-	public static final int FIELD_PHOTO_COLUMN = 6;	
-	public static final String FIELD_PRIORITY_NAME = "priority";
-	public static final int FIELD_PRIORITY_COLUMN = 7;	
-
-	private DatabaseHelper dbHelper;
-	private SQLiteDatabase db;
-	private final Context context;
+	public static final String FIELD_UUID_NAME = "uuid";
+	public static final String FIELD_TITLE_NAME = "title";
+	public static final String FIELD_EQUIPMENT_TYPE_UUID_NAME = "equipment_type_uuid";
+	public static final String FIELD_CRITICAL_TYPE_UUID_NAME = "critical_type_uuid";
+	public static final String FIELD_START_DATE_NAME = "start_date";
+	public static final String FIELD_LOCATION_NAME = "location";
+	public static final String FIELD_TAG_ID_NAME = "tag_id";
+	
+	private static String mColumns[] = {
+		FIELD_UUID_NAME,
+		FIELD_TITLE_NAME,
+		FIELD_EQUIPMENT_TYPE_UUID_NAME,
+		FIELD_CRITICAL_TYPE_UUID_NAME,
+		FIELD_START_DATE_NAME,
+		FIELD_LOCATION_NAME,
+		FIELD_TAG_ID_NAME};
 	
 	/**
 	 * @param context
 	 * @return EquipmentDBAdapter
 	 */
 	public EquipmentDBAdapter(Context context){
-		this.context = context;
+		this.mContext = context;
 	}
 	
 	/**
@@ -52,8 +53,8 @@ public class EquipmentDBAdapter {
 	 * @throws SQLException
 	 */
 	public EquipmentDBAdapter open() throws SQLException {
-		this.dbHelper = new DatabaseHelper(this.context, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
-		this.db = dbHelper.getWritableDatabase();
+		this.mDbHelper = new DatabaseHelper(this.mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		this.mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
 	
@@ -61,88 +62,57 @@ public class EquipmentDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		dbHelper.close();
+		mDb.close();
+		mDbHelper.close();
 	}
 	
 	/**
 	 * <p>Возвращает все записи из таблицы equipment</p>
 	 * @return Cursor
 	 */
-	public Cursor getAllEquipment() {
-		return db.query(TABLE_NAME, new String[]{FIELD_ID_NAME, FIELD_NAME_NAME, FIELD_LINK_NAME, FIELD_TYPE_NAME, FIELD_YEAR_NAME, FIELD_MANUFACTURER_NAME, FIELD_PHOTO_NAME, FIELD_PRIORITY_NAME}, null, null, null, null, null);
+	public Cursor getAllItems() {
+		return mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
 	}
 	
 	/**
 	 * <p>Возвращает запись из таблицы equipment</p>
-	 * @param id
+	 * @param uuid
 	 * @return Cursor
 	 */
-	public Cursor getEquipment(long id) {
-		return db.query(TABLE_NAME, new String[]{FIELD_ID_NAME, FIELD_NAME_NAME, FIELD_LINK_NAME, FIELD_TYPE_NAME, FIELD_YEAR_NAME, FIELD_MANUFACTURER_NAME, FIELD_PHOTO_NAME, FIELD_PRIORITY_NAME}, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)}, null, null, null);
+	public Cursor getItem(String uuid) {
+		return mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
 	}
 	
 	/**
-	 * <p>Добавляет запись в таблицу equipments</p>
-	 * @param String name;
-	 * @param String link;
-	 * @param int type;
-	 * @param int year;
-	 * @param String manufacturer;
-	 * @param String photo;
-	 * @param int priority;
-	 * @return long id столбца или -1 если не удалось добавить запись
+	 * <p>Добавляет/заменяет запись в таблице equipments</p>
+	 * @param uuid
+	 * @param title
+	 * @param equipment_type_uuid
+	 * @param critical_type_uuid
+	 * @param start_date
+	 * @param location
+	 * @param tag_id
+	 * @return
 	 */
-	public long insertEquipment(String name, String link, int type, int year, String manufacturer, String photo, int priority){
+	public long replace(String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id){
 		ContentValues values = new ContentValues();
-		values.put(EquipmentDBAdapter.FIELD_NAME_NAME, name);
-		values.put(EquipmentDBAdapter.FIELD_LINK_NAME, link);
-		values.put(EquipmentDBAdapter.FIELD_TYPE_NAME, type);
-		values.put(EquipmentDBAdapter.FIELD_YEAR_NAME, year);
-		values.put(EquipmentDBAdapter.FIELD_MANUFACTURER_NAME, manufacturer);
-		values.put(EquipmentDBAdapter.FIELD_PHOTO_NAME, photo);
-		values.put(EquipmentDBAdapter.FIELD_PRIORITY_NAME, priority);
-		return db.insert(EquipmentDBAdapter.TABLE_NAME, null, values);
+		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
+		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);
+		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_TYPE_UUID_NAME, equipment_type_uuid);
+		values.put(EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME, critical_type_uuid);
+		values.put(EquipmentDBAdapter.FIELD_START_DATE_NAME, start_date);
+		values.put(EquipmentDBAdapter.FIELD_LOCATION_NAME, location);
+		values.put(EquipmentDBAdapter.FIELD_TAG_ID_NAME, tag_id);
+		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);
 	}
 	
 	/**
-	 * <p>Удаляет все записи</p>
-	 * @return int количество удалённых записей
+	 * <p>Добавляет/заменяет запись в таблице equipments</p>
+	 * @param equipment
+	 * @return
 	 */
-	public int deleteEquipment(){
-		return db.delete(TABLE_NAME, null, null);
-	}
-
-	/**
-	 * <p>Удаляет запись</p>
-	 * @param id ид для удаления
-	 * @return int количество удалённых записей
-	 */
-	public int deleteEquipment(long id){
-		return db.delete(TABLE_NAME, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)});
-	}
-	
-	/**
-	 * <p>Обновляет запись в таблице equipments</p>
-	 * @param  long id;
-	 * @param String name;
-	 * @param String link;
-	 * @param int type;
-	 * @param int year;
-	 * @param String manufacturer;
-	 * @param String photo;
-	 * @param int priority;
-	 * @return long количество обновлённых записей
-	 */
-	public long updateEquipment(long id, String name, String link, int type, int year, String manufacturer, String photo, int priority){
-		ContentValues values = new ContentValues();
-		values.put(EquipmentDBAdapter.FIELD_NAME_NAME, name);
-		values.put(EquipmentDBAdapter.FIELD_LINK_NAME, link);
-		values.put(EquipmentDBAdapter.FIELD_TYPE_NAME, type);
-		values.put(EquipmentDBAdapter.FIELD_YEAR_NAME, year);
-		values.put(EquipmentDBAdapter.FIELD_MANUFACTURER_NAME, manufacturer);
-		values.put(EquipmentDBAdapter.FIELD_PHOTO_NAME, photo);
-		values.put(EquipmentDBAdapter.FIELD_PRIORITY_NAME, priority);
-		return db.update(EquipmentDBAdapter.TABLE_NAME, values, FIELD_ID_NAME + "=?", new String[]{String.valueOf(id)});
+	public long replace(Equipment equipment) {
+		return replace(equipment.getUuid(), equipment.getTitle(), equipment.getEquipment_type_uuid(), equipment.getCritical_type_uuid(), equipment.getStart_date(), equipment.getLocation(), equipment.getTag_id());
 	}
 
 }

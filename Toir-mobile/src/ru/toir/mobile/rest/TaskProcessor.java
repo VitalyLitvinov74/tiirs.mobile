@@ -11,7 +11,9 @@ import org.json.JSONObject;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
@@ -50,6 +52,7 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public boolean GetTask(Bundle bundle) {
+		// TODO добавить в запрос переменную tag_id
 		URI requestUri = null;
 		String tag = bundle
 				.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
@@ -75,6 +78,8 @@ public class TaskProcessor {
 					JSONArray elementArray = jsonRootObject.getJSONArray(next);
 					if (next.equals(TaskDBAdapter.TABLE_NAME)) {
 						ParseTask(elementArray);
+					} else if (next.equals(EquipmentDBAdapter.TABLE_NAME)) {
+						ParseEquipment(elementArray);
 					}
 				}
 				return true;
@@ -87,6 +92,44 @@ public class TaskProcessor {
 		}
 	}
 
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseEquipment(JSONArray array) {
+		int elementCount = array.length();
+		EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				Equipment item = new Equipment();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(EquipmentDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(EquipmentDBAdapter.FIELD_TITLE_NAME));
+				item.setEquipment_type_uuid(value.getString(EquipmentDBAdapter.FIELD_EQUIPMENT_TYPE_UUID_NAME));
+				item.setCritical_type_uuid(value.getString(EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME));
+				item.setStart_date(value.getLong(EquipmentDBAdapter.FIELD_START_DATE_NAME));
+				item.setLocation(value.getString(EquipmentDBAdapter.FIELD_LOCATION_NAME));
+				item.setTag_id(value.getString(EquipmentDBAdapter.FIELD_TAG_ID_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
 	private boolean ParseTask(JSONArray array) {
 
 		int elementCount = array.length();
