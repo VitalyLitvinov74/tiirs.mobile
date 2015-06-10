@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
@@ -20,6 +21,7 @@ import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
+import ru.toir.mobile.db.tables.DocumentationType;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentType;
@@ -103,6 +105,8 @@ public class TaskProcessor {
 						ParseEquipmentType(elementArray);
 					} else if (next.equals(OperationPatternDBAdapter.TABLE_NAME)) {
 						ParseOperationPattern(elementArray);
+					} else if (next.equals(DocumentationTypeDBAdapter.TABLE_NAME)) {
+						ParseDocumentationType(elementArray);
 					}
 				}
 				return true;
@@ -113,6 +117,34 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseDocumentationType(JSONArray array) {
+		int elementCount = array.length();
+		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				DocumentationType item = new DocumentationType();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(DocumentationTypeDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(DocumentationTypeDBAdapter.FIELD_TITLE_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
 	}
 	
 	/**
