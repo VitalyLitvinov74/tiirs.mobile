@@ -11,10 +11,12 @@ import org.json.JSONObject;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.Task;
@@ -87,8 +89,9 @@ public class TaskProcessor {
 						ParseEquipmentOperation(elementArray);
 					} else if (next.equals(TaskStatusDBAdapter.TABLE_NAME)) {
 						ParseTaskStatus(elementArray);
+					} else if (next.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
+						ParseCriticalType(elementArray);
 					}
-					
 				}
 				return true;
 			} else {
@@ -99,7 +102,35 @@ public class TaskProcessor {
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseCriticalType(JSONArray array) {
+		int elementCount = array.length();
+		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
 
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				CriticalType item = new CriticalType();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(CriticalTypeDBAdapter.FIELD_UUID_NAME));
+				item.setType(value.getInt(CriticalTypeDBAdapter.FIELD_TYPE_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * 
 	 * @param array
