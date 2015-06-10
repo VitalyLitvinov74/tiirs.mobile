@@ -16,6 +16,7 @@ import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
@@ -25,6 +26,7 @@ import ru.toir.mobile.db.tables.DocumentationType;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
@@ -107,6 +109,8 @@ public class TaskProcessor {
 						ParseOperationPattern(elementArray);
 					} else if (next.equals(DocumentationTypeDBAdapter.TABLE_NAME)) {
 						ParseDocumentationType(elementArray);
+					} else if (next.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
+						ParseMeasureType(elementArray);
 					}
 				}
 				return true;
@@ -117,6 +121,34 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseMeasureType(JSONArray array) {
+		int elementCount = array.length();
+		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				MeasureType item = new MeasureType();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(DocumentationTypeDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(DocumentationTypeDBAdapter.FIELD_TITLE_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
 	}
 	
 	/**
