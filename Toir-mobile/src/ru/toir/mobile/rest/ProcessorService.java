@@ -31,6 +31,7 @@ public class ProcessorService extends Service {
 	public class Providers {
 		public static final int USERS_PROVIDER = 1;
 		public static final int TOKEN_PROVIDER = 2;
+		public static final int TASK_PROVIDER = 3;
 	}
 	
 	private IServiceProvider GetProvider(int provider) {
@@ -39,6 +40,8 @@ public class ProcessorService extends Service {
 			return new UsersServiceProvider(this);
 		case Providers.TOKEN_PROVIDER:
 			return new TokenServiceProvider(this);
+		case Providers.TASK_PROVIDER:
+			return new TaskServiceProvider(this);
 		}
 		return null;
 	}

@@ -34,11 +34,11 @@ import org.osmdroid.api.IMapController;
 
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.adapters.OrderDBAdapter;
+import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
 import ru.toir.mobile.db.tables.GpsTrack;
 import ru.toir.mobile.db.tables.Users;
-import ru.toir.mobile.db.tables.Orders;
+import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.gps.TestGPSListener;
 import android.location.LocationManager;
 import android.location.Location;
@@ -91,10 +91,10 @@ public class GPSFragment extends Fragment {
 		
 		String tagId = "01234567";
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		OrderDBAdapter dbOrder = new OrderDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		EquipmentDBAdapter equips = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		Users user = users.getUserByTagId(tagId);
-		Orders order[] = dbOrder.getOrdersByTagId(tagId);
+		Task order[] = dbOrder.getOrdersByTagId(tagId);
 		//Equipment equip = equips.getEquipsByOrderId(orderId);
 
 		equips.close();
