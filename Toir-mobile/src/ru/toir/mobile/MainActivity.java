@@ -49,9 +49,10 @@ public class MainActivity extends FragmentActivity {
 		TokenServiceHelper tsh = new TokenServiceHelper(getApplicationContext(), "action");
 		tsh.GetTokenByUsernameAndPassword("test", "00000001");
 		*/
-		
+
 		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), "action");
-		tsh.GetTask("00000001");
+		tsh.GetTask("00000001", "xyzxyzxyzxyz");
+
 		
 		Log.d(TAG, "onCreate");
 		if (isLogged) {

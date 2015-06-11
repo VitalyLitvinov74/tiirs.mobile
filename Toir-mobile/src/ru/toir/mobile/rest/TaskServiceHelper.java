@@ -26,9 +26,10 @@ public class TaskServiceHelper extends ServiceHelperBase {
 	 * 
 	 * @param tag
 	 */
-	public void GetTask(String tag) {
+	public void GetTask(String user_tag, String token) {
 		Bundle bundle = new Bundle();
-		bundle.putString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG, tag);
+		bundle.putString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG, user_tag);
+		bundle.putString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_TOKEN, token);
 		RunMethod(TaskServiceProvider.Methods.GET_TASK, bundle);
 	}
 

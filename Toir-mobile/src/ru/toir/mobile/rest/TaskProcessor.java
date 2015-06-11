@@ -4,7 +4,10 @@
 package ru.toir.mobile.rest;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,6 +45,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
 /**
@@ -74,16 +78,23 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public boolean GetTask(Bundle bundle) {
-		// TODO добавить в запрос переменную tag_id
 		URI requestUri = null;
-		//String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
+		String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
+		String token = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_TOKEN);
 		String jsonString = null;
 		JSONObject jsonRootObject = null;
 		try {
 			requestUri = new URI(mServerUrl + TASK_GET_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
+			
+			StringBuilder postData = new StringBuilder("tag_id=").append(tag);
+			
+			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+			List<String> tList = new ArrayList<String>();
+			tList.add("Bearer " + token);
+			headers.put("Authorization", tList);
 
-			Request request = new Request(Method.GET, requestUri, null, null);
+			Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
 
@@ -91,8 +102,6 @@ public class TaskProcessor {
 				Log.d("test", jsonString);
 
 				jsonRootObject = new JSONObject(jsonString);
-				// TODO реализовать разбор полученных данных и разложить по
-				// таблицам
 				Iterator<?> iterator = jsonRootObject.keys();
 				while (iterator.hasNext()) {
 					String next = (String) iterator.next();
