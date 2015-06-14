@@ -20,6 +20,7 @@ import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.*;
 import ru.toir.mobile.gps.TestGPSListener;
+import android.content.Context;
 import android.location.LocationManager;
 import android.location.Location;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -38,7 +39,7 @@ public class GPSFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
-		LocationManager lm = (LocationManager) getActivity().getSystemService(getActivity().getApplicationContext().LOCATION_SERVICE);
+		LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 		if (lm != null) {
 			TestGPSListener tgpsl = new TestGPSListener((TextView)rootView.findViewById(R.id.gpsTextView),getActivity().getApplicationContext());
 			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, tgpsl);

@@ -8,6 +8,7 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class DocumentationType {
+	private long _id;
 	private String uuid;
 	private String title;
 
@@ -18,7 +19,8 @@ public class DocumentationType {
 
 	}
 	
-	public DocumentationType(String uuid, String title) {
+	public DocumentationType(long _id, String uuid, String title) {
+		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
 	}

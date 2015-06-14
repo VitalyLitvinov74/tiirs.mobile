@@ -8,6 +8,7 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class Equipment {
+	private long _id;
 	private String uuid;
 	private String title;
 	private String equipment_type_uuid;
@@ -26,7 +27,8 @@ public class Equipment {
 	/**
 	 * 
 	 */
-	public Equipment(String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id) {
+	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id) {
+		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
 		this.equipment_type_uuid = equipment_type_uuid;
@@ -132,6 +134,20 @@ public class Equipment {
 	 */
 	public void setTag_id(String tag_id) {
 		this.tag_id = tag_id;
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public long get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(long _id) {
+		this._id = _id;
 	}
 
 }

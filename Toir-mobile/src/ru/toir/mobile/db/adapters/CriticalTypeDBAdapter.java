@@ -15,10 +15,12 @@ public class CriticalTypeDBAdapter {
 
 	public static final String TABLE_NAME = "critical_type";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TYPE_NAME = "type";
 	
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_TYPE_NAME};
 		
@@ -81,7 +83,6 @@ public class CriticalTypeDBAdapter {
 	 * @return
 	 */
 	public long replace(String uuid, int type) {
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);

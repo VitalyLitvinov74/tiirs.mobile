@@ -17,6 +17,7 @@ import android.text.format.Time;
 public class GPSDBAdapter {
 	public static final String TABLE_NAME = "gps_position";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_USER_NAME = "user_uuid";
 	public static final String FIELD_DATE_NAME = "cur_date";
@@ -24,6 +25,7 @@ public class GPSDBAdapter {
 	public static final String FIELD_LON_NAME = "longitude";
 	
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_USER_NAME,
 			FIELD_DATE_NAME,
@@ -68,7 +70,8 @@ public class GPSDBAdapter {
 		Cursor cur;
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, FIELD_DATE_NAME, null);
 		if (cur.moveToFirst()) {
-			track = new GpsTrack(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
+			track = new GpsTrack(cur.getLong(cur.getColumnIndex(FIELD__ID_NAME)),
+					cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_USER_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_DATE_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_LAT_NAME)),

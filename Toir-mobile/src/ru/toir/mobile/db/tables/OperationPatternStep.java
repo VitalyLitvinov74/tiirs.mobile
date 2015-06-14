@@ -8,6 +8,7 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class OperationPatternStep {
+	private long _id;
 	private String uuid;
 	private String operation_pattern_uuid;
 	private String description;
@@ -22,7 +23,8 @@ public class OperationPatternStep {
 
 	}
 	
-	public OperationPatternStep(String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step) {
+	public OperationPatternStep(long _id, String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step) {
+		this._id = _id;
 		this.uuid = uuid;
 		this.operation_pattern_uuid = operation_pattern_uuid;
 		this.description = description;
@@ -113,6 +115,20 @@ public class OperationPatternStep {
 	 */
 	public void setLast_step(boolean last_step) {
 		this.last_step = last_step;
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public long get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(long _id) {
+		this._id = _id;
 	}
 
 }

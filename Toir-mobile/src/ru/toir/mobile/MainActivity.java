@@ -41,6 +41,16 @@ public class MainActivity extends FragmentActivity {
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
 		
+		Log.d(TAG, "onCreate");
+		if (isLogged) {
+			setMainLayout();
+		} else {
+			setContentView(R.layout.login_layout);
+		}
+		
+		// инициализация приложения
+		init();
+		
 		/*
 		UsersServiceHelper ush = new UsersServiceHelper(getApplicationContext(), "action");
 		ush.GetUser("01234567");
@@ -52,17 +62,6 @@ public class MainActivity extends FragmentActivity {
 
 		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), "action");
 		tsh.GetTask("00000001", "xyzxyzxyzxyz");
-
-		
-		Log.d(TAG, "onCreate");
-		if (isLogged) {
-			setMainLayout();
-		} else {
-			setContentView(R.layout.login_layout);
-		}
-		
-		// инициализация приложения
-		init();
 		
 	}
 

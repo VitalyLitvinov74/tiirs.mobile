@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class UsersDBAdapter {
 	public static final String TABLE_NAME = "users";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_NAME_NAME = "name";
 	public static final String FIELD_LOGIN_NAME = "login";
@@ -25,6 +26,7 @@ public class UsersDBAdapter {
 	public static final String FIELD_ACTIVE_NAME = "active";
 	
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_NAME_NAME,
 			FIELD_LOGIN_NAME,
@@ -71,19 +73,9 @@ public class UsersDBAdapter {
 	 */
 	public Users getUserByLoginAndPass(String login, String pass) {
 		
-		Users user = null;
 		Cursor cur;
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
-		if (cur.moveToFirst()) {
-			user = new Users(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_NAME_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_LOGIN_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_PASS_NAME)),
-					cur.getInt(cur.getColumnIndex(FIELD_TYPE_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)),
-					(cur.getInt(cur.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
-		}
-		return user;
+		return getUser(cur);
 	}
 
 	/**
@@ -93,19 +85,25 @@ public class UsersDBAdapter {
 	 */
 	public Users getUserByTagId(String tagId) {
 		
-		Users user = null;
 		Cursor cur;
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
-		if (cur.moveToFirst()) {
-			user = new Users(cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_NAME_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_LOGIN_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_PASS_NAME)),
-					cur.getInt(cur.getColumnIndex(FIELD_TYPE_NAME)),
-					cur.getString(cur.getColumnIndex(FIELD_TAGID_NAME)),
-					(cur.getInt(cur.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
+		return getUser(cur);
+	}
+	
+	public Users getUser(Cursor cursor) {
+		if (cursor.moveToFirst()) {
+			Users user = new Users();
+			user = new Users(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_NAME_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_LOGIN_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_PASS_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_TYPE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TAGID_NAME)),
+					(cursor.getInt(cursor.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
+			return user;
 		}
-		return user;
+		return null;
 	}
 
 	/**
@@ -129,7 +127,6 @@ public class UsersDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replaceItem(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);

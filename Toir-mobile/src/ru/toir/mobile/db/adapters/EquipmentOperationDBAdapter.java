@@ -20,6 +20,7 @@ public class EquipmentOperationDBAdapter {
 		
 	public static final String TABLE_NAME = "equipment_operation";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TASK_UUID_NAME = "task_uuid";
 	public static final String FIELD_EQUIPMENT_UUID_NAME = "equipment_uuid";
@@ -28,6 +29,7 @@ public class EquipmentOperationDBAdapter {
 	public static final String FIELD_OPERATION_STATUS_UUID_NAME = "operation_status_uuid";
 		
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_TASK_UUID_NAME,
 			FIELD_EQUIPMENT_UUID_NAME,
@@ -75,6 +77,7 @@ public class EquipmentOperationDBAdapter {
 		while (true)		
 			{
 			 EquipmentOperation equipOp = new EquipmentOperation(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID_NAME)),
@@ -148,7 +151,6 @@ public class EquipmentOperationDBAdapter {
 	 * @return
 	 */
 	public long replace(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid) {
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		ContentValues values = new ContentValues();
 		values.put(EquipmentOperationDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentOperationDBAdapter.FIELD_TASK_UUID_NAME, task_uuid);

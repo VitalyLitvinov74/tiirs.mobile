@@ -15,6 +15,7 @@ public class OperationPatternStepResultDBAdapter {
 
 	public static final String TABLE_NAME = "operation_pattern_step_result";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_OPERATION_PATTERN_STEP_UUID_NAME = "operation_pattern_step_uuid";
 	public static final String FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME = "next_operation_pattern_step_uuid";
@@ -22,6 +23,7 @@ public class OperationPatternStepResultDBAdapter {
 	public static final String FIELD_MEASURE_TYPE_UUID_NAME = "measure_type_uuid";
 	
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_OPERATION_PATTERN_STEP_UUID_NAME,
 			FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME,
@@ -87,7 +89,6 @@ public class OperationPatternStepResultDBAdapter {
 	 * @return
 	 */
 	public long replace(String uuid, String operation_pattern_step_uuid, String next_operation_pattern_step_uuid, String title, String measure_type_uuid) {
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);

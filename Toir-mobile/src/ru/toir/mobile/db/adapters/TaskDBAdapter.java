@@ -17,6 +17,7 @@ public class TaskDBAdapter {
 
 	public static final String TABLE_NAME = "task";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_USER_UUID_NAME = "users_uuid";
 	public static final String FIELD_CREATE_DATE_NAME = "create_date";
@@ -28,6 +29,7 @@ public class TaskDBAdapter {
 	public static final String FIELD_SUCCESSEFULL_SEND_NAME = "successefull_send";
 	
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_USER_UUID_NAME,
 			FIELD_CREATE_DATE_NAME,
@@ -74,7 +76,9 @@ public class TaskDBAdapter {
 			while (true)		
 				{
 				Task task;
-				task = new Task(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+				task = new Task(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)),
 					cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)),
 					cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
@@ -106,7 +110,6 @@ public class TaskDBAdapter {
 	 */
 	public long replace(String uuid, String users_uuid, long create_date, long modify_date, long close_date,
 			String task_status_uuid, long attempt_send_date, int attempt_count, boolean successefull_send) {
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);

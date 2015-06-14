@@ -8,6 +8,7 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class Task {
+	private long _id;
 	private String uuid;
 	private String users_uuid;
 	private long create_date;
@@ -22,9 +23,10 @@ public class Task {
 
 	}
 
-	public Task(String uuid, String users_uuid, long create_date, long modify_date, 
+	public Task(long _id, String uuid, String users_uuid, long create_date, long modify_date, 
 			long close_date, String task_status_uuid, long attempt_send_date, int attempt_count, boolean successefull_send) 
 	{
+		this._id = _id;
 		this.uuid = uuid;
 		this.users_uuid = users_uuid;
 		this.create_date = create_date;
@@ -160,6 +162,20 @@ public class Task {
 	 */
 	public void setSuccessefull_send(boolean successefull_send) {
 		this.successefull_send = successefull_send;
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public long get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(long _id) {
+		this._id = _id;
 	}
 
 }

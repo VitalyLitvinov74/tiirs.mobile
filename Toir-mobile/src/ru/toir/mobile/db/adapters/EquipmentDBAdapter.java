@@ -22,6 +22,7 @@ public class EquipmentDBAdapter {
 
 	public static final String TABLE_NAME = "equipment";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
 	public static final String FIELD_EQUIPMENT_TYPE_UUID_NAME = "equipment_type_uuid";
@@ -31,6 +32,7 @@ public class EquipmentDBAdapter {
 	public static final String FIELD_TAG_ID_NAME = "tag_id";
 	
 	private static String mColumns[] = {
+		FIELD__ID_NAME,
 		FIELD_UUID_NAME,
 		FIELD_TITLE_NAME,
 		FIELD_EQUIPMENT_TYPE_UUID_NAME,
@@ -95,7 +97,6 @@ public class EquipmentDBAdapter {
 	 * @return
 	 */
 	public long replace(String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id){
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		ContentValues values = new ContentValues();
 		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);

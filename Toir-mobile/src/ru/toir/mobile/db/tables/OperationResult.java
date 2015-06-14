@@ -8,6 +8,7 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class OperationResult {
+	private long _id;
 	private String uuid;
 	private String operation_type_uuid;
 	private String title;
@@ -19,7 +20,8 @@ public class OperationResult {
 
 	}
 	
-	public OperationResult(String uuid, String operation_type_uuid, String title) {
+	public OperationResult(long _id, String uuid, String operation_type_uuid, String title) {
+		this._id = _id;
 		this.uuid = uuid;
 		this.operation_type_uuid = operation_type_uuid;
 		this.title = title;
@@ -65,6 +67,20 @@ public class OperationResult {
 	 */
 	public void setOperation_type_uuid(String operation_type_uuid) {
 		this.operation_type_uuid = operation_type_uuid;
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public long get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(long _id) {
+		this._id = _id;
 	}
 
 }

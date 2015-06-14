@@ -8,6 +8,7 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class CriticalType {
+	private long _id;
 	private String uuid;
 	private int type;
 
@@ -18,7 +19,8 @@ public class CriticalType {
 
 	}
 	
-	public CriticalType(String uuid, int type) {
+	public CriticalType(long _id, String uuid, int type) {
+		this._id = _id;
 		this.uuid = uuid;
 		this.type = type;
 	}
@@ -49,6 +51,20 @@ public class CriticalType {
 	 */
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public long get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(long _id) {
+		this._id = _id;
 	}
 
 }

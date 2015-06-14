@@ -15,10 +15,12 @@ public class OperationPatternDBAdapter {
 
 	public static final String TABLE_NAME = "operation_pattern";
 	
+	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
 	
 	String[] mColumns = {
+			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
 			FIELD_TITLE_NAME};
 		
@@ -81,7 +83,6 @@ public class OperationPatternDBAdapter {
 	 * @return
 	 */
 	public long replace(String uuid, String title) {
-		// TODO нужно сделать контроль, выполнилось выражение или нет
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
