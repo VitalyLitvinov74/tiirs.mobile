@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.Locale;
+import java.util.Calendar;
+//import java.text.DateFormat;
 import android.text.TextUtils;
-
+import android.text.format.DateFormat;
 
 public class DataUtils {
 
@@ -197,4 +199,11 @@ public class DataUtils {
 		temp |= (b2 & 0xff);
 		return temp;
 	}
+	
+	public static String getDate(long time) {
+	    Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+	    cal.setTimeInMillis(time);
+	    String date = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal).toString();
+	    return date;
+		}
 }
