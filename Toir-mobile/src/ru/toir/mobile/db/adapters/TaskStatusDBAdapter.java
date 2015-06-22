@@ -62,7 +62,19 @@ public class TaskStatusDBAdapter {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * 
+	 * @param UUID
+	 * @return
+	 */
+	public String getNameByUUID(String uuid) {		
+		Cursor cur;
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cur.isFirst()) 
+			return cur.getString(2);
+		else return "неизвестен";
+	}
 	/**
 	 * 
 	 * @return

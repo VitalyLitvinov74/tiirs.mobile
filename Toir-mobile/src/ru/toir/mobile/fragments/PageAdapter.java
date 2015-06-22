@@ -14,7 +14,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int arg0) {
 		Fragment fragment;
 		switch (arg0) {
-		case 5 :
+		case 0 :
 			fragment = new UserInfoFragment();
 			break;
 		case 1 :
@@ -29,7 +29,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 4 :
 			fragment = new ChartsFragment();
 			break;
-		case 0 :
+		case 5 :
 			fragment = new GPSFragment();
 			break;
 		default :
@@ -52,7 +52,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
 		CharSequence title;
 		switch (position) {
-		case 5 :
+		case 0 :
 			title = "Информация о пользователе";
 			break;
 		case 1 :
@@ -67,7 +67,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 4 :
 			title = "Тест графиков";
 			break;
-		case 0 :
+		case 5 :
 			title = "Тест GPS";
 			break;
 		default :

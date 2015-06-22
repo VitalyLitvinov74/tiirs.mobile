@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.utils.DataUtils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,7 +15,8 @@ public class TaskDBAdapter {
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	private final Context mContext;
-
+	private TaskStatusDBAdapter taskstdbadapter;
+	
 	public static final String TABLE_NAME = "task";
 	
 	public static final String FIELD__ID_NAME = "_id";
@@ -137,5 +139,25 @@ public class TaskDBAdapter {
 		return replace(task.getUuid(), task.getUsers_uuid(), task.getCreate_date(),
 				task.getModify_date(), task.getClose_date(), task.getTask_status_uuid(),
 				task.getAttempt_send_date(), task.getAttempt_count(), task.isSuccessefull_send());
+	}
+
+	public String getStatusNameByUUID(String uuid) {	
+		Cursor cur;		
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		//taskstatus = new TaskStatus();
+		//String getNameByUUID(String uuid)
+		if (cur.isFirst())
+			return taskstdbadapter.getNameByUUID(cur.getString(1));
+		else
+			return "неизвестен";
+	}
+	
+	public String getCompleteTimeByUUID(String uuid) {	
+		Cursor cur;		
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cur.isFirst())
+			return DataUtils.getDate(cur.getLong(5));
+		else
+			return "";
 	}
 }

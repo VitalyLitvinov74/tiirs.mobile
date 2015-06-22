@@ -92,6 +92,7 @@
                         android:orientation="vertical" >
 
                         <TableLayout
+                            android:id="@+id/TableLayout01"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" >
 
@@ -251,7 +252,8 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:background="@color/black" >
 
                 <TableLayout
                     android:layout_width="wrap_content"
