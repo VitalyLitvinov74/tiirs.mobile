@@ -20,6 +20,7 @@ public class TestGPSListener implements LocationListener,GpsStatus.Listener{
 	String ls;
 	String strGpsStats;
 	private Context context;
+	private String user_uuid;
 	private LocationManager lM;
 	
 	@Override
@@ -37,9 +38,14 @@ public class TestGPSListener implements LocationListener,GpsStatus.Listener{
         }
     }
 
-	public TestGPSListener(TextView tv, Context contex) {
+	public void SetUserUUID(String uuid) {
+		this.user_uuid = uuid;
+	}
+
+	public TestGPSListener(TextView tv, Context contex, String uuid) {
 		gpsLog = tv;
 		this.context=contex;
+		this.user_uuid = uuid;
 		ls = System.getProperty("line.separator");
 	}
 	
@@ -79,7 +85,7 @@ public class TestGPSListener implements LocationListener,GpsStatus.Listener{
 		gpsLog.append("Longitude:"+String.valueOf(Longitude)+"\n");
 		GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(context)).open();		
 		String gpsuuid = UUID.randomUUID().toString();
-		String user_uuid = UUID.randomUUID().toString();
+		//String user_uuid = UUID.randomUUID().toString();
 		//GpsTrack gpstracker = gps.getGPSByUuid(user_uuid);
 		gpsLog.append(gpsuuid + " " + user_uuid + String.valueOf(Latitude) +" " + String.valueOf(Longitude));
 		gps.addItem(gpsuuid, user_uuid, String.valueOf(Latitude), String.valueOf(Longitude));

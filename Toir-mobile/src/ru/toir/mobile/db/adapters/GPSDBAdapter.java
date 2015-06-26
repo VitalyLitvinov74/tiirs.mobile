@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.Time;
+import android.widget.Toast;
 
 /**
  * @author Olejek
@@ -68,7 +69,8 @@ public class GPSDBAdapter {
 	public GpsTrack getGPSByUuid(String uuid) {
 		GpsTrack track = null;
 		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, FIELD_DATE_NAME, null);
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_USER_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cur.getColumnCount()>0)
 		if (cur.moveToFirst()) {
 			track = new GpsTrack(cur.getLong(cur.getColumnIndex(FIELD__ID_NAME)),
 					cur.getString(cur.getColumnIndex(FIELD_UUID_NAME)),

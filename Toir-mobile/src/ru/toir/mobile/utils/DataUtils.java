@@ -200,10 +200,11 @@ public class DataUtils {
 		return temp;
 	}
 	
-	public static String getDate(long time) {
+	public static String getDate(long time, String format) {
 	    Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-	    cal.setTimeInMillis(time);
-	    String date = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal).toString();
+	    cal.setTimeInMillis(time*1000);
+	    //"dd-MM-yyyy hh:mm:ss"
+	    String date = DateFormat.format(format, cal).toString();
 	    return date;
 		}
 }

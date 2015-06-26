@@ -67,12 +67,14 @@
 
             <TableLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
 
                 <TableRow
                     android:id="@+id/tableRow3"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -93,149 +95,10 @@
 
                         <TableLayout
                             android:id="@+id/TableLayout01"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
-
-                            <TableRow
-                                android:id="@+id/TableRow08"
-                                android:layout_width="wrap_content"
-                                android:layout_height="fill_parent"
-                                android:background="@color/black" >
-
-                                <ImageView
-                                    android:id="@+id/ImageView04"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/forbidden_32" />
-
-                                <TextView
-                                    android:id="@+id/TextView01"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="none"
-                                    android:paddingTop="1dp"
-                                    android:text="Старый наряд: выполнен 10-12-2014 01:11"
-                                    android:textSize="12sp" />
-                            </TableRow>
-
-                            <TableRow
-                                android:id="@+id/TableRow03"
-                                android:layout_width="wrap_content"
-                                android:layout_height="fill_parent"
-                                android:background="@color/black"
-                                android:paddingTop="1dp" >
-
-                                <ImageView
-                                    android:id="@+id/ImageView03"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/checkmark_32" />
-
-                                <TextView
-                                    android:id="@+id/EditText03"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="none"
-                                    android:text="Статус текущего наряда: выполнен 21-12-2014 05:16"
-                                    android:textSize="12sp" />
-                            </TableRow>
-
-                            <TableRow
-                                android:id="@+id/TableRow02"
-                                android:layout_width="wrap_content"
-                                android:layout_height="fill_parent"
-                                android:background="@color/black"
-                                android:paddingTop="1dp" >
-
-                                <ImageView
-                                    android:id="@+id/ImageView02"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/forbidden_32" />
-
-                                <TextView
-                                    android:id="@+id/EditText02"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="none"
-                                    android:paddingTop="1dp"
-                                    android:text="Предпоследний наряд: отменен 20-12-2014 02:26"
-                                    android:textSize="12sp" />
-
-                            </TableRow>
-
-                            <TableRow
-                                android:id="@+id/TableRow01"
-                                android:layout_width="wrap_content"
-                                android:layout_height="fill_parent"
-                                android:background="@color/black" >
-
-                                <ImageView
-                                    android:id="@+id/ImageView01"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/information_32" />
-
-                                <TextView
-                                    android:id="@+id/EditText01"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="none"
-                                    android:paddingTop="1dp"
-                                    android:text="По наряду есть комментарии: выполнен 19-12-2014 01:16"
-                                    android:textSize="12sp" />
-
-                            </TableRow>
-
-                            <TableRow
-                                android:id="@+id/tableRow13"
-                                android:layout_width="wrap_content"
-                                android:layout_height="fill_parent"
-                                android:background="@color/black" >
-
-                                <ImageView
-                                    android:id="@+id/imageView2"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/checkmark_32" />
-
-                                <TextView
-                                    android:id="@+id/editText5"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="none"
-                                    android:paddingTop="1dp"
-                                    android:text="Старый наряд: выполнен 11-12-2014 05:16"
-                                    android:textSize="12sp" />
-
-                            </TableRow>
-                            <TableRow
-                                android:id="@+id/tableRow23"
-                                android:layout_width="wrap_content"
-                                android:layout_height="fill_parent"
-                                android:background="@color/black" >
-
-                                <ImageView
-                                    android:id="@+id/imageView22"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/error_32" />
-
-                                <TextView
-                                    android:id="@+id/editText25"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:inputType="none"
-                                    android:paddingTop="1dp"
-                                    android:text="Старый наряд: выполнен 10-12-2014 01:11"
-                                    android:textSize="12sp" />
-                            </TableRow>                            
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" >
+                            
                          </TableLayout>
 
                     </LinearLayout>
@@ -253,6 +116,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@color/black" >
 
                 <TableLayout
@@ -322,14 +186,6 @@
                         android:layout_margin="1dp"
                         android:background="@color/black"
                         android:gravity="top" >
-
-                        <TextView
-                            android:id="@+id/EditText04"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/black"
-                            android:text="Текущий статус: задание"
-                            android:textSize="12sp" />
                     </TableRow>
 
                     <TableRow
@@ -339,15 +195,6 @@
                         android:layout_margin="1dp"
                         android:background="@color/black"
                         android:gravity="top" >
-
-                        <TextView
-                            android:id="@+id/editText3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/black"
-                            android:text="Время: 2 часа 21 минута"
-                            android:textAllCaps="false"
-                            android:textSize="12sp" />
 
                     </TableRow>
                 </TableLayout>

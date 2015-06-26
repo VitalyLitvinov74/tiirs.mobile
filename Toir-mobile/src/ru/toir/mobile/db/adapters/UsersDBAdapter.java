@@ -24,6 +24,7 @@ public class UsersDBAdapter {
 	public static final String FIELD_TYPE_NAME = "type";
 	public static final String FIELD_TAGID_NAME = "tag_id";
 	public static final String FIELD_ACTIVE_NAME = "active";
+	public static final String FIELD_WHOIS_NAME = "whois";
 	
 	String[] mColumns = {
 			FIELD__ID_NAME,
@@ -33,7 +34,8 @@ public class UsersDBAdapter {
 			FIELD_PASS_NAME,
 			FIELD_TYPE_NAME,
 			FIELD_TAGID_NAME,
-			FIELD_ACTIVE_NAME};
+			FIELD_ACTIVE_NAME,
+			FIELD_WHOIS_NAME};
 	
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
@@ -100,6 +102,7 @@ public class UsersDBAdapter {
 					cursor.getString(cursor.getColumnIndex(FIELD_PASS_NAME)),
 					cursor.getInt(cursor.getColumnIndex(FIELD_TYPE_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_TAGID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_WHOIS_NAME)),
 					(cursor.getInt(cursor.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
 			return user;
 		}
@@ -126,7 +129,7 @@ public class UsersDBAdapter {
 	 * @param active
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replaceItem(String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
+	public long replaceItem(String uuid, String name, String login, String pass, int type, String tag_id, boolean active, String whois) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
@@ -136,6 +139,7 @@ public class UsersDBAdapter {
 		values.put(FIELD_TYPE_NAME, type);
 		values.put(FIELD_TAGID_NAME, tag_id);
 		values.put(FIELD_ACTIVE_NAME, active);
+		values.put(FIELD_WHOIS_NAME, whois);
 		id  = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -146,7 +150,7 @@ public class UsersDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replaceItem(Users user) {
-		long id  = replaceItem(user.getUuid(), user.getName(), user.getLogin(), user.getPass(), user.getType(), user.getTag_id(), user.isActive());
+		long id  = replaceItem(user.getUuid(), user.getName(), user.getLogin(), user.getPass(), user.getType(), user.getTag_id(), user.isActive(), user.getWhoIs());
 		return id;
 	}
 }

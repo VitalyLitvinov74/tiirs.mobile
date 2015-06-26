@@ -67,15 +67,15 @@ public class TaskDBAdapter {
 		mDbHelper.close();
 	}
 
-	public ArrayList<Task> getOrdersByTagId(String tagId) {		
+	public ArrayList<Task> getOrdersByTagId(String uuid) {		
 		ArrayList<Task> arrayList = new ArrayList<Task>();
 		Cursor cursor;
 
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{tagId}, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.getCount()>0)
 			{
-			cursor.moveToFirst();
-			while (true)		
+			 cursor.moveToFirst();
+			 while (true)		
 				{
 				Task task;
 				task = new Task(
@@ -146,8 +146,11 @@ public class TaskDBAdapter {
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
 		//taskstatus = new TaskStatus();
 		//String getNameByUUID(String uuid)
-		if (cur.isFirst())
-			return taskstdbadapter.getNameByUUID(cur.getString(1));
+		if (cur.getCount()>0)
+			{
+			 cur.moveToFirst();
+			 return taskstdbadapter.getNameByUUID(cur.getString(1));
+			}
 		else
 			return "неизвестен";
 	}
@@ -155,8 +158,11 @@ public class TaskDBAdapter {
 	public String getCompleteTimeByUUID(String uuid) {	
 		Cursor cur;		
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
-		if (cur.isFirst())
-			return DataUtils.getDate(cur.getLong(5));
+		if (cur.getCount()>0)
+			{
+			 cur.moveToFirst();
+			 return DataUtils.getDate(cur.getLong(5),"dd-MM-yyyy hh:mm:ss");
+			}
 		else
 			return "";
 	}

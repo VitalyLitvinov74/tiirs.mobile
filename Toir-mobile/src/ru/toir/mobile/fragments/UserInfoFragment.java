@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import ru.toir.mobile.utils.DataUtils;
 import android.widget.TableLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class UserInfoFragment extends Fragment {
 		initView(rootView);
 		return rootView;
 	}
+
 	private void initView(View view) {
 		tv_user_id = (TextView) view.findViewById(R.id.EditText07);
 		tv_user_name = (TextView) view.findViewById(R.id.EditText06);
@@ -44,6 +46,7 @@ public class UserInfoFragment extends Fragment {
 
 		// hardcoded for test, tagID for user must be global
 		String tagId = "01234567";
+		String temp = "";
 		
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		Users user = users.getUserByTagId(tagId);
@@ -51,44 +54,55 @@ public class UserInfoFragment extends Fragment {
 		if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
 		} else {
-			//tv_user_id.setText(user.getTag_id());
-			//tv_user_name.setText(user.getName());
-			//tv_user_type.setText(user.getType());
-			//GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-			//GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
-			//gps.close();
-			//tv_user_gps.setText(gpstrack.getLatitude().toString() + " / " + gpstrack.getLongitude().toString());
+			tv_user_id.setText("ID: " + user.getTag_id());
+			tv_user_name.setText("ФИО: " + user.getName());
+			tv_user_type.setText("Должность: " + user.getWhoIs());
+			GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
+			Toast.makeText(getActivity(), user.getUuid(), Toast.LENGTH_SHORT).show();			
+			gps.close();
+			if (gpstrack != null)
+				{
+				 tv_user_gps.setText(gpstrack.getLatitude().toString().subSequence(0, 7) + " / " + gpstrack.getLongitude().toString().subSequence(0, 7));
+				}			
+
+			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+			TaskStatusDBAdapter TaskStatusDBAdapt = new TaskStatusDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+			ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(user.getUuid());
 			
-			//TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-			//ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(tagId);
-			
+			//Toast.makeText(getActivity(), ordersList.size(), Toast.LENGTH_SHORT).show();						
 			Integer cnt=0;
-			//while (cnt<ordersList.size())
-					{
-				/*
+			//if (false)
+			while (cnt<ordersList.size())
+					{				
 			         // Creation row
 			         final TableRow tableRow = new TableRow(getActivity().getApplicationContext());
 			         tableRow.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
-
-			         // Creation textView
-			         final TextView text = new TextView(getActivity().getApplicationContext());
-			         //text.setText(ordersList);
-			         text.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+			         tableRow.setBackgroundColor(getResources().getColor(R.color.black));
 
 			         // Creation row
 			         final ImageView img = new ImageView(getActivity().getApplicationContext());
-			         img.setImageResource(R.drawable.forbidden_32);
-			         final TextView textv = new TextView(getActivity().getApplicationContext());			         			         
-			         textv.setText("Статус наряда: " + dbOrder.getStatusNameByUUID(ordersList.get(cnt).getTask_status_uuid()) + dbOrder.getCompleteTimeByUUID(ordersList.get(cnt).getTask_status_uuid()));			         
+			         img.setImageResource(R.drawable.checkmark_32);
+			         //Toast.makeText(getActivity(), ordersList.get(cnt).getTask_status_uuid() + " " + TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED, Toast.LENGTH_SHORT).show();
+			         if (ordersList.get(cnt).getTask_status_uuid().equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED))
+			        	 img.setImageResource(R.drawable.forbidden_32);
+			         if (ordersList.get(cnt).getTask_status_uuid().equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED))
+			        	 img.setImageResource(R.drawable.checkmark_32);
+			         if (ordersList.get(cnt).getTask_status_uuid().equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED))
+			        	 img.setImageResource(R.drawable.information_32);
+			         if (ordersList.get(cnt).getTask_status_uuid().equals(TaskStatusDBAdapter.STATUS_UUID_CREATED))
+			        	 img.setImageResource(R.drawable.help_32);
+			         
+			         final TextView textv = new TextView(getActivity().getApplicationContext());
+			         textv.setText("Статус наряда: "  + TaskStatusDBAdapt.getNameByUUID(ordersList.get(cnt).getTask_status_uuid()) + " [" + DataUtils.getDate(ordersList.get(cnt).getModify_date(),"dd-MM-yyyy hh:mm:ss") + "]");
 			         tableRow.addView(img);
 			         tableRow.addView(textv);
 			    	 tl_task.addView(tableRow);
-			    	 */
-					 cnt= cnt +1;
-					 //if (cnt>5) break;
+			    	 
+					 cnt=cnt+1;
+					 if (cnt>5) break;
 					}
-			//users.close();
-			//dbOrder.close();       			
+			dbOrder.close();       			
 		}
 	}
 }

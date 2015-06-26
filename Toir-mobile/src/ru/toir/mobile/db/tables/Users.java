@@ -17,6 +17,7 @@ public class Users {
 	private int type;
 	private String tag_id;
 	private boolean active;
+	private String whois;
 
 	/**
 	 * 
@@ -24,7 +25,7 @@ public class Users {
 	public Users() {
 	}
 
-	public Users(long _id, String uuid, String name, String login, String pass, int type, String tag_id, boolean active) {
+	public Users(long _id, String uuid, String name, String login, String pass, int type, String tag_id, String whois, boolean active) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.name = name;
@@ -33,6 +34,7 @@ public class Users {
 		this.type = type;
 		this.tag_id = tag_id;
 		this.active = active;
+		this.whois = whois;
 	}
 
 	/**
@@ -54,6 +56,13 @@ public class Users {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return the whois
+	 */
+	public String getWhoIs() {
+		return whois;
 	}
 
 	/**
@@ -109,7 +118,7 @@ public class Users {
 	@Override
 	public String toString() {
 
-		return "uuid=" + uuid + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id + ", active=" + active;
+		return "uuid=" + uuid + ", name=" + name + ", login=" + login + ", pass=" + pass + ", type=" + type + ", tag_id=" + tag_id + ", active=" + active + ", whois=" + whois;
 	}
 
 	/**
