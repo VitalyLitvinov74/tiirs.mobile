@@ -14,7 +14,6 @@ import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.utils.DataUtils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -282,20 +281,5 @@ public class OrdersFragment extends Fragment {
 		 operationTypeDBAdapter.close();
 		 equipmentOperationResultDBAdapter.close();
 	 	}
-	}
-
-	
-	private OnClickListener onClickListener= new OnClickListener() {
-        public void onClick(View v) {
-        	tl_task = (TableLayout) v.findViewById(R.id.TableLayout01);        	
-        	tl_task.removeAllViews();
-        	while (tl_task.getChildCount() > 1) {
-        		TableRow row =  (TableRow)tl_task.getChildAt(1);
-        		tl_task.removeView(row);
-        		//tl_task.getChildCount();
-            }
-        	//initTaskEquipment(v);        	
-        	//v.getId()        	
-        }
-    };  
+	}	
 }

@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
-import ru.toir.mobile.db.tables.EquipmentOperation;
 
 /**
  * @author olejek
