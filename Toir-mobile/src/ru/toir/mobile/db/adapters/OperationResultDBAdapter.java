@@ -103,4 +103,5 @@ public class OperationResultDBAdapter {
 	public long replace(OperationResult result) {
 		return replace(result.getUuid(), result.getOperation_type_uuid(), result.getTitle());
 	}
+
 }

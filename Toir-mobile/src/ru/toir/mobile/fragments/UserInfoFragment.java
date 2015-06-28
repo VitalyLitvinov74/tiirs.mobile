@@ -58,7 +58,7 @@ public class UserInfoFragment extends Fragment {
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
-			Toast.makeText(getActivity(), user.getUuid(), Toast.LENGTH_SHORT).show();			
+			//Toast.makeText(getActivity(), user.getUuid(), Toast.LENGTH_SHORT).show();			
 			gps.close();
 			if (gpstrack != null)
 				{
@@ -71,7 +71,6 @@ public class UserInfoFragment extends Fragment {
 			
 			//Toast.makeText(getActivity(), ordersList.size(), Toast.LENGTH_SHORT).show();						
 			Integer cnt=0;
-			//if (false)
 			while (cnt<ordersList.size())
 					{				
 			         // Creation row

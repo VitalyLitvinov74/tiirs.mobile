@@ -100,4 +100,20 @@ public class OperationTypeDBAdapter {
 	public long replace(OperationType status) {
 		return replace(status.getUuid(), status.getTitle());
 	}
+
+	/**
+	 * <p>Возвращает название типа обслуживания по uuid</p>
+	 * @param uuid
+	 */
+	public String getOperationTypeByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME));
+			}
+		else return "неизвестно";
+	}
+
 }

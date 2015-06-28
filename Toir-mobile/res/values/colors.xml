@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="white">#ffffff</color><!--白色 -->
+	<color name="almostblack">#222222</color>
 	<color name="ivory">#fffff0</color><!--象牙色 -->
 	<color name="lightyellow">#ffffe0</color><!--亮黄色 -->
 	<color name="yellow">#ffff00</color><!--黄色 -->

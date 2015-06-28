@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentOperation;
 
 /**
  * @author olejek
@@ -117,4 +118,63 @@ public class EquipmentDBAdapter {
 		return replace(equipment.getUuid(), equipment.getTitle(), equipment.getEquipment_type_uuid(), equipment.getCritical_type_uuid(), equipment.getStart_date(), equipment.getLocation(), equipment.getTag_id());
 	}
 
+	/**
+	 * <p>Возвращает название оборудования по uuid</p>
+	 * @param uuid
+	 */
+	public String getEquipsNameByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME));
+			}
+		else return "неизвестно";
+	}
+
+	/**
+	 * <p>Возвращает тип оборудования по uuid</p>
+	 * @param uuid
+	 */
+	public String getEquipsTypeByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME));
+			}
+		else return "неизвестно";
+	}
+	
+	/**
+	 * <p>Возвращает тип оборудования по uuid</p>
+	 * @param uuid
+	 */
+	public String getCriticalByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME));
+			}
+		else return "неизвестен";
+	}
+	
+	/**
+	 * <p>Возвращает координаты по uuid</p>
+	 * @param uuid
+	 */
+	public String getLocationByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_LOCATION_NAME));
+			}
+		else return "неизвестны";
+	}		
 }

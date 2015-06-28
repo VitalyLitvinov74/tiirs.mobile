@@ -90,7 +90,7 @@ public class EquipmentOperationDBAdapter {
 		}
 		return arrayList;
 	}
-	
+
 	/**
 	 * <p>Возвращает все записи из таблицы equipment_operation</p>
 	 * @return Cursor
@@ -169,4 +169,5 @@ public class EquipmentOperationDBAdapter {
 	public long replace(EquipmentOperation operation) {
 		return replace(operation.getUuid(), operation.getTask_uuid(), operation.getEquipment_uuid(), operation.getOperation_type_uuid(), operation.getOperation_pattern_uuid(), operation.getOperation_status_uuid());
 	}
+	
 }
