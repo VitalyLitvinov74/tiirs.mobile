@@ -274,7 +274,7 @@ public class OrdersFragment extends Fragment {
 			 tableRow.addView(tv_end);
 			 tl_task.addView(tableRow);	    	 
 			 cnt=cnt+1;
-			 if (cnt>2) break;
+			 if (cnt>5) break;
 		 	}
 		 eqOperation.close();
 		 eqDBAdapter.close();
