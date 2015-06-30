@@ -62,7 +62,7 @@ public class MainActivity extends FragmentActivity {
 
 		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), "action");
 		tsh.GetTask("00000001", "xyzxyzxyzxyz");
-		
+
 	}
 
 	/**
