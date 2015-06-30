@@ -1,7 +1,6 @@
 package ru.toir.mobile.test;
 
 import ru.toir.mobile.db.adapters.DocsDBAdapter;
-import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -40,7 +39,7 @@ import android.util.Log;
 		 * проверка чтения документации из базы
 		 */
 		public void testSelectDocs() {
-			Cursor user = adapter.getDocs(1);
+			//Cursor user = adapter.getDocs(1);
 			//assertEquals(true, docs.moveToFirst());
 			//assertEquals(1, user.getLong(EquipmentDBAdapter.FIELD_ID_COLUMN));
 		}

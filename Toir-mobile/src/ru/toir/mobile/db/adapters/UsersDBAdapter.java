@@ -46,7 +46,6 @@ public class UsersDBAdapter {
 	 * @return UsersDBAdapter
 	 */
 	public UsersDBAdapter(Context context) {
-		super();
 		mContext = context;
 	}
 	
