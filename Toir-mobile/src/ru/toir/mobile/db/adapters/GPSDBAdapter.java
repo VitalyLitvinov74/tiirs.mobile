@@ -41,7 +41,6 @@ public class GPSDBAdapter {
 	 * @return GPSDBAdapter
 	 */
 	public GPSDBAdapter(Context context) {
-		super();
 		mContext = context;
 	}
 	

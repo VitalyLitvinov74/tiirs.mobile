@@ -37,16 +37,16 @@ public class EquipmentOperationDBAdapter {
 			FIELD_OPERATION_PATTERN_UUID_NAME,
 			FIELD_OPERATION_STATUS_UUID_NAME};
 
-	private DatabaseHelper dbHelper;
-	private SQLiteDatabase db;
-	private final Context context;
+	private DatabaseHelper mDbHelper;
+	private SQLiteDatabase mDb;
+	private final Context mContext;
 	
 	/**
 	 * @param context
 	 * @return EquipmentOpDBAdapter
 	 */
 	public EquipmentOperationDBAdapter(Context context){
-		this.context = context;
+		mContext = context;
 	}
 	
 	/**
@@ -55,8 +55,8 @@ public class EquipmentOperationDBAdapter {
 	 * @throws SQLException
 	 */
 	public EquipmentOperationDBAdapter open() throws SQLException {
-		this.dbHelper = new DatabaseHelper(this.context, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
-		this.db = dbHelper.getWritableDatabase();
+		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
 	
@@ -64,7 +64,8 @@ public class EquipmentOperationDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		dbHelper.close();
+		mDb.close();
+		mDbHelper.close();
 	}
 
 	public ArrayList<EquipmentOperation> getEquipsByOrderId(String orderId, String status) {
@@ -72,7 +73,7 @@ public class EquipmentOperationDBAdapter {
 		Cursor cursor;
 
 		// можем или отобрать все оборудование или только с нужным статусом 
-		cursor = db.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{orderId}, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{orderId}, null, null, null);		
 		cursor.moveToFirst();
 		while (true)		
 			{
@@ -96,7 +97,7 @@ public class EquipmentOperationDBAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getAllOpEquipment() {
-		return db.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME}, null, null, null, null, null);
+		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME}, null, null, null, null, null);
 	}
 	
 	/**
@@ -105,7 +106,7 @@ public class EquipmentOperationDBAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getOpEquipment(long uuid) {
-		return db.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME}, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)}, null, null, null);
+		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME}, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)}, null, null, null);
 	}
 	
 	/**
@@ -120,7 +121,7 @@ public class EquipmentOperationDBAdapter {
 		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID_NAME, equipment_uuid);
 		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME, operation_type_uuid);
 		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME, operation_pattern_uuid);
-		return db.insert(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
+		return mDb.insert(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
 	}
 	
 	/**
@@ -128,7 +129,7 @@ public class EquipmentOperationDBAdapter {
 	 * @return int количество удалённых записей
 	 */
 	public int deleteOpEquipment(){
-		return db.delete(TABLE_NAME, null, null);
+		return mDb.delete(TABLE_NAME, null, null);
 	}
 
 	/**
@@ -137,7 +138,7 @@ public class EquipmentOperationDBAdapter {
 	 * @return int количество удалённых записей
 	 */
 	public int deleteOpEquipment(String uuid){
-		return db.delete(TABLE_NAME, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)});
+		return mDb.delete(TABLE_NAME, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)});
 	}
 	
 	/**
@@ -158,7 +159,7 @@ public class EquipmentOperationDBAdapter {
 		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME, operation_type_uuid);
 		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME, operation_pattern_uuid);
 		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_STATUS_UUID_NAME, operation_status_uuid);
-		return db.replace(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
+		return mDb.replace(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
 	}
 	
 	/**

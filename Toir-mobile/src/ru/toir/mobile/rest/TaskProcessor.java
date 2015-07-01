@@ -17,9 +17,12 @@ import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
@@ -30,9 +33,12 @@ import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.DocumentationType;
 import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.EquipmentOperationResult;
 import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.MeasureType;
+import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
@@ -132,6 +138,12 @@ public class TaskProcessor {
 						ParseOperationPatternStep(elementArray);
 					} else if (next.equals(OperationPatternStepResultDBAdapter.TABLE_NAME)) {
 						ParseOperationPatternStepResult(elementArray);
+					} else if (next.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
+						ParseEquipmentDocumentation(elementArray);
+					} else if (next.equals(MeasureValueDBAdapter.TABLE_NAME)) {
+						ParseMeasureValue(elementArray);
+					} else if (next.equals(EquipmentOperationResultDBAdapter.TABLE_NAME)) {
+						ParseEquipmentOperationResult(elementArray);
 					}
 				}
 				return true;
@@ -511,21 +523,100 @@ public class TaskProcessor {
 		try {
 
 			for (int i = 0; i < elementCount; i++) {
-				Task task = new Task();
+				Task item = new Task();
 				JSONObject value = array.getJSONObject(i);
-				task.setUuid(value.getString(TaskDBAdapter.FIELD_UUID_NAME));
-				task.setUsers_uuid(value.getString(TaskDBAdapter.FIELD_USER_UUID_NAME));
-				task.setCreate_date(value.getLong(TaskDBAdapter.FIELD_CREATE_DATE_NAME));
-				task.setModify_date(value.getLong(TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
-				task.setClose_date(value.getLong(TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
-				task.setTask_status_uuid(value.getString(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
-				task.setAttempt_send_date(value.getLong(TaskDBAdapter.FIELD_ATTEMPT_SEND_DATE_NAME));
-				task.setAttempt_count(value.getInt(TaskDBAdapter.FIELD_ATTEMPT_COUNT_NAME));
-				task.setSuccessefull_send(value
+				item.setUuid(value.getString(TaskDBAdapter.FIELD_UUID_NAME));
+				item.setUsers_uuid(value.getString(TaskDBAdapter.FIELD_USER_UUID_NAME));
+				item.setCreate_date(value.getLong(TaskDBAdapter.FIELD_CREATE_DATE_NAME));
+				item.setModify_date(value.getLong(TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
+				item.setClose_date(value.getLong(TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
+				item.setTask_status_uuid(value.getString(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
+				item.setAttempt_send_date(value.getLong(TaskDBAdapter.FIELD_ATTEMPT_SEND_DATE_NAME));
+				item.setAttempt_count(value.getInt(TaskDBAdapter.FIELD_ATTEMPT_COUNT_NAME));
+				item.setSuccessefull_send(value
 						.getInt(TaskDBAdapter.FIELD_SUCCESSEFULL_SEND_NAME) == 0 ? false
 						: true);
-				adapter.replace(task);
+				adapter.replace(item);
 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
+	private boolean ParseEquipmentOperationResult(JSONArray array) {
+
+		int elementCount = array.length();
+		EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+
+			for (int i = 0; i < elementCount; i++) {
+				EquipmentOperationResult item = new EquipmentOperationResult();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(EquipmentOperationResultDBAdapter.FIELD_UUID_NAME));
+				item.setEquipment_operation_uuid(value.getString(EquipmentOperationResultDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID_NAME));
+				item.setStart_date(value.getLong(EquipmentOperationResultDBAdapter.FIELD_START_DATE_NAME));
+				item.setEnd_date(value.getLong(EquipmentOperationResultDBAdapter.FIELD_END_DATE_NAME));
+				item.setOperation_result_uuid(value.getString(EquipmentOperationResultDBAdapter.FIELD_OPERATION_RESULT_UUID_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+	
+	private boolean ParseEquipmentDocumentation(JSONArray array) {
+
+		int elementCount = array.length();
+		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				EquipmentDocumentation item = new EquipmentDocumentation();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(EquipmentDocumentationDBAdapter.FIELD_UUID_NAME));
+				item.setEquipment_uuid(value.getString(EquipmentDocumentationDBAdapter.FIELD_EQUIPMENT_UUID_NAME));
+				item.setDocumentation_type_uuid(value.getString(EquipmentDocumentationDBAdapter.FIELD_DOCUMENTATION_TYPE_UUID_NAME));
+				item.setTitle(value.getString(EquipmentDocumentationDBAdapter.FIELD_TITLE_NAME));
+				item.setPath(value.getString(EquipmentDocumentationDBAdapter.FIELD_PATH_NAME));
+				adapter.replace(item);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
+		return true;
+	}
+
+	private boolean ParseMeasureValue(JSONArray array) {
+
+		int elementCount = array.length();
+		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				MeasureValue item = new MeasureValue();
+				JSONObject value = array.getJSONObject(i);
+				item.setUuid(value.getString(MeasureValueDBAdapter.FIELD_UUID_NAME));
+				item.setTitle(value.getString(MeasureValueDBAdapter.FIELD_TITLE_NAME));
+				adapter.replace(item);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

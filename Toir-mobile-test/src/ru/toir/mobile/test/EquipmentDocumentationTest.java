@@ -1,6 +1,6 @@
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.db.adapters.DocsDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -9,14 +9,14 @@ import android.util.Log;
 	 * <p>Тестирование адаптера к таблице docs</p>
 	 *
 	 */
-	public class DocsTest extends AndroidTestCase {
+	public class EquipmentDocumentationTest extends AndroidTestCase {
 		private static final String TAG = "DocsTest";
-		private DocsDBAdapter adapter;
+		private EquipmentDocumentationDBAdapter adapter;
 		
 		/**
 		 * Конструктор 
 		 */
-		public DocsTest() {
+		public EquipmentDocumentationTest() {
 			Log.d(TAG, "DocsTest()");
 		}
 		
@@ -24,8 +24,10 @@ import android.util.Log;
 		 * проверка создания записи о документации 
 		 */
 		public void testCreateDocs() {
+			/*
 			long id = adapter.insertDocs("Installation manual v1.1", "/files/manual1.pdf", 1,1 );
 			assertEquals(6, id);
+			*/
 		}
 		
 		/**
