@@ -10,9 +10,11 @@ import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.utils.DataUtils;
 import android.os.Bundle;
@@ -28,11 +30,15 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Button;
 
 public class OrdersFragment extends Fragment {
 	private TableLayout tl_task;
+	private Button button1;
 	private int MaxOrders=5;
-	ArrayList<String> order_uuid = new ArrayList<String>();
+	ArrayList<String> orders_uuid = new ArrayList<String>();
+	ArrayList<String> tasks_uuid = new ArrayList<String>();
+
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
@@ -40,26 +46,28 @@ public class OrdersFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.orders_layout, container, false);
-		initView(rootView);
+		tl_task = (TableLayout) rootView.findViewById(R.id.TableLayout01);
+	    button1 = (Button) rootView.findViewById(R.id.button3);
+
+		initView();
 		return rootView;
 		}
 
-	private void initView(View view)
+	private void initView()
 		{
-		 tl_task = (TableLayout) view.findViewById(R.id.TableLayout01);
 		 String tagId = "01234567";
 		 UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		 Users user = users.getUserByTagId(tagId);
 		 users.close();
+		 orders_uuid.clear();
+
 		 if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
 		 } else {
 			 TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-//			 TaskStatusDBAdapter TaskStatusDBAdapt = new TaskStatusDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 			 ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(user.getUuid());	
 			 Integer cnt=0;
 			 final TableRow tableHead = new TableRow(getActivity().getApplicationContext());
-			 //TableRow.LayoutParams params = new TableRow.LayoutParams();
 			 tableHead.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
 			 tableHead.setBackgroundColor(getResources().getColor(R.color.almostblack));
 			 final TextView tv_head1 = new TextView(getActivity().getApplicationContext());
@@ -98,7 +106,6 @@ public class OrdersFragment extends Fragment {
 				 final TableRow tableRow = new TableRow(getActivity().getApplicationContext());
 				 TableLayout.LayoutParams tableRowParams= new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT);
 				 tableRowParams.setMargins(7, 2, 7, 2);
-				 //TableRow.LayoutParams params = new TableRow.LayoutParams();
 				 tableRow.setLayoutParams(tableRowParams);
 				 tableRow.setBackgroundColor(getResources().getColor(R.color.black));
 				 tableRow.setId(cnt);			
@@ -107,7 +114,7 @@ public class OrdersFragment extends Fragment {
 				        public void onClick(View v) {
 				        	tl_task.removeAllViews();
 				        	v.getId();
-				        	initTaskEquipment(v, order_uuid.get(v.getId()));
+				        	initTaskEquipment(orders_uuid.get(v.getId()));
 				        	}});
 				 
 				 // Creation row
@@ -127,7 +134,7 @@ public class OrdersFragment extends Fragment {
 				 tv_uuid.setBackgroundResource(R.color.almostblack);
 				 tv_uuid.setGravity(Gravity.CENTER_HORIZONTAL);
 				 tv_uuid.setPadding(5, 2, 5, 2);
-				 order_uuid.add(cnt, ordersList.get(cnt).getUuid().toString());
+				 orders_uuid.add(cnt, ordersList.get(cnt).getUuid().toString());
 
 				 final TextView tv_create = new TextView(getActivity().getApplicationContext());
 				 tv_create.setText(DataUtils.getDate(ordersList.get(cnt).getCreate_date(),"dd-MM-yyyy hh:mm"));
@@ -161,13 +168,16 @@ public class OrdersFragment extends Fragment {
 				 if (cnt>MaxOrders) break;
 			 	}
 			 dbOrder.close();
+			 button1.setVisibility(View.INVISIBLE);
 		 	}
 		}
 
-	private void initTaskEquipment(View view, String order_uuid)
+	private void initTaskEquipment(String order_uuid)
 	{
+     final String order = order_uuid; 
 	 //tl_task = (TableLayout) view.findViewById(R.id.TableLayout01);
 	 String tagId = "01234567";
+	 tasks_uuid.clear();
 	 UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 	 Users user = users.getUserByTagId(tagId);
 	 users.close();
@@ -219,7 +229,7 @@ public class OrdersFragment extends Fragment {
 		 //Toast.makeText(getActivity(), equipmentList.size(), Toast.LENGTH_SHORT).show();
 		 
 		 while (cnt<equipmentList.size())
-		 	{				
+		 	{					 
 			 // Creation row
 			 final TableRow tableRow = new TableRow(getActivity().getApplicationContext());
 			 TableLayout.LayoutParams tableRowParams= new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT);
@@ -227,6 +237,7 @@ public class OrdersFragment extends Fragment {
 			 tableRow.setLayoutParams(tableRowParams);
 			 tableRow.setBackgroundColor(getResources().getColor(R.color.black));
 			 tableRow.setId(cnt);
+
 			 // Creation row
 			 final ImageView img = new ImageView(getActivity().getApplicationContext());
 			 img.setImageResource(R.drawable.checkmark_32);
@@ -244,7 +255,15 @@ public class OrdersFragment extends Fragment {
 			 tv_uuid.setBackgroundResource(R.color.almostblack);
 			 tv_uuid.setGravity(Gravity.CENTER_HORIZONTAL);
 			 tv_uuid.setPadding(5, 2, 5, 2);
-			 
+			 tasks_uuid.add(cnt, equipmentList.get(cnt).getUuid().toString());
+
+			 tableRow.setOnClickListener(new OnClickListener() {
+			        public void onClick(View v) {
+			        	tl_task.removeAllViews();
+			        	v.getId();
+			        	initOperationPattern(tasks_uuid.get(v.getId()), order);
+			        	}});
+
 			 final TextView tv_device = new TextView(getActivity().getApplicationContext());			 
 			 tv_device.setText(eqDBAdapter.getEquipsNameByUUID(equipmentList.get(cnt).getEquipment_uuid()));
 			 tv_device.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -275,11 +294,88 @@ public class OrdersFragment extends Fragment {
 			 tl_task.addView(tableRow);	    	 
 			 cnt=cnt+1;
 			 if (cnt>5) break;
-		 	}
+		 	}		 
+
+		 button1.setVisibility(View.VISIBLE);
+		 button1.setOnClickListener(new OnClickListener() {
+		        public void onClick(View v) {
+		        	tl_task.removeAllViews();
+		        	initView();
+		        	}});
+		 
 		 eqOperation.close();
 		 eqDBAdapter.close();
 		 operationTypeDBAdapter.close();
 		 equipmentOperationResultDBAdapter.close();
 	 	}
-	}	
+	}
+	
+  // init operation pattern view
+  private void initOperationPattern(String task_equipment_uuid, String order_uuid)
+	{
+         final String order =order_uuid; 
+		 OperationPatternDBAdapter opPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();		 		 
+		 ArrayList<OperationPattern> operationsList = opPatternDBAdapter.getOperationByUUID(task_equipment_uuid);
+		 Integer cnt=0;
+		 final TableRow tableHead = new TableRow(getActivity().getApplicationContext());
+		 tableHead.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
+		 tableHead.setBackgroundColor(getResources().getColor(R.color.almostblack));
+		 final TextView tv_head1 = new TextView(getActivity().getApplicationContext());
+		 tv_head1.setText("S");
+		 tv_head1.setGravity(Gravity.CENTER_HORIZONTAL);
+		 tableHead.addView(tv_head1);
+		 final TextView tv_head2 = new TextView(getActivity().getApplicationContext());
+		 tv_head2.setText("uuid");
+		 tv_head2.setGravity(Gravity.CENTER_HORIZONTAL);
+		 tableHead.addView(tv_head2);
+		 final TextView tv_head3 = new TextView(getActivity().getApplicationContext());
+		 tv_head3.setText("операция");
+		 tv_head3.setGravity(Gravity.CENTER_HORIZONTAL);
+		 tableHead.addView(tv_head3);
+		 
+		 while (cnt<operationsList.size())
+		 	{				
+			 // Creation row
+			 final TableRow tableRow = new TableRow(getActivity().getApplicationContext());
+			 TableLayout.LayoutParams tableRowParams= new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT);
+			 tableRowParams.setMargins(7, 2, 7, 2);
+			 tableRow.setLayoutParams(tableRowParams);
+			 tableRow.setBackgroundColor(getResources().getColor(R.color.black));
+			 tableRow.setId(cnt);
+			 tableRow.setOnClickListener(new OnClickListener() {
+			        public void onClick(View v) {
+			        	// TODO: вызов активити с паттерном
+
+			        }});
+
+			 // Creation row
+			 final ImageView img = new ImageView(getActivity().getApplicationContext());
+			 img.setImageResource(R.drawable.checkmark_32);
+			          
+			 final TextView tv_uuid = new TextView(getActivity().getApplicationContext());
+			 tv_uuid.setText(operationsList.get(cnt).getUuid().toString().subSequence(0,8));
+			 tv_uuid.setBackgroundResource(R.color.almostblack);
+			 tv_uuid.setGravity(Gravity.CENTER_HORIZONTAL);
+			 tv_uuid.setPadding(5, 2, 5, 2);
+			 
+			 final TextView tv_operation = new TextView(getActivity().getApplicationContext());			 
+			 tv_operation.setText(operationsList.get(cnt).getTitle());
+			 tv_operation.setGravity(Gravity.CENTER_HORIZONTAL);
+			 tv_operation.setPadding(5, 2, 5, 2);
+			 
+			 tableRow.addView(img);
+			 tableRow.addView(tv_uuid);
+			 tableRow.addView(tv_operation);
+			 tl_task.addView(tableRow);	    	 
+			 cnt=cnt+1;
+			 if (cnt>5) break;
+		 	}		 
+		 button1.setVisibility(1);
+		 button1.setOnClickListener(new OnClickListener() {
+		        public void onClick(View v) {
+		        	tl_task.removeAllViews();
+		        	initTaskEquipment(order);
+		        }});		 
+		 opPatternDBAdapter.close();
+	 	}	
 }
