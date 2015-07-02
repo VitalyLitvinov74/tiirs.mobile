@@ -63,7 +63,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:scrollbarAlwaysDrawVerticalTrack="false"
+            android:scrollbars="vertical" >
 
             <TableLayout
                 android:id="@+id/TableLayout01"
@@ -72,6 +74,36 @@
                 android:layout_weight="1" >
 
             </TableLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+
+                <TableRow
+                    android:id="@+id/tableRow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal" >
+
+                    <Button
+                        android:id="@+id/button3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button4"
+                        android:minHeight="20dp"
+                        android:minWidth="54dp"
+                        android:text="назад"
+                        android:textSize="12sp"
+                        android:visibility="invisible" />
+
+                </TableRow>
+            </TableLayout>
+
         </LinearLayout>
        
         </TableLayout>

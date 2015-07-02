@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationPattern;
@@ -99,5 +101,29 @@ public class OperationPatternDBAdapter {
 	 */
 	public long replace(OperationPattern status) {
 		return replace(status.getUuid(), status.getTitle());
+	}
+
+	/**
+	 * <p>Возвращает список операций</p>
+	 * @param uuid
+	 * @return array
+	 */
+	public ArrayList<OperationPattern> getOperationByUUID(String uuid) {
+		ArrayList<OperationPattern> arrayList = new ArrayList<OperationPattern>();
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
+		cursor.moveToFirst();
+		if (cursor.getCount()>0)
+		while (true)		
+			{
+			OperationPattern operationPattern = new OperationPattern(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+			 arrayList.add(operationPattern);
+			 if (cursor.isLast()) break;
+			 cursor.moveToNext();
+			}
+		return arrayList;
 	}
 }
