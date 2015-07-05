@@ -255,8 +255,8 @@ public class OrdersFragment extends Fragment {
 			 tv_uuid.setBackgroundResource(R.color.almostblack);
 			 tv_uuid.setGravity(Gravity.CENTER_HORIZONTAL);
 			 tv_uuid.setPadding(5, 2, 5, 2);
-			 tasks_uuid.add(cnt, equipmentList.get(cnt).getUuid().toString());
-
+			 //tasks_uuid.add(cnt, equipmentList.get(cnt).getUuid().toString());
+			 tasks_uuid.add(cnt, equipmentList.get(cnt).getOperation_pattern_uuid().toString());			 
 			 tableRow.setOnClickListener(new OnClickListener() {
 			        public void onClick(View v) {
 			        	tl_task.removeAllViews();

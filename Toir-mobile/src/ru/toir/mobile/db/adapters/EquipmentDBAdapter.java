@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -70,10 +72,50 @@ public class EquipmentDBAdapter {
 	
 	/**
 	 * <p>Возвращает все записи из таблицы equipment</p>
-	 * @return Cursor
+	 * @return list
 	 */
-	public Cursor getAllItems() {
-		return mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
+	public ArrayList<Equipment> getAllItems(String type, String critical_type) {
+		ArrayList<Equipment> arrayList = new ArrayList<Equipment>();
+		Cursor cursor;
+		// можем или отобрать все оборудование или только определенного типа
+		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
+		
+		if (type.equals("") && !critical_type.equals(""))
+			{
+			 cursor.close();
+			 cursor = mDb.query(TABLE_NAME, mColumns, FIELD_CRITICAL_TYPE_UUID_NAME + "=?", new String[]{critical_type}, null, null, null);
+			}
+		if (!type.equals("") && critical_type.equals(""))
+			{
+			 cursor.close();
+			 cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_TYPE_UUID_NAME + "=?", new String[]{type}, null, null, null);
+			}
+		if (!type.equals("") && !critical_type.equals(""))
+			{
+			 cursor.close();
+			 cursor = mDb.query(TABLE_NAME, mColumns, FIELD_CRITICAL_TYPE_UUID_NAME + "=? AND " + FIELD_EQUIPMENT_TYPE_UUID_NAME + "=?", new String[]{critical_type,type}, null, null, null);
+			}
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 while (true)		
+			 	{			 
+				 Equipment equip = new Equipment(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_LOCATION_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME)));
+				 	arrayList.add(equip);
+				 	if (cursor.isLast()) break;
+				 	cursor.moveToNext();
+			 	}
+			}
+		cursor.close();
+		return arrayList;
 	}
 	
 	/**

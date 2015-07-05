@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentType;
@@ -67,7 +69,7 @@ public class EquipmentTypeDBAdapter {
 	 * 
 	 * @return
 	 */
-	public Cursor getAllItems() {
+	public Cursor getAllItems_() {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);		
 		if (cursor.moveToFirst()) {
@@ -100,4 +102,55 @@ public class EquipmentTypeDBAdapter {
 	public long replace(EquipmentType type) {
 		return replace(type.getUuid(), type.getTitle());
 	}
+	
+	/**
+	 * <p>Возвращает все записи из таблицы equipmentType</p>
+	 * @return list
+	 */
+	public ArrayList<EquipmentType> getAllItems() {
+		ArrayList<EquipmentType> arrayList = new ArrayList<EquipmentType>();
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
+		
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 while (true)		
+			 	{			 
+				 EquipmentType equip = new EquipmentType(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+				 	arrayList.add(equip);
+				 	if (cursor.isLast()) break;
+				 	cursor.moveToNext();
+			 	}
+			}
+		return arrayList;
+	}
+
+	public String getNameByUUID(String uuid) {	
+		Cursor cur;		
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cur.getCount()>0)
+			{
+			 cur.moveToFirst();
+			 return cur.getString(2);
+			}
+		else
+			return "";
+	}
+
+	public String getUUIDByName(String name) {	
+		Cursor cur;		
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TITLE_NAME + "=?", new String[]{name}, null, null, null);
+		if (cur.getCount()>0)
+			{
+			 cur.moveToFirst();
+			 return cur.getString(1);
+			}
+		else
+			return "";
+	}
+	
 }
