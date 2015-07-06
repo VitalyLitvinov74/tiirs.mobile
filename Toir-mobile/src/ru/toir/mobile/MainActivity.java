@@ -1,7 +1,11 @@
 package ru.toir.mobile;
 
 import java.io.File;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,7 +22,9 @@ import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
+import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rfid.RFID;
@@ -30,6 +36,32 @@ public class MainActivity extends FragmentActivity {
 	private boolean isLogged = false;
 	ViewPager viewPager;
 	PageAdapter pageAdapter;
+	
+	private final static String ACTION_GET_TASK = "action_get_task";
+	private final static String ACTION_TASK_CONFIRM = "action_task_confirm";
+    private final IntentFilter mFilterGetTask = new IntentFilter(ACTION_GET_TASK);
+	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			Log.d(TAG, "" + provider);
+			if (provider == ProcessorService.Providers.TASK_PROVIDER) {
+				int method = intent.getIntExtra(ProcessorService.Extras.METHOD_EXTRA, 0);
+				Log.d(TAG, "" + method);
+				if (method == TaskServiceProvider.Methods.GET_TASK) {
+					boolean result = intent.getBooleanExtra(ProcessorService.Extras.RESULT_EXTRA, false);
+					Log.d(TAG, "" + result);
+					if (result == true) {
+						TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), ACTION_TASK_CONFIRM);
+						tsh.TaskConfirmation("00000001", "xyzxyzxyzxyz");
+					} else {
+						// если наряды по какой-то причине не удалось получить, видимо нужно вывести какое-то сообщение
+					}
+				}
+			}
+			
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +92,8 @@ public class MainActivity extends FragmentActivity {
 		tsh.GetTokenByUsernameAndPassword("test", "00000001");
 		*/
 
-		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), "action");
+		
+		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), ACTION_GET_TASK);
 		tsh.GetTask("00000001", "xyzxyzxyzxyz");
 
 	}
@@ -249,5 +282,23 @@ public class MainActivity extends FragmentActivity {
 		super.onSaveInstanceState(outState);
 		Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
 		outState.putBoolean("isLogged", isLogged);
+	}
+
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.FragmentActivity#onStart()
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		registerReceiver(mReceiverGetTask, mFilterGetTask);
+	}
+
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.FragmentActivity#onStop()
+	 */
+	@Override
+	protected void onStop() {
+		super.onStop();
+		unregisterReceiver(mReceiverGetTask);
 	}
 }

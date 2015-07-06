@@ -29,8 +29,15 @@ public class TaskServiceHelper extends ServiceHelperBase {
 	public void GetTask(String user_tag, String token) {
 		Bundle bundle = new Bundle();
 		bundle.putString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG, user_tag);
-		bundle.putString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_TOKEN, token);
+		bundle.putString(TaskServiceProvider.Methods.PARAMETER_TOKEN, token);
 		RunMethod(TaskServiceProvider.Methods.GET_TASK, bundle);
+	}
+	
+	public void TaskConfirmation(String user_tag, String token) {
+		Bundle bundle = new Bundle();
+		bundle.putString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG, user_tag);
+		bundle.putString(TaskServiceProvider.Methods.PARAMETER_TOKEN, token);
+		RunMethod(TaskServiceProvider.Methods.TASK_CONFIRMATION, bundle);
 	}
 
 }

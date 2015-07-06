@@ -62,6 +62,7 @@ public class TaskProcessor {
 
 	private Context mContext;
 	private static final String TASK_GET_URL = "/orders.php";
+	private static final String TASK_CONFIRMATION_URL = "/orders_confirm.php";
 	private String mServerUrl;
 
 	public TaskProcessor(Context context) throws Exception {
@@ -79,14 +80,14 @@ public class TaskProcessor {
 	}
 
 	/**
-	 * 
+	 * Получение нарядов со статусом "Новый"
 	 * @param bundle
 	 * @return
 	 */
 	public boolean GetTask(Bundle bundle) {
 		URI requestUri = null;
 		String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
-		String token = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_TOKEN);
+		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String jsonString = null;
 		JSONObject jsonRootObject = null;
 		try {
@@ -146,7 +147,6 @@ public class TaskProcessor {
 						ParseEquipmentOperationResult(elementArray);
 					}
 				}
-				return true;
 			} else {
 				return false;
 			}
@@ -154,6 +154,77 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+		
+		return true;
+
+	}
+	
+	/**
+	 * Отправка списка uuid нарядов со статусом "Новый" для подтверждения о получении.
+	 * В ответ с сервера отправляется список нарядов которые подтверждны.
+	 * Соответственно в локальной базе у соответствующих нарядов меняется статус на "В работе"
+	 * @param bundle
+	 * @return
+	 */
+	public boolean TaskConfirmation(Bundle bundle) {
+		URI requestUri = null;
+		String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
+		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+		String jsonString = null;
+		JSONObject jsonRootObject = null;
+		
+		// TODO реализовать отправку подтверждения получения нарядов
+		try {
+			requestUri = new URI(mServerUrl + TASK_CONFIRMATION_URL);
+			Log.d("test", "requestUri = " + requestUri.toString());
+			
+			
+			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+			List<String> tList = new ArrayList<String>();
+			tList.add("Bearer " + token);
+			headers.put("Authorization", tList);
+			
+			TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+			ArrayList<Task> tasks;
+			tasks = adapter.getTaskByUserAndStatus(tag, TaskStatusDBAdapter.STATUS_UUID_CREATED);
+			adapter.close();
+			if (tasks != null) {
+				// TODO реализовать упаковку данных по полученным нарядам для подтверждения о получении
+				StringBuilder postData = new StringBuilder("tag_id=").append(tag);
+				Iterator<Task> tasksIterator = tasks.iterator();
+				while (tasksIterator.hasNext()) {
+					postData.append("&uuids[]=");
+					postData.append(tasksIterator.next().getUuid());
+				}
+				Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
+				Response response = new RestClient().execute(request);
+				if (response.mStatus == 200) {
+
+					jsonString = new String(response.mBody, "UTF-8");
+					Log.d("test", jsonString);
+
+					jsonRootObject = new JSONObject(jsonString);
+					Iterator<?> iterator = jsonRootObject.keys();
+					while (iterator.hasNext()) {
+						// TODO реализовать разбор данных, обновление записей в базе
+						/*
+						String next = (String) iterator.next();
+						JSONArray elementArray = jsonRootObject.getJSONArray(next);
+						// TODO разобрать ответ от сервера, по полученным uuid изменить статусы на "В работе"
+						elementArray.toString();
+						*/
+					}
+				} else {
+					return false;
+				}				
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
 	}
 	
 	/**

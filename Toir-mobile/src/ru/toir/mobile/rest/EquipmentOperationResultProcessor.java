@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import ru.toir.mobile.R;
+import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -59,6 +59,8 @@ public class EquipmentOperationResultProcessor {
 			
 			StringBuilder postData = new StringBuilder("tag_id=").append(tag);
 			// TODO сделать упаковку данных из базы с результатами операций для отправки
+			EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(mContext)).open();
+			adapter.close();
 			
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();
