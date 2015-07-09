@@ -3,6 +3,8 @@
  */
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
@@ -122,6 +124,39 @@ public class EquipmentDocumentationDBAdapter {
 	 */
 	public long replace(EquipmentDocumentation document) {
 		return replace(document.getUuid(), document.getEquipment_uuid(), document.getDocumentation_type_uuid(), document.getTitle(), document.getPath());
+	}
+
+	/**
+	 * <p>Возвращает все записи из таблицы equipment documentation</p>
+	 * @return list
+	 */
+	public ArrayList<EquipmentDocumentation> getAllItems(String type) {
+		ArrayList<EquipmentDocumentation> arrayList = new ArrayList<EquipmentDocumentation>();
+		Cursor cursor;
+		// можем или отобрать всю документацию или только определенного типа
+		if (type.equals(""))
+			cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
+		else
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_DOCUMENTATION_TYPE_UUID_NAME + "=?", new String[]{type}, null, null, null);
+		
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 while (true)		
+			 	{			 
+				 EquipmentDocumentation equip = new EquipmentDocumentation(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_DOCUMENTATION_TYPE_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_PATH_NAME)));
+				 	arrayList.add(equip);
+				 	if (cursor.isLast()) break;
+				 	cursor.moveToNext();
+			 	}
+			}
+		return arrayList;
 	}
 
 }

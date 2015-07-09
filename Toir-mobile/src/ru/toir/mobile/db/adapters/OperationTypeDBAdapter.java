@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationType;
@@ -67,13 +69,38 @@ public class OperationTypeDBAdapter {
 	 * 
 	 * @return
 	 */
-	public Cursor getAllItems() {
+	public Cursor getAllItems_cursor() {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);		
 		if (cursor.moveToFirst()) {
 			return cursor;
 		}
 		return null;
+	}
+
+	/**
+	 * <p>Возвращает все записи из таблицы</p>
+	 * @return list
+	 */
+	public ArrayList<OperationType> getAllItems() {
+		ArrayList<OperationType> arrayList = new ArrayList<OperationType>();
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);		
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 while (true)		
+			 	{			 
+				 OperationType equip = new OperationType(
+					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+				 	arrayList.add(equip);
+				 	if (cursor.isLast()) break;
+				 	cursor.moveToNext();
+			 	}
+			}
+		return arrayList;
 	}
 	
 	/**
