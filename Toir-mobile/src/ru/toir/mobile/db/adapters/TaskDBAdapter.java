@@ -28,13 +28,13 @@ public class TaskDBAdapter {
 	public static final String FIELD_TASK_STATUS_UUID_NAME = "task_status_uuid";
 	public static final String FIELD_ATTEMPT_SEND_DATE_NAME = "attempt_send_date";
 	public static final String FIELD_ATTEMPT_COUNT_NAME = "attempt_count";
-	public static final String FIELD_SUCCESSEFULL_SEND_NAME = "successefull_send";
+	public static final String FIELD_UPDATED_NAME = "updated";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_USER_UUID_NAME, FIELD_CREATE_DATE_NAME,
 			FIELD_MODIFY_DATE_NAME, FIELD_CLOSE_DATE_NAME,
 			FIELD_TASK_STATUS_UUID_NAME, FIELD_ATTEMPT_SEND_DATE_NAME,
-			FIELD_ATTEMPT_COUNT_NAME, FIELD_SUCCESSEFULL_SEND_NAME };
+			FIELD_ATTEMPT_COUNT_NAME, FIELD_UPDATED_NAME };
 
 	/**
 	 * @param context
@@ -90,7 +90,7 @@ public class TaskDBAdapter {
 						cursor.getInt(cursor
 								.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
 						cursor.getInt(cursor
-								.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)) == 0 ? false
+								.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false
 								: true);
 				arrayList.add(task);
 				if (cursor.isLast())
@@ -131,7 +131,7 @@ public class TaskDBAdapter {
 						cursor.getInt(cursor
 								.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
 						cursor.getInt(cursor
-								.getColumnIndex(FIELD_SUCCESSEFULL_SEND_NAME)) == 0 ? false
+								.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false
 								: true);
 				arrayList.add(task);
 			} while (cursor.moveToNext());
@@ -154,7 +154,7 @@ public class TaskDBAdapter {
 	 */
 	public long replace(String uuid, String users_uuid, long create_date,
 			long modify_date, long close_date, String task_status_uuid,
-			long attempt_send_date, int attempt_count, boolean successefull_send) {
+			long attempt_send_date, int attempt_count, boolean updated) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
@@ -165,7 +165,7 @@ public class TaskDBAdapter {
 		values.put(FIELD_TASK_STATUS_UUID_NAME, task_status_uuid);
 		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
 		values.put(FIELD_ATTEMPT_COUNT_NAME, attempt_count);
-		values.put(FIELD_SUCCESSEFULL_SEND_NAME, successefull_send ? 1 : 0);
+		values.put(FIELD_UPDATED_NAME, updated == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -183,7 +183,7 @@ public class TaskDBAdapter {
 				task.getCreate_date(), task.getModify_date(),
 				task.getClose_date(), task.getTask_status_uuid(),
 				task.getAttempt_send_date(), task.getAttempt_count(),
-				task.isSuccessefull_send());
+				task.isUpdated());
 	}
 
 	public String getStatusNameByUUID(String uuid) {

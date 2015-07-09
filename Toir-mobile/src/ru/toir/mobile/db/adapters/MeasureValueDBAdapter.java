@@ -17,12 +17,24 @@ public class MeasureValueDBAdapter {
 	
 	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
-	public static final String FIELD_TITLE_NAME = "title";
+	public static final String FIELD_EQUIPMENT_OPERATION_UUID_NAME = "equipment_operation_uuid";
+	public static final String FIELD_OPERATION_PATTERN_STEP_RESULT_NAME = "operation_pattern_step_result";
+	public static final String FIELD_DATE_NAME = "date";
+	public static final String FIELD_VALUE_NAME = "value";
+	public static final String FIELD_ATTEMPT_SEND_DATE_NAME = "attempt_send_date";
+	public static final String FIELD_ATTEMPT_COUNT_NAME = "attempt_count";
+	public static final String FIELD_UPDATED_NAME = "updated";
 	
 	String[] mColumns = {
 			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
-			FIELD_TITLE_NAME};
+			FIELD_EQUIPMENT_OPERATION_UUID_NAME,
+			FIELD_OPERATION_PATTERN_STEP_RESULT_NAME,
+			FIELD_DATE_NAME,
+			FIELD_VALUE_NAME,
+			FIELD_ATTEMPT_SEND_DATE_NAME,
+			FIELD_ATTEMPT_COUNT_NAME,
+			FIELD_UPDATED_NAME};
 		
 	/**
 	 * @param context
@@ -68,7 +80,13 @@ public class MeasureValueDBAdapter {
 			MeasureValue item = null;
 			item = new MeasureValue(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_DATE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_VALUE_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 1 ? true : false);
 			return item;
 		}
 		return null;
@@ -80,11 +98,17 @@ public class MeasureValueDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String title) {
+	public long replace(String uuid, String equipment_operation_uuid, String operation_pattern_step_result, long date, String value, long attempt_send_date, int attempt_count, boolean updated) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_TITLE_NAME, title);
+		values.put(FIELD_EQUIPMENT_OPERATION_UUID_NAME, equipment_operation_uuid);
+		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT_NAME, operation_pattern_step_result);
+		values.put(FIELD_DATE_NAME, date);
+		values.put(FIELD_VALUE_NAME, value);
+		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
+		values.put(FIELD_ATTEMPT_COUNT_NAME, attempt_count);
+		values.put(FIELD_UPDATED_NAME, updated == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -95,7 +119,7 @@ public class MeasureValueDBAdapter {
 	 * @param token
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(MeasureValue status) {
-		return replace(status.getUuid(), status.getTitle());
+	public long replace(MeasureValue value) {
+		return replace(value.getUuid(), value.getEquipment_operation_uuid(), value.getOperation_pattern_step_result(), value.getDate(), value.getValue(), value.getAttempt_send_date(), value.getAttempt_count(), value.isUpdated());
 	}
 }

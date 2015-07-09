@@ -602,11 +602,10 @@ public class TaskProcessor {
 				item.setModify_date(value.getLong(TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
 				item.setClose_date(value.getLong(TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
 				item.setTask_status_uuid(value.getString(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
+				// TODO необходимо для полей отвечающих за отправку данных на сервер, либо устанавливать значения по умолчанию, либо предварительно вытаскивать их из базы. РЕШИТЬ!!!
 				item.setAttempt_send_date(value.getLong(TaskDBAdapter.FIELD_ATTEMPT_SEND_DATE_NAME));
 				item.setAttempt_count(value.getInt(TaskDBAdapter.FIELD_ATTEMPT_COUNT_NAME));
-				item.setSuccessefull_send(value
-						.getInt(TaskDBAdapter.FIELD_SUCCESSEFULL_SEND_NAME) == 0 ? false
-						: true);
+				item.setUpdated(value.getInt(TaskDBAdapter.FIELD_UPDATED_NAME) == 0 ? false	: true);
 				adapter.replace(item);
 
 			}
@@ -686,7 +685,11 @@ public class TaskProcessor {
 				MeasureValue item = new MeasureValue();
 				JSONObject value = array.getJSONObject(i);
 				item.setUuid(value.getString(MeasureValueDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(MeasureValueDBAdapter.FIELD_TITLE_NAME));
+				item.setEquipment_operation_uuid(value.getString(MeasureValueDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID_NAME));
+				item.setOperation_pattern_step_result(value.getString(MeasureValueDBAdapter.FIELD_OPERATION_PATTERN_STEP_RESULT_NAME));
+				item.setDate(value.getInt(MeasureValueDBAdapter.FIELD_DATE_NAME));
+				item.setValue(value.getString(MeasureValueDBAdapter.FIELD_VALUE_NAME));
+				// TODO необходимо для полей отвечающих за отправку данных на сервер, либо устанавливать значения по умолчанию, либо предварительно вытаскивать их из базы. РЕШИТЬ!!! 
 				adapter.replace(item);
 			}
 		} catch (Exception e) {

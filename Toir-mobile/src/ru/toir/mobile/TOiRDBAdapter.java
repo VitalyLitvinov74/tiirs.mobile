@@ -27,7 +27,7 @@ public class TOiRDBAdapter{
 	/**
 	 * <p>Версия базы данных с которой работает приложение</p>
 	 */
-	private static final int DATABASE_VERSION = 10;
+	private static final int DATABASE_VERSION = 11;
 	
 	/**
 	 * база приложения
@@ -180,11 +180,13 @@ public class TOiRDBAdapter{
 					BufferedReader br = new BufferedReader(new InputStreamReader(is));
 					String line;
 					while((line = br.readLine()) != null){
-						try{
-							db.execSQL(line);
-						}catch(SQLException e){
-							transactionSuccefful = false;
-							Log.d(TAG, e.toString());
+						if (!line.isEmpty()) {
+							try{
+								db.execSQL(line);
+							}catch(SQLException e){
+								transactionSuccefful = false;
+								Log.d(TAG, e.toString());
+							}
 						}
 					}
 				}catch(IOException e){
@@ -196,6 +198,20 @@ public class TOiRDBAdapter{
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
+			
+			if (!transactionSuccefful) {
+				throw new RuntimeException("при обновлении базы данных произошла ошибка");
+			}
+		}
+
+		/* (non-Javadoc)
+		 * @see android.database.sqlite.SQLiteOpenHelper#onDowngrade(android.database.sqlite.SQLiteDatabase, int, int)
+		 */
+		@Override
+		public void onDowngrade(SQLiteDatabase db, int oldVersion,
+				int newVersion) {
+			Log.d(TAG, "TOiRDbHelper.onDowngrade: db.version=" + db.getVersion());
+			Log.d(TAG, "TOiRDbHelper.onDowngrade: oldVersion=" + oldVersion + ", newVersion=" + newVersion);
 		}
 	}
 }

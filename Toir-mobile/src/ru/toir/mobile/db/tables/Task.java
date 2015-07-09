@@ -17,14 +17,14 @@ public class Task {
 	private String task_status_uuid;
 	private long attempt_send_date;
 	private int attempt_count;
-	private boolean successefull_send;
+	private boolean updated;
 
 	public Task() {
 
 	}
 
 	public Task(long _id, String uuid, String users_uuid, long create_date, long modify_date, 
-			long close_date, String task_status_uuid, long attempt_send_date, int attempt_count, boolean successefull_send) 
+			long close_date, String task_status_uuid, long attempt_send_date, int attempt_count, boolean updated) 
 	{
 		this._id = _id;
 		this.uuid = uuid;
@@ -35,7 +35,7 @@ public class Task {
 		this.task_status_uuid = task_status_uuid;
 		this.attempt_send_date = attempt_send_date;
 		this.attempt_count = attempt_count;
-		this.successefull_send = successefull_send;
+		this.updated = updated;
 	}
 
 	/**
@@ -151,17 +151,17 @@ public class Task {
 	}
 
 	/**
-	 * @return the successefull_send
+	 * @return the updated
 	 */
-	public boolean isSuccessefull_send() {
-		return successefull_send;
+	public boolean isUpdated() {
+		return updated;
 	}
 
 	/**
-	 * @param successefull_send the successefull_send to set
+	 * @param updated the updated to set
 	 */
-	public void setSuccessefull_send(boolean successefull_send) {
-		this.successefull_send = successefull_send;
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 
 	/**

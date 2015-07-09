@@ -24,6 +24,10 @@ public class EquipmentOperationResultDBAdapter {
 	public static final String FIELD_START_DATE_NAME = "start_date";
 	public static final String FIELD_END_DATE_NAME = "end_date";
 	public static final String FIELD_OPERATION_RESULT_UUID_NAME = "operation_result_uuid";
+	public static final String FIELD_ATTEMPT_SEND_DATE_NAME = "attempt_send_date";
+	public static final String FIELD_ATTEMPT_COUNT_NAME = "attempt_count";
+	public static final String FIELD_UPDATED_NAME = "updated";
+
 		
 	String[] mColumns = {
 			FIELD__ID_NAME,
@@ -31,7 +35,10 @@ public class EquipmentOperationResultDBAdapter {
 			FIELD_EQUIPMENT_OPERATION_UUID_NAME,
 			FIELD_START_DATE_NAME,
 			FIELD_END_DATE_NAME,
-			FIELD_OPERATION_RESULT_UUID_NAME};
+			FIELD_OPERATION_RESULT_UUID_NAME,
+			FIELD_ATTEMPT_SEND_DATE_NAME,
+			FIELD_ATTEMPT_COUNT_NAME,
+			FIELD_UPDATED_NAME};
 
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
@@ -133,7 +140,10 @@ public class EquipmentOperationResultDBAdapter {
 					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)),
 					cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)),
 					cursor.getLong(cursor.getColumnIndex(FIELD_END_DATE_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_RESULT_UUID_NAME)));
+					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_RESULT_UUID_NAME)),
+					cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 1);
 			return result;
 		}
 		return null;
@@ -148,7 +158,7 @@ public class EquipmentOperationResultDBAdapter {
 	 * @param operation_result_uuid
 	 * @return
 	 */
-	public long replace(String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid) {
+	public long replace(String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, long attempt_send_date, int attempt_count, boolean updated) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
@@ -156,6 +166,9 @@ public class EquipmentOperationResultDBAdapter {
 		values.put(FIELD_START_DATE_NAME, start_date);
 		values.put(FIELD_END_DATE_NAME, end_date);
 		values.put(FIELD_OPERATION_RESULT_UUID_NAME, operation_result_uuid);
+		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
+		values.put(FIELD_ATTEMPT_COUNT_NAME, attempt_count);
+		values.put(FIELD_UPDATED_NAME, updated == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -166,7 +179,7 @@ public class EquipmentOperationResultDBAdapter {
 	 * @return
 	 */
 	public long replace(EquipmentOperationResult result) {
-		return replace(result.getUuid(), result.getEquipment_operation_uuid(), result.getStart_date(), result.getEnd_date(), result.getOperation_result_uuid());
+		return replace(result.getUuid(), result.getEquipment_operation_uuid(), result.getStart_date(), result.getEnd_date(), result.getOperation_result_uuid(), result.getAttempt_send_date(), result.getAttempt_count(), result.isUpdated());
 	}
 	
 }

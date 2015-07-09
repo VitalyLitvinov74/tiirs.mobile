@@ -92,9 +92,10 @@ public class MainActivity extends FragmentActivity {
 		tsh.GetTokenByUsernameAndPassword("test", "00000001");
 		*/
 
-		
+		/*
 		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), ACTION_GET_TASK);
 		tsh.GetTask("00000001", "xyzxyzxyzxyz");
+		*/
 
 	}
 
@@ -104,26 +105,35 @@ public class MainActivity extends FragmentActivity {
 	public void init() {
 		if (!initDB()) {
 			// принудительное обновление приложения
+			finish();
 		}
 	}
 	
 	public boolean initDB() {
 		boolean success = false;
-		// создаём базу данных, в качестве контекста передаём свой, с переопределёнными путями к базе 
-		TOiRDBAdapter adapter = new TOiRDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		Log.d("test", "db.version=" + adapter.getDbVersion());
-		if(!adapter.isActual()){
-			Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_SHORT);
+		TOiRDBAdapter adapter = null;
+		// создаём базу данных, в качестве контекста передаём свой, с переопределёнными путями к базе
+		try {
+			adapter = new TOiRDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+			Log.d("test", "db.version=" + adapter.getDbVersion());
+			if(!adapter.isActual()){
+				Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
+			}else {
+				Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
+				success = true;
+			}
+			adapter.close();
+			adapter = null;
+		} catch (Exception e) {
+			Toast toast = Toast.makeText(this, "Не удалось открыть/обновить базу данных!", Toast.LENGTH_LONG);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
-		}else {
-			Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.CENTER, 0, 0);
-			toast.show();
-			success = true;
 		}
-		adapter.close();
-		adapter = null;
+		
 		return success;
 	}
 	

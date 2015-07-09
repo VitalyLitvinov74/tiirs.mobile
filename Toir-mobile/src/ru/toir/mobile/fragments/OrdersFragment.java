@@ -151,7 +151,7 @@ public class OrdersFragment extends Fragment {
 				 
 				 final ImageView img2 = new ImageView(getActivity().getApplicationContext());
 				 img2.setImageResource(R.drawable.help_32);
-				 if (ordersList.get(cnt).isSuccessefull_send())
+				 if (ordersList.get(cnt).isUpdated())
 					 img2.setImageResource(R.drawable.checkmark_32);
 				 else
 					 img2.setImageResource(R.drawable.forbidden_32);
