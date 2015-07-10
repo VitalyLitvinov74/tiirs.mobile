@@ -67,7 +67,7 @@ public class UserInfoFragment extends Fragment {
 
 			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 			TaskStatusDBAdapter TaskStatusDBAdapt = new TaskStatusDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-			ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(user.getUuid());
+			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid());
 			
 			//Toast.makeText(getActivity(), ordersList.size(), Toast.LENGTH_SHORT).show();						
 			Integer cnt=0;

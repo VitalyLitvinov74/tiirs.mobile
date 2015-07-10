@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.TaskResult;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -63,6 +64,7 @@ public class TaskProcessor {
 	private Context mContext;
 	private static final String TASK_GET_URL = "/orders.php";
 	private static final String TASK_CONFIRMATION_URL = "/confirm.php";
+	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
 	private String mServerUrl;
 
 	public TaskProcessor(Context context) throws Exception {
@@ -168,7 +170,7 @@ public class TaskProcessor {
 		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String jsonString = null;
 		// TODO необходимо реализовать хранение данных по текущему аутентифицированному пользователю и данные для запроса брать на "ходу"
-		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+		String user_uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
 		
 		try {
 			requestUri = new URI(mServerUrl + TASK_CONFIRMATION_URL);
@@ -182,7 +184,7 @@ public class TaskProcessor {
 			
 			TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
 			ArrayList<Task> tasks;
-			tasks = adapter.getTaskByUserAndStatus(uuid, TaskStatusDBAdapter.STATUS_UUID_CREATED);
+			tasks = adapter.getTaskByUserAndStatus(user_uuid, TaskStatusDBAdapter.STATUS_UUID_CREATED);
 			adapter.close();
 			if (tasks != null) {
 				StringBuilder postData = new StringBuilder();
@@ -198,6 +200,124 @@ public class TaskProcessor {
 					jsonString = new String(response.mBody, "UTF-8");
 					JSONArray jsonArray = new JSONArray(jsonString);
 					ParseConfirmTask(jsonArray);
+				} else {
+					return false;
+				}				
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Отправка результатов выполнения наряда.
+	 * @param bundle
+	 * @return
+	 */
+	public boolean TaskSendResult(Bundle bundle) {
+		URI requestUri = null;
+		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+		String taskUuid = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
+		String jsonString = null;
+		
+		try {
+			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
+			Log.d("test", "requestUri = " + requestUri.toString());
+			
+			
+			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+			List<String> tList = new ArrayList<String>();
+			tList.add("Bearer " + token);
+			headers.put("Authorization", tList);
+			
+			TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+			Task task;
+			task = adapter.getTaskByUuidAndUpdated(taskUuid);
+			adapter.close();
+			if (task != null) {
+				StringBuilder postData = new StringBuilder();
+				
+				TaskResult taskResult = new TaskResult(mContext);
+				if (taskResult.getTaskResult(task.getUuid())) {
+					// TODO реализовать упаковку данных с результатами выполнения наряда, на сервер должен уехать массив с одним элементом 
+					/*
+					postData.append("uuids[]=");
+					postData.append(tasksIterator.next().getUuid());
+					*/
+	
+					Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
+					Response response = new RestClient().execute(request);
+					if (response.mStatus == 200) {
+						// TODO реализовать разбор ответа с подтверждением об отправке результатов
+						// TODO реализовать изменение статусов данных(updated) на "отправлено"
+						jsonString = new String(response.mBody, "UTF-8");
+						JSONArray jsonArray = new JSONArray(jsonString);
+						//ParseConfirmTask(jsonArray);
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Отправка результатов выполнения нарядов.
+	 * @param bundle
+	 * @return
+	 */
+	public boolean TasksSendResult(Bundle bundle) {
+		URI requestUri = null;
+		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+		String jsonString = null;
+		// TODO необходимо реализовать хранение данных по текущему аутентифицированному пользователю и данные для запроса брать на "ходу"
+		String user_uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+		
+		try {
+			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
+			Log.d("test", "requestUri = " + requestUri.toString());
+			
+			
+			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+			List<String> tList = new ArrayList<String>();
+			tList.add("Bearer " + token);
+			headers.put("Authorization", tList);
+			
+			TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+			ArrayList<Task> tasks;
+			// TODO необходимо решить и реализовать выборку не отправленных нарядов, либо по текущему пользователю либо все какие есть неотправленные.
+			tasks = adapter.getTaskByUserAndUpdated(user_uuid);
+			adapter.close();
+			if (tasks != null) {
+				StringBuilder postData = new StringBuilder();
+				Iterator<Task> tasksIterator = tasks.iterator();
+				while (tasksIterator.hasNext()) {
+					postData.append("uuids[]=");
+					postData.append(tasksIterator.next().getUuid());
+				}
+
+				Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
+				Response response = new RestClient().execute(request);
+				if (response.mStatus == 200) {
+					// TODO реализовать разбор ответа с подтверждением об отправке результатов
+					// TODO реализовать изменение статусов данных(updated) на "отправлено"
+					jsonString = new String(response.mBody, "UTF-8");
+					JSONArray jsonArray = new JSONArray(jsonString);
+					//ParseConfirmTask(jsonArray);
 				} else {
 					return false;
 				}				

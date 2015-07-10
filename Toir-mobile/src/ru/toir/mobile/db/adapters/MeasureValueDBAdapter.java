@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.MeasureValue;
@@ -62,34 +64,54 @@ public class MeasureValueDBAdapter {
 	}
 
 	/**
-	 * 
+	 * Возвращает результат измерений по uuid
 	 * @param uuid
-	 * @return
+	 * @return если результата нет, возвращает null
 	 */
-	public MeasureValue getItem(String uuid) {		
-		return getMeasureValue(mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null));		
+	public MeasureValue getItem(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getMeasureValue(cursor);
+		} else {
+			return null;
+		}
 	}
-	
+
+	/**
+	 * Возвращает результаты измерений по uuid операции над оборудованием
+	 * @param uuid
+	 * @return если результатов нет, список результатов пустой
+	 */
+	public ArrayList<MeasureValue> getItems(String operationUuid) {
+		Cursor cursor;
+		ArrayList<MeasureValue> arrayList = new ArrayList<MeasureValue>();
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID_NAME + "=?", new String[]{operationUuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				arrayList.add(getMeasureValue(cursor));
+			} while(cursor.moveToNext());
+		}
+		return arrayList;
+	}
+
 	/**
 	 * <p>Возвращает объект MeasureValue</p>
 	 * @param cursor
 	 * @return
 	 */
 	public static MeasureValue getMeasureValue(Cursor cursor) {
-		if (cursor.moveToFirst()) {
-			MeasureValue item = null;
-			item = new MeasureValue(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT_NAME)),
-					cursor.getInt(cursor.getColumnIndex(FIELD_DATE_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_VALUE_NAME)),
-					cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
-					cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-					cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 1 ? true : false);
-			return item;
-		}
-		return null;
+		MeasureValue item = null;
+		item = new MeasureValue(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
+				cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
+				cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)),
+				cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT_NAME)),
+				cursor.getInt(cursor.getColumnIndex(FIELD_DATE_NAME)),
+				cursor.getString(cursor.getColumnIndex(FIELD_VALUE_NAME)),
+				cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
+				cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
+				cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 1 ? true : false);
+		return item;
 	}
 	
 	/**

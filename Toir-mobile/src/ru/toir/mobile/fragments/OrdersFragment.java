@@ -85,7 +85,7 @@ public class OrdersFragment extends Fragment {
 		} else {
 			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
 					getActivity().getApplicationContext())).open();
-			ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(user
+			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user
 					.getUuid());
 			Integer cnt = 0;
 			final TableRow tableHead = new TableRow(getActivity()

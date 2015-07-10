@@ -68,26 +68,22 @@ public class EquipmentOperationDBAdapter {
 		mDbHelper.close();
 	}
 
+	/**
+	 * Возвращает список операций над оборудованием по наряду и статусу
+	 * @param orderId
+	 * @param status
+	 * @return
+	 */
 	public ArrayList<EquipmentOperation> getEquipsByOrderId(String orderId, String status) {
 		ArrayList<EquipmentOperation> arrayList = new ArrayList<EquipmentOperation>();
 		Cursor cursor;
 
 		// можем или отобрать все оборудование или только с нужным статусом 
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{orderId}, null, null, null);		
-		cursor.moveToFirst();
-		while (true)		
-			{
-			 EquipmentOperation equipOp = new EquipmentOperation(
-					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_STATUS_UUID_NAME)));
-			 arrayList.add(equipOp);
-			 if (cursor.isLast()) break;
-			 cursor.moveToNext();
+		if (cursor.moveToFirst()) {
+			do	{
+				 arrayList.add(getItem(cursor));
+			} while(cursor.moveToNext());
 		}
 		return arrayList;
 	}
@@ -170,5 +166,56 @@ public class EquipmentOperationDBAdapter {
 	public long replace(EquipmentOperation operation) {
 		return replace(operation.getUuid(), operation.getTask_uuid(), operation.getEquipment_uuid(), operation.getOperation_type_uuid(), operation.getOperation_pattern_uuid(), operation.getOperation_status_uuid());
 	}
+	
+	/**
+	 * Возвращает операцию над оборудованием по uuid
+	 * @param uuid
+	 * @return если операции нет, возвращает null
+	 */
+	public EquipmentOperation getItem(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Возвращает объект операции над оборудованием
+	 * @param cursor
+	 * @return
+	 */
+	public EquipmentOperation getItem(Cursor cursor) {
+		EquipmentOperation equipmentOperation = new EquipmentOperation();
+		equipmentOperation.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		equipmentOperation.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		equipmentOperation.setTask_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID_NAME)));
+		equipmentOperation.setEquipment_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID_NAME)));
+		equipmentOperation.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID_NAME)));
+		equipmentOperation.setOperation_pattern_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID_NAME)));
+		equipmentOperation.setOperation_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_STATUS_UUID_NAME)));
+		return equipmentOperation;
+	}
+	
+	/**
+	 * Возвращает список операций над оборудованием по наряду
+	 * @param taskUuid
+	 * @return если нет наряда, возвращает null
+	 */
+	public ArrayList<EquipmentOperation> getItems(String taskUuid) {
+		ArrayList<EquipmentOperation> arrayList = null;
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{taskUuid}, null, null, null);		
+		if (cursor.moveToFirst()) {
+			arrayList = new ArrayList<EquipmentOperation>();
+			do	{
+				 arrayList.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return arrayList;
+	}
+
 	
 }

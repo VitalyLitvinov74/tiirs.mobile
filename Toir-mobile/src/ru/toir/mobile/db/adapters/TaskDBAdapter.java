@@ -62,94 +62,62 @@ public class TaskDBAdapter {
 		mDbHelper.close();
 	}
 
-	public ArrayList<Task> getOrdersByTagId(String uuid) {
+	/**
+	 * Возвращает список всех нарядов пользователя
+	 * 
+	 * @param uuid
+	 * @return
+	 */
+	public ArrayList<Task> getOrdersByUser(String uuid) {
 		ArrayList<Task> arrayList = new ArrayList<Task>();
 		Cursor cursor;
 
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
-			while (true) {
-				Task task;
-				task = new Task(
-						cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-						cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-						cursor.getString(cursor
-								.getColumnIndex(FIELD_USER_UUID_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_CREATE_DATE_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_CLOSE_DATE_NAME)),
-						cursor.getString(cursor
-								.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
-						cursor.getInt(cursor
-								.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-						cursor.getInt(cursor
-								.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false
-								: true);
-				arrayList.add(task);
-				if (cursor.isLast())
-					break;
-				cursor.moveToNext();
-			}
+		if (cursor.moveToFirst()) {
+			do {
+				arrayList.add(getItem(cursor));
+			} while(cursor.moveToNext());
 		}
 		return arrayList;
 	}
 
+	/**
+	 * Возвращает список нарядов по пользователю и статусу наряда
+	 * 
+	 * @param user_uuid
+	 * @param status_uuid
+	 * @return Если ни одной записи нет, возвращает null
+	 */
 	public ArrayList<Task> getTaskByUserAndStatus(String user_uuid,
 			String status_uuid) {
-		ArrayList<Task> arrayList = null;
+		ArrayList<Task> list = null;
 		Cursor cursor;
 
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME
 				+ "=? AND " + FIELD_TASK_STATUS_UUID_NAME + "=?", new String[] {
 				user_uuid, status_uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
-			arrayList = new ArrayList<Task>();
+			list = new ArrayList<Task>();
 			do {
-				Task task;
-				task = new Task(
-						cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-						cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-						cursor.getString(cursor
-								.getColumnIndex(FIELD_USER_UUID_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_CREATE_DATE_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_MODIFY_DATE_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_CLOSE_DATE_NAME)),
-						cursor.getString(cursor
-								.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)),
-						cursor.getLong(cursor
-								.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
-						cursor.getInt(cursor
-								.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-						cursor.getInt(cursor
-								.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false
-								: true);
-				arrayList.add(task);
+				list.add(getItem(cursor));
 			} while (cursor.moveToNext());
 		}
-		return arrayList;
+		return list;
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице task
-	 * </p>
+	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param token_type
-	 * @param access_token
-	 * @param expires_in
-	 * @param userName
-	 * @param issued
-	 * @param expires
+	 * @param uuid
+	 * @param users_uuid
+	 * @param create_date
+	 * @param modify_date
+	 * @param close_date
+	 * @param task_status_uuid
+	 * @param attempt_send_date
+	 * @param attempt_count
+	 * @param updated
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(String uuid, String users_uuid, long create_date,
@@ -171,11 +139,9 @@ public class TaskDBAdapter {
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице token
-	 * </p>
+	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param token
+	 * @param task
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(Task task) {
@@ -210,25 +176,74 @@ public class TaskDBAdapter {
 			return "";
 	}
 	
-	public Task getItem(Cursor cursor) {
-		Task item = null;
-		if (cursor.moveToFirst()) {
-			item = new Task();
-			item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
-			item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
-			item.setUsers_uuid(cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)));
-			item.setCreate_date(cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)));
-			item.setModify_date(cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)));
-			item.setClose_date(cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE_NAME)));
-			item.setTask_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)));
-			item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
-			item.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)));
-			item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false : true);
-		}
+	/**
+	 * Возвращает объект Task
+	 * @param cursor
+	 * @return
+	 */
+	public static Task getItem(Cursor cursor) {
+		Task item = new Task();
+		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		item.setUsers_uuid(cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)));
+		item.setCreate_date(cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)));
+		item.setModify_date(cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)));
+		item.setClose_date(cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE_NAME)));
+		item.setTask_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)));
+		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
+		item.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)));
+		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false : true);
 		return item;
 	}
 	
+	/**
+	 * Возвращает наряд по uuid
+	 * @param uuid
+	 * @return если наряда нет, возвращает null
+	 */
 	public Task getItem(String uuid) {
-		return getItem(mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[] { uuid }, null, null, null));
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[] { uuid }, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Возвращает список нарядов по пользователю и с флагом updated=1
+	 * @param uuid
+	 * @return Если ни одной записи нет, возвращает null
+	 */
+	public ArrayList<Task> getTaskByUserAndUpdated(String uuid) {
+		ArrayList<Task> list = null;
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=? AND " + FIELD_UPDATED_NAME + "=1", new String[] { uuid }, null, null, null);
+		
+		if (cursor.moveToFirst()) {
+			list = new ArrayList<Task>();
+			do {
+				list.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+
+		return list;
+	}
+	
+	/**
+	 * Возвращает наряд по uuid с флагом updated=1
+	 * @param uuid
+	 * @return Если записи нет, возвращает null
+	 */
+	public Task getTaskByUuidAndUpdated(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=? AND " + FIELD_UPDATED_NAME + "=1", new String[] { uuid }, null, null, null);
+		
+		if (cursor.moveToFirst()) {
+				return getItem(cursor);
+		} else {
+			return null;
+		}
 	}
 }
