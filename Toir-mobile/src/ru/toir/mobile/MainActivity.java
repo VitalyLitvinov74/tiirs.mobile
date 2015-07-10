@@ -25,8 +25,6 @@ import ru.toir.mobile.fragments.PageAdapter;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
-import ru.toir.mobile.rest.TokenServiceHelper;
-import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rfid.RFID;
 
 public class MainActivity extends FragmentActivity {
@@ -37,9 +35,7 @@ public class MainActivity extends FragmentActivity {
 	ViewPager viewPager;
 	PageAdapter pageAdapter;
 	
-	private final static String ACTION_GET_TASK = "action_get_task";
-	private final static String ACTION_TASK_CONFIRM = "action_task_confirm";
-    private final IntentFilter mFilterGetTask = new IntentFilter(ACTION_GET_TASK);
+    private final IntentFilter mFilterGetTask = new IntentFilter(TaskServiceProvider.Actions.ACTION_GET_TASK);
 	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -52,8 +48,8 @@ public class MainActivity extends FragmentActivity {
 					boolean result = intent.getBooleanExtra(ProcessorService.Extras.RESULT_EXTRA, false);
 					Log.d(TAG, "" + result);
 					if (result == true) {
-						TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), ACTION_TASK_CONFIRM);
-						tsh.TaskConfirmation("00000001", "xyzxyzxyzxyz");
+						TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), TaskServiceProvider.Actions.ACTION_TASK_CONFIRM);
+						tsh.TaskConfirmation("xyzxyzxyzxyz");
 					} else {
 						// если наряды по какой-то причине не удалось получить, видимо нужно вывести какое-то сообщение
 					}
@@ -90,11 +86,6 @@ public class MainActivity extends FragmentActivity {
 		/*
 		TokenServiceHelper tsh = new TokenServiceHelper(getApplicationContext(), "action");
 		tsh.GetTokenByUsernameAndPassword("test", "00000001");
-		*/
-
-		/*
-		TaskServiceHelper tsh = new TaskServiceHelper(getApplicationContext(), ACTION_GET_TASK);
-		tsh.GetTask("00000001", "xyzxyzxyzxyz");
 		*/
 
 	}

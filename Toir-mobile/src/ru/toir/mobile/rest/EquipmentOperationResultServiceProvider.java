@@ -16,8 +16,7 @@ public class EquipmentOperationResultServiceProvider implements
 	
 	public static class Methods {
 		public static final int SEND_RESULT = 1;
-		public static final String SEND_RESULT_PARAMETER_USER_TAG = "tag_id";
-		public static final String SEND_RESULT_PARAMETER_TOKEN = "token";
+		public static final String PARAMETER_TOKEN = "token";
 	}
 
 	/**

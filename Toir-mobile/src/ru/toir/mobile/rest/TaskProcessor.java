@@ -62,7 +62,7 @@ public class TaskProcessor {
 
 	private Context mContext;
 	private static final String TASK_GET_URL = "/orders.php";
-	private static final String TASK_CONFIRMATION_URL = "/orders_confirm.php";
+	private static final String TASK_CONFIRMATION_URL = "/confirm.php";
 	private String mServerUrl;
 
 	public TaskProcessor(Context context) throws Exception {
@@ -86,7 +86,6 @@ public class TaskProcessor {
 	 */
 	public boolean GetTask(Bundle bundle) {
 		URI requestUri = null;
-		String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
 		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String jsonString = null;
 		JSONObject jsonRootObject = null;
@@ -94,14 +93,12 @@ public class TaskProcessor {
 			requestUri = new URI(mServerUrl + TASK_GET_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 			
-			StringBuilder postData = new StringBuilder("tag_id=").append(tag);
-			
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();
 			tList.add("Bearer " + token);
 			headers.put("Authorization", tList);
 
-			Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
+			Request request = new Request(Method.POST, requestUri, headers, null);
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
 
@@ -168,12 +165,11 @@ public class TaskProcessor {
 	 */
 	public boolean TaskConfirmation(Bundle bundle) {
 		URI requestUri = null;
-		String tag = bundle.getString(TaskServiceProvider.Methods.GET_TASK_PARAMETER_USER_TAG);
 		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String jsonString = null;
-		JSONObject jsonRootObject = null;
+		// TODO необходимо реализовать хранение данных по текущему аутентифицированному пользователю и данные для запроса брать на "ходу"
+		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
 		
-		// TODO реализовать отправку подтверждения получения нарядов
 		try {
 			requestUri = new URI(mServerUrl + TASK_CONFIRMATION_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
@@ -186,34 +182,22 @@ public class TaskProcessor {
 			
 			TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
 			ArrayList<Task> tasks;
-			tasks = adapter.getTaskByUserAndStatus(tag, TaskStatusDBAdapter.STATUS_UUID_CREATED);
+			tasks = adapter.getTaskByUserAndStatus(uuid, TaskStatusDBAdapter.STATUS_UUID_CREATED);
 			adapter.close();
 			if (tasks != null) {
-				// TODO реализовать упаковку данных по полученным нарядам для подтверждения о получении
-				StringBuilder postData = new StringBuilder("tag_id=").append(tag);
+				StringBuilder postData = new StringBuilder();
 				Iterator<Task> tasksIterator = tasks.iterator();
 				while (tasksIterator.hasNext()) {
-					postData.append("&uuids[]=");
+					postData.append("uuids[]=");
 					postData.append(tasksIterator.next().getUuid());
 				}
+
 				Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
 				Response response = new RestClient().execute(request);
 				if (response.mStatus == 200) {
-
 					jsonString = new String(response.mBody, "UTF-8");
-					Log.d("test", jsonString);
-
-					jsonRootObject = new JSONObject(jsonString);
-					Iterator<?> iterator = jsonRootObject.keys();
-					while (iterator.hasNext()) {
-						// TODO реализовать разбор данных, обновление записей в базе
-						/*
-						String next = (String) iterator.next();
-						JSONArray elementArray = jsonRootObject.getJSONArray(next);
-						// TODO разобрать ответ от сервера, по полученным uuid изменить статусы на "В работе"
-						elementArray.toString();
-						*/
-					}
+					JSONArray jsonArray = new JSONArray(jsonString);
+					ParseConfirmTask(jsonArray);
 				} else {
 					return false;
 				}				
@@ -224,6 +208,37 @@ public class TaskProcessor {
 			return false;
 		}
 
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean ParseConfirmTask(JSONArray array) {
+		String uuid;
+		int elementCount = array.length();
+		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext)).open();
+
+		try {
+			for (int i = 0; i < elementCount; i++) {
+				uuid = array.getString(i);
+				Log.d("test", uuid);
+				Task item = adapter.getItem(uuid);
+				if (item != null) {
+					item.setTask_status_uuid(TaskStatusDBAdapter.STATUS_UUID_SENDED);
+					adapter.replace(item);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			adapter.close();
+		}
+		
 		return true;
 	}
 	
@@ -602,12 +617,7 @@ public class TaskProcessor {
 				item.setModify_date(value.getLong(TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
 				item.setClose_date(value.getLong(TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
 				item.setTask_status_uuid(value.getString(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
-				// TODO необходимо для полей отвечающих за отправку данных на сервер, либо устанавливать значения по умолчанию, либо предварительно вытаскивать их из базы. РЕШИТЬ!!!
-				item.setAttempt_send_date(value.getLong(TaskDBAdapter.FIELD_ATTEMPT_SEND_DATE_NAME));
-				item.setAttempt_count(value.getInt(TaskDBAdapter.FIELD_ATTEMPT_COUNT_NAME));
-				item.setUpdated(value.getInt(TaskDBAdapter.FIELD_UPDATED_NAME) == 0 ? false	: true);
 				adapter.replace(item);
-
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -689,7 +699,6 @@ public class TaskProcessor {
 				item.setOperation_pattern_step_result(value.getString(MeasureValueDBAdapter.FIELD_OPERATION_PATTERN_STEP_RESULT_NAME));
 				item.setDate(value.getInt(MeasureValueDBAdapter.FIELD_DATE_NAME));
 				item.setValue(value.getString(MeasureValueDBAdapter.FIELD_VALUE_NAME));
-				// TODO необходимо для полей отвечающих за отправку данных на сервер, либо устанавливать значения по умолчанию, либо предварительно вытаскивать их из базы. РЕШИТЬ!!! 
 				adapter.replace(item);
 			}
 		} catch (Exception e) {

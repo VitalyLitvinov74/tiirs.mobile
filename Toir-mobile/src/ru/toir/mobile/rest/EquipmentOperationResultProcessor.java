@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
+import ru.toir.mobile.db.tables.EquipmentOperationResult;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -49,18 +50,32 @@ public class EquipmentOperationResultProcessor {
 	
 	public boolean SendResult(Bundle bundle) {
 		URI requestUri = null;
-		String tag = bundle.getString(EquipmentOperationResultServiceProvider.Methods.SEND_RESULT_PARAMETER_USER_TAG);
-		String token = bundle.getString(EquipmentOperationResultServiceProvider.Methods.SEND_RESULT_PARAMETER_TOKEN);
+		String token = bundle.getString(EquipmentOperationResultServiceProvider.Methods.PARAMETER_TOKEN);
 		String jsonString = null;
 		JSONObject jsonRootObject = null;
+		// TODO необходимо реализовать хранение данных по текущему аутентифицированному пользователю и данные для запроса брать на "ходу"
+		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+
 		try {
 			requestUri = new URI(mServerUrl + SEND_RESULT_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 			
-			StringBuilder postData = new StringBuilder("tag_id=").append(tag);
+			StringBuilder postData;
 			// TODO сделать упаковку данных из базы с результатами операций для отправки
 			EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(mContext)).open();
+			ArrayList<EquipmentOperationResult> operationResults = null;
 			adapter.close();
+			if (operationResults != null) {
+				postData = new StringBuilder();
+				Iterator<EquipmentOperationResult> equipmentOperationResultIterator = operationResults.iterator();
+				while (equipmentOperationResultIterator.hasNext()) {
+					postData.append("uuids[]=");
+					postData.append(equipmentOperationResultIterator.next().getUuid());
+				}
+			} else {
+				return false;
+			}
+			
 			
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();

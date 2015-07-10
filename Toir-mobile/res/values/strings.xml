@@ -29,4 +29,5 @@
     <string name="updateUrl">updateUrl</string>
     <string name="RFIDDriver">RFIDDriver</string>
     <string name="references">Справочники</string>
+    <string name="get_task">Получить наряд</string>
 </resources>

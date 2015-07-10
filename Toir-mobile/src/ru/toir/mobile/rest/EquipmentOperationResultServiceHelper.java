@@ -23,8 +23,7 @@ public class EquipmentOperationResultServiceHelper extends ServiceHelperBase {
 	
 	public void SendResult(String user_tag, String token) {
 		Bundle bundle = new Bundle();
-		bundle.putString(EquipmentOperationResultServiceProvider.Methods.SEND_RESULT_PARAMETER_USER_TAG, user_tag);
-		bundle.putString(EquipmentOperationResultServiceProvider.Methods.SEND_RESULT_PARAMETER_USER_TAG, token);
+		bundle.putString(EquipmentOperationResultServiceProvider.Methods.PARAMETER_TOKEN, token);
 		RunMethod(EquipmentOperationResultServiceProvider.Methods.SEND_RESULT, bundle);
 	}
 

@@ -58,6 +58,19 @@
                 android:minHeight="20dp"
                 android:text="Помощь"
                 android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/getTask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:minHeight="20dp"
+                android:text="@string/get_task"
+                android:textSize="12sp" />
+
         </TableRow>
 
         <LinearLayout

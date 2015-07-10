@@ -22,6 +22,12 @@ public class TaskServiceProvider implements IServiceProvider {
 		public static final String GET_TASK_PARAMETER_USER_TAG = "tag_id";
 		public static final String PARAMETER_TOKEN = "token";
 	}
+	
+	public static class Actions {
+		public final static String ACTION_GET_TASK = "action_get_task";
+		public final static String ACTION_TASK_CONFIRM = "action_task_confirm";
+
+	}
 
 	public TaskServiceProvider(Context context) {
 		mContext = context;

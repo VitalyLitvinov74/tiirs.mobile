@@ -209,4 +209,26 @@ public class TaskDBAdapter {
 		} else
 			return "";
 	}
+	
+	public Task getItem(Cursor cursor) {
+		Task item = null;
+		if (cursor.moveToFirst()) {
+			item = new Task();
+			item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+			item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+			item.setUsers_uuid(cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)));
+			item.setCreate_date(cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)));
+			item.setModify_date(cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)));
+			item.setClose_date(cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE_NAME)));
+			item.setTask_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)));
+			item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
+			item.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)));
+			item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false : true);
+		}
+		return item;
+	}
+	
+	public Task getItem(String uuid) {
+		return getItem(mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[] { uuid }, null, null, null));
+	}
 }

@@ -134,16 +134,16 @@ public class EquipmentOperationResultDBAdapter {
 	 */
 	static EquipmentOperationResult getEquipmentOperationResult(Cursor cursor) {
 		if (cursor.moveToFirst()) {
-			EquipmentOperationResult result = null;
-			result = new EquipmentOperationResult(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)),
-					cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)),
-					cursor.getLong(cursor.getColumnIndex(FIELD_END_DATE_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_RESULT_UUID_NAME)),
-					cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
-					cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-					cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 1);
+			EquipmentOperationResult result = new EquipmentOperationResult();
+			result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+			result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+			result.setEquipment_operation_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)));
+			result.setStart_date(cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)));
+			result.setEnd_date(cursor.getLong(cursor.getColumnIndex(FIELD_END_DATE_NAME)));
+			result.setOperation_result_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_RESULT_UUID_NAME)));
+			result.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
+			result.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)));
+			result.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 0);
 			return result;
 		}
 		return null;
