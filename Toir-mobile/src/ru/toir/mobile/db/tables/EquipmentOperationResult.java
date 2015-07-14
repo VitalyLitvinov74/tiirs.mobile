@@ -14,6 +14,7 @@ public class EquipmentOperationResult {
 	private long start_date;
 	private long end_date;
 	private String operation_result_uuid;
+	private int type;
 
 	/**
 	 * 
@@ -24,13 +25,14 @@ public class EquipmentOperationResult {
 	/**
 	 * 
 	 */
-	public EquipmentOperationResult(long _id, String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid) {
+	public EquipmentOperationResult(long _id, String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, int type) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.equipment_operation_uuid = equipment_operation_uuid;
 		this.start_date = start_date;
 		this.end_date = end_date;
 		this.operation_result_uuid = operation_result_uuid;
+		this.type = type;		
 	}
 
 	/**
@@ -117,4 +119,10 @@ public class EquipmentOperationResult {
 		this.operation_result_uuid = operation_result_uuid;
 	}
 
+	/**
+	 * @return the start_date
+	 */
+	public long getType() {
+		return type;
+	}
 }

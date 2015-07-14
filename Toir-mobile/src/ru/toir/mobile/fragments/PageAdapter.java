@@ -32,6 +32,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 5 :
 			fragment = new GPSFragment();
 			break;
+		case 6 :
+			fragment = new TaskFragment();
+			break;
 		default :
 			fragment = null;
 			break;
@@ -41,8 +44,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		// пока три вкладки
-		return 6;
+		return 7;
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +58,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 			title = "Информация о пользователе";
 			break;
 		case 1 :
-			title = "Наряды";
+			title = "Наряды таблица";
 			break;
 		case 2 :
 			title = "Справочники";
@@ -69,6 +71,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		case 5 :
 			title = "Тест GPS";
+			break;
+		case 6 :
+			title = "Наряды";
 			break;
 		default :
 			title = "";

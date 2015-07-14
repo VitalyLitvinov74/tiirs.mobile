@@ -77,12 +77,12 @@ public class GPSFragment extends Fragment {
 		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		EquipmentOperationDBAdapter equips = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
 		// запращиваем перечень задач нарядов (активных)
-		ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(tagId);
+		ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(tagId,"","");
 		Integer cnt=0,cnt2=0;
 		while (cnt<ordersList.size())
 				{
 				 // запращиваем перечень оборудования статус - hardcoded!
-				 ArrayList<EquipmentOperation> equipOpList = equips.getEquipsByOrderId(ordersList.get(cnt).getUuid(),"1");
+				 ArrayList<EquipmentOperation> equipOpList = equips.getEquipsByOrderId(ordersList.get(cnt).getUuid(),"",1);
 				 cnt2=0;
 				 while (cnt2<equipOpList.size())
 					{

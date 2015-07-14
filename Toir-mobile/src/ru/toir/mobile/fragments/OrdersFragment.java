@@ -65,7 +65,7 @@ public class OrdersFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
 		 } else {
 			 TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-			 ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(user.getUuid());	
+			 ArrayList<Task> ordersList = dbOrder.getOrdersByTagId(user.getUuid(),"","");	
 			 Integer cnt=0;
 			 final TableRow tableHead = new TableRow(getActivity().getApplicationContext());
 			 tableHead.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
@@ -191,7 +191,7 @@ public class OrdersFragment extends Fragment {
 
 		 Toast.makeText(getActivity(), order_uuid, Toast.LENGTH_SHORT).show();
 		 		 
-		 ArrayList<EquipmentOperation> equipmentList = eqOperation.getEquipsByOrderId(order_uuid,"");
+		 ArrayList<EquipmentOperation> equipmentList = eqOperation.getEquipsByOrderId(order_uuid,"",1);
 		 Integer cnt=0;
 		 final TableRow tableHead = new TableRow(getActivity().getApplicationContext());
 		 tableHead.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));

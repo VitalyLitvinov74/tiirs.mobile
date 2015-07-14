@@ -27,7 +27,7 @@ public class TOiRDBAdapter{
 	/**
 	 * <p>Версия базы данных с которой работает приложение</p>
 	 */
-	private static final int DATABASE_VERSION = 10;
+	private static final int DATABASE_VERSION = 11;
 	
 	/**
 	 * база приложения
