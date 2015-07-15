@@ -132,4 +132,21 @@ public class OperationResultDBAdapter {
 		return replace(result.getUuid(), result.getOperation_type_uuid(), result.getTitle());
 	}
 
+	/**
+	 * <p>Возвращает расшифровку статуса из таблицы</p>
+	 * @param token
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public String getNameByUUID(String uuid) {	
+		Cursor cur;		
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cur.getCount()>0)
+			{
+			 cur.moveToFirst();
+			 return cur.getString(3);
+			}
+		else
+			return "";
+	}
+
 }

@@ -14,6 +14,7 @@ public class EquipmentOperationResult {
 	private long start_date;
 	private long end_date;
 	private String operation_result_uuid;
+	private int type;
 	private long attempt_send_date;
 	private int attempt_count;
 	private boolean updated;
@@ -27,13 +28,14 @@ public class EquipmentOperationResult {
 	/**
 	 * 
 	 */
-	public EquipmentOperationResult(long _id, String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, long attempt_send_date, int attempt_count, boolean updated) {
+	public EquipmentOperationResult(long _id, String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, int type, long attempt_send_date, int attempt_count, boolean updated) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.equipment_operation_uuid = equipment_operation_uuid;
 		this.start_date = start_date;
 		this.end_date = end_date;
 		this.operation_result_uuid = operation_result_uuid;
+		this.type = type;
 		this.attempt_send_date = attempt_send_date;
 		this.attempt_count = attempt_count;
 		this.updated = updated;
@@ -165,4 +167,11 @@ public class EquipmentOperationResult {
 		this.updated = updated;
 	}
 
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public long getType() {
+		return type;
+	}
 }

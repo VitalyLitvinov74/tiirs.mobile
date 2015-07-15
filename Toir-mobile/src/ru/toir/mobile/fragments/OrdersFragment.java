@@ -56,17 +56,19 @@ public class OrdersFragment extends Fragment {
 				false);
 		tl_task = (TableLayout) rootView.findViewById(R.id.TableLayout01);
 		button1 = (Button) rootView.findViewById(R.id.button3);
-		
+
 		Button getTask = (Button) rootView.findViewById(R.id.getTask);
 		getTask.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.d("test", "Получаем наряд.");
-				TaskServiceHelper tsh = new TaskServiceHelper(getActivity().getApplicationContext(), TaskServiceProvider.Actions.ACTION_GET_TASK);
+				TaskServiceHelper tsh = new TaskServiceHelper(getActivity()
+						.getApplicationContext(),
+						TaskServiceProvider.Actions.ACTION_GET_TASK);
 				tsh.GetTask("xyzxyzxyzxyz");
 			}
 		});
-		
+
 		initView();
 		return rootView;
 	}
@@ -85,8 +87,8 @@ public class OrdersFragment extends Fragment {
 		} else {
 			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
 					getActivity().getApplicationContext())).open();
-			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user
-					.getUuid());
+			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
+					user.getUuid(), "", "");
 			Integer cnt = 0;
 			final TableRow tableHead = new TableRow(getActivity()
 					.getApplicationContext());
@@ -221,8 +223,7 @@ public class OrdersFragment extends Fragment {
 			}
 			dbOrder.close();
 			button1.setVisibility(View.INVISIBLE);
-			
-			
+
 		}
 	}
 
@@ -256,7 +257,7 @@ public class OrdersFragment extends Fragment {
 					.show();
 
 			ArrayList<EquipmentOperation> equipmentList = eqOperation
-					.getEquipsByOrderId(order_uuid, "");
+					.getEquipsByOrderId(order_uuid, "", 1);
 			Integer cnt = 0;
 			final TableRow tableHead = new TableRow(getActivity()
 					.getApplicationContext());
@@ -495,8 +496,9 @@ public class OrdersFragment extends Fragment {
 			tableRow.addView(tv_operation);
 			tl_task.addView(tableRow);
 			cnt = cnt + 1;
-			if (cnt > 5)
+			if (cnt > 5) {
 				break;
+			}
 		}
 		button1.setVisibility(1);
 		button1.setOnClickListener(new OnClickListener() {

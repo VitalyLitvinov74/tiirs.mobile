@@ -68,17 +68,23 @@ public class TaskDBAdapter {
 	 * @param uuid
 	 * @return
 	 */
-	public ArrayList<Task> getOrdersByUser(String uuid) {
+	public ArrayList<Task> getOrdersByUser(String uuid, String type, String sort) {
 		ArrayList<Task> arrayList = new ArrayList<Task>();
 		Cursor cursor;
 
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?",
-				new String[] { uuid }, null, null, null);
+		if (sort.equals("")) sort=null;
+		if (type.equals("")) {
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{ uuid }, null, null, sort);
+		} else {
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=? AND " + FIELD_TASK_STATUS_UUID_NAME + "=?", new String[]{uuid,type}, null, null, sort);
+		}
+
 		if (cursor.moveToFirst()) {
 			do {
 				arrayList.add(getItem(cursor));
 			} while(cursor.moveToNext());
 		}
+
 		return arrayList;
 	}
 

@@ -2,6 +2,7 @@ package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
 import java.util.UUID;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -68,23 +69,31 @@ public class EquipmentOperationDBAdapter {
 		mDbHelper.close();
 	}
 
+
 	/**
-	 * Возвращает список операций над оборудованием по наряду и статусу
+	 * Возвращает список операций над оборудованием по наряду
 	 * @param orderId
-	 * @param status
+	 * @param operation_type
+	 * @param critical_type
 	 * @return
 	 */
-	public ArrayList<EquipmentOperation> getEquipsByOrderId(String orderId, String status) {
+	public ArrayList<EquipmentOperation> getEquipsByOrderId(String orderId, String operation_type, int critical_type) {
 		ArrayList<EquipmentOperation> arrayList = new ArrayList<EquipmentOperation>();
 		Cursor cursor;
 
-		// можем или отобрать все оборудование или только с нужным статусом 
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{orderId}, null, null, null);		
+		// можем или отобрать все оборудование или только с нужными параметрами
+		if (operation_type.equals("")) {
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{orderId}, null, null, null);
+		} else {
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=? AND " + FIELD_OPERATION_TYPE_UUID_NAME + "=?", new String[]{orderId,operation_type}, null, null, null);
+		}
+
 		if (cursor.moveToFirst()) {
 			do	{
 				 arrayList.add(getItem(cursor));
 			} while(cursor.moveToNext());
 		}
+
 		return arrayList;
 	}
 
