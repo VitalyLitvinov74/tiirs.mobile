@@ -3,6 +3,10 @@
  */
 package ru.toir.mobile.db.tables;
 
+import android.R.string;
+
+import com.google.common.base.Objects.ToStringHelper;
+
 /**
  * @author Dmitriy Logachov
  *
@@ -81,6 +85,10 @@ public class OperationResult {
 	 */
 	public void set_id(long _id) {
 		this._id = _id;
+	}
+	
+	public String toString() {
+		return title;
 	}
 
 }

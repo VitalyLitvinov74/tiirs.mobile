@@ -36,11 +36,13 @@ public class RestClient {
 				conn.setDoOutput(false);
 				break;
 			case POST:
-				byte[] payload = request.getBody();
 				conn.setRequestMethod("POST");
 				conn.setDoOutput(true);
-				conn.setFixedLengthStreamingMode(payload.length);
-				conn.getOutputStream().write(payload);
+				byte[] payload = request.getBody();
+				if ( payload != null ) {
+					conn.setFixedLengthStreamingMode(payload.length);
+					conn.getOutputStream().write(payload);
+				}
 				status = conn.getResponseCode();
 			default:
 				break;

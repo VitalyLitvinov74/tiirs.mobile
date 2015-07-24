@@ -54,17 +54,44 @@ public class OperationResultDBAdapter {
 	}
 
 	/**
-	 * 
+	 * Возвращает результат выполнения операции по uuid
 	 * @param uuid
 	 * @return
 	 */
-	public Cursor getItem(String uuid) {		
+	public OperationResult getItem(String uuid) {		
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
-			return cursor;
+			return getItem(cursor);
 		}
 		return null;
+	}
+	
+	/**
+	 * Возвращает результат выполнения операции
+	 * @param cursor
+	 * @return
+	 */
+	public OperationResult getItem(Cursor cursor) {
+		OperationResult result = new OperationResult();
+		result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		result.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID_NAME)));
+		result.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+		return result;
+	}
+	
+	public ArrayList<OperationResult> getItems(String type_uuid) {
+		ArrayList<OperationResult> list = null;
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_TYPE_UUID_NAME + "=?", new String[]{type_uuid}, null, null, null);		
+		if (cursor.moveToFirst()) {
+			list = new ArrayList<OperationResult>();
+			do {
+				list.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return list;
 	}
 	
 	/**

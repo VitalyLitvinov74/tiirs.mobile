@@ -56,13 +56,21 @@ public class OperationPatternDBAdapter {
 	 * @param uuid
 	 * @return
 	 */
-	public Cursor getItem(String uuid) {		
+	public OperationPattern getItem(String uuid) {		
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
-			return cursor;
+			return getItem(cursor);
 		}
 		return null;
+	}
+	
+	public OperationPattern getItem(Cursor cursor) {
+		OperationPattern pattern = new OperationPattern();
+		pattern.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		pattern.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		pattern.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+		return pattern;
 	}
 	
 	/**

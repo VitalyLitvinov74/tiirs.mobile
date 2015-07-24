@@ -42,6 +42,12 @@
                 <category android:name="android.intent.category.DEFAULT"/>
         </activity>
         <service android:name=".rest.ProcessorService"></service>
+        <activity android:name=".OperationActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

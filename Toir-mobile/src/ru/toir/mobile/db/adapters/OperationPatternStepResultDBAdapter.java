@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
@@ -56,17 +58,76 @@ public class OperationPatternStepResultDBAdapter {
 	}
 
 	/**
-	 * 
+	 * Возвращает результат шага по uuid
 	 * @param uuid
 	 * @return
 	 */
-	public Cursor getItem(String uuid) {		
+	public OperationPatternStepResult getItem(String uuid) {		
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
-			return cursor;
+			return getItem(cursor);
 		}
 		return null;
+	}
+	
+	/**
+	 * Возвращает результат шага
+	 * @param cursor
+	 * @return
+	 */
+	public OperationPatternStepResult getItem(Cursor cursor) {
+		OperationPatternStepResult result = new OperationPatternStepResult();
+		result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		result.setOperation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_UUID_NAME)));
+		result.setNext_operation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME)));
+		result.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+		result.setMeasure_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_MEASURE_TYPE_UUID_NAME)));
+		return result;
+	}
+	
+	/**
+	 * Возвращает все результаты связанные с шагом
+	 * @param step_uuid
+	 * @return
+	 */
+	public ArrayList<OperationPatternStepResult> getItems(String step_uuid) {
+		ArrayList<OperationPatternStepResult> stepResults = null;
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_STEP_UUID_NAME + "=?", new String[]{step_uuid}, null, null, null);		
+		if (cursor.moveToFirst()) {
+			stepResults = new ArrayList<OperationPatternStepResult>();
+			do	{
+				stepResults.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return stepResults;
+	}
+	
+	/**
+	 * Возвращает список результатов связанных с шагами переданными в качестве параметра
+	 * @param steps_uuids
+	 * @return
+	 */
+	public ArrayList<OperationPatternStepResult> getItems(ArrayList<String> steps_uuids) {
+		ArrayList<OperationPatternStepResult> stepResults = null;
+		Cursor cursor;
+		StringBuilder stringBuilder = new StringBuilder();
+		for (String uuid: steps_uuids) {
+			if (stringBuilder.length() != 0) {
+				stringBuilder.append(",");
+			}
+			stringBuilder.append("'").append(uuid).append("'");
+		}
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_STEP_UUID_NAME + " IN (" + stringBuilder.toString() + ")", null, null, null, null);		
+		if (cursor.moveToFirst()) {
+			stepResults = new ArrayList<OperationPatternStepResult>();
+			do	{
+				stepResults.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return stepResults;
 	}
 	
 	/**

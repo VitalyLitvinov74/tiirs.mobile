@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationPatternStep;
@@ -58,17 +60,52 @@ public class OperationPatternStepDBAdapter {
 	}
 
 	/**
-	 * 
+	 * Возвращает шаг операции по uuid
 	 * @param uuid
 	 * @return
 	 */
-	public Cursor getItem(String uuid) {		
+	public OperationPatternStep getItem(String uuid) {		
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
-			return cursor;
+			return getItem(cursor);
 		}
 		return null;
+	}
+	
+	/**
+	 * Возвращает шаг операции
+	 * @param cursor
+	 * @return
+	 */
+	public OperationPatternStep getItem(Cursor cursor) {		
+		OperationPatternStep patternStep = new OperationPatternStep();
+		patternStep.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		patternStep.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		patternStep.setOperation_pattern_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID_NAME)));
+		patternStep.setDescription(cursor.getString(cursor.getColumnIndex(FIELD_DESCRIPTION_NAME)));
+		patternStep.setImage(cursor.getString(cursor.getColumnIndex(FIELD_IMAGE_NAME)));
+		patternStep.setFirst_step(cursor.getInt(cursor.getColumnIndex(FIELD_FIRST_STEP_NAME)) == 0);
+		patternStep.setLast_step(cursor.getInt(cursor.getColumnIndex(FIELD_LAST_STEP_NAME)) == 0);
+		return patternStep;
+	}
+
+	/**
+	 * Возвращает список шагов операции по uuid
+	 * @param pattern_uuid
+	 * @return
+	 */
+	public ArrayList<OperationPatternStep> getItems(String pattern_uuid) {
+		ArrayList<OperationPatternStep> patternSteps = null;
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_UUID_NAME + "=?", new String[]{pattern_uuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			patternSteps = new ArrayList<OperationPatternStep>();
+			do	{
+				 patternSteps.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return patternSteps;		
 	}
 	
 	/**

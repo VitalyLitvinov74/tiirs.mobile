@@ -192,6 +192,25 @@ public class EquipmentOperationDBAdapter {
 	}
 	
 	/**
+	 * Возвращает операцию по наряду и оборудованию
+	 * @param task_uuid
+	 * @param equipment_uuid
+	 * @return
+	 */
+	public ArrayList<EquipmentOperation> getItemsByTaskAndEquipment(String task_uuid, String equipment_uuid) {
+		ArrayList<EquipmentOperation> arrayList = null;
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=? AND " + FIELD_EQUIPMENT_UUID_NAME + "=?", new String[]{task_uuid, equipment_uuid}, null, null, null);		
+		if (cursor.moveToFirst()) {
+			arrayList = new ArrayList<EquipmentOperation>();
+			do	{
+				 arrayList.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return arrayList;
+	}
+
+	/**
 	 * Возвращает объект операции над оборудованием
 	 * @param cursor
 	 * @return
