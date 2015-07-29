@@ -1,6 +1,8 @@
 package ru.toir.mobile.rfid.driver;
 
 
+import ru.toir.mobile.RFIDActivity;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Menu;
@@ -13,17 +15,20 @@ import android.view.MenuItem.OnMenuItemClickListener;
  */
 public class RFIDDriverText implements RFIDDriver{
 	
-	TOIRCallback callback;
-	ReadTagAsyncTask task;
+	ReadTagAsyncTask mTask;
+	Activity mActivity;
+	
+	@Override
+	public void setActivity(Activity activity) {
+		mActivity = activity;
+	}
 	
 	/**
 	 * <p>Инициализируем драйвер</p>
-	 * @param TOIRCallback
 	 * @return boolean
 	 */
 	@Override
-	public boolean init(TOIRCallback callback) {
-		this.callback = callback;
+	public boolean init() {
 		return true;
 	}
 	
@@ -35,7 +40,7 @@ public class RFIDDriverText implements RFIDDriver{
 	@Override
 	public void read() {
 		// запускаем отдельную задачу для считывания метки
-		task = (ReadTagAsyncTask)new ReadTagAsyncTask().execute();
+		mTask = (ReadTagAsyncTask)new ReadTagAsyncTask().execute();
 	}
 	
 	/**
@@ -72,8 +77,9 @@ public class RFIDDriverText implements RFIDDriver{
 					String tag = String.valueOf(item.getTitle());
 					Log.d("test", tag);
 					// отменяем выполнение задачи
-					task.cancel(true);
-					callback.Callback(tag);
+					mTask.cancel(true);
+					//mCallback.Callback(tag);
+					((RFIDActivity)mActivity).Callback(tag);
 					return true;
 				}
 			});

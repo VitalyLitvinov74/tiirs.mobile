@@ -3,9 +3,9 @@
  */
 package ru.toir.mobile.rfid;
 
+import android.app.Activity;
 import android.view.Menu;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
-import ru.toir.mobile.rfid.driver.TOIRCallback;
 
 /**
  * @author koputo
@@ -15,29 +15,34 @@ public class RFID {
 	public static final int RESULT_RFID_READ_ERROR = android.app.Activity.RESULT_FIRST_USER;
 	public static final int RESULT_RFID_INIT_ERROR = android.app.Activity.RESULT_FIRST_USER + 1;
 	public static final int RESULT_RFID_CLASS_NOT_FOUND = android.app.Activity.RESULT_FIRST_USER + 2;
-	RFIDDriver driver;
+	RFIDDriver mDriver;
+	
+	public void setActivity(Activity activity) {
+		mDriver.setActivity(activity);
+	}
 	
 	/**
 	 * @param driver
 	 * @return {@link RFID}
 	 */
 	public RFID(RFIDDriver driver){
-		this.driver = driver;
+		this.mDriver = driver;
 	}
+	
 	/**
 	 * <p>Инициализация драйвера</p>
 	 * @return boolean
 	 */
-	public boolean init(TOIRCallback callback){
-		return driver.init(callback);
+	public boolean init(){
+		return mDriver.init();
 	}
-	
+
 	/**
 	 * <p>Считывание метки</p>
 	 * @return byte[]
 	 */
 	public void read(){
-		driver.read();
+		mDriver.read();
 	}
 	
 	/**
@@ -46,21 +51,21 @@ public class RFID {
 	 * @return boolean
 	 */
 	public boolean write(byte[] outBuffer){
-		return driver.write(outBuffer);
+		return mDriver.write(outBuffer);
 	}
 	
 	/**
 	 * <p>Завершаем работу</p> 
 	 */
 	public void close(){
-		driver.close();
+		mDriver.close();
 	}
 	
 	/**
 	 * <p>Меню которое предоставляет драйвер</p>
 	 */
 	public void getMenu(Menu menu) {
-		driver.getMenu(menu);
+		mDriver.getMenu(menu);
 	}
 
 }

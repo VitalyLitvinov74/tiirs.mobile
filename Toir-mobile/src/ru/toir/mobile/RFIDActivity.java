@@ -1,5 +1,7 @@
 package ru.toir.mobile;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+
 import ru.toir.mobile.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -12,7 +14,6 @@ import android.view.Menu;
 import android.view.View;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
-import ru.toir.mobile.rfid.driver.TOIRCallback;
 
 /**
  * @author Dmitriy Logachov
@@ -57,32 +58,44 @@ public class RFIDActivity extends Activity {
 			finish();
 		}
 		
-		// запускаем процедуру считывания
 		RFID rfid = new RFID(driver);
-		
-		// объект функция которого будет вызвана когда данные будут прочитаны
-		TOIRCallback tagReadCallback = new TOIRCallback() {
-			@Override
-			public void Callback(String result) {
-				Intent data = new Intent();
-				if(result == null){
-					setResult(RFID.RESULT_RFID_READ_ERROR);	
-				} else {
-					data.setData(Uri.parse(result));
-					setResult(RESULT_OK, data);
-				}
-				finish();
-			}
-		};
-		
 		// инициализируем драйвер
-		if (rfid.init(tagReadCallback)) {
+		if (rfid.init()) {
+			rfid.setActivity(this);
+			// запускаем процедуру считывания
 			rfid.read();
 		} else {
 			setResult(RFID.RESULT_RFID_INIT_ERROR);
 			finish();
 		}
-		
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent data) {
+		switch (requestCode) {
+		case IntentIntegrator.REQUEST_CODE:
+			if (data != null) {
+				String result = data.getStringExtra("SCAN_RESULT");
+				if (result != null && !result.equals("")) {
+					Intent i = new Intent();
+					i.setData(Uri.parse(result));
+					setResult(RESULT_OK, i);
+				} else {
+					setResult(RFID.RESULT_RFID_READ_ERROR);
+				}
+			} else {
+				setResult(RESULT_CANCELED);
+			}
+			break;
+		case RESULT_CANCELED:
+			setResult(RESULT_CANCELED);
+			break;
+		default:
+			setResult(RESULT_CANCELED);
+			break;
+		}
+		finish();
 	}
 	
 	public void cancelOnClick(View view){
@@ -97,5 +110,17 @@ public class RFIDActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		driver.getMenu(menu);
 		return true;
+	}
+	
+	public void Callback(String result) {
+		Intent data = null;
+		if(result == null){
+			setResult(RFID.RESULT_RFID_READ_ERROR);	
+		} else {
+			data = new Intent();
+			data.setData(Uri.parse(result));
+			setResult(RESULT_OK, data);
+		}
+		finish();
 	}
 }

@@ -1,5 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
+import android.app.Activity;
 import android.view.Menu;
 
 /**
@@ -8,12 +9,14 @@ import android.view.Menu;
  */
 public interface RFIDDriver {
 	
+	public void setActivity(Activity activity);
+	
 	/**
 	 * <p>Инициализация драйвера</p>
 	 * @return
 	 */
-	public boolean init(TOIRCallback callback);
-	
+	public boolean init();
+
 	/**
 	 * <p>Считывание метки</p>
 	 * @return

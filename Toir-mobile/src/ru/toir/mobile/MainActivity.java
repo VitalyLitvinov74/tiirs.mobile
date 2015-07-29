@@ -1,7 +1,6 @@
 package ru.toir.mobile;
 
 import java.io.File;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -146,7 +145,6 @@ public class MainActivity extends FragmentActivity {
 		String msg = null;
 		Uri tagData = null;
 		
-		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case RETURN_CODE_READ_RFID:
 			if (resultCode == RESULT_OK) {
@@ -166,7 +164,7 @@ public class MainActivity extends FragmentActivity {
 				msg = "Не найден драйвер считывателя!";
 			}
 			break;
-
+			
 		default:
 			msg = "Не известный код возврата.";
 			break;
@@ -176,6 +174,7 @@ public class MainActivity extends FragmentActivity {
 		if (msg != null) {
 			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 		} else {
+			// TODO необходимо реализовать рассылку уведомлений с результатом чтения метки всем кто сейчас заинтересован в результате операции
 			// проверяем наличие пользователя в локальной базе
 			String tagId = tagData.toString();
 			UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();

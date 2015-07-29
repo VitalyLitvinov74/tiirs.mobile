@@ -1,5 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
+import android.app.Activity;
 import android.view.Menu;
 
 /**
@@ -7,13 +8,9 @@ import android.view.Menu;
  * <p>Драйвер считывателя RFID который ни чего не делает.</p>
  */
 public class RFIDDriverNull implements RFIDDriver{
-
-	/**
-	 * <p>Инициализируем драйвер</p>
-	 * @return
-	 */
+	
 	@Override
-	public boolean init(TOIRCallback callback){
+	public boolean init() {
 		return true;
 	}
 	
@@ -47,5 +44,12 @@ public class RFIDDriverNull implements RFIDDriver{
 	 */
 	@Override
 	public void getMenu(Menu menu) {
+	}
+
+	/* (non-Javadoc)
+	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
+	 */
+	@Override
+	public void setActivity(Activity activity) {
 	}
 }

@@ -4,11 +4,13 @@
         <item >Null driver</item>
         <item >Text driver</item>
         <item >Reader 666</item>
+        <item >Barcode</item>
     </string-array>
     <string-array name="drvClassNameList">
         <item >RFIDDriverNull</item>
         <item >RFIDDriverText</item>
         <item >RFIDDriver666</item>
+        <item >RFIDBarcode</item>
     </string-array>
     
 </resources>
