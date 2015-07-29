@@ -4,27 +4,34 @@
 package ru.toir.mobile;
 
 import java.util.ArrayList;
+
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
+import ru.toir.mobile.db.tables.Task;
 import android.app.Activity;
-import android.content.Intent;
+//import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
+import android.widget.LinearLayout;
+//import android.widget.RelativeLayout;
+//import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author Dmitriy Logachov
@@ -32,11 +39,18 @@ import android.widget.TextView;
  */
 public class OperationActivity extends Activity {
 	public static final String OPERATION_UUID_EXTRA =  "operation_uuid";
-	private EquipmentOperation operation;
+	//private EquipmentOperation operation;
 	private OperationPattern pattern;
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
 	private ArrayList<OperationResult> operationResults;
+	private String order_uuid, task_equipment_uuid,equipment_uuid;
+	private String taskname="";
+	private String operationname="";
+	private LinearLayout layout;
+	private TextView stepTitle;
+	private TextView stepDescrition;
+	private Button numStepButton;		
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -44,20 +58,40 @@ public class OperationActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.operation_layout);
+		//setContentView(R.layout.operation_layout);
 		
-		Intent intent = getIntent();
-		String operationUuid = intent.getStringExtra(OPERATION_UUID_EXTRA);
-		Log.d("test", operationUuid);
-		
-		// получаем операцию
-		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		operation = operationDBAdapter.getItem(operationUuid);
-		operationDBAdapter.close();
-		
+		//Intent intent = getIntent();
+		//String operationUuid = intent.getStringExtra(OPERATION_UUID_EXTRA);
+		//Log.d("test", operationUuid);
+
+        Bundle b = getIntent().getExtras();
+        task_equipment_uuid = b.getString("task_equipment_uuid"); 
+        order_uuid = b.getString("order_uuid"); 
+        equipment_uuid = b.getString("equipment_uuid"); 
+        setContentView(R.layout.taskwork_fragment);
+
+    	layout = (LinearLayout)findViewById(R.id.resultButtonLayout);
+    	stepTitle = (TextView)findViewById(R.id.stepTitle);
+    	stepDescrition = (TextView)findViewById(R.id.step_description);
+    	numStepButton = (Button)findViewById(R.id.button1);		
+
+        // получаем статус и время наряда
+	 	TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+	 	Task order = dbOrder.getTaskByUuidAndUpdated(order_uuid);
+	 	TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		taskname = "Наряд: " + dbOrder.getCreateTimeByUUID(order_uuid) + " / Статус: " + taskStatusDBAdapter.getNameByUUID(order.getTask_status_uuid());
+
+        // получаем тип операции
+//		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+        EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		EquipmentOperation equipmentOperation = operationDBAdapter.getItem(task_equipment_uuid);
+        		
 		// получаем шаблон операции
 		OperationPatternDBAdapter patternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		pattern = patternDBAdapter.getItem(operation.getOperation_pattern_uuid());
+		pattern = patternDBAdapter.getItem(equipmentOperation.getOperation_pattern_uuid());		
+        operationname = "Оборудование: " + eqDBAdapter.getEquipsNameByUUID(equipment_uuid) + " / Операция: " + pattern.getTitle(); 						
+		operationDBAdapter.close();		
 		patternDBAdapter.close();
 		
 		// получаем шаги шаблона операции
@@ -76,20 +110,28 @@ public class OperationActivity extends Activity {
 		
 		// получаем список вариантов завершения операции
 		OperationResultDBAdapter resultDBAdapter = new OperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		operationResults = resultDBAdapter.getItems(operation.getOperation_type_uuid());
+		operationResults = resultDBAdapter.getItems(equipmentOperation.getOperation_type_uuid());
 		resultDBAdapter.close();
-		ShowFirstStep();
 
+		TextView taskName = (TextView)findViewById(R.id.textView1);
+		taskName.setText(taskname);
+		TextView operationName = (TextView)findViewById(R.id.textView2);
+		operationName.setText(operationname);
+		
+		ShowFirstStep();
 	}
 	
 	private void ShowNextStep(String step_uuid) {
-		RelativeLayout layout = (RelativeLayout)findViewById(R.id.resultButtonLayout);
 		OperationPatternStep step = getStep(step_uuid);
-		RelativeLayout.LayoutParams param;
-		
-		TextView stepTitle = (TextView)findViewById(R.id.stepTitle);
-		stepTitle.setText(step.getDescription());
-		
+		if (step == null) 
+			{
+			 Toast.makeText(this, "Шаг с UUID: " + step_uuid + " не найден", Toast.LENGTH_SHORT).show();
+			 return;
+			}
+		//RelativeLayout.LayoutParams param;		
+		stepTitle.setText(step.getName());
+		stepDescrition.setText(step.getDescription());
+		numStepButton.setText(step.get_id() + "");		
 		layout.removeAllViewsInLayout();
 		
 		// получаем список результатов шагов
@@ -124,17 +166,13 @@ public class OperationActivity extends Activity {
 	}
 	
 	private void ShowFinalStep() {
-		RelativeLayout layout = (RelativeLayout)findViewById(R.id.resultButtonLayout);
-		TextView stepTitle = (TextView)findViewById(R.id.stepTitle);
-		stepTitle.setText("Завершение операции");
-		
 		Button resultButton = new Button(getApplicationContext());
 		resultButton.setText("Завершить операцию");
 		resultButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				// TODO реализовать сохранение результата выполнения операции
-				Spinner spinner = (Spinner)((RelativeLayout)v.getParent()).findViewWithTag("result");
+				Spinner spinner = (Spinner)((LinearLayout)v.getParent()).findViewWithTag("result");
 				OperationResult result = (OperationResult)spinner.getSelectedItem();
 				Log.d("test", result.getTitle());
 				finish();
@@ -151,18 +189,25 @@ public class OperationActivity extends Activity {
 		layout.addView(resultButton);
 
 		// TODO разобраться как вывести кнопку под выпадающим списком 
-		RelativeLayout.LayoutParams params = (LayoutParams) resultButton.getLayoutParams();
-		params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, -1);
-		resultButton.setLayoutParams(params);
-		
+		//RelativeLayout.LayoutParams params = (LayoutParams) resultButton.getLayoutParams();
+		//LinearLayout.LayoutParams params = (LayoutParams) resultButton.getLayoutParams();
+		//params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, -1);
+		//resultButton.setLayoutParams(params);		
 	}
 	
 	private void ShowFirstStep() {
-		RelativeLayout layout = (RelativeLayout)findViewById(R.id.resultButtonLayout);
 		// получаем первый шаг операции
 		OperationPatternStep firstStep = getFirstStep();
-		TextView stepTitle = (TextView)findViewById(R.id.stepTitle);
-		stepTitle.setText(firstStep.getDescription());
+		if (firstStep == null) 
+		{
+		 Toast.makeText(this, "Первый шаг не найден", Toast.LENGTH_SHORT).show();
+		 return;
+		}
+
+		stepTitle.setText(firstStep.getName());
+		//firstStep.getImage();		
+		stepDescrition.setText(firstStep.getDescription());
+		numStepButton.setText(firstStep.get_id() + "");
 		
 		// получаем список результатов шагов
 		ArrayList<OperationPatternStepResult> resultsList = getStepResult(firstStep.getUuid());
@@ -208,5 +253,4 @@ public class OperationActivity extends Activity {
 		}
 		return resultsList;
 	}
-
 }

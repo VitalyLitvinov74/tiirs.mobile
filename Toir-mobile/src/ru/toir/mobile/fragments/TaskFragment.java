@@ -6,7 +6,9 @@ import java.util.List;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+//import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
@@ -15,12 +17,14 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
+//import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationType;
-import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.utils.DataUtils;
+import ru.toir.mobile.db.tables.TaskStatus;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -39,6 +43,7 @@ import android.widget.Button;
 public class TaskFragment extends Fragment {
 	private int	Level = 0;
 	private String	currentTaskEquipmentUUID="";
+	private String	currentEquipmentUUID="";
 	private Spinner Spinner_references; 
 	private Spinner Spinner_type;
 	private ListView lv;
@@ -48,11 +53,15 @@ public class TaskFragment extends Fragment {
 	ArrayAdapter<String> spinner_type_adapter;
 	private Button button;
 	ArrayList<String> orders_uuid = new ArrayList<String>();
+	ArrayList<String> equipment_uuid = new ArrayList<String>();
 	ArrayList<String> tasks_status_uuid = new ArrayList<String>();
 	ArrayList<String> tasks_equipment_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_critical_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_operation_uuid = new ArrayList<String>();
 
+	//private String operationUuidTag = "operation_uuid_tag";
+	//private String equipmentUuidTag = "equipment_uuid_tag";	
+	
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
@@ -71,7 +80,7 @@ public class TaskFragment extends Fragment {
 		return rootView;
 	}
 
-	private void initView()
+ private void initView()
 		{
 		 Level=0;
 		 orders_uuid.clear();
@@ -151,8 +160,9 @@ public class TaskFragment extends Fragment {
 	    public void onItemClick(AdapterView<?> parentView, View selectedItemView, int position, long id)
         {
 	     if (Level==1)
-	     	{	    	 
-	    	 initOperationPattern (tasks_equipment_uuid.get(position),currentTaskEquipmentUUID);
+	     	{
+	    	 currentEquipmentUUID=equipment_uuid.get(position);
+	    	 initOperationPattern (tasks_equipment_uuid.get(position),currentTaskEquipmentUUID, currentEquipmentUUID);
 	    	 Level=1;
 	     	}
 	     if (Level==0)
@@ -269,6 +279,7 @@ public class TaskFragment extends Fragment {
 	 String[] from = { "name","descr","img"};
 	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};
 	 tasks_equipment_uuid.clear();
+	 equipment_uuid.clear();
 	 while (cnt<equipmentOperationList.size())
 			{	 		 		
 		 	 HashMap<String, String> hm = new HashMap<String,String>();
@@ -287,7 +298,8 @@ public class TaskFragment extends Fragment {
 		 		 default: hm.put("img", Integer.toString(R.drawable.img_status_1));
 		 		}
 		 	aList.add(hm);
-		 	tasks_equipment_uuid.add(cnt, equipmentOperationList.get(cnt).getEquipment_uuid());
+		 	equipment_uuid.add(cnt, equipmentOperationList.get(cnt).getEquipment_uuid());
+		 	tasks_equipment_uuid.add(cnt, equipmentOperationList.get(cnt).getUuid());
  			cnt++;
 		   }	        
 	SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
@@ -307,9 +319,16 @@ public class TaskFragment extends Fragment {
 	}
 	
   // init equipment operation information screen
-  private void initOperationPattern(String task_equipment_uuid, String order_uuid)
+  private void initOperationPattern(String task_equipment_uuid, String order_uuid, String equipment_uuid)
 	{
-	  // TODO решить, что вывести на экране
-	  Toast.makeText(getActivity(), "Проваливаемся на экран с информацией об обслуживании", Toast.LENGTH_SHORT).show();	  
+	  Intent operationActivity = new Intent(getActivity(), OperationActivity.class);
+	  Toast.makeText(getActivity(), "Проваливаемся на экран с информацией об обслуживании", Toast.LENGTH_SHORT).show();
+
+	  Bundle b = new Bundle();
+	  b.putString("task_equipment_uuid", task_equipment_uuid); 
+	  b.putString("order_uuid", order_uuid); 
+	  b.putString("equipment_uuid", equipment_uuid); 
+	  operationActivity.putExtras(b);	  
+	  startActivity(operationActivity);	  
  	}	
 }

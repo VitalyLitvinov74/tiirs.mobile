@@ -15,6 +15,7 @@ public class OperationPatternStep {
 	private String image;
 	private boolean first_step;
 	private boolean last_step;
+	private String name;
 
 	/**
 	 * 
@@ -23,7 +24,7 @@ public class OperationPatternStep {
 
 	}
 	
-	public OperationPatternStep(long _id, String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step) {
+	public OperationPatternStep(long _id, String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step, String name) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.operation_pattern_uuid = operation_pattern_uuid;
@@ -31,6 +32,7 @@ public class OperationPatternStep {
 		this.image = image;
 		this.first_step = first_step;
 		this.last_step = last_step;
+		this.name = name;		
 	}
 
 	/**
@@ -66,6 +68,13 @@ public class OperationPatternStep {
 	 */
 	public String getDescription() {
 		return description;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -129,6 +138,10 @@ public class OperationPatternStep {
 	 */
 	public void set_id(long _id) {
 		this._id = _id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

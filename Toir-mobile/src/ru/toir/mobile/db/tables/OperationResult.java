@@ -3,9 +3,8 @@
  */
 package ru.toir.mobile.db.tables;
 
-import android.R.string;
-
-import com.google.common.base.Objects.ToStringHelper;
+//import android.R.string;
+//import com.google.common.base.Objects.ToStringHelper;
 
 /**
  * @author Dmitriy Logachov

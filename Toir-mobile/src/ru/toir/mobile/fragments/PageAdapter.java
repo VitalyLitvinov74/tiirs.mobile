@@ -35,6 +35,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 6 :
 			fragment = new TaskFragment();
 			break;
+		case 7 :
+			fragment = new NativeCameraFragment();
+			break;
 		default :
 			fragment = null;
 			break;
@@ -44,7 +47,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 7;
+		return 8;
 	}
 
 	/* (non-Javadoc)
@@ -55,7 +58,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		CharSequence title;
 		switch (position) {
 		case 0 :
-			title = "Информация о пользователе";
+			title = "Пользователь";
 			break;
 		case 1 :
 			title = "Наряды таблица";
@@ -64,16 +67,19 @@ public class PageAdapter extends FragmentPagerAdapter {
 			title = "Справочники";
 			break;
 		case 3 :
-			title = "Тест RFID";
+			title = "RFID";
 			break;
 		case 4 :
-			title = "Тест графиков";
+			title = "Графики";
 			break;
 		case 5 :
 			title = "Тест GPS";
 			break;
 		case 6 :
 			title = "Наряды";
+			break;
+		case 7 :
+			title = "Фото";
 			break;
 		default :
 			title = "";

@@ -61,10 +61,12 @@ public class GPSFragment extends Fragment {
 				}
 		}		
 		mapView = (MapView) rootView.findViewById(R.id.mapview);
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        //mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setUseDataConnection(false);
+        mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
         mapView.setBuiltInZoomControls(true);
         mapController = mapView.getController();
-        mapController.setZoom(18);
+        mapController.setZoom(17);
         GeoPoint point2 = new GeoPoint(curLatitude,curLongitude);
         mapController.setCenter(point2);
         

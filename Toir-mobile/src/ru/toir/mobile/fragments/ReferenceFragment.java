@@ -43,6 +43,7 @@ public class ReferenceFragment extends Fragment {
 	private Spinner Spinner_references; 
 	private Spinner Spinner_type; 
 	private Spinner Spinner_addict;
+	private ListView lv;
 	ArrayList<String> list = new ArrayList<String>();
 	ArrayList<String> list2 = new ArrayList<String>();
 	ArrayAdapter<String> spinner_type_adapter;
@@ -58,6 +59,7 @@ public class ReferenceFragment extends Fragment {
 		Spinner_references = (Spinner) rootView.findViewById(R.id.spinner1);
 		Spinner_type = (Spinner) rootView.findViewById(R.id.spinner2);
 		Spinner_addict = (Spinner) rootView.findViewById(R.id.spinner3);
+		lv = (ListView)rootView.findViewById(R.id.listView1);
 		initView();
 		return rootView;
 	}
@@ -65,6 +67,7 @@ public class ReferenceFragment extends Fragment {
 	private void initView()
 	{
 		FillSpinners();
+		FillListViewEquipment("", "");
 	}
 
 	private void FillSpinners()
@@ -230,7 +233,6 @@ public class ReferenceFragment extends Fragment {
          	}
         
 		 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-		 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
  		 // Setting the adapter to the listView
 	     lv.setAdapter(adapter);	   
 	     eqDBAdapter.close();
@@ -255,7 +257,6 @@ public class ReferenceFragment extends Fragment {
     	 cnt++;
      	}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
      lv.setAdapter(adapter);
      eqTypeDBAdapter.close();
 	}
@@ -296,7 +297,6 @@ public class ReferenceFragment extends Fragment {
 		 cnt++;
   		}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
 	 // Setting the adapter to the listView
 	 lv.setAdapter(adapter);	     
 	 DocumentationTypeDBAdapter.close();
@@ -324,8 +324,6 @@ public class ReferenceFragment extends Fragment {
 		 cnt++;
   		}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
-		 // Setting the adapter to the listView
 	 lv.setAdapter(adapter);
 	 criticalTypeDBAdapter.close();
 	}
@@ -348,7 +346,6 @@ public class ReferenceFragment extends Fragment {
     	 cnt++;
      	}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
      lv.setAdapter(adapter);
      measureTypeDBAdapter.close();
 	}
@@ -373,7 +370,6 @@ public class ReferenceFragment extends Fragment {
 		 cnt++;
   		}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
 	 lv.setAdapter(adapter);
 	 opResultTypeDBAdapter.close();
 	}
@@ -396,7 +392,6 @@ public class ReferenceFragment extends Fragment {
 		 cnt++;
   		}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
 	 lv.setAdapter(adapter);
 	 opTypeDBAdapter.close();
 	}
@@ -419,7 +414,6 @@ public class ReferenceFragment extends Fragment {
 		 cnt++;
 		}    
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
-	 ListView lv = (ListView)getActivity().findViewById(R.id.listView1);		 
 	 lv.setAdapter(adapter);
 	 taskStatusDBAdapter.close();
 	}

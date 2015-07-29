@@ -24,6 +24,7 @@ public class OperationPatternStepDBAdapter {
 	public static final String FIELD_IMAGE_NAME = "image";
 	public static final String FIELD_FIRST_STEP_NAME = "first_step";
 	public static final String FIELD_LAST_STEP_NAME = "last_step";
+	public static final String FIELD_NAME_NAME = "name";
 	
 	String[] mColumns = {
 			FIELD__ID_NAME,
@@ -32,7 +33,8 @@ public class OperationPatternStepDBAdapter {
 			FIELD_DESCRIPTION_NAME,
 			FIELD_IMAGE_NAME,
 			FIELD_FIRST_STEP_NAME,
-			FIELD_LAST_STEP_NAME};
+			FIELD_LAST_STEP_NAME,
+			FIELD_NAME_NAME};
 		
 	/**
 	 * @param context
@@ -85,8 +87,9 @@ public class OperationPatternStepDBAdapter {
 		patternStep.setOperation_pattern_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID_NAME)));
 		patternStep.setDescription(cursor.getString(cursor.getColumnIndex(FIELD_DESCRIPTION_NAME)));
 		patternStep.setImage(cursor.getString(cursor.getColumnIndex(FIELD_IMAGE_NAME)));
-		patternStep.setFirst_step(cursor.getInt(cursor.getColumnIndex(FIELD_FIRST_STEP_NAME)) == 0);
-		patternStep.setLast_step(cursor.getInt(cursor.getColumnIndex(FIELD_LAST_STEP_NAME)) == 0);
+		patternStep.setFirst_step(cursor.getInt(cursor.getColumnIndex(FIELD_FIRST_STEP_NAME)) == 1);
+		patternStep.setLast_step(cursor.getInt(cursor.getColumnIndex(FIELD_LAST_STEP_NAME)) == 1);
+		patternStep.setName(cursor.getString(cursor.getColumnIndex(FIELD_NAME_NAME)));		
 		return patternStep;
 	}
 
@@ -127,7 +130,7 @@ public class OperationPatternStepDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step) {
+	public long replace(String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step, String name) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
@@ -136,6 +139,7 @@ public class OperationPatternStepDBAdapter {
 		values.put(FIELD_IMAGE_NAME, image);
 		values.put(FIELD_FIRST_STEP_NAME, first_step ? 1 : 0);
 		values.put(FIELD_LAST_STEP_NAME, last_step ? 1 : 0);
+		values.put(FIELD_NAME_NAME, name);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -147,6 +151,6 @@ public class OperationPatternStepDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(OperationPatternStep step) {
-		return replace(step.getUuid(), step.getOperation_pattern_uuid(), step.getDescription(), step.getImage(), step.isFirst_step(), step.isLast_step());
+		return replace(step.getUuid(), step.getOperation_pattern_uuid(), step.getDescription(), step.getImage(), step.isFirst_step(), step.isLast_step(), step.getName());
 	}
 }

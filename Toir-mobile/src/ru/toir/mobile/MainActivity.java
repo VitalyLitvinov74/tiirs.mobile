@@ -1,6 +1,9 @@
 package ru.toir.mobile;
 
 import java.io.File;
+
+import com.astuetz.PagerSlidingTabStrip;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -194,10 +197,16 @@ public class MainActivity extends FragmentActivity {
 	 * Устанавливам основной экран приложения
 	 */
 	void setMainLayout() {
-		setContentView(R.layout.main_layout);
-		viewPager = (ViewPager) findViewById(R.id.pager);
-		pageAdapter = new PageAdapter(getSupportFragmentManager());
-		viewPager.setAdapter(pageAdapter);
+		ViewPager pager = (ViewPager) findViewById(R.id.pager);
+		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
+		// Bind the tabs to the ViewPager
+		PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+		tabs.setViewPager(pager);		
+
+		//setContentView(R.layout.main_layout);
+		//viewPager = (ViewPager) findViewById(R.id.pager);
+		//pageAdapter = new PageAdapter(getSupportFragmentManager());
+		//viewPager.setAdapter(pageAdapter);
 	}
 	
 	/**

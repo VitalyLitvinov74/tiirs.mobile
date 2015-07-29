@@ -170,8 +170,27 @@ public class TaskDBAdapter {
 		} else
 			return "неизвестен";
 	}
-
+	/**
+	 * <p>Возвращает дату завершения наряда</p>
+	 * @param uuid
+	 * @return format create date
+	 */
 	public String getCompleteTimeByUUID(String uuid) {
+		Cursor cur;
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cur.getCount() > 0) {
+			cur.moveToFirst();
+			return DataUtils.getDate(cur.getLong(5), "dd-MM-yyyy hh:mm:ss");
+		} else
+			return "";
+	}
+	/**
+	 * <p>Возвращает дату создания наряда</p>
+	 * @param uuid
+	 * @return format create date
+	 */
+	public String getCreateTimeByUUID(String uuid) {
 		Cursor cur;
 		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
 				new String[] { uuid }, null, null, null);
