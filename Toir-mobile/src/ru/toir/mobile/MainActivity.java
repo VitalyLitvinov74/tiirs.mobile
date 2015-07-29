@@ -20,6 +20,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
@@ -64,6 +65,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
 		if ( savedInstanceState != null ) {
@@ -197,13 +199,13 @@ public class MainActivity extends FragmentActivity {
 	 * Устанавливам основной экран приложения
 	 */
 	void setMainLayout() {
+		setContentView(R.layout.main_layout);
 		ViewPager pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager
 		PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 		tabs.setViewPager(pager);		
 
-		//setContentView(R.layout.main_layout);
 		//viewPager = (ViewPager) findViewById(R.id.pager);
 		//pageAdapter = new PageAdapter(getSupportFragmentManager());
 		//viewPager.setAdapter(pageAdapter);
