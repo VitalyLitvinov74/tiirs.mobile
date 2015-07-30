@@ -84,7 +84,9 @@ public class NativeCameraFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_native_camera, container, false);
-
+        // !!! если открывать камеру при создании фрагмента, камера блокируется и невозможно считать баркоды через неё !!!
+        // как вариант - добавить пару кнопок для инициализации/деинициализации камеры
+        /*
         // Create our Preview view and set it as the content of our activity.
         boolean opened = safeCameraOpenInView(view);
 
@@ -104,6 +106,7 @@ public class NativeCameraFragment extends Fragment {
                     }
                 }
         );
+        */
 
         return view;
     }

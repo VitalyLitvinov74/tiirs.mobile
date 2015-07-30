@@ -80,6 +80,7 @@ public class RFIDActivity extends Activity {
 				if (result != null && !result.equals("")) {
 					Intent i = new Intent();
 					i.setData(Uri.parse(result));
+					i.putExtras(getIntent().getExtras());
 					setResult(RESULT_OK, i);
 				} else {
 					setResult(RFID.RESULT_RFID_READ_ERROR);
@@ -119,6 +120,7 @@ public class RFIDActivity extends Activity {
 		} else {
 			data = new Intent();
 			data.setData(Uri.parse(result));
+			data.putExtras(getIntent().getExtras());
 			setResult(RESULT_OK, data);
 		}
 		finish();

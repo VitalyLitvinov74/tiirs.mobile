@@ -77,7 +77,7 @@ public class OperationActivity extends Activity {
 
         // получаем статус и время наряда
 	 	TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-	 	Task order = dbOrder.getTaskByUuidAndUpdated(order_uuid);
+	 	Task order = dbOrder.getItem(order_uuid);
 	 	TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
 		taskname = "Наряд: " + dbOrder.getCreateTimeByUUID(order_uuid) + " / Статус: " + taskStatusDBAdapter.getNameByUUID(order.getTask_status_uuid());
 

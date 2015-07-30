@@ -121,12 +121,35 @@ public class EquipmentDBAdapter {
 	/**
 	 * <p>Возвращает запись из таблицы equipment</p>
 	 * @param uuid
-	 * @return Cursor
+	 * @return Equipment
 	 */
-	public Cursor getItem(String uuid) {
-		return mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+	public Equipment getItem(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		}
+		return null;
 	}
-	
+
+	/**
+	 * <p>Возвращает Equipment</p>
+	 * @param uuid
+	 * @return Equipment
+	 */
+	public Equipment getItem(Cursor cursor) {
+		Equipment equipment = new Equipment();
+		equipment.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		equipment.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		equipment.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+		equipment.setEquipment_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME)));
+		equipment.setCritical_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME)));
+		equipment.setStart_date(cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)));
+		equipment.setLocation(cursor.getString(cursor.getColumnIndex(FIELD_LOCATION_NAME)));
+		equipment.setTag_id(cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME)));
+		return equipment;
+	}
+
 	/**
 	 * <p>Добавляет/заменяет запись в таблице equipments</p>
 	 * @param uuid
