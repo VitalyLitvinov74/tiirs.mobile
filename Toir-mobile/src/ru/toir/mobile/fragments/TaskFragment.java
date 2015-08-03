@@ -25,6 +25,8 @@ import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -59,7 +61,7 @@ public class TaskFragment extends Fragment {
 	ArrayList<String> tasks_equipment_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_critical_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_operation_uuid = new ArrayList<String>();
-	
+
 	// private String operationUuidTag = "operation_uuid_tag";
 	// private String equipmentUuidTag = "equipment_uuid_tag";
 
@@ -85,9 +87,9 @@ public class TaskFragment extends Fragment {
 				list2);
 		Spinner_references = (Spinner) rootView.findViewById(R.id.spinner10);
 		Spinner_type = (Spinner) rootView.findViewById(R.id.spinner11);
-		
+
 		initView();
-		
+
 		return rootView;
 	}
 
@@ -199,6 +201,43 @@ public class TaskFragment extends Fragment {
 				Level = 1;
 			}
 		}
+	}
+
+	public class ListViewLongClickListener implements
+			AdapterView.OnItemLongClickListener {
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view,
+				int position, long id) {
+			final Dialog dialog = new Dialog(getActivity());
+			dialog.setContentView(R.layout.operation_cancel_dialog);
+			dialog.setTitle("Отмена операции");
+			dialog.show();
+			Button cancelOK = (Button)dialog.findViewById(R.id.cancelOK);
+			cancelOK.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					// TODO перед установкой статуса проверить что статус операции либо "новая" либо "не выполнена", нужно уточнить
+					// TODO реализовать установку статуса для операции
+					View parent = (View)v.getParent();
+					String status = (String)((Spinner)parent.findViewById(R.id.statusSpinner)).getSelectedItem();
+					Toast.makeText(getActivity(), status, Toast.LENGTH_SHORT).show();
+					dialog.dismiss();
+				}
+			});
+			Button cancelCancel = (Button)dialog.findViewById(R.id.cancelCancel);
+			cancelCancel.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+			// TODO реализовать выборку статусов операций из базы
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, new String[]{"Нет оборудования", "К оборудованию нет доступа", "Нет инструмента"});
+			Spinner statusSpinner = (Spinner)dialog.findViewById(R.id.statusSpinner);
+			statusSpinner.setAdapter(adapter);
+			return true;
+		}
+
 	}
 
 	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
@@ -415,6 +454,7 @@ public class TaskFragment extends Fragment {
 		// Setting the adapter to the listView
 		lv.setAdapter(adapter);
 		lv.setOnItemClickListener(new ListviewClickListener());
+		lv.setOnItemLongClickListener(new ListViewLongClickListener());
 
 		button.setVisibility(View.VISIBLE);
 		button.setOnClickListener(new OnClickListener() {
@@ -436,10 +476,14 @@ public class TaskFragment extends Fragment {
 				Toast.LENGTH_SHORT).show();
 
 		// запускаем считывание метки оборудования
-		// передаём в активити считывания метки все необходимые данные для запуска активити выполнения операции
-		// они будут возвращены в MainActivity.onActivityResult и переданны в новое активити
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity())).open();
-		String equipment_tag  = equipmentDBAdapter.getItem(equipment_uuid).getTag_id();
+		// передаём в активити считывания метки все необходимые данные для
+		// запуска активити выполнения операции
+		// они будут возвращены в MainActivity.onActivityResult и переданны в
+		// новое активити
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+				new TOiRDatabaseContext(getActivity())).open();
+		String equipment_tag = equipmentDBAdapter.getItem(equipment_uuid)
+				.getTag_id();
 		equipmentDBAdapter.close();
 		Intent rfidRead = new Intent(getActivity(), RFIDActivity.class);
 		Bundle bundle = new Bundle();
@@ -449,7 +493,8 @@ public class TaskFragment extends Fragment {
 		bundle.putString("equipment_tag", equipment_tag);
 		bundle.putInt("action", 2);
 		rfidRead.putExtras(bundle);
-		getActivity().startActivityForResult(rfidRead, MainActivity.RETURN_CODE_READ_RFID);
+		getActivity().startActivityForResult(rfidRead,
+				MainActivity.RETURN_CODE_READ_RFID);
 	}
-	
+
 }
