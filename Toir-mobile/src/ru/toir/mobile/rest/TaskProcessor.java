@@ -62,7 +62,7 @@ import android.util.Log;
 public class TaskProcessor {
 
 	private Context mContext;
-	private static final String TASK_GET_URL = "/orders.php";
+	private static final String TASK_GET_URL = "/ordershierarchy/";
 	private static final String TASK_CONFIRMATION_URL = "/confirm.php";
 	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
 	private String mServerUrl;

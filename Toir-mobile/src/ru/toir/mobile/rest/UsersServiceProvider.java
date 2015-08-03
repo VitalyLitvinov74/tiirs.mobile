@@ -16,7 +16,8 @@ public class UsersServiceProvider implements IServiceProvider {
 
 	public static class Methods {
 		public static final int GET_USER = 1;
-		public static final String GET_USER_PARAMETER_TAG = "tag";
+		public static final String GET_USER_PARAMETER_TAG = "label";
+		public static final String GET_USER_PARAMETER_USER_NAME = "username";
 	}
 
 	public UsersServiceProvider(Context context) {

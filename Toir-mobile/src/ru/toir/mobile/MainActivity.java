@@ -27,6 +27,7 @@ import ru.toir.mobile.fragments.PageAdapter;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rfid.RFID;
 
 public class MainActivity extends FragmentActivity {
@@ -89,11 +90,9 @@ public class MainActivity extends FragmentActivity {
 		// инициализация приложения
 		init();
 
-		/*
-		 * UsersServiceHelper ush = new
-		 * UsersServiceHelper(getApplicationContext(), "action");
-		 * ush.GetUser("01234567");
-		 */
+		UsersServiceHelper ush = new UsersServiceHelper(getApplicationContext(), "action");
+		ush.GetUser("01234567", "example@domain.ru");
+
 		/*
 		 * TokenServiceHelper tsh = new
 		 * TokenServiceHelper(getApplicationContext(), "action");

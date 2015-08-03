@@ -3,11 +3,14 @@ package ru.toir.mobile.rest;
 import java.net.URI;
 import org.json.JSONObject;
 
+import com.google.gson.Gson;
+
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
+import ru.toir.mobile.serverapi.Token;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,7 +24,7 @@ import android.util.Log;
 
 public class UsersProcessor {
 	private Context mContext;
-	private static final String USERS_GET_USER_URL = "/user.php?tag=";
+	private static final String USERS_GET_USER_URL = "/token";
 	private String mServerUrl;
 	
 
@@ -46,33 +49,27 @@ public class UsersProcessor {
 	public boolean GetUser(Bundle bundle) {
 		URI requestUri = null;
 		String tag = bundle.getString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG);
+		String username = bundle.getString(UsersServiceProvider.Methods.GET_USER_PARAMETER_USER_NAME);
 		String jsonString = null;
-		JSONObject jsonArray = null;
 		try {
-			requestUri = new URI(mServerUrl + USERS_GET_USER_URL + tag);
+			requestUri = new URI(mServerUrl + USERS_GET_USER_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
+			StringBuilder postData = new StringBuilder();
+			postData.append(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG).append("=").append(tag);
+			postData.append("&");
+			postData.append(UsersServiceProvider.Methods.GET_USER_PARAMETER_USER_NAME).append("=").append(username);
+			postData.append("&");
+			postData.append("grant_type=label");
 			
-			Request request = new Request(Method.GET, requestUri, null, null);
+			Request request = new Request(Method.POST, requestUri, null, postData.toString().getBytes());
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
 
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
 
-				jsonArray = new JSONObject(jsonString);
-				
-				JSONObject value = jsonArray.getJSONObject("data");
-				Users user = new Users();
-				user.setUuid(value.getString(UsersDBAdapter.FIELD_UUID_NAME));
-				user.setName(value.getString(UsersDBAdapter.FIELD_NAME_NAME));
-				user.setLogin(value.getString(UsersDBAdapter.FIELD_LOGIN_NAME));
-				user.setPass(value.getString(UsersDBAdapter.FIELD_PASS_NAME));
-				user.setType(value.getInt(UsersDBAdapter.FIELD_TYPE_NAME));
-				user.setTag_id(value.getString(UsersDBAdapter.FIELD_TAGID_NAME));
-				user.setActive(value.getInt(UsersDBAdapter.FIELD_ACTIVE_NAME) == 0 ? false : true);
-				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
-				adapter.replaceItem(user);
-				adapter.close();
+				Token token = new Gson().fromJson(jsonString, Token.class);
+				// TODO нужно кудато занести полученные данные !!!!
 				
 				return true;
 			} else {
