@@ -100,6 +100,9 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// инициализация приложения
+		init();
+
 		// this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
@@ -113,14 +116,14 @@ public class MainActivity extends FragmentActivity {
 			setMainLayout();
 		} else {
 			setContentView(R.layout.login_layout);
+			// TODO необходимо реализовать механизм который бы позволял подключаться к базе только после того как она полностью обновится
+			/*
 			TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
 			tokenDBAdapter.deleteAll();
 			tokenDBAdapter.close();
+			*/
 		}
 		
-		// инициализация приложения
-		init();
-
 	}
 
 	/**

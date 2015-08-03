@@ -7,8 +7,10 @@ import java.util.List;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
+import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 //import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
@@ -18,6 +20,7 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
+import ru.toir.mobile.db.tables.OperationStatus;
 //import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
@@ -219,8 +222,9 @@ public class TaskFragment extends Fragment {
 					// TODO перед установкой статуса проверить что статус операции либо "новая" либо "не выполнена", нужно уточнить
 					// TODO реализовать установку статуса для операции
 					View parent = (View)v.getParent();
-					String status = (String)((Spinner)parent.findViewById(R.id.statusSpinner)).getSelectedItem();
-					Toast.makeText(getActivity(), status, Toast.LENGTH_SHORT).show();
+					Spinner spinner = (Spinner)parent.findViewById(R.id.statusSpinner);
+					OperationStatus status = (OperationStatus)spinner.getSelectedItem();
+					Toast.makeText(getActivity(), status.getTitle(), Toast.LENGTH_SHORT).show();
 					dialog.dismiss();
 				}
 			});
@@ -231,8 +235,13 @@ public class TaskFragment extends Fragment {
 					dialog.dismiss();
 				}
 			});
+
 			// TODO реализовать выборку статусов операций из базы
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, new String[]{"Нет оборудования", "К оборудованию нет доступа", "Нет инструмента"});
+			OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(getActivity())).open();
+			ArrayList<OperationStatus> operationStatus = statusDBAdapter.getItems();
+			statusDBAdapter.close();
+			  
+			ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(getActivity(), android.R.layout.simple_spinner_item, operationStatus);
 			Spinner statusSpinner = (Spinner)dialog.findViewById(R.id.statusSpinner);
 			statusSpinner.setAdapter(adapter);
 			return true;
