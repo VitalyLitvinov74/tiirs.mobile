@@ -35,7 +35,7 @@ public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
 	private static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
-	ViewPager viewPager;
+	public ViewPager pager;
 	PageAdapter pageAdapter;
 	
     private final IntentFilter mFilterGetTask = new IntentFilter(TaskServiceProvider.Actions.ACTION_GET_TASK);
@@ -200,12 +200,11 @@ public class MainActivity extends FragmentActivity {
 	 */
 	void setMainLayout() {
 		setContentView(R.layout.main_layout);
-		ViewPager pager = (ViewPager) findViewById(R.id.pager);
+		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager
 		PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 		tabs.setViewPager(pager);		
-
 		//viewPager = (ViewPager) findViewById(R.id.pager);
 		//pageAdapter = new PageAdapter(getSupportFragmentManager());
 		//viewPager.setAdapter(pageAdapter);

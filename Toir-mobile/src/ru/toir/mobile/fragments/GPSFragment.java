@@ -1,11 +1,14 @@
 package ru.toir.mobile.fragments;
-
+	
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+
 import java.util.ArrayList;
+
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,16 +16,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.os.Bundle;
+
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
+//import org.osmdroid.api.Marker;
+//import org.osmdroid.bonuspack.overlays.Marker;
+
+
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.*;
 import ru.toir.mobile.gps.TestGPSListener;
+import ru.toir.mobile.utils.TaskItemizedOverlay;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.location.Location;
+
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 
 public class GPSFragment extends Fragment {
@@ -75,28 +88,46 @@ public class GPSFragment extends Fragment {
         aOverlayItemArray.add(new OverlayItem("We are here", "WAH", new GeoPoint(curLatitude,curLongitude)));        
         ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity().getApplicationContext(), aOverlayItemArray, null);
         mapView.getOverlays().add(aItemizedIconOverlay);
-		
-		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentOperationDBAdapter equips = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		// запращиваем перечень задач нарядов (активных)
-
-		ArrayList<Task> ordersList = dbOrder.getOrdersByUser(tagId, "", "");
-
+        ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();                
+        
+        TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();    	
+        ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(), TaskStatusDBAdapter.STATUS_UUID_RECIEVED, "");
 		Integer cnt=0,cnt2=0;
 		while (cnt<ordersList.size())
 				{
-				 // запращиваем перечень оборудования статус - hardcoded!
-				 ArrayList<EquipmentOperation> equipOpList = equips.getEquipsByOrderId(ordersList.get(cnt).getUuid(),"",1);
+				 EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+				 ArrayList<EquipmentOperation> equipOperationList = operationDBAdapter.getItems(ordersList.get(cnt).getUuid());
+				 // запрашиваем перечень оборудования
 				 cnt2=0;
-				 while (cnt2<equipOpList.size())
+				 while (cnt2<equipOperationList.size())
 					{
 					 //equipOpList.get(cnt2).getUuid();
+					 String location="";
+			         EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+			         if (equipOperationList.get(cnt2).getEquipment_uuid()!=null)
+			         	{
+			        	 location = eqDBAdapter.getLocationByUUID(equipOperationList.get(cnt2).getEquipment_uuid());
+			        	 // TODO: добавить парсинг реальных координат
+			        	 // String coordinates[]=location.split("[NSWE]");
+			        	 // coordinates[0]; // Latitude
+			        	 // coordinates[1]; // Longitude
+			        	 //N60.04535 E30.12754
+			        	 curLatitude=curLatitude-0.0001*cnt2;
+			        	 curLongitude=curLongitude-0.0001*cnt2;
+
+			        	 OverlayItem olItem = new OverlayItem(eqDBAdapter.getEquipsNameByUUID(equipOperationList.get(cnt2).getEquipment_uuid()), "Device", new GeoPoint(curLatitude,curLongitude));
+			        	 Drawable newMarker = this.getResources().getDrawable(R.drawable.marker_equip);
+			        	 olItem.setMarker(newMarker);
+			        	 overlayItemArray.add(olItem);
+			        	 
+			        	 //aOverlayItemArray.add(olItem);			        	 
+			         	}
 					 cnt2 = cnt2 +1;
 					}
 				 cnt=cnt +1;
 				}
-
-		equips.close();
+   	 	TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity().getApplicationContext(), overlayItemArray);
+   	 	mapView.getOverlays().add(overlay);        
 		users.close();
 		dbOrder.close();       
 		onInit(rootView);
