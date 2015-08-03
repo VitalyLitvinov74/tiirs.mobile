@@ -22,6 +22,10 @@ public class TokenServiceProvider implements IServiceProvider {
 		public static final String GET_TOKEN_PARAMETER_USERNAME = "username";
 		public static final String GET_TOKEN_PARAMETER_PASSWORD = "password";
 	}
+	
+	public static class Actions {
+		public static final String ACTION_GET_TOKEN = "action_get_token";
+	}
 
 	/**
 	 * 
@@ -51,7 +55,7 @@ public class TokenServiceProvider implements IServiceProvider {
 	 */
 	private boolean getTokenByTag(Bundle extras) {
 		try {
-			return new TokenProcessor(mContext).GetTokenByTag(extras);
+			return new TokenProcessor(mContext).getTokenByTag(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -64,7 +68,7 @@ public class TokenServiceProvider implements IServiceProvider {
 	private boolean getTokenByUsernameAndPassword(Bundle extras) {
 		try {
 			return new TokenProcessor(mContext)
-					.GetTokenByUsernameAndPassword(extras);
+					.getTokenByUsernameAndPassword(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

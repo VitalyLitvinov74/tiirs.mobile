@@ -21,13 +21,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
+import ru.toir.mobile.db.adapters.TokenDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.rest.TokenServiceHelper;
+import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
+import ru.toir.mobile.rest.UsersServiceProvider;
 import ru.toir.mobile.rfid.RFID;
 
 public class MainActivity extends FragmentActivity {
@@ -38,6 +42,30 @@ public class MainActivity extends FragmentActivity {
 	ViewPager viewPager;
 	PageAdapter pageAdapter;
 
+	// фильтр для сообщений при получении пользователя с сервера
+	private final IntentFilter mFilterGetUser = new IntentFilter(UsersServiceProvider.Actions.ACTION_GET_USER);
+	private BroadcastReceiver mReceiverGetUser = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			if (provider == ProcessorService.Providers.USERS_PROVIDER) {
+				int method = intent.getIntExtra(ProcessorService.Extras.METHOD_EXTRA, 0);
+				if (method == UsersServiceProvider.Methods.GET_USER) {
+					boolean result = intent.getBooleanExtra(ProcessorService.Extras.RESULT_EXTRA, false);
+					if (result == true) {
+						// TODO при получении пользователя, нужно запросить токен
+						TokenServiceHelper serviceHelper = new TokenServiceHelper(getApplicationContext(), TokenServiceProvider.Actions.ACTION_GET_TOKEN);
+						// TODO сюда нужно передать либо имя пользователя либо его метку
+						serviceHelper.GetTokenByTag("");
+					} else {
+						// либо пользователя нет, либо произошла еще какая-то ошибка
+					}
+				}
+			}
+		}
+	};
+	
+	// фильтр для получения сообщений при получении нарядов с сервера
 	private final IntentFilter mFilterGetTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_GET_TASK);
 	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
@@ -85,19 +113,13 @@ public class MainActivity extends FragmentActivity {
 			setMainLayout();
 		} else {
 			setContentView(R.layout.login_layout);
+			TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+			tokenDBAdapter.deleteAll();
+			tokenDBAdapter.close();
 		}
 		
 		// инициализация приложения
 		init();
-
-		UsersServiceHelper ush = new UsersServiceHelper(getApplicationContext(), "action");
-		ush.GetUser("01234567", "example@domain.ru");
-
-		/*
-		 * TokenServiceHelper tsh = new
-		 * TokenServiceHelper(getApplicationContext(), "action");
-		 * tsh.GetTokenByUsernameAndPassword("test", "00000001");
-		 */
 
 	}
 
@@ -210,8 +232,12 @@ public class MainActivity extends FragmentActivity {
 				Users user = users.getUserByTagId(tagId);
 				users.close();
 				if (user == null) {
-					Toast.makeText(this, "Нет такого пользователя!",
-							Toast.LENGTH_SHORT).show();
+					UsersServiceHelper serviceHelper = new UsersServiceHelper(getApplicationContext(), "get_unknown_user");
+					serviceHelper.getUser(tagId);
+					// TODO реализовать уведомление и обработку получения пользователя с сервера !!!
+					/*
+					Toast.makeText(this, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
+					*/
 				} else {
 					Log.d(TAG, user.toString());
 					isLogged = true;
@@ -247,10 +273,6 @@ public class MainActivity extends FragmentActivity {
 		// Bind the tabs to the ViewPager
 		PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 		tabs.setViewPager(pager);
-
-		// viewPager = (ViewPager) findViewById(R.id.pager);
-		// pageAdapter = new PageAdapter(getSupportFragmentManager());
-		// viewPager.setAdapter(pageAdapter);
 	}
 
 	/**
@@ -351,6 +373,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onStart() {
 		super.onStart();
 		registerReceiver(mReceiverGetTask, mFilterGetTask);
+		registerReceiver(mReceiverGetUser, mFilterGetUser);
 	}
 
 	/*
@@ -362,5 +385,6 @@ public class MainActivity extends FragmentActivity {
 	protected void onStop() {
 		super.onStop();
 		unregisterReceiver(mReceiverGetTask);
+		unregisterReceiver(mReceiverGetUser);
 	}
 }

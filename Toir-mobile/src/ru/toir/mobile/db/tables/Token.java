@@ -12,7 +12,6 @@ public class Token {
 	private String token_type;
 	private String access_token;
 	private int expires_in;
-	// TODO вместо логина пользователя с сервера должен приезжать uuid
 	private String userName;
 	private String issued;
 	private String expires;

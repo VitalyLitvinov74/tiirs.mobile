@@ -136,4 +136,26 @@ public class TokenDBAdapter {
 				token.getExpires_in(), token.getUserName(), token.getIssued(),
 				token.getExpires());
 	}
+	
+	/**
+	 * <p>
+	 * Добавляет/изменяет запись в таблице token
+	 * </p>
+	 * 
+	 * @param token
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public long replace(ru.toir.mobile.serverapi.Token token) {
+		return replace(token.getTokenType(), token.getAccessToken(),
+				token.getExpiresIn(), token.getUserName(), token.getIssued(),
+				token.getExpires());
+	}
+	
+	/**
+	 * Удаляет все данные из таблицы
+	 * @return
+	 */
+	public int deleteAll() {
+		return mDb.delete(TABLE_NAME, null, null);
+	}
 }

@@ -4,12 +4,10 @@
 package ru.toir.mobile.rest;
 
 import java.net.URI;
-import org.json.JSONObject;
-
+import com.google.gson.Gson;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.TokenDBAdapter;
-import ru.toir.mobile.db.tables.Token;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,7 +22,7 @@ import android.util.Log;
 public class TokenProcessor {
 
 	private Context mContext;
-	private static final String USERS_GET_TOKEN_URL = "/token.php";
+	private static final String USERS_GET_TOKEN_URL = "/token";
 	private String mServerUrl;
 
 	/**
@@ -46,46 +44,10 @@ public class TokenProcessor {
 
 	/**
 	 * 
-	 * @param data
-	 * @return
-	 */
-	private Token GetTokenData(byte data[]) {
-		Token token = null;
-		String jsonString = null;
-		JSONObject jsonArray = null;
-
-		try {
-			jsonString = new String(data, "UTF-8");
-			Log.d("test", jsonString);
-
-			jsonArray = new JSONObject(jsonString);
-
-			token = new Token();
-			token.setToken_type(jsonArray
-					.getString(TokenDBAdapter.FIELD_TOKEN_TYPE_NAME));
-			token.setAccess_token(jsonArray
-					.getString(TokenDBAdapter.FIELD_ACCESS_TOKEN_NAME));
-			token.setExpires_in(jsonArray
-					.getInt(TokenDBAdapter.FIELD_EXPIRES_IN_NAME));
-			token.setUserName(jsonArray
-					.getString(TokenDBAdapter.FIELD_USER_NAME_NAME));
-			token.setIssued(jsonArray
-					.getString(TokenDBAdapter.FIELD_ISSUED_NAME));
-			token.setExpires(jsonArray
-					.getString(TokenDBAdapter.FIELD_EXPIRES_NAME));
-			return token;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return token;
-		}
-	}
-
-	/**
-	 * 
 	 * @param bundle
 	 * @return
 	 */
-	public boolean GetTokenByTag(Bundle bundle) {
+	public boolean getTokenByTag(Bundle bundle) {
 		URI requestUri = null;
 		String tag = bundle
 				.getString(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG);
@@ -100,12 +62,10 @@ public class TokenProcessor {
 			Response response = new RestClient().execute(request);
 
 			if (response.mStatus == 200) {
-				Token token = GetTokenData(response.mBody);
-				if (token != null) {
-					TokenDBAdapter adapter = new TokenDBAdapter(
-							new TOiRDatabaseContext(mContext)).open();
-					adapter.replace(token);
-					adapter.close();
+				String jsonString = new String(response.mBody);
+				ru.toir.mobile.serverapi.Token serverToken = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Token.class);
+				if (serverToken != null) {
+					saveToken(serverToken);
 					return true;
 				} else {
 					return false;
@@ -124,7 +84,7 @@ public class TokenProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean GetTokenByUsernameAndPassword(Bundle bundle) {
+	public boolean getTokenByUsernameAndPassword(Bundle bundle) {
 		URI requestUri = null;
 		String username = bundle
 				.getString(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_USERNAME);
@@ -146,12 +106,10 @@ public class TokenProcessor {
 					postData.toString().getBytes());
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
-				Token token = GetTokenData(response.mBody);
-				if (token != null) {
-					TokenDBAdapter adapter = new TokenDBAdapter(
-							new TOiRDatabaseContext(mContext)).open();
-					adapter.replace(token);
-					adapter.close();
+				String jsonString = new String(response.mBody);
+				ru.toir.mobile.serverapi.Token serverToken = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Token.class);
+				if (serverToken != null) {
+					saveToken(serverToken);
 					return true;
 				} else {
 					return false;
@@ -163,5 +121,16 @@ public class TokenProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param token
+	 */
+	private void saveToken(ru.toir.mobile.serverapi.Token token) {
+		TokenDBAdapter adapter = new TokenDBAdapter(
+				new TOiRDatabaseContext(mContext)).open();
+		adapter.replace(token);
+		adapter.close();		
 	}
 }

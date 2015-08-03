@@ -34,7 +34,7 @@ public class TokenServiceHelper extends ServiceHelperBase {
 	 * @param username
 	 * @param password
 	 */
-	public void GetTokenByUsernameAndPassword(String username, String password) {
+	public void getTokenByUsernameAndPassword(String username, String password) {
 		Bundle bundle = new Bundle();
 		bundle.putString(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_USERNAME, username);
 		bundle.putString(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_PASSWORD, password);

@@ -17,7 +17,10 @@ public class UsersServiceProvider implements IServiceProvider {
 	public static class Methods {
 		public static final int GET_USER = 1;
 		public static final String GET_USER_PARAMETER_TAG = "label";
-		public static final String GET_USER_PARAMETER_USER_NAME = "username";
+	}
+	
+	public static class Actions {
+		public static final String ACTION_GET_USER = "action_get_user";
 	}
 
 	public UsersServiceProvider(Context context) {
@@ -35,7 +38,7 @@ public class UsersServiceProvider implements IServiceProvider {
 
 	private boolean getUser(Bundle extras) {
 		try {
-			return new UsersProcessor(mContext).GetUser(extras);
+			return new UsersProcessor(mContext).getUser(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
