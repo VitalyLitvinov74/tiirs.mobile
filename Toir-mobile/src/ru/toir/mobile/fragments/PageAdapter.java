@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 public class PageAdapter extends FragmentPagerAdapter {
+	
+	public final static int TASK_FRAGMENT = 6;
 
 	public PageAdapter(FragmentManager fm) {
 		super(fm);
@@ -32,7 +34,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 5 :
 			fragment = new GPSFragment();
 			break;
-		case 6 :
+		case TASK_FRAGMENT :
 			fragment = new TaskFragment();
 			break;
 		case 7 :

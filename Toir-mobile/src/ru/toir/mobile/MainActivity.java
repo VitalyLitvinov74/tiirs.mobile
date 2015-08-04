@@ -39,7 +39,7 @@ public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
-	ViewPager viewPager;
+	public ViewPager pager;
 	PageAdapter pageAdapter;
 
 	// фильтр для сообщений при получении пользователя с сервера
@@ -271,7 +271,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	void setMainLayout() {
 		setContentView(R.layout.main_layout);
-		ViewPager pager = (ViewPager) findViewById(R.id.pager);
+		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager
 		PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);

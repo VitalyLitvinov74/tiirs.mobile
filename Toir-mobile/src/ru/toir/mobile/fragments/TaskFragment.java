@@ -80,16 +80,17 @@ public class TaskFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.tasks_layout, container,
 				false);
-		lv = (ListView) rootView.findViewById(R.id.listView1);
-		button = (Button) rootView.findViewById(R.id.button_back);
+		lv = (ListView) rootView.findViewById(R.id.tasks_listView);
+		button = (Button) rootView.findViewById(R.id.tasks_button_back);
 		spinner_type_adapter = new ArrayAdapter<String>(getActivity()
 				.getApplicationContext(), android.R.layout.simple_spinner_item,
 				list);
 		spinner_reference_adapter = new ArrayAdapter<String>(getActivity()
 				.getApplicationContext(), android.R.layout.simple_spinner_item,
 				list2);
-		Spinner_references = (Spinner) rootView.findViewById(R.id.spinner10);
-		Spinner_type = (Spinner) rootView.findViewById(R.id.spinner11);
+		Spinner_references = (Spinner) rootView
+				.findViewById(R.id.tasks_spinner10);
+		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
 
 		initView();
 
@@ -138,6 +139,84 @@ public class TaskFragment extends Fragment {
 		Spinner_type.setAdapter(spinner_type_adapter);
 		Spinner_references.setAdapter(spinner_reference_adapter);
 		taskStatusDBAdapter.close();
+	}
+
+	private void FillListViewTasks(String type, String sort) {
+		String tagId = "01234567";
+		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
+				getActivity().getApplicationContext())).open();
+		Users user = users.getUserByTagId(tagId);
+		users.close();
+
+		if (user == null) {
+			Toast.makeText(getActivity(), "Нет такого пользователя!",
+					Toast.LENGTH_SHORT).show();
+		} else {
+			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
+					getActivity().getApplicationContext())).open();
+			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
+					user.getUuid(), type, sort);
+			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
+					new TOiRDatabaseContext(getActivity()
+							.getApplicationContext())).open();
+
+			Integer cnt = 0;
+			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+			String[] from = { "name", "descr", "img" };
+			int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
+			while (cnt < ordersList.size()) {
+				HashMap<String, String> hm = new HashMap<String, String>();
+				hm.put("name",
+						"Создан: "
+								+ DataUtils.getDate(ordersList.get(cnt)
+										.getCreate_date(), "dd-MM-yyyy hh:mm")
+								+ " | Изменен: "
+								+ DataUtils.getDate(ordersList.get(cnt)
+										.getModify_date(), "dd-MM-yyyy hh:mm"));
+				hm.put("descr",
+						"Статус: "
+								+ taskStatusDBAdapter.getNameByUUID(ordersList
+										.get(cnt).getTask_status_uuid())
+								+ " | Отправлялся: "
+								+ DataUtils.getDate(ordersList.get(cnt)
+										.getAttempt_send_date(),
+										"dd-MM-yyyy hh:mm") + " [Count="
+								+ ordersList.get(cnt).getAttempt_count() + "]");
+				// hm.put("descr","Статус: " +
+				// ordersList.get(cnt).getTask_status_uuid() + " Отправлялся: "
+				// +
+				// DataUtils.getDate(ordersList.get(cnt).getAttempt_send_date(),"dd-MM-yyyy hh:mm")
+				// + " [Count=" + ordersList.get(cnt).getAttempt_count() + "]");
+				// default
+				hm.put("img", Integer.toString(R.drawable.img_status_1));
+				if (ordersList.get(cnt).getTask_status_uuid()
+						.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED))
+					hm.put("img", Integer.toString(R.drawable.img_status_3));
+				if (ordersList.get(cnt).getTask_status_uuid()
+						.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED))
+					hm.put("img", Integer.toString(R.drawable.img_status_1));
+				if (ordersList.get(cnt).getTask_status_uuid()
+						.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED))
+					hm.put("img", Integer.toString(R.drawable.img_status_5));
+				if (ordersList.get(cnt).getTask_status_uuid()
+						.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED))
+					hm.put("img", Integer.toString(R.drawable.img_status_4));
+				if (ordersList.get(cnt).getTask_status_uuid()
+						.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED))
+					hm.put("img", Integer.toString(R.drawable.img_status_2));
+				aList.add(hm);
+				orders_uuid.add(cnt, ordersList.get(cnt).getUuid().toString());
+				cnt++;
+			}
+			SimpleAdapter adapter = new SimpleAdapter(getActivity()
+					.getApplicationContext(), aList, R.layout.listview, from,
+					to);
+			// Setting the adapter to the listView
+			lv.setAdapter(adapter);
+			lv.setOnItemClickListener(new ListviewClickListener());
+			dbOrder.close();
+			button.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	private void FillEquipmentSpinners() {
@@ -215,20 +294,25 @@ public class TaskFragment extends Fragment {
 			dialog.setContentView(R.layout.operation_cancel_dialog);
 			dialog.setTitle("Отмена операции");
 			dialog.show();
-			Button cancelOK = (Button)dialog.findViewById(R.id.cancelOK);
+			Button cancelOK = (Button) dialog.findViewById(R.id.cancelOK);
 			cancelOK.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// TODO перед установкой статуса проверить что статус операции либо "новая" либо "не выполнена", нужно уточнить
+					// TODO перед установкой статуса проверить что статус
+					// операции либо "новая" либо "не выполнена", нужно уточнить
 					// TODO реализовать установку статуса для операции
-					View parent = (View)v.getParent();
-					Spinner spinner = (Spinner)parent.findViewById(R.id.statusSpinner);
-					OperationStatus status = (OperationStatus)spinner.getSelectedItem();
-					Toast.makeText(getActivity(), status.getTitle(), Toast.LENGTH_SHORT).show();
+					View parent = (View) v.getParent();
+					Spinner spinner = (Spinner) parent
+							.findViewById(R.id.statusSpinner);
+					OperationStatus status = (OperationStatus) spinner
+							.getSelectedItem();
+					Toast.makeText(getActivity(), status.getTitle(),
+							Toast.LENGTH_SHORT).show();
 					dialog.dismiss();
 				}
 			});
-			Button cancelCancel = (Button)dialog.findViewById(R.id.cancelCancel);
+			Button cancelCancel = (Button) dialog
+					.findViewById(R.id.cancelCancel);
 			cancelCancel.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -237,12 +321,17 @@ public class TaskFragment extends Fragment {
 			});
 
 			// TODO реализовать выборку статусов операций из базы
-			OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(getActivity())).open();
-			ArrayList<OperationStatus> operationStatus = statusDBAdapter.getItems();
+			OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
+					new TOiRDatabaseContext(getActivity())).open();
+			ArrayList<OperationStatus> operationStatus = statusDBAdapter
+					.getItems();
 			statusDBAdapter.close();
-			  
-			ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(getActivity(), android.R.layout.simple_spinner_item, operationStatus);
-			Spinner statusSpinner = (Spinner)dialog.findViewById(R.id.statusSpinner);
+
+			ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
+					getActivity(), android.R.layout.simple_spinner_item,
+					operationStatus);
+			Spinner statusSpinner = (Spinner) dialog
+					.findViewById(R.id.statusSpinner);
 			statusSpinner.setAdapter(adapter);
 			return true;
 		}
@@ -303,84 +392,6 @@ public class TaskFragment extends Fragment {
 		}
 	}
 
-	private void FillListViewTasks(String type, String sort) {
-		String tagId = "01234567";
-		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
-		Users user = users.getUserByTagId(tagId);
-		users.close();
-
-		if (user == null) {
-			Toast.makeText(getActivity(), "Нет такого пользователя!",
-					Toast.LENGTH_SHORT).show();
-		} else {
-			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
-					getActivity().getApplicationContext())).open();
-			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
-					user.getUuid(), type, sort);
-			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
-
-			Integer cnt = 0;
-			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-			String[] from = { "name", "descr", "img" };
-			int[] to = { R.id.firstLine, R.id.secondLine, R.id.icon };
-			while (cnt < ordersList.size()) {
-				HashMap<String, String> hm = new HashMap<String, String>();
-				hm.put("name",
-						"Создан: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getCreate_date(), "dd-MM-yyyy hh:mm")
-								+ " | Изменен: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getModify_date(), "dd-MM-yyyy hh:mm"));
-				hm.put("descr",
-						"Статус: "
-								+ taskStatusDBAdapter.getNameByUUID(ordersList
-										.get(cnt).getTask_status_uuid())
-								+ " | Отправлялся: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getAttempt_send_date(),
-										"dd-MM-yyyy hh:mm") + " [Count="
-								+ ordersList.get(cnt).getAttempt_count() + "]");
-				// hm.put("descr","Статус: " +
-				// ordersList.get(cnt).getTask_status_uuid() + " Отправлялся: "
-				// +
-				// DataUtils.getDate(ordersList.get(cnt).getAttempt_send_date(),"dd-MM-yyyy hh:mm")
-				// + " [Count=" + ordersList.get(cnt).getAttempt_count() + "]");
-				// default
-				hm.put("img", Integer.toString(R.drawable.img_status_1));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED))
-					hm.put("img", Integer.toString(R.drawable.img_status_3));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED))
-					hm.put("img", Integer.toString(R.drawable.img_status_1));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED))
-					hm.put("img", Integer.toString(R.drawable.img_status_5));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED))
-					hm.put("img", Integer.toString(R.drawable.img_status_4));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED))
-					hm.put("img", Integer.toString(R.drawable.img_status_2));
-				aList.add(hm);
-				orders_uuid.add(cnt, ordersList.get(cnt).getUuid().toString());
-				cnt++;
-			}
-			SimpleAdapter adapter = new SimpleAdapter(getActivity()
-					.getApplicationContext(), aList, R.layout.listview, from,
-					to);
-			// Setting the adapter to the listView
-			lv.setAdapter(adapter);
-			lv.setOnItemClickListener(new ListviewClickListener());
-			dbOrder.close();
-			button.setVisibility(View.INVISIBLE);
-		}
-	}
-
 	private void FillListViewEquipment(String order_uuid,
 			String operation_type_uuid, int critical_type) {
 		int operation_type;
@@ -407,7 +418,7 @@ public class TaskFragment extends Fragment {
 		int cnt = 0;
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		String[] from = { "name", "descr", "img" };
-		int[] to = { R.id.firstLine, R.id.secondLine, R.id.icon };
+		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
 		tasks_equipment_uuid.clear();
 		equipment_uuid.clear();
 		while (cnt < equipmentOperationList.size()) {
