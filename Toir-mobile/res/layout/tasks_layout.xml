@@ -4,24 +4,24 @@
     android:layout_height="match_parent" >
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/tasks_linearLayout1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Spinner
-            android:id="@+id/spinner10"
+            android:id="@+id/tasks_spinner10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2" />
 
         <Spinner
-            android:id="@+id/spinner11"
+            android:id="@+id/tasks_spinner11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2" />
 
         <Button
-            android:id="@+id/button_back"
+            android:id="@+id/tasks_button_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
@@ -31,7 +31,7 @@
             android:background="@drawable/button4"
             android:minHeight="20dp"
             android:minWidth="54dp"
-            android:text="назад"
+            android:text="@string/back"
             android:textSize="12sp"
             android:layout_weight="1"
             android:visibility="invisible" />
@@ -42,11 +42,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/linearLayout1"
+        android:layout_below="@+id/tasks_linearLayout1"
         android:orientation="vertical" >
 
         <ListView
-            android:id="@+id/listView1"
+            android:id="@+id/tasks_listView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>

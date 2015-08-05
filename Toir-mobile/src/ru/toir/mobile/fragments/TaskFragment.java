@@ -69,12 +69,12 @@ public class TaskFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.tasks_layout, container, false);
-	 	lv = (ListView) rootView.findViewById(R.id.listView1);		 			 
-		button = (Button) rootView.findViewById(R.id.button_back);
+	 	lv = (ListView) rootView.findViewById(R.id.tasks_listView);		 			 
+		button = (Button) rootView.findViewById(R.id.tasks_button_back);
 		spinner_type_adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, list);
 		spinner_reference_adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, list2);
-		Spinner_references = (Spinner) rootView.findViewById(R.id.spinner10);
-		Spinner_type = (Spinner) rootView.findViewById(R.id.spinner11);
+		Spinner_references = (Spinner) rootView.findViewById(R.id.tasks_spinner10);
+		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
 
 		initView();
 		return rootView;
@@ -231,7 +231,7 @@ public class TaskFragment extends Fragment {
 	 		 	Integer cnt=0;			 			 
 	 		 	List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 		 	String[] from = { "name","descr","img"};
-	 		 	int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+	 		 	int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
 	 		 	while (cnt<ordersList.size())
 	 		 		{	 		 		
 	 		 			HashMap<String, String> hm = new HashMap<String,String>();
@@ -277,7 +277,7 @@ public class TaskFragment extends Fragment {
  	 int cnt=0;
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 String[] from = { "name","descr","img"};
-	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};
 	 tasks_equipment_uuid.clear();
 	 equipment_uuid.clear();
 	 while (cnt<equipmentOperationList.size())

@@ -108,7 +108,7 @@ public class GPSFragment extends Fragment {
 			         	{
 			        	 location = eqDBAdapter.getLocationByUUID(equipOperationList.get(cnt2).getEquipment_uuid());
 			        	 // TODO: добавить парсинг реальных координат
-			        	 // String coordinates[]=location.split("[NSWE]");
+			        	 String coordinates[]=location.split("[NSWE]");
 			        	 // coordinates[0]; // Latitude
 			        	 // coordinates[1]; // Longitude
 			        	 //N60.04535 E30.12754

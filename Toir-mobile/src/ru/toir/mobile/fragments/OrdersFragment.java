@@ -2,7 +2,7 @@ package ru.toir.mobile.fragments;
 
 import java.util.ArrayList;
 
-import com.google.zxing.integration.android.IntentIntegrator;
+//import com.google.zxing.integration.android.IntentIntegrator;
 
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;

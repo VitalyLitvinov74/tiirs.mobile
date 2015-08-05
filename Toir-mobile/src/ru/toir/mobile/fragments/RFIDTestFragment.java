@@ -6,23 +6,18 @@ import com.example.magicuhf.ReadWrite;
 import com.example.magicuhf.Setting;
 
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRApplication;
-import ru.toir.mobile.utils.DataUtils;
-import ru.toir.mobile.utils.ToastUtil;
 import android.content.Intent;
 import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
+//import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 //import android.widget.TextView;
 //import android.app.Activity;
 
@@ -38,7 +33,7 @@ public class RFIDTestFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.activity_magic_main, container, false);
 		initView(rootView);
 		super.onCreate(savedInstanceState);
-		Init();
+		//Init();
 		return rootView;		
 	}
 	private void initView(View view) {

@@ -30,4 +30,18 @@
     <string name="RFIDDriver">RFIDDriver</string>
     <string name="references">Справочники</string>
     <string name="get_task">Получить наряд</string>
+    <string name="back">Назад</string>
+    <string name="make_photo">Снять</string>
+    <string name="image_description">изображение</string>
+    <string name="description">описание</string>
+    <string name="id">ID</string>
+    <string name="whois">Должность</string>
+    <string name="current_location">Текущие координаты</string>
+    <string name="no_gps_data">Нет данных GPS</string>
+    <string name="current_status">Текущий статус</string>
+    <string name="gpsstatus">Состояние GPS</string>
+    <string name="gprsstatus">Связь GPRS</string>
+    <string name="server_date_connect">Дата связи с сервером:</string>
+    <string name="tasks_quantity">Нарядов получено/выполнено:</string>
+    <string name="boss_contact">Контакт начальника:</string>
 </resources>

@@ -5,27 +5,26 @@
     android:padding="3dip" >
 
     <ImageView
-        android:id="@+id/icon"
+        android:id="@+id/lv1_icon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="2dip"
-        android:contentDescription="TODO"
+        android:contentDescription="@string/image_description"
         android:maxHeight="32dp"
         android:maxWidth="32dp" />
 
     <TextView
-        android:id="@+id/firstLine"
+        android:id="@+id/lv1_firstLine"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/secondLine"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_toRightOf="@id/icon"
+        android:layout_toRightOf="@id/lv1_icon"
         android:gravity="center_vertical"
-        android:text="Name"
+        android:text="@string/description"
         android:textSize="15sp" />
 
 </RelativeLayout> 

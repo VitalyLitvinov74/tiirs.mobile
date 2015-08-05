@@ -40,11 +40,11 @@ public class UserInfoFragment extends Fragment {
 	}
 
 	private void initView(View view) {		
-		tv_user_id = (TextView) view.findViewById(R.id.EditText07);
-		tv_user_name = (TextView) view.findViewById(R.id.EditText06);
-		tv_user_type = (TextView) view.findViewById(R.id.EditText05);
-		tv_user_gps = (TextView) view.findViewById(R.id.editText7);
-		tv_user_status = (TextView) view.findViewById(R.id.EditText08);		
+		tv_user_id = (TextView) view.findViewById(R.id.user_text_id);
+		tv_user_name = (TextView) view.findViewById(R.id.user_text_name);
+		tv_user_type = (TextView) view.findViewById(R.id.user_text_whois);
+		tv_user_gps = (TextView) view.findViewById(R.id.user_text_gps);
+		tv_user_status = (TextView) view.findViewById(R.id.user_position);		
 		
 		// hardcoded for test, tagID for user must be global
 		String tagId = "01234567";
@@ -87,7 +87,7 @@ public class UserInfoFragment extends Fragment {
 	 		 	Integer cnt=0;			 			 
 	 		 	List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 		 	String[] from = { "name","img"};
-	 		 	int[] to = { R.id.firstLine,R.id.icon};         
+	 		 	int[] to = { R.id.lv1_firstLine,R.id.lv1_icon};         
 	 		 	while (cnt<ordersList.size())
 	 		 		{	 		 		
 	 		 			HashMap<String, String> hm = new HashMap<String,String>();
@@ -111,7 +111,7 @@ public class UserInfoFragment extends Fragment {
 	 		 	SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview1row, from, to);		 
 	 		 	// Setting the adapter to the listView
 	 			ListView lv;
-	 		 	lv = (ListView) view.findViewById(R.id.listView_main);		 			 
+	 		 	lv = (ListView) view.findViewById(R.id.user_listView_main);		 			 
 	 		 	lv.setAdapter(adapter);
 	 		 	dbOrder.close();		 
 	 	 	}

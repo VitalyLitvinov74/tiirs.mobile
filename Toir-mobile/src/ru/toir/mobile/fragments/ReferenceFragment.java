@@ -221,7 +221,7 @@ public class ReferenceFragment extends Fragment {
          // keys used in Hashmap
          String[] from = { "name","descr","img"};
          // id of views in listview_layout
-         int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+         int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
          while (cnt<equipmentList.size())
          	{
     	     HashMap<String, String> hm = new HashMap<String,String>();
@@ -246,7 +246,7 @@ public class ReferenceFragment extends Fragment {
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
      Integer cnt=0;
      String[] from = { "name","descr","img"};
-     int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+     int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
      while (cnt<equipmentTypeList.size())
      	{
          HashMap<String, String> hm = new HashMap<String,String>();
@@ -286,7 +286,7 @@ public class ReferenceFragment extends Fragment {
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 Integer cnt=0;
 	 String[] from = { "name","descr","img"};
-	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
 	 while (cnt<equipmentDocumentationList.size())
   		{
 		 HashMap<String, String> hm = new HashMap<String,String>();
@@ -313,7 +313,7 @@ public class ReferenceFragment extends Fragment {
 	 // keys used in Hashmap
 	 String[] from = { "name","descr","img"};
 	 // id of views in listview_layout
-	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
 	 while (cnt<criticalTypeList.size())
   		{
 		 HashMap<String, String> hm = new HashMap<String,String>();
@@ -335,7 +335,7 @@ public class ReferenceFragment extends Fragment {
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
      Integer cnt=0;
      String[] from = { "name","descr","img"};
-     int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+     int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
      while (cnt<measureTypeList.size())
      	{
          HashMap<String, String> hm = new HashMap<String,String>();
@@ -359,7 +359,7 @@ public class ReferenceFragment extends Fragment {
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 Integer cnt=0;
 	 String[] from = { "name","descr","img"};
-	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
 	 while (cnt<opResultList.size())
   		{
 		 HashMap<String, String> hm = new HashMap<String,String>();
@@ -381,7 +381,7 @@ public class ReferenceFragment extends Fragment {
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 Integer cnt=0;
 	 String[] from = { "name","descr","img"};
-	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
 	 while (cnt<opTypeList.size())
   		{
 		 HashMap<String, String> hm = new HashMap<String,String>();
@@ -403,7 +403,7 @@ public class ReferenceFragment extends Fragment {
 	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 	 Integer cnt=0;
 	 String[] from = { "name","descr","img"};
-	 int[] to = { R.id.firstLine,R.id.secondLine,R.id.icon};         
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
 	 while (cnt<taskStatusList.size())
 		{
 		 HashMap<String, String> hm = new HashMap<String,String>();
