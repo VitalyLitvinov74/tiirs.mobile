@@ -4,31 +4,19 @@
 package ru.toir.mobile.rest;
 
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
 import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.Gson;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.TaskResult;
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
-import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
-import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
-import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
-import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
-import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
-import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
@@ -44,10 +32,17 @@ import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
+import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
+import ru.toir.mobile.serverapi.CriticalityType;
+import ru.toir.mobile.serverapi.Item;
+import ru.toir.mobile.serverapi.OrderStatus;
+import ru.toir.mobile.serverapi.Result;
+import ru.toir.mobile.serverapi.Status;
+import ru.toir.mobile.serverapi.Step;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -62,11 +57,32 @@ import android.util.Log;
 public class TaskProcessor {
 
 	private Context mContext;
-	private static final String TASK_GET_URL = "/ordershierarchy/";
+	private static final String TASK_GET_URL = "/api/ordershierarchy/";
 	private static final String TASK_CONFIRMATION_URL = "/confirm.php";
 	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
 	private String mServerUrl;
 
+	
+	ArrayList<Task> tasks = null;
+	ArrayList<EquipmentOperation> equipmentOperations = null;
+	ArrayList<Equipment> equipments = null;
+	ArrayList<TaskStatus> taskStatus = null;
+	ArrayList<CriticalType> criticalTypes = null;
+	ArrayList<OperationType> operationTypes = null;
+	ArrayList<EquipmentType> equipmentTypes = null;
+	ArrayList<OperationPattern> operationPatterns = null;
+	ArrayList<MeasureType> measureTypes = null;
+	ArrayList<OperationPatternStep> operationPatternSteps = null;
+	ArrayList<OperationPatternStepResult> operationPatternStepResults = null;
+	ArrayList<OperationStatus> operationStatus = null;
+
+	ArrayList<DocumentationType> documentationTypes = null;
+	ArrayList<OperationResult> operationResults = null;
+	ArrayList<EquipmentDocumentation> equipmentDocumentations = null;
+	ArrayList<MeasureValue> measureValues = null;
+	ArrayList<EquipmentOperationResult> equipmentOperationResults = null;
+	
+	
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
 
@@ -79,6 +95,24 @@ public class TaskProcessor {
 		if (mServerUrl.equals("")) {
 			throw new Exception("URL сервера не указан!");
 		}
+		
+		tasks = new ArrayList<Task>();
+		equipments = new ArrayList<Equipment>();
+		equipmentOperations = new ArrayList<EquipmentOperation>();
+		taskStatus = new ArrayList<TaskStatus>();
+		criticalTypes = new ArrayList<CriticalType>();
+		operationTypes = new ArrayList<OperationType>();
+		equipmentTypes = new ArrayList<EquipmentType>();
+		operationPatterns = new ArrayList<OperationPattern>();
+		documentationTypes = new ArrayList<DocumentationType>();
+		measureTypes = new ArrayList<MeasureType>();
+		operationResults = new ArrayList<OperationResult>();
+		operationPatternSteps = new ArrayList<OperationPatternStep>();
+		operationPatternStepResults = new ArrayList<OperationPatternStepResult>();
+		equipmentDocumentations = new ArrayList<EquipmentDocumentation>();
+		measureValues = new ArrayList<MeasureValue>();
+		equipmentOperationResults = new ArrayList<EquipmentOperationResult>();
+		operationStatus = new ArrayList<OperationStatus>();
 	}
 
 	/**
@@ -90,62 +124,29 @@ public class TaskProcessor {
 		URI requestUri = null;
 		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String jsonString = null;
-		JSONObject jsonRootObject = null;
+
 		try {
 			requestUri = new URI(mServerUrl + TASK_GET_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 			
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();
-			tList.add("Bearer " + token);
+			tList.add("bearer " + token);
 			headers.put("Authorization", tList);
 
-			Request request = new Request(Method.POST, requestUri, headers, null);
+			Request request = new Request(Method.GET, requestUri, headers, null);
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
-
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
-
-				jsonRootObject = new JSONObject(jsonString);
-				Iterator<?> iterator = jsonRootObject.keys();
-				while (iterator.hasNext()) {
-					String next = (String) iterator.next();
-					JSONArray elementArray = jsonRootObject.getJSONArray(next);
-					if (next.equals(TaskDBAdapter.TABLE_NAME)) {
-						ParseTask(elementArray);
-					} else if (next.equals(EquipmentDBAdapter.TABLE_NAME)) {
-						ParseEquipment(elementArray);
-					} else if (next.equals(EquipmentOperationDBAdapter.TABLE_NAME)) {
-						ParseEquipmentOperation(elementArray);
-					} else if (next.equals(TaskStatusDBAdapter.TABLE_NAME)) {
-						ParseTaskStatus(elementArray);
-					} else if (next.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
-						ParseCriticalType(elementArray);
-					} else if (next.equals(OperationTypeDBAdapter.TABLE_NAME)) {
-						ParseOperationType(elementArray);
-					} else if (next.equals(EquipmentTypeDBAdapter.TABLE_NAME)) {
-						ParseEquipmentType(elementArray);
-					} else if (next.equals(OperationPatternDBAdapter.TABLE_NAME)) {
-						ParseOperationPattern(elementArray);
-					} else if (next.equals(DocumentationTypeDBAdapter.TABLE_NAME)) {
-						ParseDocumentationType(elementArray);
-					} else if (next.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
-						ParseMeasureType(elementArray);
-					} else if (next.equals(OperationResultDBAdapter.TABLE_NAME)) {
-						ParseOperationResult(elementArray);
-					} else if (next.equals(OperationPatternStepDBAdapter.TABLE_NAME)) {
-						ParseOperationPatternStep(elementArray);
-					} else if (next.equals(OperationPatternStepResultDBAdapter.TABLE_NAME)) {
-						ParseOperationPatternStepResult(elementArray);
-					} else if (next.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
-						ParseEquipmentDocumentation(elementArray);
-					} else if (next.equals(MeasureValueDBAdapter.TABLE_NAME)) {
-						ParseMeasureValue(elementArray);
-					} else if (next.equals(EquipmentOperationResultDBAdapter.TABLE_NAME)) {
-						ParseEquipmentOperationResult(elementArray);
+				
+				ru.toir.mobile.serverapi.Task[] serverTasks = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Task[].class);
+				if (serverTasks != null) {
+					for (int i = 0; i < serverTasks.length; i++) {
+						tasks.add(getTask(serverTasks[i]));
 					}
 				}
+
 			} else {
 				return false;
 			}
@@ -158,6 +159,247 @@ public class TaskProcessor {
 
 	}
 	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param serverTask
+	 * @return
+	 */
+	public Task getTask(ru.toir.mobile.serverapi.Task serverTask) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss", Locale.ENGLISH);
+
+		Task item = new Task();
+		item.setUuid(serverTask.getId());
+		// TODO здесь нужно подставлять uuid текущего пользователя или получать его с сервера
+		item.setUsers_uuid("");
+		try {
+			item.setCreate_date(dateFormat.parse(serverTask.getCreatedAt()).getTime() / 1000);
+		} catch(ParseException e) {
+			e.printStackTrace();
+		}
+		try {
+			item.setModify_date(dateFormat.parse(serverTask.getChangedAt()).getTime() / 1000);
+		} catch(ParseException e) {
+			e.printStackTrace();
+		}
+		item.setClose_date(serverTask.getCloseDate());
+		
+		item.setTask_status_uuid(serverTask.getOrderStatus().getId());
+		// добавляем объект статуса наряда
+		taskStatus.add(getTaskStatus(serverTask.getOrderStatus()));
+		
+		List<Item> operations = serverTask.getItems();
+		if (operations != null) {
+			for (int i = 0; i < operations.size(); i++) {
+				equipmentOperations.add(getOperation(operations.get(i)));
+			}
+		}
+
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param status
+	 * @return
+	 */
+	public TaskStatus getTaskStatus(OrderStatus status) {
+		TaskStatus item = new TaskStatus();
+		item.setUuid(status.getId());
+		item.setTitle(status.getTitle());
+		return item;
+	}
+
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param operation
+	 * @return
+	 */
+	public EquipmentOperation getOperation(Item operation) {
+		EquipmentOperation item = new EquipmentOperation();
+		
+		item.setUuid(operation.getId());
+		
+		// TODO нужен uuid наряда
+		item.setTask_uuid("");
+		
+		item.setEquipment_uuid(operation.getEquipment().getId());
+		// создаём объект оборудования
+		equipments.add(getEquipment(operation.getEquipment()));
+		
+		item.setOperation_type_uuid(operation.getOperationType().getId());
+		// создаём объект типа операции
+		operationTypes.add(getOperationType(operation.getOperationType()));
+		
+		item.setOperation_pattern_uuid(operation.getOperationPattern().getId());
+		// создаём объект шаблона операции
+		operationPatterns.add(getOperationPattern(operation.getOperationPattern()));
+		
+		item.setOperation_status_uuid(operation.getStatus().getId());
+		// создаём объект статуса операции
+		operationStatus.add(getOperationStatus(operation.getStatus()));
+
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param status
+	 * @return
+	 */
+	public OperationStatus getOperationStatus(Status status) {
+		// TODO Изменить входящий параметр на статус операции(когда с сервера будут приходит правильные данные)
+		OperationStatus item = new OperationStatus();
+		item.setUuid(status.getId());
+		item.setTitle(status.getTitle());
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param pattern
+	 * @return
+	 */
+	public OperationPattern getOperationPattern(ru.toir.mobile.serverapi.OperationPattern pattern) {
+		
+		OperationPattern item = new OperationPattern();
+		
+		item.setUuid(pattern.getId());
+		item.setTitle(pattern.getTitle());
+
+		// создаём объекты шагов шаблона выполнения операции
+		List<Step> steps = pattern.getSteps();
+		if (steps != null) {
+			for (int i = 0; i < steps.size(); i++) {
+				operationPatternSteps.add(getStep(steps.get(i)));
+			}
+		}
+		
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param step
+	 * @return
+	 */
+	public OperationPatternStep getStep(Step step) {
+		OperationPatternStep item = new OperationPatternStep();
+		item.setUuid(step.getId());
+		// TODO нужен uuid шаблона операции
+		item.setOperation_pattern_uuid("");
+		item.setDescription(step.getDescription());
+		// TODO проверить что приходит с сервера, т.к. вместо строки - объект
+		item.setImage((String)step.getImagePath());
+		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
+		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
+		// TODO уточнить что за поле, сказать диме чтоб завёл
+		item.setName("");
+		
+		// создаём объекты варантов результатов шагов
+		List<Result> results = step.getResults();
+		if (results != null) {
+			for (int i = 0; i < results.size(); i++) {
+				operationPatternStepResults.add(getStepResult(results.get(i)));
+			} 
+		}
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param result
+	 * @return
+	 */
+	public OperationPatternStepResult getStepResult(Result result) {
+		OperationPatternStepResult item = new OperationPatternStepResult();
+		item.setUuid(result.getId());
+		// TODO нужен uuid шага шаблона
+		item.setOperation_pattern_step_uuid("");
+		item.setNext_operation_pattern_step_uuid(result.getNextPatternStep().getId());
+		item.setTitle(result.getTitle());
+		item.setMeasure_type_uuid(result.getMeasureType().getId());
+		// создаём объект варианта измерения
+		measureTypes.add(getMeasureType(result.getMeasureType()));
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param type
+	 * @return
+	 */
+	public MeasureType getMeasureType(ru.toir.mobile.serverapi.MeasureType type) {
+		MeasureType item = new MeasureType();
+		item.setUuid(type.getId());
+		item.setTitle(type.getTitle());
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param operationType
+	 * @return
+	 */
+	public OperationType getOperationType(ru.toir.mobile.serverapi.OperationType operationType) {
+		OperationType item = new OperationType();
+		item.setUuid(operationType.getId());
+		item.setTitle(operationType.getTitle());
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param equipment
+	 * @return
+	 */
+	public Equipment getEquipment(ru.toir.mobile.serverapi.Equipment equipment) {
+		Equipment item = new Equipment();
+		item.setUuid(equipment.getId());
+		item.setTitle(equipment.getName());
+		
+		item.setEquipment_type_uuid(equipment.getEquipmentType().getId());
+		// создаём объект типа оборудования
+		equipmentTypes.add(getEquipmentType(equipment.getEquipmentType()));
+		
+		item.setCritical_type_uuid(equipment.getCriticalityType().getId());
+		// создаём объект типа критичности оборудования
+		criticalTypes.add(getCriticalType(equipment.getCriticalityType()));
+		
+		// TODO нужна дата ввода оборудования в эксплуатацию
+		item.setStart_date(0);
+		
+		item.setLocation(equipment.getGeoCoordinates().getLatitude() + " " + equipment.getGeoCoordinates().getLongitude());
+		
+		// TODO нужна метка оборудования
+		item.setTag_id("");
+		
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param type
+	 * @return
+	 */
+	public EquipmentType getEquipmentType(ru.toir.mobile.serverapi.EquipmentType type) {
+		EquipmentType item = new EquipmentType();
+		item.setUuid(type.getId());
+		item.setTitle(type.getTitle());
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param type
+	 * @return
+	 */
+	public CriticalType getCriticalType(CriticalityType type) {
+		CriticalType item = new CriticalType();
+		item.setUuid(type.getId());
+		item.setType(type.getValue());
+		return item;
+	}
+
 	/**
 	 * Отправка списка uuid нарядов со статусом "Новый" для подтверждения о получении.
 	 * В ответ с сервера отправляется список нарядов которые подтверждны.
@@ -351,475 +593,6 @@ public class TaskProcessor {
 					item.setTask_status_uuid(TaskStatusDBAdapter.STATUS_UUID_SENDED);
 					adapter.replace(item);
 				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseOperationPatternStepResult(JSONArray array) {
-		int elementCount = array.length();
-		OperationPatternStepResultDBAdapter adapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				OperationPatternStepResult item = new OperationPatternStepResult();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_UUID_NAME));
-				item.setOperation_pattern_step_uuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_OPERATION_PATTERN_STEP_UUID_NAME));
-				item.setNext_operation_pattern_step_uuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME));
-				item.setTitle(value.getString(OperationPatternStepResultDBAdapter.FIELD_TITLE_NAME));
-				item.setMeasure_type_uuid(value.getString(OperationPatternStepResultDBAdapter.FIELD_MEASURE_TYPE_UUID_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseOperationPatternStep(JSONArray array) {
-		int elementCount = array.length();
-		OperationPatternStepDBAdapter adapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				OperationPatternStep item = new OperationPatternStep();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(OperationPatternStepDBAdapter.FIELD_UUID_NAME));
-				item.setOperation_pattern_uuid(value.getString(OperationPatternStepDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME));
-				item.setDescription(value.getString(OperationPatternStepDBAdapter.FIELD_DESCRIPTION_NAME));
-				item.setImage(value.getString(OperationPatternStepDBAdapter.FIELD_IMAGE_NAME));
-				item.setFirst_step(value.getInt(OperationPatternStepDBAdapter.FIELD_FIRST_STEP_NAME) == 0 ? false : true);
-				item.setLast_step(value.getInt(OperationPatternStepDBAdapter.FIELD_LAST_STEP_NAME) == 0 ? false : true);
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseOperationResult(JSONArray array) {
-		int elementCount = array.length();
-		OperationResultDBAdapter adapter = new OperationResultDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				OperationResult item = new OperationResult();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(OperationResultDBAdapter.FIELD_UUID_NAME));
-				item.setOperation_type_uuid(value.getString(OperationResultDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME));
-				item.setTitle(value.getString(OperationResultDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseMeasureType(JSONArray array) {
-		int elementCount = array.length();
-		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				MeasureType item = new MeasureType();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(DocumentationTypeDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(DocumentationTypeDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseDocumentationType(JSONArray array) {
-		int elementCount = array.length();
-		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				DocumentationType item = new DocumentationType();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(DocumentationTypeDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(DocumentationTypeDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseOperationPattern(JSONArray array) {
-		int elementCount = array.length();
-		OperationPatternDBAdapter adapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				OperationPattern item = new OperationPattern();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(EquipmentTypeDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(EquipmentTypeDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseEquipmentType(JSONArray array) {
-		int elementCount = array.length();
-		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				EquipmentType item = new EquipmentType();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(EquipmentTypeDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(EquipmentTypeDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseOperationType(JSONArray array) {
-		int elementCount = array.length();
-		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				OperationType item = new OperationType();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(OperationTypeDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(OperationTypeDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseCriticalType(JSONArray array) {
-		int elementCount = array.length();
-		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				CriticalType item = new CriticalType();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(CriticalTypeDBAdapter.FIELD_UUID_NAME));
-				item.setType(value.getInt(CriticalTypeDBAdapter.FIELD_TYPE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseTaskStatus(JSONArray array) {
-		int elementCount = array.length();
-		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				TaskStatus item = new TaskStatus();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(TaskStatusDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(TaskStatusDBAdapter.FIELD_TITLE_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseEquipmentOperation(JSONArray array) {
-		int elementCount = array.length();
-		EquipmentOperationDBAdapter adapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				EquipmentOperation item = new EquipmentOperation();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(EquipmentOperationDBAdapter.FIELD_UUID_NAME));
-				item.setTask_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_TASK_UUID_NAME));
-				item.setEquipment_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID_NAME));
-				item.setOperation_type_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME));
-				item.setOperation_pattern_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME));
-				item.setOperation_status_uuid(value.getString(EquipmentOperationDBAdapter.FIELD_OPERATION_STATUS_UUID_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseEquipment(JSONArray array) {
-		int elementCount = array.length();
-		EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				Equipment item = new Equipment();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(EquipmentDBAdapter.FIELD_UUID_NAME));
-				item.setTitle(value.getString(EquipmentDBAdapter.FIELD_TITLE_NAME));
-				item.setEquipment_type_uuid(value.getString(EquipmentDBAdapter.FIELD_EQUIPMENT_TYPE_UUID_NAME));
-				item.setCritical_type_uuid(value.getString(EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME));
-				item.setStart_date(value.getLong(EquipmentDBAdapter.FIELD_START_DATE_NAME));
-				item.setLocation(value.getString(EquipmentDBAdapter.FIELD_LOCATION_NAME));
-				item.setTag_id(value.getString(EquipmentDBAdapter.FIELD_TAG_ID_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean ParseTask(JSONArray array) {
-
-		int elementCount = array.length();
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-
-			for (int i = 0; i < elementCount; i++) {
-				Task item = new Task();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(TaskDBAdapter.FIELD_UUID_NAME));
-				item.setUsers_uuid(value.getString(TaskDBAdapter.FIELD_USER_UUID_NAME));
-				item.setCreate_date(value.getLong(TaskDBAdapter.FIELD_CREATE_DATE_NAME));
-				item.setModify_date(value.getLong(TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
-				item.setClose_date(value.getLong(TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
-				item.setTask_status_uuid(value.getString(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	private boolean ParseEquipmentOperationResult(JSONArray array) {
-
-		int elementCount = array.length();
-		EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-
-			for (int i = 0; i < elementCount; i++) {
-				EquipmentOperationResult item = new EquipmentOperationResult();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(EquipmentOperationResultDBAdapter.FIELD_UUID_NAME));
-				item.setEquipment_operation_uuid(value.getString(EquipmentOperationResultDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID_NAME));
-				item.setStart_date(value.getLong(EquipmentOperationResultDBAdapter.FIELD_START_DATE_NAME));
-				item.setEnd_date(value.getLong(EquipmentOperationResultDBAdapter.FIELD_END_DATE_NAME));
-				item.setOperation_result_uuid(value.getString(EquipmentOperationResultDBAdapter.FIELD_OPERATION_RESULT_UUID_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-	
-	private boolean ParseEquipmentDocumentation(JSONArray array) {
-
-		int elementCount = array.length();
-		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				EquipmentDocumentation item = new EquipmentDocumentation();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(EquipmentDocumentationDBAdapter.FIELD_UUID_NAME));
-				item.setEquipment_uuid(value.getString(EquipmentDocumentationDBAdapter.FIELD_EQUIPMENT_UUID_NAME));
-				item.setDocumentation_type_uuid(value.getString(EquipmentDocumentationDBAdapter.FIELD_DOCUMENTATION_TYPE_UUID_NAME));
-				item.setTitle(value.getString(EquipmentDocumentationDBAdapter.FIELD_TITLE_NAME));
-				item.setPath(value.getString(EquipmentDocumentationDBAdapter.FIELD_PATH_NAME));
-				adapter.replace(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			adapter.close();
-		}
-		
-		return true;
-	}
-
-	private boolean ParseMeasureValue(JSONArray array) {
-
-		int elementCount = array.length();
-		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(new TOiRDatabaseContext(
-				mContext)).open();
-
-		try {
-			for (int i = 0; i < elementCount; i++) {
-				MeasureValue item = new MeasureValue();
-				JSONObject value = array.getJSONObject(i);
-				item.setUuid(value.getString(MeasureValueDBAdapter.FIELD_UUID_NAME));
-				item.setEquipment_operation_uuid(value.getString(MeasureValueDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID_NAME));
-				item.setOperation_pattern_step_result(value.getString(MeasureValueDBAdapter.FIELD_OPERATION_PATTERN_STEP_RESULT_NAME));
-				item.setDate(value.getInt(MeasureValueDBAdapter.FIELD_DATE_NAME));
-				item.setValue(value.getString(MeasureValueDBAdapter.FIELD_VALUE_NAME));
-				adapter.replace(item);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

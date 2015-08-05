@@ -8,7 +8,6 @@ package ru.toir.mobile.db.tables;
  *
  */
 public class Token {
-	private long _id;
 	private String token_type;
 	private String access_token;
 	private int expires_in;
@@ -25,8 +24,7 @@ public class Token {
 	/**
 	 * 
 	 */
-	public Token(long _id, String token_type, String access_token, int expires_in, String userName, String issued, String expires) {
-		this._id = _id;
+	public Token(String token_type, String access_token, int expires_in, String userName, String issued, String expires) {
 		this.token_type = token_type;
 		this.access_token = access_token;
 		this.expires_in = expires_in;
@@ -117,20 +115,6 @@ public class Token {
 	 */
 	public void setExpires(String expires) {
 		this.expires = expires;
-	}
-
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void set_id(long _id) {
-		this._id = _id;
 	}
 
 }

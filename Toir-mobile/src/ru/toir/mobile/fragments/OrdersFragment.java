@@ -9,6 +9,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.adapters.TokenDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
@@ -71,7 +72,9 @@ public class OrdersFragment extends Fragment {
 				TaskServiceHelper tsh = new TaskServiceHelper(getActivity()
 						.getApplicationContext(),
 						TaskServiceProvider.Actions.ACTION_GET_TASK);
-				tsh.GetTask("xyzxyzxyzxyz");
+				TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new TOiRDatabaseContext(getActivity())).open();
+				tsh.GetTask(tokenDBAdapter.getTokenByUserName("ivanov").getAccess_token());
+				tokenDBAdapter.close();
 			}
 		});
 
