@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 //import com.google.zxing.integration.android.IntentIntegrator;
 
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
@@ -83,7 +84,7 @@ public class OrdersFragment extends Fragment {
 	}
 
 	private void initView() {
-		String tagId = "01234567";
+		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext())).open();
 		Users user = users.getUserByTagId(tagId);
@@ -239,7 +240,7 @@ public class OrdersFragment extends Fragment {
 	private void initTaskEquipment(String order_uuid) {
 		final String order = order_uuid;
 		// tl_task = (TableLayout) view.findViewById(R.id.TableLayout01);
-		String tagId = "01234567";
+		String tagId = AuthorizedUser.getInstance().getTagId();
 		tasks_uuid.clear();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext())).open();

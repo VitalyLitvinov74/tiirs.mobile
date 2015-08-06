@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import org.json.JSONArray;
 import com.google.gson.Gson;
+
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.TaskResult;
@@ -139,7 +141,9 @@ public class TaskProcessor {
 	 */
 	public boolean GetTask(Bundle bundle) {
 		URI requestUri = null;
-		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+		//String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+		String token = AuthorizedUser.getInstance().getToken();
+
 		String jsonString = null;
 
 		try {
@@ -591,9 +595,7 @@ public class TaskProcessor {
 		
 		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		
-		// TODO необходимо реализовать хранение данных по текущему аутентифицированному пользователю и данные для запроса брать на "ходу"
-		String user_uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
-
+		String user_uuid = AuthorizedUser.getInstance().getUuid();
 		ArrayList<Task> tasks;
 		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
 		// TODO необходимо решить и реализовать выборку не отправленных нарядов, либо по текущему пользователю либо все какие есть неотправленные.

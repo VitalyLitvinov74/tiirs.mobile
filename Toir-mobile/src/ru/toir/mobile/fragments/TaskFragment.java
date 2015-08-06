@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
@@ -140,7 +141,7 @@ public class TaskFragment extends Fragment {
 	}
 
 	private void FillListViewTasks(String type, String sort) {
-		String tagId = "01234567";
+		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext())).open();
 		Users user = users.getUserByTagId(tagId);

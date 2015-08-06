@@ -102,7 +102,7 @@ public class MainActivity extends FragmentActivity {
 		init();
 
 		// this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+		
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
 		if (savedInstanceState != null) {
 			isLogged = savedInstanceState.getBoolean("isLogged");
@@ -225,6 +225,7 @@ public class MainActivity extends FragmentActivity {
 			// чтения метки всем кто сейчас заинтересован в результате операции
 			int action = data.getIntExtra("action", 0);
 			switch (action) {
+			// TODO заменить цифры на читаемые константы операций для которых считывается метка
 			case 1:
 				// TODO запросить наличие/токен на сервере, по результату запроса принимать решение что делать дальше 
 				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(getApplicationContext(), TokenServiceProvider.Actions.ACTION_GET_TOKEN);
@@ -246,6 +247,10 @@ public class MainActivity extends FragmentActivity {
 					*/
 				} else {
 					Log.d(TAG, user.toString());
+					AuthorizedUser aUser = AuthorizedUser.getInstance();
+					aUser.setTagId(tagId);
+					aUser.setUuid(user.getUuid());
+
 					isLogged = true;
 					setMainLayout();
 				}
