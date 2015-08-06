@@ -99,7 +99,7 @@ public class TaskProcessor {
 	ArrayList<EquipmentOperationResult> equipmentOperationResults = null;
 	
 	// TODO удалить когда с сервера будут приезжать метки для оборудования
-	int tagId = 2;
+	int tagId = 1;
 	
 	
 	public TaskProcessor(Context context) throws Exception {
@@ -499,7 +499,7 @@ public class TaskProcessor {
 		item.setLongitude(equipment.getGeoCoordinates().getLongitude());
 		
 		// TODO нужна метка оборудования
-		item.setTag_id("0000000" + tagId);
+		item.setTag_id("000000" + tagId);
 		tagId++;
 		
 		return item;

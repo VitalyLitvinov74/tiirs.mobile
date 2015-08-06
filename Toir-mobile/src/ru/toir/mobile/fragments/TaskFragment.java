@@ -7,7 +7,6 @@ import java.util.List;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
@@ -28,7 +27,6 @@ import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -232,28 +230,24 @@ public class TaskFragment extends Fragment {
 				.getAllItems();
 		spinner_reference_adapter.clear();
 		spinner_type_adapter.clear();
-		int cnt = 0;
 		equipment_operation_uuid.clear();
 		equipment_critical_uuid.clear();
 		spinner_reference_adapter.add("Все операции");
-		cnt++;
-		while (cnt <= operationTypeList.size()) {
-			spinner_reference_adapter.add(operationTypeList.get(cnt - 1)
-					.getTitle());
-			equipment_operation_uuid.add(operationTypeList.get(cnt - 1)
-					.getUuid());
-			cnt++;
+
+		for (OperationType operationType : operationTypeList) {
+			spinner_reference_adapter.add(operationType.getTitle());
+			equipment_operation_uuid.add(operationType.getUuid());
 		}
-		cnt = 0;
+
 		spinner_type_adapter.add("Любая значимость");
-		cnt++;
-		while (cnt <= criticalTypeList.size()) {
-			spinner_type_adapter.add("Критичность: "
-					+ criticalTypeList.get(cnt - 1).getType());
-			equipment_critical_uuid.add(operationTypeList.get(cnt - 1)
-					.getUuid());
-			cnt++;
+		for (CriticalType criticalType : criticalTypeList) {
+			spinner_type_adapter.add("Критичность: " + criticalType.getType());
 		}
+
+		for (OperationType operationType : operationTypeList) {
+			equipment_critical_uuid.add(operationType.getUuid());
+		}
+
 		spinner_reference_adapter
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner_type_adapter
