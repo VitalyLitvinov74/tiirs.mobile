@@ -11,12 +11,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
 import org.json.JSONArray;
 import com.google.gson.Gson;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.TaskResult;
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
@@ -83,6 +97,9 @@ public class TaskProcessor {
 	ArrayList<OperationResult> operationResults = null;
 	ArrayList<MeasureValue> measureValues = null;
 	ArrayList<EquipmentOperationResult> equipmentOperationResults = null;
+	
+	// TODO удалить когда с сервера будут приезжать метки для оборудования
+	int tagId = 2;
 	
 	
 	public TaskProcessor(Context context) throws Exception {
@@ -160,9 +177,112 @@ public class TaskProcessor {
 		}
 		
 		// всё полученные данные заносим в базу
+		saveAllData();
 		
 		return true;
 
+	}
+	
+	public void saveAllData() {
+		Set<String> set;
+		
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = tasks.keySet();
+		for (String uuid: set) {
+			taskDBAdapter.replace(tasks.get(uuid));
+		}
+		taskDBAdapter.close();
+		
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = equipments.keySet();
+		for (String uuid: set) {
+			equipmentDBAdapter.replace(equipments.get(uuid));
+		}
+		equipmentDBAdapter.close();
+		
+		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = equipmentOperations.keySet();
+		for (String uuid: set) {
+			operationDBAdapter.replace(equipmentOperations.get(uuid));
+		}
+		operationDBAdapter.close();
+		
+		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = taskStatus.keySet();
+		for (String uuid: set) {
+			taskStatusDBAdapter.replace(taskStatus.get(uuid));
+		}
+		taskStatusDBAdapter.close();
+		
+		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = criticalTypes.keySet();
+		for (String uuid: set) {
+			criticalTypeDBAdapter.replace(criticalTypes.get(uuid));
+		}
+		criticalTypeDBAdapter.close();
+		
+		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = operationTypes.keySet();
+		for (String uuid: set) {
+			operationTypeDBAdapter.replace(operationTypes.get(uuid));
+		}
+		operationDBAdapter.close();
+		
+		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = equipmentTypes.keySet();
+		for (String uuid: set) {
+			equipmentTypeDBAdapter.replace(equipmentTypes.get(uuid));
+		}
+		equipmentDBAdapter.close();
+		
+		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = operationPatterns.keySet();
+		for (String uuid: set) {
+			operationPatternDBAdapter.replace(operationPatterns.get(uuid));
+		}
+		operationPatternDBAdapter.close();
+		
+		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = documentationTypes.keySet();
+		for (String uuid: set) {
+			documentationTypeDBAdapter.replace(documentationTypes.get(uuid));
+		}
+		documentationTypeDBAdapter.close();
+		
+		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = measureTypes.keySet();
+		for (String uuid: set) {
+			measureTypeDBAdapter.replace(measureTypes.get(uuid));
+		}
+		measureTypeDBAdapter.close();
+		
+		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = operationPatternSteps.keySet();
+		for (String uuid: set) {
+			patternStepDBAdapter.replace(operationPatternSteps.get(uuid));
+		}
+		patternStepDBAdapter.close();
+		
+		OperationPatternStepResultDBAdapter patternStepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = operationPatternStepResults.keySet();
+		for (String uuid: set) {
+			patternStepResultDBAdapter.replace(operationPatternStepResults.get(uuid));
+		}
+		patternStepResultDBAdapter.close();
+		
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = equipmentDocumentations.keySet();
+		for (String uuid: set) {
+			documentationDBAdapter.replace(equipmentDocumentations.get(uuid));
+		}
+		documentationDBAdapter.close();
+		
+		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = operationStatus.keySet();
+		for (String uuid: set) {
+			operationStatusDBAdapter.replace(operationStatus.get(uuid));
+		}
+		operationStatusDBAdapter.close();
 	}
 	
 	/**
@@ -176,7 +296,7 @@ public class TaskProcessor {
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
 		// TODO здесь нужен uuid пользователя, с сервера пока не приходит
-		item.setUsers_uuid("");
+		item.setUsers_uuid("4462ed77-9bf0-4542-b127-f4ecefce49da");
 		try {
 			item.setCreate_date(dateFormat.parse(serverTask.getCreatedAt()).getTime() / 1000);
 		} catch(ParseException e) {
@@ -354,6 +474,7 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public Equipment getEquipment(ru.toir.mobile.serverapi.Equipment equipment) {
+
 		Equipment item = new Equipment();
 		item.setUuid(equipment.getId());
 		item.setTitle(equipment.getName());
@@ -378,7 +499,8 @@ public class TaskProcessor {
 		item.setLongitude(equipment.getGeoCoordinates().getLongitude());
 		
 		// TODO нужна метка оборудования
-		item.setTag_id("");
+		item.setTag_id("0000000" + tagId);
+		tagId++;
 		
 		return item;
 	}

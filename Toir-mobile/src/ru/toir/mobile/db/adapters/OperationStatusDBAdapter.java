@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -117,4 +119,30 @@ public class OperationStatusDBAdapter {
 			}
 		return arrayList;
 	}
+	
+	/**
+	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * @param uuid
+	 * @param title
+	 * @return
+	 */
+	public long replace(String uuid, String title) {
+		long id;
+		ContentValues values = new ContentValues();
+		values.put(FIELD_UUID_NAME, uuid);
+		values.put(FIELD_TITLE_NAME, title);
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
+	}
+
+	/**
+	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * 
+	 * @param status
+	 * @return long id столбца или -1 если не удалось добавить запись
+	 */
+	public long replace(OperationStatus status) {
+		return replace(status.getUuid(), status.getTitle());
+	}
+
 }
