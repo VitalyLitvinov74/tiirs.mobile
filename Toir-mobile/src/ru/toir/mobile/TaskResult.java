@@ -29,6 +29,8 @@ public class TaskResult {
 	public ArrayList<EquipmentOperationResult> mEquipmentOperationResults;
 	public ArrayList<MeasureValue> mMeasureValues;
 
+	// TODO переписать, геттеры, сеттеры, чтоб метод возвращал объект класса
+	
 	/**
 	 * 
 	 */

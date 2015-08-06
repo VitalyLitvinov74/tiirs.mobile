@@ -83,10 +83,8 @@ public class MainActivity extends FragmentActivity {
 							ProcessorService.Extras.RESULT_EXTRA, false);
 					Log.d(TAG, "" + result);
 					if (result == true) {
-						TaskServiceHelper tsh = new TaskServiceHelper(
-								getApplicationContext(),
-								TaskServiceProvider.Actions.ACTION_TASK_CONFIRM);
-						tsh.TaskConfirmation("xyzxyzxyzxyz");
+						// нужно видимо что-то дёрнуть чтоб уведомить о том что наряд(ы) получены
+						// вероятно нужно сделать попытку отправить на сервер информацию о полученых нарядах(которые изменили свой статус на "В работе") 
 					} else {
 						// если наряды по какой-то причине не удалось получить,
 						// видимо нужно вывести какое-то сообщение
