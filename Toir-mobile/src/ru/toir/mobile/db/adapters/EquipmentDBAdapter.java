@@ -13,55 +13,56 @@ import ru.toir.mobile.db.tables.Equipment;
 
 /**
  * @author olejek
- * <p>Класс для работы с оборудованием</p>
- *
+ *         <p>
+ *         Класс для работы с оборудованием
+ *         </p>
+ * 
  */
 public class EquipmentDBAdapter {
-		
+
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	private final Context mContext;
 
 	public static final String TABLE_NAME = "equipment";
-	
+
 	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
 	public static final String FIELD_EQUIPMENT_TYPE_UUID_NAME = "equipment_type_uuid";
 	public static final String FIELD_CRITICAL_TYPE_UUID_NAME = "critical_type_uuid";
 	public static final String FIELD_START_DATE_NAME = "start_date";
-	public static final String FIELD_LOCATION_NAME = "location";
+	public static final String FIELD_LATITUDE_NAME = "latitude";
+	public static final String FIELD_LONGITUDE_NAME = "longitude";
 	public static final String FIELD_TAG_ID_NAME = "tag_id";
-	
-	private static String mColumns[] = {
-		FIELD__ID_NAME,
-		FIELD_UUID_NAME,
-		FIELD_TITLE_NAME,
-		FIELD_EQUIPMENT_TYPE_UUID_NAME,
-		FIELD_CRITICAL_TYPE_UUID_NAME,
-		FIELD_START_DATE_NAME,
-		FIELD_LOCATION_NAME,
-		FIELD_TAG_ID_NAME};
-	
+
+	private static String mColumns[] = { FIELD__ID_NAME, FIELD_UUID_NAME,
+			FIELD_TITLE_NAME, FIELD_EQUIPMENT_TYPE_UUID_NAME,
+			FIELD_CRITICAL_TYPE_UUID_NAME, FIELD_START_DATE_NAME,
+			FIELD_LATITUDE_NAME, FIELD_LONGITUDE_NAME, FIELD_TAG_ID_NAME };
+
 	/**
 	 * @param context
 	 * @return EquipmentDBAdapter
 	 */
-	public EquipmentDBAdapter(Context context){
+	public EquipmentDBAdapter(Context context) {
 		this.mContext = context;
 	}
-	
+
 	/**
 	 * Получаем объект базы данных
+	 * 
 	 * @return EquipmentDBAdapter
 	 * @throws SQLException
 	 */
 	public EquipmentDBAdapter open() throws SQLException {
-		this.mDbHelper = new DatabaseHelper(this.mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		this.mDbHelper = new DatabaseHelper(this.mContext,
+				TOiRDBAdapter.getDbName(), null,
+				TOiRDBAdapter.getAppDbVersion());
 		this.mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
-	
+
 	/**
 	 * Закрываем базу данных
 	 */
@@ -69,9 +70,12 @@ public class EquipmentDBAdapter {
 		mDb.close();
 		mDbHelper.close();
 	}
-	
+
 	/**
-	 * <p>Возвращает все записи из таблицы equipment</p>
+	 * <p>
+	 * Возвращает все записи из таблицы equipment
+	 * </p>
+	 * 
 	 * @return list
 	 */
 	public ArrayList<Equipment> getAllItems(String type, String critical_type) {
@@ -79,53 +83,51 @@ public class EquipmentDBAdapter {
 		Cursor cursor;
 		// можем или отобрать все оборудование или только определенного типа
 		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
-		
-		if (type.equals("") && !critical_type.equals(""))
-			{
-			 cursor.close();
-			 cursor = mDb.query(TABLE_NAME, mColumns, FIELD_CRITICAL_TYPE_UUID_NAME + "=?", new String[]{critical_type}, null, null, null);
+
+		if (type.equals("") && !critical_type.equals("")) {
+			cursor.close();
+			cursor = mDb.query(TABLE_NAME, mColumns,
+					FIELD_CRITICAL_TYPE_UUID_NAME + "=?",
+					new String[] { critical_type }, null, null, null);
+		}
+		if (!type.equals("") && critical_type.equals("")) {
+			cursor.close();
+			cursor = mDb.query(TABLE_NAME, mColumns,
+					FIELD_EQUIPMENT_TYPE_UUID_NAME + "=?",
+					new String[] { type }, null, null, null);
+		}
+		if (!type.equals("") && !critical_type.equals("")) {
+			cursor.close();
+			cursor = mDb.query(TABLE_NAME, mColumns,
+					FIELD_CRITICAL_TYPE_UUID_NAME + "=? AND "
+							+ FIELD_EQUIPMENT_TYPE_UUID_NAME + "=?",
+					new String[] { critical_type, type }, null, null, null);
+		}
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			while (true) {
+				arrayList.add(getItem(cursor));
+				if (cursor.isLast())
+					break;
+				cursor.moveToNext();
 			}
-		if (!type.equals("") && critical_type.equals(""))
-			{
-			 cursor.close();
-			 cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_TYPE_UUID_NAME + "=?", new String[]{type}, null, null, null);
-			}
-		if (!type.equals("") && !critical_type.equals(""))
-			{
-			 cursor.close();
-			 cursor = mDb.query(TABLE_NAME, mColumns, FIELD_CRITICAL_TYPE_UUID_NAME + "=? AND " + FIELD_EQUIPMENT_TYPE_UUID_NAME + "=?", new String[]{critical_type,type}, null, null, null);
-			}
-		if (cursor.getCount()>0)
-			{
-			 cursor.moveToFirst();
-			 while (true)		
-			 	{			 
-				 Equipment equip = new Equipment(
-					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME)),
-					cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_LOCATION_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME)));
-				 	arrayList.add(equip);
-				 	if (cursor.isLast()) break;
-				 	cursor.moveToNext();
-			 	}
-			}
+		}
 		cursor.close();
 		return arrayList;
 	}
-	
+
 	/**
-	 * <p>Возвращает запись из таблицы equipment</p>
+	 * <p>
+	 * Возвращает запись из таблицы equipment
+	 * </p>
+	 * 
 	 * @param uuid
 	 * @return Equipment
 	 */
 	public Equipment getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
 			return getItem(cursor);
 		}
@@ -133,25 +135,40 @@ public class EquipmentDBAdapter {
 	}
 
 	/**
-	 * <p>Возвращает Equipment</p>
+	 * <p>
+	 * Возвращает Equipment
+	 * </p>
+	 * 
 	 * @param uuid
 	 * @return Equipment
 	 */
 	public Equipment getItem(Cursor cursor) {
 		Equipment equipment = new Equipment();
 		equipment.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
-		equipment.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
-		equipment.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
-		equipment.setEquipment_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME)));
-		equipment.setCritical_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME)));
-		equipment.setStart_date(cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE_NAME)));
-		equipment.setLocation(cursor.getString(cursor.getColumnIndex(FIELD_LOCATION_NAME)));
-		equipment.setTag_id(cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME)));
+		equipment.setUuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_UUID_NAME)));
+		equipment.setTitle(cursor.getString(cursor
+				.getColumnIndex(FIELD_TITLE_NAME)));
+		equipment.setEquipment_type_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME)));
+		equipment.setCritical_type_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME)));
+		equipment.setStart_date(cursor.getLong(cursor
+				.getColumnIndex(FIELD_START_DATE_NAME)));
+		equipment.setLatitude(cursor.getFloat(cursor
+				.getColumnIndex(FIELD_LATITUDE_NAME)));
+		equipment.setLongitude(cursor.getFloat(cursor
+				.getColumnIndex(FIELD_LONGITUDE_NAME)));
+		equipment.setTag_id(cursor.getString(cursor
+				.getColumnIndex(FIELD_TAG_ID_NAME)));
 		return equipment;
 	}
 
 	/**
-	 * <p>Добавляет/заменяет запись в таблице equipments</p>
+	 * <p>
+	 * Добавляет/заменяет запись в таблице equipments
+	 * </p>
+	 * 
 	 * @param uuid
 	 * @param title
 	 * @param equipment_type_uuid
@@ -161,84 +178,113 @@ public class EquipmentDBAdapter {
 	 * @param tag_id
 	 * @return
 	 */
-	public long replace(String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id){
+	public long replace(String uuid, String title, String equipment_type_uuid,
+			String critical_type_uuid, long start_date, float latitude,
+			float longitude, String tag_id) {
 		ContentValues values = new ContentValues();
 		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);
-		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_TYPE_UUID_NAME, equipment_type_uuid);
-		values.put(EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME, critical_type_uuid);
+		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_TYPE_UUID_NAME,
+				equipment_type_uuid);
+		values.put(EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME,
+				critical_type_uuid);
 		values.put(EquipmentDBAdapter.FIELD_START_DATE_NAME, start_date);
-		values.put(EquipmentDBAdapter.FIELD_LOCATION_NAME, location);
+		values.put(EquipmentDBAdapter.FIELD_LATITUDE_NAME, latitude);
+		values.put(EquipmentDBAdapter.FIELD_LONGITUDE_NAME, longitude);
 		values.put(EquipmentDBAdapter.FIELD_TAG_ID_NAME, tag_id);
 		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);
 	}
-	
+
 	/**
-	 * <p>Добавляет/заменяет запись в таблице equipments</p>
+	 * <p>
+	 * Добавляет/заменяет запись в таблице equipments
+	 * </p>
+	 * 
 	 * @param equipment
 	 * @return
 	 */
 	public long replace(Equipment equipment) {
-		return replace(equipment.getUuid(), equipment.getTitle(), equipment.getEquipment_type_uuid(), equipment.getCritical_type_uuid(), equipment.getStart_date(), equipment.getLocation(), equipment.getTag_id());
+		return replace(equipment.getUuid(), equipment.getTitle(),
+				equipment.getEquipment_type_uuid(),
+				equipment.getCritical_type_uuid(), equipment.getStart_date(),
+				equipment.getLatitude(), equipment.getLongitude(),
+				equipment.getTag_id());
 	}
 
 	/**
-	 * <p>Возвращает название оборудования по uuid</p>
+	 * <p>
+	 * Возвращает название оборудования по uuid
+	 * </p>
+	 * 
 	 * @param uuid
 	 */
 	public String getEquipsNameByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
-		if (cursor.getColumnCount()>0)
-			{
-			 cursor.moveToFirst();
-			 return cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME));
-			}
-		else return "неизвестно";
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cursor.getColumnCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME));
+		} else
+			return "неизвестно";
 	}
 
 	/**
-	 * <p>Возвращает тип оборудования по uuid</p>
+	 * <p>
+	 * Возвращает тип оборудования по uuid
+	 * </p>
+	 * 
 	 * @param uuid
 	 */
 	public String getEquipsTypeByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
-		if (cursor.getColumnCount()>0)
-			{
-			 cursor.moveToFirst();
-			 return cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME));
-			}
-		else return "неизвестно";
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cursor.getColumnCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getString(cursor
+					.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID_NAME));
+		} else
+			return "неизвестно";
 	}
-	
+
 	/**
-	 * <p>Возвращает тип оборудования по uuid</p>
+	 * <p>
+	 * Возвращает тип оборудования по uuid
+	 * </p>
+	 * 
 	 * @param uuid
 	 */
 	public String getCriticalByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
-		if (cursor.getColumnCount()>0)
-			{
-			 cursor.moveToFirst();
-			 return cursor.getString(cursor.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME));
-			}
-		else return "неизвестен";
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cursor.getColumnCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getString(cursor
+					.getColumnIndex(FIELD_CRITICAL_TYPE_UUID_NAME));
+		} else
+			return "неизвестен";
 	}
-	
+
 	/**
-	 * <p>Возвращает координаты по uuid</p>
+	 * <p>
+	 * Возвращает координаты по uuid
+	 * </p>
+	 * 
 	 * @param uuid
 	 */
 	public String getLocationByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
-		if (cursor.getColumnCount()>0)
-			{
-			 cursor.moveToFirst();
-			 return cursor.getString(cursor.getColumnIndex(FIELD_LOCATION_NAME));
-			}
-		else return "неизвестны";
-	}		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cursor.getColumnCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getFloat(cursor.getColumnIndex(FIELD_LATITUDE_NAME))
+					+ " "
+					+ cursor.getFloat(cursor
+							.getColumnIndex(FIELD_LONGITUDE_NAME));
+		} else
+			return "неизвестны";
+	}
 }

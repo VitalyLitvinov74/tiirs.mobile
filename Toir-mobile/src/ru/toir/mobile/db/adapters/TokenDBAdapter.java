@@ -19,17 +19,17 @@ public class TokenDBAdapter {
 
 	public static final String TABLE_NAME = "token";
 
-	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_TOKEN_TYPE_NAME = "token_type";
 	public static final String FIELD_ACCESS_TOKEN_NAME = "access_token";
 	public static final String FIELD_EXPIRES_IN_NAME = "expires_in";
-	public static final String FIELD_USER_NAME_NAME = "userName";
+	public static final String FIELD_USER_NAME_NAME = "username";
 	public static final String FIELD_ISSUED_NAME = ".issued";
 	public static final String FIELD_EXPIRES_NAME = ".expires";
 
-	public String[] mColumns = { FIELD__ID_NAME, FIELD_TOKEN_TYPE_NAME,
+	// TODO решить что делать с полями .issued .expires
+	public String[] mColumns = { FIELD_TOKEN_TYPE_NAME,
 			FIELD_ACCESS_TOKEN_NAME, FIELD_EXPIRES_IN_NAME,
-			FIELD_USER_NAME_NAME, FIELD_ISSUED_NAME, FIELD_EXPIRES_NAME };
+			FIELD_USER_NAME_NAME, "'" + FIELD_ISSUED_NAME + "' as issued", "'" + FIELD_EXPIRES_NAME + "' as expires"};
 
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
@@ -67,15 +67,13 @@ public class TokenDBAdapter {
 	 * @return
 	 */
 	private Token getTokenData(Cursor cursor) {
-		Token token = null;
-		token = new Token(
-				cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_TOKEN_TYPE_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_ACCESS_TOKEN_NAME)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_EXPIRES_IN_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_USER_NAME_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_ISSUED_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_EXPIRES_NAME)));
+		Token token = new Token();
+		token.setToken_type(cursor.getString(cursor.getColumnIndex(FIELD_TOKEN_TYPE_NAME)));
+		token.setAccess_token(cursor.getString(cursor.getColumnIndex(FIELD_ACCESS_TOKEN_NAME)));
+		token.setExpires_in(cursor.getInt(cursor.getColumnIndex(FIELD_EXPIRES_IN_NAME)));
+		token.setUserName(cursor.getString(cursor.getColumnIndex(FIELD_USER_NAME_NAME)));
+		token.setIssued(cursor.getString(cursor.getColumnIndex("issued")));
+		token.setExpires(cursor.getString(cursor.getColumnIndex("expires")));
 		return token;
 	}
 

@@ -14,7 +14,8 @@ public class Equipment {
 	private String equipment_type_uuid;
 	private String critical_type_uuid;
 	private long start_date;
-	private String location;
+	private float latitude;
+	private float longitude;
 	private String tag_id;
 
 	/**
@@ -27,14 +28,15 @@ public class Equipment {
 	/**
 	 * 
 	 */
-	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, String location, String tag_id) {
+	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
 		this.equipment_type_uuid = equipment_type_uuid;
 		this.critical_type_uuid = critical_type_uuid;
 		this.start_date = start_date;
-		this.location = location;
+		this.latitude = latitude;
+		this.longitude = longitude;
 		this.tag_id = tag_id;
 	}
 
@@ -109,20 +111,6 @@ public class Equipment {
 	}
 
 	/**
-	 * @return the location
-	 */
-	public String getLocation() {
-		return location;
-	}
-
-	/**
-	 * @param location the location to set
-	 */
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	/**
 	 * @return the tag_id
 	 */
 	public String getTag_id() {
@@ -148,6 +136,34 @@ public class Equipment {
 	 */
 	public void set_id(long _id) {
 		this._id = _id;
+	}
+
+	/**
+	 * @return the latitude
+	 */
+	public float getLatitude() {
+		return latitude;
+	}
+
+	/**
+	 * @param latitude the latitude to set
+	 */
+	public void setLatitude(float latitude) {
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public float getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(float longitude) {
+		this.longitude = longitude;
 	}
 
 }

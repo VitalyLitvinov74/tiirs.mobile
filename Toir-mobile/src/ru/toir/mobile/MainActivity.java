@@ -110,7 +110,7 @@ public class MainActivity extends FragmentActivity {
 			isLogged = savedInstanceState.getBoolean("isLogged");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
-
+		
 		Log.d(TAG, "onCreate");
 		if (isLogged) {
 			setMainLayout();
@@ -228,6 +228,11 @@ public class MainActivity extends FragmentActivity {
 			int action = data.getIntExtra("action", 0);
 			switch (action) {
 			case 1:
+				// TODO запросить наличие/токен на сервере, по результату запроса принимать решение что делать дальше 
+				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(getApplicationContext(), TokenServiceProvider.Actions.ACTION_GET_TOKEN);
+				tokenServiceHelper.GetTokenByTag(tagId);
+
+				
 				// проверяем наличие пользователя в локальной базе
 				UsersDBAdapter users = new UsersDBAdapter(
 						new TOiRDatabaseContext(getApplicationContext()))

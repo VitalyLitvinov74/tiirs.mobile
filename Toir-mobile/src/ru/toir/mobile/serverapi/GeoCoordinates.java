@@ -6,16 +6,16 @@ import com.google.gson.annotations.Expose;
 public class GeoCoordinates {
 
     @Expose
-    private Double Latitude;
+    private float Latitude;
     @Expose
-    private Double Longitude;
+    private float Longitude;
 
     /**
      * 
      * @return
      *     The Latitude
      */
-    public Double getLatitude() {
+    public float getLatitude() {
         return Latitude;
     }
 
@@ -24,7 +24,7 @@ public class GeoCoordinates {
      * @param Latitude
      *     The Latitude
      */
-    public void setLatitude(Double Latitude) {
+    public void setLatitude(float Latitude) {
         this.Latitude = Latitude;
     }
 
@@ -33,7 +33,7 @@ public class GeoCoordinates {
      * @return
      *     The Longitude
      */
-    public Double getLongitude() {
+    public float getLongitude() {
         return Longitude;
     }
 
@@ -42,7 +42,7 @@ public class GeoCoordinates {
      * @param Longitude
      *     The Longitude
      */
-    public void setLongitude(Double Longitude) {
+    public void setLongitude(float Longitude) {
         this.Longitude = Longitude;
     }
 

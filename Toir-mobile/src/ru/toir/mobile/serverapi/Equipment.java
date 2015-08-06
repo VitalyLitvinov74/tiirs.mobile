@@ -16,7 +16,7 @@ public class Equipment {
     @Expose
     private ru.toir.mobile.serverapi.CriticalityType CriticalityType;
     @Expose
-    private List<Object> Documents = new ArrayList<Object>();
+    private List<Document> Documents = new ArrayList<Document>();
     @Expose
     private String Id;
     @Expose
@@ -101,7 +101,7 @@ public class Equipment {
      * @return
      *     The Documents
      */
-    public List<Object> getDocuments() {
+    public List<Document> getDocuments() {
         return Documents;
     }
 
@@ -110,7 +110,7 @@ public class Equipment {
      * @param Documents
      *     The Documents
      */
-    public void setDocuments(List<Object> Documents) {
+    public void setDocuments(List<Document> Documents) {
         this.Documents = Documents;
     }
 
