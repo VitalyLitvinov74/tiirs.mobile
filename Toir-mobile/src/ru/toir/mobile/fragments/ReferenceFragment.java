@@ -226,7 +226,7 @@ public class ReferenceFragment extends Fragment {
          	{
     	     HashMap<String, String> hm = new HashMap<String,String>();
         	 hm.put("name", equipmentList.get(cnt).getTitle());
-        	 hm.put("descr","Критичность: " + criticalTypeDBAdapter.getNameByUUID(equipmentList.get(cnt).getCritical_type_uuid()) + " | Тип: "+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(cnt).getEquipment_type_uuid())+ " [" + equipmentList.get(cnt).getLocation() + "]");
+        	 hm.put("descr","Критичность: " + criticalTypeDBAdapter.getNameByUUID(equipmentList.get(cnt).getCritical_type_uuid()) + " | Тип: "+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(cnt).getEquipment_type_uuid())+ " [" + equipmentList.get(cnt).getLatitude() + " " + equipmentList.get(cnt).getLongitude() + "]");
         	 hm.put("img", Integer.toString(R.drawable.img_1));
         	 aList.add(hm);        	 
         	 cnt++;

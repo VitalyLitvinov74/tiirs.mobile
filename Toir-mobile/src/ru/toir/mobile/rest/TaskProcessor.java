@@ -38,6 +38,8 @@ import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalityType;
+import ru.toir.mobile.serverapi.Document;
+import ru.toir.mobile.serverapi.DocumentType;
 import ru.toir.mobile.serverapi.Item;
 import ru.toir.mobile.serverapi.OrderStatus;
 import ru.toir.mobile.serverapi.Result;
@@ -75,10 +77,10 @@ public class TaskProcessor {
 	ArrayList<OperationPatternStep> operationPatternSteps = null;
 	ArrayList<OperationPatternStepResult> operationPatternStepResults = null;
 	ArrayList<OperationStatus> operationStatus = null;
-
 	ArrayList<DocumentationType> documentationTypes = null;
-	ArrayList<OperationResult> operationResults = null;
 	ArrayList<EquipmentDocumentation> equipmentDocumentations = null;
+
+	ArrayList<OperationResult> operationResults = null;
 	ArrayList<MeasureValue> measureValues = null;
 	ArrayList<EquipmentOperationResult> equipmentOperationResults = null;
 	
@@ -169,7 +171,7 @@ public class TaskProcessor {
 
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
-		// TODO здесь нужно подставлять uuid текущего пользователя или получать его с сервера
+		// TODO здесь нужен uuid пользователя, с сервера пока не приходит
 		item.setUsers_uuid("");
 		try {
 			item.setCreate_date(dateFormat.parse(serverTask.getCreatedAt()).getTime() / 1000);
@@ -190,7 +192,7 @@ public class TaskProcessor {
 		List<Item> operations = serverTask.getItems();
 		if (operations != null) {
 			for (int i = 0; i < operations.size(); i++) {
-				equipmentOperations.add(getOperation(operations.get(i)));
+				equipmentOperations.add(getOperation(operations.get(i), item.getUuid()));
 			}
 		}
 
@@ -214,13 +216,12 @@ public class TaskProcessor {
 	 * @param operation
 	 * @return
 	 */
-	public EquipmentOperation getOperation(Item operation) {
+	public EquipmentOperation getOperation(Item operation, String parentUuid) {
 		EquipmentOperation item = new EquipmentOperation();
 		
 		item.setUuid(operation.getId());
 		
-		// TODO нужен uuid наряда
-		item.setTask_uuid("");
+		item.setTask_uuid(parentUuid);
 		
 		item.setEquipment_uuid(operation.getEquipment().getId());
 		// создаём объект оборудования
@@ -247,7 +248,6 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public OperationStatus getOperationStatus(Status status) {
-		// TODO Изменить входящий параметр на статус операции(когда с сервера будут приходит правильные данные)
 		OperationStatus item = new OperationStatus();
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
@@ -270,7 +270,7 @@ public class TaskProcessor {
 		List<Step> steps = pattern.getSteps();
 		if (steps != null) {
 			for (int i = 0; i < steps.size(); i++) {
-				operationPatternSteps.add(getStep(steps.get(i)));
+				operationPatternSteps.add(getStep(steps.get(i), item.getUuid()));
 			}
 		}
 		
@@ -282,24 +282,22 @@ public class TaskProcessor {
 	 * @param step
 	 * @return
 	 */
-	public OperationPatternStep getStep(Step step) {
+	public OperationPatternStep getStep(Step step, String parentUuid) {
 		OperationPatternStep item = new OperationPatternStep();
 		item.setUuid(step.getId());
-		// TODO нужен uuid шаблона операции
-		item.setOperation_pattern_uuid("");
+		item.setOperation_pattern_uuid(parentUuid);
 		item.setDescription(step.getDescription());
-		// TODO проверить что приходит с сервера, т.к. вместо строки - объект
-		item.setImage((String)step.getImagePath());
+		item.setImage(step.getImagePath());
 		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
 		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
-		// TODO уточнить что за поле, сказать диме чтоб завёл
+		// TODO исправить как с сервера будут приходить необходимые данные
 		item.setName("");
 		
 		// создаём объекты варантов результатов шагов
 		List<Result> results = step.getResults();
 		if (results != null) {
 			for (int i = 0; i < results.size(); i++) {
-				operationPatternStepResults.add(getStepResult(results.get(i)));
+				operationPatternStepResults.add(getStepResult(results.get(i), item.getUuid()));
 			} 
 		}
 		return item;
@@ -310,11 +308,10 @@ public class TaskProcessor {
 	 * @param result
 	 * @return
 	 */
-	public OperationPatternStepResult getStepResult(Result result) {
+	public OperationPatternStepResult getStepResult(Result result, String parrentUuid) {
 		OperationPatternStepResult item = new OperationPatternStepResult();
 		item.setUuid(result.getId());
-		// TODO нужен uuid шага шаблона
-		item.setOperation_pattern_step_uuid("");
+		item.setOperation_pattern_step_uuid(parrentUuid);
 		item.setNext_operation_pattern_step_uuid(result.getNextPatternStep().getId());
 		item.setTitle(result.getTitle());
 		item.setMeasure_type_uuid(result.getMeasureType().getId());
@@ -368,11 +365,46 @@ public class TaskProcessor {
 		// TODO нужна дата ввода оборудования в эксплуатацию
 		item.setStart_date(0);
 		
-		item.setLocation(equipment.getGeoCoordinates().getLatitude() + " " + equipment.getGeoCoordinates().getLongitude());
+		List<Document> documents = equipment.getDocuments();
+		for (int i = 0; i < documents.size(); i++) {
+			equipmentDocumentations.add(getDocumentation(documents.get(i), item.getUuid()));
+		}
+		
+		item.setLatitude(equipment.getGeoCoordinates().getLatitude());
+		item.setLongitude(equipment.getGeoCoordinates().getLongitude());
 		
 		// TODO нужна метка оборудования
 		item.setTag_id("");
 		
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param document
+	 * @return
+	 */
+	public EquipmentDocumentation getDocumentation(Document document, String parrentUuid) {
+		EquipmentDocumentation item = new EquipmentDocumentation();
+		item.setUuid(document.getId());
+		item.setDocumentation_type_uuid(document.getDocumentType().getId());
+		// создаём объект типа документации
+		documentationTypes.add(getDocumentationType(document.getDocumentType()));
+		item.setEquipment_uuid(parrentUuid);
+		item.setTitle(document.getTitle());
+		item.setPath(document.getPath());
+		return item;
+	}
+	
+	/**
+	 * преобразуем объект с сервера в локальный объект
+	 * @param type
+	 * @return
+	 */
+	public DocumentationType getDocumentationType(DocumentType type) {
+		DocumentationType item = new DocumentationType();
+		item.setUuid(type.getId());
+		item.setTitle(type.getTitle());
 		return item;
 	}
 	

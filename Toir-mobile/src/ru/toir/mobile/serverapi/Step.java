@@ -16,7 +16,7 @@ public class Step {
     @Expose
     private Integer IsFirstStep;
     @Expose
-    private Object ImagePath;
+    private String ImagePath;
     @Expose
     private List<Result> Results = new ArrayList<Result>();
 
@@ -97,7 +97,7 @@ public class Step {
      * @return
      *     The ImagePath
      */
-    public Object getImagePath() {
+    public String getImagePath() {
         return ImagePath;
     }
 
@@ -106,7 +106,7 @@ public class Step {
      * @param ImagePath
      *     The ImagePath
      */
-    public void setImagePath(Object ImagePath) {
+    public void setImagePath(String ImagePath) {
         this.ImagePath = ImagePath;
     }
 
