@@ -65,20 +65,20 @@ public class TaskProcessor {
 	private String mServerUrl;
 
 	
-	ArrayList<Task> tasks = null;
-	ArrayList<EquipmentOperation> equipmentOperations = null;
-	ArrayList<Equipment> equipments = null;
-	ArrayList<TaskStatus> taskStatus = null;
-	ArrayList<CriticalType> criticalTypes = null;
-	ArrayList<OperationType> operationTypes = null;
-	ArrayList<EquipmentType> equipmentTypes = null;
-	ArrayList<OperationPattern> operationPatterns = null;
-	ArrayList<MeasureType> measureTypes = null;
-	ArrayList<OperationPatternStep> operationPatternSteps = null;
-	ArrayList<OperationPatternStepResult> operationPatternStepResults = null;
-	ArrayList<OperationStatus> operationStatus = null;
-	ArrayList<DocumentationType> documentationTypes = null;
-	ArrayList<EquipmentDocumentation> equipmentDocumentations = null;
+	Map<String, Task> tasks = null;
+	Map<String, EquipmentOperation> equipmentOperations = null;
+	Map<String, Equipment> equipments = null;
+	Map<String, TaskStatus> taskStatus = null;
+	Map<String, CriticalType> criticalTypes = null;
+	Map<String, OperationType> operationTypes = null;
+	Map<String, EquipmentType> equipmentTypes = null;
+	Map<String, OperationPattern> operationPatterns = null;
+	Map<String, MeasureType> measureTypes = null;
+	Map<String, OperationPatternStep> operationPatternSteps = null;
+	Map<String, OperationPatternStepResult> operationPatternStepResults = null;
+	Map<String, OperationStatus> operationStatus = null;
+	Map<String, DocumentationType> documentationTypes = null;
+	Map<String, EquipmentDocumentation> equipmentDocumentations = null;
 
 	ArrayList<OperationResult> operationResults = null;
 	ArrayList<MeasureValue> measureValues = null;
@@ -98,23 +98,25 @@ public class TaskProcessor {
 			throw new Exception("URL сервера не указан!");
 		}
 		
-		tasks = new ArrayList<Task>();
-		equipments = new ArrayList<Equipment>();
-		equipmentOperations = new ArrayList<EquipmentOperation>();
-		taskStatus = new ArrayList<TaskStatus>();
-		criticalTypes = new ArrayList<CriticalType>();
-		operationTypes = new ArrayList<OperationType>();
-		equipmentTypes = new ArrayList<EquipmentType>();
-		operationPatterns = new ArrayList<OperationPattern>();
-		documentationTypes = new ArrayList<DocumentationType>();
-		measureTypes = new ArrayList<MeasureType>();
+		tasks = new ArrayMap<String, Task>();
+		equipments = new ArrayMap<String, Equipment>();
+		equipmentOperations = new ArrayMap<String, EquipmentOperation>();
+		taskStatus = new ArrayMap<String, TaskStatus>();
+		criticalTypes = new ArrayMap<String, CriticalType>();
+		operationTypes = new ArrayMap<String, OperationType>();
+		equipmentTypes = new ArrayMap<String, EquipmentType>();
+		operationPatterns = new ArrayMap<String, OperationPattern>();
+		documentationTypes = new ArrayMap<String, DocumentationType>();
+		measureTypes = new ArrayMap<String, MeasureType>();
+		operationPatternSteps = new ArrayMap<String, OperationPatternStep>();
+		operationPatternStepResults = new ArrayMap<String, OperationPatternStepResult>();
+		equipmentDocumentations = new ArrayMap<String, EquipmentDocumentation>();
+		operationStatus = new ArrayMap<String, OperationStatus>();
+		
 		operationResults = new ArrayList<OperationResult>();
-		operationPatternSteps = new ArrayList<OperationPatternStep>();
-		operationPatternStepResults = new ArrayList<OperationPatternStepResult>();
-		equipmentDocumentations = new ArrayList<EquipmentDocumentation>();
 		measureValues = new ArrayList<MeasureValue>();
 		equipmentOperationResults = new ArrayList<EquipmentOperationResult>();
-		operationStatus = new ArrayList<OperationStatus>();
+		
 	}
 
 	/**
@@ -145,7 +147,7 @@ public class TaskProcessor {
 				ru.toir.mobile.serverapi.Task[] serverTasks = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Task[].class);
 				if (serverTasks != null) {
 					for (int i = 0; i < serverTasks.length; i++) {
-						tasks.add(getTask(serverTasks[i]));
+						tasks.put(serverTasks[i].getId(), getTask(serverTasks[i]));
 					}
 				}
 
@@ -156,6 +158,8 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+		
+		// всё полученные данные заносим в базу
 		
 		return true;
 
@@ -187,12 +191,12 @@ public class TaskProcessor {
 		
 		item.setTask_status_uuid(serverTask.getOrderStatus().getId());
 		// добавляем объект статуса наряда
-		taskStatus.add(getTaskStatus(serverTask.getOrderStatus()));
+		taskStatus.put(serverTask.getOrderStatus().getId(), getTaskStatus(serverTask.getOrderStatus()));
 		
 		List<Item> operations = serverTask.getItems();
 		if (operations != null) {
 			for (int i = 0; i < operations.size(); i++) {
-				equipmentOperations.add(getOperation(operations.get(i), item.getUuid()));
+				equipmentOperations.put(operations.get(i).getId(), getOperation(operations.get(i), item.getUuid()));
 			}
 		}
 
@@ -225,19 +229,19 @@ public class TaskProcessor {
 		
 		item.setEquipment_uuid(operation.getEquipment().getId());
 		// создаём объект оборудования
-		equipments.add(getEquipment(operation.getEquipment()));
+		equipments.put(operation.getEquipment().getId(), getEquipment(operation.getEquipment()));
 		
 		item.setOperation_type_uuid(operation.getOperationType().getId());
 		// создаём объект типа операции
-		operationTypes.add(getOperationType(operation.getOperationType()));
+		operationTypes.put(operation.getOperationType().getId(), getOperationType(operation.getOperationType()));
 		
 		item.setOperation_pattern_uuid(operation.getOperationPattern().getId());
 		// создаём объект шаблона операции
-		operationPatterns.add(getOperationPattern(operation.getOperationPattern()));
+		operationPatterns.put(operation.getOperationPattern().getId(), getOperationPattern(operation.getOperationPattern()));
 		
 		item.setOperation_status_uuid(operation.getStatus().getId());
 		// создаём объект статуса операции
-		operationStatus.add(getOperationStatus(operation.getStatus()));
+		operationStatus.put(operation.getStatus().getId(), getOperationStatus(operation.getStatus()));
 
 		return item;
 	}
@@ -270,7 +274,7 @@ public class TaskProcessor {
 		List<Step> steps = pattern.getSteps();
 		if (steps != null) {
 			for (int i = 0; i < steps.size(); i++) {
-				operationPatternSteps.add(getStep(steps.get(i), item.getUuid()));
+				operationPatternSteps.put(steps.get(i).getId(), getStep(steps.get(i), item.getUuid()));
 			}
 		}
 		
@@ -297,7 +301,7 @@ public class TaskProcessor {
 		List<Result> results = step.getResults();
 		if (results != null) {
 			for (int i = 0; i < results.size(); i++) {
-				operationPatternStepResults.add(getStepResult(results.get(i), item.getUuid()));
+				operationPatternStepResults.put(results.get(i).getId(), getStepResult(results.get(i), item.getUuid()));
 			} 
 		}
 		return item;
@@ -316,7 +320,7 @@ public class TaskProcessor {
 		item.setTitle(result.getTitle());
 		item.setMeasure_type_uuid(result.getMeasureType().getId());
 		// создаём объект варианта измерения
-		measureTypes.add(getMeasureType(result.getMeasureType()));
+		measureTypes.put(result.getMeasureType().getId(), getMeasureType(result.getMeasureType()));
 		return item;
 	}
 	
@@ -356,18 +360,18 @@ public class TaskProcessor {
 		
 		item.setEquipment_type_uuid(equipment.getEquipmentType().getId());
 		// создаём объект типа оборудования
-		equipmentTypes.add(getEquipmentType(equipment.getEquipmentType()));
+		equipmentTypes.put(equipment.getEquipmentType().getId(), getEquipmentType(equipment.getEquipmentType()));
 		
 		item.setCritical_type_uuid(equipment.getCriticalityType().getId());
 		// создаём объект типа критичности оборудования
-		criticalTypes.add(getCriticalType(equipment.getCriticalityType()));
+		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
 		
 		// TODO нужна дата ввода оборудования в эксплуатацию
 		item.setStart_date(0);
 		
 		List<Document> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
-			equipmentDocumentations.add(getDocumentation(documents.get(i), item.getUuid()));
+			equipmentDocumentations.put(documents.get(i).getId(), getDocumentation(documents.get(i), item.getUuid()));
 		}
 		
 		item.setLatitude(equipment.getGeoCoordinates().getLatitude());
@@ -389,7 +393,7 @@ public class TaskProcessor {
 		item.setUuid(document.getId());
 		item.setDocumentation_type_uuid(document.getDocumentType().getId());
 		// создаём объект типа документации
-		documentationTypes.add(getDocumentationType(document.getDocumentType()));
+		documentationTypes.put(document.getDocumentType().getId(), getDocumentationType(document.getDocumentType()));
 		item.setEquipment_uuid(parrentUuid);
 		item.setTitle(document.getTitle());
 		item.setPath(document.getPath());
