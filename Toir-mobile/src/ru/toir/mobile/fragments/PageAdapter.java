@@ -6,7 +6,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 public class PageAdapter extends FragmentPagerAdapter {
 	
+	public final static int ORDER_FRAGMENT = 1; 
 	public final static int TASK_FRAGMENT = 6;
+	
+	private OrdersFragment ordersFragment;
 
 	public PageAdapter(FragmentManager fm) {
 		super(fm);
@@ -19,8 +22,11 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 0 :
 			fragment = new UserInfoFragment();
 			break;
-		case 1 :
-			fragment = new OrdersFragment();
+		case ORDER_FRAGMENT :
+			if (ordersFragment == null) {
+				ordersFragment = new OrdersFragment();
+			}
+			fragment = ordersFragment;
 			break;
 		case 2 :
 			fragment = new ReferenceFragment();
@@ -62,7 +68,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 0 :
 			title = "Пользователь";
 			break;
-		case 1 :
+		case ORDER_FRAGMENT :
 			title = "Наряды таблица";
 			break;
 		case 2 :
@@ -77,7 +83,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 5 :
 			title = "Тест GPS";
 			break;
-		case 6 :
+		case TASK_FRAGMENT :
 			title = "Наряды";
 			break;
 		case 7 :

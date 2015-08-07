@@ -10,7 +10,6 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.adapters.TokenDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
@@ -24,6 +23,8 @@ import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.utils.DataUtils;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -50,6 +51,11 @@ public class OrdersFragment extends Fragment {
 	private String operationUuidTag = "operation_uuid_tag";
 	private String equipmentUuidTag = "equipment_uuid_tag";
 
+	private ProgressDialog getOrderDialog;
+	public void cancelGetOrders() {
+		getOrderDialog.cancel();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -73,9 +79,25 @@ public class OrdersFragment extends Fragment {
 				TaskServiceHelper tsh = new TaskServiceHelper(getActivity()
 						.getApplicationContext(),
 						TaskServiceProvider.Actions.ACTION_GET_TASK);
-				TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new TOiRDatabaseContext(getActivity())).open();
-				tsh.GetTask(tokenDBAdapter.getTokenByUserName("ivanov").getAccess_token());
-				tokenDBAdapter.close();
+				tsh.GetTask(AuthorizedUser.getInstance().getToken());
+				// показываем диалог получения наряда
+				getOrderDialog = new ProgressDialog(getActivity());
+				getOrderDialog.setMessage("Получаем наряд");
+				getOrderDialog.setIndeterminate(true);
+				getOrderDialog
+						.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				getOrderDialog.setCancelable(false);
+				getOrderDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+						"Отмена", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO необходимые операции для отмены приёма нарядов
+							}
+						});
+				getOrderDialog.show();
+
+
 			}
 		});
 
@@ -358,8 +380,9 @@ public class OrdersFragment extends Fragment {
 				TextView equipmentUuidTView = new TextView(getActivity());
 				equipmentUuidTView.setVisibility(View.INVISIBLE);
 				equipmentUuidTView.setTag(equipmentUuidTag);
-				equipmentUuidTView.setText(equipmentList.get(cnt).getEquipment_uuid());
-				
+				equipmentUuidTView.setText(equipmentList.get(cnt)
+						.getEquipment_uuid());
+
 				// tasks_uuid.add(cnt,
 				// equipmentList.get(cnt).getUuid().toString());
 				tasks_uuid.add(cnt, equipmentList.get(cnt)
@@ -367,8 +390,11 @@ public class OrdersFragment extends Fragment {
 				tableRow.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
 						tl_task.removeAllViews();
-						String equipmentUuid = ((TextView)v.findViewWithTag(equipmentUuidTag)).getText().toString();
-						initOperationPattern(tasks_uuid.get(v.getId()), order, equipmentUuid);
+						String equipmentUuid = ((TextView) v
+								.findViewWithTag(equipmentUuidTag)).getText()
+								.toString();
+						initOperationPattern(tasks_uuid.get(v.getId()), order,
+								equipmentUuid);
 					}
 				});
 
@@ -440,7 +466,7 @@ public class OrdersFragment extends Fragment {
 	}
 
 	// init operation pattern view
-	private void initOperationPattern(String task_equipment_uuid, 
+	private void initOperationPattern(String task_equipment_uuid,
 			String order_uuid, String equipment_uuid) {
 		final String order = order_uuid;
 		OperationPatternDBAdapter opPatternDBAdapter = new OperationPatternDBAdapter(
@@ -475,7 +501,8 @@ public class OrdersFragment extends Fragment {
 		tv_head3.setGravity(Gravity.CENTER_HORIZONTAL);
 		tableHead.addView(tv_head3);
 
-		// TODO нужно переписать алгоритм посторения списка операций, так как сейчас список строится не по операциям а по шаблонам операций!!!
+		// TODO нужно переписать алгоритм посторения списка операций, так как
+		// сейчас список строится не по операциям а по шаблонам операций!!!
 		while (cnt < operationsList.size()) {
 			// Creation row
 			final TableRow tableRow = new TableRow(getActivity()
@@ -489,9 +516,14 @@ public class OrdersFragment extends Fragment {
 			tableRow.setId(cnt);
 			tableRow.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
-					String operationUuid = ((TextView)v.findViewWithTag(operationUuidTag)).getText().toString();
-					Intent operationActivity = new Intent(getActivity(), OperationActivity.class);
-					operationActivity.putExtra(OperationActivity.OPERATION_UUID_EXTRA, operationUuid);
+					String operationUuid = ((TextView) v
+							.findViewWithTag(operationUuidTag)).getText()
+							.toString();
+					Intent operationActivity = new Intent(getActivity(),
+							OperationActivity.class);
+					operationActivity.putExtra(
+							OperationActivity.OPERATION_UUID_EXTRA,
+							operationUuid);
 					startActivity(operationActivity);
 				}
 			});
@@ -508,7 +540,7 @@ public class OrdersFragment extends Fragment {
 			tv_uuid.setBackgroundResource(R.color.almostblack);
 			tv_uuid.setGravity(Gravity.CENTER_HORIZONTAL);
 			tv_uuid.setPadding(5, 2, 5, 2);
-			
+
 			final TextView tv_operation = new TextView(getActivity()
 					.getApplicationContext());
 			tv_operation.setText(operationsList.get(cnt).getTitle());
@@ -520,18 +552,23 @@ public class OrdersFragment extends Fragment {
 			tableRow.addView(tv_operation);
 
 			// элемент с uuid операции
-			ArrayList<EquipmentOperation> equipmentOperations = equipmentOperationDBAdapter.getItemsByTaskAndEquipment(order_uuid, equipment_uuid);
+			ArrayList<EquipmentOperation> equipmentOperations = equipmentOperationDBAdapter
+					.getItemsByTaskAndEquipment(order_uuid, equipment_uuid);
 			if (equipmentOperations.size() > 0) {
 				TextView operationUuidTView = new TextView(getActivity());
 				operationUuidTView.setVisibility(View.INVISIBLE);
 				operationUuidTView.setTag(operationUuidTag);
-				// TODO заглушка. выбираем первую операцию из списка. это не верно. исправить с изменением алгоритма построения списка операций!!!
-				operationUuidTView.setText(equipmentOperations.get(0).getUuid());
+				// TODO заглушка. выбираем первую операцию из списка. это не
+				// верно. исправить с изменением алгоритма построения списка
+				// операций!!!
+				operationUuidTView
+						.setText(equipmentOperations.get(0).getUuid());
 				tableRow.addView(operationUuidTView);
 			} else {
-				// TODO ни чего не будем делать после изменения алгоритма построения списка, то есть список операций будет пустой
+				// TODO ни чего не будем делать после изменения алгоритма
+				// построения списка, то есть список операций будет пустой
 			}
-			
+
 			tl_task.addView(tableRow);
 			cnt = cnt + 1;
 			if (cnt > 5) {
