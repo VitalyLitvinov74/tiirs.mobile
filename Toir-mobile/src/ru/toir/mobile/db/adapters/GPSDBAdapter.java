@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.GpsTrack;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,7 +47,7 @@ public class GPSDBAdapter {
 	 * Открываем базу данных
 	 */
 	public GPSDBAdapter open() {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

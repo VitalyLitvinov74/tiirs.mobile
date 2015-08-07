@@ -4,7 +4,6 @@
 package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Token;
 import android.content.ContentValues;
 import android.content.Context;
@@ -47,8 +46,7 @@ public class TokenDBAdapter {
 	 * Открываем базу данных
 	 */
 	public TokenDBAdapter open() {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(),
-				null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

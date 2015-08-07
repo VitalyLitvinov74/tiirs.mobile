@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import android.content.ContentValues;
 import android.content.Context;
@@ -53,7 +52,7 @@ public class UsersDBAdapter {
 	 * Открываем базу данных
 	 */
 	public UsersDBAdapter open() {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

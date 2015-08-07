@@ -10,7 +10,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.TOiRDBAdapter;
 
 /**
  * @author olejek
@@ -56,7 +55,7 @@ public class EquipmentOperationDBAdapter {
 	 * @throws SQLException
 	 */
 	public EquipmentOperationDBAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

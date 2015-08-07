@@ -2,9 +2,7 @@ package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationStatus;
-import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.content.ContentValues;
 import android.content.Context;
@@ -39,7 +37,7 @@ public class OperationStatusDBAdapter {
 	 * Открываем базу данных
 	 */
 	public OperationStatusDBAdapter open() {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
