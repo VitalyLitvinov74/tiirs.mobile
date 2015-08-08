@@ -46,7 +46,7 @@ public class UserInfoFragment extends Fragment {
 		return rootView;
 	}
 
-	private void initView(View view) {		
+	private void initView(View view) {
 		tv_user_id = (TextView) view.findViewById(R.id.user_text_id);
 		tv_user_name = (TextView) view.findViewById(R.id.user_text_name);
 		tv_user_type = (TextView) view.findViewById(R.id.equipment_text_type);

@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import android.content.ContentValues;
 import android.content.Context;

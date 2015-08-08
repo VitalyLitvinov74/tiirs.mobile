@@ -10,7 +10,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.TOiRDBAdapter;
 
 /**
  * @author olejek
