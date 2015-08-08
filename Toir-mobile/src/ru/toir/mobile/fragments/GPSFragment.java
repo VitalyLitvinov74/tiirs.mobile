@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,8 +73,7 @@ public class GPSFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
-		// Hardcoded !!
-		String tagId = "01234567";
+		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext())).open();
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid

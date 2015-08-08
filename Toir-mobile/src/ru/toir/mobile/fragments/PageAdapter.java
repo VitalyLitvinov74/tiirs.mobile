@@ -3,12 +3,15 @@ package ru.toir.mobile.fragments;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import ru.toir.mobile.fragments.EquipmentsFragment;
 
 public class PageAdapter extends FragmentPagerAdapter {
-	
+	public final static int ORDER_FRAGMENT = 1; 
 	public final static int TASK_FRAGMENT = 6;
 
-	public PageAdapter(FragmentManager fm) {
+	private OrdersFragment ordersFragment;
+
+	public PageAdapter(FragmentManager fm) {	
 		super(fm);
 	}
 
@@ -19,15 +22,18 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 0 :
 			fragment = new UserInfoFragment();
 			break;
-		case 1 :
-			fragment = new OrdersFragment();
+		case ORDER_FRAGMENT :
+			if (ordersFragment == null) {
+				ordersFragment = new OrdersFragment();
+			}
+			fragment = ordersFragment;
 			break;
 		case 2 :
 			fragment = new ReferenceFragment();
 			break;
 		case 3 :
 			fragment = new RFIDTestFragment();
-			break;
+			break;			
 		case 4 :
 			fragment = new ChartsFragment();
 			break;
@@ -40,6 +46,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 7 :
 			fragment = new NativeCameraFragment();
 			break;
+		case 8 :
+			fragment = new EquipmentsFragment();
+			break;
 		default :
 			fragment = null;
 			break;
@@ -49,7 +58,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 8;
+		return 9;
 	}
 
 	/* (non-Javadoc)
@@ -62,7 +71,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 0 :
 			title = "Пользователь";
 			break;
-		case 1 :
+		case ORDER_FRAGMENT :
 			title = "Наряды таблица";
 			break;
 		case 2 :
@@ -77,17 +86,19 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 5 :
 			title = "Тест GPS";
 			break;
-		case 6 :
+		case TASK_FRAGMENT :
 			title = "Наряды";
 			break;
 		case 7 :
 			title = "Фото";
+			break;
+		case 8 :
+			title = "Оборудование";
 			break;
 		default :
 			title = "";
 			break;
 		}
 		return title;
-	}
-
+	}	
 }

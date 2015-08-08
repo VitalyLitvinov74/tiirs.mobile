@@ -3,7 +3,6 @@ package ru.toir.mobile.db.adapters;
 import java.util.ArrayList;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,7 +47,7 @@ public class OperationPatternStepDBAdapter {
 	 * Открываем базу данных
 	 */
 	public OperationPatternStepDBAdapter open() {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

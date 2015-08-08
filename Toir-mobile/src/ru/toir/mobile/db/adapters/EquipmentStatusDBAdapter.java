@@ -1,42 +1,48 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.TOiRDBAdapter;
+import ru.toir.mobile.db.tables.EquipmentStatus;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class OperationStatusDBAdapter {
+public class EquipmentStatusDBAdapter {
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	private final Context mContext;
 
-	public static final String TABLE_NAME = "operation_status";
+	public static final String TABLE_NAME = "equipment_status";
 	
 	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
-	public static final String FIELD_TITLE_NAME = "title";
+	public static final String FIELD_NAME_NAME = "name";
+	public static final String FIELD_UUID_NAME = "status_uuid";
+	public static final String FIELD_TYPE_NAME = "type";
+
+	//public static final String STATUS_UUID_CREATED = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
 
 	String[] mColumns = {
 			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
-			FIELD_TITLE_NAME};
+			FIELD_NAME_NAME,
+			FIELD_TYPE_NAME};
 		
 	/**
-	 * 
 	 * @param context
+	 * @return OrderDBAdapter
 	 */
-	public OperationStatusDBAdapter(Context context) {
+	public EquipmentStatusDBAdapter(Context context) {
 		mContext = context;
 	}
 	
 	/**
 	 * Открываем базу данных
 	 */
-	public OperationStatusDBAdapter open() {
+	public EquipmentStatusDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
@@ -55,50 +61,49 @@ public class OperationStatusDBAdapter {
 	 * @param uuid
 	 * @return
 	 */
-	public OperationStatus getItem(String uuid) {		
+	public Cursor getItem(String uuid) {		
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
-			return getItem(cursor);
+			return cursor;
 		}
 		return null;
 	}
 
 	/**
 	 * 
-	 * @param cursor
+	 * @param UUID
 	 * @return
 	 */
-	public OperationStatus getItem(Cursor cursor) {		
-		OperationStatus status = new OperationStatus();
-		status.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
-		status.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
-		status.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
-		return status;
+	public String getNameByUUID(String uuid) {		
+		Cursor cur;
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cur.getCount()>0)
+			{
+			 cur.moveToFirst();
+			 return cur.getString(1);
+			}
+		else return "неизвестен";
 	}
 
 	/**
 	 * @return
 	 */
-	public ArrayList<OperationStatus> getItems() {
-		ArrayList<OperationStatus> arrayList = null;
+	public Cursor getAllItems_cursor() {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);		
 		if (cursor.moveToFirst()) {
-			arrayList = new ArrayList<OperationStatus>();
-			do {
-				arrayList.add(getItem(cursor));
-			} while(cursor.moveToNext());
+			return cursor;
 		}
-		return arrayList;
+		return null;
 	}
 	
 	/**
 	 * <p>Возвращает все записи из таблицы</p>
 	 * @return list
 	 */
-	public ArrayList<TaskStatus> getAllItems() {
-		ArrayList<TaskStatus> arrayList = new ArrayList<TaskStatus>();
+	public ArrayList<EquipmentStatus> getAllItems() {
+		ArrayList<EquipmentStatus> arrayList = new ArrayList<EquipmentStatus>();
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);		
 		if (cursor.getCount()>0)
@@ -106,10 +111,11 @@ public class OperationStatusDBAdapter {
 			 cursor.moveToFirst();
 			 while (true)		
 			 	{			 
-				 TaskStatus equip = new TaskStatus(
+				 EquipmentStatus equip = new EquipmentStatus(
 					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+					cursor.getString(cursor.getColumnIndex(FIELD_NAME_NAME)),
+					cursor.getInt(cursor.getColumnIndex(FIELD_TYPE_NAME)));
 				 	arrayList.add(equip);
 				 	if (cursor.isLast()) break;
 				 	cursor.moveToNext();
@@ -117,9 +123,9 @@ public class OperationStatusDBAdapter {
 			}
 		return arrayList;
 	}
-	
+
 	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * <p>Добавляет/изменяет запись в таблице equipment_status</p>
 	 * @param uuid
 	 * @param title
 	 * @return
@@ -128,19 +134,18 @@ public class OperationStatusDBAdapter {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_TITLE_NAME, title);
+		values.put(FIELD_NAME_NAME, title);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
 
 	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * <p>Добавляет/изменяет запись в таблице task_status</p>
 	 * 
-	 * @param status
+	 * @param token
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(OperationStatus status) {
+	public long replace(TaskStatus status) {
 		return replace(status.getUuid(), status.getTitle());
 	}
-
 }

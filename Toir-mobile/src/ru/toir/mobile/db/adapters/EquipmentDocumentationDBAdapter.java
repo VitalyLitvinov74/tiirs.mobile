@@ -6,7 +6,6 @@ package ru.toir.mobile.db.adapters;
 import java.util.ArrayList;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -56,7 +55,7 @@ public class EquipmentDocumentationDBAdapter {
 	 * @throws SQLException
 	 */
 	public EquipmentDocumentationDBAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}

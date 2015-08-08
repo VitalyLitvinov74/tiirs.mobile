@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
 
 /**
@@ -35,11 +34,15 @@ public class EquipmentDBAdapter {
 	public static final String FIELD_LATITUDE_NAME = "latitude";
 	public static final String FIELD_LONGITUDE_NAME = "longitude";
 	public static final String FIELD_TAG_ID_NAME = "tag_id";
+	public static final String FIELD_IMG_NAME = "img";
+	public static final String FIELD_STATUS_UUID_NAME = "status_uuid";
+	public static final String FIELD_STATUS_TYPE_NAME = "status_type";
 
 	private static String mColumns[] = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_TITLE_NAME, FIELD_EQUIPMENT_TYPE_UUID_NAME,
 			FIELD_CRITICAL_TYPE_UUID_NAME, FIELD_START_DATE_NAME,
-			FIELD_LATITUDE_NAME, FIELD_LONGITUDE_NAME, FIELD_TAG_ID_NAME };
+			FIELD_LATITUDE_NAME, FIELD_LONGITUDE_NAME, FIELD_TAG_ID_NAME, FIELD_IMG_NAME,
+			FIELD_STATUS_UUID_NAME,	FIELD_STATUS_TYPE_NAME };
 
 	/**
 	 * @param context
@@ -56,10 +59,8 @@ public class EquipmentDBAdapter {
 	 * @throws SQLException
 	 */
 	public EquipmentDBAdapter open() throws SQLException {
-		this.mDbHelper = new DatabaseHelper(this.mContext,
-				TOiRDBAdapter.getDbName(), null,
-				TOiRDBAdapter.getAppDbVersion());
-		this.mDb = mDbHelper.getWritableDatabase();
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
 
@@ -161,6 +162,12 @@ public class EquipmentDBAdapter {
 				.getColumnIndex(FIELD_LONGITUDE_NAME)));
 		equipment.setTag_id(cursor.getString(cursor
 				.getColumnIndex(FIELD_TAG_ID_NAME)));
+		equipment.setImg(cursor.getString(cursor
+				.getColumnIndex(FIELD_IMG_NAME)));
+		equipment.setStatus_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_STATUS_UUID_NAME)));
+		equipment.setType(cursor.getInt(cursor
+				.getColumnIndex(FIELD_STATUS_TYPE_NAME)));
 		return equipment;
 	}
 
@@ -176,11 +183,14 @@ public class EquipmentDBAdapter {
 	 * @param start_date
 	 * @param location
 	 * @param tag_id
+	 * @param img
+	 * @param status_uuid
+	 * @param type
 	 * @return
 	 */
 	public long replace(String uuid, String title, String equipment_type_uuid,
 			String critical_type_uuid, long start_date, float latitude,
-			float longitude, String tag_id) {
+			float longitude, String tag_id, String img, String status_uuid, int type) {
 		ContentValues values = new ContentValues();
 		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);
@@ -192,6 +202,9 @@ public class EquipmentDBAdapter {
 		values.put(EquipmentDBAdapter.FIELD_LATITUDE_NAME, latitude);
 		values.put(EquipmentDBAdapter.FIELD_LONGITUDE_NAME, longitude);
 		values.put(EquipmentDBAdapter.FIELD_TAG_ID_NAME, tag_id);
+		values.put(EquipmentDBAdapter.FIELD_IMG_NAME, img);
+		values.put(EquipmentDBAdapter.FIELD_STATUS_UUID_NAME, status_uuid);
+		values.put(EquipmentDBAdapter.FIELD_STATUS_TYPE_NAME, type);
 		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);
 	}
 
@@ -208,7 +221,7 @@ public class EquipmentDBAdapter {
 				equipment.getEquipment_type_uuid(),
 				equipment.getCritical_type_uuid(), equipment.getStart_date(),
 				equipment.getLatitude(), equipment.getLongitude(),
-				equipment.getTag_id());
+				equipment.getTag_id(),equipment.getImg(),equipment.getStatus_uuid(),equipment.getStatus_type());
 	}
 
 	/**
@@ -287,4 +300,33 @@ public class EquipmentDBAdapter {
 		} else
 			return "неизвестны";
 	}
+	/**
+	 * <p>Возвращает фото по uuid</p>
+	 * @param uuid
+	 */
+	public String getImgByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_IMG_NAME));
+			}
+		else return "/data/img/img.png";
+	}
+	/**
+	 * <p>Возвращает tag_id по uuid</p>
+	 * @param uuid
+	 */
+	public String getTagIDByUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getColumnCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME));
+			}
+		else return "0-0-0";
+	}				
+
 }

@@ -5,19 +5,7 @@ import java.util.List;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
-
-//import ru.toir.mobile.MainActivity;
-//import ru.toir.mobile.R;
-//import ru.toir.mobile.fragments.TaskFragment;
-//import android.app.AlertDialog;
-//import android.app.DialogFragment;
-//import android.support.v4.app.Fragment;
-//import android.support.v4.app.FragmentManager;
-//import android.support.v4.app.FragmentTransaction;
-//import android.support.v4.view.ViewPager;
 import android.content.Context;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 public class TaskItemizedOverlay extends ItemizedIconOverlay<OverlayItem> {

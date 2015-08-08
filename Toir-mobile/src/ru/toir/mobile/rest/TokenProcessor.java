@@ -5,6 +5,8 @@ package ru.toir.mobile.rest;
 
 import java.net.URI;
 import com.google.gson.Gson;
+
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.TokenDBAdapter;
@@ -16,7 +18,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachov
  * 
  */
 public class TokenProcessor {
@@ -128,6 +130,9 @@ public class TokenProcessor {
 	 * @param token
 	 */
 	private void saveToken(ru.toir.mobile.serverapi.Token token) {
+		
+		AuthorizedUser.getInstance().setToken(token.getAccessToken());
+
 		TokenDBAdapter adapter = new TokenDBAdapter(
 				new TOiRDatabaseContext(mContext)).open();
 		adapter.replace(token);

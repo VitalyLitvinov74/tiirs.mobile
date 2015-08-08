@@ -21,12 +21,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
-import ru.toir.mobile.db.adapters.TokenDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.fragments.OrdersFragment;
 import ru.toir.mobile.fragments.PageAdapter;
 import ru.toir.mobile.rest.ProcessorService;
-import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
@@ -40,31 +39,40 @@ public class MainActivity extends FragmentActivity {
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
-	PageAdapter pageAdapter;
+	// PageAdapter pageAdapter;
 
 	// фильтр для сообщений при получении пользователя с сервера
-	private final IntentFilter mFilterGetUser = new IntentFilter(UsersServiceProvider.Actions.ACTION_GET_USER);
+	private final IntentFilter mFilterGetUser = new IntentFilter(
+			UsersServiceProvider.Actions.ACTION_GET_USER);
 	private BroadcastReceiver mReceiverGetUser = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			int provider = intent.getIntExtra(
+					ProcessorService.Extras.PROVIDER_EXTRA, 0);
 			if (provider == ProcessorService.Providers.USERS_PROVIDER) {
-				int method = intent.getIntExtra(ProcessorService.Extras.METHOD_EXTRA, 0);
+				int method = intent.getIntExtra(
+						ProcessorService.Extras.METHOD_EXTRA, 0);
 				if (method == UsersServiceProvider.Methods.GET_USER) {
-					boolean result = intent.getBooleanExtra(ProcessorService.Extras.RESULT_EXTRA, false);
+					boolean result = intent.getBooleanExtra(
+							ProcessorService.Extras.RESULT_EXTRA, false);
 					if (result == true) {
-						// TODO при получении пользователя, нужно запросить токен
-						TokenServiceHelper serviceHelper = new TokenServiceHelper(getApplicationContext(), TokenServiceProvider.Actions.ACTION_GET_TOKEN);
-						// TODO сюда нужно передать либо имя пользователя либо его метку
+						// TODO при получении пользователя, нужно запросить
+						// токен
+						TokenServiceHelper serviceHelper = new TokenServiceHelper(
+								getApplicationContext(),
+								TokenServiceProvider.Actions.ACTION_GET_TOKEN);
+						// TODO сюда нужно передать либо имя пользователя либо
+						// его метку
 						serviceHelper.GetTokenByTag("");
 					} else {
-						// либо пользователя нет, либо произошла еще какая-то ошибка
+						// либо пользователя нет, либо произошла еще какая-то
+						// ошибка
 					}
 				}
 			}
 		}
 	};
-	
+
 	// фильтр для получения сообщений при получении нарядов с сервера
 	private final IntentFilter mFilterGetTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_GET_TASK);
@@ -83,13 +91,26 @@ public class MainActivity extends FragmentActivity {
 							ProcessorService.Extras.RESULT_EXTRA, false);
 					Log.d(TAG, "" + result);
 					if (result == true) {
-						TaskServiceHelper tsh = new TaskServiceHelper(
-								getApplicationContext(),
-								TaskServiceProvider.Actions.ACTION_TASK_CONFIRM);
-						tsh.TaskConfirmation("xyzxyzxyzxyz");
+						/*
+						 * нужно видимо что-то дёрнуть чтоб уведомить о том что
+						 * наряд(ы) получены вероятно нужно сделать попытку
+						 * отправить на сервер информацию о полученых нарядах
+						 * (которые изменили свой статус на "В работе")
+						 */
+
+						// закрываем диалог получения наряда
+						PageAdapter adapter = (PageAdapter) pager.getAdapter();
+						OrdersFragment fragment = (OrdersFragment) adapter
+								.getItem(PageAdapter.ORDER_FRAGMENT);
+						fragment.cancelGetOrders();
+						Toast.makeText(getApplicationContext(),
+								"Наряды получены.", Toast.LENGTH_SHORT).show();
 					} else {
 						// если наряды по какой-то причине не удалось получить,
 						// видимо нужно вывести какое-то сообщение
+						Toast.makeText(getApplicationContext(),
+								"Ошибка при получении нарядов.",
+								Toast.LENGTH_LONG).show();
 					}
 				}
 			}
@@ -110,20 +131,21 @@ public class MainActivity extends FragmentActivity {
 			isLogged = savedInstanceState.getBoolean("isLogged");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
-		
+
 		Log.d(TAG, "onCreate");
 		if (isLogged) {
 			setMainLayout();
 		} else {
 			setContentView(R.layout.login_layout);
-			// TODO необходимо реализовать механизм который бы позволял подключаться к базе только после того как она полностью обновится
+			// TODO необходимо реализовать механизм который бы позволял
+			// подключаться к базе только после того как она полностью обновится
 			/*
-			TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-			tokenDBAdapter.deleteAll();
-			tokenDBAdapter.close();
-			*/
+			 * TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new
+			 * TOiRDatabaseContext(getApplicationContext())).open();
+			 * tokenDBAdapter.deleteAll(); tokenDBAdapter.close();
+			 */
 		}
-		
+
 	}
 
 	/**
@@ -199,8 +221,7 @@ public class MainActivity extends FragmentActivity {
 					msg = "Данные не получены!";
 				} else {
 					tagId = tagData.toString();
-					Log.d(TAG,
-							"Прочитаны данные из метки: " + tagId);
+					Log.d(TAG, "Прочитаны данные из метки: " + tagId);
 				}
 			} else if (resultCode == RESULT_CANCELED) {
 				msg = "Чтение метки отменено пользователем!";
@@ -227,12 +248,16 @@ public class MainActivity extends FragmentActivity {
 			// чтения метки всем кто сейчас заинтересован в результате операции
 			int action = data.getIntExtra("action", 0);
 			switch (action) {
+			// TODO заменить цифры на читаемые константы операций для которых
+			// считывается метка
 			case 1:
-				// TODO запросить наличие/токен на сервере, по результату запроса принимать решение что делать дальше 
-				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(getApplicationContext(), TokenServiceProvider.Actions.ACTION_GET_TOKEN);
+				// TODO запросить наличие/токен на сервере, по результату
+				// запроса принимать решение что делать дальше
+				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
+						getApplicationContext(),
+						TokenServiceProvider.Actions.ACTION_GET_TOKEN);
 				tokenServiceHelper.GetTokenByTag(tagId);
 
-				
 				// проверяем наличие пользователя в локальной базе
 				UsersDBAdapter users = new UsersDBAdapter(
 						new TOiRDatabaseContext(getApplicationContext()))
@@ -240,14 +265,21 @@ public class MainActivity extends FragmentActivity {
 				Users user = users.getUserByTagId(tagId);
 				users.close();
 				if (user == null) {
-					UsersServiceHelper serviceHelper = new UsersServiceHelper(getApplicationContext(), "get_unknown_user");
+					UsersServiceHelper serviceHelper = new UsersServiceHelper(
+							getApplicationContext(), "get_unknown_user");
 					serviceHelper.getUser(tagId);
-					// TODO реализовать уведомление и обработку получения пользователя с сервера !!!
+					// TODO реализовать уведомление и обработку получения
+					// пользователя с сервера !!!
 					/*
-					Toast.makeText(this, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
-					*/
+					 * Toast.makeText(this, "Нет такого пользователя!",
+					 * Toast.LENGTH_SHORT).show();
+					 */
 				} else {
 					Log.d(TAG, user.toString());
+					AuthorizedUser aUser = AuthorizedUser.getInstance();
+					aUser.setTagId(tagId);
+					aUser.setUuid(user.getUuid());
+
 					isLogged = true;
 					setMainLayout();
 				}
@@ -260,8 +292,9 @@ public class MainActivity extends FragmentActivity {
 					operationActivity.putExtras(bundle);
 					startActivity(operationActivity);
 				} else {
-					Toast.makeText(getApplicationContext(), "Не верное оборудование!!!", Toast.LENGTH_SHORT)
-					.show();
+					Toast.makeText(getApplicationContext(),
+							"Не верное оборудование!!!", Toast.LENGTH_SHORT)
+							.show();
 				}
 				break;
 			default:

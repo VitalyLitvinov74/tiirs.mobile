@@ -9,5 +9,6 @@
         <item>Результаты операций</item>
         <item>Типы операций</item>
         <item>Статусы нарядов</item>
+        <item>Состояния оборудования</item>        
     </string-array>    
 </resources>

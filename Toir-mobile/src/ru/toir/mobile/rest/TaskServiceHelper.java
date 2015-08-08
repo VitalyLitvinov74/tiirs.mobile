@@ -32,16 +32,6 @@ public class TaskServiceHelper extends ServiceHelperBase {
 	}
 	
 	/**
-	 * 
-	 * @param token
-	 */
-	public void TaskConfirmation(String token) {
-		Bundle bundle = new Bundle();
-		bundle.putString(TaskServiceProvider.Methods.PARAMETER_TOKEN, token);
-		RunMethod(TaskServiceProvider.Methods.TASK_CONFIRMATION, bundle);
-	}
-	
-	/**
 	 * Отправляет результаты выполнения наряда
 	 * @param token
 	 * @param taskUuid

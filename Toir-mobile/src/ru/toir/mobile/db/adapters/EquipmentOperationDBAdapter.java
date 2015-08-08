@@ -56,7 +56,7 @@ public class EquipmentOperationDBAdapter {
 	 * @throws SQLException
 	 */
 	public EquipmentOperationDBAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mContext, TOiRDBAdapter.getDbName(), null, TOiRDBAdapter.getAppDbVersion());
+		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
 		return this;
 	}
@@ -200,7 +200,10 @@ public class EquipmentOperationDBAdapter {
 	public ArrayList<EquipmentOperation> getItemsByTaskAndEquipment(String task_uuid, String equipment_uuid) {
 		ArrayList<EquipmentOperation> arrayList = null;
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=? AND " + FIELD_EQUIPMENT_UUID_NAME + "=?", new String[]{task_uuid, equipment_uuid}, null, null, null);		
+		if (task_uuid.equals(""))
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_UUID_NAME + "=?", new String[]{equipment_uuid}, null, null, "_id DESC");
+		else
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=? AND " + FIELD_EQUIPMENT_UUID_NAME + "=?", new String[]{task_uuid, equipment_uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
 			arrayList = new ArrayList<EquipmentOperation>();
 			do	{

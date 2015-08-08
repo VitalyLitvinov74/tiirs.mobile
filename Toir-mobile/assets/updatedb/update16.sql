@@ -1,0 +1,12 @@
+drop table if exists 'equipment_status';
+create table 'equipment_status' ('_id' integer not null primary key autoincrement, 'name' text not null, 'status_uuid' text not null, 'type' integer);
+insert into 'equipment_status' ('name', 'status_uuid', 'type') VALUES ('Не установлено','62a9aa68-9fe5-4d8c-a4b8-34278b95e51e','1');
+insert into 'equipment_status' ('name', 'status_uuid', 'type') VALUES ('Все в порядке','61c5007f-ae18-4c4e-bd57-737a20ef9ebc','2');
+insert into 'equipment_status' ('name', 'status_uuid', 'type') VALUES ('Требует проверки','d818a97e-b6eb-4aec-9168-174c780e365b','1');
+insert into 'equipment_status' ('name', 'status_uuid', 'type') VALUES ('Требует ремонта','7d0713cc-e79d-48d3-a2a2-60898a70bd8a','1');
+insert into 'equipment_status' ('name', 'status_uuid', 'type') VALUES ('Неисправно','7b9c5d15-4079-489f-af73-5135c36b330a','1');
+drop table if exists 'equipment_new';
+create table 'equipment_new' ('_id' integer not null primary key, 'uuid' text not null unique, 'title' text not null, 'equipment_type_uuid' text not null, 'critical_type_uuid' text not null, 'start_date' integer not null default 0, 'latitude' real, 'longitude' real, 'tag_id' text not null unique, 'img' text, 'status_uuid' text, 'status_type' integer);
+insert into 'equipment_new' ('uuid', 'title', 'equipment_type_uuid', 'critical_type_uuid', 'start_date', 'tag_id', 'latitude', 'longitude','img', 'status_uuid', 'status_type') select uuid, title, equipment_type_uuid, critical_type_uuid, start_date, tag_id, 0, 0,'/data/img/img.png','0', 1 from 'equipment';
+drop table if exists 'equipment';
+alter table 'equipment_new' rename to 'equipment';

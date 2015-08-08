@@ -7,6 +7,7 @@ import java.util.HashMap;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
@@ -16,6 +17,7 @@ import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentStatus;
 import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.MeasureType;
@@ -24,7 +26,6 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
-
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -132,7 +133,12 @@ public class ReferenceFragment extends Fragment {
                     case 7:
                         FillListViewTaskStatus();
                         ClearReferences();
-                        break;                        
+                        break;           
+                    //Статусы состояния оборудования
+                    case 8:
+                        FillListViewEquipmentStatus();
+                        ClearReferences();
+                        break;                                                           
                     default:
                         break;
                 }
@@ -416,6 +422,28 @@ public class ReferenceFragment extends Fragment {
 	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
 	 lv.setAdapter(adapter);
 	 taskStatusDBAdapter.close();
+	}
+
+ private void FillListViewEquipmentStatus()
+	{				 
+	 EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+	 ArrayList<EquipmentStatus> equipmentStatusList = equipmentStatusDBAdapter.getAllItems();
+	 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
+	 Integer cnt=0;
+	 String[] from = { "name","descr","img"};
+	 int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};         
+	 while (cnt<equipmentStatusList.size())
+		{
+		 HashMap<String, String> hm = new HashMap<String,String>();
+		 hm.put("name", equipmentStatusList.get(cnt).getTitle());
+		 hm.put("descr","uuid: " +  equipmentStatusList.get(cnt).getUuid());
+		 hm.put("img", Integer.toString(R.drawable.img_3));
+		 aList.add(hm);        	 
+		 cnt++;
+		}    
+	 SimpleAdapter adapter = new SimpleAdapter(getActivity().getApplicationContext(), aList, R.layout.listview, from, to);		 
+	 lv.setAdapter(adapter);
+	 equipmentStatusDBAdapter.close();
 	}
  
  private void ClearReferences()

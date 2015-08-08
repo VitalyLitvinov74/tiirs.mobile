@@ -7,7 +7,7 @@ alter table 'token_new' rename to 'token';
 
 drop table if exists 'equipment_new';
 create table 'equipment_new' ('_id' integer not null primary key, 'uuid' text not null unique, 'title' text not null, 'equipment_type_uuid' text not null, 'critical_type_uuid' text not null, 'start_date' integer not null default 0, 'latitude' real, 'longitude' real, 'tag_id' text not null unique);
-insert into 'equipment_new' ('uuid', 'title', 'equipment_type_uuid', 'critical_type_uuid', 'start_date', 'tag_id', 'latitude', 'longitude') select 'uuid', 'title', 'equipment_type_uuid', 'critical_type_uuid', 'start_date', 'tag_id', 0, 0 from 'equipment';
+insert into 'equipment_new' ('uuid', 'title', 'equipment_type_uuid', 'critical_type_uuid', 'start_date', 'tag_id', 'latitude', 'longitude') select uuid, title, equipment_type_uuid, critical_type_uuid, start_date, tag_id, 0, 0 from 'equipment';
 drop table if exists 'equipment';
 alter table 'equipment_new' rename to 'equipment';
 

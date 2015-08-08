@@ -44,4 +44,9 @@
     <string name="server_date_connect">Дата связи с сервером:</string>
     <string name="tasks_quantity">Нарядов получено/выполнено:</string>
     <string name="boss_contact">Контакт начальника:</string>
+    <string name="type">Тип:</string>   
+    <string name="critical">Критичность:</string>     
+    <string name="last_date">Дата последнего обслуживания:</string> 
+    <string name="last_result">Результат последнего обслуживания:</string>
+    <string name="documentation">Документация:</string>        
 </resources>
