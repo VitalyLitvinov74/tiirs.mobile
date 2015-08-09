@@ -49,6 +49,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 8 :
 			fragment = new EquipmentsFragment();
 			break;
+		case 9 :
+			fragment = new QRTestFragment();
+			break;
 		default :
 			fragment = null;
 			break;
@@ -58,7 +61,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 9;
+		return 10;
 	}
 
 	/* (non-Javadoc)
@@ -94,6 +97,9 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		case 8 :
 			title = "Оборудование";
+			break;
+		case 9 :
+			title = "QR test";
 			break;
 		default :
 			title = "";
