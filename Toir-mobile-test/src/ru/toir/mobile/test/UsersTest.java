@@ -3,7 +3,7 @@
  */
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.TOiRDBAdapter;
+import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import android.content.Context;
@@ -69,10 +69,10 @@ public class UsersTest extends AndroidTestCase {
 		// закрываем базу
 		adapter.close();
 		adapter = null;
-		assertEquals(true, context.deleteDatabase(TOiRDBAdapter.getDbName()));
+		assertEquals(true, context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName()));
 		
 		// чтобы выполнились последующие тесты, создаём заново базу
-		new TOiRDBAdapter(context).open().close();
+		DatabaseHelper.getInstance(context);
 
 		// для того чтобы выполнился tearDown, создаём заново адаптер
 		adapter = new UsersDBAdapter(context);
@@ -95,10 +95,10 @@ public class UsersTest extends AndroidTestCase {
 		context = new TOiRDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
 		
 		// удаляем предыдущую тестовую базу
-		context.deleteDatabase(TOiRDBAdapter.getDbName());
+		context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName());
 		
 		// создаём тестовую базу
-		new TOiRDBAdapter(context).open().close();
+		DatabaseHelper.getInstance(context);
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
         adapter = new UsersDBAdapter(context);

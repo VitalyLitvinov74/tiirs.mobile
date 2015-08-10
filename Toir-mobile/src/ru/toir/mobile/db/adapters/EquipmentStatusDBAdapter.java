@@ -3,7 +3,6 @@ package ru.toir.mobile.db.adapters;
 import java.util.ArrayList;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentStatus;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.content.ContentValues;

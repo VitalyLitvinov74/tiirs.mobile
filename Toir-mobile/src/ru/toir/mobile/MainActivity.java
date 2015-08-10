@@ -161,14 +161,14 @@ public class MainActivity extends FragmentActivity {
 
 	public boolean initDB() {
 		boolean success = false;
-		TOiRDBAdapter adapter = null;
+		DatabaseHelper helper = null;
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
-			adapter = new TOiRDBAdapter(new TOiRDatabaseContext(
-					getApplicationContext())).open();
-			Log.d("test", "db.version=" + adapter.getDbVersion());
-			if (!adapter.isActual()) {
+			helper = DatabaseHelper.getInstance(new TOiRDatabaseContext(
+					getApplicationContext()));
+			Log.d(TAG, "db.version=" + helper.getVersion());
+			if (!helper.isDBActual()) {
 				Toast toast = Toast.makeText(this, "База данных не актуальна!",
 						Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.CENTER, 0, 0);
@@ -180,8 +180,6 @@ public class MainActivity extends FragmentActivity {
 				toast.show();
 				success = true;
 			}
-			adapter.close();
-			adapter = null;
 		} catch (Exception e) {
 			Toast toast = Toast.makeText(this,
 					"Не удалось открыть/обновить базу данных!",

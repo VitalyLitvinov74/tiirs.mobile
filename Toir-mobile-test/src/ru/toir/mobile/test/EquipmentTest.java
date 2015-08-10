@@ -3,11 +3,10 @@
  */
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.TOiRDBAdapter;
+import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import android.content.Context;
-import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import android.util.Log;
@@ -64,10 +63,10 @@ public class EquipmentTest extends AndroidTestCase {
 		context = new TOiRDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
 		
 		// удаляем базу
-		context.deleteDatabase(TOiRDBAdapter.getDbName());
+		context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName());
 		
 		// создаём базу
-		new TOiRDBAdapter(context).open().close();
+		DatabaseHelper.getInstance(context);
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
         adapter = new EquipmentDBAdapter(context);
@@ -83,6 +82,6 @@ public class EquipmentTest extends AndroidTestCase {
 		Log.d(TAG, "tearDown");
 		adapter.close();
 		adapter = null;
-		context.deleteDatabase(TOiRDBAdapter.getDbName());
+		context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName());
 	}
 }
