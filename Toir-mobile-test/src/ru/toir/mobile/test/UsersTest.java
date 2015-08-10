@@ -51,7 +51,7 @@ public class UsersTest extends AndroidTestCase {
 	 * проверка чтения пользователя из из курсора
 	 */
 	public void testSelectUserFromCursor() {
-		String name = "admin";
+		String name = "Иванов О.А.";
 		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
 		Cursor user = adapter.getItem(uuid);
 		assertEquals(true, user.moveToFirst());
