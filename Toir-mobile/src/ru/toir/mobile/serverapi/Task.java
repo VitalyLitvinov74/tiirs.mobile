@@ -20,6 +20,8 @@ public class Task {
     @Expose
     private String Id;
     @Expose
+    private String EmployeeId;
+    @Expose
     private String CreatedAt;
     @Expose
     private String ChangedAt;
@@ -167,5 +169,19 @@ public class Task {
     public void setChangedAt(String ChangedAt) {
         this.ChangedAt = ChangedAt;
     }
+
+	/**
+	 * @return the employeeId
+	 */
+	public String getEmployeeId() {
+		return EmployeeId;
+	}
+
+	/**
+	 * @param employeeId the employeeId to set
+	 */
+	public void setEmployeeId(String employeeId) {
+		EmployeeId = employeeId;
+	}
 
 }

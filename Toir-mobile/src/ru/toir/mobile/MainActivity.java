@@ -98,11 +98,6 @@ public class MainActivity extends FragmentActivity {
 						 * (которые изменили свой статус на "В работе")
 						 */
 
-						// закрываем диалог получения наряда
-						PageAdapter adapter = (PageAdapter) pager.getAdapter();
-						OrdersFragment fragment = (OrdersFragment) adapter
-								.getItem(PageAdapter.ORDER_FRAGMENT);
-						fragment.cancelGetOrders();
 						Toast.makeText(getApplicationContext(),
 								"Наряды получены.", Toast.LENGTH_SHORT).show();
 					} else {
@@ -112,6 +107,12 @@ public class MainActivity extends FragmentActivity {
 								"Ошибка при получении нарядов.",
 								Toast.LENGTH_LONG).show();
 					}
+
+					// закрываем диалог получения наряда
+					PageAdapter adapter = (PageAdapter) pager.getAdapter();
+					OrdersFragment fragment = (OrdersFragment) adapter
+							.getItem(PageAdapter.ORDER_FRAGMENT);
+					fragment.cancelGetOrders();
 				}
 			}
 

@@ -18,6 +18,8 @@ public class Step {
     @Expose
     private String ImagePath;
     @Expose
+    private String Title;
+    @Expose
     private List<Result> Results = new ArrayList<Result>();
 
     /**
@@ -127,5 +129,19 @@ public class Step {
     public void setResults(List<Result> Results) {
         this.Results = Results;
     }
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return Title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		Title = title;
+	}
 
 }

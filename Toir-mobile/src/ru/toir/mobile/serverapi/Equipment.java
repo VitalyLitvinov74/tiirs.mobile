@@ -20,6 +20,10 @@ public class Equipment {
     @Expose
     private String Id;
     @Expose
+    private String Tag;
+    @Expose
+    private String StartupDate;
+    @Expose
     private String CreatedAt;
     @Expose
     private String ChangedAt;
@@ -167,5 +171,33 @@ public class Equipment {
     public void setChangedAt(String ChangedAt) {
         this.ChangedAt = ChangedAt;
     }
+
+	/**
+	 * @return the tag
+	 */
+	public String getTag() {
+		return Tag;
+	}
+
+	/**
+	 * @param tag the tag to set
+	 */
+	public void setTag(String tag) {
+		Tag = tag;
+	}
+
+	/**
+	 * @return the startupDate
+	 */
+	public String getStartupDate() {
+		return StartupDate;
+	}
+
+	/**
+	 * @param startupDate the startupDate to set
+	 */
+	public void setStartupDate(String startupDate) {
+		StartupDate = startupDate;
+	}
 
 }

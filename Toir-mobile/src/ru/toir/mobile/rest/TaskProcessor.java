@@ -96,10 +96,6 @@ public class TaskProcessor {
 	ArrayList<MeasureValue> measureValues = null;
 	ArrayList<EquipmentOperationResult> equipmentOperationResults = null;
 	
-	// TODO удалить когда с сервера будут приезжать метки для оборудования
-	int tagId = 1;
-	
-	
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
 
@@ -295,8 +291,7 @@ public class TaskProcessor {
 
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
-		// TODO здесь нужен uuid пользователя, с сервера пока не приходит
-		item.setUsers_uuid("4462ed77-9bf0-4542-b127-f4ecefce49da");
+		item.setUsers_uuid(serverTask.getEmployeeId());
 		try {
 			item.setCreate_date(dateFormat.parse(serverTask.getCreatedAt()).getTime() / 1000);
 		} catch(ParseException e) {
@@ -414,8 +409,7 @@ public class TaskProcessor {
 		item.setImage(step.getImagePath());
 		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
 		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
-		// TODO исправить как с сервера будут приходить необходимые данные
-		item.setName("");
+		item.setName(step.getTitle());
 		
 		// создаём объекты варантов результатов шагов
 		List<Result> results = step.getResults();
@@ -436,7 +430,8 @@ public class TaskProcessor {
 		OperationPatternStepResult item = new OperationPatternStepResult();
 		item.setUuid(result.getId());
 		item.setOperation_pattern_step_uuid(parrentUuid);
-		item.setNext_operation_pattern_step_uuid(result.getNextPatternStep().getId());
+		String nextStepUuid = result.getNextPatternStep() == null ? "00000000-0000-0000-0000-000000000000" : result.getNextPatternStep().getId();
+		item.setNext_operation_pattern_step_uuid(nextStepUuid);
 		item.setTitle(result.getTitle());
 		item.setMeasure_type_uuid(result.getMeasureType().getId());
 		// создаём объект варианта измерения
@@ -474,7 +469,8 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public Equipment getEquipment(ru.toir.mobile.serverapi.Equipment equipment) {
-
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss", Locale.ENGLISH);
 		Equipment item = new Equipment();
 		item.setUuid(equipment.getId());
 		item.setTitle(equipment.getName());
@@ -487,9 +483,12 @@ public class TaskProcessor {
 		// создаём объект типа критичности оборудования
 		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
 		
-		// TODO нужна дата ввода оборудования в эксплуатацию, пока не приходит с сервера
-		item.setStart_date(0);
-		
+		try {
+			item.setStart_date(dateFormat.parse(equipment.getStartupDate()).getTime() / 1000);
+		} catch(ParseException e) {
+			e.printStackTrace();
+		}
+
 		List<Document> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
 			equipmentDocumentations.put(documents.get(i).getId(), getDocumentation(documents.get(i), item.getUuid()));
@@ -497,10 +496,8 @@ public class TaskProcessor {
 		
 		item.setLatitude(equipment.getGeoCoordinates().getLatitude());
 		item.setLongitude(equipment.getGeoCoordinates().getLongitude());
-		
-		// TODO нужна метка оборудования, пока не приходит с сервера
-		item.setTag_id("000000" + tagId);
-		tagId++;
+		item.setTag_id(equipment.getTag());
+
 		
 		return item;
 	}
