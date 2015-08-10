@@ -32,6 +32,10 @@ public class RFIDTestFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.activity_magic_main, container, false);
 		initView(rootView);
+
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+
 		super.onCreate(savedInstanceState);
 		//Init();
 		return rootView;		

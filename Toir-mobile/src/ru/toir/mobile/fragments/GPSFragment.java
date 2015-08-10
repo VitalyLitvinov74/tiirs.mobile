@@ -194,6 +194,10 @@ public class GPSFragment extends Fragment {
 		users.close();
 		dbOrder.close();
 		onInit(rootView);
+		
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+
 		return rootView;
 	}
 

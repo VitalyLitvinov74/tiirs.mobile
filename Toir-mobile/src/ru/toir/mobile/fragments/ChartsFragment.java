@@ -135,6 +135,10 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         mSeekBarX.setOnSeekBarChangeListener(this);
         setHasOptionsMenu(true);
         // mChart.setDrawLegend(false);
+        
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+
         return rootView;
     }
 

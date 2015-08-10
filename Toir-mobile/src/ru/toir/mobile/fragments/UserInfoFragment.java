@@ -43,6 +43,10 @@ public class UserInfoFragment extends Fragment {
 				.inflate(R.layout.user_layout, container, false);
 		FillListViewTasks(rootView);
 		initView(rootView);
+
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+
 		return rootView;
 	}
 

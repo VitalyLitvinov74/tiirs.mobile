@@ -83,20 +83,20 @@ public class NativeCameraFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_native_camera, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_native_camera, container, false);
         // !!! если открывать камеру при создании фрагмента, камера блокируется и невозможно считать баркоды через неё !!!
         // как вариант - добавить пару кнопок для инициализации/деинициализации камеры
         /*
         // Create our Preview view and set it as the content of our activity.
-        boolean opened = safeCameraOpenInView(view);
+        boolean opened = safeCameraOpenInView(rootView);
 
         if(opened == false){
             Log.d("CameraGuide","Error, Camera failed to open");
-            return view;
+            return rootView;
         }
 
         // Trap the capture button.
-        Button captureButton = (Button) view.findViewById(R.id.button_capture);
+        Button captureButton = (Button) rootView.findViewById(R.id.button_capture);
         captureButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -108,7 +108,10 @@ public class NativeCameraFragment extends Fragment {
         );
         */
 
-        return view;
+        rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+
+        return rootView;
     }
 
     /**

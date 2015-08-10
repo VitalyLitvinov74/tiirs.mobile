@@ -100,6 +100,9 @@ public class OrdersFragment extends Fragment {
 
 			}
 		});
+		
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
 
 		initView();
 		return rootView;

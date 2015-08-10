@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -108,6 +109,22 @@ public class TaskFragment extends Fragment {
 		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
 		
 		setHasOptionsMenu(true);
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+		rootView.setOnKeyListener(new View.OnKeyListener() {
+			
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if ( keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+					Log.d("test", "TaskFragment !!! back pressed!!!");
+					if (Level == 1) {
+						initView();
+					}
+					return true;
+				}
+				return false;
+			}
+		});
 
 		initView();
 

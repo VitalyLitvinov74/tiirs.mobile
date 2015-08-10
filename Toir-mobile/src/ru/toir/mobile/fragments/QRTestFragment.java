@@ -112,12 +112,12 @@ public class QRTestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
     	/*
-        View view = inflater.inflate(R.layout.qr_layout, container, false);
+        View rootView = inflater.inflate(R.layout.qr_layout, container, false);
         autoFocusHandler = new Handler();
 
-        preview = (FrameLayout) view.findViewById(R.id.cameraPreview);
+        preview = (FrameLayout) rootView.findViewById(R.id.cameraPreview);
         */
-    	View view = null;
+    	View rootView = null;
 
         /* Instance barcode scanner */
         scanner = new ImageScanner();
@@ -125,10 +125,10 @@ public class QRTestFragment extends Fragment {
         scanner.setConfig(0, Config.Y_DENSITY, 3);
 
         /*
-        scanText = (TextView) view.findViewById(R.id.scanText);
+        scanText = (TextView) rootView.findViewById(R.id.scanText);
 
-        bar_code = (ImageView) view.findViewById(R.id.bar_code);
-        code_for_bar = (EditText) view.findViewById(R.id.code_for_bar);
+        bar_code = (ImageView) rootView.findViewById(R.id.bar_code);
+        code_for_bar = (EditText) rootView.findViewById(R.id.code_for_bar);
 
         code_for_bar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -147,8 +147,13 @@ public class QRTestFragment extends Fragment {
                 generateCodeImage(text);
             }
         });
-        */
-        return view;
+
+        
+        rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+		*/
+		
+        return rootView;
     }
     
     public static Camera getCameraInstance() {

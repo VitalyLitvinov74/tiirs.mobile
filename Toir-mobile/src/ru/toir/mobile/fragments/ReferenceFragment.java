@@ -62,6 +62,10 @@ public class ReferenceFragment extends Fragment {
 		Spinner_addict = (Spinner) rootView.findViewById(R.id.spinner3);
 		lv = (ListView)rootView.findViewById(R.id.listView1);
 		initView();
+
+		rootView.setFocusableInTouchMode(true);
+		rootView.requestFocus();
+
 		return rootView;
 	}
 	

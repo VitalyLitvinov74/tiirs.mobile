@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -425,5 +426,16 @@ public class MainActivity extends FragmentActivity {
 		super.onStop();
 		unregisterReceiver(mReceiverGetTask);
 		unregisterReceiver(mReceiverGetUser);
+	}
+
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ( keyCode == KeyEvent.KEYCODE_BACK) {
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }
