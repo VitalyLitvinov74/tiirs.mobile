@@ -26,14 +26,22 @@ import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationType;
+import ru.toir.mobile.rest.TaskServiceHelper;
+import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -63,6 +71,14 @@ public class TaskFragment extends Fragment {
 	ArrayList<String> tasks_equipment_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_critical_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_operation_uuid = new ArrayList<String>();
+	
+	private ProgressDialog getOrderDialog;
+	public void cancelGetOrders() {
+		if (getOrderDialog != null) {
+			getOrderDialog.cancel();
+		}
+	}
+
 
 	// private String operationUuidTag = "operation_uuid_tag";
 	// private String equipmentUuidTag = "equipment_uuid_tag";
@@ -90,6 +106,8 @@ public class TaskFragment extends Fragment {
 		Spinner_references = (Spinner) rootView
 				.findViewById(R.id.tasks_spinner10);
 		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
+		
+		setHasOptionsMenu(true);
 
 		initView();
 
@@ -510,6 +528,46 @@ public class TaskFragment extends Fragment {
 		rfidRead.putExtras(bundle);
 		getActivity().startActivityForResult(rfidRead,
 				MainActivity.RETURN_CODE_READ_RFID);
+	}
+
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+	 */
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		// добавляем элемент меню для получения наряда
+		MenuItem getTask = menu.add("Получить наряды");
+		getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Log.d("test", "Получаем наряд.");
+				TaskServiceHelper tsh = new TaskServiceHelper(getActivity()
+						.getApplicationContext(),
+						TaskServiceProvider.Actions.ACTION_GET_TASK);
+				tsh.GetTask(AuthorizedUser.getInstance().getToken());
+				// показываем диалог получения наряда
+				getOrderDialog = new ProgressDialog(getActivity());
+				getOrderDialog.setMessage("Получаем наряд");
+				getOrderDialog.setIndeterminate(true);
+				getOrderDialog
+						.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				getOrderDialog.setCancelable(false);
+				getOrderDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+						"Отмена", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO необходимые операции для отмены приёма нарядов
+							}
+						});
+				getOrderDialog.show();
+
+				return true;
+			}
+		});
+		Log.d("test", "on create task menu size" + menu.size());
 	}
 
 }

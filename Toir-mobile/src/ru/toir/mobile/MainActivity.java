@@ -23,8 +23,8 @@ import android.view.Window;
 import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
-import ru.toir.mobile.fragments.OrdersFragment;
 import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.fragments.TaskFragment;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.TokenServiceHelper;
@@ -39,7 +39,6 @@ public class MainActivity extends FragmentActivity {
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
-	// PageAdapter pageAdapter;
 
 	// фильтр для сообщений при получении пользователя с сервера
 	private final IntentFilter mFilterGetUser = new IntentFilter(
@@ -110,8 +109,8 @@ public class MainActivity extends FragmentActivity {
 
 					// закрываем диалог получения наряда
 					PageAdapter adapter = (PageAdapter) pager.getAdapter();
-					OrdersFragment fragment = (OrdersFragment) adapter
-							.getItem(PageAdapter.ORDER_FRAGMENT);
+					TaskFragment fragment = (TaskFragment) adapter
+							.getItem(PageAdapter.TASK_FRAGMENT);
 					fragment.cancelGetOrders();
 				}
 			}

@@ -10,6 +10,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public final static int TASK_FRAGMENT = 6;
 
 	private OrdersFragment ordersFragment;
+	private TaskFragment taskFragment;
 
 	public PageAdapter(FragmentManager fm) {	
 		super(fm);
@@ -26,8 +27,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 			if (ordersFragment == null) {
 				ordersFragment = new OrdersFragment();
 			}
-			fragment = ordersFragment;
-			break;
+			return ordersFragment;
 		case 2 :
 			fragment = new ReferenceFragment();
 			break;
@@ -41,8 +41,10 @@ public class PageAdapter extends FragmentPagerAdapter {
 			fragment = new GPSFragment();
 			break;
 		case TASK_FRAGMENT :
-			fragment = new TaskFragment();
-			break;
+			if (taskFragment == null) {
+				taskFragment = new TaskFragment();
+			}
+			return taskFragment;
 		case 7 :
 			fragment = new NativeCameraFragment();
 			break;
@@ -106,5 +108,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		}
 		return title;
-	}	
+	}
+
 }
