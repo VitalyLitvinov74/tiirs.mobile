@@ -18,8 +18,7 @@ public class Equipment {
 	private float longitude;
 	private String tag_id;
 	private String img;
-	private String status_uuid;
-	private int status_type;
+	private String equipment_status_uuid;
 
 	/**
 	 * 
@@ -31,7 +30,7 @@ public class Equipment {
 	/**
 	 * 
 	 */
-	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String status_uuid, int status_type) {
+	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String equipment_status_uuid) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
@@ -42,8 +41,7 @@ public class Equipment {
 		this.longitude = longitude;
 		this.tag_id = tag_id;
 		this.img = img;
-		this.status_uuid = status_uuid;
-		this.status_type = status_type;		
+		this.equipment_status_uuid = equipment_status_uuid;
 	}
 
 	/**
@@ -176,15 +174,15 @@ public class Equipment {
 	/**
 	 * @return the status_uuid
 	 */
-	public String getStatus_uuid() {
-		return status_uuid;
+	public String getEquipmentStatus_uuid() {
+		return equipment_status_uuid;
 	}
 
 	/**
 	 * @param status uuid to set
 	 */
-	public void setStatus_uuid(String status_uuid) {
-		this.status_uuid = status_uuid;
+	public void setEquipmentStatus_uuid(String status_uuid) {
+		this.equipment_status_uuid = status_uuid;
 	}
 
 	/**
@@ -200,17 +198,4 @@ public class Equipment {
 		this.img = img;
 	}
 
-	/**
-	 * @return the status_uuid
-	 */
-	public int getStatus_type() {
-		return status_type;
-	}	
-	
-	/**
-	 * @param type to set
-	 */
-	public void setType(int type) {
-		this.status_type = type;
-	}
 }

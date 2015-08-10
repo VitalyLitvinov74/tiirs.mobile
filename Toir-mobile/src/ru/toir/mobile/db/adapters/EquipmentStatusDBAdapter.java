@@ -18,8 +18,8 @@ public class EquipmentStatusDBAdapter {
 	public static final String TABLE_NAME = "equipment_status";
 	
 	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_NAME_NAME = "name";
-	public static final String FIELD_UUID_NAME = "status_uuid";
+	public static final String FIELD_UUID_NAME = "uuid";
+	public static final String FIELD_TITLE_NAME = "title";
 	public static final String FIELD_TYPE_NAME = "type";
 
 	//public static final String STATUS_UUID_CREATED = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
@@ -27,7 +27,7 @@ public class EquipmentStatusDBAdapter {
 	String[] mColumns = {
 			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
-			FIELD_NAME_NAME,
+			FIELD_TITLE_NAME,
 			FIELD_TYPE_NAME};
 		
 	/**
@@ -113,7 +113,7 @@ public class EquipmentStatusDBAdapter {
 				 EquipmentStatus equip = new EquipmentStatus(
 					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_NAME_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)),
 					cursor.getInt(cursor.getColumnIndex(FIELD_TYPE_NAME)));
 				 	arrayList.add(equip);
 				 	if (cursor.isLast()) break;
@@ -133,7 +133,7 @@ public class EquipmentStatusDBAdapter {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_NAME_NAME, title);
+		values.put(FIELD_TITLE_NAME, title);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}

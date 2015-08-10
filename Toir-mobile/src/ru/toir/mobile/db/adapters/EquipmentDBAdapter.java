@@ -35,14 +35,13 @@ public class EquipmentDBAdapter {
 	public static final String FIELD_LONGITUDE_NAME = "longitude";
 	public static final String FIELD_TAG_ID_NAME = "tag_id";
 	public static final String FIELD_IMG_NAME = "img";
-	public static final String FIELD_STATUS_UUID_NAME = "status_uuid";
-	public static final String FIELD_STATUS_TYPE_NAME = "status_type";
+	public static final String FIELD_EQUIPMENT_STATUS_UUID_NAME = "equipment_status_uuid";
 
 	private static String mColumns[] = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_TITLE_NAME, FIELD_EQUIPMENT_TYPE_UUID_NAME,
 			FIELD_CRITICAL_TYPE_UUID_NAME, FIELD_START_DATE_NAME,
-			FIELD_LATITUDE_NAME, FIELD_LONGITUDE_NAME, FIELD_TAG_ID_NAME, FIELD_IMG_NAME,
-			FIELD_STATUS_UUID_NAME,	FIELD_STATUS_TYPE_NAME };
+			FIELD_LATITUDE_NAME, FIELD_LONGITUDE_NAME, FIELD_TAG_ID_NAME,
+			FIELD_IMG_NAME, FIELD_EQUIPMENT_STATUS_UUID_NAME };
 
 	/**
 	 * @param context
@@ -162,12 +161,10 @@ public class EquipmentDBAdapter {
 				.getColumnIndex(FIELD_LONGITUDE_NAME)));
 		equipment.setTag_id(cursor.getString(cursor
 				.getColumnIndex(FIELD_TAG_ID_NAME)));
-		equipment.setImg(cursor.getString(cursor
-				.getColumnIndex(FIELD_IMG_NAME)));
-		equipment.setStatus_uuid(cursor.getString(cursor
-				.getColumnIndex(FIELD_STATUS_UUID_NAME)));
-		equipment.setType(cursor.getInt(cursor
-				.getColumnIndex(FIELD_STATUS_TYPE_NAME)));
+		equipment
+				.setImg(cursor.getString(cursor.getColumnIndex(FIELD_IMG_NAME)));
+		equipment.setEquipmentStatus_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_EQUIPMENT_STATUS_UUID_NAME)));
 		return equipment;
 	}
 
@@ -190,7 +187,7 @@ public class EquipmentDBAdapter {
 	 */
 	public long replace(String uuid, String title, String equipment_type_uuid,
 			String critical_type_uuid, long start_date, float latitude,
-			float longitude, String tag_id, String img, String status_uuid, int type) {
+			float longitude, String tag_id, String img, String status_uuid) {
 		ContentValues values = new ContentValues();
 		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);
@@ -203,8 +200,7 @@ public class EquipmentDBAdapter {
 		values.put(EquipmentDBAdapter.FIELD_LONGITUDE_NAME, longitude);
 		values.put(EquipmentDBAdapter.FIELD_TAG_ID_NAME, tag_id);
 		values.put(EquipmentDBAdapter.FIELD_IMG_NAME, img);
-		values.put(EquipmentDBAdapter.FIELD_STATUS_UUID_NAME, status_uuid);
-		values.put(EquipmentDBAdapter.FIELD_STATUS_TYPE_NAME, type);
+		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_STATUS_UUID_NAME, status_uuid);
 		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);
 	}
 
@@ -221,7 +217,8 @@ public class EquipmentDBAdapter {
 				equipment.getEquipment_type_uuid(),
 				equipment.getCritical_type_uuid(), equipment.getStart_date(),
 				equipment.getLatitude(), equipment.getLongitude(),
-				equipment.getTag_id(),equipment.getImg(),equipment.getStatus_uuid(),equipment.getStatus_type());
+				equipment.getTag_id(), equipment.getImg(),
+				equipment.getEquipmentStatus_uuid());
 	}
 
 	/**
@@ -300,33 +297,41 @@ public class EquipmentDBAdapter {
 		} else
 			return "неизвестны";
 	}
+
 	/**
-	 * <p>Возвращает фото по uuid</p>
+	 * <p>
+	 * Возвращает фото по uuid
+	 * </p>
+	 * 
 	 * @param uuid
 	 */
 	public String getImgByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
-		if (cursor.getColumnCount()>0)
-			{
-			 cursor.moveToFirst();
-			 return cursor.getString(cursor.getColumnIndex(FIELD_IMG_NAME));
-			}
-		else return "/data/img/img.png";
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cursor.getColumnCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getString(cursor.getColumnIndex(FIELD_IMG_NAME));
+		} else
+			return "/data/img/img.png";
 	}
+
 	/**
-	 * <p>Возвращает tag_id по uuid</p>
+	 * <p>
+	 * Возвращает tag_id по uuid
+	 * </p>
+	 * 
 	 * @param uuid
 	 */
 	public String getTagIDByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);				
-		if (cursor.getColumnCount()>0)
-			{
-			 cursor.moveToFirst();
-			 return cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME));
-			}
-		else return "0-0-0";
-	}				
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		if (cursor.getColumnCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID_NAME));
+		} else
+			return "0-0-0";
+	}
 
 }
