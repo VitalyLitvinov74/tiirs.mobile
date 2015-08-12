@@ -163,4 +163,18 @@ public class Users {
 		this._id = _id;
 	}
 
+	/**
+	 * @return the whois
+	 */
+	public String getWhois() {
+		return whois;
+	}
+
+	/**
+	 * @param whois the whois to set
+	 */
+	public void setWhois(String whois) {
+		this.whois = whois;
+	}
+
 }

@@ -40,6 +40,10 @@ public class MainActivity extends FragmentActivity {
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
+	public static class RFIDReadAction {
+		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
+		public static final int READ_EQUIPMENT_TAG_BEFORE_OPERATION = 2;
+	}
 
 	// фильтр для сообщений при получении пользователя с сервера
 	private final IntentFilter mFilterGetUser = new IntentFilter(
@@ -56,17 +60,75 @@ public class MainActivity extends FragmentActivity {
 					boolean result = intent.getBooleanExtra(
 							ProcessorService.Extras.RESULT_EXTRA, false);
 					if (result == true) {
-						// TODO при получении пользователя, нужно запросить
-						// токен
-						TokenServiceHelper serviceHelper = new TokenServiceHelper(
-								getApplicationContext(),
-								TokenServiceProvider.Actions.ACTION_GET_TOKEN);
-						// TODO сюда нужно передать либо имя пользователя либо
-						// его метку
-						serviceHelper.GetTokenByTag("");
+						UsersDBAdapter users = new UsersDBAdapter(
+								new TOiRDatabaseContext(getApplicationContext()))
+								.open();
+						Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
+						users.close();
+						// в зависимости от результата либо дать работать, либо не дать
+						if (user != null && user.isActive()) {
+							isLogged = true;
+							setMainLayout();
+						} else {
+							Toast.makeText(getApplicationContext(),
+									"Нет доступа.",
+									Toast.LENGTH_LONG).show();
+
+						}
 					} else {
-						// либо пользователя нет, либо произошла еще какая-то
-						// ошибка
+						// либо пользователя нет, либо произошла ошибка
+					}
+				}
+			}
+		}
+	};
+	
+	// фильтр для получения сообщений при получении токена с сервера
+	private final IntentFilter mFilterGetToken = new IntentFilter(
+			TokenServiceProvider.Actions.ACTION_GET_TOKEN);
+	private BroadcastReceiver mReceiverGetToken = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int provider = intent.getIntExtra(
+					ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			Log.d(TAG, "" + provider);
+			if (provider == ProcessorService.Providers.TOKEN_PROVIDER) {
+				int method = intent.getIntExtra(
+						ProcessorService.Extras.METHOD_EXTRA, 0);
+				Log.d(TAG, "" + method);
+				if (method == TokenServiceProvider.Methods.GET_TOKEN_BY_TAG) {
+					boolean result = intent.getBooleanExtra(
+							ProcessorService.Extras.RESULT_EXTRA, false);
+					Log.d(TAG, "" + result);
+					if (result == true) {
+						// пользователь есть на сервере, токен выдан, нужно запросить актуальную информацию по пользователю
+						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(getApplicationContext(), UsersServiceProvider.Actions.ACTION_GET_USER);
+						usersServiceHelper.getUser();
+
+						Toast.makeText(getApplicationContext(),
+								"Токен получен.", Toast.LENGTH_SHORT).show();
+					} else {
+						// токен не получен, сервер не ответил...
+						// проверяем наличие пользователя в локальной базе
+						UsersDBAdapter users = new UsersDBAdapter(
+								new TOiRDatabaseContext(getApplicationContext()))
+								.open();
+						Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
+						users.close();
+						// в зависимости от результата либо дать работать, либо не дать
+						if (user != null && user.isActive()) {
+							isLogged = true;
+							setMainLayout();
+						} else {
+							Toast.makeText(getApplicationContext(),
+									"Нет доступа.",
+									Toast.LENGTH_LONG).show();
+
+						}
+
+						Toast.makeText(getApplicationContext(),
+								"Токен не получен.",
+								Toast.LENGTH_LONG).show();
 					}
 				}
 			}
@@ -138,13 +200,6 @@ public class MainActivity extends FragmentActivity {
 			setMainLayout();
 		} else {
 			setContentView(R.layout.login_layout);
-			// TODO необходимо реализовать механизм который бы позволял
-			// подключаться к базе только после того как она полностью обновится
-			/*
-			 * TokenDBAdapter tokenDBAdapter = new TokenDBAdapter(new
-			 * TOiRDatabaseContext(getApplicationContext())).open();
-			 * tokenDBAdapter.deleteAll(); tokenDBAdapter.close();
-			 */
 		}
 
 	}
@@ -197,7 +252,7 @@ public class MainActivity extends FragmentActivity {
 	public void startAuthorise() {
 		isLogged = false;
 		Intent rfidRead = new Intent(this, RFIDActivity.class);
-		rfidRead.putExtra("action", 1);
+		rfidRead.putExtra("action", RFIDReadAction.READ_USER_TAG_BEFORE_LOGIN);
 		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
 	}
 
@@ -243,47 +298,18 @@ public class MainActivity extends FragmentActivity {
 			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT)
 					.show();
 		} else {
-			// TODO необходимо реализовать рассылку уведомлений с результатом
-			// чтения метки всем кто сейчас заинтересован в результате операции
 			int action = data.getIntExtra("action", 0);
 			switch (action) {
-			// TODO заменить цифры на читаемые константы операций для которых
-			// считывается метка
-			case 1:
-				// TODO запросить наличие/токен на сервере, по результату
-				// запроса принимать решение что делать дальше
+			case RFIDReadAction.READ_USER_TAG_BEFORE_LOGIN:
 				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
 						getApplicationContext(),
 						TokenServiceProvider.Actions.ACTION_GET_TOKEN);
 				tokenServiceHelper.GetTokenByTag(tagId);
-
-				// проверяем наличие пользователя в локальной базе
-				UsersDBAdapter users = new UsersDBAdapter(
-						new TOiRDatabaseContext(getApplicationContext()))
-						.open();
-				Users user = users.getUserByTagId(tagId);
-				users.close();
-				if (user == null) {
-					UsersServiceHelper serviceHelper = new UsersServiceHelper(
-							getApplicationContext(), "get_unknown_user");
-					serviceHelper.getUser(tagId);
-					// TODO реализовать уведомление и обработку получения
-					// пользователя с сервера !!!
-					/*
-					 * Toast.makeText(this, "Нет такого пользователя!",
-					 * Toast.LENGTH_SHORT).show();
-					 */
-				} else {
-					Log.d(TAG, user.toString());
-					AuthorizedUser aUser = AuthorizedUser.getInstance();
-					aUser.setTagId(tagId);
-					aUser.setUuid(user.getUuid());
-
-					isLogged = true;
-					setMainLayout();
-				}
+				
+				// сохраняем ид метки для дальнейшего использования
+				AuthorizedUser.getInstance().setTagId(tagId);
 				break;
-			case 2:
+			case RFIDReadAction.READ_EQUIPMENT_TAG_BEFORE_OPERATION:
 				Intent operationActivity = new Intent(this,
 						OperationActivity.class);
 				Bundle bundle = data.getExtras();
@@ -414,6 +440,7 @@ public class MainActivity extends FragmentActivity {
 		super.onStart();
 		registerReceiver(mReceiverGetTask, mFilterGetTask);
 		registerReceiver(mReceiverGetUser, mFilterGetUser);
+		registerReceiver(mReceiverGetToken, mFilterGetToken);
 	}
 
 	/*
@@ -426,6 +453,7 @@ public class MainActivity extends FragmentActivity {
 		super.onStop();
 		unregisterReceiver(mReceiverGetTask);
 		unregisterReceiver(mReceiverGetUser);
+		unregisterReceiver(mReceiverGetToken);
 	}
 
 	/* (non-Javadoc)

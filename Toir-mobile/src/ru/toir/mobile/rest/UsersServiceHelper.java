@@ -26,9 +26,8 @@ public class UsersServiceHelper extends ServiceHelperBase {
 	 * 
 	 * @param tag
 	 */
-	public void getUser(String tag) {
+	public void getUser() {
 		Bundle bundle = new Bundle();
-		bundle.putString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG, tag);
 		RunMethod(UsersServiceProvider.Methods.GET_USER, bundle);
 	}
 

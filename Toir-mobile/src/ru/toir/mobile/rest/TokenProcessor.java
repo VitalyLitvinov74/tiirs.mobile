@@ -8,8 +8,6 @@ import com.google.gson.Gson;
 
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
-import ru.toir.mobile.db.adapters.TokenDBAdapter;
 import ru.toir.mobile.rest.RestClient.Method;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,7 +21,6 @@ import android.util.Log;
  */
 public class TokenProcessor {
 
-	private Context mContext;
 	private static final String USERS_GET_TOKEN_URL = "/token";
 	private String mServerUrl;
 
@@ -31,7 +28,6 @@ public class TokenProcessor {
 	 * 
 	 */
 	public TokenProcessor(Context context) throws Exception {
-		mContext = context;
 
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -67,7 +63,7 @@ public class TokenProcessor {
 				String jsonString = new String(response.mBody);
 				ru.toir.mobile.serverapi.Token serverToken = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Token.class);
 				if (serverToken != null) {
-					saveToken(serverToken);
+					AuthorizedUser.getInstance().setToken(serverToken.getAccessToken());
 					return true;
 				} else {
 					return false;
@@ -111,7 +107,7 @@ public class TokenProcessor {
 				String jsonString = new String(response.mBody);
 				ru.toir.mobile.serverapi.Token serverToken = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Token.class);
 				if (serverToken != null) {
-					saveToken(serverToken);
+					AuthorizedUser.getInstance().setToken(serverToken.getAccessToken());
 					return true;
 				} else {
 					return false;
@@ -123,19 +119,5 @@ public class TokenProcessor {
 			e.printStackTrace();
 			return false;
 		}
-	}
-	
-	/**
-	 * 
-	 * @param token
-	 */
-	private void saveToken(ru.toir.mobile.serverapi.Token token) {
-		
-		AuthorizedUser.getInstance().setToken(token.getAccessToken());
-
-		TokenDBAdapter adapter = new TokenDBAdapter(
-				new TOiRDatabaseContext(mContext)).open();
-		adapter.replace(token);
-		adapter.close();		
 	}
 }

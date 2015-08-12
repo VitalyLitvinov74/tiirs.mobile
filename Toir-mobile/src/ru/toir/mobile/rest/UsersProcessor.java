@@ -1,8 +1,13 @@
 package ru.toir.mobile.rest;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONObject;
 
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
@@ -12,6 +17,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
 /**
@@ -21,7 +27,7 @@ import android.util.Log;
 
 public class UsersProcessor {
 	private Context mContext;
-	private static final String USERS_GET_USER_URL = "/user";
+	private static final String USERS_GET_USER_URL = "/api/account/me";
 	private String mServerUrl;
 	
 
@@ -44,35 +50,42 @@ public class UsersProcessor {
 	 * @return
 	 */
 	public boolean getUser(Bundle bundle) {
-		// TODO реализовать получение пользователя с сервера для внесения в локальную базу
 		URI requestUri = null;
-		String tag = bundle.getString(UsersServiceProvider.Methods.GET_USER_PARAMETER_TAG);
+		String token = AuthorizedUser.getInstance().getToken();
 		String jsonString = null;
-		JSONObject jsonArray = null;
+		JSONObject jsonObject = null;
 		try {
 			requestUri = new URI(mServerUrl + USERS_GET_USER_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 			
-			StringBuilder postData = new StringBuilder("label=").append(tag);
-			Request request = new Request(Method.POST, requestUri, null, postData.toString().getBytes());
-			
+			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+			List<String> tList = new ArrayList<String>();
+			tList.add("bearer " + token);
+			headers.put("Authorization", tList);
+
+			Request request = new Request(Method.GET, requestUri, headers, null);
+
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
 
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
 
-				jsonArray = new JSONObject(jsonString);
+				jsonObject = new JSONObject(jsonString);
 				
-				JSONObject value = jsonArray.getJSONObject("data");
 				Users user = new Users();
-				user.setUuid(value.getString(UsersDBAdapter.FIELD_UUID_NAME));
-				user.setName(value.getString(UsersDBAdapter.FIELD_NAME_NAME));
-				user.setLogin(value.getString(UsersDBAdapter.FIELD_LOGIN_NAME));
-				user.setPass(value.getString(UsersDBAdapter.FIELD_PASS_NAME));
-				user.setType(value.getInt(UsersDBAdapter.FIELD_TYPE_NAME));
-				user.setTag_id(value.getString(UsersDBAdapter.FIELD_TAGID_NAME));
-				user.setActive(value.getInt(UsersDBAdapter.FIELD_ACTIVE_NAME) == 0 ? false : true);
+				// TODO реализовать разбор данных о пользователе с сервера
+				// пока всех нет рыба для проверки
+				user.setUuid("4462ed77-9bf0-4542-b127-f4ecefce49da");
+				user.setName(jsonObject.getString("UserName"));
+				user.setLogin(jsonObject.getString("Email"));
+				user.setPass("password");
+				user.setType(3);
+				user.setTag_id("01234567");
+				int active = 1;
+				user.setActive(active == 0 ? false : true);
+				user.setWhois("Бугор");
+
 				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
 				adapter.replaceItem(user);
 				adapter.close();

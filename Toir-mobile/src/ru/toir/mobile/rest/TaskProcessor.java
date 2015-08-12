@@ -137,9 +137,7 @@ public class TaskProcessor {
 	 */
 	public boolean GetTask(Bundle bundle) {
 		URI requestUri = null;
-		//String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String token = AuthorizedUser.getInstance().getToken();
-
 		String jsonString = null;
 
 		try {

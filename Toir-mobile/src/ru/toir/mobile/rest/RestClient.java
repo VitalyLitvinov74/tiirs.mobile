@@ -31,6 +31,9 @@ public class RestClient {
 				}
 			}
 
+			// костыль на время тестирования, так как у Олега нет поднятого локального сервера
+			conn.setConnectTimeout(5000);
+
 			switch (request.getMethod()) {
 			case GET:
 				conn.setDoOutput(false);

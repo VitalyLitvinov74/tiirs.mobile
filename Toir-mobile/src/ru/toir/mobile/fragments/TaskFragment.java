@@ -350,7 +350,6 @@ public class TaskFragment extends Fragment {
 				}
 			});
 
-			// TODO реализовать выборку статусов операций из базы
 			OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
 					new TOiRDatabaseContext(getActivity())).open();
 			ArrayList<OperationStatus> operationStatus = statusDBAdapter
@@ -541,7 +540,7 @@ public class TaskFragment extends Fragment {
 		bundle.putString("order_uuid", order_uuid);
 		bundle.putString("equipment_uuid", equipment_uuid);
 		bundle.putString("equipment_tag", equipment_tag);
-		bundle.putInt("action", 2);
+		bundle.putInt("action", MainActivity.RFIDReadAction.READ_EQUIPMENT_TAG_BEFORE_OPERATION);
 		rfidRead.putExtras(bundle);
 		getActivity().startActivityForResult(rfidRead,
 				MainActivity.RETURN_CODE_READ_RFID);
