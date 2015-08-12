@@ -30,6 +30,7 @@
             android:id="@+id/bar_code"
             android:layout_width="150dip"
             android:layout_height="150dip"
+            android:contentDescription="@string/image_description"
             android:background="@android:color/white" />
 
         <EditText
@@ -38,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dip"
             android:ems="10"
-            android:text="123456789" >
+            android:inputType="text"
+            android:text="@string/scan_process" >
 
             <requestFocus />
         </EditText>
@@ -55,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dip"
-            android:text="scan process"
+            android:text="@string/scan_process"
             android:textColor="@android:color/black" />
 
     </LinearLayout>

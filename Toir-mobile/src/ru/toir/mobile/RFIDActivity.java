@@ -29,13 +29,14 @@ public class RFIDActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.rfid_read);
+		super.onCreate(savedInstanceState);		
 		
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		driverClassName = sp.getString(getString(R.string.RFIDDriver), "RFIDDriverNull");
 
+		setContentView(R.layout.rfid_read);
+		
 		// пытаемся получить класс драйвера
 		try {
 			driverClass = Class.forName("ru.toir.mobile.rfid.driver." + driverClassName);
@@ -59,9 +60,10 @@ public class RFIDActivity extends Activity {
 		}
 		
 		RFID rfid = new RFID(driver);
+		rfid.setActivity(this);
+
 		// инициализируем драйвер
 		if (rfid.init()) {
-			rfid.setActivity(this);
 			// запускаем процедуру считывания
 			rfid.read();
 		} else {

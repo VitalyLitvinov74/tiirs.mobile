@@ -111,11 +111,10 @@ public class QRTestFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.qr_layout, container, false);
+    	View rootView = inflater.inflate(R.layout.qr_layout, container, false);
         autoFocusHandler = new Handler();
 
-        preview = (FrameLayout) rootView.findViewById(R.id.cameraPreview);
+        preview = (FrameLayout) rootView.findViewById(R.id.cameraPreview);       
 
         /* Instance barcode scanner */
         scanner = new ImageScanner();
@@ -144,7 +143,6 @@ public class QRTestFragment extends Fragment {
                 generateCodeImage(text);
             }
         });
-
         
         rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
