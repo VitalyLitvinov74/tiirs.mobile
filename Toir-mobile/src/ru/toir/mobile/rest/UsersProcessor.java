@@ -4,15 +4,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONObject;
-
+import com.google.gson.Gson;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
+import ru.toir.mobile.serverapi.User;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -50,10 +49,11 @@ public class UsersProcessor {
 	 * @return
 	 */
 	public boolean getUser(Bundle bundle) {
+
 		URI requestUri = null;
 		String token = AuthorizedUser.getInstance().getToken();
 		String jsonString = null;
-		JSONObject jsonObject = null;
+
 		try {
 			requestUri = new URI(mServerUrl + USERS_GET_USER_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
@@ -70,25 +70,30 @@ public class UsersProcessor {
 
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
-
-				jsonObject = new JSONObject(jsonString);
 				
-				Users user = new Users();
-				// TODO реализовать разбор данных о пользователе с сервера
-				// пока всех нет рыба для проверки
-				user.setUuid("4462ed77-9bf0-4542-b127-f4ecefce49da");
-				user.setName(jsonObject.getString("UserName"));
-				user.setLogin(jsonObject.getString("Email"));
-				user.setPass("password");
-				user.setType(3);
-				user.setTag_id("01234567");
-				int active = 1;
-				user.setActive(active == 0 ? false : true);
-				user.setWhois("Бугор");
+				User serverUser = new Gson().fromJson(jsonString, User.class);
+				if (serverUser != null) {
+					Users user = new Users();
+					user.setUuid(serverUser.getId());
+					user.setName(serverUser.getUserName());
+					user.setLogin(serverUser.getEmail());
+					// TODO с сервера не приходит хэш
+					user.setPass("password");
+					// TODO с сервера не приходит тип
+					user.setType(3);
+					// TODO реализовать сохранение хэша вместо ид метки
+					user.setTag_id("01234567");
+					boolean active = serverUser.isIsActive();
+					user.setActive(active);
+					// TODO с сервера не приходит должность
+					user.setWhois("Бугор");
 
-				UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
-				adapter.replaceItem(user);
-				adapter.close();
+					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
+					adapter.replaceItem(user);
+					adapter.close();
+				} else {
+					return false;
+				}
 				
 				return true;
 			} else {

@@ -2,6 +2,7 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 
@@ -16,15 +17,15 @@ public class Task {
     @Expose
     private ru.toir.mobile.serverapi.OrderStatus OrderStatus;
     @Expose
-    private Integer CloseDate;
+    private Date CloseDate;
     @Expose
     private String Id;
     @Expose
     private String EmployeeId;
     @Expose
-    private String CreatedAt;
+    private Date CreatedAt;
     @Expose
-    private String ChangedAt;
+    private Date ChangedAt;
 
     /**
      * 
@@ -103,7 +104,7 @@ public class Task {
      * @return
      *     The CloseDate
      */
-    public Integer getCloseDate() {
+    public Date getCloseDate() {
         return CloseDate;
     }
 
@@ -112,7 +113,7 @@ public class Task {
      * @param CloseDate
      *     The CloseDate
      */
-    public void setCloseDate(Integer CloseDate) {
+    public void setCloseDate(Date CloseDate) {
         this.CloseDate = CloseDate;
     }
 
@@ -134,42 +135,6 @@ public class Task {
         this.Id = Id;
     }
 
-    /**
-     * 
-     * @return
-     *     The CreatedAt
-     */
-    public String getCreatedAt() {
-        return CreatedAt;
-    }
-
-    /**
-     * 
-     * @param CreatedAt
-     *     The CreatedAt
-     */
-    public void setCreatedAt(String CreatedAt) {
-        this.CreatedAt = CreatedAt;
-    }
-
-    /**
-     * 
-     * @return
-     *     The ChangedAt
-     */
-    public String getChangedAt() {
-        return ChangedAt;
-    }
-
-    /**
-     * 
-     * @param ChangedAt
-     *     The ChangedAt
-     */
-    public void setChangedAt(String ChangedAt) {
-        this.ChangedAt = ChangedAt;
-    }
-
 	/**
 	 * @return the employeeId
 	 */
@@ -182,6 +147,34 @@ public class Task {
 	 */
 	public void setEmployeeId(String employeeId) {
 		EmployeeId = employeeId;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(Date createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(Date changedAt) {
+		ChangedAt = changedAt;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public Date getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public Date getChangedAt() {
+		return ChangedAt;
 	}
 
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentStatus;
-import ru.toir.mobile.db.tables.TaskStatus;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -129,22 +128,23 @@ public class EquipmentStatusDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String title) {
+	public long replace(String uuid, String title, int type) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
 		values.put(FIELD_TITLE_NAME, title);
+		values.put(FIELD_TYPE_NAME, type);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
-
+	
 	/**
-	 * <p>Добавляет/изменяет запись в таблице task_status</p>
+	 * <p>Добавляет/изменяет запись</p>
 	 * 
 	 * @param token
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(TaskStatus status) {
-		return replace(status.getUuid(), status.getTitle());
+	public long replace(EquipmentStatus status) {
+		return replace(status.getUuid(), status.getTitle(), status.getType());
 	}
 }

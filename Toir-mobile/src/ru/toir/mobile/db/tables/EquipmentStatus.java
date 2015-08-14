@@ -9,7 +9,7 @@ package ru.toir.mobile.db.tables;
  */
 public class EquipmentStatus {
 	private long _id;
-	private String name;
+	private String title;
 	private String uuid;
 	private int type;
 
@@ -21,11 +21,39 @@ public class EquipmentStatus {
 
 	}
 	
-	public EquipmentStatus(long _id, String uuid, String name, int type) {
+	public EquipmentStatus(long _id, String uuid, String title, int type) {
 		this._id = _id;
 		this.uuid = uuid;
-		this.name = name;
+		this.title = title;
 		this.type = type;
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public long get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id the _id to set
+	 */
+	public void set_id(long _id) {
+		this._id = _id;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	/**
@@ -43,38 +71,17 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @return the title
-	 */
-	public String getTitle() {
-		return name;
-	}
-
-	/**
-	 * @param title the title to set
-	 */
-	public void setTitle(String title) {
-		this.name = title;
-	}
-
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
 	 * @return the type
 	 */
-	public long get_type() {
+	public int getType() {
 		return type;
 	}
 
 	/**
-	 * @param _id the _id to set
+	 * @param type the type to set
 	 */
-	public void set_id(long _id) {
-		this._id = _id;
+	public void setType(int type) {
+		this.type = type;
 	}
 
 }

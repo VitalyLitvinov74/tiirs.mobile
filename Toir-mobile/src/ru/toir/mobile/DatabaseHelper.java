@@ -16,9 +16,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * @author koputo Класс используется в адаптерах таблиц базы данных. Сама база
- *         создаётся/обновляется в адаптере {@link TOiRDBAdapter} при старте
- *         приложения.
+ * @author Dmitriy Logachov
+ * 
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -27,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static Context sContext;
 	private String updatePath = "updatedb";
 	private static final String DATABASE_NAME = "toir.db";
-	private static final int DATABASE_VERSION = 17;
+	private static final int DATABASE_VERSION = 18;
 
 
 

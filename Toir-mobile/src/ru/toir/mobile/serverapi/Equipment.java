@@ -2,6 +2,7 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 
@@ -22,11 +23,13 @@ public class Equipment {
     @Expose
     private String Tag;
     @Expose
-    private String StartupDate;
+    private Date StartupDate;
     @Expose
-    private String CreatedAt;
+    private Date CreatedAt;
     @Expose
-    private String ChangedAt;
+    private Date ChangedAt;
+    @Expose
+    private ru.toir.mobile.serverapi.EquipmentStatus EquipmentStatus;
 
     /**
      * 
@@ -141,7 +144,7 @@ public class Equipment {
      * @return
      *     The CreatedAt
      */
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return CreatedAt;
     }
 
@@ -150,7 +153,7 @@ public class Equipment {
      * @param CreatedAt
      *     The CreatedAt
      */
-    public void setCreatedAt(String CreatedAt) {
+    public void setCreatedAt(Date CreatedAt) {
         this.CreatedAt = CreatedAt;
     }
 
@@ -159,7 +162,7 @@ public class Equipment {
      * @return
      *     The ChangedAt
      */
-    public String getChangedAt() {
+    public Date getChangedAt() {
         return ChangedAt;
     }
 
@@ -168,7 +171,7 @@ public class Equipment {
      * @param ChangedAt
      *     The ChangedAt
      */
-    public void setChangedAt(String ChangedAt) {
+    public void setChangedAt(Date ChangedAt) {
         this.ChangedAt = ChangedAt;
     }
 
@@ -189,15 +192,30 @@ public class Equipment {
 	/**
 	 * @return the startupDate
 	 */
-	public String getStartupDate() {
+	public Date getStartupDate() {
 		return StartupDate;
 	}
 
 	/**
 	 * @param startupDate the startupDate to set
 	 */
-	public void setStartupDate(String startupDate) {
+	public void setStartupDate(Date startupDate) {
 		StartupDate = startupDate;
+	}
+
+	/**
+	 * @return the equipmentStatus
+	 */
+	public ru.toir.mobile.serverapi.EquipmentStatus getEquipmentStatus() {
+		return EquipmentStatus;
+	}
+
+	/**
+	 * @param equipmentStatus the equipmentStatus to set
+	 */
+	public void setEquipmentStatus(
+			ru.toir.mobile.serverapi.EquipmentStatus equipmentStatus) {
+		EquipmentStatus = equipmentStatus;
 	}
 
 }

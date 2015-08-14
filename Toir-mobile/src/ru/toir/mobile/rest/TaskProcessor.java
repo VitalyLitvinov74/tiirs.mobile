@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import org.json.JSONArray;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
@@ -23,6 +24,7 @@ import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
@@ -38,6 +40,7 @@ import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentOperationResult;
+import ru.toir.mobile.db.tables.EquipmentStatus;
 import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.MeasureValue;
@@ -91,6 +94,7 @@ public class TaskProcessor {
 	Map<String, OperationStatus> operationStatus = null;
 	Map<String, DocumentationType> documentationTypes = null;
 	Map<String, EquipmentDocumentation> equipmentDocumentations = null;
+	Map<String, EquipmentStatus> equipmentStatus = null;
 
 	ArrayList<OperationResult> operationResults = null;
 	ArrayList<MeasureValue> measureValues = null;
@@ -123,6 +127,7 @@ public class TaskProcessor {
 		operationPatternStepResults = new ArrayMap<String, OperationPatternStepResult>();
 		equipmentDocumentations = new ArrayMap<String, EquipmentDocumentation>();
 		operationStatus = new ArrayMap<String, OperationStatus>();
+		equipmentStatus = new ArrayMap<String, EquipmentStatus>();
 		
 		operationResults = new ArrayList<OperationResult>();
 		measureValues = new ArrayList<MeasureValue>();
@@ -155,7 +160,9 @@ public class TaskProcessor {
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
 				
-				ru.toir.mobile.serverapi.Task[] serverTasks = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Task[].class);
+				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+				
+				ru.toir.mobile.serverapi.Task[] serverTasks = gson.fromJson(jsonString, ru.toir.mobile.serverapi.Task[].class);
 				if (serverTasks != null) {
 					for (int i = 0; i < serverTasks.length; i++) {
 						tasks.put(serverTasks[i].getId(), getTask(serverTasks[i]));
@@ -277,6 +284,13 @@ public class TaskProcessor {
 			operationStatusDBAdapter.replace(operationStatus.get(uuid));
 		}
 		operationStatusDBAdapter.close();
+		
+		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		set = equipmentStatus.keySet();
+		for (String uuid: set) {
+			equipmentStatusDBAdapter.replace(equipmentStatus.get(uuid));
+		}
+		equipmentStatusDBAdapter.close();
 	}
 	
 	/**
@@ -285,22 +299,13 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public Task getTask(ru.toir.mobile.serverapi.Task serverTask) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss", Locale.ENGLISH);
 
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
 		item.setUsers_uuid(serverTask.getEmployeeId());
-		try {
-			item.setCreate_date(dateFormat.parse(serverTask.getCreatedAt()).getTime() / 1000);
-		} catch(ParseException e) {
-			e.printStackTrace();
-		}
-		try {
-			item.setModify_date(dateFormat.parse(serverTask.getChangedAt()).getTime() / 1000);
-		} catch(ParseException e) {
-			e.printStackTrace();
-		}
-		item.setClose_date(serverTask.getCloseDate());
+		item.setCreate_date(serverTask.getCreatedAt().getTime() / 1000);
+		item.setModify_date(serverTask.getChangedAt().getTime() / 1000);
+		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDate().getTime() / 1000);
 		
 		item.setTask_status_uuid(serverTask.getOrderStatus().getId());
 		// добавляем объект статуса наряда
@@ -468,7 +473,6 @@ public class TaskProcessor {
 	 */
 	public Equipment getEquipment(ru.toir.mobile.serverapi.Equipment equipment) {
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss", Locale.ENGLISH);
 		Equipment item = new Equipment();
 		item.setUuid(equipment.getId());
 		item.setTitle(equipment.getName());
@@ -480,12 +484,7 @@ public class TaskProcessor {
 		item.setCritical_type_uuid(equipment.getCriticalityType().getId());
 		// создаём объект типа критичности оборудования
 		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
-		
-		try {
-			item.setStart_date(dateFormat.parse(equipment.getStartupDate()).getTime() / 1000);
-		} catch(ParseException e) {
-			e.printStackTrace();
-		}
+		item.setStart_date(equipment.getStartupDate().getTime() / 1000);
 
 		List<Document> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
@@ -495,8 +494,20 @@ public class TaskProcessor {
 		item.setLatitude(equipment.getGeoCoordinates().getLatitude());
 		item.setLongitude(equipment.getGeoCoordinates().getLongitude());
 		item.setTag_id(equipment.getTag());
+		
+		item.setEquipmentStatus_uuid(equipment.getEquipmentStatus().getId());
+		// создаём объект статуса оборудования
+		equipmentStatus.put(equipment.getEquipmentStatus().getId(), getEquipmentStatus(equipment.getEquipmentStatus()));
 
 		
+		return item;
+	}
+	
+	public EquipmentStatus getEquipmentStatus(ru.toir.mobile.serverapi.EquipmentStatus status) {
+		EquipmentStatus item = new EquipmentStatus();
+		item.setUuid(status.getId());
+		item.setTitle(status.getTitle());
+		item.setType(status.getType());
 		return item;
 	}
 	

@@ -27,6 +27,9 @@ import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
 import ru.toir.mobile.fragments.TaskFragment;
 import ru.toir.mobile.rest.ProcessorService;
+import ru.toir.mobile.rest.ReferenceProcessor;
+import ru.toir.mobile.rest.ReferenceServiceHelper;
+import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
@@ -101,13 +104,20 @@ public class MainActivity extends FragmentActivity {
 							ProcessorService.Extras.RESULT_EXTRA, false);
 					Log.d(TAG, "" + result);
 					if (result == true) {
-						// пользователь есть на сервере, токен выдан, нужно запросить актуальную информацию по пользователю
+						// запрашиваем актуальную информацию по пользователю
 						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(getApplicationContext(), UsersServiceProvider.Actions.ACTION_GET_USER);
 						usersServiceHelper.getUser();
+						
+						// TODO удалить после проверки
+						/*
+						ReferenceServiceHelper Tprovider = new ReferenceServiceHelper(getApplicationContext(), ReferenceServiceProvider.Actions.ACTION_GET_REFERENCE);
+						Tprovider.getReference(ReferenceProcessor.ReferenceNames.OperationResultName);
+						*/
 
 						Toast.makeText(getApplicationContext(),
 								"Токен получен.", Toast.LENGTH_SHORT).show();
 					} else {
+						// TODO реализовать проверку на то что пользователя нет на сервере
 						// токен не получен, сервер не ответил...
 						// проверяем наличие пользователя в локальной базе
 						UsersDBAdapter users = new UsersDBAdapter(

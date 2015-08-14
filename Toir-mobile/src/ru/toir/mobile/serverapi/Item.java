@@ -1,6 +1,8 @@
 
 package ru.toir.mobile.serverapi;
 
+import java.util.Date;
+
 import com.google.gson.annotations.Expose;
 
 public class Item {
@@ -18,9 +20,9 @@ public class Item {
     @Expose
     private String Id;
     @Expose
-    private String CreatedAt;
+    private Date CreatedAt;
     @Expose
-    private String ChangedAt;
+    private Date ChangedAt;
 
     /**
      * 
@@ -135,7 +137,7 @@ public class Item {
      * @return
      *     The CreatedAt
      */
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return CreatedAt;
     }
 
@@ -144,7 +146,7 @@ public class Item {
      * @param CreatedAt
      *     The CreatedAt
      */
-    public void setCreatedAt(String CreatedAt) {
+    public void setCreatedAt(Date CreatedAt) {
         this.CreatedAt = CreatedAt;
     }
 
@@ -153,7 +155,7 @@ public class Item {
      * @return
      *     The ChangedAt
      */
-    public String getChangedAt() {
+    public Date getChangedAt() {
         return ChangedAt;
     }
 
@@ -162,7 +164,7 @@ public class Item {
      * @param ChangedAt
      *     The ChangedAt
      */
-    public void setChangedAt(String ChangedAt) {
+    public void setChangedAt(Date ChangedAt) {
         this.ChangedAt = ChangedAt;
     }
 
