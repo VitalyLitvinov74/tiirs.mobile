@@ -33,8 +33,10 @@ import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -47,10 +49,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.Button;
@@ -73,8 +78,9 @@ public class TaskFragment extends Fragment {
 	ArrayList<String> tasks_equipment_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_critical_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_operation_uuid = new ArrayList<String>();
-	
-	private final static String OPERATION_UUID = "operation_uuid";
+	private SimpleCursorAdapter operationAdapter;
+	private ListviewClickListener clickListener = new ListviewClickListener();
+	private ListViewLongClickListener longClickListener = new ListViewLongClickListener();
 	
 	private ProgressDialog getOrderDialog;
 	public void cancelGetOrders() {
@@ -128,7 +134,15 @@ public class TaskFragment extends Fragment {
 				return false;
 			}
 		});
+		
+		// создаём "пустой" адаптер для отображения операций над оборудованием
+		String[] operationFrom = {"equipment_title", "operation_title", "operation_status_title"};
+		int[] operationTo = {R.id.equipmentItem, R.id.operationItem, R.id.opItemStatus};
+		operationAdapter = new SimpleCursorAdapter(getActivity(), R.layout.equipment_operation_item, null, operationFrom, operationTo, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
+		lv.setOnItemClickListener(clickListener);
+		lv.setOnItemLongClickListener(longClickListener);
+		
 		initView();
 
 		return rootView;
@@ -250,8 +264,6 @@ public class TaskFragment extends Fragment {
 					to);
 			// Setting the adapter to the listView
 			lv.setAdapter(adapter);
-			lv.setOnItemClickListener(new ListviewClickListener());
-			taskDbAdapter.close();
 			button.setVisibility(View.INVISIBLE);
 		}
 	}
@@ -301,13 +313,13 @@ public class TaskFragment extends Fragment {
 	public class ListviewClickListener implements
 			AdapterView.OnItemClickListener {
 		@Override
-		public void onItemClick(AdapterView<?> parentView,
+		public void onItemClick(AdapterView<?> parent,
 				View selectedItemView, int position, long id) {
 			if (Level == 1) {
-				currentEquipmentUUID = equipment_uuid.get(position);
-				initOperationPattern(tasks_equipment_uuid.get(position),
-						currentTaskEquipmentUUID, currentEquipmentUUID);
-				Level = 1;
+				Cursor cursor = (Cursor)parent.getItemAtPosition(position);
+				initOperationPattern(cursor.getString(cursor.getColumnIndex("operation_uuid")),
+						cursor.getString(cursor.getColumnIndex("task_uuid")),
+						cursor.getString(cursor.getColumnIndex("equipment_uuid")));
 			}
 			if (Level == 0) {
 				currentTaskEquipmentUUID = orders_uuid.get(position);
@@ -323,10 +335,10 @@ public class TaskFragment extends Fragment {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {
-			// получаем uuid операции для передачи его в обработчик диалога при отмене операции
-			final SimpleAdapter pAdapter = (SimpleAdapter)parent.getAdapter();
-			HashMap<?, ?> testHm = (HashMap<?, ?>)pAdapter.getItem(position);
-			final String operation_uuid = (String)testHm.get(OPERATION_UUID);
+			Cursor cursor = (Cursor)parent.getItemAtPosition(position);
+			final String operation_uuid = cursor.getString(cursor.getColumnIndex("operation_uuid"));
+			final String taskUuid = cursor.getString(cursor.getColumnIndex("task_uuid"));
+
 			// диалог для отмены операции
 			final Dialog dialog = new Dialog(getActivity());
 			dialog.setContentView(R.layout.operation_cancel_dialog);
@@ -338,16 +350,21 @@ public class TaskFragment extends Fragment {
 				public void onClick(View v) {
 					// TODO перед установкой статуса проверить что статус
 					// операции либо "новая" либо "не выполнена", нужно уточнить
+					// и видимо часть статусов оператору не должна показываться
+					// например "Новая"
 					View parent = (View) v.getParent();
 					Spinner spinner = (Spinner) parent
 							.findViewById(R.id.statusSpinner);
 					OperationStatus status = (OperationStatus) spinner
 							.getSelectedItem();
+					// выставляем выбранный статус
 					EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity())).open();
 					dbAdapter.setOperationStatus(operation_uuid, status.getUuid());
-					dbAdapter.close();
-					// TODO реализовать адаптер для списка операций на курсоре
-					pAdapter.notifyDataSetChanged();
+
+					// обновляем содержимое курсора
+					operationAdapter.changeCursor(dbAdapter.getOperationWithInfo(taskUuid));
+
+					// закрываем диалог
 					dialog.dismiss();
 				}
 			});
@@ -431,12 +448,14 @@ public class TaskFragment extends Fragment {
 		}
 	}
 
-	private void FillListViewEquipment(String order_uuid,
+	private void FillListViewEquipment(String task_uuid,
 			String operation_type_uuid, int critical_type) {
-		int operation_type;
+
 		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
 				new TOiRDatabaseContext(getActivity().getApplicationContext()))
 				.open();
+		/*
+		int operation_type;
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(getActivity().getApplicationContext()))
 				.open();
@@ -451,7 +470,7 @@ public class TaskFragment extends Fragment {
 				.open();
 
 		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter
-				.getEquipsByOrderId(order_uuid, operation_type_uuid,
+				.getEquipsByOrderId(task_uuid, operation_type_uuid,
 						critical_type);
 
 		int cnt = 0;
@@ -483,8 +502,6 @@ public class TaskFragment extends Fragment {
 													.get(cnt)
 													.getEquipment_uuid()),
 									"dd-MM-yyyy hh:mm") + "]" + "STATUS=" + equipmentOperationList.get(cnt).getOperation_status_uuid());
-			// добавляем uuid операции, чтоб при длинном нажатии получить uuid
-			hm.put(OPERATION_UUID, equipmentOperationList.get(cnt).getUuid());
 			
 			// Creation row
 			operation_type = equipmentOperationResultDBAdapter
@@ -513,10 +530,13 @@ public class TaskFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
+		*/
+		
+		// обновляем содержимое курсора
+		operationAdapter.changeCursor(eqOperationDBAdapter.getOperationWithInfo(task_uuid));
+
 		// Setting the adapter to the listView
-		lv.setAdapter(adapter);
-		lv.setOnItemClickListener(new ListviewClickListener());
-		lv.setOnItemLongClickListener(new ListViewLongClickListener());
+		lv.setAdapter(operationAdapter);
 
 		button.setVisibility(View.VISIBLE);
 		button.setOnClickListener(new OnClickListener() {
@@ -524,10 +544,7 @@ public class TaskFragment extends Fragment {
 				initView();
 			}
 		});
-		eqOperationDBAdapter.close();
-		eqDBAdapter.close();
-		operationTypeDBAdapter.close();
-		equipmentOperationResultDBAdapter.close();
+
 	}
 
 	// init equipment operation information screen
@@ -594,11 +611,9 @@ public class TaskFragment extends Fragment {
 							}
 						});
 				getOrderDialog.show();
-
 				return true;
 			}
 		});
-		Log.d("test", "on create task menu size" + menu.size());
 	}
 
 }

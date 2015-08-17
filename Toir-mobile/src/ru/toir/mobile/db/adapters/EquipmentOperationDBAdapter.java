@@ -255,6 +255,13 @@ public class EquipmentOperationDBAdapter {
 		operation.setOperation_status_uuid(status);
 		replace(operation);
 	}
+	
+	public Cursor getOperationWithInfo(String taskUuid) {
+		Cursor cursor = null;
+		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid where eo.task_uuid=?";
+		cursor = mDb.rawQuery(query, new String[]{taskUuid});		
+		return cursor;
+	}
 
 	
 }
