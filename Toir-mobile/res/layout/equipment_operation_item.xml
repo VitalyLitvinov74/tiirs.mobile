@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/opItemImageStatus"
-        android:layout_alignLeft="@+id/eqItemLabel"
+        android:layout_toRightOf="@+id/opItemImageStatus"
         android:layout_marginLeft="15dp"
         android:text="Операция:"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -57,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/opItemImageStatus"
-        android:layout_alignLeft="@+id/operationItem"
+        android:layout_toRightOf="@+id/operationItem"
         android:layout_marginLeft="15dp"
         android:text="Статус:"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -66,8 +66,7 @@
         android:id="@+id/opItemStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/operationItem"
-        android:layout_alignBottom="@+id/eqItemLabel"
+        android:layout_alignBottom="@+id/opItemImageStatus"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/statusItemLabel"
         android:text=""

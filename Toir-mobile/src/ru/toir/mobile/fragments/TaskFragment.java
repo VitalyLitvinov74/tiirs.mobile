@@ -53,6 +53,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
@@ -136,9 +137,45 @@ public class TaskFragment extends Fragment {
 		});
 		
 		// создаём "пустой" адаптер для отображения операций над оборудованием
-		String[] operationFrom = {"equipment_title", "operation_title", "operation_status_title"};
-		int[] operationTo = {R.id.equipmentItem, R.id.operationItem, R.id.opItemStatus};
+		String[] operationFrom = {"_id", "equipment_title", "operation_title", "operation_status_title"};
+		int[] operationTo = {R.id.opItemImageStatus, R.id.equipmentItem, R.id.operationItem, R.id.opItemStatus};
 		operationAdapter = new SimpleCursorAdapter(getActivity(), R.layout.equipment_operation_item, null, operationFrom, operationTo, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		operationAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+			
+			@Override
+			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+				int testId = view.getId(); 
+				if (testId == R.id.opItemImageStatus) {
+					// TODO добавить установку картинки в зависимости от
+					// я так и не понял от чего зависит картинка операции
+					// берём значения в диапазоне от 0 до 3
+					long row_id = cursor.getLong(cursor.getColumnIndex("_id"));
+					int criteria = (int)(row_id % 4);
+					int image_id;
+					switch(criteria) {
+					case 0 :
+						image_id = R.drawable.img_status_1;
+						break;
+					case 1 :
+						image_id = R.drawable.img_status_2;
+						break;
+					case 2 :
+						image_id = R.drawable.img_status_3;
+						break;
+					case 3 :
+						image_id = R.drawable.img_status_4;
+						break;
+					default :
+						image_id = R.drawable.img_status_1; 
+					}
+					
+					((ImageView)view).setImageResource(image_id);
+					return true;
+				}
+
+				return false;
+			}
+		});
 
 		lv.setOnItemClickListener(clickListener);
 		lv.setOnItemLongClickListener(longClickListener);
