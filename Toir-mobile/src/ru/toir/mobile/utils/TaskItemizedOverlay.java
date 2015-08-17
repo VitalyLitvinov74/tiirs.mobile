@@ -27,7 +27,6 @@ public class TaskItemizedOverlay extends ItemizedIconOverlay<OverlayItem> {
 			}
 		});
 
-		// TODO Auto-generated constructor stub
 		mContext = context;
 	}
 

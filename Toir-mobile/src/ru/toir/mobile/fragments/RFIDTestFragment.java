@@ -48,7 +48,6 @@ public class RFIDTestFragment extends Fragment {
 		m_setting.setOnClickListener(new OnClickListener() {			   
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 	    		Intent intentTo = new Intent();  
  	    		intentTo.setClass(RFIDTestFragment.this.getActivity(), Setting.class);
  	    		startActivity(intentTo);  			
@@ -59,7 +58,6 @@ public class RFIDTestFragment extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 	    		Intent intentTo = new Intent();  
  	    		intentTo.setClass(RFIDTestFragment.this.getActivity(), EPC.class);
  	    		startActivity(intentTo);  					
@@ -69,7 +67,6 @@ public class RFIDTestFragment extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 	    		Intent intentTo = new Intent();  
  	    		intentTo.setClass(RFIDTestFragment.this.getActivity(), ReadWrite.class);
  	    		startActivity(intentTo);  					
@@ -79,7 +76,6 @@ public class RFIDTestFragment extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 	    		Intent intentTo = new Intent();  
  	    		intentTo.setClass(RFIDTestFragment.this.getActivity(), Lock.class);
  	    		startActivity(intentTo);  					
@@ -89,7 +85,6 @@ public class RFIDTestFragment extends Fragment {
 		
 	//@Override
 	//protected void onDestroy() {
-		// TODO Auto-generated method stub
 	//	super.onDestroy();
 	//	android.hardware.uhf.magic.reader.Close();
 	//}

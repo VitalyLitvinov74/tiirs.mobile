@@ -4,9 +4,12 @@
 package ru.toir.mobile;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
@@ -14,6 +17,7 @@ import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.EquipmentOperationResult;
 import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
@@ -39,12 +43,15 @@ import android.widget.Toast;
  */
 public class OperationActivity extends Activity {
 	public static final String OPERATION_UUID_EXTRA =  "operation_uuid";
+	public static final String TASK_UUID_EXTRA =  "task_uuid";
+	public static final String EQUIPMENT_UUID_EXTRA =  "equipment_uuid";
+	public static final String EQUIPMENT_TAG_EXTRA =  "equipment_tag";
 	//private EquipmentOperation operation;
 	private OperationPattern pattern;
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
 	private ArrayList<OperationResult> operationResults;
-	private String order_uuid, task_equipment_uuid,equipment_uuid;
+	private String task_uuid, operation_uuid, equipment_uuid;
 	private String taskname="";
 	private String operationname="";
 	private LinearLayout layout;
@@ -60,14 +67,10 @@ public class OperationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		//setContentView(R.layout.operation_layout);
 		
-		//Intent intent = getIntent();
-		//String operationUuid = intent.getStringExtra(OPERATION_UUID_EXTRA);
-		//Log.d("test", operationUuid);
-
         Bundle b = getIntent().getExtras();
-        task_equipment_uuid = b.getString("task_equipment_uuid"); 
-        order_uuid = b.getString("order_uuid"); 
-        equipment_uuid = b.getString("equipment_uuid"); 
+        operation_uuid = b.getString(OPERATION_UUID_EXTRA); 
+        task_uuid = b.getString(TASK_UUID_EXTRA); 
+        equipment_uuid = b.getString(EQUIPMENT_UUID_EXTRA); 
         setContentView(R.layout.taskwork_fragment);
 
     	layout = (LinearLayout)findViewById(R.id.resultButtonLayout);
@@ -76,16 +79,16 @@ public class OperationActivity extends Activity {
     	numStepButton = (Button)findViewById(R.id.button1);		
 
         // получаем статус и время наряда
-	 	TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-	 	Task order = dbOrder.getItem(order_uuid);
+	 	TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+	 	Task task = dbTask.getItem(task_uuid);
 	 	TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		taskname = "Наряд: " + dbOrder.getCreateTimeByUUID(order_uuid) + " / Статус: " + taskStatusDBAdapter.getNameByUUID(order.getTask_status_uuid());
+		taskname = "Наряд: " + dbTask.getCreateTimeByUUID(task_uuid) + " / Статус: " + taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
 
         // получаем тип операции
-//		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		//OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
         EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		EquipmentOperation equipmentOperation = operationDBAdapter.getItem(task_equipment_uuid);
+		EquipmentOperation equipmentOperation = operationDBAdapter.getItem(operation_uuid);
         		
 		// получаем шаблон операции
 		OperationPatternDBAdapter patternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
@@ -117,6 +120,16 @@ public class OperationActivity extends Activity {
 		taskName.setText(taskname);
 		TextView operationName = (TextView)findViewById(R.id.textView2);
 		operationName.setText(operationname);
+		
+		// cоздаём запись с результатом выполнения операции для фиксации времени начала выполнения
+		EquipmentOperationResult operationResult = new EquipmentOperationResult();
+		UUID uuid = UUID.randomUUID();
+		operationResult.setUuid(uuid.toString());
+		operationResult.setEquipment_operation_uuid(operation_uuid);
+		operationResult.setStart_date(new Date().getTime() / 1000);
+		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		equipmentOperationResultDBAdapter.replace(operationResult);
+		equipmentOperationResultDBAdapter.close();
 		
 		ShowFirstStep();
 	}
@@ -155,12 +168,7 @@ public class OperationActivity extends Activity {
 					}
 				});
 			}
-			// TODO реализовать выравнивание кнопок результатов относительно друг друга
-			/*
-			param = new RelativeLayout.LayoutParams(null);
-			param.addRule(RelativeLayout.LEFT_OF, prev_button_id);
-			resultButton.setLayoutParams(param);
-			*/
+
 			layout.addView(resultButton);
 		}
 	}
@@ -171,10 +179,17 @@ public class OperationActivity extends Activity {
 		resultButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO реализовать сохранение результата выполнения операции
+				// сохраняем результат выполнения операции, фиксируем время окончания, статус выполнения
 				Spinner spinner = (Spinner)((LinearLayout)v.getParent()).findViewWithTag("result");
 				OperationResult result = (OperationResult)spinner.getSelectedItem();
 				Log.d("test", result.getTitle());
+				EquipmentOperationResult operationResult = null;
+				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+				operationResult = equipmentOperationResultDBAdapter.getItemByOperation(operation_uuid);
+				operationResult.setOperation_result_uuid(result.getUuid());
+				operationResult.setEnd_date(new Date().getTime() / 1000);
+				equipmentOperationResultDBAdapter.replace(operationResult);
+				equipmentOperationResultDBAdapter.close();
 				finish();
 			}
 		});
@@ -187,12 +202,6 @@ public class OperationActivity extends Activity {
 		layout.removeAllViewsInLayout();
 		layout.addView(spinner);
 		layout.addView(resultButton);
-
-		// TODO разобраться как вывести кнопку под выпадающим списком 
-		//RelativeLayout.LayoutParams params = (LayoutParams) resultButton.getLayoutParams();
-		//LinearLayout.LayoutParams params = (LayoutParams) resultButton.getLayoutParams();
-		//params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, -1);
-		//resultButton.setLayoutParams(params);		
 	}
 	
 	private void ShowFirstStep() {

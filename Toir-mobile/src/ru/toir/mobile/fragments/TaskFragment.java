@@ -6,6 +6,7 @@ import java.util.List;
 
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
+import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.TOiRDatabaseContext;
@@ -72,6 +73,8 @@ public class TaskFragment extends Fragment {
 	ArrayList<String> tasks_equipment_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_critical_uuid = new ArrayList<String>();
 	ArrayList<String> equipment_operation_uuid = new ArrayList<String>();
+	
+	private final static String OPERATION_UUID = "operation_uuid";
 	
 	private ProgressDialog getOrderDialog;
 	public void cancelGetOrders() {
@@ -186,9 +189,9 @@ public class TaskFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
+			TaskDBAdapter taskDbAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
 					getActivity().getApplicationContext())).open();
-			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
+			ArrayList<Task> ordersList = taskDbAdapter.getOrdersByUser(
 					user.getUuid(), type, sort);
 			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 					new TOiRDatabaseContext(getActivity()
@@ -248,7 +251,7 @@ public class TaskFragment extends Fragment {
 			// Setting the adapter to the listView
 			lv.setAdapter(adapter);
 			lv.setOnItemClickListener(new ListviewClickListener());
-			dbOrder.close();
+			taskDbAdapter.close();
 			button.setVisibility(View.INVISIBLE);
 		}
 	}
@@ -320,6 +323,11 @@ public class TaskFragment extends Fragment {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {
+			// получаем uuid операции для передачи его в обработчик диалога при отмене операции
+			final SimpleAdapter pAdapter = (SimpleAdapter)parent.getAdapter();
+			HashMap<?, ?> testHm = (HashMap<?, ?>)pAdapter.getItem(position);
+			final String operation_uuid = (String)testHm.get(OPERATION_UUID);
+			// диалог для отмены операции
 			final Dialog dialog = new Dialog(getActivity());
 			dialog.setContentView(R.layout.operation_cancel_dialog);
 			dialog.setTitle("Отмена операции");
@@ -330,14 +338,16 @@ public class TaskFragment extends Fragment {
 				public void onClick(View v) {
 					// TODO перед установкой статуса проверить что статус
 					// операции либо "новая" либо "не выполнена", нужно уточнить
-					// TODO реализовать установку статуса для операции
 					View parent = (View) v.getParent();
 					Spinner spinner = (Spinner) parent
 							.findViewById(R.id.statusSpinner);
 					OperationStatus status = (OperationStatus) spinner
 							.getSelectedItem();
-					Toast.makeText(getActivity(), status.getTitle(),
-							Toast.LENGTH_SHORT).show();
+					EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity())).open();
+					dbAdapter.setOperationStatus(operation_uuid, status.getUuid());
+					dbAdapter.close();
+					// TODO реализовать адаптер для списка операций на курсоре
+					pAdapter.notifyDataSetChanged();
 					dialog.dismiss();
 				}
 			});
@@ -472,7 +482,10 @@ public class TaskFragment extends Fragment {
 											.getStartDateByUUID(equipmentOperationList
 													.get(cnt)
 													.getEquipment_uuid()),
-									"dd-MM-yyyy hh:mm") + "]");
+									"dd-MM-yyyy hh:mm") + "]" + "STATUS=" + equipmentOperationList.get(cnt).getOperation_status_uuid());
+			// добавляем uuid операции, чтоб при длинном нажатии получить uuid
+			hm.put(OPERATION_UUID, equipmentOperationList.get(cnt).getUuid());
+			
 			// Creation row
 			operation_type = equipmentOperationResultDBAdapter
 					.getOperationResultTypeByUUID(equipmentOperationList.get(
@@ -518,8 +531,8 @@ public class TaskFragment extends Fragment {
 	}
 
 	// init equipment operation information screen
-	private void initOperationPattern(String task_equipment_uuid,
-			String order_uuid, String equipment_uuid) {
+	private void initOperationPattern(String equipment_operation_uuid,
+			String task_uuid, String equipment_uuid) {
 		Toast.makeText(getActivity(),
 				"Проваливаемся на экран с информацией об обслуживании",
 				Toast.LENGTH_SHORT).show();
@@ -536,10 +549,12 @@ public class TaskFragment extends Fragment {
 		equipmentDBAdapter.close();
 		Intent rfidRead = new Intent(getActivity(), RFIDActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putString("task_equipment_uuid", task_equipment_uuid);
-		bundle.putString("order_uuid", order_uuid);
-		bundle.putString("equipment_uuid", equipment_uuid);
-		bundle.putString("equipment_tag", equipment_tag);
+		// следующие параметры предаются в OperationActivity
+		bundle.putString(OperationActivity.OPERATION_UUID_EXTRA, equipment_operation_uuid);
+		bundle.putString(OperationActivity.TASK_UUID_EXTRA, task_uuid);
+		bundle.putString(OperationActivity.EQUIPMENT_UUID_EXTRA, equipment_uuid);
+		// метка предаётся в MainActivity для проверки правильности оборудования
+		bundle.putString(OperationActivity.EQUIPMENT_TAG_EXTRA, equipment_tag);
 		bundle.putInt("action", MainActivity.RFIDReadAction.READ_EQUIPMENT_TAG_BEFORE_OPERATION);
 		rfidRead.putExtras(bundle);
 		getActivity().startActivityForResult(rfidRead,

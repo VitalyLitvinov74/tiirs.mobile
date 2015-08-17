@@ -13,7 +13,6 @@ public class OperationType {
 	 * 
 	 */
 	public OperationType() {
-		// TODO Auto-generated constructor stub
 	}
 
 }
