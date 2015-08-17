@@ -52,8 +52,6 @@ public class OperationPatternStepResultDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		mDb.close();
-		mDbHelper.close();
 	}
 
 	/**

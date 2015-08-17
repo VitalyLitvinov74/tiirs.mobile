@@ -46,8 +46,6 @@ public class OperationTypeDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		mDb.close();
-		mDbHelper.close();
 	}
 
 	/**

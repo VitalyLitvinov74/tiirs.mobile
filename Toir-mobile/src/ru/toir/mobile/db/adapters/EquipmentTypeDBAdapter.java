@@ -46,8 +46,6 @@ public class EquipmentTypeDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		mDb.close();
-		mDbHelper.close();
 	}
 
 	/**

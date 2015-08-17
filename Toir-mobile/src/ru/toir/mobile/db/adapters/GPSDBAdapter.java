@@ -56,8 +56,6 @@ public class GPSDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		mDb.close();
-		mDbHelper.close();
 	}
 	
 	/**
@@ -107,7 +105,6 @@ public class GPSDBAdapter {
 	 * @return boolean
 	 */
 	public boolean removeAllItems() {
-		// TODO так как в чистом виде мы записи удалять не будем, возможно этот метод не нужен
 		boolean isDeleted;
 		isDeleted = mDb.delete(TABLE_NAME, null, null) > 0;
 		return isDeleted;

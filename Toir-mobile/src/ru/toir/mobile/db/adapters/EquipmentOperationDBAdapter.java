@@ -64,8 +64,6 @@ public class EquipmentOperationDBAdapter {
 	 * Закрываем базу данных
 	 */
 	public void close() {
-		mDb.close();
-		mDbHelper.close();
 	}
 
 
@@ -245,6 +243,17 @@ public class EquipmentOperationDBAdapter {
 			} while(cursor.moveToNext());
 		}
 		return arrayList;
+	}
+
+	/**
+	 * Устанавливаем статус операции
+	 * @param uuid
+	 * @param status
+	 */
+	public void setOperationStatus(String uuid, String status) {
+		EquipmentOperation operation = getItem(uuid);
+		operation.setOperation_status_uuid(status);
+		replace(operation);
 	}
 
 	
