@@ -1,8 +1,6 @@
 package ru.toir.mobile.fragments;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.OperationActivity;
@@ -19,7 +17,6 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.OperationStatus;
-import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.rest.TaskServiceHelper;
@@ -48,22 +45,20 @@ import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Button;
 
 public class TaskFragment extends Fragment {
 
 	private int Level = 0;
-	private String currentTaskEquipmentUUID = "";
+	private String currentTaskUuid = "";
 	private Spinner Spinner_references;
 	private Spinner Spinner_type;
 	private ListView lv;
 	private Button button;
-
-	ArrayList<String> orders_uuid = new ArrayList<String>();
 
 	private SimpleCursorAdapter operationAdapter;
 	private ListviewClickListener clickListener = new ListviewClickListener();
@@ -73,6 +68,7 @@ public class TaskFragment extends Fragment {
 	private ArrayAdapter<CriticalType> criticalTypeAdapter;
 	private ArrayAdapter<TaskStatus> taskStatusAdapter;
 	private ArrayAdapter<SortField> sortFieldAdapter;
+	private SimpleCursorAdapter taskAdapter;
 
 	private ProgressDialog getOrderDialog;
 
@@ -122,8 +118,8 @@ public class TaskFragment extends Fragment {
 		// создаём "пустой" адаптер для отображения операций над оборудованием
 		String[] operationFrom = { "_id", "equipment_title", "operation_title",
 				"operation_status_title" };
-		int[] operationTo = { R.id.opItemImageStatus, R.id.equipmentItem,
-				R.id.operationItem, R.id.opItemStatus };
+		int[] operationTo = { R.id.eoi_ImageStatus, R.id.eoi_Equipment,
+				R.id.eoi_Operation, R.id.eoi_Status };
 		operationAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.equipment_operation_item, null, operationFrom,
 				operationTo, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -133,8 +129,8 @@ public class TaskFragment extends Fragment {
 			@Override
 			public boolean setViewValue(View view, Cursor cursor,
 					int columnIndex) {
-				int testId = view.getId();
-				if (testId == R.id.opItemImageStatus) {
+				int viewId = view.getId();
+				if (viewId == R.id.eoi_ImageStatus) {
 					// TODO добавить установку картинки в зависимости от...
 					// я так и не понял от чего зависит картинка операции
 					// берём значения в диапазоне от 0 до 3
@@ -166,6 +162,61 @@ public class TaskFragment extends Fragment {
 			}
 		});
 
+		// создаём "пустой" адаптер для отображения нарядов
+		String[] taskFrom = { "_id", "create_date" };
+		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Create };
+		taskAdapter = new SimpleCursorAdapter(getActivity(),
+				R.layout.task_item, null, taskFrom,	taskTo,
+				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+		// это нужно для отображения произвольных изображений и конвертации в строку дат
+		taskAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+
+			@Override
+			public boolean setViewValue(View view, Cursor cursor,
+					int columnIndex) {
+
+				int viewId = view.getId();
+				
+				if (viewId == R.id.ti_Create) {
+					((TextView) view).setText(DataUtils.getDate(cursor.getLong(columnIndex), "dd.MM.yyyy hh:mm"));
+					return true;
+				}
+				
+				if (viewId == R.id.ti_ImageStatus) {
+					int image_id = R.drawable.img_status_3;
+					String taskStatus = cursor.getString(cursor.getColumnIndex(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
+
+					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED)) {
+						image_id = R.drawable.img_status_3;
+					}
+
+					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED)) {
+						image_id = R.drawable.img_status_1;
+					}
+					
+					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED)) {
+						image_id = R.drawable.img_status_5;
+					}
+					
+					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED)) {
+						image_id = R.drawable.img_status_4;
+					}
+					
+					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED)) {
+						image_id = R.drawable.img_status_2;
+					}
+					
+					((ImageView) view).setImageResource(image_id);
+					
+					return true;
+				}
+
+				return false;
+			}
+		});
+		
+		// адаптеры для выпадающих списков по типу содержимого
 		operationTypeAdapter = new ArrayAdapter<OperationType>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<OperationType>());
@@ -193,8 +244,7 @@ public class TaskFragment extends Fragment {
 
 	private void initView() {
 		Level = 0;
-		orders_uuid.clear();
-		FillListViewTasks("", "");
+		FillListViewTasks(null, null);
 		FillSpinnersTasks();
 	}
 
@@ -227,6 +277,7 @@ public class TaskFragment extends Fragment {
 	}
 
 	private void FillListViewTasks(String taskStatus, String orderByField) {
+		
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext())).open();
@@ -239,16 +290,12 @@ public class TaskFragment extends Fragment {
 			TaskDBAdapter taskDbAdapter = new TaskDBAdapter(
 					new TOiRDatabaseContext(getActivity()
 							.getApplicationContext())).open();
-			ArrayList<Task> ordersList = taskDbAdapter.getOrdersByUser(
-					user.getUuid(), taskStatus, orderByField);
-			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
-
+			
+			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(user.getUuid()));
+			
+			/*
 			Integer cnt = 0;
 			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-			String[] from = { "name", "descr", "img" };
-			int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
 			while (cnt < ordersList.size()) {
 				HashMap<String, String> hm = new HashMap<String, String>();
 				hm.put("name",
@@ -267,37 +314,12 @@ public class TaskFragment extends Fragment {
 										.getAttempt_send_date(),
 										"dd-MM-yyyy hh:mm") + " [Count="
 								+ ordersList.get(cnt).getAttempt_count() + "]");
-				// hm.put("descr","Статус: " +
-				// ordersList.get(cnt).getTask_status_uuid() + " Отправлялся: "
-				// +
-				// DataUtils.getDate(ordersList.get(cnt).getAttempt_send_date(),"dd-MM-yyyy hh:mm")
-				// + " [Count=" + ordersList.get(cnt).getAttempt_count() + "]");
-				// default
-				hm.put("img", Integer.toString(R.drawable.img_status_1));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED))
-					hm.put("img", Integer.toString(R.drawable.img_status_3));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED))
-					hm.put("img", Integer.toString(R.drawable.img_status_1));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED))
-					hm.put("img", Integer.toString(R.drawable.img_status_5));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED))
-					hm.put("img", Integer.toString(R.drawable.img_status_4));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED))
-					hm.put("img", Integer.toString(R.drawable.img_status_2));
 				aList.add(hm);
-				orders_uuid.add(cnt, ordersList.get(cnt).getUuid().toString());
 				cnt++;
 			}
-			SimpleAdapter adapter = new SimpleAdapter(getActivity()
-					.getApplicationContext(), aList, R.layout.listview, from,
-					to);
+			*/
 			// Setting the adapter to the listView
-			lv.setAdapter(adapter);
+			lv.setAdapter(taskAdapter);
 			button.setVisibility(View.INVISIBLE);
 		}
 	}
@@ -334,17 +356,20 @@ public class TaskFragment extends Fragment {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View selectedItemView,
 				int position, long id) {
+
+			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+
 			if (Level == 1) {
-				Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 				initOperationPattern(cursor.getString(cursor
 						.getColumnIndex("operation_uuid")),
 						cursor.getString(cursor.getColumnIndex("task_uuid")),
 						cursor.getString(cursor
 								.getColumnIndex("equipment_uuid")));
 			}
+
 			if (Level == 0) {
-				currentTaskEquipmentUUID = orders_uuid.get(position);
-				FillListViewEquipment(orders_uuid.get(position), null, null);
+				currentTaskUuid = cursor.getString(cursor.getColumnIndex(TaskDBAdapter.FIELD_UUID_NAME));
+				FillListViewEquipment(currentTaskUuid, null, null);
 				FillEquipmentSpinners();
 				Level = 1;
 			}
@@ -371,27 +396,29 @@ public class TaskFragment extends Fragment {
 			cancelOK.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// TODO перед установкой статуса проверить что статус
-					// операции либо "новая" либо "не выполнена", нужно уточнить
-					// и видимо часть статусов оператору не должна показываться
-					// например "Новая"
-					View parent = (View) v.getParent();
-					Spinner spinner = (Spinner) parent
-							.findViewById(R.id.statusSpinner);
-					OperationStatus status = (OperationStatus) spinner
-							.getSelectedItem();
-					// выставляем выбранный статус
-					EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
-							new TOiRDatabaseContext(getActivity())).open();
-					dbAdapter.setOperationStatus(operation_uuid,
-							status.getUuid());
+					if (Level == 1) {
+						// TODO перед установкой статуса проверить что статус
+						// операции либо "новая" либо "не выполнена", нужно уточнить
+						// и видимо часть статусов оператору не должна показываться
+						// например "Новая"
+						View parent = (View) v.getParent();
+						Spinner spinner = (Spinner) parent
+								.findViewById(R.id.statusSpinner);
+						OperationStatus status = (OperationStatus) spinner
+								.getSelectedItem();
+						// выставляем выбранный статус
+						EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
+								new TOiRDatabaseContext(getActivity())).open();
+						dbAdapter.setOperationStatus(operation_uuid,
+								status.getUuid());
 
-					// обновляем содержимое курсора
-					operationAdapter.changeCursor(dbAdapter
-							.getOperationWithInfo(taskUuid));
+						// обновляем содержимое курсора
+						operationAdapter.changeCursor(dbAdapter
+								.getOperationWithInfo(taskUuid));
 
-					// закрываем диалог
-					dialog.dismiss();
+						// закрываем диалог
+						dialog.dismiss();
+					}
 				}
 			});
 			Button cancelCancel = (Button) dialog
@@ -448,7 +475,7 @@ public class TaskFragment extends Fragment {
 				String criticalTypeUuid = ((CriticalType) Spinner_type
 						.getSelectedItem()).getUuid();
 
-				FillListViewEquipment(currentTaskEquipmentUUID,
+				FillListViewEquipment(currentTaskUuid,
 						operationTypeUuid, criticalTypeUuid);
 			}
 		}

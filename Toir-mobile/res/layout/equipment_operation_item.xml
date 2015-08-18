@@ -5,70 +5,70 @@
     android:orientation="vertical" >
 
     <ImageView
-        android:id="@+id/opItemImageStatus"
+        android:id="@+id/eoi_ImageStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="Статус операции"
         android:src="@drawable/img_status_1" />
 
     <TextView
-        android:id="@+id/eqItemLabel"
+        android:id="@+id/eoi_EquipmentLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/opItemImageStatus"
+        android:layout_toRightOf="@+id/eoi_ImageStatus"
         android:text="Оборудование:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/equipmentItem"
+        android:id="@+id/eoi_Equipment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/eqItemLabel"
+        android:layout_toRightOf="@+id/eoi_EquipmentLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/opItemLabel"
+        android:id="@+id/eoi_OperationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/opItemImageStatus"
-        android:layout_toRightOf="@+id/opItemImageStatus"
+        android:layout_alignBottom="@+id/eoi_ImageStatus"
         android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/eoi_ImageStatus"
         android:text="Операция:"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
-        android:id="@+id/operationItem"
+        android:id="@+id/eoi_Operation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/opItemLabel"
-        android:layout_alignBottom="@+id/opItemLabel"
+        android:layout_alignBaseline="@+id/eoi_OperationLabel"
+        android:layout_alignBottom="@+id/eoi_OperationLabel"
         android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/opItemLabel"
+        android:layout_toRightOf="@+id/eoi_OperationLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <TextView
-        android:id="@+id/statusItemLabel"
+        android:id="@+id/eoi_StatusLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/opItemImageStatus"
-        android:layout_toRightOf="@+id/operationItem"
+        android:layout_alignBottom="@+id/eoi_ImageStatus"
         android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/eoi_Operation"
         android:text="Статус:"
         android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <TextView
-        android:id="@+id/opItemStatus"
+        android:id="@+id/eoi_Status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/opItemImageStatus"
+        android:layout_alignBottom="@+id/eoi_ImageStatus"
         android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/statusItemLabel"
+        android:layout_toRightOf="@+id/eoi_StatusLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
 

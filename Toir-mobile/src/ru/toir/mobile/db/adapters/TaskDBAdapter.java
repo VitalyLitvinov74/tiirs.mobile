@@ -267,4 +267,10 @@ public class TaskDBAdapter {
 			return null;
 		}
 	}
+	
+	public Cursor getTaskWithInfo(String user_uuid) {
+		Cursor cursor;
+		cursor = mDb.rawQuery("select * from task where users_uuid=?", new String[]{user_uuid});
+		return cursor;
+	}
 }
