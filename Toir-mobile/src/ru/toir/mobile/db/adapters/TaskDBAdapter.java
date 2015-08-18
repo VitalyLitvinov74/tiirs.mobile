@@ -268,9 +268,26 @@ public class TaskDBAdapter {
 		}
 	}
 	
-	public Cursor getTaskWithInfo(String user_uuid) {
+	/**
+	 * Возвращает курсор для ListView списка нарядов
+	 * @param userUuid
+	 * @param statusUuid
+	 * @param orderByField
+	 * @return
+	 */
+	public Cursor getTaskWithInfo(String userUuid, String statusUuid, String orderByField) {
 		Cursor cursor;
-		cursor = mDb.rawQuery("select * from task where users_uuid=?", new String[]{user_uuid});
+		String query = "select * from task where users_uuid='" + userUuid + "'";
+
+		if (statusUuid != null) {
+			query += " and " + TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME + "='" + statusUuid + "'";
+		}
+		
+		if (orderByField != null) {
+			query += " order by " + orderByField;
+		}
+		
+		cursor = mDb.rawQuery(query, null);
 		return cursor;
 	}
 }

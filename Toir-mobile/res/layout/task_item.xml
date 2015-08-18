@@ -29,7 +29,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/ti_CreateLabel"
-        android:inputType="datetime"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
