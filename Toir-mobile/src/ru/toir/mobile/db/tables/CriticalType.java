@@ -66,5 +66,12 @@ public class CriticalType {
 	public void set_id(long _id) {
 		this._id = _id;
 	}
+	
+	public String toString() {
+		if (type == 0) {
+			return "Любая критичность";
+		}
+		return "Критичность: " + type;
+	}
 
 }

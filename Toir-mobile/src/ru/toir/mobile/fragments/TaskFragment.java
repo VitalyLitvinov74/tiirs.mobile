@@ -55,25 +55,24 @@ import android.widget.Toast;
 import android.widget.Button;
 
 public class TaskFragment extends Fragment {
+
 	private int Level = 0;
 	private String currentTaskEquipmentUUID = "";
 	private Spinner Spinner_references;
 	private Spinner Spinner_type;
 	private ListView lv;
-	ArrayAdapter<String> spinner_reference_adapter;
-	ArrayAdapter<String> spinner_type_adapter;
 	private Button button;
+
 	ArrayList<String> orders_uuid = new ArrayList<String>();
-	ArrayList<String> equipment_uuid = new ArrayList<String>();
-	ArrayList<String> tasks_status_uuid = new ArrayList<String>();
-	ArrayList<String> tasks_equipment_uuid = new ArrayList<String>();
-	ArrayList<String> criticalTypeUuidArrayList = new ArrayList<String>();
-	ArrayList<String> operationTypeUuidArrayList = new ArrayList<String>();
 
 	private SimpleCursorAdapter operationAdapter;
 	private ListviewClickListener clickListener = new ListviewClickListener();
 	private ListViewLongClickListener longClickListener = new ListViewLongClickListener();
 	private ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
+	private ArrayAdapter<OperationType> operationTypeAdapter;
+	private ArrayAdapter<CriticalType> criticalTypeAdapter;
+	private ArrayAdapter<TaskStatus> taskStatusAdapter;
+	private ArrayAdapter<SortField> sortFieldAdapter;
 
 	private ProgressDialog getOrderDialog;
 
@@ -97,12 +96,6 @@ public class TaskFragment extends Fragment {
 				false);
 		lv = (ListView) rootView.findViewById(R.id.tasks_listView);
 		button = (Button) rootView.findViewById(R.id.tasks_button_back);
-		spinner_type_adapter = new ArrayAdapter<String>(getActivity()
-				.getApplicationContext(), android.R.layout.simple_spinner_item,
-				new ArrayList<String>());
-		spinner_reference_adapter = new ArrayAdapter<String>(getActivity()
-				.getApplicationContext(), android.R.layout.simple_spinner_item,
-				new ArrayList<String>());
 		Spinner_references = (Spinner) rootView
 				.findViewById(R.id.tasks_spinner10);
 		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
@@ -173,6 +166,22 @@ public class TaskFragment extends Fragment {
 			}
 		});
 
+		operationTypeAdapter = new ArrayAdapter<OperationType>(getActivity(),
+				android.R.layout.simple_spinner_dropdown_item,
+				new ArrayList<OperationType>());
+
+		criticalTypeAdapter = new ArrayAdapter<CriticalType>(getActivity(),
+				android.R.layout.simple_spinner_dropdown_item,
+				new ArrayList<CriticalType>());
+
+		taskStatusAdapter = new ArrayAdapter<TaskStatus>(getActivity(),
+				android.R.layout.simple_spinner_dropdown_item,
+				new ArrayList<TaskStatus>());
+
+		sortFieldAdapter = new ArrayAdapter<SortField>(getActivity(),
+				android.R.layout.simple_spinner_dropdown_item,
+				new ArrayList<SortField>());
+
 		// так как обработчики пока одни на всё, ставим их один раз
 		lv.setOnItemClickListener(clickListener);
 		lv.setOnItemLongClickListener(longClickListener);
@@ -196,28 +205,23 @@ public class TaskFragment extends Fragment {
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
 				.getAllItems();
 
-		spinner_reference_adapter.clear();
-		tasks_status_uuid.clear();
-		tasks_status_uuid.add(null);
-		spinner_reference_adapter.add("Все статусы");
-		for (TaskStatus status : taskStatusList) {
-			spinner_reference_adapter.add(status.getTitle());
-			tasks_status_uuid.add(status.getUuid());
-		}
-		spinner_reference_adapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		Spinner_references.setAdapter(spinner_reference_adapter);
+		taskStatusList.add(0, new TaskStatus(0, null, "Все статусы"));
+		taskStatusAdapter.clear();
+		taskStatusAdapter.addAll(taskStatusList);
+		Spinner_references.setAdapter(taskStatusAdapter);
 		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
 
-		spinner_type_adapter.clear();
-		spinner_type_adapter.add("Сортировка");
-		spinner_type_adapter.add("По дате создания");
-		spinner_type_adapter.add("По дате получения");
-		spinner_type_adapter.add("По дате изменения");
-		spinner_type_adapter.add("По статусу отправки");
-		spinner_type_adapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		Spinner_type.setAdapter(spinner_type_adapter);
+		sortFieldAdapter.clear();
+		sortFieldAdapter.add(new SortField("Сортировка", null));
+		sortFieldAdapter.add(new SortField("По дате создания",
+				TaskDBAdapter.FIELD_CREATE_DATE_NAME));
+		sortFieldAdapter.add(new SortField("По дате получения",
+				TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
+		sortFieldAdapter.add(new SortField("По дате изменения",
+				TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
+		sortFieldAdapter.add(new SortField("По статусу отправки",
+				TaskDBAdapter.FIELD_UPDATED_NAME));
+		Spinner_type.setAdapter(sortFieldAdapter);
 		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
 
 	}
@@ -299,6 +303,7 @@ public class TaskFragment extends Fragment {
 	}
 
 	private void FillEquipmentSpinners() {
+
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(getActivity().getApplicationContext()))
 				.open();
@@ -310,29 +315,16 @@ public class TaskFragment extends Fragment {
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 
-		// наполняем данными выпадающий список и сопутствующие списки
-		spinner_reference_adapter.clear();
-		spinner_reference_adapter.add("Все операции");
-		operationTypeUuidArrayList.clear();
-		operationTypeUuidArrayList.add(null);
-		for (OperationType operationType : operationTypeList) {
-			spinner_reference_adapter.add(operationType.getTitle());
-			operationTypeUuidArrayList.add(operationType.getUuid());
-		}
-		spinner_reference_adapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		operationTypeList.add(0, new OperationType(0, null, "Все операции"));
+		operationTypeAdapter.clear();
+		operationTypeAdapter.addAll(operationTypeList);
+		Spinner_references.setAdapter(operationTypeAdapter);
 		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
 
-		spinner_type_adapter.clear();
-		spinner_type_adapter.add("Любая значимость");
-		criticalTypeUuidArrayList.clear();
-		criticalTypeUuidArrayList.add(null);
-		for (CriticalType criticalType : criticalTypeList) {
-			spinner_type_adapter.add("Критичность: " + criticalType.getType());
-			criticalTypeUuidArrayList.add(criticalType.getUuid());
-		}
-		spinner_type_adapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		criticalTypeList.add(0, new CriticalType(0, null, 0));
+		criticalTypeAdapter.clear();
+		criticalTypeAdapter.addAll(criticalTypeList);
+		Spinner_type.setAdapter(criticalTypeAdapter);
 		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
 
 	}
@@ -440,36 +432,21 @@ public class TaskFragment extends Fragment {
 				View selectedItemView, int position, long id) {
 
 			if (Level == 0) {
-				String taskStatusUuid = tasks_status_uuid.get((int) Spinner_references
-						.getSelectedItemId());
-				String orderByField;
-				switch ((int) Spinner_type.getSelectedItemId()) {
-				case 0:
-					orderByField = "";
-					break;
-				case 1:
-					orderByField = "create_date";
-					break;
-				case 2:
-					orderByField = "close_date";
-					break;
-				case 3:
-					orderByField = "modify_date";
-					break;
-				case 4:
-					orderByField = "successfull_send";
-					break;
-				default:
-					orderByField = "";
-				}
+				String taskStatusUuid = ((TaskStatus) Spinner_references
+						.getSelectedItem()).getUuid();
+
+				String orderByField = ((SortField) Spinner_type
+						.getSelectedItem()).getField();
+
 				FillListViewTasks(taskStatusUuid, orderByField);
 			}
-			if (Level == 1) {
-				String operationTypeUuid = operationTypeUuidArrayList
-						.get((int) Spinner_references.getSelectedItemId());
 
-				String criticalTypeUuid = criticalTypeUuidArrayList
-						.get((int) Spinner_type.getSelectedItemId());
+			if (Level == 1) {
+				String operationTypeUuid = ((OperationType) Spinner_references
+						.getSelectedItem()).getUuid();
+
+				String criticalTypeUuid = ((CriticalType) Spinner_type
+						.getSelectedItem()).getUuid();
 
 				FillListViewEquipment(currentTaskEquipmentUUID,
 						operationTypeUuid, criticalTypeUuid);
@@ -574,6 +551,43 @@ public class TaskFragment extends Fragment {
 				return true;
 			}
 		});
+	}
+
+	/**
+	 * 
+	 * @author Dmitriy Logachov
+	 * 
+	 *         Класс для представления элемента выпадающего списка сортировки по
+	 *         полю в базе
+	 */
+	class SortField {
+		private String Title;
+		private String Field;
+
+		public SortField(String title, String field) {
+			Title = title;
+			Field = field;
+		}
+
+		public String getTitle() {
+			return Title;
+		}
+
+		public void setTitle(String title) {
+			Title = title;
+		}
+
+		public String getField() {
+			return Field;
+		}
+
+		public void setField(String field) {
+			Field = field;
+		}
+
+		public String toString() {
+			return Title;
+		}
 	}
 
 }

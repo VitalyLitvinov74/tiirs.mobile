@@ -68,8 +68,8 @@ public class TaskDBAdapter {
 		ArrayList<Task> arrayList = new ArrayList<Task>();
 		Cursor cursor;
 
-		if (sort.equals("")) sort=null;
-		if (type.equals("")) {
+		if (sort == null || sort.equals("")) sort=null;
+		if (type == null || type.equals("")) {
 			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=?", new String[]{ uuid }, null, null, sort);
 		} else {
 			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID_NAME + "=? AND " + FIELD_TASK_STATUS_UUID_NAME + "=?", new String[]{uuid,type}, null, null, sort);

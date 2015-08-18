@@ -75,5 +75,9 @@ public class TaskStatus {
 	public void set_id(long _id) {
 		this._id = _id;
 	}
+	
+	public String toString() {
+		return title;
+	}
 
 }
