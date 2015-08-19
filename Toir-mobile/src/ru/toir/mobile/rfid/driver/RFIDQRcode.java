@@ -10,6 +10,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.camera.CameraPreview;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
@@ -54,6 +55,7 @@ public class RFIDQRcode implements RFIDDriver{
 	@Override
 	public boolean init() {
 		mActivity.setContentView(R.layout.qr_read);
+		mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		return true;
 	}
 
@@ -126,6 +128,8 @@ public class RFIDQRcode implements RFIDDriver{
 			// в данном случае мы не вызываем callback, так как реального считывания не происходит и данные мы вернём из обработчика меню
 			// но в реальных условиях этот метод вызывается как только происходит выход из doInBackground 
 			//callback.Callback(result);
+			// add 18.08
+			releaseCamera();
 		}
 
 		/* (non-Javadoc)
@@ -138,6 +142,8 @@ public class RFIDQRcode implements RFIDDriver{
 			// в данном случае мы не вызываем callback, так как нам необходимо обязательно остановить выполнение задачи,
 			// а данные мы вернём из обработчика меню
 			//callback.Callback(null);
+			// add 18.08
+			releaseCamera();
 		}
 		
 	}

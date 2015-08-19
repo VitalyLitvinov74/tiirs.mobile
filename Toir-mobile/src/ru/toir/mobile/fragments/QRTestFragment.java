@@ -124,8 +124,8 @@ public class QRTestFragment extends Fragment {
         scanText = (TextView) rootView.findViewById(R.id.scanText);
 
         bar_code = (ImageView) rootView.findViewById(R.id.bar_code);
-        code_for_bar = (EditText) rootView.findViewById(R.id.code_for_bar);
-
+        //code_for_bar = (EditText) rootView.findViewById(R.id.code_for_bar);
+        /*
         code_for_bar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -143,7 +143,7 @@ public class QRTestFragment extends Fragment {
                 generateCodeImage(text);
             }
         });
-        
+        */
         rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
 		

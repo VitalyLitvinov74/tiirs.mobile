@@ -33,18 +33,6 @@
             android:contentDescription="@string/image_description"
             android:background="@android:color/white" />
 
-        <EditText
-            android:id="@+id/code_for_bar"
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dip"
-            android:ems="10"
-            android:inputType="text"
-            android:text="@string/scan_process" >
-
-            <requestFocus />
-        </EditText>
-
     </LinearLayout>
 
     <LinearLayout
