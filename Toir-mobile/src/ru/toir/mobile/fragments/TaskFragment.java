@@ -90,11 +90,22 @@ public class TaskFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.tasks_layout, container,
 				false);
+		
 		lv = (ListView) rootView.findViewById(R.id.tasks_listView);
+		
 		button = (Button) rootView.findViewById(R.id.tasks_button_back);
+		button.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				initView();
+			}
+		});
+		
 		Spinner_references = (Spinner) rootView
 				.findViewById(R.id.tasks_spinner10);
+		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
+		
 		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
+		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
 
 		setHasOptionsMenu(true);
 		rootView.setFocusableInTouchMode(true);
@@ -166,7 +177,7 @@ public class TaskFragment extends Fragment {
 		String[] taskFrom = { "_id", "create_date" };
 		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Create };
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
-				R.layout.task_item, null, taskFrom,	taskTo,
+				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
 		// это нужно для отображения произвольных изображений и конвертации в строку дат
@@ -177,45 +188,52 @@ public class TaskFragment extends Fragment {
 					int columnIndex) {
 
 				int viewId = view.getId();
-				
+
 				if (viewId == R.id.ti_Create) {
-					((TextView) view).setText(DataUtils.getDate(cursor.getLong(columnIndex), "dd.MM.yyyy hh:mm"));
+					((TextView) view).setText(DataUtils.getDate(
+							cursor.getLong(columnIndex), "dd.MM.yyyy hh:mm"));
 					return true;
 				}
-				
+
 				if (viewId == R.id.ti_ImageStatus) {
 					int image_id = R.drawable.img_status_3;
-					String taskStatus = cursor.getString(cursor.getColumnIndex(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
+					String taskStatus = cursor.getString(cursor
+							.getColumnIndex(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
 
-					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED)) {
+					if (taskStatus
+							.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED)) {
 						image_id = R.drawable.img_status_3;
 					}
 
-					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED)) {
+					if (taskStatus
+							.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED)) {
 						image_id = R.drawable.img_status_1;
 					}
-					
-					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED)) {
+
+					if (taskStatus
+							.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED)) {
 						image_id = R.drawable.img_status_5;
 					}
-					
-					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED)) {
+
+					if (taskStatus
+							.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED)) {
 						image_id = R.drawable.img_status_4;
 					}
-					
-					if (taskStatus.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED)) {
+
+					if (taskStatus
+							.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED)) {
 						image_id = R.drawable.img_status_2;
 					}
-					
+
 					((ImageView) view).setImageResource(image_id);
-					
+
 					return true;
 				}
 
 				return false;
 			}
 		});
-		
+
 		// адаптеры для выпадающих списков по типу содержимого
 		operationTypeAdapter = new ArrayAdapter<OperationType>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
@@ -243,12 +261,14 @@ public class TaskFragment extends Fragment {
 	}
 
 	private void initView() {
+
 		Level = 0;
 		FillListViewTasks(null, null);
-		FillSpinnersTasks();
+		fillSpinnersTasks();
+
 	}
 
-	private void FillSpinnersTasks() {
+	private void fillSpinnersTasks() {
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new TOiRDatabaseContext(getActivity().getApplicationContext()))
 				.open();
@@ -259,7 +279,6 @@ public class TaskFragment extends Fragment {
 		taskStatusAdapter.clear();
 		taskStatusAdapter.addAll(taskStatusList);
 		Spinner_references.setAdapter(taskStatusAdapter);
-		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
 
 		sortFieldAdapter.clear();
 		sortFieldAdapter.add(new SortField("Сортировка", null));
@@ -272,12 +291,11 @@ public class TaskFragment extends Fragment {
 		sortFieldAdapter.add(new SortField("По статусу отправки",
 				TaskDBAdapter.FIELD_UPDATED_NAME));
 		Spinner_type.setAdapter(sortFieldAdapter);
-		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
 
 	}
 
 	private void FillListViewTasks(String taskStatus, String orderByField) {
-		
+
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext())).open();
@@ -290,9 +308,10 @@ public class TaskFragment extends Fragment {
 			TaskDBAdapter taskDbAdapter = new TaskDBAdapter(
 					new TOiRDatabaseContext(getActivity()
 							.getApplicationContext())).open();
-			
-			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(user.getUuid()));
-			
+
+			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(user
+					.getUuid(), taskStatus, orderByField));
+
 			/*
 			Integer cnt = 0;
 			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -324,7 +343,7 @@ public class TaskFragment extends Fragment {
 		}
 	}
 
-	private void FillEquipmentSpinners() {
+	private void fillSpinnersEquipment() {
 
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(getActivity().getApplicationContext()))
@@ -341,13 +360,11 @@ public class TaskFragment extends Fragment {
 		operationTypeAdapter.clear();
 		operationTypeAdapter.addAll(operationTypeList);
 		Spinner_references.setAdapter(operationTypeAdapter);
-		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
 
 		criticalTypeList.add(0, new CriticalType(0, null, 0));
 		criticalTypeAdapter.clear();
 		criticalTypeAdapter.addAll(criticalTypeList);
 		Spinner_type.setAdapter(criticalTypeAdapter);
-		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
 
 	}
 
@@ -368,9 +385,10 @@ public class TaskFragment extends Fragment {
 			}
 
 			if (Level == 0) {
-				currentTaskUuid = cursor.getString(cursor.getColumnIndex(TaskDBAdapter.FIELD_UUID_NAME));
+				currentTaskUuid = cursor.getString(cursor
+						.getColumnIndex(TaskDBAdapter.FIELD_UUID_NAME));
 				FillListViewEquipment(currentTaskUuid, null, null);
-				FillEquipmentSpinners();
+				fillSpinnersEquipment();
 				Level = 1;
 			}
 		}
@@ -381,22 +399,24 @@ public class TaskFragment extends Fragment {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {
-			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-			final String operation_uuid = cursor.getString(cursor
-					.getColumnIndex("operation_uuid"));
-			final String taskUuid = cursor.getString(cursor
-					.getColumnIndex("task_uuid"));
 
-			// диалог для отмены операции
-			final Dialog dialog = new Dialog(getActivity());
-			dialog.setContentView(R.layout.operation_cancel_dialog);
-			dialog.setTitle("Отмена операции");
-			dialog.show();
-			Button cancelOK = (Button) dialog.findViewById(R.id.cancelOK);
-			cancelOK.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (Level == 1) {
+			if (Level == 1) {
+				Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+				final String operation_uuid = cursor.getString(cursor
+						.getColumnIndex("operation_uuid"));
+				final String taskUuid = cursor.getString(cursor
+						.getColumnIndex("task_uuid"));
+
+				// диалог для отмены операции
+				final Dialog dialog = new Dialog(getActivity());
+				dialog.setContentView(R.layout.operation_cancel_dialog);
+				dialog.setTitle("Отмена операции");
+				dialog.show();
+				Button cancelOK = (Button) dialog.findViewById(R.id.cancelOK);
+				cancelOK.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
 						// TODO перед установкой статуса проверить что статус
 						// операции либо "новая" либо "не выполнена", нужно уточнить
 						// и видимо часть статусов оператору не должна показываться
@@ -412,35 +432,39 @@ public class TaskFragment extends Fragment {
 						dbAdapter.setOperationStatus(operation_uuid,
 								status.getUuid());
 
+						// текущие значения фильтров
+						OperationType operationType = (OperationType) Spinner_references.getSelectedItem();
+						CriticalType criticalType = (CriticalType) Spinner_type.getSelectedItem();
 						// обновляем содержимое курсора
 						operationAdapter.changeCursor(dbAdapter
-								.getOperationWithInfo(taskUuid));
+								.getOperationWithInfo(taskUuid, operationType.getUuid(), criticalType.getUuid()));
 
 						// закрываем диалог
 						dialog.dismiss();
 					}
-				}
-			});
-			Button cancelCancel = (Button) dialog
-					.findViewById(R.id.cancelCancel);
-			cancelCancel.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-				}
-			});
+				});
+				Button cancelCancel = (Button) dialog
+						.findViewById(R.id.cancelCancel);
+				cancelCancel.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						dialog.dismiss();
+					}
+				});
 
-			OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
-					new TOiRDatabaseContext(getActivity())).open();
-			ArrayList<OperationStatus> operationStatus = statusDBAdapter
-					.getItems();
+				// список статусов операций в выпадающем списке для выбора
+				OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
+						new TOiRDatabaseContext(getActivity())).open();
+				ArrayList<OperationStatus> operationStatus = statusDBAdapter
+						.getItems();
 
-			ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
-					getActivity(), android.R.layout.simple_spinner_item,
-					operationStatus);
-			Spinner statusSpinner = (Spinner) dialog
-					.findViewById(R.id.statusSpinner);
-			statusSpinner.setAdapter(adapter);
+				ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
+						getActivity(), android.R.layout.simple_spinner_item,
+						operationStatus);
+				Spinner statusSpinner = (Spinner) dialog
+						.findViewById(R.id.statusSpinner);
+				statusSpinner.setAdapter(adapter);
+			}
 			return true;
 		}
 
@@ -458,6 +482,7 @@ public class TaskFragment extends Fragment {
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
 
+			Log.d("test", "reference spinner onItemSelected");
 			if (Level == 0) {
 				String taskStatusUuid = ((TaskStatus) Spinner_references
 						.getSelectedItem()).getUuid();
@@ -475,8 +500,8 @@ public class TaskFragment extends Fragment {
 				String criticalTypeUuid = ((CriticalType) Spinner_type
 						.getSelectedItem()).getUuid();
 
-				FillListViewEquipment(currentTaskUuid,
-						operationTypeUuid, criticalTypeUuid);
+				FillListViewEquipment(currentTaskUuid, operationTypeUuid,
+						criticalTypeUuid);
 			}
 		}
 	}
@@ -490,17 +515,12 @@ public class TaskFragment extends Fragment {
 
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(eqOperationDBAdapter
-				.getOperationWithInfo(task_uuid));
+				.getOperationWithInfo(task_uuid, operation_type_uuid, critical_type_uuid));
 
 		// Setting the adapter to the listView
 		lv.setAdapter(operationAdapter);
 
 		button.setVisibility(View.VISIBLE);
-		button.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				initView();
-			}
-		});
 
 	}
 

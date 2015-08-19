@@ -256,10 +256,25 @@ public class EquipmentOperationDBAdapter {
 		replace(operation);
 	}
 	
-	public Cursor getOperationWithInfo(String taskUuid) {
+	/**
+	 * Возвращает курсор для ListView списка операций в наряде
+	 * @param taskUuid
+	 * @param operationTypeUuid
+	 * @param criticalTypeUuid
+	 * @return
+	 */
+	public Cursor getOperationWithInfo(String taskUuid, String operationTypeUuid, String criticalTypeUuid) {
 		Cursor cursor = null;
-		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid where eo.task_uuid=?";
-		cursor = mDb.rawQuery(query, new String[]{taskUuid});		
+		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid where eo.task_uuid='" + taskUuid + "'";
+		
+		if (operationTypeUuid != null) {
+			query += " and " + FIELD_OPERATION_TYPE_UUID_NAME + "='" + operationTypeUuid + "'";
+		}
+		
+		if (criticalTypeUuid != null) {
+			query += " and " + EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME + "='" + criticalTypeUuid + "'";
+		}
+		cursor = mDb.rawQuery(query, null);		
 		return cursor;
 	}
 
