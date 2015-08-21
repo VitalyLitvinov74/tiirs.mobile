@@ -3,6 +3,8 @@
  */
 package ru.toir.mobile.rest;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -21,11 +23,11 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	
 	/**
 	 * 
-	 * @param tag
+	 * @param name Список имён справочников которые необходимо получить
 	 */
-	public void getReference(String uuid) {
+	public void getReference(ArrayList<String> names) {
 		Bundle bundle = new Bundle();
-		bundle.putString(ReferenceServiceProvider.Methods.GET_REFERENCE_PARAMETER_NAME, uuid);
+		bundle.putStringArrayList(ReferenceServiceProvider.Methods.GET_REFERENCE_PARAMETER_NAME, names);
 		RunMethod(ReferenceServiceProvider.Methods.GET_REFERENCE, bundle);
 	}
 	

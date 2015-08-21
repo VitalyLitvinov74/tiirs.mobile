@@ -31,6 +31,8 @@ public class DocumentationTypeDBAdapter {
 	 */
 	public DocumentationTypeDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -150,4 +152,11 @@ public class DocumentationTypeDBAdapter {
 			return "";
 	}
 
+	public void saveItems(ArrayList<DocumentationType> array) {
+		mDb.beginTransaction();
+		for(DocumentationType item : array) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 }

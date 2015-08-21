@@ -7,7 +7,7 @@
     <string name="pleasePutTag">Поднесите метку</string>
     <string name="readTag">Считать</string>
     <string name="cancel">Отмена</string>
-    <string name="action_update">Обновить</string>
+    <string name="action_update">Обновить приложение</string>
     <string name="pref_cat_main">Основные</string>
     <string name="pref_update_url">Сервер обновления</string>
     <string name="pref_update_url_dialog_title">Введите URL сервера обновления</string>

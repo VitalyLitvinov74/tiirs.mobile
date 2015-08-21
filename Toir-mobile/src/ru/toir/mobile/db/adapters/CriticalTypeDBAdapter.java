@@ -31,6 +31,8 @@ public class CriticalTypeDBAdapter {
 	 */
 	public CriticalTypeDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -148,6 +150,14 @@ public class CriticalTypeDBAdapter {
 			}
 		else
 			return "";
+	}
+	
+	public void saveItems(ArrayList<CriticalType> list) {
+		mDb.beginTransaction();
+		for(CriticalType item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
 	}
 	
 }

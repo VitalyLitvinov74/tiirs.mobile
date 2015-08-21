@@ -31,6 +31,8 @@ public class EquipmentTypeDBAdapter {
 	 */
 	public EquipmentTypeDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -150,4 +152,11 @@ public class EquipmentTypeDBAdapter {
 			return "";
 	}
 	
+	public void saveItems(ArrayList<EquipmentType> list) {
+		mDb.beginTransaction();
+		for(EquipmentType item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 }

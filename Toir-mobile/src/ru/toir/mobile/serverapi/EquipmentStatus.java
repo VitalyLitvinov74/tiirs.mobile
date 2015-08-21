@@ -1,4 +1,3 @@
-
 package ru.toir.mobile.serverapi;
 
 import java.util.Date;
@@ -7,52 +6,50 @@ import com.google.gson.annotations.Expose;
 
 public class EquipmentStatus {
 
-    @Expose
-    private String Id;
-    @Expose
-    private String Title;
-    @Expose
-    private int Type;
-    @Expose
-    private Date CreatedAt;
-    @Expose
-    private Date ChangedAt;
+	@Expose
+	private String Id;
+	@Expose
+	private String Title;
+	@Expose
+	private int Type;
+	@Expose
+	private Date CreatedAt;
+	@Expose
+	private Date ChangedAt;
 
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
+	/**
+	 * 
+	 * @return The Id
+	 */
+	public String getId() {
+		return Id;
+	}
 
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
+	/**
+	 * 
+	 * @param Id
+	 *            The Id
+	 */
+	public void setId(String Id) {
+		this.Id = Id;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Title
-     */
-    public String getTitle() {
-        return Title;
-    }
+	/**
+	 * 
+	 * @return The Title
+	 */
+	public String getTitle() {
+		return Title;
+	}
 
-    /**
-     * 
-     * @param Title
-     *     The Title
-     */
-    public void setTitle(String Title) {
-        this.Title = Title;
-    }
+	/**
+	 * 
+	 * @param Title
+	 *            The Title
+	 */
+	public void setTitle(String Title) {
+		this.Title = Title;
+	}
 
 	/**
 	 * @return the type
@@ -62,7 +59,8 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(int type) {
 		Type = type;
@@ -76,7 +74,8 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @param createdAt the createdAt to set
+	 * @param createdAt
+	 *            the createdAt to set
 	 */
 	public void setCreatedAt(Date createdAt) {
 		CreatedAt = createdAt;
@@ -90,7 +89,8 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @param changedAt the changedAt to set
+	 * @param changedAt
+	 *            the changedAt to set
 	 */
 	public void setChangedAt(Date changedAt) {
 		ChangedAt = changedAt;

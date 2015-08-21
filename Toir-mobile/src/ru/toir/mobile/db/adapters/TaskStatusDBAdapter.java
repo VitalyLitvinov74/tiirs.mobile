@@ -39,6 +39,8 @@ public class TaskStatusDBAdapter {
 	 */
 	public TaskStatusDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -147,4 +149,13 @@ public class TaskStatusDBAdapter {
 	public long replace(TaskStatus status) {
 		return replace(status.getUuid(), status.getTitle());
 	}
+	
+	public void saveItems(ArrayList<TaskStatus> list) {
+		mDb.beginTransaction();
+		for(TaskStatus item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
+	
 }

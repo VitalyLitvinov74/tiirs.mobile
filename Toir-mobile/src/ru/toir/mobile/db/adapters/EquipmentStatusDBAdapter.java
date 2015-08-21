@@ -35,6 +35,8 @@ public class EquipmentStatusDBAdapter {
 	 */
 	public EquipmentStatusDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -145,4 +147,13 @@ public class EquipmentStatusDBAdapter {
 	public long replace(EquipmentStatus status) {
 		return replace(status.getUuid(), status.getTitle(), status.getType());
 	}
+	
+	public void saveItems(ArrayList<EquipmentStatus> list) {
+		mDb.beginTransaction();
+		for(EquipmentStatus item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
+
 }

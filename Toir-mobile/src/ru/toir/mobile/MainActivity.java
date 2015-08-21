@@ -108,12 +108,6 @@ public class MainActivity extends FragmentActivity {
 						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(getApplicationContext(), UsersServiceProvider.Actions.ACTION_GET_USER);
 						usersServiceHelper.getUser();
 						
-						// TODO удалить после проверки
-						/*
-						ReferenceServiceHelper Tprovider = new ReferenceServiceHelper(getApplicationContext(), ReferenceServiceProvider.Actions.ACTION_GET_REFERENCE);
-						Tprovider.getReference(ReferenceProcessor.ReferenceNames.OperationResultName);
-						*/
-
 						Toast.makeText(getApplicationContext(),
 								"Токен получен.", Toast.LENGTH_SHORT).show();
 					} else {

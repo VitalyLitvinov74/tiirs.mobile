@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.OperationResult;
 import android.content.ContentValues;
@@ -173,4 +172,11 @@ public class OperationResultDBAdapter {
 			return "";
 	}
 
+	public void saveItems(ArrayList<OperationResult> list) {
+		mDb.beginTransaction();
+		for(OperationResult item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 }

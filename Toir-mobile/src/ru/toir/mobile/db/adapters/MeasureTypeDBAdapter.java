@@ -31,6 +31,8 @@ public class MeasureTypeDBAdapter {
 	 */
 	public MeasureTypeDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -126,4 +128,11 @@ public class MeasureTypeDBAdapter {
 		return arrayList;
 	}
 
+	public void saveItems(ArrayList<MeasureType> list) {
+		mDb.beginTransaction();
+		for(MeasureType item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 }

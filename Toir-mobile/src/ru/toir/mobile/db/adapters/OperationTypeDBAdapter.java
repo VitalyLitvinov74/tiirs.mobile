@@ -31,6 +31,8 @@ public class OperationTypeDBAdapter {
 	 */
 	public OperationTypeDBAdapter(Context context) {
 		mContext = context;
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		mDb = mDbHelper.getWritableDatabase();
 	}
 	
 	/**
@@ -140,4 +142,11 @@ public class OperationTypeDBAdapter {
 		else return "неизвестно";
 	}
 
+	public void saveItems(ArrayList<OperationType> list) {
+		mDb.beginTransaction();
+		for(OperationType item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 }
