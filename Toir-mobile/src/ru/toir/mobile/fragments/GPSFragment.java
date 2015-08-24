@@ -141,7 +141,7 @@ public class GPSFragment extends Fragment {
 						new TOiRDatabaseContext(getActivity()
 								.getApplicationContext())).open();
 				if (equipOperationList.get(cnt2).getEquipment_uuid() != null) {
-					location = eqDBAdapter.getLocationByUUID(equipOperationList
+					location = eqDBAdapter.getLocationCoordinatesByUUID(equipOperationList
 							.get(cnt2).getEquipment_uuid());
 					// TODO: добавить парсинг реальных координат
 					String coordinates[] = location.split("[NSWE]");

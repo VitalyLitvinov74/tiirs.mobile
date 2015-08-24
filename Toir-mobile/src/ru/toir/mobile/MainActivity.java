@@ -3,11 +3,13 @@ package ru.toir.mobile;
 import java.io.File;
 
 import com.astuetz.PagerSlidingTabStrip;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -204,6 +206,7 @@ public class MainActivity extends FragmentActivity {
 			setMainLayout();
 		} else {
 			setContentView(R.layout.login_layout);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 
 	}
@@ -338,6 +341,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	void setMainLayout() {
 		setContentView(R.layout.main_layout);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);		
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager
@@ -466,7 +470,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ( keyCode == KeyEvent.KEYCODE_BACK) {
-			return true;
+			//return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}

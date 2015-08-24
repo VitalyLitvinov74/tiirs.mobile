@@ -175,7 +175,7 @@ public class TaskFragment extends Fragment {
 
 		// создаём "пустой" адаптер для отображения нарядов
 		String[] taskFrom = { "_id", "create_date" };
-		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Create };
+		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create};
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -188,7 +188,12 @@ public class TaskFragment extends Fragment {
 					int columnIndex) {
 
 				int viewId = view.getId();
-
+				
+				if (viewId == R.id.ti_Name) {
+					((TextView) view).setText(cursor.getString(cursor
+							.getColumnIndex(TaskDBAdapter.FIELD_TASK_NAME_NAME)));
+					return true;
+				}
 				if (viewId == R.id.ti_Create) {
 					((TextView) view).setText(DataUtils.getDate(
 							cursor.getLong(columnIndex), "dd.MM.yyyy hh:mm"));

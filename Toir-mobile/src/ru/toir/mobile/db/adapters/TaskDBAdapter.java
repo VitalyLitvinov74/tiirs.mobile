@@ -28,12 +28,13 @@ public class TaskDBAdapter {
 	public static final String FIELD_ATTEMPT_SEND_DATE_NAME = "attempt_send_date";
 	public static final String FIELD_ATTEMPT_COUNT_NAME = "attempt_count";
 	public static final String FIELD_UPDATED_NAME = "updated";
+	public static final String FIELD_TASK_NAME_NAME = "task_name";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_USER_UUID_NAME, FIELD_CREATE_DATE_NAME,
 			FIELD_MODIFY_DATE_NAME, FIELD_CLOSE_DATE_NAME,
 			FIELD_TASK_STATUS_UUID_NAME, FIELD_ATTEMPT_SEND_DATE_NAME,
-			FIELD_ATTEMPT_COUNT_NAME, FIELD_UPDATED_NAME };
+			FIELD_ATTEMPT_COUNT_NAME, FIELD_UPDATED_NAME, FIELD_TASK_NAME_NAME};
 
 	/**
 	 * @param context
@@ -124,7 +125,8 @@ public class TaskDBAdapter {
 	 */
 	public long replace(String uuid, String users_uuid, long create_date,
 			long modify_date, long close_date, String task_status_uuid,
-			long attempt_send_date, int attempt_count, boolean updated) {
+			long attempt_send_date, int attempt_count, boolean updated, 
+			String task_name) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
@@ -136,6 +138,7 @@ public class TaskDBAdapter {
 		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
 		values.put(FIELD_ATTEMPT_COUNT_NAME, attempt_count);
 		values.put(FIELD_UPDATED_NAME, updated == true ? 1 : 0);
+		values.put(FIELD_TASK_NAME_NAME, task_name);		
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -151,7 +154,7 @@ public class TaskDBAdapter {
 				task.getCreate_date(), task.getModify_date(),
 				task.getClose_date(), task.getTask_status_uuid(),
 				task.getAttempt_send_date(), task.getAttempt_count(),
-				task.isUpdated());
+				task.isUpdated(),task.getTask_name());
 	}
 
 	public String getStatusNameByUUID(String uuid) {
@@ -214,6 +217,7 @@ public class TaskDBAdapter {
 		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
 		item.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)));
 		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 0 ? false : true);
+		item.setTask_name(cursor.getString(cursor.getColumnIndex(FIELD_TASK_NAME_NAME)));
 		return item;
 	}
 	

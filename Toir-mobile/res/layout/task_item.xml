@@ -11,15 +11,26 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/img_status_1"
-        android:contentDescription="Статус" />
+        android:contentDescription="@string/status" />
 
+    <TextView
+        android:id="@+id/ti_Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/ti_ImageStatus"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+   
     <TextView
         android:id="@+id/ti_CreateLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/ti_ImageStatus"
-        android:text="Создан:"
+        android:layout_toRightOf="@+id/ti_Name"
+        android:text="@string/created"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
