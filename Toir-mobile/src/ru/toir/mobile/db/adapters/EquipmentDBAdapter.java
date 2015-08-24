@@ -166,9 +166,9 @@ public class EquipmentDBAdapter {
 				.setImg(cursor.getString(cursor.getColumnIndex(FIELD_IMG_NAME)));
 		equipment.setEquipmentStatus_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_EQUIPMENT_STATUS_UUID_NAME)));
-		equipment.setEquipmentStatus_uuid(cursor.getString(cursor
+		equipment.setInventoryNumber(cursor.getString(cursor
 				.getColumnIndex(FIELD_INVENTORY_NUMBER_NAME)));
-		equipment.setEquipmentStatus_uuid(cursor.getString(cursor
+		equipment.setLocation(cursor.getString(cursor
 				.getColumnIndex(FIELD_LOCATION_NAME)));
 
 		return equipment;
