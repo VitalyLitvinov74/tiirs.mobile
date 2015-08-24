@@ -288,13 +288,15 @@ public class TaskProcessor {
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
 		item.setUsers_uuid(serverTask.getEmployeeId());
-		item.setCreate_date(serverTask.getCreatedAt().getTime() / 1000);
-		item.setModify_date(serverTask.getChangedAt().getTime() / 1000);
-		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDate().getTime() / 1000);
+		item.setCreate_date(serverTask.getCreatedAt().getTime());
+		item.setModify_date(serverTask.getChangedAt().getTime());
+		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDate().getTime());
 		
 		item.setTask_status_uuid(serverTask.getOrderStatus().getId());
 		// добавляем объект статуса наряда
 		taskStatus.put(serverTask.getOrderStatus().getId(), getTaskStatus(serverTask.getOrderStatus()));
+		
+		item.setTask_name("номер " + serverTask.getNumber());
 		
 		List<Item> operations = serverTask.getItems();
 		if (operations != null) {
@@ -372,6 +374,8 @@ public class TaskProcessor {
 		
 		item.setUuid(pattern.getId());
 		item.setTitle(pattern.getTitle());
+		// TODO уточнить приходит ли поле с сервера
+		item.setOperation_type_uuid("");
 
 		// создаём объекты шагов шаблона выполнения операции
 		List<Step> steps = pattern.getSteps();
@@ -469,7 +473,7 @@ public class TaskProcessor {
 		item.setCritical_type_uuid(equipment.getCriticalityType().getId());
 		// создаём объект типа критичности оборудования
 		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
-		item.setStart_date(equipment.getStartupDate().getTime() / 1000);
+		item.setStart_date(equipment.getStartupDate().getTime());
 
 		List<Document> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
@@ -484,6 +488,12 @@ public class TaskProcessor {
 		// создаём объект статуса оборудования
 		equipmentStatus.put(equipment.getEquipmentStatus().getId(), getEquipmentStatus(equipment.getEquipmentStatus()));
 
+		// TODO данные не приходят с сервера
+		item.setInventory_number("");
+		// TODO данные не приходят с сервера
+		item.setLocation("");
+		item.setCreatedAt(equipment.getCreatedAt().getTime());
+		item.setChangedAt(equipment.getChangedAt().getTime());
 		
 		return item;
 	}

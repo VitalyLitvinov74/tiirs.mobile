@@ -72,10 +72,16 @@ public class TaskFragment extends Fragment {
 
 	private ProgressDialog getOrderDialog;
 
+	private String dateFormat = "dd.MM.yyyy hh:mm";
+
 	public void cancelGetOrders() {
 		if (getOrderDialog != null) {
 			getOrderDialog.cancel();
 		}
+	}
+	
+	public void refreshTaskList() {
+		initView();
 	}
 
 	/*
@@ -90,20 +96,20 @@ public class TaskFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.tasks_layout, container,
 				false);
-		
+
 		lv = (ListView) rootView.findViewById(R.id.tasks_listView);
-		
+
 		button = (Button) rootView.findViewById(R.id.tasks_button_back);
 		button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				initView();
 			}
 		});
-		
+
 		Spinner_references = (Spinner) rootView
 				.findViewById(R.id.tasks_spinner10);
 		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
-		
+
 		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
 		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
 
@@ -174,8 +180,8 @@ public class TaskFragment extends Fragment {
 		});
 
 		// создаём "пустой" адаптер для отображения нарядов
-		String[] taskFrom = { "_id", "create_date" };
-		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create};
+		String[] taskFrom = { "_id", "task_name", "create_date" };
+		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create };
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -188,15 +194,16 @@ public class TaskFragment extends Fragment {
 					int columnIndex) {
 
 				int viewId = view.getId();
-				
+
 				if (viewId == R.id.ti_Name) {
 					((TextView) view).setText(cursor.getString(cursor
 							.getColumnIndex(TaskDBAdapter.FIELD_TASK_NAME_NAME)));
 					return true;
 				}
+
 				if (viewId == R.id.ti_Create) {
 					((TextView) view).setText(DataUtils.getDate(
-							cursor.getLong(columnIndex), "dd.MM.yyyy hh:mm"));
+							cursor.getLong(columnIndex), dateFormat));
 					return true;
 				}
 
@@ -313,8 +320,8 @@ public class TaskFragment extends Fragment {
 					new TOiRDatabaseContext(getActivity()
 							.getApplicationContext()));
 
-			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(user
-					.getUuid(), taskStatus, orderByField));
+			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
+					user.getUuid(), taskStatus, orderByField));
 
 			/*
 			Integer cnt = 0;
@@ -358,7 +365,8 @@ public class TaskFragment extends Fragment {
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 
-		operationTypeList.add(0, new OperationType(0, null, "Все операции", 0, 0));
+		operationTypeList.add(0, new OperationType(0, null, "Все операции", 0,
+				0));
 		operationTypeAdapter.clear();
 		operationTypeAdapter.addAll(operationTypeList);
 		Spinner_references.setAdapter(operationTypeAdapter);
@@ -435,11 +443,15 @@ public class TaskFragment extends Fragment {
 								status.getUuid());
 
 						// текущие значения фильтров
-						OperationType operationType = (OperationType) Spinner_references.getSelectedItem();
-						CriticalType criticalType = (CriticalType) Spinner_type.getSelectedItem();
+						OperationType operationType = (OperationType) Spinner_references
+								.getSelectedItem();
+						CriticalType criticalType = (CriticalType) Spinner_type
+								.getSelectedItem();
 						// обновляем содержимое курсора
 						operationAdapter.changeCursor(dbAdapter
-								.getOperationWithInfo(taskUuid, operationType.getUuid(), criticalType.getUuid()));
+								.getOperationWithInfo(taskUuid,
+										operationType.getUuid(),
+										criticalType.getUuid()));
 
 						// закрываем диалог
 						dialog.dismiss();
@@ -516,7 +528,8 @@ public class TaskFragment extends Fragment {
 
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(eqOperationDBAdapter
-				.getOperationWithInfo(task_uuid, operation_type_uuid, critical_type_uuid));
+				.getOperationWithInfo(task_uuid, operation_type_uuid,
+						critical_type_uuid));
 
 		// Setting the adapter to the listView
 		lv.setAdapter(operationAdapter);

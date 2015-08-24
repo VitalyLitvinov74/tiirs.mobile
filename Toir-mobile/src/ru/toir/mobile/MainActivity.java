@@ -175,6 +175,7 @@ public class MainActivity extends FragmentActivity {
 					TaskFragment fragment = (TaskFragment) adapter
 							.getItem(PageAdapter.TASK_FRAGMENT);
 					fragment.cancelGetOrders();
+					fragment.refreshTaskList();
 				}
 			}
 

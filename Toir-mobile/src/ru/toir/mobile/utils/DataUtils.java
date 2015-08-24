@@ -202,7 +202,7 @@ public class DataUtils {
 	
 	public static String getDate(long time, String format) {
 	    Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-	    cal.setTimeInMillis(time*1000);
+	    cal.setTimeInMillis(time);
 	    //"dd-MM-yyyy hh:mm:ss"
 	    String date = DateFormat.format(format, cal).toString();
 	    return date;

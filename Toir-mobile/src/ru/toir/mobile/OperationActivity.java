@@ -121,7 +121,7 @@ public class OperationActivity extends Activity {
 		UUID uuid = UUID.randomUUID();
 		operationResult.setUuid(uuid.toString());
 		operationResult.setEquipment_operation_uuid(operation_uuid);
-		operationResult.setStart_date(new Date().getTime() / 1000);
+		operationResult.setStart_date(new Date().getTime());
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		equipmentOperationResultDBAdapter.replace(operationResult);
 		
@@ -181,7 +181,7 @@ public class OperationActivity extends Activity {
 				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 				operationResult = equipmentOperationResultDBAdapter.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
-				operationResult.setEnd_date(new Date().getTime() / 1000);
+				operationResult.setEnd_date(new Date().getTime());
 				equipmentOperationResultDBAdapter.replace(operationResult);
 				finish();
 			}
