@@ -84,7 +84,7 @@ public class EquipmentOperationDBAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getAllOpEquipment() {
-		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME}, null, null, null, null, null);
+		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME, FIELD_OPERATION_STATUS_UUID_NAME, FIELD_OPERATION_TIME_NAME}, null, null, null, null, null);
 	}
 	
 	/**
@@ -93,7 +93,7 @@ public class EquipmentOperationDBAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getOpEquipment(long uuid) {
-		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME}, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)}, null, null, null);
+		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME, FIELD_OPERATION_STATUS_UUID_NAME, FIELD_OPERATION_TIME_NAME}, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)}, null, null, null);
 	}
 	
 	/**
@@ -266,5 +266,15 @@ public class EquipmentOperationDBAdapter {
 		return cursor;
 	}
 
+	/**
+	 * Возвращает курсор для ListView списка всех операций (временная функция - тестовая) 
+	 * @return
+	 */
+	public Cursor getOperationWithInfo() {
+		Cursor cursor = null;
+		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid";		
+		cursor = mDb.rawQuery(query, null);		
+		return cursor;
+	}
 	
 }

@@ -6,17 +6,30 @@
     android:background="@color/gray"
     android:orientation="vertical" >
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/mapview"
-        android:layout_width="fill_parent"
-        android:layout_height="203dp"
-        android:layout_weight="10"
-        android:clickable="true" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical" >
 
-    </org.osmdroid.views.MapView>
+        <ListView
+            android:id="@+id/gps_listView"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:scrollbarAlwaysDrawVerticalTrack="true" >
 
+        </ListView>
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/gps_mapview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true" >
+        </org.osmdroid.views.MapView>
+    </LinearLayout>
+    
     <TextView
-        android:id="@+id/gpsTextView"
+        android:id="@+id/gps_TextView"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_gravity="bottom"
@@ -27,5 +40,5 @@
         android:textColorLink="@color/black"
         android:textSize="12sp"
         android:typeface="normal" />
-
+    
 </LinearLayout>

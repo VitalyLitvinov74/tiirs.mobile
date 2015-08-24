@@ -9,6 +9,8 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,14 +18,17 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Bundle;
 
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
-//import org.osmdroid.api.Marker;
-//import org.osmdroid.bonuspack.overlays.Marker;
 
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
@@ -31,9 +36,11 @@ import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.*;
+import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
-import ru.toir.mobile.utils.TaskItemizedOverlay;
+import ru.toir.mobile.utils.DataUtils;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.location.Location;
@@ -44,9 +51,12 @@ public class GPSFragment extends Fragment {
 	private IMapController mapController;
 	private MapView mapView;
 	private double curLatitude, curLongitude;
+	private ListView lv_equipment;	
 	Location location;
 	TextView gpsLog;
 	ArrayList<OverlayItem> aOverlayItemArray;
+	private SimpleCursorAdapter equipmentAdapter;
+	private ListviewClickListener clickListener = new ListviewClickListener();
 
 	/**
 	 * Класс объекта оборудования для отображения на крате
@@ -74,6 +84,7 @@ public class GPSFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
 		String tagId = AuthorizedUser.getInstance().getTagId();
+		String equipmentUUID = "";
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext()));
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
@@ -84,12 +95,12 @@ public class GPSFragment extends Fragment {
 				Context.LOCATION_SERVICE);
 		if (lm != null) {
 			TestGPSListener tgpsl = new TestGPSListener(
-					(TextView) rootView.findViewById(R.id.gpsTextView),
+					(TextView) rootView.findViewById(R.id.gps_TextView),
 					getActivity().getApplicationContext(), user.getUuid());
 			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1,
 					tgpsl);
 			location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			gpsLog = (TextView) rootView.findViewById(R.id.gpsTextView);
+			gpsLog = (TextView) rootView.findViewById(R.id.gps_TextView);
 			if (location != null) {
 				curLatitude = location.getLatitude();
 				curLongitude = location.getLongitude();
@@ -101,7 +112,7 @@ public class GPSFragment extends Fragment {
 						+ String.valueOf(location.getLongitude()) + "\n");
 			}
 		}
-		mapView = (MapView) rootView.findViewById(R.id.mapview);
+		mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
 		// mapView.setTileSource(TileSourceFactory.MAPNIK);
 		mapView.setUseDataConnection(false);
 		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
@@ -125,6 +136,12 @@ public class GPSFragment extends Fragment {
 				getActivity().getApplicationContext()));
 		ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(),
 				TaskStatusDBAdapter.STATUS_UUID_RECIEVED, "");
+
+		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+		String[] equipmentFrom = { "name", "location" };
+		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine};
+		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);		
+
 		Integer cnt = 0, cnt2 = 0;
 		while (cnt < ordersList.size()) {
 			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
@@ -140,9 +157,20 @@ public class GPSFragment extends Fragment {
 				EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 						new TOiRDatabaseContext(getActivity()
 								.getApplicationContext()));
-				if (equipOperationList.get(cnt2).getEquipment_uuid() != null) {
-					location = eqDBAdapter.getLocationCoordinatesByUUID(equipOperationList
-							.get(cnt2).getEquipment_uuid());
+				equipmentUUID = equipOperationList.get(cnt2).getEquipment_uuid();
+				if (equipmentUUID != null) {
+					location = eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
+					HashMap<String, String> hm = new HashMap<String, String>();
+					hm.put("name", eqDBAdapter.getEquipsNameByUUID(equipmentUUID)
+							//+ " ["
+							//+ eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
+							//+ "]"
+							);
+					// default
+					hm.put("location", eqDBAdapter.getLocationByUUID(equipmentUUID));
+					aList.add(hm);
+
+					
 					// TODO: добавить парсинг реальных координат
 					String coordinates[] = location.split("[NSWE]");
 					// coordinates[0]; // Latitude
@@ -169,7 +197,13 @@ public class GPSFragment extends Fragment {
 			}
 			cnt = cnt + 1;
 		}
-
+		SimpleAdapter adapter = new SimpleAdapter(getActivity()
+				.getApplicationContext(), aList, R.layout.listview,
+				equipmentFrom, equipmentTo);
+		// Setting the adapter to the listView
+		lv_equipment.setAdapter(adapter);
+		lv_equipment.setOnItemClickListener(clickListener);
+		
 		TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
 			@Override
@@ -190,7 +224,25 @@ public class GPSFragment extends Fragment {
 			}
 		};
 		mapView.getOverlays().add(overlay);
+/*
+		String[] equipmentFrom = { "", "equipment_uuid" };
+		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine};
+		EquipmentOperationDBAdapter equipmentOperationDBAdapter = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(getActivity()
+						.getApplicationContext()));
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+				new TOiRDatabaseContext(getActivity()
+						.getApplicationContext()));
 
+		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);		
+		equipmentAdapter = new SimpleCursorAdapter(getActivity(),
+				R.layout.listview, null, equipmentFrom, equipmentTo,
+				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		// Setting the adapter to the listView
+		lv_equipment.setAdapter(equipmentAdapter);
+		lv_equipment.setOnItemClickListener(clickListener);		
+		equipmentAdapter.changeCursor(equipmentOperationDBAdapter.getOperationWithInfo());
+		*/				
 		onInit(rootView);
 		
 		rootView.setFocusableInTouchMode(true);
@@ -198,6 +250,16 @@ public class GPSFragment extends Fragment {
 
 		return rootView;
 	}
+
+public class ListviewClickListener implements
+AdapterView.OnItemClickListener {
+	@Override
+	public void onItemClick(AdapterView<?> parent, View selectedItemView,
+		int position, long id) {
+		//Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+		// TODO связать нажатие в списке с картой: изменить цвет маркера
+	}
+}
 
 	public void onInit(View view) {
 
