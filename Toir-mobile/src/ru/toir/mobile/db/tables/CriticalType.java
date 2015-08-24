@@ -11,6 +11,8 @@ public class CriticalType {
 	private long _id;
 	private String uuid;
 	private int type;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	/**
 	 * 
@@ -72,6 +74,34 @@ public class CriticalType {
 			return "Любая критичность";
 		}
 		return "Критичность: " + type;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

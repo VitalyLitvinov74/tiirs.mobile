@@ -4,7 +4,6 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import android.content.ContentValues;
@@ -140,4 +139,11 @@ public class EquipmentDocumentationDBAdapter {
 		return arrayList;
 	}
 
+	public void saveItems(ArrayList<EquipmentDocumentation> list) {
+		mDb.beginTransaction();
+		for(EquipmentDocumentation item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 }

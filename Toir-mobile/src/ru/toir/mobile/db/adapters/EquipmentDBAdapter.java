@@ -364,5 +364,13 @@ public class EquipmentDBAdapter {
 		} else
 			return "-";
 	}
+	
+	public void saveItems(ArrayList<Equipment> list) {
+		mDb.beginTransaction();
+		for(Equipment item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 
 }

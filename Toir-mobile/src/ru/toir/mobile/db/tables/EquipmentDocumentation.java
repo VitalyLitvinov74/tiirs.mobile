@@ -10,6 +10,8 @@ public class EquipmentDocumentation {
 		private String documentation_type_uuid;
 		private String title;
 		private String path;
+		private long CreatedAt;
+		private long ChangedAt;
 
 		/**
 		 * 
@@ -108,6 +110,34 @@ public class EquipmentDocumentation {
 		 */
 		public void setPath(String path) {
 			this.path = path;
+		}
+
+		/**
+		 * @return the createdAt
+		 */
+		public long getCreatedAt() {
+			return CreatedAt;
+		}
+
+		/**
+		 * @param createdAt the createdAt to set
+		 */
+		public void setCreatedAt(long createdAt) {
+			CreatedAt = createdAt;
+		}
+
+		/**
+		 * @return the changedAt
+		 */
+		public long getChangedAt() {
+			return ChangedAt;
+		}
+
+		/**
+		 * @param changedAt the changedAt to set
+		 */
+		public void setChangedAt(long changedAt) {
+			ChangedAt = changedAt;
 		}
 
 }

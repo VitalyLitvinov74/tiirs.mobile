@@ -12,6 +12,8 @@ public class EquipmentStatus {
 	private String title;
 	private String uuid;
 	private int type;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	public static class Extras {
 		//public static final String STATUS_UUID_UNCERTAINED = "PROVIDER_E";
@@ -82,6 +84,34 @@ public class EquipmentStatus {
 	 */
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

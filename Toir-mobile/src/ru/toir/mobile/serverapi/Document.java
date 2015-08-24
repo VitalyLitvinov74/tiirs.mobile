@@ -1,6 +1,8 @@
 
 package ru.toir.mobile.serverapi;
 
+import java.util.Date;
+
 import com.google.gson.annotations.Expose;
 
 public class Document {
@@ -13,6 +15,10 @@ public class Document {
     private String Path;
     @Expose
     private ru.toir.mobile.serverapi.DocumentType DocumentType;
+    @Expose
+	private Date CreatedAt;
+	@Expose
+	private Date ChangedAt;
 
     /**
      * 
@@ -85,5 +91,33 @@ public class Document {
     public void setDocumentType(ru.toir.mobile.serverapi.DocumentType DocumentType) {
         this.DocumentType = DocumentType;
     }
+
+	/**
+	 * @return the createdAt
+	 */
+	public Date getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(Date createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public Date getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(Date changedAt) {
+		ChangedAt = changedAt;
+	}
 
 }

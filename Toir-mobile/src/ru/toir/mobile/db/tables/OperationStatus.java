@@ -11,6 +11,8 @@ public class OperationStatus {
 	private long _id;
 	private String uuid;
 	private String title;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	public static class Extras {
 		public static final String STATUS_UUID_NEW = "18d3d5d4-336f-4b25-ba2b-00a6c7d5eb6c";
@@ -71,6 +73,34 @@ public class OperationStatus {
 	
 	public String toString() {
 		return this.title;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

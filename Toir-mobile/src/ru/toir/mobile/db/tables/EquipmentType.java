@@ -11,6 +11,8 @@ public class EquipmentType {
 	private long _id;
 	private String uuid;
 	private String title;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	/**
 	 * 
@@ -65,6 +67,34 @@ public class EquipmentType {
 	 */
 	public void set_id(long _id) {
 		this._id = _id;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

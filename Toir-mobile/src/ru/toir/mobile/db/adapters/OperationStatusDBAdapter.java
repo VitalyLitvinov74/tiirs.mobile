@@ -127,5 +127,13 @@ public class OperationStatusDBAdapter {
 	public long replace(OperationStatus status) {
 		return replace(status.getUuid(), status.getTitle());
 	}
+	
+	public void saveItems(ArrayList<OperationStatus> list) {
+		mDb.beginTransaction();
+		for(OperationStatus item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+	}
 
 }

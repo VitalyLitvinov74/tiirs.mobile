@@ -11,6 +11,8 @@ public class TaskStatus {
 	private long _id;
 	private String uuid;
 	private String title;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	public static class Extras {
 		//public static final String STATUS_UUID_UNCERTAINED = "PROVIDER_E";
@@ -78,6 +80,34 @@ public class TaskStatus {
 	
 	public String toString() {
 		return title;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

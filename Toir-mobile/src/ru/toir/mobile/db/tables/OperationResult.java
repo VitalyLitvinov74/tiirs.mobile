@@ -3,9 +3,6 @@
  */
 package ru.toir.mobile.db.tables;
 
-//import android.R.string;
-//import com.google.common.base.Objects.ToStringHelper;
-
 /**
  * @author Dmitriy Logachov
  *
@@ -15,6 +12,8 @@ public class OperationResult {
 	private String uuid;
 	private String operation_type_uuid;
 	private String title;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	/**
 	 * 
@@ -88,6 +87,34 @@ public class OperationResult {
 	
 	public String toString() {
 		return title;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

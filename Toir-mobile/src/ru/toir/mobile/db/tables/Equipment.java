@@ -21,6 +21,8 @@ public class Equipment {
 	private String equipment_status_uuid;
 	private String inventory_number;
 	private String location;
+	private long CreatedAt;
+	private long ChangedAt;
 
 	/**
 	 * 
@@ -226,5 +228,61 @@ public class Equipment {
 	 */
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	/**
+	 * @return the equipment_status_uuid
+	 */
+	public String getEquipment_status_uuid() {
+		return equipment_status_uuid;
+	}
+
+	/**
+	 * @param equipment_status_uuid the equipment_status_uuid to set
+	 */
+	public void setEquipment_status_uuid(String equipment_status_uuid) {
+		this.equipment_status_uuid = equipment_status_uuid;
+	}
+
+	/**
+	 * @return the inventory_number
+	 */
+	public String getInventory_number() {
+		return inventory_number;
+	}
+
+	/**
+	 * @param inventory_number the inventory_number to set
+	 */
+	public void setInventory_number(String inventory_number) {
+		this.inventory_number = inventory_number;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public long getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(long createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public long getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(long changedAt) {
+		ChangedAt = changedAt;
 	}
 }
