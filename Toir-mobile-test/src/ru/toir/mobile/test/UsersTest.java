@@ -67,7 +67,6 @@ public class UsersTest extends AndroidTestCase {
 	 */
 	public void testDeleteDatabase() {
 		// закрываем базу
-		adapter.close();
 		adapter = null;
 		assertEquals(true, context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName()));
 		
@@ -76,7 +75,6 @@ public class UsersTest extends AndroidTestCase {
 
 		// для того чтобы выполнился tearDown, создаём заново адаптер
 		adapter = new UsersDBAdapter(context);
-		adapter.open();
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +100,6 @@ public class UsersTest extends AndroidTestCase {
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
         adapter = new UsersDBAdapter(context);
-		adapter.open();
 	}
 
 	/* (non-Javadoc)
@@ -112,7 +109,6 @@ public class UsersTest extends AndroidTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		Log.d(TAG, "tearDown");
-		adapter.close();
 		adapter = null;
 	}
 }

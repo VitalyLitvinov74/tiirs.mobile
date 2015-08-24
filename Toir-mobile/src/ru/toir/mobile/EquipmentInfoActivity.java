@@ -83,13 +83,13 @@ public class EquipmentInfoActivity extends Activity {
 			spinner_operation_adapter.add("Ремонт задвижки");
 	      	spinner_operation_adapter.add("Осмотр задвижки");
 	      	 
-			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-			EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-			EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-			EquipmentOperationResultDBAdapter eqOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			EquipmentOperationResultDBAdapter eqOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			
-			CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+			CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			Equipment equipment = equipmentDBAdapter.getItem(equipment_uuid);
 			ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment.getUuid());		
 			tv_equipment_id.setText("TAGID: " + equipment.getTag_id());
@@ -112,21 +112,15 @@ public class EquipmentInfoActivity extends Activity {
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 			    tv_equipment_image.setImageBitmap(myBitmap);			    			    
 			}			
-			taskDBAdapter.close();
-			eqOperationDBAdapter.close();
-			eqOperationResultDBAdapter.close();
-			equipmentDBAdapter.close();
-			eqTypeDBAdapter.close();
-			criticalTypeDBAdapter.close();
 		}
 
 	 private void FillListViewOperations()
 		{				 
-		 EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		 EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-	     CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		 EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		 OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		 EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		 EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+	     CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		 EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		 OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 	     ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment_uuid);		
 	     int operation_type;
 	 	 int cnt=0;

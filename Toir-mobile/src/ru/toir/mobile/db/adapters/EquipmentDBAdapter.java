@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.Equipment;
@@ -52,24 +51,8 @@ public class EquipmentDBAdapter {
 	 */
 	public EquipmentDBAdapter(Context context) {
 		this.mContext = context;
-	}
-
-	/**
-	 * Получаем объект базы данных
-	 * 
-	 * @return EquipmentDBAdapter
-	 * @throws SQLException
-	 */
-	public EquipmentDBAdapter open() throws SQLException {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
 	}
 
 	/**

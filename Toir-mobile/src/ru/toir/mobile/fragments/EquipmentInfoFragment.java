@@ -90,13 +90,13 @@ public class EquipmentInfoFragment extends Fragment {
 		spinner_operation_adapter.add("Ремонт задвижки");
       	spinner_operation_adapter.add("Осмотр задвижки");
       	 
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-		EquipmentOperationResultDBAdapter eqOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+		EquipmentOperationResultDBAdapter eqOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		Equipment equipment = equipmentDBAdapter.getItem(equipment_uuid);
 		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment.getUuid());		
 		tv_equipment_id.setText("TAGID: " + equipment.getTag_id());
@@ -116,21 +116,15 @@ public class EquipmentInfoFragment extends Fragment {
 		    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 		    tv_equipment_image.setImageBitmap(myBitmap);
 		}
-		taskDBAdapter.close();
-		eqOperationDBAdapter.close();
-		eqOperationResultDBAdapter.close();
-		equipmentDBAdapter.close();
-		eqTypeDBAdapter.close();
-		criticalTypeDBAdapter.close();
 	}
 
  private void FillListViewOperations(View view)
 	{				 
-	 EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-	 EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-     CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-	 EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
-	 OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext())).open();
+	 EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+	 EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+     CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+	 EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
+	 OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getActivity().getApplicationContext()));
      ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment_uuid);		
      int operation_type;
  	 int cnt=0;

@@ -46,27 +46,23 @@ public class TaskResult {
 	 * @return true если есть наряд и операции связанные с этим нарядом
 	 */
 	public boolean getTaskResult(String taskUuid) {
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
 		mTask = taskDBAdapter.getItem(taskUuid);
-		taskDBAdapter.close();
 		if (mTask != null) {
-			EquipmentOperationDBAdapter equipmentOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext)).open();
+			EquipmentOperationDBAdapter equipmentOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
 			mEquipmentOperations = equipmentOperationDBAdapter.getItems(taskUuid);
-			equipmentOperationDBAdapter.close();
 			if (mEquipmentOperations != null) {
 				mEquipmentOperationResults = new ArrayList<EquipmentOperationResult>();
 				mMeasureValues = new ArrayList<MeasureValue>();
 				Iterator<EquipmentOperation> iterator = mEquipmentOperations.iterator();
-				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(mContext)).open();
-				MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(new TOiRDatabaseContext(mContext)).open();
+				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(mContext));
+				MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(new TOiRDatabaseContext(mContext));
 				String operationUuid;
 				while (iterator.hasNext()) {
 					operationUuid = iterator.next().getUuid();
 					mEquipmentOperationResults.add(equipmentOperationResultDBAdapter.getItemByOperation(operationUuid));
 					mMeasureValues.addAll(measureValueDBAdapter.getItems(operationUuid));
 				}
-				equipmentOperationResultDBAdapter.close();
-				measureValueDBAdapter.close();
 			} else {
 				return false;
 			}

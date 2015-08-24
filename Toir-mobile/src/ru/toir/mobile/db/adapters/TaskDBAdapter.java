@@ -42,21 +42,8 @@ public class TaskDBAdapter {
 	 */
 	public TaskDBAdapter(Context context) {
 		mContext = context;
-	}
-
-	/**
-	 * Открываем базу данных
-	 */
-	public TaskDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
 	}
 
 	/**

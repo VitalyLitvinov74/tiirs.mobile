@@ -41,23 +41,10 @@ public class OperationPatternStepDBAdapter {
 	 */
 	public OperationPatternStepDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Открываем базу данных
-	 */
-	public OperationPatternStepDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * Возвращает шаг операции по uuid
 	 * @param uuid

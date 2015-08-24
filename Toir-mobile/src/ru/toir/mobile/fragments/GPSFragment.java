@@ -75,7 +75,7 @@ public class GPSFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
 		// (если он будет храниться глобально, то запрашивать постоянно уже не
 		// надо будет)
@@ -122,14 +122,14 @@ public class GPSFragment extends Fragment {
 		ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
 
 		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(),
 				TaskStatusDBAdapter.STATUS_UUID_RECIEVED, "");
 		Integer cnt = 0, cnt2 = 0;
 		while (cnt < ordersList.size()) {
 			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			ArrayList<EquipmentOperation> equipOperationList = operationDBAdapter
 					.getItems(ordersList.get(cnt).getUuid());
 			// запрашиваем перечень оборудования
@@ -139,7 +139,7 @@ public class GPSFragment extends Fragment {
 				String location = "";
 				EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 						new TOiRDatabaseContext(getActivity()
-								.getApplicationContext())).open();
+								.getApplicationContext()));
 				if (equipOperationList.get(cnt2).getEquipment_uuid() != null) {
 					location = eqDBAdapter.getLocationCoordinatesByUUID(equipOperationList
 							.get(cnt2).getEquipment_uuid());
@@ -191,8 +191,6 @@ public class GPSFragment extends Fragment {
 		};
 		mapView.getOverlays().add(overlay);
 
-		users.close();
-		dbOrder.close();
 		onInit(rootView);
 		
 		rootView.setFocusableInTouchMode(true);

@@ -60,9 +60,8 @@ public class UserInfoFragment extends Fragment {
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
-		users.close();
 		if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
@@ -72,11 +71,10 @@ public class UserInfoFragment extends Fragment {
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			tv_user_status.setText("Статус: задание");
 			GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(
-					getActivity().getApplicationContext())).open();
+					getActivity().getApplicationContext()));
 			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
 			// Toast.makeText(getActivity(), user.getUuid(),
 			// Toast.LENGTH_SHORT).show();
-			gps.close();
 			if (gpstrack != null) {
 				tv_user_gps.setText(gpstrack.getLatitude().toString() + " / "
 						+ gpstrack.getLongitude().toString());
@@ -87,21 +85,20 @@ public class UserInfoFragment extends Fragment {
 	private void FillListViewTasks(View view) {
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
-		users.close();
 
 		if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
-					getActivity().getApplicationContext())).open();
+					getActivity().getApplicationContext()));
 			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
 					user.getUuid(), "", "");
 			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 
 			Integer cnt = 0;
 			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -144,7 +141,6 @@ public class UserInfoFragment extends Fragment {
 			ListView lv;
 			lv = (ListView) view.findViewById(R.id.user_listView_main);
 			lv.setAdapter(adapter);
-			dbOrder.close();
 		}
 	}
 }

@@ -111,9 +111,8 @@ public class OrdersFragment extends Fragment {
 	private void initView() {
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
-		users.close();
 		orders_uuid.clear();
 
 		if (user == null) {
@@ -121,7 +120,7 @@ public class OrdersFragment extends Fragment {
 					Toast.LENGTH_SHORT).show();
 		} else {
 			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
-					getActivity().getApplicationContext())).open();
+					getActivity().getApplicationContext()));
 			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
 					user.getUuid(), "", "");
 			Integer cnt = 0;
@@ -256,7 +255,6 @@ public class OrdersFragment extends Fragment {
 				if (cnt > MaxOrders)
 					break;
 			}
-			dbOrder.close();
 			button1.setVisibility(View.INVISIBLE);
 
 		}
@@ -268,25 +266,25 @@ public class OrdersFragment extends Fragment {
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		tasks_uuid.clear();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
-		users.close();
+
 		if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			EquipmentOperationDBAdapter eqOperation = new EquipmentOperationDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 
 			Toast.makeText(getActivity(), order_uuid, Toast.LENGTH_SHORT)
 					.show();
@@ -461,10 +459,6 @@ public class OrdersFragment extends Fragment {
 				}
 			});
 
-			eqOperation.close();
-			eqDBAdapter.close();
-			operationTypeDBAdapter.close();
-			equipmentOperationResultDBAdapter.close();
 		}
 	}
 
@@ -473,13 +467,11 @@ public class OrdersFragment extends Fragment {
 			String order_uuid, String equipment_uuid) {
 		final String order = order_uuid;
 		OperationPatternDBAdapter opPatternDBAdapter = new OperationPatternDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<OperationPattern> operationsList = opPatternDBAdapter
 				.getOperationByUUID(task_equipment_uuid);
 		EquipmentOperationDBAdapter equipmentOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		Integer cnt = 0;
 		final TableRow tableHead = new TableRow(getActivity()
 				.getApplicationContext());
@@ -585,7 +577,5 @@ public class OrdersFragment extends Fragment {
 				initTaskEquipment(order);
 			}
 		});
-		equipmentOperationDBAdapter.close();
-		opPatternDBAdapter.close();
 	}
 }

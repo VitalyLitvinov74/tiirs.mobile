@@ -43,23 +43,10 @@ public class MeasureValueDBAdapter {
 	 */
 	public MeasureValueDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Открываем базу данных
-	 */
-	public MeasureValueDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * Возвращает результат измерений по uuid
 	 * @param uuid

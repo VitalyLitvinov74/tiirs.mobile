@@ -33,23 +33,10 @@ public class OperationPatternDBAdapter {
 	 */
 	public OperationPatternDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Открываем базу данных
-	 */
-	public OperationPatternDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * 
 	 * @param uuid

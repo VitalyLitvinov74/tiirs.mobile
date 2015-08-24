@@ -10,7 +10,6 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
@@ -47,25 +46,10 @@ public class EquipmentDocumentationDBAdapter {
 	 */
 	public EquipmentDocumentationDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Получаем объект базы данных
-	 * @return
-	 * @throws SQLException
-	 */
-	public EquipmentDocumentationDBAdapter open() throws SQLException {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * <p>Возвращает запись из таблицы equipment_documentation</p>
 	 * @param uuid

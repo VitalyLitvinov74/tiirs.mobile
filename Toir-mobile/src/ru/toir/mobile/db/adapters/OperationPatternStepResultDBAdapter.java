@@ -37,23 +37,10 @@ public class OperationPatternStepResultDBAdapter {
 	 */
 	public OperationPatternStepResultDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Открываем базу данных
-	 */
-	public OperationPatternStepResultDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * Возвращает результат шага по uuid
 	 * @param uuid

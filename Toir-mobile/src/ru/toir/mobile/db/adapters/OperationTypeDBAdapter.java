@@ -36,21 +36,6 @@ public class OperationTypeDBAdapter {
 	}
 	
 	/**
-	 * Открываем базу данных
-	 */
-	public OperationTypeDBAdapter open() {
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
-	/**
 	 * 
 	 * @param uuid
 	 * @return

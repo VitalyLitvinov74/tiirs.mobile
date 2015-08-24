@@ -79,42 +79,37 @@ public class OperationActivity extends Activity {
     	numStepButton = (Button)findViewById(R.id.button1);		
 
         // получаем статус и время наряда
-	 	TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+	 	TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 	 	Task task = dbTask.getItem(task_uuid);
-	 	TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+	 	TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		taskname = "Наряд: " + dbTask.getCreateTimeByUUID(task_uuid) + " / Статус: " + taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
 
         // получаем тип операции
 		//OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
-        EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+        EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		EquipmentOperation equipmentOperation = operationDBAdapter.getItem(operation_uuid);
         		
 		// получаем шаблон операции
-		OperationPatternDBAdapter patternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		OperationPatternDBAdapter patternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		pattern = patternDBAdapter.getItem(equipmentOperation.getOperation_pattern_uuid());		
         operationname = "Оборудование: " + eqDBAdapter.getEquipsNameByUUID(equipment_uuid) + " / Операция: " + pattern.getTitle(); 						
-		operationDBAdapter.close();		
-		patternDBAdapter.close();
 		
 		// получаем шаги шаблона операции
-		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		patternSteps = patternStepDBAdapter.getItems(pattern.getUuid());
-		patternDBAdapter.close();
 		
 		// получаем варианты выполнения шагов
 		ArrayList <String> uuids = new ArrayList<String>();
 		for (OperationPatternStep step: patternSteps) {
 			uuids.add(step.getUuid());
 		}
-		OperationPatternStepResultDBAdapter stepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		OperationPatternStepResultDBAdapter stepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		stepsResults = stepResultDBAdapter.getItems(uuids);
-		stepResultDBAdapter.close();
 		
 		// получаем список вариантов завершения операции
-		OperationResultDBAdapter resultDBAdapter = new OperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		OperationResultDBAdapter resultDBAdapter = new OperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		operationResults = resultDBAdapter.getItems(equipmentOperation.getOperation_type_uuid());
-		resultDBAdapter.close();
 
 		TextView taskName = (TextView)findViewById(R.id.textView1);
 		taskName.setText(taskname);
@@ -127,9 +122,8 @@ public class OperationActivity extends Activity {
 		operationResult.setUuid(uuid.toString());
 		operationResult.setEquipment_operation_uuid(operation_uuid);
 		operationResult.setStart_date(new Date().getTime() / 1000);
-		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		equipmentOperationResultDBAdapter.replace(operationResult);
-		equipmentOperationResultDBAdapter.close();
 		
 		ShowFirstStep();
 	}
@@ -184,12 +178,11 @@ public class OperationActivity extends Activity {
 				OperationResult result = (OperationResult)spinner.getSelectedItem();
 				Log.d("test", result.getTitle());
 				EquipmentOperationResult operationResult = null;
-				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext())).open();
+				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 				operationResult = equipmentOperationResultDBAdapter.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
 				operationResult.setEnd_date(new Date().getTime() / 1000);
 				equipmentOperationResultDBAdapter.replace(operationResult);
-				equipmentOperationResultDBAdapter.close();
 				finish();
 			}
 		});

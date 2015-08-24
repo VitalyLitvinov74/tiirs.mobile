@@ -83,12 +83,11 @@ public class TestGPSListener implements LocationListener,GpsStatus.Listener{
     public void RecordGPSData(Double Latitude, Double Longitude) {
 		gpsLog.append("Latitude:"+String.valueOf(Latitude)+"\n");
 		gpsLog.append("Longitude:"+String.valueOf(Longitude)+"\n");
-		GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(context)).open();		
+		GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(context));		
 		String gpsuuid = UUID.randomUUID().toString();
 		//String user_uuid = UUID.randomUUID().toString();
 		//GpsTrack gpstracker = gps.getGPSByUuid(user_uuid);
 		gpsLog.append(gpsuuid + " " + user_uuid + String.valueOf(Latitude) +" " + String.valueOf(Longitude));
 		gps.addItem(gpsuuid, user_uuid, String.valueOf(Latitude), String.valueOf(Longitude));
-		gps.close();
     }	
 }

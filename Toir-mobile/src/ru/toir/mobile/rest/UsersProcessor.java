@@ -88,9 +88,8 @@ public class UsersProcessor {
 					// TODO с сервера не приходит должность
 					user.setWhois("Бугор");
 
-					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext)).open();
+					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
 					adapter.replaceItem(user);
-					adapter.close();
 				} else {
 					return false;
 				}

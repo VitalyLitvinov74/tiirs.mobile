@@ -36,21 +36,6 @@ public class DocumentationTypeDBAdapter {
 	}
 	
 	/**
-	 * Открываем базу данных
-	 */
-	public DocumentationTypeDBAdapter open() {
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
-	/**
 	 * 
 	 * @param uuid
 	 * @return

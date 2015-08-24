@@ -44,21 +44,6 @@ public class TaskStatusDBAdapter {
 	}
 	
 	/**
-	 * Открываем базу данных
-	 */
-	public TaskStatusDBAdapter open() {
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
-	/**
 	 * 
 	 * @param uuid
 	 * @return

@@ -187,110 +187,95 @@ public class TaskProcessor {
 	public void saveAllData() {
 		Set<String> set;
 		
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
 		set = tasks.keySet();
 		for (String uuid: set) {
 			taskDBAdapter.replace(tasks.get(uuid));
 		}
-		taskDBAdapter.close();
 		
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
 		set = equipments.keySet();
 		for (String uuid: set) {
 			equipmentDBAdapter.replace(equipments.get(uuid));
 		}
-		equipmentDBAdapter.close();
 		
-		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
 		set = equipmentOperations.keySet();
 		for (String uuid: set) {
 			operationDBAdapter.replace(equipmentOperations.get(uuid));
 		}
-		operationDBAdapter.close();
 		
-		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
 		set = taskStatus.keySet();
 		for (String uuid: set) {
 			taskStatusDBAdapter.replace(taskStatus.get(uuid));
 		}
-		taskStatusDBAdapter.close();
 		
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		set = criticalTypes.keySet();
 		for (String uuid: set) {
 			criticalTypeDBAdapter.replace(criticalTypes.get(uuid));
 		}
-		criticalTypeDBAdapter.close();
 		
-		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationTypes.keySet();
 		for (String uuid: set) {
 			operationTypeDBAdapter.replace(operationTypes.get(uuid));
 		}
-		operationDBAdapter.close();
 		
-		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		set = equipmentTypes.keySet();
 		for (String uuid: set) {
 			equipmentTypeDBAdapter.replace(equipmentTypes.get(uuid));
 		}
-		equipmentDBAdapter.close();
 		
-		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationPatterns.keySet();
 		for (String uuid: set) {
 			operationPatternDBAdapter.replace(operationPatterns.get(uuid));
 		}
-		operationPatternDBAdapter.close();
 		
-		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		set = documentationTypes.keySet();
 		for (String uuid: set) {
 			documentationTypeDBAdapter.replace(documentationTypes.get(uuid));
 		}
-		documentationTypeDBAdapter.close();
 		
-		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		set = measureTypes.keySet();
 		for (String uuid: set) {
 			measureTypeDBAdapter.replace(measureTypes.get(uuid));
 		}
-		measureTypeDBAdapter.close();
 		
-		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationPatternSteps.keySet();
 		for (String uuid: set) {
 			patternStepDBAdapter.replace(operationPatternSteps.get(uuid));
 		}
-		patternStepDBAdapter.close();
 		
-		OperationPatternStepResultDBAdapter patternStepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		OperationPatternStepResultDBAdapter patternStepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationPatternStepResults.keySet();
 		for (String uuid: set) {
 			patternStepResultDBAdapter.replace(operationPatternStepResults.get(uuid));
 		}
-		patternStepResultDBAdapter.close();
 		
-		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
 		set = equipmentDocumentations.keySet();
 		for (String uuid: set) {
 			documentationDBAdapter.replace(equipmentDocumentations.get(uuid));
 		}
-		documentationDBAdapter.close();
 		
-		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationStatus.keySet();
 		for (String uuid: set) {
 			operationStatusDBAdapter.replace(operationStatus.get(uuid));
 		}
-		operationStatusDBAdapter.close();
 		
-		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
 		set = equipmentStatus.keySet();
 		for (String uuid: set) {
 			equipmentStatusDBAdapter.replace(equipmentStatus.get(uuid));
 		}
-		equipmentStatusDBAdapter.close();
 	}
 	
 	/**
@@ -573,10 +558,9 @@ public class TaskProcessor {
 		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
 		String taskUuid = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
 		Task task;
 		task = adapter.getTaskByUuidAndUpdated(taskUuid);
-		adapter.close();
 
 		if (task != null) {
 			TaskResult taskResult = new TaskResult(mContext);
@@ -603,10 +587,9 @@ public class TaskProcessor {
 		
 		String user_uuid = AuthorizedUser.getInstance().getUuid();
 		ArrayList<Task> tasks;
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext)).open();
+		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
 		// TODO необходимо решить и реализовать выборку не отправленных нарядов, либо по текущему пользователю либо все какие есть неотправленные.
 		tasks = adapter.getTaskByUserAndUpdated(user_uuid);
-		adapter.close();
 
 		// получаем из базы результаты связанные с нарядами
 		ArrayList<TaskResult> taskResults = new ArrayList<TaskResult>();

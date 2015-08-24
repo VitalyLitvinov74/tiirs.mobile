@@ -70,7 +70,6 @@ public class EquipmentTest extends AndroidTestCase {
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
         adapter = new EquipmentDBAdapter(context);
-		adapter.open();
 	}
 
 	/* (non-Javadoc)
@@ -80,7 +79,6 @@ public class EquipmentTest extends AndroidTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		Log.d(TAG, "tearDown");
-		adapter.close();
 		adapter = null;
 		context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName());
 	}

@@ -36,21 +36,6 @@ public class MeasureTypeDBAdapter {
 	}
 	
 	/**
-	 * Открываем базу данных
-	 */
-	public MeasureTypeDBAdapter open() {
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
-	/**
 	 * 
 	 * @param uuid
 	 * @return

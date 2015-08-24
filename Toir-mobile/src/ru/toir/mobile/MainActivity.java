@@ -66,10 +66,8 @@ public class MainActivity extends FragmentActivity {
 							ProcessorService.Extras.RESULT_EXTRA, false);
 					if (result == true) {
 						UsersDBAdapter users = new UsersDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()))
-								.open();
+								new TOiRDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
-						users.close();
 						// в зависимости от результата либо дать работать, либо не дать
 						if (user != null && user.isActive()) {
 							isLogged = true;
@@ -117,10 +115,9 @@ public class MainActivity extends FragmentActivity {
 						// токен не получен, сервер не ответил...
 						// проверяем наличие пользователя в локальной базе
 						UsersDBAdapter users = new UsersDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()))
-								.open();
+								new TOiRDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
-						users.close();
+
 						// в зависимости от результата либо дать работать, либо не дать
 						if (user != null && user.isActive()) {
 							isLogged = true;

@@ -31,23 +31,10 @@ public class OperationStatusDBAdapter {
 	 */
 	public OperationStatusDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Открываем базу данных
-	 */
-	public OperationStatusDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * 
 	 * @param uuid

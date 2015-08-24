@@ -205,13 +205,13 @@ public class ReferenceFragment extends Fragment {
 			long current_ref = Spinner_references.getSelectedItemId();
 			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 			String type = "";
 			String critical_type = "";
 			if (current_ref == 0) {
@@ -235,16 +235,12 @@ public class ReferenceFragment extends Fragment {
 			}
 			// TODO add this
 			// <item>Результаты операций</item>
-			eqTypeDBAdapter.close();
-			DocumentationTypeDBAdapter.close();
-			criticalTypeDBAdapter.close();
 		}
 	}
 
 	private void FillReferencesEquipment() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
 				.getAllItems();
 		spinner_type_adapter.clear();
@@ -257,8 +253,7 @@ public class ReferenceFragment extends Fragment {
 		}
 
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 		spinner_addict_adapter.clear();
@@ -270,21 +265,17 @@ public class ReferenceFragment extends Fragment {
 					+ criticalTypeList.get(cnt - 1).getType());
 			cnt++;
 		}
-		eqTypeDBAdapter.close();
 	}
 
 	private void FillListViewEquipment(String type, String critical_type) {
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = eqDBAdapter.getAllItems(type,
 				critical_type);
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		Integer cnt = 0;
@@ -313,13 +304,11 @@ public class ReferenceFragment extends Fragment {
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		// Setting the adapter to the listView
 		lv.setAdapter(adapter);
-		eqDBAdapter.close();
 	}
 
 	private void FillListViewEquipmentType() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
 				.getAllItems();
 
@@ -338,13 +327,11 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		eqTypeDBAdapter.close();
 	}
 
 	private void FillReferencesDocumentation() {
 		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<DocumentationType> documentationTypeList = DocumentationTypeDBAdapter
 				.getAllItems();
 		spinner_type_adapter.clear();
@@ -357,16 +344,13 @@ public class ReferenceFragment extends Fragment {
 					.getTitle());
 			cnt++;
 		}
-		DocumentationTypeDBAdapter.close();
 	}
 
 	private void FillListViewDocumentation(String type) {
 		EquipmentDocumentationDBAdapter EquipmentDocumentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentDocumentation> equipmentDocumentationList = EquipmentDocumentationDBAdapter
 				.getAllItems(type);
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -391,14 +375,11 @@ public class ReferenceFragment extends Fragment {
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		// Setting the adapter to the listView
 		lv.setAdapter(adapter);
-		DocumentationTypeDBAdapter.close();
-		EquipmentDocumentationDBAdapter.close();
 	}
 
 	private void FillListViewCriticalType() {
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 
@@ -420,13 +401,11 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		criticalTypeDBAdapter.close();
 	}
 
 	private void FillListViewMeasurementType() {
 		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<MeasureType> measureTypeList = measureTypeDBAdapter
 				.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -444,16 +423,13 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		measureTypeDBAdapter.close();
 	}
 
 	private void FillListViewOperationResult() {
 		OperationResultDBAdapter opResultTypeDBAdapter = new OperationResultDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		OperationTypeDBAdapter OperationTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 
 		ArrayList<OperationResult> opResultList = opResultTypeDBAdapter
 				.getAllItems();
@@ -477,13 +453,11 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		opResultTypeDBAdapter.close();
 	}
 
 	private void FillListViewOperationType() {
 		OperationTypeDBAdapter opTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<OperationType> opTypeList = opTypeDBAdapter.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		Integer cnt = 0;
@@ -500,13 +474,11 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		opTypeDBAdapter.close();
 	}
 
 	private void FillListViewTaskStatus() {
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
 				.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -524,13 +496,11 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		taskStatusDBAdapter.close();
 	}
 
 	private void FillListViewEquipmentStatus() {
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentStatus> equipmentStatusList = equipmentStatusDBAdapter
 				.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -548,7 +518,6 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		lv.setAdapter(adapter);
-		equipmentStatusDBAdapter.close();
 	}
 
 	private void ClearReferences() {

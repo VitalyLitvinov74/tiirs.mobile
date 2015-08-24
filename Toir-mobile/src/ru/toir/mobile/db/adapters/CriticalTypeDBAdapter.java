@@ -36,21 +36,6 @@ public class CriticalTypeDBAdapter {
 	}
 	
 	/**
-	 * Открываем базу данных
-	 */
-	public CriticalTypeDBAdapter open() {
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
-		return this;
-	}
-	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
-	/**
 	 * 
 	 * @param uuid
 	 * @return

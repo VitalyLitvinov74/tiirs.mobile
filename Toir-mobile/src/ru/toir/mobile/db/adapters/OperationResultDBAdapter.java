@@ -32,23 +32,10 @@ public class OperationResultDBAdapter {
 	 */
 	public OperationResultDBAdapter(Context context) {
 		mContext = context;
-	}
-	
-	/**
-	 * Открываем базу данных
-	 */
-	public OperationResultDBAdapter open() {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
 	/**
 	 * Возвращает результат выполнения операции по uuid
 	 * @param uuid

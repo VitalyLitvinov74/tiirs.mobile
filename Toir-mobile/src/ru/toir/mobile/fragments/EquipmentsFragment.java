@@ -82,8 +82,7 @@ public class EquipmentsFragment extends Fragment {
 
 	private void FillSpinnersEquipments() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
 				.getAllItems();
 		spinner_type_adapter.clear();
@@ -112,7 +111,6 @@ public class EquipmentsFragment extends Fragment {
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		Spinner_type.setAdapter(spinner_type_adapter);
 		Spinner_sort.setAdapter(spinner_sort_adapter);
-		eqTypeDBAdapter.close();
 	}
 
 	public class ListviewClickListener implements
@@ -179,14 +177,11 @@ public class EquipmentsFragment extends Fragment {
 
 	private void FillListViewEquipments(String type, String sort) {
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = equipmentDBAdapter.getAllItems(
 				type, "");
 		equipment_uuid.clear();
@@ -226,8 +221,5 @@ public class EquipmentsFragment extends Fragment {
 		// Setting the adapter to the listView
 		lv.setAdapter(adapter);
 		lv.setOnItemClickListener(new ListviewClickListener());
-		equipmentDBAdapter.close();
-		eqTypeDBAdapter.close();
-		criticalTypeDBAdapter.close();
 	}
 }

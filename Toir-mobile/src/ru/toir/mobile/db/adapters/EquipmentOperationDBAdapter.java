@@ -6,7 +6,6 @@ import java.util.UUID;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentOperation;
@@ -49,26 +48,10 @@ public class EquipmentOperationDBAdapter {
 	 */
 	public EquipmentOperationDBAdapter(Context context){
 		mContext = context;
-	}
-	
-	/**
-	 * Получаем объект базы данных
-	 * @return EquipmentOpDBAdapter
-	 * @throws SQLException
-	 */
-	public EquipmentOperationDBAdapter open() throws SQLException {
 		mDbHelper = DatabaseHelper.getInstance(mContext);
 		mDb = mDbHelper.getWritableDatabase();
-		return this;
 	}
 	
-	/**
-	 * Закрываем базу данных
-	 */
-	public void close() {
-	}
-
-
 	/**
 	 * Возвращает список операций над оборудованием по наряду
 	 * @param orderId

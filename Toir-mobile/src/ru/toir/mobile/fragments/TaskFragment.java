@@ -275,8 +275,7 @@ public class TaskFragment extends Fragment {
 
 	private void fillSpinnersTasks() {
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
 				.getAllItems();
 
@@ -303,7 +302,7 @@ public class TaskFragment extends Fragment {
 
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
-				getActivity().getApplicationContext())).open();
+				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
 
 		if (user == null) {
@@ -312,7 +311,7 @@ public class TaskFragment extends Fragment {
 		} else {
 			TaskDBAdapter taskDbAdapter = new TaskDBAdapter(
 					new TOiRDatabaseContext(getActivity()
-							.getApplicationContext())).open();
+							.getApplicationContext()));
 
 			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(user
 					.getUuid(), taskStatus, orderByField));
@@ -351,11 +350,9 @@ public class TaskFragment extends Fragment {
 	private void fillSpinnersEquipment() {
 
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<OperationType> operationTypeList = operationTypeDBAdapter
 				.getAllItems();
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
@@ -433,7 +430,7 @@ public class TaskFragment extends Fragment {
 								.getSelectedItem();
 						// выставляем выбранный статус
 						EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
-								new TOiRDatabaseContext(getActivity())).open();
+								new TOiRDatabaseContext(getActivity()));
 						dbAdapter.setOperationStatus(operation_uuid,
 								status.getUuid());
 
@@ -459,7 +456,7 @@ public class TaskFragment extends Fragment {
 
 				// список статусов операций в выпадающем списке для выбора
 				OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
-						new TOiRDatabaseContext(getActivity())).open();
+						new TOiRDatabaseContext(getActivity()));
 				ArrayList<OperationStatus> operationStatus = statusDBAdapter
 						.getItems();
 
@@ -515,8 +512,7 @@ public class TaskFragment extends Fragment {
 			String operation_type_uuid, String critical_type_uuid) {
 
 		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()))
-				.open();
+				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(eqOperationDBAdapter
@@ -542,7 +538,7 @@ public class TaskFragment extends Fragment {
 		// они будут возвращены в MainActivity.onActivityResult и переданны в
 		// новое активити
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity())).open();
+				new TOiRDatabaseContext(getActivity()));
 		String equipment_tag = equipmentDBAdapter.getItem(equipment_uuid)
 				.getTag_id();
 
