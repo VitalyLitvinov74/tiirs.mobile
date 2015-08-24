@@ -15,11 +15,12 @@ public class EquipmentOperation {
 	private String operation_type_uuid;
 	private String operation_pattern_uuid;
 	private String operation_status_uuid;
+	private int operation_time;
 
 	public EquipmentOperation() {
 	}
 
-	public EquipmentOperation(long _id, String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid) 
+	public EquipmentOperation(long _id, String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid, int operation_time) 
 	{
 		this._id = _id;
 		this.uuid = uuid;
@@ -28,6 +29,7 @@ public class EquipmentOperation {
 		this.operation_type_uuid = operation_type_uuid;
 		this.operation_pattern_uuid = operation_pattern_uuid;
 		this.operation_status_uuid = operation_status_uuid;
+		this.operation_time = operation_time;
 	}
 
 	/**
@@ -112,6 +114,20 @@ public class EquipmentOperation {
 	 */
 	public void setOperation_status_uuid(String equipment_status_uuid) {
 		this.operation_status_uuid = equipment_status_uuid;
+	}
+
+	/**
+	 * @return the operation_time
+	 */
+	public int getOperation_time() {
+		return operation_time;
+	}
+
+	/**
+	 * @param operation_time the operation_time to set
+	 */
+	public void setOperation_time(int operation_time ) {
+		this.operation_time = operation_time;
 	}
 
 	/**

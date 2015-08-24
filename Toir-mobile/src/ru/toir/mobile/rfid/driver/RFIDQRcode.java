@@ -116,6 +116,7 @@ public class RFIDQRcode implements RFIDDriver{
 					e.printStackTrace();
 				}
 			}
+			releaseCamera();			
 			return null;
 		}
 
@@ -199,6 +200,7 @@ public class RFIDQRcode implements RFIDDriver{
                     // !!!! hardcoded
                     lastScannedCode = "01234567";
                     ((RFIDActivity)mActivity).Callback(lastScannedCode);
+        			releaseCamera();                    
                 }
             }
         }

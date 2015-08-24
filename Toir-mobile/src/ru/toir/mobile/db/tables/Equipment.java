@@ -19,6 +19,8 @@ public class Equipment {
 	private String tag_id;
 	private String img;
 	private String equipment_status_uuid;
+	private String inventory_number;
+	private String location;
 
 	/**
 	 * 
@@ -30,7 +32,7 @@ public class Equipment {
 	/**
 	 * 
 	 */
-	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String equipment_status_uuid) {
+	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String equipment_status_uuid, String inventory_number, String location) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
@@ -42,6 +44,8 @@ public class Equipment {
 		this.tag_id = tag_id;
 		this.img = img;
 		this.equipment_status_uuid = equipment_status_uuid;
+		this.inventory_number=inventory_number;
+		this.location=location;		
 	}
 
 	/**
@@ -198,4 +202,29 @@ public class Equipment {
 		this.img = img;
 	}
 
+	/**
+	 * @return the inventory number
+	 */
+	public String getInventoryNumber() {
+		return inventory_number;
+	}
+	/**
+	 * @param inventory_number to set
+	 */
+	public void setInventoryNumber(String inventory_number) {
+		this.inventory_number = inventory_number;
+	}
+
+	/**
+	 * @return the location
+	 */
+	public String getLocation() {
+		return location;
+	}
+	/**
+	 * @param location to set
+	 */
+	public void setLocation(String location) {
+		this.location = location;
+	}
 }

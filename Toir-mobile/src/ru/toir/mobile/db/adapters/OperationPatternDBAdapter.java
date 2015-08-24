@@ -19,11 +19,13 @@ public class OperationPatternDBAdapter {
 	public static final String FIELD__ID_NAME = "_id";
 	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
+	public static final String FIELD_OPERATION_TYPE_UUID_NAME = "operation_type_uuid";
 	
 	String[] mColumns = {
 			FIELD__ID_NAME,
 			FIELD_UUID_NAME,
-			FIELD_TITLE_NAME};
+			FIELD_TITLE_NAME,
+			FIELD_OPERATION_TYPE_UUID_NAME};
 		
 	/**
 	 * @param context
@@ -67,6 +69,7 @@ public class OperationPatternDBAdapter {
 		pattern.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
 		pattern.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
 		pattern.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+		pattern.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID_NAME)));
 		return pattern;
 	}
 	
@@ -89,11 +92,12 @@ public class OperationPatternDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String title) {
+	public long replace(String uuid, String title, String operation_type_uuid) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
 		values.put(FIELD_TITLE_NAME, title);
+		values.put(FIELD_OPERATION_TYPE_UUID_NAME, operation_type_uuid);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -105,7 +109,7 @@ public class OperationPatternDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(OperationPattern status) {
-		return replace(status.getUuid(), status.getTitle());
+		return replace(status.getUuid(), status.getTitle(), status.getOperation_type_uuid());
 	}
 
 	/**
@@ -124,7 +128,8 @@ public class OperationPatternDBAdapter {
 			OperationPattern operationPattern = new OperationPattern(
 					cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
 					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+					cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)),
+					cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID_NAME)));
 			 arrayList.add(operationPattern);
 			 if (cursor.isLast()) break;
 			 cursor.moveToNext();

@@ -83,7 +83,7 @@ public class QRTestFragment extends Fragment {
     public void onResume() {
         super.onResume();
         resumeCamera();
-        generateCodeImage(code_for_bar.getText().toString());
+        //generateCodeImage(code_for_bar.getText().toString());
     }
 
     public void onPause() {

@@ -18,13 +18,14 @@ public class Task {
 	private long attempt_send_date;
 	private int attempt_count;
 	private boolean updated;
+	private String task_name;
 
 	public Task() {
 
 	}
 
 	public Task(long _id, String uuid, String users_uuid, long create_date, long modify_date, 
-			long close_date, String task_status_uuid, long attempt_send_date, int attempt_count, boolean updated) 
+			long close_date, String task_status_uuid, long attempt_send_date, int attempt_count, boolean updated, String task_name) 
 	{
 		this._id = _id;
 		this.uuid = uuid;
@@ -36,6 +37,7 @@ public class Task {
 		this.attempt_send_date = attempt_send_date;
 		this.attempt_count = attempt_count;
 		this.updated = updated;
+		this.task_name = task_name;
 	}
 
 	/**
@@ -162,6 +164,20 @@ public class Task {
 	 */
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
+	}
+
+	/**
+	 * @return the task_name
+	 */
+	public String getTask_name() {
+		return task_name;
+	}
+
+	/**
+	 * @param task_name to set
+	 */
+	public void setTask_name(String task_name) {
+		this.task_name = task_name;
 	}
 
 	/**
