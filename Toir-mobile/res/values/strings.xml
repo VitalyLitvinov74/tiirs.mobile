@@ -52,4 +52,6 @@
     <string name="pleaseScanImg">Наведите камеру на код</string>
     <string name="scan_process">Процесс сканирования</string>
     <string name="empty"></string>
+    <string name="created">Создан:</string>
+    <string name="status">Статус</string>
 </resources>

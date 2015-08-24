@@ -198,6 +198,8 @@ public class EquipmentsFragment extends Fragment {
 			HashMap<String, String> hm = new HashMap<String, String>();
 			hm.put("name",
 					equipmentList.get(cnt).getTitle()
+							+ " | ИД: "
+							+ equipmentList.get(cnt).getInventoryNumber()
 							+ " | Дата: "
 							+ DataUtils.getDate(equipmentList.get(cnt)
 									.getStart_date(), "dd-MM-yyyy hh:mm"));
@@ -205,6 +207,9 @@ public class EquipmentsFragment extends Fragment {
 					"Тип: "
 							+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(
 									cnt).getEquipment_type_uuid())
+							+ " ["
+							+ equipmentList.get(cnt).getLocation()
+							+ "]"
 							+ " | Критичность: "
 							+ criticalTypeDBAdapter.getNameByUUID(equipmentList
 									.get(cnt).getCritical_type_uuid()));
