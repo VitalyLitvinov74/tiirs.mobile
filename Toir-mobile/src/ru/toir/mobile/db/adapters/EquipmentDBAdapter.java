@@ -37,13 +37,16 @@ public class EquipmentDBAdapter {
 	public static final String FIELD_EQUIPMENT_STATUS_UUID_NAME = "equipment_status_uuid";
 	public static final String FIELD_INVENTORY_NUMBER_NAME = "inventory_number";
 	public static final String FIELD_LOCATION_NAME = "location";
+	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
+	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
 
 	private static String mColumns[] = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_TITLE_NAME, FIELD_EQUIPMENT_TYPE_UUID_NAME,
 			FIELD_CRITICAL_TYPE_UUID_NAME, FIELD_START_DATE_NAME,
 			FIELD_LATITUDE_NAME, FIELD_LONGITUDE_NAME, FIELD_TAG_ID_NAME,
-			FIELD_IMG_NAME, FIELD_EQUIPMENT_STATUS_UUID_NAME, FIELD_INVENTORY_NUMBER_NAME,
-			FIELD_LOCATION_NAME};
+			FIELD_IMG_NAME, FIELD_EQUIPMENT_STATUS_UUID_NAME,
+			FIELD_INVENTORY_NUMBER_NAME, FIELD_LOCATION_NAME,
+			FIELD_CREATED_AT_NAME, FIELD_CHANGED_AT_NAME };
 
 	/**
 	 * @param context
@@ -153,6 +156,10 @@ public class EquipmentDBAdapter {
 				.getColumnIndex(FIELD_INVENTORY_NUMBER_NAME)));
 		equipment.setLocation(cursor.getString(cursor
 				.getColumnIndex(FIELD_LOCATION_NAME)));
+		equipment.setCreatedAt(cursor.getLong(cursor
+				.getColumnIndex(FIELD_CREATED_AT_NAME)));
+		equipment.setChangedAt(cursor.getLong(cursor
+				.getColumnIndex(FIELD_CHANGED_AT_NAME)));
 
 		return equipment;
 	}
@@ -177,8 +184,9 @@ public class EquipmentDBAdapter {
 	 */
 	public long replace(String uuid, String title, String equipment_type_uuid,
 			String critical_type_uuid, long start_date, float latitude,
-			float longitude, String tag_id, String img, String status_uuid, 
-			String inventory_number, String location) {
+			float longitude, String tag_id, String img, String status_uuid,
+			String inventory_number, String location, long createdAt,
+			long changedAt) {
 		ContentValues values = new ContentValues();
 		values.put(EquipmentDBAdapter.FIELD_UUID_NAME, uuid);
 		values.put(EquipmentDBAdapter.FIELD_TITLE_NAME, title);
@@ -191,9 +199,13 @@ public class EquipmentDBAdapter {
 		values.put(EquipmentDBAdapter.FIELD_LONGITUDE_NAME, longitude);
 		values.put(EquipmentDBAdapter.FIELD_TAG_ID_NAME, tag_id);
 		values.put(EquipmentDBAdapter.FIELD_IMG_NAME, img);
-		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_STATUS_UUID_NAME, status_uuid);
-		values.put(EquipmentDBAdapter.FIELD_INVENTORY_NUMBER_NAME, inventory_number);
+		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_STATUS_UUID_NAME,
+				status_uuid);
+		values.put(EquipmentDBAdapter.FIELD_INVENTORY_NUMBER_NAME,
+				inventory_number);
 		values.put(EquipmentDBAdapter.FIELD_LOCATION_NAME, location);
+		values.put(FIELD_CREATED_AT_NAME, createdAt);
+		values.put(FIELD_CHANGED_AT_NAME, changedAt);
 		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);
 	}
 
@@ -212,8 +224,8 @@ public class EquipmentDBAdapter {
 				equipment.getLatitude(), equipment.getLongitude(),
 				equipment.getTag_id(), equipment.getImg(),
 				equipment.getEquipmentStatus_uuid(),
-				equipment.getInventoryNumber(),
-				equipment.getLocation());
+				equipment.getInventoryNumber(), equipment.getLocation(),
+				equipment.getCreatedAt(), equipment.getChangedAt());
 	}
 
 	/**
@@ -360,14 +372,15 @@ public class EquipmentDBAdapter {
 				new String[] { uuid }, null, null, null);
 		if (cursor.getColumnCount() > 0) {
 			cursor.moveToFirst();
-			return cursor.getString(cursor.getColumnIndex(FIELD_INVENTORY_NUMBER_NAME));
+			return cursor.getString(cursor
+					.getColumnIndex(FIELD_INVENTORY_NUMBER_NAME));
 		} else
 			return "-";
 	}
-	
+
 	public void saveItems(ArrayList<Equipment> list) {
 		mDb.beginTransaction();
-		for(Equipment item : list) {
+		for (Equipment item : list) {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();

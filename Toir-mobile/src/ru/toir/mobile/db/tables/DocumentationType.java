@@ -21,10 +21,12 @@ public class DocumentationType {
 
 	}
 	
-	public DocumentationType(long _id, String uuid, String title) {
+	public DocumentationType(long _id, String uuid, String title, long createdAt, long changedAt) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
+		this.CreatedAt = createdAt;
+		this.ChangedAt = changedAt;
 	}
 
 	/**

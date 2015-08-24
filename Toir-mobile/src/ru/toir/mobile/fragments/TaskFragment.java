@@ -279,7 +279,7 @@ public class TaskFragment extends Fragment {
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
 				.getAllItems();
 
-		taskStatusList.add(0, new TaskStatus(0, null, "Все статусы"));
+		taskStatusList.add(0, new TaskStatus(0, null, "Все статусы", 0, 0));
 		taskStatusAdapter.clear();
 		taskStatusAdapter.addAll(taskStatusList);
 		Spinner_references.setAdapter(taskStatusAdapter);
@@ -358,12 +358,12 @@ public class TaskFragment extends Fragment {
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 
-		operationTypeList.add(0, new OperationType(0, null, "Все операции"));
+		operationTypeList.add(0, new OperationType(0, null, "Все операции", 0, 0));
 		operationTypeAdapter.clear();
 		operationTypeAdapter.addAll(operationTypeList);
 		Spinner_references.setAdapter(operationTypeAdapter);
 
-		criticalTypeList.add(0, new CriticalType(0, null, 0));
+		criticalTypeList.add(0, new CriticalType(0, null, 0, 0, 0));
 		criticalTypeAdapter.clear();
 		criticalTypeAdapter.addAll(criticalTypeList);
 		Spinner_type.setAdapter(criticalTypeAdapter);

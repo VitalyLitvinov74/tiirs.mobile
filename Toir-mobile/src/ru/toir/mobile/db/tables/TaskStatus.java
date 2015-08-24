@@ -30,10 +30,12 @@ public class TaskStatus {
 
 	}
 	
-	public TaskStatus(long _id, String uuid, String title) {
+	public TaskStatus(long _id, String uuid, String title, long createdAt, long changedAt) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
+		this.CreatedAt = createdAt;
+		this.ChangedAt = changedAt;
 	}
 
 	/**

@@ -34,7 +34,7 @@ public class Equipment {
 	/**
 	 * 
 	 */
-	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String equipment_status_uuid, String inventory_number, String location) {
+	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String equipment_status_uuid, String inventory_number, String location, long createdAt, long changedAt) {
 		this._id = _id;
 		this.uuid = uuid;
 		this.title = title;
@@ -47,7 +47,9 @@ public class Equipment {
 		this.img = img;
 		this.equipment_status_uuid = equipment_status_uuid;
 		this.inventory_number=inventory_number;
-		this.location=location;		
+		this.location=location;
+		this.CreatedAt = createdAt;
+		this.ChangedAt = changedAt;
 	}
 
 	/**

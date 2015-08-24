@@ -19,13 +19,15 @@ public class EquipmentDocumentation {
 		public EquipmentDocumentation() {
 		}
 
-		public EquipmentDocumentation(long _id, String uuid, String equipment_uuid, String documentation_type_uuid, String title, String path) {
+		public EquipmentDocumentation(long _id, String uuid, String equipment_uuid, String documentation_type_uuid, String title, String path, long createdAt, long changedAt) {
 			this._id = _id;
 			this.uuid = uuid;
 			this.equipment_uuid = equipment_uuid;
 			this.documentation_type_uuid = documentation_type_uuid;
 			this.title = title;
 			this.path = path;
+			this.CreatedAt = createdAt;
+			this.ChangedAt = changedAt;
 		}
 
 		/**
