@@ -162,9 +162,10 @@ public class GPSFragment extends Fragment {
 					location = eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
 					HashMap<String, String> hm = new HashMap<String, String>();
 					hm.put("name", eqDBAdapter.getEquipsNameByUUID(equipmentUUID)
-							+ " ["
-							+ eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
-							+ "]");
+							//+ " ["
+							//+ eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
+							//+ "]"
+							);
 					// default
 					hm.put("location", eqDBAdapter.getLocationByUUID(equipmentUUID));
 					aList.add(hm);
