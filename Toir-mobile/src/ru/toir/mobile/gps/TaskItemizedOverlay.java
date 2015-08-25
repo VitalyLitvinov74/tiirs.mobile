@@ -1,4 +1,4 @@
-package ru.toir.mobile.utils;
+package ru.toir.mobile.gps;
 
 import java.util.List;
 

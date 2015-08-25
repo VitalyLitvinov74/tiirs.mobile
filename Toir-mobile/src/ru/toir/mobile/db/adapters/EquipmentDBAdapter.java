@@ -137,6 +137,21 @@ public class EquipmentDBAdapter {
 
 	/**
 	 * <p>
+	 * Возвращает запись из таблицы equipment
+	 * </p>
+	 * 
+	 * @param uuid
+	 * @return Equipment
+	 */
+	public Cursor getItemCursor(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+				new String[] { uuid }, null, null, null);
+		return cursor;
+	}
+
+	/**
+	 * <p>
 	 * Возвращает Equipment
 	 * </p>
 	 * 
