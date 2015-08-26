@@ -58,7 +58,7 @@ public class ReferenceProcessor {
 	private String mServerUrl;
 	private Context mContext;
 	public static class ReferenceNames {
-		// TODO отдельно нет справочника EquipmentDocumentation
+		// TODO отдельно нет справочника EquipmentDocumentation, OperationPattern, OperationPatternStep, OperationPatternStepResult
 		public static String CriticalTypeName = "CriticalityType";
 		public static String DocumentTypeName = "DocumentType";
 		public static String EquipmentName = "Equipment";
@@ -89,13 +89,9 @@ public class ReferenceProcessor {
 		}
 	}
 	
-	// TODO реализовать получение справочника(ов) в качестве параметра передаём список строк с именами справочников которые хотим получить
-	// решение: ни чего сверх имени справочника не передавать, прямо в процессоре будем получать крайнии даты модификации и отправлять их
-
-	// TODO нужно подумать о том как наполнить пустые таблицы или тотально обновить справочники 
-
 	/**
 	 * Получаем только "новые" данные из справочника(ов)
+	 * Если в таблице не окажется данных вообще, будет загружен весь справочник.
 	 * @param bundle
 	 * @return
 	 */
@@ -104,7 +100,7 @@ public class ReferenceProcessor {
 		URI requestUri = null;
 		ArrayList<String> referenceNames = bundle
 				.getStringArrayList(ReferenceServiceProvider.Methods.GET_REFERENCE_PARAMETER_NAME);
-		long lastChangedAt;
+		Long lastChangedAt;
 		StringBuilder postData = new StringBuilder();
 
 		for (String name: referenceNames) {
@@ -112,7 +108,7 @@ public class ReferenceProcessor {
 				// получаем дату последней модификации содержимого таблицы
 				lastChangedAt = getLastChanged(name);
 				postData.setLength(0);
-				if (lastChangedAt > -1) {
+				if (lastChangedAt != null) {
 					// формируем параметры для запроса
 					// TODO нужно изменить условие на сервере с >= на >
 					postData.append('?').append("ChangedAfter=").append(DataUtils.getDate(lastChangedAt + 1000, "yyyy-MM-dd'T'HH:mm:ss"));
@@ -166,7 +162,7 @@ public class ReferenceProcessor {
 	}
 	
 	private long getLastChanged(String referenceName) {
-		long changed = -1;
+		Long changed = null;
 		if (referenceName.equals(ReferenceNames.CriticalTypeName)) {
 			CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
@@ -350,9 +346,8 @@ public class ReferenceProcessor {
 			item.setTitle(element.getTitle());
 			item.setOperation_type_uuid(element.getOperationType().getId());
 			saveOperationType(new OperationType[] { element.getOperationType() });
-			// TODO в ответе нет дат создания и модификации
-			item.setCreatedAt(0); //element.getCreatedAt().getTime());
-			item.setChangedAt(0); //element.getChangedAt().getTime());
+			item.setCreatedAt(element.getCreatedAt().getTime());
+			item.setChangedAt(element.getChangedAt().getTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -372,9 +367,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			// TODO в ответе нет дат создания и модификации
-			item.setCreatedAt(0); //element.getCreatedAt().getTime());
-			item.setChangedAt(0); //element.getChangedAt().getTime());
+			item.setCreatedAt(element.getCreatedAt().getTime());
+			item.setChangedAt(element.getChangedAt().getTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -455,9 +449,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			// TODO в ответе нет дат создания и модификации
-			item.setCreatedAt(0); //element.getCreatedAt().getTime());
-			item.setChangedAt(0); //element.getChangedAt().getTime());
+			item.setCreatedAt(element.getCreatedAt().getTime());
+			item.setChangedAt(element.getChangedAt().getTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);

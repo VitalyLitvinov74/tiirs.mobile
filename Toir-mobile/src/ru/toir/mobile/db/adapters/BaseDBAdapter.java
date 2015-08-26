@@ -38,10 +38,10 @@ public class BaseDBAdapter {
 
 	/**
 	 * Возвращает дату последней модификации среди всех элементов таблицы
-	 * @return Количество милисекунд, если записей нет -1
+	 * @return Количество милисекунд, если записей нет, null
 	 */
-	public long getLastChangedAt() {
-		long changed = -1;
+	public Long getLastChangedAt() {
+		Long changed = null;
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, new String[]{ FIELD_CHANGED_AT_NAME }, null, null, FIELD_CHANGED_AT_NAME, null, FIELD_CHANGED_AT_NAME + " DESC" + " LIMIT 1");
 		if (cursor.moveToFirst()) {
