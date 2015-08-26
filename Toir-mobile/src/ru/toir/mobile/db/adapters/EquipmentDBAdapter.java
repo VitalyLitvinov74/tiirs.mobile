@@ -399,6 +399,7 @@ public class EquipmentDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 
 }

@@ -160,6 +160,7 @@ public class EquipmentStatusDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 
 }

@@ -177,5 +177,6 @@ public class EquipmentDocumentationDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 }

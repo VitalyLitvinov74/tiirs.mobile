@@ -146,6 +146,7 @@ public class OperationStatusDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 
 }

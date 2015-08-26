@@ -161,5 +161,6 @@ public class DocumentationTypeDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 }

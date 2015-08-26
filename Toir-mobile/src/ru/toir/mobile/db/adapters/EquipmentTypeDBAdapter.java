@@ -162,5 +162,6 @@ public class EquipmentTypeDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 }

@@ -139,5 +139,6 @@ public class MeasureTypeDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 }

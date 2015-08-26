@@ -159,6 +159,7 @@ public class CriticalTypeDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 
 }

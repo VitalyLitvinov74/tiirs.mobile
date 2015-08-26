@@ -160,6 +160,7 @@ public class TaskStatusDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 
 }

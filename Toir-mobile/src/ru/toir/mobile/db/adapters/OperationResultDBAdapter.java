@@ -183,5 +183,6 @@ public class OperationResultDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 }

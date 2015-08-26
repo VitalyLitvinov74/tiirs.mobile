@@ -157,5 +157,6 @@ public class OperationTypeDBAdapter {
 			replace(item);
 		}
 		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
 	}
 }
