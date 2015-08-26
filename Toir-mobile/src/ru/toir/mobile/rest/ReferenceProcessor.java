@@ -304,8 +304,8 @@ public class ReferenceProcessor {
 			item.setOperation_type_uuid(element.getOperationType().getId());
 			saveOperationType(new OperationType[] { element.getOperationType() });
 			// TODO в ответе нет дат создания и модификации
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(0); //element.getCreatedAt().getTime());
+			item.setChangedAt(0); //element.getChangedAt().getTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -326,8 +326,8 @@ public class ReferenceProcessor {
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
 			// TODO в ответе нет дат создания и модификации
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(0); //element.getCreatedAt().getTime());
+			item.setChangedAt(0); //element.getChangedAt().getTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -372,7 +372,6 @@ public class ReferenceProcessor {
 			saveEquipmentType(new EquipmentType[] { element.getEquipmentType() });
 			item.setCritical_type_uuid(element.getCriticalityType().getId());
 			saveCriticalType(new CriticalityType[]{ element.getCriticalityType() });
-			// TODO проверить соответствие секудн с и милисекунд с !!!!
 			item.setStart_date(element.getStartupDate().getTime());
 			item.setLatitude(element.getGeoCoordinates().getLatitude());
 			item.setLongitude(element.getGeoCoordinates().getLongitude());
@@ -383,7 +382,7 @@ public class ReferenceProcessor {
 			saveEquipmentStatus(new EquipmentStatus[] { element.getEquipmentStatus() });
 			// TODO когда на сервере появится - добавить
 			item.setInventoryNumber("");
-			// TODO когда на сервере появится Location - добавить
+			// TODO когда на сервере появится - добавить
 			item.setLocation("");
 			item.setCreatedAt(element.getCreatedAt().getTime());
 			item.setChangedAt(element.getChangedAt().getTime());
@@ -410,8 +409,8 @@ public class ReferenceProcessor {
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
 			// TODO в ответе нет дат создания и модификации
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(0); //element.getCreatedAt().getTime());
+			item.setChangedAt(0); //element.getChangedAt().getTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);

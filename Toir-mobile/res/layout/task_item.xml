@@ -29,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/ti_Name"
         android:text="@string/created"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -40,6 +41,26 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/ti_CreateLabel"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/ti_CloseLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/ti_Create"
+        android:text="@string/closed"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/ti_Close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/ti_CloseLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 

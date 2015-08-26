@@ -201,10 +201,14 @@ public class DataUtils {
 	}
 	
 	public static String getDate(long time, String format) {
-	    Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-	    cal.setTimeInMillis(time);
-	    //"dd-MM-yyyy hh:mm:ss"
-	    String date = DateFormat.format(format, cal).toString();
-	    return date;
+		if (time == 0) {
+			return "нет";
 		}
+
+		Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+		cal.setTimeInMillis(time);
+		// "dd-MM-yyyy hh:mm:ss"
+		String date = DateFormat.format(format, cal).toString();
+		return date;
+	}
 }
