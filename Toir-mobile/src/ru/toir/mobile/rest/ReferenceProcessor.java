@@ -40,6 +40,7 @@ import ru.toir.mobile.serverapi.OperationResult;
 import ru.toir.mobile.serverapi.OperationType;
 import ru.toir.mobile.serverapi.OrderStatus;
 import ru.toir.mobile.serverapi.Status;
+import ru.toir.mobile.utils.DataUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -103,10 +104,20 @@ public class ReferenceProcessor {
 		URI requestUri = null;
 		ArrayList<String> referenceNames = bundle
 				.getStringArrayList(ReferenceServiceProvider.Methods.GET_REFERENCE_PARAMETER_NAME);
+		long lastChangedAt;
+		StringBuilder postData = new StringBuilder();
 
 		for (String name: referenceNames) {
 			try {
-				requestUri = new URI(mServerUrl + GET_REFERENCE_URL + "/" + name);
+				// получаем дату последней модификации содержимого таблицы
+				lastChangedAt = getLastChanged(name);
+				postData.setLength(0);
+				if (lastChangedAt > -1) {
+					// формируем параметры для запроса
+					postData.append('?').append("ChangedAfter=").append(DataUtils.getDate(lastChangedAt, "yyyy-MM-dd'T'hh:mm:ss"));
+				}
+				
+				requestUri = new URI(mServerUrl + GET_REFERENCE_URL + "/" + name + postData.toString());
 				Log.d("test", "requestUri = " + requestUri.toString());
 					
 				Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
@@ -136,7 +147,6 @@ public class ReferenceProcessor {
 					} else if(name.equals(ReferenceNames.OperationResultName)) {
 						saveOperationResult(gson.fromJson(jsonString, OperationResult[].class));
 					} else if(name.equals(ReferenceNames.OperationStatusName)) {
-						// в ответе нет дат создания и модификации
 						saveOperationStatus(gson.fromJson(jsonString, Status[].class));
 					} else if(name.equals(ReferenceNames.OperationTypeName)) {
 						saveOperationType(gson.fromJson(jsonString, OperationType[].class));
@@ -152,6 +162,42 @@ public class ReferenceProcessor {
 			}
 		}
 		return true;
+	}
+	
+	private long getLastChanged(String referenceName) {
+		long changed = -1;
+		if (referenceName.equals(ReferenceNames.CriticalTypeName)) {
+			CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.DocumentTypeName)) {
+			DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.EquipmentName)) {
+			EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.EquipmentStatusName)) {
+			EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.EquipmentTypeName)) {
+			EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.MeasureTypeName)) {
+			MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.OperationResultName)) {
+			OperationResultDBAdapter adapter = new OperationResultDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.OperationStatusName)) {
+			OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.OperationTypeName)) {
+			OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		} else if(referenceName.equals(ReferenceNames.TaskStatusName)) {
+			TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
+			changed = adapter.getLastChangedAt();
+		}
+		return changed;
 	}
 	
 	private void saveCriticalType(CriticalityType[] array) {

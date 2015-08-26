@@ -4,47 +4,35 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 /**
  * @author olejek
  * 
  */
-public class EquipmentDocumentationDBAdapter {
+public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "equipment_documentation";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_EQUIPMENT_UUID_NAME = "equipment_uuid";
 	public static final String FIELD_DOCUMENTATION_TYPE_UUID_NAME = "documentation_type_uuid";
 	public static final String FIELD_TITLE_NAME = "title";
 	public static final String FIELD_PATH_NAME = "path";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_EQUIPMENT_UUID_NAME, FIELD_DOCUMENTATION_TYPE_UUID_NAME,
 			FIELD_TITLE_NAME, FIELD_PATH_NAME, FIELD_CREATED_AT_NAME,
 			FIELD_CHANGED_AT_NAME };
 
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
-
 	/**
 	 * 
 	 * @param context
 	 */
 	public EquipmentDocumentationDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**

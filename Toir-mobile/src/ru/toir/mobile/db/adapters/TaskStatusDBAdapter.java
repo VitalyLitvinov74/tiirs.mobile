@@ -1,26 +1,16 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class TaskStatusDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class TaskStatusDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "task_status";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
 
 	public static final String STATUS_UUID_CREATED = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
 	public static final String STATUS_UUID_SENDED = "9f980db5-934c-4ddb-999a-04c6c3daca59";
@@ -38,9 +28,7 @@ public class TaskStatusDBAdapter {
 	 * @return OrderDBAdapter
 	 */
 	public TaskStatusDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**
@@ -162,5 +150,5 @@ public class TaskStatusDBAdapter {
 		mDb.setTransactionSuccessful();
 		mDb.endTransaction();
 	}
-
+	
 }

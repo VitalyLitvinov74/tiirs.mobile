@@ -1,26 +1,16 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.MeasureType;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class MeasureTypeDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class MeasureTypeDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "measure_type";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME, FIELD_TITLE_NAME,
 			FIELD_CREATED_AT_NAME, FIELD_CHANGED_AT_NAME };
@@ -30,9 +20,7 @@ public class MeasureTypeDBAdapter {
 	 * @return OrderDBAdapter
 	 */
 	public MeasureTypeDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**
@@ -141,4 +129,5 @@ public class MeasureTypeDBAdapter {
 		mDb.setTransactionSuccessful();
 		mDb.endTransaction();
 	}
+
 }

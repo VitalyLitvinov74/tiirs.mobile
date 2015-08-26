@@ -1,30 +1,17 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.EquipmentStatus;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class EquipmentStatusDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
-
+public class EquipmentStatusDBAdapter extends BaseDBAdapter {
+	
 	public static final String TABLE_NAME = "equipment_status";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
 	public static final String FIELD_TYPE_NAME = "type";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
-
-	// public static final String STATUS_UUID_CREATED =
-	// "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME, FIELD_TITLE_NAME,
 			FIELD_TYPE_NAME, FIELD_CREATED_AT_NAME, FIELD_CHANGED_AT_NAME };
@@ -34,9 +21,7 @@ public class EquipmentStatusDBAdapter {
 	 * @return OrderDBAdapter
 	 */
 	public EquipmentStatusDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**

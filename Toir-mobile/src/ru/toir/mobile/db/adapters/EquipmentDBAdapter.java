@@ -1,12 +1,9 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.Equipment;
 
 /**
@@ -16,16 +13,10 @@ import ru.toir.mobile.db.tables.Equipment;
  *         </p>
  * 
  */
-public class EquipmentDBAdapter {
-
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class EquipmentDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "equipment";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TITLE_NAME = "title";
 	public static final String FIELD_EQUIPMENT_TYPE_UUID_NAME = "equipment_type_uuid";
 	public static final String FIELD_CRITICAL_TYPE_UUID_NAME = "critical_type_uuid";
@@ -37,8 +28,6 @@ public class EquipmentDBAdapter {
 	public static final String FIELD_EQUIPMENT_STATUS_UUID_NAME = "equipment_status_uuid";
 	public static final String FIELD_INVENTORY_NUMBER_NAME = "inventory_number";
 	public static final String FIELD_LOCATION_NAME = "location";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
 
 	private static String mColumns[] = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_TITLE_NAME, FIELD_EQUIPMENT_TYPE_UUID_NAME,
@@ -53,9 +42,7 @@ public class EquipmentDBAdapter {
 	 * @return EquipmentDBAdapter
 	 */
 	public EquipmentDBAdapter(Context context) {
-		this.mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**

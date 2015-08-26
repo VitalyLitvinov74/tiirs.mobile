@@ -1,26 +1,17 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.OperationResult;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class OperationResultDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class OperationResultDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "operation_result";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_OPERATION_TYPE_UUID_NAME = "operation_type_uuid";
 	public static final String FIELD_TITLE_NAME = "title";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_OPERATION_TYPE_UUID_NAME, FIELD_TITLE_NAME,
@@ -31,9 +22,7 @@ public class OperationResultDBAdapter {
 	 * @return OrderDBAdapter
 	 */
 	public OperationResultDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**
@@ -185,4 +174,5 @@ public class OperationResultDBAdapter {
 		mDb.setTransactionSuccessful();
 		mDb.endTransaction();
 	}
+
 }
