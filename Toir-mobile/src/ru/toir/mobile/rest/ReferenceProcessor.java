@@ -114,7 +114,8 @@ public class ReferenceProcessor {
 				postData.setLength(0);
 				if (lastChangedAt > -1) {
 					// формируем параметры для запроса
-					postData.append('?').append("ChangedAfter=").append(DataUtils.getDate(lastChangedAt, "yyyy-MM-dd'T'hh:mm:ss"));
+					// TODO нужно изменить условие на сервере с >= на >
+					postData.append('?').append("ChangedAfter=").append(DataUtils.getDate(lastChangedAt + 1000, "yyyy-MM-dd'T'HH:mm:ss"));
 				}
 				
 				requestUri = new URI(mServerUrl + GET_REFERENCE_URL + "/" + name + postData.toString());

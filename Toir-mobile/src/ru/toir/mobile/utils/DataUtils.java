@@ -3,13 +3,12 @@ package ru.toir.mobile.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.Locale;
-import java.util.Calendar;
-//import java.text.DateFormat;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
+
 
 public class DataUtils {
 
@@ -205,10 +204,9 @@ public class DataUtils {
 			return "нет";
 		}
 
-		Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-		cal.setTimeInMillis(time);
-		// "dd-MM-yyyy hh:mm:ss"
-		String date = DateFormat.format(format, cal).toString();
+		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.ENGLISH);
+		String date = sdf.format(time);
+		
 		return date;
 	}
 }

@@ -125,6 +125,8 @@ public class TaskStatusDBAdapter extends BaseDBAdapter {
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
 		values.put(FIELD_TITLE_NAME, title);
+		values.put(FIELD_CREATED_AT_NAME, createdAt);
+		values.put(FIELD_CHANGED_AT_NAME, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
