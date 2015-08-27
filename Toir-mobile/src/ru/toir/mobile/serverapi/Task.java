@@ -16,7 +16,7 @@ public class Task {
     @Expose
     private List<Item> Items = new ArrayList<Item>();
     @Expose
-    private Integer Number;
+    private String Number;
     @Expose
     private String Comment;
     @Expose
@@ -55,7 +55,7 @@ public class Task {
      * @return
      *     The Number
      */
-    public Integer getNumber() {
+    public String getNumber() {
         return Number;
     }
 
@@ -64,7 +64,7 @@ public class Task {
      * @param Number
      *     The Number
      */
-    public void setNumber(Integer Number) {
+    public void setNumber(String Number) {
         this.Number = Number;
     }
 
