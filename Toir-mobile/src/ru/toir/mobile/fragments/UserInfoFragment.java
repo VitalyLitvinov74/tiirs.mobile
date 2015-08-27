@@ -109,7 +109,7 @@ public class UserInfoFragment extends Fragment {
 				hm.put("name",
 						"["
 								+ DataUtils.getDate(ordersList.get(cnt)
-										.getCreate_date(), "dd-MM-yyyy hh:mm")
+										.getCreatedAt(), "dd-MM-yyyy hh:mm")
 								+ "] Статус: "
 								+ taskStatusDBAdapter.getNameByUUID(ordersList
 										.get(cnt).getTask_status_uuid()));

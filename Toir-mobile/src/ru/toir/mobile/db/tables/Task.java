@@ -7,12 +7,9 @@ package ru.toir.mobile.db.tables;
  * @author Dmitriy Logachov
  *
  */
-public class Task {
-	private long _id;
-	private String uuid;
+public class Task extends BaseTable {
+
 	private String users_uuid;
-	private long CreatedAt;
-	private long ChangedAt;
 	private long close_date;
 	private String task_status_uuid;
 	private long attempt_send_date;
@@ -41,20 +38,6 @@ public class Task {
 	}
 
 	/**
-	 * @return the uuid
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	/**
 	 * @return the users_uuid
 	 */
 	public String getUsers_uuid() {
@@ -66,34 +49,6 @@ public class Task {
 	 */
 	public void setUsers_uuid(String users_uuid) {
 		this.users_uuid = users_uuid;
-	}
-
-	/**
-	 * @return the create_date
-	 */
-	public long getCreate_date() {
-		return CreatedAt;
-	}
-
-	/**
-	 * @param create_date the create_date to set
-	 */
-	public void setCreate_date(long create_date) {
-		this.CreatedAt = create_date;
-	}
-
-	/**
-	 * @return the modify_date
-	 */
-	public long getModify_date() {
-		return ChangedAt;
-	}
-
-	/**
-	 * @param modify_date the modify_date to set
-	 */
-	public void setModify_date(long modify_date) {
-		this.ChangedAt = modify_date;
 	}
 
 	/**
@@ -178,20 +133,6 @@ public class Task {
 	 */
 	public void setTask_name(String task_name) {
 		this.task_name = task_name;
-	}
-
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void set_id(long _id) {
-		this._id = _id;
 	}
 
 }

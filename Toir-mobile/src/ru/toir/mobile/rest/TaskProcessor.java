@@ -288,8 +288,8 @@ public class TaskProcessor {
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
 		item.setUsers_uuid(serverTask.getEmployeeId());
-		item.setCreate_date(serverTask.getCreatedAt().getTime());
-		item.setModify_date(serverTask.getChangedAt().getTime());
+		item.setCreatedAt(serverTask.getCreatedAt().getTime());
+		item.setChangedAt(serverTask.getChangedAt().getTime());
 		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDate().getTime());
 		
 		item.setTask_status_uuid(serverTask.getOrderStatus().getId());

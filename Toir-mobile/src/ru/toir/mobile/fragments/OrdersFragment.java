@@ -218,12 +218,12 @@ public class OrdersFragment extends Fragment {
 				final TextView tv_create = new TextView(getActivity()
 						.getApplicationContext());
 				tv_create.setText(DataUtils.getDate(ordersList.get(cnt)
-						.getCreate_date(), "dd-MM-yyyy hh:mm"));
+						.getCreatedAt(), "dd-MM-yyyy hh:mm"));
 				tv_create.setGravity(Gravity.CENTER_HORIZONTAL);
 				final TextView tv_modify = new TextView(getActivity()
 						.getApplicationContext());
 				tv_modify.setText(DataUtils.getDate(ordersList.get(cnt)
-						.getModify_date(), "dd-MM-yyyy hh:mm"));
+						.getChangedAt(), "dd-MM-yyyy hh:mm"));
 				tv_modify.setBackgroundResource(R.color.almostblack);
 				final TextView tv_close = new TextView(getActivity()
 						.getApplicationContext());

@@ -7,9 +7,8 @@ package ru.toir.mobile.db.tables;
  * @author Dmitriy Logachov
  *
  */
-public class Equipment {
-	private long _id;
-	private String uuid;
+public class Equipment extends BaseTable {
+
 	private String title;
 	private String equipment_type_uuid;
 	private String critical_type_uuid;
@@ -21,8 +20,6 @@ public class Equipment {
 	private String equipment_status_uuid;
 	private String inventory_number;
 	private String location;
-	private long CreatedAt;
-	private long ChangedAt;
 
 	/**
 	 * 
@@ -50,20 +47,6 @@ public class Equipment {
 		this.location=location;
 		this.CreatedAt = createdAt;
 		this.ChangedAt = changedAt;
-	}
-
-	/**
-	 * @return the uuid
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-
-	/**
-	 * @param uuid the uuid to set
-	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	/**
@@ -134,20 +117,6 @@ public class Equipment {
 	 */
 	public void setTag_id(String tag_id) {
 		this.tag_id = tag_id;
-	}
-
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void set_id(long _id) {
-		this._id = _id;
 	}
 
 	/**
@@ -260,31 +229,4 @@ public class Equipment {
 		this.inventory_number = inventory_number;
 	}
 
-	/**
-	 * @return the createdAt
-	 */
-	public long getCreatedAt() {
-		return CreatedAt;
-	}
-
-	/**
-	 * @param createdAt the createdAt to set
-	 */
-	public void setCreatedAt(long createdAt) {
-		CreatedAt = createdAt;
-	}
-
-	/**
-	 * @return the changedAt
-	 */
-	public long getChangedAt() {
-		return ChangedAt;
-	}
-
-	/**
-	 * @param changedAt the changedAt to set
-	 */
-	public void setChangedAt(long changedAt) {
-		ChangedAt = changedAt;
-	}
 }

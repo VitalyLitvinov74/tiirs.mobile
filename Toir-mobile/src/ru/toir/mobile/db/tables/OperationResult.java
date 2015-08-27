@@ -7,13 +7,10 @@ package ru.toir.mobile.db.tables;
  * @author Dmitriy Logachov
  *
  */
-public class OperationResult {
-	private long _id;
-	private String uuid;
+public class OperationResult extends BaseTable{
+
 	private String operation_type_uuid;
 	private String title;
-	private long CreatedAt;
-	private long ChangedAt;
 
 	/**
 	 * 
@@ -29,20 +26,6 @@ public class OperationResult {
 		this.title = title;
 		this.CreatedAt = createdAt;
 		this.ChangedAt = changedAt;
-	}
-
-	/**
-	 * @return the uuid
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-
-	/**
-	 * @param uuid the uuid to set
-	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	/**
@@ -73,50 +56,8 @@ public class OperationResult {
 		this.operation_type_uuid = operation_type_uuid;
 	}
 
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void set_id(long _id) {
-		this._id = _id;
-	}
-	
 	public String toString() {
 		return title;
-	}
-
-	/**
-	 * @return the createdAt
-	 */
-	public long getCreatedAt() {
-		return CreatedAt;
-	}
-
-	/**
-	 * @param createdAt the createdAt to set
-	 */
-	public void setCreatedAt(long createdAt) {
-		CreatedAt = createdAt;
-	}
-
-	/**
-	 * @return the changedAt
-	 */
-	public long getChangedAt() {
-		return ChangedAt;
-	}
-
-	/**
-	 * @param changedAt the changedAt to set
-	 */
-	public void setChangedAt(long changedAt) {
-		ChangedAt = changedAt;
 	}
 
 }

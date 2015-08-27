@@ -127,7 +127,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	 */
 	public long replace(Task task) {
 		return replace(task.getUuid(), task.getUsers_uuid(),
-				task.getCreate_date(), task.getModify_date(),
+				task.getCreatedAt(), task.getChangedAt(),
 				task.getClose_date(), task.getTask_status_uuid(),
 				task.getAttempt_send_date(), task.getAttempt_count(),
 				task.isUpdated(),task.getTask_name());
@@ -186,8 +186,8 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
 		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
 		item.setUsers_uuid(cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)));
-		item.setCreate_date(cursor.getLong(cursor.getColumnIndex(FIELD_CREATED_AT_NAME)));
-		item.setModify_date(cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT_NAME)));
+		item.setCreatedAt(cursor.getLong(cursor.getColumnIndex(FIELD_CREATED_AT_NAME)));
+		item.setChangedAt(cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT_NAME)));
 		item.setClose_date(cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE_NAME)));
 		item.setTask_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)));
 		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
