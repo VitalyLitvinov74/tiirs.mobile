@@ -1,13 +1,14 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import ru.toir.mobile.DatabaseHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 
 /**
@@ -15,18 +16,46 @@ import ru.toir.mobile.db.tables.EquipmentOperation;
  * <p>Класс для работы с оборудованием</p>
  *
  */
-public class EquipmentOperationDBAdapter {
+public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		
 	public static final String TABLE_NAME = "equipment_operation";
 	
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_TASK_UUID_NAME = "task_uuid";
 	public static final String FIELD_EQUIPMENT_UUID_NAME = "equipment_uuid";
 	public static final String FIELD_OPERATION_TYPE_UUID_NAME = "operation_type_uuid";
 	public static final String FIELD_OPERATION_PATTERN_UUID_NAME = "operation_pattern_uuid";
 	public static final String FIELD_OPERATION_STATUS_UUID_NAME = "operation_status_uuid";
 	public static final String FIELD_OPERATION_TIME_NAME = "operation_time";
+	
+	public static final class Projection {
+		public static final String _ID = FIELD__ID_NAME;
+		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID_NAME;
+		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT_NAME;
+		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT_NAME;
+		
+		public static final String TASK_UUID = TABLE_NAME + '_' + FIELD_TASK_UUID_NAME;
+		public static final String EQUIPMENT_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_UUID_NAME;
+		public static final String OPERATION_TYPE_UUID = TABLE_NAME + '_' + FIELD_OPERATION_TYPE_UUID_NAME;
+		public static final String OPERATION_PATTERN_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_UUID_NAME;
+		public static final String OPERATION_STATUS_UUID = TABLE_NAME + '_' + FIELD_OPERATION_STATUS_UUID_NAME;
+		public static final String OPERATION_TIME = TABLE_NAME + '_' + FIELD_OPERATION_TIME_NAME;
+		
+	}
+	
+	private static Map<String, String> mProjection = new HashMap<String, String>();
+	static {
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID_NAME) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID_NAME) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT_NAME) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT_NAME) + " AS " + Projection.CHANGED_AT);
+
+		mProjection.put(Projection.TASK_UUID, getFullName(TABLE_NAME, FIELD_TASK_UUID_NAME) + " AS " + Projection.TASK_UUID);
+		mProjection.put(Projection.EQUIPMENT_UUID, getFullName(TABLE_NAME, FIELD_EQUIPMENT_UUID_NAME) + " AS " + Projection.EQUIPMENT_UUID);
+		mProjection.put(Projection.OPERATION_TYPE_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_TYPE_UUID_NAME) + " AS " + Projection.OPERATION_TYPE_UUID);
+		mProjection.put(Projection.OPERATION_PATTERN_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_UUID_NAME) + " AS " + Projection.OPERATION_PATTERN_UUID);
+		mProjection.put(Projection.OPERATION_STATUS_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_STATUS_UUID_NAME) + " AS " + Projection.OPERATION_STATUS_UUID);
+		mProjection.put(Projection.OPERATION_TIME, getFullName(TABLE_NAME, FIELD_OPERATION_TIME_NAME) + " AS " + Projection.OPERATION_TIME);
+	}
 	
 	String[] mColumns = {
 			FIELD__ID_NAME,
@@ -38,18 +67,12 @@ public class EquipmentOperationDBAdapter {
 			FIELD_OPERATION_STATUS_UUID_NAME,
 			FIELD_OPERATION_TIME_NAME};
 
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
-	
 	/**
 	 * @param context
 	 * @return EquipmentOpDBAdapter
 	 */
 	public EquipmentOperationDBAdapter(Context context){
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 	
 	/**
@@ -263,6 +286,82 @@ public class EquipmentOperationDBAdapter {
 			query += " and " + EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME + "='" + criticalTypeUuid + "'";
 		}
 		cursor = mDb.rawQuery(query, null);		
+		return cursor;
+	}
+	
+	/**
+	 * тестовый метод для отработки работы с QueryBuilder
+	 * @param taskUuid
+	 * @param operationTypeUuid
+	 * @param criticalTypeUuid
+	 * @return
+	 */
+	public Cursor getOperationWithInfoQB(String taskUuid, String operationTypeUuid, String criticalTypeUuid) {
+		/*
+		 * equipment as e on eo.equipment_uuid=e.uuid
+		 * critical_type as ct on e.critical_type_uuid=ct.uuid
+		 */
+		Cursor cursor;
+		String sortOrder = null;
+		List<String> paramArray = new ArrayList<String>();
+		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+		Map<String, String> projection = new HashMap<String, String>();
+		
+		projection.putAll(mProjection);
+		
+		queryBuilder.appendWhere(FIELD_TASK_UUID_NAME
+				+ "=?");
+		paramArray.add(taskUuid);
+
+		String table;
+		StringBuilder tables = new StringBuilder();
+		// операции с типами операций
+		table = getLeftJoinTables(TABLE_NAME,
+				OperationTypeDBAdapter.TABLE_NAME,
+				FIELD_OPERATION_TYPE_UUID_NAME,
+				OperationTypeDBAdapter.FIELD_UUID_NAME, true);
+		tables.append(table);
+		projection.putAll(OperationTypeDBAdapter.getProjection());
+		
+		// оборудование 
+		table = getLeftJoinTables(TABLE_NAME,
+				EquipmentDBAdapter.TABLE_NAME, FIELD_EQUIPMENT_UUID_NAME,
+				EquipmentDBAdapter.FIELD_UUID_NAME, false);
+		tables.append(' ').append(table);
+		projection.putAll(EquipmentDBAdapter.getProjection());
+
+		// типы критичности оборудования
+		table = getLeftJoinTables(EquipmentDBAdapter.TABLE_NAME,
+				CriticalTypeDBAdapter.TABLE_NAME,
+				EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME,
+				CriticalTypeDBAdapter.FIELD_UUID_NAME, false);
+		tables.append(' ').append(table);
+		projection.putAll(CriticalTypeDBAdapter.getProjection());
+		
+		// статусы операций
+		table = getLeftJoinTables(TABLE_NAME,
+				OperationStatusDBAdapter.TABLE_NAME, FIELD_OPERATION_STATUS_UUID_NAME,
+				OperationStatusDBAdapter.FIELD_UUID_NAME, false);
+		tables.append(' ').append(table);
+		projection.putAll(OperationStatusDBAdapter.getProjection());
+		
+		queryBuilder.setTables(tables.toString());
+		queryBuilder.setProjectionMap(projection);
+		
+		if (operationTypeUuid != null) {
+			queryBuilder.appendWhere(FIELD_OPERATION_TYPE_UUID_NAME
+					+ "=?");
+			paramArray.add(operationTypeUuid);
+		}
+		
+		if (criticalTypeUuid != null) {
+			sortOrder = criticalTypeUuid;
+		}
+		
+		String[] pa = new String[paramArray.size()];
+		pa = paramArray.toArray(pa);
+		cursor = queryBuilder.query(mDb, null, null, pa, null, null,
+				sortOrder);		
 		return cursor;
 	}
 

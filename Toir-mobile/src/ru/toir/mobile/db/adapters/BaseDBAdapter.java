@@ -59,9 +59,9 @@ public class BaseDBAdapter {
 	 * @return
 	 */
 	protected static String getLeftJoinTables(String firstTable, String secondTable,
-			String firstField, String secondField) {
+			String firstField, String secondField, boolean first) {
 		return getJoinTables("LEFT JOIN", firstTable, secondTable, firstField,
-				secondField);
+				secondField, first);
 	}
 
 	/**
@@ -74,10 +74,14 @@ public class BaseDBAdapter {
 	 * @return
 	 */
 	protected static String getJoinTables(String join, String firstTable,
-			String secondTable, String firstField, String secondField) {
+			String secondTable, String firstField, String secondField, boolean first) {
 		StringBuilder result = new StringBuilder();
 
-		result.append(firstTable).append(' ').append(join).append(' ')
+		if (first) {
+			result.append(firstTable).append(' ');
+		}
+		
+		result.append(join).append(' ')
 				.append(secondTable).append(" ON ").append(firstTable)
 				.append('.').append(firstField).append('=').append(secondTable)
 				.append('.').append(secondField);

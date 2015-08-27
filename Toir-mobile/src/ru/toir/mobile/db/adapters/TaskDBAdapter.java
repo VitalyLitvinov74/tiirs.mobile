@@ -3,7 +3,6 @@ package ru.toir.mobile.db.adapters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.utils.DataUtils;
 import android.content.ContentValues;
@@ -27,14 +26,14 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	
 	public static final class Projection {
 		public static final String _ID = "_id";
-		public static final String UUID = "task_uuid";
-		public static final String CREATED_AT = "task_CreatedAt";
-		public static final String CHANGED_AT = "task_ChangedAt";
+		public static final String UUID = TABLE_NAME + '_' + "uuid";
+		public static final String CREATED_AT = TABLE_NAME + '_' + "CreatedAt";
+		public static final String CHANGED_AT = TABLE_NAME + '_' + "ChangedAt";
 		
-		public static final String USER_UUID = "task_users_uuid";
-		public static final String CLOSE_DATE = "task_close_date";
-		public static final String TASK_STATUS_UUID = "task_task_status_uuid";
-		public static final String TASK_NAME = "task_task_name";
+		public static final String USER_UUID = TABLE_NAME + '_' + "users_uuid";
+		public static final String CLOSE_DATE = TABLE_NAME + '_' + "close_date";
+		public static final String TASK_STATUS_UUID = TABLE_NAME + '_' + "task_status_uuid";
+		public static final String TASK_NAME = TABLE_NAME + '_' + "task_name";
 		
 	}
 	
@@ -293,15 +292,19 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		String sortOrder = null;
 		String paramArray[] = null;
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+		Map<String, String> projection = new HashMap<String, String>();
+		
+		projection.putAll(mProjection);
 
 		queryBuilder.setTables(getLeftJoinTables(TABLE_NAME,
 				TaskStatusDBAdapter.TABLE_NAME, FIELD_TASK_STATUS_UUID_NAME,
-				TaskStatusDBAdapter.FIELD_UUID_NAME));
-		
-		queryBuilder.setProjectionMap(mProjection);
+				TaskStatusDBAdapter.FIELD_UUID_NAME, true));
+
+		projection.putAll(TaskStatusDBAdapter.getProjection());
+		queryBuilder.setProjectionMap(projection);
 
 		if (statusUuid != null) {
-			queryBuilder.appendWhere(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME
+			queryBuilder.appendWhere(FIELD_TASK_STATUS_UUID_NAME
 					+ "=?");
 			paramArray = new String[] { statusUuid };
 		}
@@ -315,5 +318,15 @@ public class TaskDBAdapter extends BaseDBAdapter {
 
 		return cursor;
 	}
-	
+
+	/**
+	 * @return the mProjection
+	 */
+	public static Map<String, String> getProjection() {
+		Map<String, String> projection = new HashMap<String, String>();
+		projection.putAll(mProjection);
+		projection.remove(Projection._ID);
+		return projection;
+	}
+
 }

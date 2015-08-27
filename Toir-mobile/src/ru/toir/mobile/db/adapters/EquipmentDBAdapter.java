@@ -1,6 +1,8 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,6 +30,36 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_EQUIPMENT_STATUS_UUID_NAME = "equipment_status_uuid";
 	public static final String FIELD_INVENTORY_NUMBER_NAME = "inventory_number";
 	public static final String FIELD_LOCATION_NAME = "location";
+	
+	public static final class Projection {
+		public static final String _ID = FIELD__ID_NAME;
+		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID_NAME;
+		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT_NAME;
+		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT_NAME;
+		
+		public static final String TITLE = TABLE_NAME + '_' + FIELD_TITLE_NAME;
+		public static final String EQUIPMENT_TYPE_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_TYPE_UUID_NAME;
+		public static final String CRITICAL_TYPE_UUID = TABLE_NAME + '_' + FIELD_CRITICAL_TYPE_UUID_NAME;
+		public static final String START_DATE = TABLE_NAME + '_' + FIELD_START_DATE_NAME;
+		public static final String LATITUDE = TABLE_NAME + '_' + FIELD_LATITUDE_NAME;
+		public static final String LONGITUDE = TABLE_NAME + '_' + FIELD_LONGITUDE_NAME;
+		public static final String TAG_ID = TABLE_NAME + '_' + FIELD_TAG_ID_NAME;
+		public static final String IMG = TABLE_NAME + '_' + FIELD_IMG_NAME;
+		public static final String EQUIPMENT_STATUS_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_STATUS_UUID_NAME;
+		public static final String INVENTORY_NUMBER = TABLE_NAME + '_' + FIELD_INVENTORY_NUMBER_NAME;
+		public static final String LOCATION = TABLE_NAME + '_' + FIELD_LOCATION_NAME;
+		
+	}
+	
+	private static final Map<String, String> mProjection = new HashMap<String, String>();
+	static {
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID_NAME) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID_NAME) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT_NAME) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT_NAME) + " AS " + Projection.CHANGED_AT);
+
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE_NAME) + " AS " + Projection.TITLE);
+	}
 
 	private static String mColumns[] = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_TITLE_NAME, FIELD_EQUIPMENT_TYPE_UUID_NAME,
@@ -387,6 +419,16 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		}
 		mDb.setTransactionSuccessful();
 		mDb.endTransaction();
+	}
+
+	/**
+	 * @return the mProjection
+	 */
+	public static Map<String, String> getProjection() {
+		Map<String, String> projection = new HashMap<String, String>();
+		projection.putAll(mProjection);
+		projection.remove(Projection._ID);
+		return projection;
 	}
 
 }
