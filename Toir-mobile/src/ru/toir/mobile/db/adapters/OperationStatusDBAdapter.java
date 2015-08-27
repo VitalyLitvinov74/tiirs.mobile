@@ -12,7 +12,7 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "operation_status";
 
-	public static final String FIELD_TITLE_NAME = "title";
+	public static final String FIELD_TITLE = "title";
 	
 	public static final class Projection {
 		public static final String _ID = "_id";
@@ -25,16 +25,16 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID_NAME) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID_NAME) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT_NAME) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT_NAME) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE_NAME) + " AS " + Projection.TITLE);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
 	}
 
-	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME, FIELD_TITLE_NAME,
-			FIELD_CREATED_AT_NAME, FIELD_CHANGED_AT_NAME };
+	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TITLE,
+			FIELD_CREATED_AT, FIELD_CHANGED_AT };
 
 	/**
 	 * 
@@ -51,7 +51,7 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	 */
 	public OperationStatus getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
 			return getItem(cursor);
@@ -66,13 +66,13 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	 */
 	public OperationStatus getItem(Cursor cursor) {
 		OperationStatus item = new OperationStatus();
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
-		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
-		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
+		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
+		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		item.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT_NAME)));
+				.getColumnIndex(FIELD_CREATED_AT)));
 		item.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT_NAME)));
+				.getColumnIndex(FIELD_CHANGED_AT)));
 		return item;
 	}
 
@@ -129,10 +129,10 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 			long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_TITLE_NAME, title);
-		values.put(FIELD_CREATED_AT_NAME, createdAt);
-		values.put(FIELD_CHANGED_AT_NAME, changedAt);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_TITLE, title);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}

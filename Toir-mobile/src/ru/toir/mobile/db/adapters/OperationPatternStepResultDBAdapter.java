@@ -1,44 +1,61 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
-import ru.toir.mobile.DatabaseHelper;
+import java.util.HashMap;
+import java.util.Map;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class OperationPatternStepResultDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class OperationPatternStepResultDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "operation_pattern_step_result";
 	
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
-	public static final String FIELD_OPERATION_PATTERN_STEP_UUID_NAME = "operation_pattern_step_uuid";
-	public static final String FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME = "next_operation_pattern_step_uuid";
-	public static final String FIELD_TITLE_NAME = "title";
-	public static final String FIELD_MEASURE_TYPE_UUID_NAME = "measure_type_uuid";
+	public static final String FIELD_OPERATION_PATTERN_STEP_UUID = "operation_pattern_step_uuid";
+	public static final String FIELD_NEXT_OPERATION_PATTERN_STEP_UUID = "next_operation_pattern_step_uuid";
+	public static final String FIELD_TITLE = "title";
+	public static final String FIELD_MEASURE_TYPE_UUID = "measure_type_uuid";
+	
+	public static final class Projection {
+		public static final String _ID = FIELD__ID;
+		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
+		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
+
+		public static final String OPERATION_PATTERN_STEP_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_STEP_UUID;
+		public static final String NEXT_OPERATION_PATTERN_STEP_UUID = TABLE_NAME + '_' + FIELD_NEXT_OPERATION_PATTERN_STEP_UUID;
+		public static final String TITLE = TABLE_NAME + '_' + FIELD_TITLE;
+		public static final String MEASURE_TYPE_UUID = TABLE_NAME + '_' + FIELD_MEASURE_TYPE_UUID;
+		
+	}
+	
+	private static final Map<String, String> mProjection = new HashMap<String, String>();
+	static {
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
+		
+	}
 	
 	String[] mColumns = {
-			FIELD__ID_NAME,
-			FIELD_UUID_NAME,
-			FIELD_OPERATION_PATTERN_STEP_UUID_NAME,
-			FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME,
-			FIELD_TITLE_NAME,
-			FIELD_MEASURE_TYPE_UUID_NAME};
+			FIELD__ID,
+			FIELD_UUID,
+			FIELD_OPERATION_PATTERN_STEP_UUID,
+			FIELD_NEXT_OPERATION_PATTERN_STEP_UUID,
+			FIELD_TITLE,
+			FIELD_MEASURE_TYPE_UUID,
+			FIELD_CREATED_AT, FIELD_CHANGED_AT};
 		
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
 	 */
 	public OperationPatternStepResultDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 	
 	/**
@@ -48,7 +65,7 @@ public class OperationPatternStepResultDBAdapter {
 	 */
 	public OperationPatternStepResult getItem(String uuid) {		
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?", new String[]{uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
 			return getItem(cursor);
 		}
@@ -62,12 +79,12 @@ public class OperationPatternStepResultDBAdapter {
 	 */
 	public OperationPatternStepResult getItem(Cursor cursor) {
 		OperationPatternStepResult result = new OperationPatternStepResult();
-		result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
-		result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
-		result.setOperation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_UUID_NAME)));
-		result.setNext_operation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME)));
-		result.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE_NAME)));
-		result.setMeasure_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_MEASURE_TYPE_UUID_NAME)));
+		result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
+		result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		result.setOperation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_UUID)));
+		result.setNext_operation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID)));
+		result.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
+		result.setMeasure_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_MEASURE_TYPE_UUID)));
 		return result;
 	}
 	
@@ -79,7 +96,7 @@ public class OperationPatternStepResultDBAdapter {
 	public ArrayList<OperationPatternStepResult> getItems(String step_uuid) {
 		ArrayList<OperationPatternStepResult> stepResults = null;
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_STEP_UUID_NAME + "=?", new String[]{step_uuid}, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_STEP_UUID + "=?", new String[]{step_uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
 			stepResults = new ArrayList<OperationPatternStepResult>();
 			do	{
@@ -104,7 +121,7 @@ public class OperationPatternStepResultDBAdapter {
 			}
 			stringBuilder.append("'").append(uuid).append("'");
 		}
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_STEP_UUID_NAME + " IN (" + stringBuilder.toString() + ")", null, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_OPERATION_PATTERN_STEP_UUID + " IN (" + stringBuilder.toString() + ")", null, null, null, null);		
 		if (cursor.moveToFirst()) {
 			stepResults = new ArrayList<OperationPatternStepResult>();
 			do	{
@@ -136,11 +153,11 @@ public class OperationPatternStepResultDBAdapter {
 	public long replace(String uuid, String operation_pattern_step_uuid, String next_operation_pattern_step_uuid, String title, String measure_type_uuid) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_OPERATION_PATTERN_STEP_UUID_NAME, operation_pattern_step_uuid);
-		values.put(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID_NAME, next_operation_pattern_step_uuid);
-		values.put(FIELD_TITLE_NAME, title);
-		values.put(FIELD_MEASURE_TYPE_UUID_NAME, measure_type_uuid);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_OPERATION_PATTERN_STEP_UUID, operation_pattern_step_uuid);
+		values.put(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID, next_operation_pattern_step_uuid);
+		values.put(FIELD_TITLE, title);
+		values.put(FIELD_MEASURE_TYPE_UUID, measure_type_uuid);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -154,4 +171,15 @@ public class OperationPatternStepResultDBAdapter {
 	public long replace(OperationPatternStepResult stepResult) {
 		return replace(stepResult.getUuid(), stepResult.getOperation_pattern_step_uuid(), stepResult.getNext_operation_pattern_step_uuid(), stepResult.getTitle(), stepResult.getMeasure_type_uuid());
 	}
+	
+	/**
+	 * @return the mProjection
+	 */
+	public static Map<String, String> getProjection() {
+		Map<String, String> projection = new HashMap<String, String>();
+		projection.putAll(mProjection);
+		projection.remove(Projection._ID);
+		return projection;
+	}
+
 }

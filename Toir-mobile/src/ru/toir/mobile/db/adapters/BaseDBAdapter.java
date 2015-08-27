@@ -13,16 +13,17 @@ import android.database.sqlite.SQLiteDatabase;
  *
  */
 public class BaseDBAdapter {
+	
 	private DatabaseHelper mDbHelper;
 	protected SQLiteDatabase mDb;
 	private final Context mContext;
 	
 	private String TABLE_NAME;
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
-	public static final String FIELD_CREATED_AT_NAME = "CreatedAt";
-	public static final String FIELD_CHANGED_AT_NAME = "ChangedAt";
+	public static final String FIELD__ID = "_id";
+	public static final String FIELD_UUID = "uuid";
+	public static final String FIELD_CREATED_AT = "CreatedAt";
+	public static final String FIELD_CHANGED_AT = "ChangedAt";
 
 
 
@@ -43,9 +44,9 @@ public class BaseDBAdapter {
 	public Long getLastChangedAt() {
 		Long changed = null;
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, new String[]{ FIELD_CHANGED_AT_NAME }, null, null, FIELD_CHANGED_AT_NAME, null, FIELD_CHANGED_AT_NAME + " DESC" + " LIMIT 1");
+		cursor = mDb.query(TABLE_NAME, new String[]{ FIELD_CHANGED_AT }, null, null, FIELD_CHANGED_AT, null, FIELD_CHANGED_AT + " DESC" + " LIMIT 1");
 		if (cursor.moveToFirst()) {
-			changed = cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT_NAME));
+			changed = cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT));
 		}
 		return changed;
 	}

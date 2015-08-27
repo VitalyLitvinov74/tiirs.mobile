@@ -10,10 +10,10 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "documentation_type";
 
-	public static final String FIELD_TITLE_NAME = "title";
+	public static final String FIELD_TITLE = "title";
 
-	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME, FIELD_TITLE_NAME,
-			FIELD_CREATED_AT_NAME, FIELD_CHANGED_AT_NAME };
+	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TITLE,
+			FIELD_CREATED_AT, FIELD_CHANGED_AT };
 
 	/**
 	 * @param context
@@ -30,7 +30,7 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 	 */
 	public Cursor getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
 			return cursor;
@@ -64,10 +64,10 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 			long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_TITLE_NAME, title);
-		values.put(FIELD_CREATED_AT_NAME, createdAt);
-		values.put(FIELD_CHANGED_AT_NAME, changedAt);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_TITLE, title);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -102,15 +102,15 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 			while (true) {
 				DocumentationType item = new DocumentationType();
 				item.set_id(cursor.getLong(cursor
-						.getColumnIndex(FIELD__ID_NAME)));
+						.getColumnIndex(FIELD__ID)));
 				item.setUuid(cursor.getString(cursor
-						.getColumnIndex(FIELD_UUID_NAME)));
+						.getColumnIndex(FIELD_UUID)));
 				item.setTitle(cursor.getString(cursor
-						.getColumnIndex(FIELD_TITLE_NAME)));
+						.getColumnIndex(FIELD_TITLE)));
 				item.setCreatedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CREATED_AT_NAME)));
+						.getColumnIndex(FIELD_CREATED_AT)));
 				item.setChangedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CHANGED_AT_NAME)));
+						.getColumnIndex(FIELD_CHANGED_AT)));
 
 				arrayList.add(item);
 				if (cursor.isLast())
@@ -123,7 +123,7 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 
 	public String getNameByUUID(String uuid) {
 		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cur.getCount() > 0) {
 			cur.moveToFirst();
@@ -134,7 +134,7 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 
 	public String getUUIDByName(String name) {
 		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TITLE_NAME + "=?",
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TITLE + "=?",
 				new String[] { name }, null, null, null);
 		if (cur.getCount() > 0) {
 			cur.moveToFirst();

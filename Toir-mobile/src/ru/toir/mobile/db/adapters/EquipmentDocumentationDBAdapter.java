@@ -17,15 +17,15 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "equipment_documentation";
 
-	public static final String FIELD_EQUIPMENT_UUID_NAME = "equipment_uuid";
-	public static final String FIELD_DOCUMENTATION_TYPE_UUID_NAME = "documentation_type_uuid";
-	public static final String FIELD_TITLE_NAME = "title";
-	public static final String FIELD_PATH_NAME = "path";
+	public static final String FIELD_EQUIPMENT_UUID = "equipment_uuid";
+	public static final String FIELD_DOCUMENTATION_TYPE_UUID = "documentation_type_uuid";
+	public static final String FIELD_TITLE = "title";
+	public static final String FIELD_PATH = "path";
 
-	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
-			FIELD_EQUIPMENT_UUID_NAME, FIELD_DOCUMENTATION_TYPE_UUID_NAME,
-			FIELD_TITLE_NAME, FIELD_PATH_NAME, FIELD_CREATED_AT_NAME,
-			FIELD_CHANGED_AT_NAME };
+	String[] mColumns = { FIELD__ID, FIELD_UUID,
+			FIELD_EQUIPMENT_UUID, FIELD_DOCUMENTATION_TYPE_UUID,
+			FIELD_TITLE, FIELD_PATH, FIELD_CREATED_AT,
+			FIELD_CHANGED_AT };
 
 	/**
 	 * 
@@ -45,7 +45,7 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 	 */
 	public EquipmentDocumentation getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
 			return getItem(cursor);
@@ -64,21 +64,21 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 	public static EquipmentDocumentation getItem(Cursor cursor) {
 		EquipmentDocumentation item = new EquipmentDocumentation();
 
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
 		item.setUuid(cursor.getString(cursor
-				.getColumnIndex(FIELD_UUID_NAME)));
+				.getColumnIndex(FIELD_UUID)));
 		item.setEquipment_uuid(cursor.getString(cursor
-				.getColumnIndex(FIELD_EQUIPMENT_UUID_NAME)));
+				.getColumnIndex(FIELD_EQUIPMENT_UUID)));
 		item.setDocumentation_type_uuid(cursor.getString(cursor
-				.getColumnIndex(FIELD_DOCUMENTATION_TYPE_UUID_NAME)));
+				.getColumnIndex(FIELD_DOCUMENTATION_TYPE_UUID)));
 		item.setTitle(cursor.getString(cursor
-				.getColumnIndex(FIELD_TITLE_NAME)));
+				.getColumnIndex(FIELD_TITLE)));
 		item.setPath(cursor.getString(cursor
-				.getColumnIndex(FIELD_PATH_NAME)));
+				.getColumnIndex(FIELD_PATH)));
 		item.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT_NAME)));
+				.getColumnIndex(FIELD_CREATED_AT)));
 		item.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT_NAME)));
+				.getColumnIndex(FIELD_CHANGED_AT)));
 		return item;
 	}
 
@@ -99,16 +99,16 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 			String documentation_type_uuid, String title, String path,
 			long createdAt, long changedAt) {
 		ContentValues values = new ContentValues();
-		values.put(EquipmentDocumentationDBAdapter.FIELD_UUID_NAME, uuid);
-		values.put(EquipmentDocumentationDBAdapter.FIELD_EQUIPMENT_UUID_NAME,
+		values.put(EquipmentDocumentationDBAdapter.FIELD_UUID, uuid);
+		values.put(EquipmentDocumentationDBAdapter.FIELD_EQUIPMENT_UUID,
 				equipment_uuid);
 		values.put(
-				EquipmentDocumentationDBAdapter.FIELD_DOCUMENTATION_TYPE_UUID_NAME,
+				EquipmentDocumentationDBAdapter.FIELD_DOCUMENTATION_TYPE_UUID,
 				documentation_type_uuid);
-		values.put(EquipmentDocumentationDBAdapter.FIELD_TITLE_NAME, title);
-		values.put(EquipmentDocumentationDBAdapter.FIELD_PATH_NAME, path);
-		values.put(FIELD_CREATED_AT_NAME, createdAt);
-		values.put(FIELD_CHANGED_AT_NAME, changedAt);
+		values.put(EquipmentDocumentationDBAdapter.FIELD_TITLE, title);
+		values.put(EquipmentDocumentationDBAdapter.FIELD_PATH, path);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		return mDb.replace(TABLE_NAME, null, values);
 	}
 
@@ -143,7 +143,7 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 					null);
 		else
 			cursor = mDb.query(TABLE_NAME, mColumns,
-					FIELD_DOCUMENTATION_TYPE_UUID_NAME + "=?",
+					FIELD_DOCUMENTATION_TYPE_UUID + "=?",
 					new String[] { type }, null, null, null);
 
 		if (cursor.getCount() > 0) {

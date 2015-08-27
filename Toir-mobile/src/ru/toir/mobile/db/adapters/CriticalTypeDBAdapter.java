@@ -12,29 +12,29 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "critical_type";
 
-	public static final String FIELD_TYPE_NAME = "type";
+	public static final String FIELD_TYPE = "type";
 	
 	public static final class Projection {
-		public static final String _ID = FIELD__ID_NAME;
-		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID_NAME;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT_NAME;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT_NAME;
+		public static final String _ID = FIELD__ID;
+		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
+		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
 		
-		public static final String TYPE = TABLE_NAME + '_' + FIELD_TYPE_NAME;
+		public static final String TYPE = TABLE_NAME + '_' + FIELD_TYPE;
 	}
 	
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID_NAME) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID_NAME) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT_NAME) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT_NAME) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TYPE, getFullName(TABLE_NAME, FIELD_TYPE_NAME) + " AS " + Projection.TYPE);
+		mProjection.put(Projection.TYPE, getFullName(TABLE_NAME, FIELD_TYPE) + " AS " + Projection.TYPE);
 	}
 
-	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME, FIELD_TYPE_NAME,
-			FIELD_CREATED_AT_NAME, FIELD_CHANGED_AT_NAME };
+	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TYPE,
+			FIELD_CREATED_AT, FIELD_CHANGED_AT };
 
 	/**
 	 * @param context
@@ -51,7 +51,7 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 	 */
 	public Cursor getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
 			return cursor;
@@ -84,10 +84,10 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 	public long replace(String uuid, int type, long createdAt, long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_TYPE_NAME, type);
-		values.put(FIELD_CREATED_AT_NAME, createdAt);
-		values.put(FIELD_CHANGED_AT_NAME, changedAt);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_TYPE, type);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -122,15 +122,15 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 			while (true) {
 				CriticalType item = new CriticalType();
 				item.set_id(cursor.getLong(cursor
-						.getColumnIndex(FIELD__ID_NAME)));
+						.getColumnIndex(FIELD__ID)));
 				item.setUuid(cursor.getString(cursor
-						.getColumnIndex(FIELD_UUID_NAME)));
+						.getColumnIndex(FIELD_UUID)));
 				item.setType(cursor.getInt(cursor
-						.getColumnIndex(FIELD_TYPE_NAME)));
+						.getColumnIndex(FIELD_TYPE)));
 				item.setCreatedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CREATED_AT_NAME)));
+						.getColumnIndex(FIELD_CREATED_AT)));
 				item.setChangedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CHANGED_AT_NAME)));
+						.getColumnIndex(FIELD_CHANGED_AT)));
 				arrayList.add(item);
 				if (cursor.isLast())
 					break;
@@ -142,7 +142,7 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 
 	public String getNameByUUID(String uuid) {
 		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?",
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cur.getCount() > 0) {
 			cur.moveToFirst();
@@ -153,7 +153,7 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 
 	public String getUUIDByName(String name) {
 		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TYPE_NAME + "=?",
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TYPE + "=?",
 				new String[] { name }, null, null, null);
 		if (cur.getCount() > 0) {
 			cur.moveToFirst();

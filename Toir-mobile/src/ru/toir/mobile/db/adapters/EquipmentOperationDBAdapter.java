@@ -20,52 +20,55 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		
 	public static final String TABLE_NAME = "equipment_operation";
 	
-	public static final String FIELD_TASK_UUID_NAME = "task_uuid";
-	public static final String FIELD_EQUIPMENT_UUID_NAME = "equipment_uuid";
-	public static final String FIELD_OPERATION_TYPE_UUID_NAME = "operation_type_uuid";
-	public static final String FIELD_OPERATION_PATTERN_UUID_NAME = "operation_pattern_uuid";
-	public static final String FIELD_OPERATION_STATUS_UUID_NAME = "operation_status_uuid";
-	public static final String FIELD_OPERATION_TIME_NAME = "operation_time";
+	public static final String FIELD_TASK_UUID = "task_uuid";
+	public static final String FIELD_EQUIPMENT_UUID = "equipment_uuid";
+	public static final String FIELD_OPERATION_TYPE_UUID = "operation_type_uuid";
+	public static final String FIELD_OPERATION_PATTERN_UUID = "operation_pattern_uuid";
+	public static final String FIELD_OPERATION_STATUS_UUID = "operation_status_uuid";
+	public static final String FIELD_OPERATION_TIME = "operation_time";
 	
 	public static final class Projection {
-		public static final String _ID = FIELD__ID_NAME;
-		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID_NAME;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT_NAME;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT_NAME;
+		public static final String _ID = FIELD__ID;
+		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
+		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
 		
-		public static final String TASK_UUID = TABLE_NAME + '_' + FIELD_TASK_UUID_NAME;
-		public static final String EQUIPMENT_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_UUID_NAME;
-		public static final String OPERATION_TYPE_UUID = TABLE_NAME + '_' + FIELD_OPERATION_TYPE_UUID_NAME;
-		public static final String OPERATION_PATTERN_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_UUID_NAME;
-		public static final String OPERATION_STATUS_UUID = TABLE_NAME + '_' + FIELD_OPERATION_STATUS_UUID_NAME;
-		public static final String OPERATION_TIME = TABLE_NAME + '_' + FIELD_OPERATION_TIME_NAME;
+		public static final String TASK_UUID = TABLE_NAME + '_' + FIELD_TASK_UUID;
+		public static final String EQUIPMENT_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_UUID;
+		public static final String OPERATION_TYPE_UUID = TABLE_NAME + '_' + FIELD_OPERATION_TYPE_UUID;
+		public static final String OPERATION_PATTERN_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_UUID;
+		public static final String OPERATION_STATUS_UUID = TABLE_NAME + '_' + FIELD_OPERATION_STATUS_UUID;
+		public static final String OPERATION_TIME = TABLE_NAME + '_' + FIELD_OPERATION_TIME;
 		
 	}
 	
 	private static Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID_NAME) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID_NAME) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT_NAME) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT_NAME) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TASK_UUID, getFullName(TABLE_NAME, FIELD_TASK_UUID_NAME) + " AS " + Projection.TASK_UUID);
-		mProjection.put(Projection.EQUIPMENT_UUID, getFullName(TABLE_NAME, FIELD_EQUIPMENT_UUID_NAME) + " AS " + Projection.EQUIPMENT_UUID);
-		mProjection.put(Projection.OPERATION_TYPE_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_TYPE_UUID_NAME) + " AS " + Projection.OPERATION_TYPE_UUID);
-		mProjection.put(Projection.OPERATION_PATTERN_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_UUID_NAME) + " AS " + Projection.OPERATION_PATTERN_UUID);
-		mProjection.put(Projection.OPERATION_STATUS_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_STATUS_UUID_NAME) + " AS " + Projection.OPERATION_STATUS_UUID);
-		mProjection.put(Projection.OPERATION_TIME, getFullName(TABLE_NAME, FIELD_OPERATION_TIME_NAME) + " AS " + Projection.OPERATION_TIME);
+		mProjection.put(Projection.TASK_UUID, getFullName(TABLE_NAME, FIELD_TASK_UUID) + " AS " + Projection.TASK_UUID);
+		mProjection.put(Projection.EQUIPMENT_UUID, getFullName(TABLE_NAME, FIELD_EQUIPMENT_UUID) + " AS " + Projection.EQUIPMENT_UUID);
+		mProjection.put(Projection.OPERATION_TYPE_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_TYPE_UUID) + " AS " + Projection.OPERATION_TYPE_UUID);
+		mProjection.put(Projection.OPERATION_PATTERN_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_UUID) + " AS " + Projection.OPERATION_PATTERN_UUID);
+		mProjection.put(Projection.OPERATION_STATUS_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_STATUS_UUID) + " AS " + Projection.OPERATION_STATUS_UUID);
+		mProjection.put(Projection.OPERATION_TIME, getFullName(TABLE_NAME, FIELD_OPERATION_TIME) + " AS " + Projection.OPERATION_TIME);
 	}
 	
 	String[] mColumns = {
-			FIELD__ID_NAME,
-			FIELD_UUID_NAME,
-			FIELD_TASK_UUID_NAME,
-			FIELD_EQUIPMENT_UUID_NAME,
-			FIELD_OPERATION_TYPE_UUID_NAME,
-			FIELD_OPERATION_PATTERN_UUID_NAME,
-			FIELD_OPERATION_STATUS_UUID_NAME,
-			FIELD_OPERATION_TIME_NAME};
+			FIELD__ID,
+			FIELD_UUID,
+			FIELD_TASK_UUID,
+			FIELD_EQUIPMENT_UUID,
+			FIELD_OPERATION_TYPE_UUID,
+			FIELD_OPERATION_PATTERN_UUID,
+			FIELD_OPERATION_STATUS_UUID,
+			FIELD_OPERATION_TIME,
+			FIELD_CREATED_AT,
+			FIELD_CHANGED_AT
+			};
 
 	/**
 	 * @param context
@@ -88,9 +91,9 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 
 		// можем или отобрать все оборудование или только с нужными параметрами
 		if (operation_type.equals("")) {
-			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{orderId}, null, null, null);
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID + "=?", new String[]{orderId}, null, null, null);
 		} else {
-			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=? AND " + FIELD_OPERATION_TYPE_UUID_NAME + "=?", new String[]{orderId,operation_type}, null, null, null);
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID + "=? AND " + FIELD_OPERATION_TYPE_UUID + "=?", new String[]{orderId,operation_type}, null, null, null);
 		}
 
 		if (cursor.moveToFirst()) {
@@ -107,7 +110,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getAllOpEquipment() {
-		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME, FIELD_OPERATION_STATUS_UUID_NAME, FIELD_OPERATION_TIME_NAME}, null, null, null, null, null);
+		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID, FIELD_TASK_UUID, FIELD_EQUIPMENT_UUID, FIELD_OPERATION_TYPE_UUID, FIELD_OPERATION_PATTERN_UUID, FIELD_OPERATION_STATUS_UUID, FIELD_OPERATION_TIME}, null, null, null, null, null);
 	}
 	
 	/**
@@ -116,7 +119,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @return Cursor
 	 */
 	public Cursor getOpEquipment(long uuid) {
-		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID_NAME, FIELD_TASK_UUID_NAME, FIELD_EQUIPMENT_UUID_NAME, FIELD_OPERATION_TYPE_UUID_NAME, FIELD_OPERATION_PATTERN_UUID_NAME, FIELD_OPERATION_STATUS_UUID_NAME, FIELD_OPERATION_TIME_NAME}, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)}, null, null, null);
+		return mDb.query(TABLE_NAME, new String[]{FIELD_UUID, FIELD_TASK_UUID, FIELD_EQUIPMENT_UUID, FIELD_OPERATION_TYPE_UUID, FIELD_OPERATION_PATTERN_UUID, FIELD_OPERATION_STATUS_UUID, FIELD_OPERATION_TIME}, FIELD_UUID + "=?", new String[]{String.valueOf(uuid)}, null, null, null);
 	}
 	
 	/**
@@ -126,12 +129,12 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	public long insertOpEquipment(String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, int operation_time){
 		ContentValues values = new ContentValues();
 		String uuid = UUID.randomUUID().toString();
-		values.put(EquipmentOperationDBAdapter.FIELD_UUID_NAME, uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_TASK_UUID_NAME, task_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID_NAME, equipment_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME, operation_type_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME, operation_pattern_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TIME_NAME, operation_time);
+		values.put(EquipmentOperationDBAdapter.FIELD_UUID, uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_TASK_UUID, task_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID, equipment_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID, operation_pattern_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TIME, operation_time);
 		return mDb.insert(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
 	}
 	
@@ -149,7 +152,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @return int количество удалённых записей
 	 */
 	public int deleteOpEquipment(String uuid){
-		return mDb.delete(TABLE_NAME, FIELD_UUID_NAME + "=?", new String[]{String.valueOf(uuid)});
+		return mDb.delete(TABLE_NAME, FIELD_UUID + "=?", new String[]{String.valueOf(uuid)});
 	}
 	
 	/**
@@ -164,13 +167,13 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 */
 	public long replace(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid, int operation_time) {
 		ContentValues values = new ContentValues();
-		values.put(EquipmentOperationDBAdapter.FIELD_UUID_NAME, uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_TASK_UUID_NAME, task_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID_NAME, equipment_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID_NAME, operation_type_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID_NAME, operation_pattern_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_STATUS_UUID_NAME, operation_status_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TIME_NAME, operation_time);
+		values.put(EquipmentOperationDBAdapter.FIELD_UUID, uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_TASK_UUID, task_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID, equipment_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID, operation_pattern_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_STATUS_UUID, operation_status_uuid);
+		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TIME, operation_time);
 		return mDb.replace(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
 	}
 	
@@ -190,7 +193,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 */
 	public EquipmentOperation getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?", new String[]{uuid}, null, null, null);
 		if (cursor.moveToFirst()) {
 			return getItem(cursor);
 		} else {
@@ -208,9 +211,9 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		ArrayList<EquipmentOperation> arrayList = null;
 		Cursor cursor;
 		if (task_uuid.equals(""))
-			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_UUID_NAME + "=?", new String[]{equipment_uuid}, null, null, "_id DESC");
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_UUID + "=?", new String[]{equipment_uuid}, null, null, "_id DESC");
 		else
-			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=? AND " + FIELD_EQUIPMENT_UUID_NAME + "=?", new String[]{task_uuid, equipment_uuid}, null, null, null);		
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID + "=? AND " + FIELD_EQUIPMENT_UUID + "=?", new String[]{task_uuid, equipment_uuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
 			arrayList = new ArrayList<EquipmentOperation>();
 			do	{
@@ -227,14 +230,14 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 */
 	public EquipmentOperation getItem(Cursor cursor) {
 		EquipmentOperation equipmentOperation = new EquipmentOperation();
-		equipmentOperation.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
-		equipmentOperation.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
-		equipmentOperation.setTask_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID_NAME)));
-		equipmentOperation.setEquipment_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID_NAME)));
-		equipmentOperation.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID_NAME)));
-		equipmentOperation.setOperation_pattern_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID_NAME)));
-		equipmentOperation.setOperation_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_STATUS_UUID_NAME)));
-		equipmentOperation.setOperation_time(cursor.getInt(cursor.getColumnIndex(FIELD_OPERATION_TIME_NAME)));
+		equipmentOperation.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
+		equipmentOperation.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		equipmentOperation.setTask_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID)));
+		equipmentOperation.setEquipment_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID)));
+		equipmentOperation.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID)));
+		equipmentOperation.setOperation_pattern_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID)));
+		equipmentOperation.setOperation_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_STATUS_UUID)));
+		equipmentOperation.setOperation_time(cursor.getInt(cursor.getColumnIndex(FIELD_OPERATION_TIME)));
 		return equipmentOperation;
 	}
 	
@@ -246,7 +249,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	public ArrayList<EquipmentOperation> getItems(String taskUuid) {
 		ArrayList<EquipmentOperation> arrayList = null;
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID_NAME + "=?", new String[]{taskUuid}, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID + "=?", new String[]{taskUuid}, null, null, null);		
 		if (cursor.moveToFirst()) {
 			arrayList = new ArrayList<EquipmentOperation>();
 			do	{
@@ -279,11 +282,11 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid where eo.task_uuid='" + taskUuid + "'";
 		
 		if (operationTypeUuid != null) {
-			query += " and " + FIELD_OPERATION_TYPE_UUID_NAME + "='" + operationTypeUuid + "'";
+			query += " and " + FIELD_OPERATION_TYPE_UUID + "='" + operationTypeUuid + "'";
 		}
 		
 		if (criticalTypeUuid != null) {
-			query += " and " + EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME + "='" + criticalTypeUuid + "'";
+			query += " and " + EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID + "='" + criticalTypeUuid + "'";
 		}
 		cursor = mDb.rawQuery(query, null);		
 		return cursor;
@@ -309,7 +312,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		
 		projection.putAll(mProjection);
 		
-		queryBuilder.appendWhere(FIELD_TASK_UUID_NAME
+		queryBuilder.appendWhere(FIELD_TASK_UUID
 				+ "=?");
 		paramArray.add(taskUuid);
 
@@ -318,30 +321,30 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		// операции с типами операций
 		table = getLeftJoinTables(TABLE_NAME,
 				OperationTypeDBAdapter.TABLE_NAME,
-				FIELD_OPERATION_TYPE_UUID_NAME,
-				OperationTypeDBAdapter.FIELD_UUID_NAME, true);
+				FIELD_OPERATION_TYPE_UUID,
+				OperationTypeDBAdapter.FIELD_UUID, true);
 		tables.append(table);
 		projection.putAll(OperationTypeDBAdapter.getProjection());
 		
 		// оборудование 
 		table = getLeftJoinTables(TABLE_NAME,
-				EquipmentDBAdapter.TABLE_NAME, FIELD_EQUIPMENT_UUID_NAME,
-				EquipmentDBAdapter.FIELD_UUID_NAME, false);
+				EquipmentDBAdapter.TABLE_NAME, FIELD_EQUIPMENT_UUID,
+				EquipmentDBAdapter.FIELD_UUID, false);
 		tables.append(' ').append(table);
 		projection.putAll(EquipmentDBAdapter.getProjection());
 
 		// типы критичности оборудования
 		table = getLeftJoinTables(EquipmentDBAdapter.TABLE_NAME,
 				CriticalTypeDBAdapter.TABLE_NAME,
-				EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID_NAME,
-				CriticalTypeDBAdapter.FIELD_UUID_NAME, false);
+				EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID,
+				CriticalTypeDBAdapter.FIELD_UUID, false);
 		tables.append(' ').append(table);
 		projection.putAll(CriticalTypeDBAdapter.getProjection());
 		
 		// статусы операций
 		table = getLeftJoinTables(TABLE_NAME,
-				OperationStatusDBAdapter.TABLE_NAME, FIELD_OPERATION_STATUS_UUID_NAME,
-				OperationStatusDBAdapter.FIELD_UUID_NAME, false);
+				OperationStatusDBAdapter.TABLE_NAME, FIELD_OPERATION_STATUS_UUID,
+				OperationStatusDBAdapter.FIELD_UUID, false);
 		tables.append(' ').append(table);
 		projection.putAll(OperationStatusDBAdapter.getProjection());
 		
@@ -349,7 +352,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		queryBuilder.setProjectionMap(projection);
 		
 		if (operationTypeUuid != null) {
-			queryBuilder.appendWhere(FIELD_OPERATION_TYPE_UUID_NAME
+			queryBuilder.appendWhere(FIELD_OPERATION_TYPE_UUID
 					+ "=?");
 			paramArray.add(operationTypeUuid);
 		}
