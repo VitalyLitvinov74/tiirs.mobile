@@ -269,7 +269,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		operation.setOperation_status_uuid(status);
 		replace(operation);
 	}
-	
+
 	/**
 	 * Возвращает курсор для ListView списка операций в наряде
 	 * @param taskUuid
@@ -278,32 +278,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @return
 	 */
 	public Cursor getOperationWithInfo(String taskUuid, String operationTypeUuid, String criticalTypeUuid) {
-		Cursor cursor = null;
-		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid where eo.task_uuid='" + taskUuid + "'";
-		
-		if (operationTypeUuid != null) {
-			query += " and " + FIELD_OPERATION_TYPE_UUID + "='" + operationTypeUuid + "'";
-		}
-		
-		if (criticalTypeUuid != null) {
-			query += " and " + EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID + "='" + criticalTypeUuid + "'";
-		}
-		cursor = mDb.rawQuery(query, null);		
-		return cursor;
-	}
-	
-	/**
-	 * тестовый метод для отработки работы с QueryBuilder
-	 * @param taskUuid
-	 * @param operationTypeUuid
-	 * @param criticalTypeUuid
-	 * @return
-	 */
-	public Cursor getOperationWithInfoQB(String taskUuid, String operationTypeUuid, String criticalTypeUuid) {
-		/*
-		 * equipment as e on eo.equipment_uuid=e.uuid
-		 * critical_type as ct on e.critical_type_uuid=ct.uuid
-		 */
+
 		Cursor cursor;
 		String sortOrder = null;
 		List<String> paramArray = new ArrayList<String>();
@@ -368,15 +343,4 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		return cursor;
 	}
 
-	/**
-	 * Возвращает курсор для ListView списка всех операций (временная функция - тестовая) 
-	 * @return
-	 */
-	public Cursor getOperationWithInfo() {
-		Cursor cursor = null;
-		String query = "select eo._id, eo.uuid as 'operation_uuid', eo.task_uuid, eo.equipment_uuid, ot.title as 'operation_title', e.title as 'equipment_title', ct.type as 'critical_type', os.title as 'operation_status_title' from equipment_operation as eo left join operation_type as ot on eo.operation_type_uuid=ot.uuid left join equipment as e on eo.equipment_uuid=e.uuid left join critical_type as ct on e.critical_type_uuid=ct.uuid left join operation_status as os on eo.operation_status_uuid=os.uuid";		
-		cursor = mDb.rawQuery(query, null);		
-		return cursor;
-	}
-	
 }

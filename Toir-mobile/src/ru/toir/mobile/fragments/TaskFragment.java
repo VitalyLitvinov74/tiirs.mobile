@@ -399,10 +399,10 @@ public class TaskFragment extends Fragment {
 
 			if (Level == 1) {
 				initOperationPattern(cursor.getString(cursor
-						.getColumnIndex("operation_uuid")),
-						cursor.getString(cursor.getColumnIndex("task_uuid")),
+						.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID)),
+						cursor.getString(cursor.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID)),
 						cursor.getString(cursor
-								.getColumnIndex("equipment_uuid")));
+								.getColumnIndex(EquipmentDBAdapter.Projection.UUID)));
 			}
 
 			if (Level == 0) {
@@ -424,9 +424,9 @@ public class TaskFragment extends Fragment {
 			if (Level == 1) {
 				Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 				final String operation_uuid = cursor.getString(cursor
-						.getColumnIndex("operation_uuid"));
+						.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
 				final String taskUuid = cursor.getString(cursor
-						.getColumnIndex("task_uuid"));
+						.getColumnIndex(TaskDBAdapter.Projection.UUID));
 
 				// диалог для отмены операции
 				final Dialog dialog = new Dialog(getActivity());
@@ -539,7 +539,7 @@ public class TaskFragment extends Fragment {
 
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(eqOperationDBAdapter
-				.getOperationWithInfoQB(task_uuid, operation_type_uuid,
+				.getOperationWithInfo(task_uuid, operation_type_uuid,
 						critical_type_uuid));
 
 		// Setting the adapter to the listView
