@@ -6,6 +6,7 @@ package ru.toir.mobile.serverapi;
 import com.google.gson.annotations.Expose;
 
 /**
+ * Пользователь
  * @author Dmitriy Logachov
  *
  */

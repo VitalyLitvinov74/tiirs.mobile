@@ -3,6 +3,11 @@ package ru.toir.mobile.serverapi;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Вариант выполнения текущего шага операции
+ * @author Dmitriy Logachov
+ *
+ */
 public class Result {
 
     @Expose

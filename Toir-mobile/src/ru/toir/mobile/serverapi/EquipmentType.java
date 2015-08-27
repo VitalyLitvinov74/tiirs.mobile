@@ -4,6 +4,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Тип оборудования
+ * @author Dmitriy Logachov
+ *
+ */
 public class EquipmentType {
 
 	@Expose

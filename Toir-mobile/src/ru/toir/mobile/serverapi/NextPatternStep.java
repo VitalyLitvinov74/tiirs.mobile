@@ -1,8 +1,17 @@
 
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.annotations.Expose;
 
+/**
+ * Следующий шаг в операции {@link Step}
+ * Суть шаг, но здесь почему-то без Title
+ * @author Dmitriy Logachov
+ *
+ */
 public class NextPatternStep {
 
     @Expose
@@ -14,9 +23,9 @@ public class NextPatternStep {
     @Expose
     private Integer IsFirstStep;
     @Expose
-    private Object ImagePath;
+    private String ImagePath;
     @Expose
-    private Object Results;
+    private List<Result> Results = new ArrayList<Result>();
 
     /**
      * 
@@ -104,7 +113,7 @@ public class NextPatternStep {
      * @param ImagePath
      *     The ImagePath
      */
-    public void setImagePath(Object ImagePath) {
+    public void setImagePath(String ImagePath) {
         this.ImagePath = ImagePath;
     }
 
@@ -122,7 +131,7 @@ public class NextPatternStep {
      * @param Results
      *     The Results
      */
-    public void setResults(Object Results) {
+    public void setResults(List<Result> Results) {
         this.Results = Results;
     }
 

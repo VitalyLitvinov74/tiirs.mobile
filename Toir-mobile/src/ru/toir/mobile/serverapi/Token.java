@@ -3,6 +3,11 @@ package ru.toir.mobile.serverapi;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Токен
+ * @author Dmitriy Logachov
+ *
+ */
 public class Token {
 
 	@SerializedName("access_token")

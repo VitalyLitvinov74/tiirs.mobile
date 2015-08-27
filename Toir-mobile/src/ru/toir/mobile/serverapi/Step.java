@@ -5,22 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 
+/**
+ * Шаг операции
+ * @author Dmitriy Logachov
+ *
+ */
 public class Step {
 
     @Expose
-    private String Id;
+    protected String Id;
     @Expose
-    private String Description;
+    protected String Description;
     @Expose
-    private Integer IsLastStep;
+    protected Integer IsLastStep;
     @Expose
-    private Integer IsFirstStep;
+    protected Integer IsFirstStep;
     @Expose
-    private String ImagePath;
+    protected String ImagePath;
     @Expose
-    private String Title;
+    protected String Title;
     @Expose
-    private List<Result> Results = new ArrayList<Result>();
+    protected List<Result> Results = new ArrayList<Result>();
 
     /**
      * 

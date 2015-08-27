@@ -6,6 +6,11 @@ import java.util.Date;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 
+/**
+ * Наряд
+ * @author Dmitriy Logachov
+ *
+ */
 public class Task {
 
     @Expose

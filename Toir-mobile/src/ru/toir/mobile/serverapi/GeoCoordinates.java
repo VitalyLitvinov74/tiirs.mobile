@@ -3,6 +3,11 @@ package ru.toir.mobile.serverapi;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Представления географических координат
+ * @author Dmitriy Logachov
+ *
+ */
 public class GeoCoordinates {
 
     @Expose

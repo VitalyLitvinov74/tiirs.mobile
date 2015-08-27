@@ -4,6 +4,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Тип измерения
+ * @author Dmitriy Logachov
+ *
+ */
 public class MeasureType {
 
 	@Expose

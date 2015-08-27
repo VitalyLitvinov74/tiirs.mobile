@@ -4,6 +4,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Результат выполнения операции (вердикт)
+ * @author Dmitriy Logachov
+ *
+ */
 public class OperationResult {
 
 	@Expose

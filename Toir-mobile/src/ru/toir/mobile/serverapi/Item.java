@@ -4,7 +4,11 @@ package ru.toir.mobile.serverapi;
 import java.util.Date;
 
 import com.google.gson.annotations.Expose;
-
+/**
+ * Операция в наряде
+ * @author Dmitriy Logachov
+ *
+ */
 public class Item {
 
     @Expose

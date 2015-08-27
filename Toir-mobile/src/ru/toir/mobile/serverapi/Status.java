@@ -4,6 +4,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Текущий статус операции
+ * @author Dmitriy Logachov
+ *
+ */
 public class Status {
 
 	@Expose

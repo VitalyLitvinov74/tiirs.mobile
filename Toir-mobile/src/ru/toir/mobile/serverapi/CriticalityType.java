@@ -3,7 +3,11 @@ package ru.toir.mobile.serverapi;
 import java.util.Date;
 
 import com.google.gson.annotations.Expose;
-
+/**
+ * Типы критичности оборудования
+ * @author Dmitriy Logachov
+ *
+ */
 public class CriticalityType {
 
 	@Expose

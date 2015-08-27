@@ -5,6 +5,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Документы связанные с оборудованием
+ * @author Dmitriy Logachov
+ *
+ */
 public class Document {
 
     @Expose

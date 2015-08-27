@@ -4,6 +4,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Типы документов 
+ * @author Dmitriy Logachov
+ *
+ */
 public class DocumentType {
 
 	@Expose
