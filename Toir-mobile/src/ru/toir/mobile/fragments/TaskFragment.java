@@ -133,8 +133,10 @@ public class TaskFragment extends Fragment {
 		});
 
 		// создаём "пустой" адаптер для отображения операций над оборудованием
-		String[] operationFrom = { "_id", "equipment_title", "operation_title",
-				"operation_status_title" };
+		String[] operationFrom = { EquipmentOperationDBAdapter.Projection._ID,
+				EquipmentDBAdapter.Projection.TITLE,
+				OperationTypeDBAdapter.Projection.TITLE,
+				OperationStatusDBAdapter.Projection.TITLE };
 		int[] operationTo = { R.id.eoi_ImageStatus, R.id.eoi_Equipment,
 				R.id.eoi_Operation, R.id.eoi_Status };
 		operationAdapter = new SimpleCursorAdapter(getActivity(),
