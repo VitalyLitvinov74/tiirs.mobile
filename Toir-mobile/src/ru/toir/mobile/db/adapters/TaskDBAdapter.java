@@ -1,11 +1,15 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.utils.DataUtils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 
 public class TaskDBAdapter extends BaseDBAdapter {
 
@@ -20,6 +24,33 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_ATTEMPT_COUNT_NAME = "attempt_count";
 	public static final String FIELD_UPDATED_NAME = "updated";
 	public static final String FIELD_TASK_NAME_NAME = "task_name";
+	
+	public static final class Projection {
+		public static final String _ID = "_id";
+		public static final String UUID = "task_uuid";
+		public static final String CREATED_AT = "task_CreatedAt";
+		public static final String CHANGED_AT = "task_ChangedAt";
+		
+		public static final String USER_UUID = "task_users_uuid";
+		public static final String CLOSE_DATE = "task_close_date";
+		public static final String TASK_STATUS_UUID = "task_task_status_uuid";
+		public static final String TASK_NAME = "task_task_name";
+		
+	}
+	
+	private static Map<String, String> mProjection = new HashMap<String, String>();
+	static {
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID_NAME) + " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID_NAME) + " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT_NAME) + " AS " + Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT_NAME) + " AS " + Projection.CHANGED_AT);
+
+		mProjection.put(Projection.USER_UUID, getFullName(TABLE_NAME, FIELD_USER_UUID_NAME) + " AS " + Projection.USER_UUID);
+		mProjection.put(Projection.CLOSE_DATE, getFullName(TABLE_NAME, FIELD_CLOSE_DATE_NAME) + " AS " + Projection.CLOSE_DATE);
+		mProjection.put(Projection.TASK_STATUS_UUID, getFullName(TABLE_NAME, FIELD_TASK_STATUS_UUID_NAME) + " AS " + Projection.TASK_STATUS_UUID);
+		mProjection.put(Projection.TASK_NAME, getFullName(TABLE_NAME, FIELD_TASK_NAME_NAME) + " AS " + Projection.TASK_NAME);
+	}
+
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
 			FIELD_USER_UUID_NAME, FIELD_CREATED_AT_NAME,
@@ -255,19 +286,34 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	 * @param orderByField
 	 * @return
 	 */
-	public Cursor getTaskWithInfo(String userUuid, String statusUuid, String orderByField) {
+	public Cursor getTaskWithInfo(String userUuid, String statusUuid,
+			String orderByField) {
+		
 		Cursor cursor;
-		String query = "select * from task where users_uuid='" + userUuid + "'";
+		String sortOrder = null;
+		String paramArray[] = null;
+		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+		queryBuilder.setTables(getLeftJoinTables(TABLE_NAME,
+				TaskStatusDBAdapter.TABLE_NAME, FIELD_TASK_STATUS_UUID_NAME,
+				TaskStatusDBAdapter.FIELD_UUID_NAME));
+		
+		queryBuilder.setProjectionMap(mProjection);
 
 		if (statusUuid != null) {
-			query += " and " + TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME + "='" + statusUuid + "'";
+			queryBuilder.appendWhere(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME
+					+ "=?");
+			paramArray = new String[] { statusUuid };
 		}
-		
+
 		if (orderByField != null) {
-			query += " order by " + orderByField;
+			sortOrder = orderByField;
 		}
-		
-		cursor = mDb.rawQuery(query, null);
+
+		cursor = queryBuilder.query(mDb, null, null, paramArray, null, null,
+				sortOrder);
+
 		return cursor;
 	}
+	
 }

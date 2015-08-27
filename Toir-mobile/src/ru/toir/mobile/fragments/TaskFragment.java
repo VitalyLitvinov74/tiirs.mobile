@@ -180,8 +180,12 @@ public class TaskFragment extends Fragment {
 		});
 
 		// создаём "пустой" адаптер для отображения нарядов
-		String[] taskFrom = { "_id", "task_name", "create_date", "close_date" };
-		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create, R.id.ti_Close };
+		String[] taskFrom = { TaskDBAdapter.Projection.TASK_STATUS_UUID,
+				TaskDBAdapter.Projection.TASK_NAME,
+				TaskDBAdapter.Projection.CREATED_AT,
+				TaskDBAdapter.Projection.CLOSE_DATE };
+		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create,
+				R.id.ti_Close };
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -196,8 +200,7 @@ public class TaskFragment extends Fragment {
 				int viewId = view.getId();
 
 				if (viewId == R.id.ti_Name) {
-					((TextView) view).setText(cursor.getString(cursor
-							.getColumnIndex(TaskDBAdapter.FIELD_TASK_NAME_NAME)));
+					((TextView) view).setText(cursor.getString(columnIndex));
 					return true;
 				}
 
@@ -215,8 +218,7 @@ public class TaskFragment extends Fragment {
 
 				if (viewId == R.id.ti_ImageStatus) {
 					int image_id = R.drawable.img_status_3;
-					String taskStatus = cursor.getString(cursor
-							.getColumnIndex(TaskDBAdapter.FIELD_TASK_STATUS_UUID_NAME));
+					String taskStatus = cursor.getString(columnIndex);
 
 					if (taskStatus
 							.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED)) {
@@ -402,7 +404,7 @@ public class TaskFragment extends Fragment {
 
 			if (Level == 0) {
 				currentTaskUuid = cursor.getString(cursor
-						.getColumnIndex(TaskDBAdapter.FIELD_UUID_NAME));
+						.getColumnIndex(TaskDBAdapter.Projection.UUID));
 				FillListViewEquipment(currentTaskUuid, null, null);
 				fillSpinnersEquipment();
 				Level = 1;

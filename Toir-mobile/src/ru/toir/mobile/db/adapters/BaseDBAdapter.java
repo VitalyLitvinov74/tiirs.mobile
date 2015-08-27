@@ -49,5 +49,51 @@ public class BaseDBAdapter {
 		}
 		return changed;
 	}
+	
+	/**
+	 * Собирает выражение sql для склеивания таблиц LEFT JOIN
+	 * @param firstTable
+	 * @param secondTable
+	 * @param firstField
+	 * @param secondField
+	 * @return
+	 */
+	protected static String getLeftJoinTables(String firstTable, String secondTable,
+			String firstField, String secondField) {
+		return getJoinTables("LEFT JOIN", firstTable, secondTable, firstField,
+				secondField);
+	}
+
+	/**
+	 * Собирает выражение sql для склеивания таблиц с указанным типом склеивания
+	 * @param join
+	 * @param firstTable
+	 * @param secondTable
+	 * @param firstField
+	 * @param secondField
+	 * @return
+	 */
+	protected static String getJoinTables(String join, String firstTable,
+			String secondTable, String firstField, String secondField) {
+		StringBuilder result = new StringBuilder();
+
+		result.append(firstTable).append(' ').append(join).append(' ')
+				.append(secondTable).append(" ON ").append(firstTable)
+				.append('.').append(firstField).append('=').append(secondTable)
+				.append('.').append(secondField);
+		return result.toString();
+
+	}
+	
+	/**
+	 * Возвращает имя поля в формате table.fieldname
+	 * @param table
+	 * @param field
+	 * @return
+	 */
+	protected static String getFullName(String table, String field) {
+		return new StringBuilder().append(table).append('.').append(field)
+				.toString();
+	}
 
 }
