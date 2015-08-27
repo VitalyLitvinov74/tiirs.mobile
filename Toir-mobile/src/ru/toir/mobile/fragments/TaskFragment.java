@@ -183,9 +183,10 @@ public class TaskFragment extends Fragment {
 		String[] taskFrom = { TaskDBAdapter.Projection.TASK_STATUS_UUID,
 				TaskDBAdapter.Projection.TASK_NAME,
 				TaskDBAdapter.Projection.CREATED_AT,
-				TaskDBAdapter.Projection.CLOSE_DATE };
+				TaskDBAdapter.Projection.CLOSE_DATE,
+				TaskStatusDBAdapter.Projection.TITLE};
 		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create,
-				R.id.ti_Close };
+				R.id.ti_Close, R.id.ti_Status };
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -536,7 +537,7 @@ public class TaskFragment extends Fragment {
 
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(eqOperationDBAdapter
-				.getOperationWithInfo(task_uuid, operation_type_uuid,
+				.getOperationWithInfoQB(task_uuid, operation_type_uuid,
 						critical_type_uuid));
 
 		// Setting the adapter to the listView

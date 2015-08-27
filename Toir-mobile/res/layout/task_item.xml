@@ -63,5 +63,25 @@
         android:layout_toRightOf="@+id/ti_CloseLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <TextView
+        android:id="@+id/ti_StatusLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/ti_Close"
+        android:text="@string/status"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/ti_Status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/ti_StatusLabel"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
