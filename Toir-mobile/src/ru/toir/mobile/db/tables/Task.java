@@ -11,8 +11,8 @@ public class Task {
 	private long _id;
 	private String uuid;
 	private String users_uuid;
-	private long create_date;
-	private long modify_date;
+	private long CreatedAt;
+	private long ChangedAt;
 	private long close_date;
 	private String task_status_uuid;
 	private long attempt_send_date;
@@ -30,8 +30,8 @@ public class Task {
 		this._id = _id;
 		this.uuid = uuid;
 		this.users_uuid = users_uuid;
-		this.create_date = create_date;
-		this.modify_date = modify_date;
+		this.CreatedAt = create_date;
+		this.ChangedAt = modify_date;
 		this.close_date = close_date;
 		this.task_status_uuid = task_status_uuid;
 		this.attempt_send_date = attempt_send_date;
@@ -72,28 +72,28 @@ public class Task {
 	 * @return the create_date
 	 */
 	public long getCreate_date() {
-		return create_date;
+		return CreatedAt;
 	}
 
 	/**
 	 * @param create_date the create_date to set
 	 */
 	public void setCreate_date(long create_date) {
-		this.create_date = create_date;
+		this.CreatedAt = create_date;
 	}
 
 	/**
 	 * @return the modify_date
 	 */
 	public long getModify_date() {
-		return modify_date;
+		return ChangedAt;
 	}
 
 	/**
 	 * @param modify_date the modify_date to set
 	 */
 	public void setModify_date(long modify_date) {
-		this.modify_date = modify_date;
+		this.ChangedAt = modify_date;
 	}
 
 	/**

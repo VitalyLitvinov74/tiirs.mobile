@@ -300,11 +300,11 @@ public class TaskFragment extends Fragment {
 		sortFieldAdapter.clear();
 		sortFieldAdapter.add(new SortField("Сортировка", null));
 		sortFieldAdapter.add(new SortField("По дате создания",
-				TaskDBAdapter.FIELD_CREATE_DATE_NAME));
+				TaskDBAdapter.FIELD_CREATED_AT_NAME));
 		sortFieldAdapter.add(new SortField("По дате получения",
 				TaskDBAdapter.FIELD_CLOSE_DATE_NAME));
 		sortFieldAdapter.add(new SortField("По дате изменения",
-				TaskDBAdapter.FIELD_MODIFY_DATE_NAME));
+				TaskDBAdapter.FIELD_CHANGED_AT_NAME));
 		sortFieldAdapter.add(new SortField("По статусу отправки",
 				TaskDBAdapter.FIELD_UPDATED_NAME));
 		Spinner_type.setAdapter(sortFieldAdapter);

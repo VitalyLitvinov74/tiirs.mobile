@@ -1,28 +1,19 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.utils.DataUtils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class TaskDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class TaskDBAdapter extends BaseDBAdapter {
+
 	private TaskStatusDBAdapter taskstdbadapter;
 
 	public static final String TABLE_NAME = "task";
 
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
 	public static final String FIELD_USER_UUID_NAME = "users_uuid";
-	public static final String FIELD_CREATE_DATE_NAME = "create_date";
-	public static final String FIELD_MODIFY_DATE_NAME = "modify_date";
 	public static final String FIELD_CLOSE_DATE_NAME = "close_date";
 	public static final String FIELD_TASK_STATUS_UUID_NAME = "task_status_uuid";
 	public static final String FIELD_ATTEMPT_SEND_DATE_NAME = "attempt_send_date";
@@ -31,8 +22,8 @@ public class TaskDBAdapter {
 	public static final String FIELD_TASK_NAME_NAME = "task_name";
 
 	String[] mColumns = { FIELD__ID_NAME, FIELD_UUID_NAME,
-			FIELD_USER_UUID_NAME, FIELD_CREATE_DATE_NAME,
-			FIELD_MODIFY_DATE_NAME, FIELD_CLOSE_DATE_NAME,
+			FIELD_USER_UUID_NAME, FIELD_CREATED_AT_NAME,
+			FIELD_CHANGED_AT_NAME, FIELD_CLOSE_DATE_NAME,
 			FIELD_TASK_STATUS_UUID_NAME, FIELD_ATTEMPT_SEND_DATE_NAME,
 			FIELD_ATTEMPT_COUNT_NAME, FIELD_UPDATED_NAME, FIELD_TASK_NAME_NAME};
 
@@ -41,9 +32,7 @@ public class TaskDBAdapter {
 	 * @return OrderDBAdapter
 	 */
 	public TaskDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 
 	/**
@@ -118,8 +107,8 @@ public class TaskDBAdapter {
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID_NAME, uuid);
 		values.put(FIELD_USER_UUID_NAME, users_uuid);
-		values.put(FIELD_CREATE_DATE_NAME, create_date);
-		values.put(FIELD_MODIFY_DATE_NAME, modify_date);
+		values.put(FIELD_CREATED_AT_NAME, create_date);
+		values.put(FIELD_CHANGED_AT_NAME, modify_date);
 		values.put(FIELD_CLOSE_DATE_NAME, close_date);
 		values.put(FIELD_TASK_STATUS_UUID_NAME, task_status_uuid);
 		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
@@ -197,8 +186,8 @@ public class TaskDBAdapter {
 		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
 		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
 		item.setUsers_uuid(cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID_NAME)));
-		item.setCreate_date(cursor.getLong(cursor.getColumnIndex(FIELD_CREATE_DATE_NAME)));
-		item.setModify_date(cursor.getLong(cursor.getColumnIndex(FIELD_MODIFY_DATE_NAME)));
+		item.setCreate_date(cursor.getLong(cursor.getColumnIndex(FIELD_CREATED_AT_NAME)));
+		item.setModify_date(cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT_NAME)));
 		item.setClose_date(cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE_NAME)));
 		item.setTask_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID_NAME)));
 		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)));
