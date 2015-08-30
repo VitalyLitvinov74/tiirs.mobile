@@ -137,32 +137,20 @@ public class OperationPatternStepResultDBAdapter extends BaseDBAdapter {
 	
 	/**
 	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * @param uuid
-	 * @param title
-	 * @return
-	 */
-	public long replace(String uuid, String operation_pattern_step_uuid, String next_operation_pattern_step_uuid, String title, String measure_type_uuid, long createdAt, long changedAt) {
-		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_OPERATION_PATTERN_STEP_UUID, operation_pattern_step_uuid);
-		values.put(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID, next_operation_pattern_step_uuid);
-		values.put(FIELD_TITLE, title);
-		values.put(FIELD_MEASURE_TYPE_UUID, measure_type_uuid);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		id = mDb.replace(TABLE_NAME, null, values);
-		return id;
-	}
-
-	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param token
+	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(OperationPatternStepResult stepResult) {
-		return replace(stepResult.getUuid(), stepResult.getOperation_pattern_step_uuid(), stepResult.getNext_operation_pattern_step_uuid(), stepResult.getTitle(), stepResult.getMeasure_type_uuid(), stepResult.getCreatedAt(), stepResult.getChangedAt());
+	public long replace(OperationPatternStepResult item) {
+		long id;
+		ContentValues values = putCommonFields(item);
+
+		values.put(FIELD_OPERATION_PATTERN_STEP_UUID, item.getOperation_pattern_step_uuid());
+		values.put(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID, item.getNext_operation_pattern_step_uuid());
+		values.put(FIELD_TITLE, item.getTitle());
+		values.put(FIELD_MEASURE_TYPE_UUID, item.getMeasure_type_uuid());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 	
 	/**

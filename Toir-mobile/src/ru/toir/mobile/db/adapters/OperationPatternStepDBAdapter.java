@@ -124,36 +124,24 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 	
 	/**
 	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * @param uuid
-	 * @param title
-	 * @return
+	 * 
+	 * @param item
+	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step, String name, long createdAt, long changedAt) {
+	public long replace(OperationPatternStep item) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_OPERATION_PATTERN_UUID, operation_pattern_uuid);
-		values.put(FIELD_DESCRIPTION, description);
-		values.put(FIELD_IMAGE, image);
-		values.put(FIELD_FIRST_STEP, first_step ? 1 : 0);
-		values.put(FIELD_LAST_STEP, last_step ? 1 : 0);
-		values.put(FIELD_NAME, name);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
+		
+		values.put(FIELD_OPERATION_PATTERN_UUID, item.getOperation_pattern_uuid());
+		values.put(FIELD_DESCRIPTION, item.getDescription());
+		values.put(FIELD_IMAGE, item.getImage());
+		values.put(FIELD_FIRST_STEP, item.isFirst_step() ? 1 : 0);
+		values.put(FIELD_LAST_STEP, item.isLast_step() ? 1 : 0);
+		values.put(FIELD_NAME, item.getName());
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
 
-	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * 
-	 * @param token
-	 * @return long id столбца или -1 если не удалось добавить запись
-	 */
-	public long replace(OperationPatternStep step) {
-		return replace(step.getUuid(), step.getOperation_pattern_uuid(), step.getDescription(), step.getImage(), step.isFirst_step(), step.isLast_step(), step.getName(), step.getCreatedAt(), step.getChangedAt());
-	}
-	
 	/**
 	 * @return the mProjection
 	 */

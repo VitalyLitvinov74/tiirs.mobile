@@ -143,36 +143,23 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	}
 	
 	/**
-	 * <p>Добавляет/заменяет запись в таблице equipment_operation</p>
-	 * @param uuid
-	 * @param task_uuid
-	 * @param equipment_uuid
-	 * @param operation_type_uuid
-	 * @param operation_pattern_uuid
-	 * @param operation_status_uuid
-	 * @return
+	 * <p>Добавляет/заменяет запись в таблице</p>
+	 * 
+	 * @param item
+	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid, int operation_time, long createdAt, long changedAt) {
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_TASK_UUID, task_uuid);
-		values.put(FIELD_EQUIPMENT_UUID, equipment_uuid);
-		values.put(FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
-		values.put(FIELD_OPERATION_PATTERN_UUID, operation_pattern_uuid);
-		values.put(FIELD_OPERATION_STATUS_UUID, operation_status_uuid);
-		values.put(FIELD_OPERATION_TIME, operation_time);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		return mDb.replace(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
-	}
-	
-	/**
-	 * <p>Добавляет/заменяет запись в таблице equipment_operation</p>
-	 * @param operation
-	 * @return
-	 */
-	public long replace(EquipmentOperation operation) {
-		return replace(operation.getUuid(), operation.getTask_uuid(), operation.getEquipment_uuid(), operation.getOperation_type_uuid(), operation.getOperation_pattern_uuid(), operation.getOperation_status_uuid(), operation.getOperation_time(), operation.getCreatedAt(), operation.getChangedAt());
+	public long replace(EquipmentOperation item) {
+		long id;
+		ContentValues values = putCommonFields(item);
+
+		values.put(FIELD_TASK_UUID, item.getTask_uuid());
+		values.put(FIELD_EQUIPMENT_UUID, item.getEquipment_uuid());
+		values.put(FIELD_OPERATION_TYPE_UUID, item.getOperation_type_uuid());
+		values.put(FIELD_OPERATION_PATTERN_UUID, item.getOperation_pattern_uuid());
+		values.put(FIELD_OPERATION_STATUS_UUID, item.getOperation_status_uuid());
+		values.put(FIELD_OPERATION_TIME, item.getOperation_time());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 	
 	/**

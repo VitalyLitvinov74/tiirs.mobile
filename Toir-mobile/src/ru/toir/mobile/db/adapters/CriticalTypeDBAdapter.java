@@ -84,36 +84,18 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице critical_type
-	 * </p>
+	 * <p>Добавляет/изменяет запись в таблице critical_type</p>
 	 * 
-	 * @param uuid
-	 * @param type
-	 * @return
-	 */
-	public long replace(String uuid, int type, long createdAt, long changedAt) {
-		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_TYPE, type);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		id = mDb.replace(TABLE_NAME, null, values);
-		return id;
-	}
-
-	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице critical_type
-	 * </p>
-	 * 
-	 * @param type
+	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(CriticalType type) {
-		return replace(type.getUuid(), type.getType(), type.getCreatedAt(),
-				type.getChangedAt());
+	public long replace(CriticalType item) {
+		long id;
+		ContentValues values = putCommonFields(item);
+
+		values.put(FIELD_TYPE, item.getType());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 
 	/**

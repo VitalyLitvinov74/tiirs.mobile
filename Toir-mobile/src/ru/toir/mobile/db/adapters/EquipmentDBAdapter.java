@@ -192,63 +192,28 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/заменяет запись в таблице equipments
-	 * </p>
+	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param uuid
-	 * @param title
-	 * @param equipment_type_uuid
-	 * @param critical_type_uuid
-	 * @param start_date
-	 * @param location
-	 * @param tag_id
-	 * @param img
-	 * @param status_uuid
-	 * @param inventory_number
-	 * @param location
-	 * @return
+	 * @param item
+	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(String uuid, String title, String equipment_type_uuid,
-			String critical_type_uuid, long start_date, float latitude,
-			float longitude, String tag_id, String img, String status_uuid,
-			String inventory_number, String location, long createdAt,
-			long changedAt) {
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_TITLE, title);
-		values.put(FIELD_EQUIPMENT_TYPE_UUID, equipment_type_uuid);
-		values.put(FIELD_CRITICAL_TYPE_UUID, critical_type_uuid);
-		values.put(FIELD_START_DATE, start_date);
-		values.put(FIELD_LATITUDE, latitude);
-		values.put(FIELD_LONGITUDE, longitude);
-		values.put(FIELD_TAG_ID, tag_id);
-		values.put(FIELD_IMG, img);
-		values.put(FIELD_EQUIPMENT_STATUS_UUID, status_uuid);
-		values.put(FIELD_INVENTORY_NUMBER, inventory_number);
-		values.put(FIELD_LOCATION, location);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);
-	}
+	public long replace(Equipment item) {
+		long id;
+		ContentValues values = putCommonFields(item);
 
-	/**
-	 * <p>
-	 * Добавляет/заменяет запись в таблице equipments
-	 * </p>
-	 * 
-	 * @param equipment
-	 * @return
-	 */
-	public long replace(Equipment equipment) {
-		return replace(equipment.getUuid(), equipment.getTitle(),
-				equipment.getEquipment_type_uuid(),
-				equipment.getCritical_type_uuid(), equipment.getStart_date(),
-				equipment.getLatitude(), equipment.getLongitude(),
-				equipment.getTag_id(), equipment.getImg(),
-				equipment.getEquipmentStatus_uuid(),
-				equipment.getInventoryNumber(), equipment.getLocation(),
-				equipment.getCreatedAt(), equipment.getChangedAt());
+		values.put(FIELD_TITLE, item.getTitle());
+		values.put(FIELD_EQUIPMENT_TYPE_UUID, item.getEquipment_type_uuid());
+		values.put(FIELD_CRITICAL_TYPE_UUID, item.getCritical_type_uuid());
+		values.put(FIELD_START_DATE, item.getStart_date());
+		values.put(FIELD_LATITUDE, item.getLatitude());
+		values.put(FIELD_LONGITUDE, item.getLongitude());
+		values.put(FIELD_TAG_ID, item.getTag_id());
+		values.put(FIELD_IMG, item.getImg());
+		values.put(FIELD_EQUIPMENT_STATUS_UUID, item.getEquipmentStatus_uuid());
+		values.put(FIELD_INVENTORY_NUMBER, item.getInventoryNumber());
+		values.put(FIELD_LOCATION, item.getLocation());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 
 	/**

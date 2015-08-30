@@ -79,34 +79,23 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	
 	/**
 	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * @param uuid
-	 * @param title
-	 * @return
+	 * 
+	 * @param item
+	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(String uuid, String equipment_operation_uuid, String operation_pattern_step_result, long date, String value, long attempt_send_date, int attempt_count, boolean updated	, long createdAt, long changedAt) {
+	public long replace(MeasureValue item) {
 		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_EQUIPMENT_OPERATION_UUID, equipment_operation_uuid);
-		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT, operation_pattern_step_result);
-		values.put(FIELD_DATE, date);
-		values.put(FIELD_VALUE, value);
-		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
-		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
-		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
+		ContentValues values = putCommonFields(item);
+
+		values.put(FIELD_EQUIPMENT_OPERATION_UUID, item.getEquipment_operation_uuid());
+		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT, item.getOperation_pattern_step_result());
+		values.put(FIELD_DATE, item.getDate());
+		values.put(FIELD_VALUE, item.getValue());
+		values.put(FIELD_ATTEMPT_SEND_DATE, item.getAttempt_send_date());
+		values.put(FIELD_ATTEMPT_COUNT, item.getAttempt_count());
+		values.put(FIELD_UPDATED, item.isUpdated() == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
 
-	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * 
-	 * @param token
-	 * @return long id столбца или -1 если не удалось добавить запись
-	 */
-	public long replace(MeasureValue value) {
-		return replace(value.getUuid(), value.getEquipment_operation_uuid(), value.getOperation_pattern_step_result(), value.getDate(), value.getValue(), value.getAttempt_send_date(), value.getAttempt_count(), value.isUpdated(), value.getCreatedAt(), value.getChangedAt());
-	}
 }

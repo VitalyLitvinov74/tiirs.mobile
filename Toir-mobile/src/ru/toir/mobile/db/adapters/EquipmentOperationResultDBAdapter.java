@@ -182,41 +182,26 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	
 	/**
 	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * @param uuid
-	 * @param equipment_operation_uuid
-	 * @param start_date
-	 * @param end_date
-	 * @param operation_result_uuid
-	 * @return
+	 * 
+	 * @param item
+	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-
-	public long replace(String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, long type, long attempt_send_date, int attempt_count, boolean updated, long createdAt, long changedAt) {
+	public long replace(EquipmentOperationResult item) {
 		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_EQUIPMENT_OPERATION_UUID, equipment_operation_uuid);
-		values.put(FIELD_START_DATE, start_date);
-		values.put(FIELD_END_DATE, end_date);
-		values.put(FIELD_OPERATION_RESULT_UUID, operation_result_uuid);
-		values.put(FIELD_TYPE, type);
-		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
-		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
-		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
+		ContentValues values = putCommonFields(item);
+
+		values.put(FIELD_EQUIPMENT_OPERATION_UUID, item.getEquipment_operation_uuid());
+		values.put(FIELD_START_DATE, item.getStart_date());
+		values.put(FIELD_END_DATE, item.getEnd_date());
+		values.put(FIELD_OPERATION_RESULT_UUID, item.getOperation_result_uuid());
+		values.put(FIELD_TYPE, item.getType());
+		values.put(FIELD_ATTEMPT_SEND_DATE, item.getAttempt_send_date());
+		values.put(FIELD_ATTEMPT_COUNT, item.getAttempt_count());
+		values.put(FIELD_UPDATED, item.isUpdated() == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
 
-	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * @param result
-	 * @return
-	 */
-	public long replace(EquipmentOperationResult result) {
-		return replace(result.getUuid(), result.getEquipment_operation_uuid(), result.getStart_date(), result.getEnd_date(), result.getOperation_result_uuid(), result.getType(), result.getAttempt_send_date(), result.getAttempt_count(), result.isUpdated(), result.getCreatedAt(), result.getChangedAt());
-	}
-	
 	/**
 	 * @return the mProjection
 	 */

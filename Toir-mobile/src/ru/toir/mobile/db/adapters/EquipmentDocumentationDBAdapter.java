@@ -72,45 +72,21 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/заменяет запись в таблице equipment_operation
-	 * </p>
+	 * <p>Добавляет/заменяет запись в таблице</p>
 	 * 
-	 * @param uuid
-	 * @param task_uuid
-	 * @param equipment_uuid
-	 * @param operation_type_uuid
-	 * @param operation_pattern_uuid
-	 * @param operation_status_uuid
-	 * @return
+	 * @param item
+	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(String uuid, String equipment_uuid,
-			String documentation_type_uuid, String title, String path,
-			long createdAt, long changedAt) {
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_EQUIPMENT_UUID, equipment_uuid);
-		values.put(FIELD_DOCUMENTATION_TYPE_UUID, documentation_type_uuid);
-		values.put(FIELD_TITLE, title);
-		values.put(FIELD_PATH, path);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		return mDb.replace(TABLE_NAME, null, values);
-	}
+	public long replace(EquipmentDocumentation item) {
+		long id;
+		ContentValues values = putCommonFields(item);
 
-	/**
-	 * <p>
-	 * Добавляет/заменяет запись в таблице
-	 * </p>
-	 * 
-	 * @param document
-	 * @return
-	 */
-	public long replace(EquipmentDocumentation document) {
-		return replace(document.getUuid(), document.getEquipment_uuid(),
-				document.getDocumentation_type_uuid(), document.getTitle(),
-				document.getPath(), document.getCreatedAt(),
-				document.getChangedAt());
+		values.put(FIELD_EQUIPMENT_UUID, item.getEquipment_uuid());
+		values.put(FIELD_DOCUMENTATION_TYPE_UUID, item.getDocumentation_type_uuid());
+		values.put(FIELD_TITLE, item.getTitle());
+		values.put(FIELD_PATH, item.getPath());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 
 	/**

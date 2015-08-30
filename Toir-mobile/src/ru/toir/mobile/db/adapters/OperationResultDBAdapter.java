@@ -105,38 +105,19 @@ public class OperationResultDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице operation_type
-	 * </p>
+	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param uuid
-	 * @param title
-	 * @return
-	 */
-	public long replace(String uuid, String operation_type_uuid, String title,
-			long createdAt, long changedAt) {
-		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
-		values.put(FIELD_TITLE, title);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		id = mDb.replace(TABLE_NAME, null, values);
-		return id;
-	}
-
-	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице operation_type
-	 * </p>
-	 * 
-	 * @param token
+	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(OperationResult result) {
-		return replace(result.getUuid(), result.getOperation_type_uuid(),
-				result.getTitle(), result.getCreatedAt(), result.getChangedAt());
+	public long replace(OperationResult item) {
+		long id;
+		
+		ContentValues values = putCommonFields(item);
+		values.put(FIELD_OPERATION_TYPE_UUID, item.getOperation_type_uuid());
+		values.put(FIELD_TITLE, item.getTitle());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 
 	/**

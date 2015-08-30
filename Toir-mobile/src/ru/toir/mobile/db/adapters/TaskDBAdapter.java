@@ -111,51 +111,22 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	/**
 	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param uuid
-	 * @param users_uuid
-	 * @param create_date
-	 * @param modify_date
-	 * @param close_date
-	 * @param task_status_uuid
-	 * @param attempt_send_date
-	 * @param attempt_count
-	 * @param updated
+	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(String uuid, String users_uuid, long create_date,
-			long modify_date, long close_date, String task_status_uuid,
-			long attempt_send_date, int attempt_count, boolean updated, 
-			String task_name, long createdAt, long changedAt) {
+	public long replace(Task item) {
 		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_USER_UUID, users_uuid);
-		values.put(FIELD_CREATED_AT, create_date);
-		values.put(FIELD_CHANGED_AT, modify_date);
-		values.put(FIELD_CLOSE_DATE, close_date);
-		values.put(FIELD_TASK_STATUS_UUID, task_status_uuid);
-		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
-		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
-		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
-		values.put(FIELD_TASK_NAME, task_name);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
+		ContentValues values = putCommonFields(item);
+		
+		values.put(FIELD_USER_UUID, item.getUsers_uuid());
+		values.put(FIELD_CLOSE_DATE, item.getClose_date());
+		values.put(FIELD_TASK_STATUS_UUID, item.getTask_status_uuid());
+		values.put(FIELD_ATTEMPT_SEND_DATE, item.getAttempt_send_date());
+		values.put(FIELD_ATTEMPT_COUNT, item.getAttempt_count());
+		values.put(FIELD_UPDATED, item.isUpdated() == true ? 1 : 0);
+		values.put(FIELD_TASK_NAME, item.getTask_name());
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
-	}
-
-	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
-	 * 
-	 * @param task
-	 * @return long id столбца или -1 если не удалось добавить запись
-	 */
-	public long replace(Task task) {
-		return replace(task.getUuid(), task.getUsers_uuid(),
-				task.getCreatedAt(), task.getChangedAt(),
-				task.getClose_date(), task.getTask_status_uuid(),
-				task.getAttempt_send_date(), task.getAttempt_count(),
-				task.isUpdated(),task.getTask_name(), task.getCreatedAt(), task.getChangedAt());
 	}
 
 	public String getStatusNameByUUID(String uuid) {

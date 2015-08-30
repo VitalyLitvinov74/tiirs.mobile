@@ -110,37 +110,18 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице
-	 * </p>
+	 * <p>Добавляет/изменяет запись в таблице</p>
 	 * 
-	 * @param uuid
-	 * @param title
-	 * @return
-	 */
-	public long replace(String uuid, String title, long createdAt,
-			long changedAt) {
-		long id;
-		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID, uuid);
-		values.put(FIELD_TITLE, title);
-		values.put(FIELD_CREATED_AT, createdAt);
-		values.put(FIELD_CHANGED_AT, changedAt);
-		id = mDb.replace(TABLE_NAME, null, values);
-		return id;
-	}
-
-	/**
-	 * <p>
-	 * Добавляет/изменяет запись в таблице
-	 * </p>
-	 * 
-	 * @param status
+	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
-	public long replace(OperationStatus status) {
-		return replace(status.getUuid(), status.getTitle(),
-				status.getCreatedAt(), status.getChangedAt());
+	public long replace(OperationStatus item) {
+		long id;
+		
+		ContentValues values = putCommonFields(item);
+		values.put(FIELD_TITLE, item.getTitle());
+		id = mDb.replace(TABLE_NAME, null, values);
+		return id;
 	}
 
 	public void saveItems(ArrayList<OperationStatus> list) {

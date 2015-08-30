@@ -5,6 +5,7 @@ package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.BaseTable;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -108,7 +109,7 @@ public class BaseDBAdapter {
 	 * @param item
 	 * @return
 	 */
-	public BaseTable getItem(Cursor cursor, BaseTable item) {
+	protected BaseTable getItem(Cursor cursor, BaseTable item) {
 		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
 		item.setUuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_UUID)));
@@ -118,6 +119,19 @@ public class BaseDBAdapter {
 				.getColumnIndex(FIELD_CHANGED_AT)));
 
 		return item;
+	}
+	
+	/**
+	 * Заполняет общие поля в список значений
+	 * @param item
+	 * @return
+	 */
+	protected ContentValues putCommonFields(BaseTable item) {
+		ContentValues values = new ContentValues();
+		values.put(FIELD_UUID, item.getUuid());
+		values.put(FIELD_CREATED_AT, item.getCreatedAt());
+		values.put(FIELD_CHANGED_AT, item.getChangedAt());
+		return values;
 	}
 
 }
