@@ -17,18 +17,8 @@ public class EquipmentStatus extends BaseTable {
 	}
 
 	public EquipmentStatus() {
-
 	}
 	
-	public EquipmentStatus(long _id, String uuid, String title, int type, long createdAt, long changedAt) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.title = title;
-		this.type = type;
-		this.CreatedAt = createdAt;
-		this.ChangedAt = changedAt;
-	}
-
 	/**
 	 * @return the title
 	 */

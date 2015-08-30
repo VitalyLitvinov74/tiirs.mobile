@@ -19,18 +19,6 @@ public class EquipmentOperation extends BaseTable {
 	public EquipmentOperation() {
 	}
 
-	public EquipmentOperation(long _id, String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid, int operation_time) 
-	{
-		this._id = _id;
-		this.uuid = uuid;
-		this.task_uuid = task_uuid;
-		this.equipment_uuid = equipment_uuid;
-		this.operation_type_uuid = operation_type_uuid;
-		this.operation_pattern_uuid = operation_pattern_uuid;
-		this.operation_status_uuid = operation_status_uuid;
-		this.operation_time = operation_time;
-	}
-
 	/**
 	 * @return the task_uuid
 	 */

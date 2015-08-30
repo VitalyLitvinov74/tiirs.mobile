@@ -20,20 +20,8 @@ public class OperationPatternStep extends BaseTable {
 	 * 
 	 */
 	public OperationPatternStep() {
-
 	}
 	
-	public OperationPatternStep(long _id, String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step, String name) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.operation_pattern_uuid = operation_pattern_uuid;
-		this.description = description;
-		this.image = image;
-		this.first_step = first_step;
-		this.last_step = last_step;
-		this.name = name;		
-	}
-
 	/**
 	 * @return the operation_pattern_uuid
 	 */

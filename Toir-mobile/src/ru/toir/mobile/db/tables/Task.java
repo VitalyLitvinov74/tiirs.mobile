@@ -18,23 +18,6 @@ public class Task extends BaseTable {
 	private String task_name;
 
 	public Task() {
-
-	}
-
-	public Task(long _id, String uuid, String users_uuid, long create_date, long modify_date, 
-			long close_date, String task_status_uuid, long attempt_send_date, int attempt_count, boolean updated, String task_name) 
-	{
-		this._id = _id;
-		this.uuid = uuid;
-		this.users_uuid = users_uuid;
-		this.CreatedAt = create_date;
-		this.ChangedAt = modify_date;
-		this.close_date = close_date;
-		this.task_status_uuid = task_status_uuid;
-		this.attempt_send_date = attempt_send_date;
-		this.attempt_count = attempt_count;
-		this.updated = updated;
-		this.task_name = task_name;
 	}
 
 	/**

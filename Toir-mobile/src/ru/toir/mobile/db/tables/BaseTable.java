@@ -3,6 +3,8 @@
  */
 package ru.toir.mobile.db.tables;
 
+import java.util.Calendar;
+
 /**
  * @author Dmitriy Logachov
  *
@@ -19,6 +21,9 @@ public class BaseTable {
 	 * 
 	 */
 	public BaseTable() {
+		long date = Calendar.getInstance().getTime().getTime();
+		CreatedAt = date;
+		ChangedAt = date;
 	}
 	
 	/**

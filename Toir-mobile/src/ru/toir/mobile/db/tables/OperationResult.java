@@ -16,18 +16,8 @@ public class OperationResult extends BaseTable {
 	 * 
 	 */
 	public OperationResult() {
-
 	}
 	
-	public OperationResult(long _id, String uuid, String operation_type_uuid, String title, long createdAt, long changedAt) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.operation_type_uuid = operation_type_uuid;
-		this.title = title;
-		this.CreatedAt = createdAt;
-		this.ChangedAt = changedAt;
-	}
-
 	/**
 	 * @return the title
 	 */

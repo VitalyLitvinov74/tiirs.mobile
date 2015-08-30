@@ -18,18 +18,8 @@ public class OperationPatternStepResult extends BaseTable {
 	 * 
 	 */
 	public OperationPatternStepResult() {
-
 	}
 	
-	public OperationPatternStepResult(long _id, String uuid, String operation_pattern_step_uuid, String next_operation_pattern_step_uuid, String title, String measure_type_uuid) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.operation_pattern_step_uuid = operation_pattern_step_uuid;
-		this.next_operation_pattern_step_uuid = next_operation_pattern_step_uuid;
-		this.title = title;
-		this.measure_type_uuid = measure_type_uuid;
-	}
-
 	/**
 	 * @return the operation_pattern_step_uuid
 	 */

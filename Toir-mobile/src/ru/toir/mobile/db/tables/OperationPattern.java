@@ -16,16 +16,8 @@ public class OperationPattern extends BaseTable {
 	 * 
 	 */
 	public OperationPattern() {
-
 	}
 	
-	public OperationPattern(long _id, String uuid, String title, String operation_type_uuid) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.title = title;
-		this.operation_type_uuid = operation_type_uuid;
-	}
-
 	/**
 	 * @return the title
 	 */

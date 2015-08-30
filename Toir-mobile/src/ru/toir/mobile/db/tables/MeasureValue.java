@@ -23,18 +23,6 @@ public class MeasureValue extends BaseTable {
 	public MeasureValue() {
 	}
 	
-	public MeasureValue(long _id, String uuid, String equipment_operation_uuid, String operation_pattern_step_result, int date, String value, long attempt_send_date, int attempt_count, boolean updated) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.equipment_operation_uuid = equipment_operation_uuid;
-		this.operation_pattern_step_result = operation_pattern_step_result;
-		this.date = date;
-		this.value = value;
-		this.attempt_send_date = attempt_send_date;
-		this.attempt_count = attempt_count;
-		this.updated = updated;
-	}
-
 	/**
 	 * @return the equipment_operation_uuid
 	 */

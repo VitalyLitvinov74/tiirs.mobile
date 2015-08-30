@@ -15,17 +15,8 @@ public class CriticalType extends BaseTable {
 	 * 
 	 */
 	public CriticalType() {
-
 	}
 	
-	public CriticalType(long _id, String uuid, int type, long createdAt, long changedAt) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.type = type;
-		this.CreatedAt = createdAt;
-		this.ChangedAt = changedAt;
-	}
-
 	/**
 	 * @return the title
 	 */

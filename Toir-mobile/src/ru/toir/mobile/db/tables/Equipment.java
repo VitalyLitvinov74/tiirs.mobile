@@ -25,7 +25,6 @@ public class Equipment extends BaseTable {
 	 * 
 	 */
 	public Equipment() {
-
 	}
 	
 	/**
