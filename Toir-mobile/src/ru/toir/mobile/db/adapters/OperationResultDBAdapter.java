@@ -13,10 +13,6 @@ public class OperationResultDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_OPERATION_TYPE_UUID = "operation_type_uuid";
 	public static final String FIELD_TITLE = "title";
 
-	String[] mColumns = { FIELD__ID, FIELD_UUID,
-			FIELD_OPERATION_TYPE_UUID, FIELD_TITLE,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
-
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -49,15 +45,11 @@ public class OperationResultDBAdapter extends BaseDBAdapter {
 	 */
 	public OperationResult getItem(Cursor cursor) {
 		OperationResult item = new OperationResult();
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+
+		getItem(cursor, item);
 		item.setOperation_type_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_OPERATION_TYPE_UUID)));
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
-		item.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT)));
-		item.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT)));
 		return item;
 	}
 

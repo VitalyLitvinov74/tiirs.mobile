@@ -36,13 +36,6 @@ public class OperationPatternDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.OPERATION_TYPE_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_TYPE_UUID) + " AS " + Projection.OPERATION_TYPE_UUID);
 	}
 	
-	String[] mColumns = {
-			FIELD__ID,
-			FIELD_UUID,
-			FIELD_TITLE,
-			FIELD_OPERATION_TYPE_UUID,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
-		
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -67,8 +60,8 @@ public class OperationPatternDBAdapter extends BaseDBAdapter {
 	
 	public OperationPattern getItem(Cursor cursor) {
 		OperationPattern pattern = new OperationPattern();
-		pattern.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		pattern.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, pattern);
 		pattern.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		pattern.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID)));
 		return pattern;

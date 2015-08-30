@@ -33,9 +33,6 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.TYPE, getFullName(TABLE_NAME, FIELD_TYPE) + " AS " + Projection.TYPE);
 	}
 
-	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TYPE,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
-
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -49,14 +46,28 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 	 * @param uuid
 	 * @return
 	 */
-	public Cursor getItem(String uuid) {
+	public CriticalType getItem(String uuid) {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
-			return cursor;
+			return getItem(cursor);
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @param cursor
+	 * @return
+	 */
+	public CriticalType getItem(Cursor cursor) {
+		CriticalType type = new CriticalType();
+
+		getItem(cursor, type);
+		type.setType(cursor.getInt(cursor
+				.getColumnIndex(FIELD_TYPE)));
+		return type;
 	}
 
 	/**
@@ -120,18 +131,7 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			while (true) {
-				CriticalType item = new CriticalType();
-				item.set_id(cursor.getLong(cursor
-						.getColumnIndex(FIELD__ID)));
-				item.setUuid(cursor.getString(cursor
-						.getColumnIndex(FIELD_UUID)));
-				item.setType(cursor.getInt(cursor
-						.getColumnIndex(FIELD_TYPE)));
-				item.setCreatedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CREATED_AT)));
-				item.setChangedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CHANGED_AT)));
-				arrayList.add(item);
+				arrayList.add(getItem(cursor));
 				if (cursor.isLast())
 					break;
 				cursor.moveToNext();

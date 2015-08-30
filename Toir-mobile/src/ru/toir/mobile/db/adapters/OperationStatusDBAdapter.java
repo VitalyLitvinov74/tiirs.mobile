@@ -33,9 +33,6 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
 	}
 
-	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TITLE,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
-
 	/**
 	 * 
 	 * @param context
@@ -66,13 +63,9 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	 */
 	public OperationStatus getItem(Cursor cursor) {
 		OperationStatus item = new OperationStatus();
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, item);
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
-		item.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT)));
-		item.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT)));
 		return item;
 	}
 

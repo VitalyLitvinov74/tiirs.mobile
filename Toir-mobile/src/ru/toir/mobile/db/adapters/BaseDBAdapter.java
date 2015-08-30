@@ -4,6 +4,7 @@
 package ru.toir.mobile.db.adapters;
 
 import ru.toir.mobile.DatabaseHelper;
+import ru.toir.mobile.db.tables.BaseTable;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,8 +25,8 @@ public class BaseDBAdapter {
 	public static final String FIELD_UUID = "uuid";
 	public static final String FIELD_CREATED_AT = "CreatedAt";
 	public static final String FIELD_CHANGED_AT = "ChangedAt";
-
-
+	
+	String[] mColumns = { "*" };
 
 	/**
 	 * 
@@ -99,6 +100,24 @@ public class BaseDBAdapter {
 	protected static String getFullName(String table, String field) {
 		return new StringBuilder().append(table).append('.').append(field)
 				.toString();
+	}
+	
+	/**
+	 * Заполняет общие поля для всех объектов таблиц
+	 * @param cursor
+	 * @param item
+	 * @return
+	 */
+	public BaseTable getItem(Cursor cursor, BaseTable item) {
+		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
+		item.setUuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_UUID)));
+		item.setCreatedAt(cursor.getLong(cursor
+				.getColumnIndex(FIELD_CREATED_AT)));
+		item.setChangedAt(cursor.getLong(cursor
+				.getColumnIndex(FIELD_CHANGED_AT)));
+
+		return item;
 	}
 
 }

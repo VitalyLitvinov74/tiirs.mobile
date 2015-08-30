@@ -30,44 +30,51 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_EQUIPMENT_STATUS_UUID = "equipment_status_uuid";
 	public static final String FIELD_INVENTORY_NUMBER = "inventory_number";
 	public static final String FIELD_LOCATION = "location";
-	
+
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
 		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
-		
+		public static final String CREATED_AT = TABLE_NAME + '_'
+				+ FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_'
+				+ FIELD_CHANGED_AT;
+
 		public static final String TITLE = TABLE_NAME + '_' + FIELD_TITLE;
-		public static final String EQUIPMENT_TYPE_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_TYPE_UUID;
-		public static final String CRITICAL_TYPE_UUID = TABLE_NAME + '_' + FIELD_CRITICAL_TYPE_UUID;
-		public static final String START_DATE = TABLE_NAME + '_' + FIELD_START_DATE;
+		public static final String EQUIPMENT_TYPE_UUID = TABLE_NAME + '_'
+				+ FIELD_EQUIPMENT_TYPE_UUID;
+		public static final String CRITICAL_TYPE_UUID = TABLE_NAME + '_'
+				+ FIELD_CRITICAL_TYPE_UUID;
+		public static final String START_DATE = TABLE_NAME + '_'
+				+ FIELD_START_DATE;
 		public static final String LATITUDE = TABLE_NAME + '_' + FIELD_LATITUDE;
-		public static final String LONGITUDE = TABLE_NAME + '_' + FIELD_LONGITUDE;
+		public static final String LONGITUDE = TABLE_NAME + '_'
+				+ FIELD_LONGITUDE;
 		public static final String TAG_ID = TABLE_NAME + '_' + FIELD_TAG_ID;
 		public static final String IMG = TABLE_NAME + '_' + FIELD_IMG;
-		public static final String EQUIPMENT_STATUS_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_STATUS_UUID;
-		public static final String INVENTORY_NUMBER = TABLE_NAME + '_' + FIELD_INVENTORY_NUMBER;
+		public static final String EQUIPMENT_STATUS_UUID = TABLE_NAME + '_'
+				+ FIELD_EQUIPMENT_STATUS_UUID;
+		public static final String INVENTORY_NUMBER = TABLE_NAME + '_'
+				+ FIELD_INVENTORY_NUMBER;
 		public static final String LOCATION = TABLE_NAME + '_' + FIELD_LOCATION;
-		
+
 	}
-	
+
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID)
+				+ " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID)
+				+ " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT,
+				getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS "
+						+ Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT,
+				getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS "
+						+ Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE)
+				+ " AS " + Projection.TITLE);
 	}
-
-	private static String mColumns[] = { FIELD__ID, FIELD_UUID,
-			FIELD_TITLE, FIELD_EQUIPMENT_TYPE_UUID,
-			FIELD_CRITICAL_TYPE_UUID, FIELD_START_DATE,
-			FIELD_LATITUDE, FIELD_LONGITUDE, FIELD_TAG_ID,
-			FIELD_IMG, FIELD_EQUIPMENT_STATUS_UUID,
-			FIELD_INVENTORY_NUMBER, FIELD_LOCATION,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
 
 	/**
 	 * @param context
@@ -92,21 +99,18 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 
 		if (type.equals("") && !critical_type.equals("")) {
 			cursor.close();
-			cursor = mDb.query(TABLE_NAME, mColumns,
-					FIELD_CRITICAL_TYPE_UUID + "=?",
-					new String[] { critical_type }, null, null, null);
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_CRITICAL_TYPE_UUID
+					+ "=?", new String[] { critical_type }, null, null, null);
 		}
 		if (!type.equals("") && critical_type.equals("")) {
 			cursor.close();
-			cursor = mDb.query(TABLE_NAME, mColumns,
-					FIELD_EQUIPMENT_TYPE_UUID + "=?",
-					new String[] { type }, null, null, null);
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_TYPE_UUID
+					+ "=?", new String[] { type }, null, null, null);
 		}
 		if (!type.equals("") && !critical_type.equals("")) {
 			cursor.close();
-			cursor = mDb.query(TABLE_NAME, mColumns,
-					FIELD_CRITICAL_TYPE_UUID + "=? AND "
-							+ FIELD_EQUIPMENT_TYPE_UUID + "=?",
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_CRITICAL_TYPE_UUID
+					+ "=? AND " + FIELD_EQUIPMENT_TYPE_UUID + "=?",
 					new String[] { critical_type, type }, null, null, null);
 		}
 		if (cursor.getCount() > 0) {
@@ -165,35 +169,24 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 	 */
 	public Equipment getItem(Cursor cursor) {
 		Equipment equipment = new Equipment();
-		equipment.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		equipment.setUuid(cursor.getString(cursor
-				.getColumnIndex(FIELD_UUID)));
-		equipment.setTitle(cursor.getString(cursor
-				.getColumnIndex(FIELD_TITLE)));
+		getItem(cursor, equipment);
+		equipment.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		equipment.setEquipment_type_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID)));
 		equipment.setCritical_type_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_CRITICAL_TYPE_UUID)));
 		equipment.setStart_date(cursor.getLong(cursor
 				.getColumnIndex(FIELD_START_DATE)));
-		equipment.setLatitude(cursor.getFloat(cursor
-				.getColumnIndex(FIELD_LATITUDE)));
+		equipment.setLatitude(cursor.getFloat(cursor.getColumnIndex(FIELD_LATITUDE)));
 		equipment.setLongitude(cursor.getFloat(cursor
 				.getColumnIndex(FIELD_LONGITUDE)));
-		equipment.setTag_id(cursor.getString(cursor
-				.getColumnIndex(FIELD_TAG_ID)));
-		equipment
-				.setImg(cursor.getString(cursor.getColumnIndex(FIELD_IMG)));
+		equipment.setTag_id(cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID)));
+		equipment.setImg(cursor.getString(cursor.getColumnIndex(FIELD_IMG)));
 		equipment.setEquipmentStatus_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_EQUIPMENT_STATUS_UUID)));
 		equipment.setInventoryNumber(cursor.getString(cursor
 				.getColumnIndex(FIELD_INVENTORY_NUMBER)));
-		equipment.setLocation(cursor.getString(cursor
-				.getColumnIndex(FIELD_LOCATION)));
-		equipment.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT)));
-		equipment.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT)));
+		equipment.setLocation(cursor.getString(cursor.getColumnIndex(FIELD_LOCATION)));
 
 		return equipment;
 	}
@@ -233,10 +226,8 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		values.put(EquipmentDBAdapter.FIELD_LONGITUDE, longitude);
 		values.put(EquipmentDBAdapter.FIELD_TAG_ID, tag_id);
 		values.put(EquipmentDBAdapter.FIELD_IMG, img);
-		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_STATUS_UUID,
-				status_uuid);
-		values.put(EquipmentDBAdapter.FIELD_INVENTORY_NUMBER,
-				inventory_number);
+		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_STATUS_UUID, status_uuid);
+		values.put(EquipmentDBAdapter.FIELD_INVENTORY_NUMBER, inventory_number);
 		values.put(EquipmentDBAdapter.FIELD_LOCATION, location);
 		values.put(FIELD_CREATED_AT, createdAt);
 		values.put(FIELD_CHANGED_AT, changedAt);
@@ -331,10 +322,8 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 				new String[] { uuid }, null, null, null);
 		if (cursor.getColumnCount() > 0) {
 			cursor.moveToFirst();
-			return cursor.getFloat(cursor.getColumnIndex(FIELD_LATITUDE))
-					+ " "
-					+ cursor.getFloat(cursor
-							.getColumnIndex(FIELD_LONGITUDE));
+			return cursor.getFloat(cursor.getColumnIndex(FIELD_LATITUDE)) + " "
+					+ cursor.getFloat(cursor.getColumnIndex(FIELD_LONGITUDE));
 		} else
 			return "неизвестны";
 	}

@@ -41,15 +41,6 @@ public class OperationPatternStepResultDBAdapter extends BaseDBAdapter {
 		
 	}
 	
-	String[] mColumns = {
-			FIELD__ID,
-			FIELD_UUID,
-			FIELD_OPERATION_PATTERN_STEP_UUID,
-			FIELD_NEXT_OPERATION_PATTERN_STEP_UUID,
-			FIELD_TITLE,
-			FIELD_MEASURE_TYPE_UUID,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT};
-		
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -79,8 +70,8 @@ public class OperationPatternStepResultDBAdapter extends BaseDBAdapter {
 	 */
 	public OperationPatternStepResult getItem(Cursor cursor) {
 		OperationPatternStepResult result = new OperationPatternStepResult();
-		result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, result);
 		result.setOperation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_UUID)));
 		result.setNext_operation_pattern_step_uuid(cursor.getString(cursor.getColumnIndex(FIELD_NEXT_OPERATION_PATTERN_STEP_UUID)));
 		result.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));

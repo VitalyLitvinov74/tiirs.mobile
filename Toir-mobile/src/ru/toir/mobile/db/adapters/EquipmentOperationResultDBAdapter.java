@@ -61,23 +61,6 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 		
 	}
 
-
-	String[] mColumns = {
-			FIELD__ID,
-			FIELD_UUID,
-			FIELD_EQUIPMENT_OPERATION_UUID,
-			FIELD_START_DATE,
-			FIELD_END_DATE,
-			FIELD_OPERATION_RESULT_UUID,
-			FIELD_TYPE,
-			FIELD_ATTEMPT_SEND_DATE,
-			FIELD_ATTEMPT_COUNT,
-			FIELD_UPDATED,
-			FIELD_CREATED_AT,
-			FIELD_CHANGED_AT
-		};
-
-
 	/**
 	 * @param context
 	 * @return EquipmentOpDBAdapter
@@ -156,7 +139,7 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?", new String[]{uuid}, null, null, null);
 		if (cursor.moveToFirst()) {
-			return getEquipmentOperationResult(cursor);
+			return getItem(cursor);
 		} else {
 			return null;
 		}
@@ -171,7 +154,7 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID + "=?", new String[]{operationUuid}, null, null, null);
 		if (cursor.moveToFirst()) {
-			return getEquipmentOperationResult(cursor);
+			return getItem(cursor);
 		} else {
 			return null;
 		}
@@ -182,10 +165,10 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	 * @param cursor
 	 * @return EquipmentOperationResult
 	 */
-	static EquipmentOperationResult getEquipmentOperationResult(Cursor cursor) {
+	public EquipmentOperationResult getItem(Cursor cursor) {
 		EquipmentOperationResult result = new EquipmentOperationResult();
-		result.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		result.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, result);
 		result.setEquipment_operation_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID)));
 		result.setStart_date(cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE)));
 		result.setEnd_date(cursor.getLong(cursor.getColumnIndex(FIELD_END_DATE)));

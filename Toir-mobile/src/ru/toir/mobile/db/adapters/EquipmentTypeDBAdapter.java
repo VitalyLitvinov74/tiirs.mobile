@@ -12,9 +12,6 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 
 	public static final String FIELD_TITLE = "title";
 
-	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TITLE,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
-
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -40,13 +37,9 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 
 	public EquipmentType getItem(Cursor cursor) {
 		EquipmentType item = new EquipmentType();
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, item);
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
-		item.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT)));
-		item.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT)));
 		return item;
 	}
 

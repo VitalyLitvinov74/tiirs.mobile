@@ -22,11 +22,6 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_PATH = "path";
 
-	String[] mColumns = { FIELD__ID, FIELD_UUID,
-			FIELD_EQUIPMENT_UUID, FIELD_DOCUMENTATION_TYPE_UUID,
-			FIELD_TITLE, FIELD_PATH, FIELD_CREATED_AT,
-			FIELD_CHANGED_AT };
-
 	/**
 	 * 
 	 * @param context
@@ -61,12 +56,10 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 	 * @param cursor
 	 * @return
 	 */
-	public static EquipmentDocumentation getItem(Cursor cursor) {
+	public EquipmentDocumentation getItem(Cursor cursor) {
 		EquipmentDocumentation item = new EquipmentDocumentation();
 
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		item.setUuid(cursor.getString(cursor
-				.getColumnIndex(FIELD_UUID)));
+		getItem(cursor, item);
 		item.setEquipment_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_EQUIPMENT_UUID)));
 		item.setDocumentation_type_uuid(cursor.getString(cursor
@@ -75,10 +68,6 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 				.getColumnIndex(FIELD_TITLE)));
 		item.setPath(cursor.getString(cursor
 				.getColumnIndex(FIELD_PATH)));
-		item.setCreatedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CREATED_AT)));
-		item.setChangedAt(cursor.getLong(cursor
-				.getColumnIndex(FIELD_CHANGED_AT)));
 		return item;
 	}
 

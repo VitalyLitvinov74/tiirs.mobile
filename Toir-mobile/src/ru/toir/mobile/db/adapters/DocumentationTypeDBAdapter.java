@@ -12,9 +12,6 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 
 	public static final String FIELD_TITLE = "title";
 
-	String[] mColumns = { FIELD__ID, FIELD_UUID, FIELD_TITLE,
-			FIELD_CREATED_AT, FIELD_CHANGED_AT };
-
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -36,6 +33,14 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 			return cursor;
 		}
 		return null;
+	}
+	
+	public DocumentationType getItem(Cursor cursor) {
+		DocumentationType type = new DocumentationType();
+
+		getItem(cursor, type);
+		type.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
+		return type;
 	}
 
 	/**
@@ -100,19 +105,7 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			while (true) {
-				DocumentationType item = new DocumentationType();
-				item.set_id(cursor.getLong(cursor
-						.getColumnIndex(FIELD__ID)));
-				item.setUuid(cursor.getString(cursor
-						.getColumnIndex(FIELD_UUID)));
-				item.setTitle(cursor.getString(cursor
-						.getColumnIndex(FIELD_TITLE)));
-				item.setCreatedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CREATED_AT)));
-				item.setChangedAt(cursor.getLong(cursor
-						.getColumnIndex(FIELD_CHANGED_AT)));
-
-				arrayList.add(item);
+				arrayList.add(getItem(cursor));
 				if (cursor.isLast())
 					break;
 				cursor.moveToNext();

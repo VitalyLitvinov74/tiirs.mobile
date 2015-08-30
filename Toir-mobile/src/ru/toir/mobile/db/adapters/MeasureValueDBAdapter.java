@@ -18,19 +18,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_ATTEMPT_COUNT = "attempt_count";
 	public static final String FIELD_UPDATED = "updated";
 	
-	String[] mColumns = {
-			FIELD__ID,
-			FIELD_UUID,
-			FIELD_EQUIPMENT_OPERATION_UUID,
-			FIELD_OPERATION_PATTERN_STEP_RESULT,
-			FIELD_DATE,
-			FIELD_VALUE,
-			FIELD_ATTEMPT_SEND_DATE,
-			FIELD_ATTEMPT_COUNT,
-			FIELD_UPDATED,
-			FIELD_CREATED_AT,
-			FIELD_CHANGED_AT};
-		
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -48,7 +35,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?", new String[]{uuid}, null, null, null);
 		if (cursor.moveToFirst()) {
-			return getMeasureValue(cursor);
+			return getItem(cursor);
 		} else {
 			return null;
 		}
@@ -65,7 +52,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID + "=?", new String[]{operationUuid}, null, null, null);
 		if (cursor.moveToFirst()) {
 			do {
-				arrayList.add(getMeasureValue(cursor));
+				arrayList.add(getItem(cursor));
 			} while(cursor.moveToNext());
 		}
 		return arrayList;
@@ -76,17 +63,17 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	 * @param cursor
 	 * @return
 	 */
-	public static MeasureValue getMeasureValue(Cursor cursor) {
-		MeasureValue item = null;
-		item = new MeasureValue(cursor.getLong(cursor.getColumnIndex(FIELD__ID)),
-				cursor.getString(cursor.getColumnIndex(FIELD_UUID)),
-				cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID)),
-				cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_DATE)),
-				cursor.getString(cursor.getColumnIndex(FIELD_VALUE)),
-				cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 1 ? true : false);
+	public MeasureValue getItem(Cursor cursor) {
+		MeasureValue item = new MeasureValue();
+		
+		getItem(cursor, item);
+		item.setEquipment_operation_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID)));
+		item.setOperation_pattern_step_result(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT)));
+		item.setDate(cursor.getInt(cursor.getColumnIndex(FIELD_DATE)));
+		item.setValue(cursor.getString(cursor.getColumnIndex(FIELD_VALUE)));
+		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));
+		item.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT)));
+		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 1 ? true : false);
 		return item;
 	}
 	

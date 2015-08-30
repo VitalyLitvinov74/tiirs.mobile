@@ -50,13 +50,6 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.TASK_NAME, getFullName(TABLE_NAME, FIELD_TASK_NAME) + " AS " + Projection.TASK_NAME);
 	}
 
-
-	String[] mColumns = { FIELD__ID, FIELD_UUID,
-			FIELD_USER_UUID, FIELD_CREATED_AT,
-			FIELD_CHANGED_AT, FIELD_CLOSE_DATE,
-			FIELD_TASK_STATUS_UUID, FIELD_ATTEMPT_SEND_DATE,
-			FIELD_ATTEMPT_COUNT, FIELD_UPDATED, FIELD_TASK_NAME};
-
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
@@ -211,13 +204,11 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	 * @param cursor
 	 * @return
 	 */
-	public static Task getItem(Cursor cursor) {
+	public Task getItem(Cursor cursor) {
 		Task item = new Task();
-		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, item);
 		item.setUsers_uuid(cursor.getString(cursor.getColumnIndex(FIELD_USER_UUID)));
-		item.setCreatedAt(cursor.getLong(cursor.getColumnIndex(FIELD_CREATED_AT)));
-		item.setChangedAt(cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT)));
 		item.setClose_date(cursor.getLong(cursor.getColumnIndex(FIELD_CLOSE_DATE)));
 		item.setTask_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_STATUS_UUID)));
 		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));

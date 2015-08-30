@@ -57,19 +57,6 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.OPERATION_TIME, getFullName(TABLE_NAME, FIELD_OPERATION_TIME) + " AS " + Projection.OPERATION_TIME);
 	}
 	
-	String[] mColumns = {
-			FIELD__ID,
-			FIELD_UUID,
-			FIELD_TASK_UUID,
-			FIELD_EQUIPMENT_UUID,
-			FIELD_OPERATION_TYPE_UUID,
-			FIELD_OPERATION_PATTERN_UUID,
-			FIELD_OPERATION_STATUS_UUID,
-			FIELD_OPERATION_TIME,
-			FIELD_CREATED_AT,
-			FIELD_CHANGED_AT
-			};
-
 	/**
 	 * @param context
 	 * @return EquipmentOpDBAdapter
@@ -230,8 +217,8 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 */
 	public EquipmentOperation getItem(Cursor cursor) {
 		EquipmentOperation equipmentOperation = new EquipmentOperation();
-		equipmentOperation.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID)));
-		equipmentOperation.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID)));
+		
+		getItem(cursor, equipmentOperation);
 		equipmentOperation.setTask_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID)));
 		equipmentOperation.setEquipment_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID)));
 		equipmentOperation.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID)));
