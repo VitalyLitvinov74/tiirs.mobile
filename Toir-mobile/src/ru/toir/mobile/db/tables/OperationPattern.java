@@ -7,9 +7,8 @@ package ru.toir.mobile.db.tables;
  * @author Dmitriy Logachov
  *
  */
-public class OperationPattern {
-	private long _id;
-	private String uuid;
+public class OperationPattern extends BaseTable {
+
 	private String title;
 	private String operation_type_uuid;
 	
@@ -25,20 +24,6 @@ public class OperationPattern {
 		this.uuid = uuid;
 		this.title = title;
 		this.operation_type_uuid = operation_type_uuid;
-	}
-
-	/**
-	 * @return the uuid
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-
-	/**
-	 * @param uuid the uuid to set
-	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	/**
@@ -67,20 +52,6 @@ public class OperationPattern {
 	 */
 	public void setOperation_type_uuid(String operation_type_uuid) {
 		this.operation_type_uuid = operation_type_uuid;
-	}
-
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void set_id(long _id) {
-		this._id = _id;
 	}
 
 }

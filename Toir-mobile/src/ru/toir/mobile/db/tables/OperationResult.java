@@ -7,7 +7,7 @@ package ru.toir.mobile.db.tables;
  * @author Dmitriy Logachov
  *
  */
-public class OperationResult extends BaseTable{
+public class OperationResult extends BaseTable {
 
 	private String operation_type_uuid;
 	private String title;

@@ -7,9 +7,8 @@ package ru.toir.mobile.db.tables;
  * @author Dmitriy Logachov
  *
  */
-public class MeasureValue {
-	private long _id;
-	private String uuid;
+public class MeasureValue extends BaseTable {
+
 	private String equipment_operation_uuid;
 	private String operation_pattern_step_result;
 	private long date;
@@ -34,34 +33,6 @@ public class MeasureValue {
 		this.attempt_send_date = attempt_send_date;
 		this.attempt_count = attempt_count;
 		this.updated = updated;
-	}
-
-	/**
-	 * @return the _id
-	 */
-	public long get_id() {
-		return _id;
-	}
-
-	/**
-	 * @param _id the _id to set
-	 */
-	public void set_id(long _id) {
-		this._id = _id;
-	}
-
-	/**
-	 * @return the uuid
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-
-	/**
-	 * @param uuid the uuid to set
-	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	/**

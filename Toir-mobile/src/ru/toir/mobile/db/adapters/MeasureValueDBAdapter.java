@@ -1,50 +1,42 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
-
-import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.db.tables.MeasureValue;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-public class MeasureValueDBAdapter {
-	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
-	private final Context mContext;
+public class MeasureValueDBAdapter extends BaseDBAdapter {
 
 	public static final String TABLE_NAME = "measure_value";
 	
-	public static final String FIELD__ID_NAME = "_id";
-	public static final String FIELD_UUID_NAME = "uuid";
-	public static final String FIELD_EQUIPMENT_OPERATION_UUID_NAME = "equipment_operation_uuid";
-	public static final String FIELD_OPERATION_PATTERN_STEP_RESULT_NAME = "operation_pattern_step_result";
-	public static final String FIELD_DATE_NAME = "date";
-	public static final String FIELD_VALUE_NAME = "value";
-	public static final String FIELD_ATTEMPT_SEND_DATE_NAME = "attempt_send_date";
-	public static final String FIELD_ATTEMPT_COUNT_NAME = "attempt_count";
-	public static final String FIELD_UPDATED_NAME = "updated";
+	public static final String FIELD_EQUIPMENT_OPERATION_UUID = "equipment_operation_uuid";
+	public static final String FIELD_OPERATION_PATTERN_STEP_RESULT = "operation_pattern_step_result";
+	public static final String FIELD_DATE = "date";
+	public static final String FIELD_VALUE = "value";
+	public static final String FIELD_ATTEMPT_SEND_DATE = "attempt_send_date";
+	public static final String FIELD_ATTEMPT_COUNT = "attempt_count";
+	public static final String FIELD_UPDATED = "updated";
 	
 	String[] mColumns = {
-			FIELD__ID_NAME,
-			FIELD_UUID_NAME,
-			FIELD_EQUIPMENT_OPERATION_UUID_NAME,
-			FIELD_OPERATION_PATTERN_STEP_RESULT_NAME,
-			FIELD_DATE_NAME,
-			FIELD_VALUE_NAME,
-			FIELD_ATTEMPT_SEND_DATE_NAME,
-			FIELD_ATTEMPT_COUNT_NAME,
-			FIELD_UPDATED_NAME};
+			FIELD__ID,
+			FIELD_UUID,
+			FIELD_EQUIPMENT_OPERATION_UUID,
+			FIELD_OPERATION_PATTERN_STEP_RESULT,
+			FIELD_DATE,
+			FIELD_VALUE,
+			FIELD_ATTEMPT_SEND_DATE,
+			FIELD_ATTEMPT_COUNT,
+			FIELD_UPDATED,
+			FIELD_CREATED_AT,
+			FIELD_CHANGED_AT};
 		
 	/**
 	 * @param context
 	 * @return OrderDBAdapter
 	 */
 	public MeasureValueDBAdapter(Context context) {
-		mContext = context;
-		mDbHelper = DatabaseHelper.getInstance(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		super(context, TABLE_NAME);
 	}
 	
 	/**
@@ -54,7 +46,7 @@ public class MeasureValueDBAdapter {
 	 */
 	public MeasureValue getItem(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?", new String[]{uuid}, null, null, null);
 		if (cursor.moveToFirst()) {
 			return getMeasureValue(cursor);
 		} else {
@@ -70,7 +62,7 @@ public class MeasureValueDBAdapter {
 	public ArrayList<MeasureValue> getItems(String operationUuid) {
 		Cursor cursor;
 		ArrayList<MeasureValue> arrayList = new ArrayList<MeasureValue>();
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID_NAME + "=?", new String[]{operationUuid}, null, null, null);
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID + "=?", new String[]{operationUuid}, null, null, null);
 		if (cursor.moveToFirst()) {
 			do {
 				arrayList.add(getMeasureValue(cursor));
@@ -86,15 +78,15 @@ public class MeasureValueDBAdapter {
 	 */
 	public static MeasureValue getMeasureValue(Cursor cursor) {
 		MeasureValue item = null;
-		item = new MeasureValue(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT_NAME)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_DATE_NAME)),
-				cursor.getString(cursor.getColumnIndex(FIELD_VALUE_NAME)),
-				cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE_NAME)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT_NAME)),
-				cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED_NAME)) == 1 ? true : false);
+		item = new MeasureValue(cursor.getLong(cursor.getColumnIndex(FIELD__ID)),
+				cursor.getString(cursor.getColumnIndex(FIELD_UUID)),
+				cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID)),
+				cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT)),
+				cursor.getInt(cursor.getColumnIndex(FIELD_DATE)),
+				cursor.getString(cursor.getColumnIndex(FIELD_VALUE)),
+				cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)),
+				cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT)),
+				cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 1 ? true : false);
 		return item;
 	}
 	
@@ -107,14 +99,14 @@ public class MeasureValueDBAdapter {
 	public long replace(String uuid, String equipment_operation_uuid, String operation_pattern_step_result, long date, String value, long attempt_send_date, int attempt_count, boolean updated) {
 		long id;
 		ContentValues values = new ContentValues();
-		values.put(FIELD_UUID_NAME, uuid);
-		values.put(FIELD_EQUIPMENT_OPERATION_UUID_NAME, equipment_operation_uuid);
-		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT_NAME, operation_pattern_step_result);
-		values.put(FIELD_DATE_NAME, date);
-		values.put(FIELD_VALUE_NAME, value);
-		values.put(FIELD_ATTEMPT_SEND_DATE_NAME, attempt_send_date);
-		values.put(FIELD_ATTEMPT_COUNT_NAME, attempt_count);
-		values.put(FIELD_UPDATED_NAME, updated == true ? 1 : 0);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_EQUIPMENT_OPERATION_UUID, equipment_operation_uuid);
+		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT, operation_pattern_step_result);
+		values.put(FIELD_DATE, date);
+		values.put(FIELD_VALUE, value);
+		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
+		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
+		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
