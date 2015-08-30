@@ -83,7 +83,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String equipment_operation_uuid, String operation_pattern_step_result, long date, String value, long attempt_send_date, int attempt_count, boolean updated) {
+	public long replace(String uuid, String equipment_operation_uuid, String operation_pattern_step_result, long date, String value, long attempt_send_date, int attempt_count, boolean updated	, long createdAt, long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID, uuid);
@@ -94,6 +94,8 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
 		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
 		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -105,6 +107,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(MeasureValue value) {
-		return replace(value.getUuid(), value.getEquipment_operation_uuid(), value.getOperation_pattern_step_result(), value.getDate(), value.getValue(), value.getAttempt_send_date(), value.getAttempt_count(), value.isUpdated());
+		return replace(value.getUuid(), value.getEquipment_operation_uuid(), value.getOperation_pattern_step_result(), value.getDate(), value.getValue(), value.getAttempt_send_date(), value.getAttempt_count(), value.isUpdated(), value.getCreatedAt(), value.getChangedAt());
 	}
 }

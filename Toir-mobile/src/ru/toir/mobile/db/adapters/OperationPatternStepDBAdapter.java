@@ -128,7 +128,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step, String name) {
+	public long replace(String uuid, String operation_pattern_uuid, String description, String image, boolean first_step, boolean last_step, String name, long createdAt, long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID, uuid);
@@ -138,6 +138,8 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_FIRST_STEP, first_step ? 1 : 0);
 		values.put(FIELD_LAST_STEP, last_step ? 1 : 0);
 		values.put(FIELD_NAME, name);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -149,7 +151,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(OperationPatternStep step) {
-		return replace(step.getUuid(), step.getOperation_pattern_uuid(), step.getDescription(), step.getImage(), step.isFirst_step(), step.isLast_step(), step.getName());
+		return replace(step.getUuid(), step.getOperation_pattern_uuid(), step.getDescription(), step.getImage(), step.isFirst_step(), step.isLast_step(), step.getName(), step.getCreatedAt(), step.getChangedAt());
 	}
 	
 	/**

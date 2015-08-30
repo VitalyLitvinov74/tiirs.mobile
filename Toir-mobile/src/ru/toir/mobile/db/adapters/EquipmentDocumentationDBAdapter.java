@@ -88,14 +88,11 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 			String documentation_type_uuid, String title, String path,
 			long createdAt, long changedAt) {
 		ContentValues values = new ContentValues();
-		values.put(EquipmentDocumentationDBAdapter.FIELD_UUID, uuid);
-		values.put(EquipmentDocumentationDBAdapter.FIELD_EQUIPMENT_UUID,
-				equipment_uuid);
-		values.put(
-				EquipmentDocumentationDBAdapter.FIELD_DOCUMENTATION_TYPE_UUID,
-				documentation_type_uuid);
-		values.put(EquipmentDocumentationDBAdapter.FIELD_TITLE, title);
-		values.put(EquipmentDocumentationDBAdapter.FIELD_PATH, path);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_EQUIPMENT_UUID, equipment_uuid);
+		values.put(FIELD_DOCUMENTATION_TYPE_UUID, documentation_type_uuid);
+		values.put(FIELD_TITLE, title);
+		values.put(FIELD_PATH, path);
 		values.put(FIELD_CREATED_AT, createdAt);
 		values.put(FIELD_CHANGED_AT, changedAt);
 		return mDb.replace(TABLE_NAME, null, values);

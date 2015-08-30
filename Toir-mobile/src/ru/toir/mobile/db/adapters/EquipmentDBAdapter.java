@@ -215,20 +215,18 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 			String inventory_number, String location, long createdAt,
 			long changedAt) {
 		ContentValues values = new ContentValues();
-		values.put(EquipmentDBAdapter.FIELD_UUID, uuid);
-		values.put(EquipmentDBAdapter.FIELD_TITLE, title);
-		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_TYPE_UUID,
-				equipment_type_uuid);
-		values.put(EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID,
-				critical_type_uuid);
-		values.put(EquipmentDBAdapter.FIELD_START_DATE, start_date);
-		values.put(EquipmentDBAdapter.FIELD_LATITUDE, latitude);
-		values.put(EquipmentDBAdapter.FIELD_LONGITUDE, longitude);
-		values.put(EquipmentDBAdapter.FIELD_TAG_ID, tag_id);
-		values.put(EquipmentDBAdapter.FIELD_IMG, img);
-		values.put(EquipmentDBAdapter.FIELD_EQUIPMENT_STATUS_UUID, status_uuid);
-		values.put(EquipmentDBAdapter.FIELD_INVENTORY_NUMBER, inventory_number);
-		values.put(EquipmentDBAdapter.FIELD_LOCATION, location);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_TITLE, title);
+		values.put(FIELD_EQUIPMENT_TYPE_UUID, equipment_type_uuid);
+		values.put(FIELD_CRITICAL_TYPE_UUID, critical_type_uuid);
+		values.put(FIELD_START_DATE, start_date);
+		values.put(FIELD_LATITUDE, latitude);
+		values.put(FIELD_LONGITUDE, longitude);
+		values.put(FIELD_TAG_ID, tag_id);
+		values.put(FIELD_IMG, img);
+		values.put(FIELD_EQUIPMENT_STATUS_UUID, status_uuid);
+		values.put(FIELD_INVENTORY_NUMBER, inventory_number);
+		values.put(FIELD_LOCATION, location);
 		values.put(FIELD_CREATED_AT, createdAt);
 		values.put(FIELD_CHANGED_AT, changedAt);
 		return mDb.replace(EquipmentDBAdapter.TABLE_NAME, null, values);

@@ -125,7 +125,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	public long replace(String uuid, String users_uuid, long create_date,
 			long modify_date, long close_date, String task_status_uuid,
 			long attempt_send_date, int attempt_count, boolean updated, 
-			String task_name) {
+			String task_name, long createdAt, long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID, uuid);
@@ -137,7 +137,9 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
 		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
 		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
-		values.put(FIELD_TASK_NAME, task_name);		
+		values.put(FIELD_TASK_NAME, task_name);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -153,7 +155,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 				task.getCreatedAt(), task.getChangedAt(),
 				task.getClose_date(), task.getTask_status_uuid(),
 				task.getAttempt_send_date(), task.getAttempt_count(),
-				task.isUpdated(),task.getTask_name());
+				task.isUpdated(),task.getTask_name(), task.getCreatedAt(), task.getChangedAt());
 	}
 
 	public String getStatusNameByUUID(String uuid) {

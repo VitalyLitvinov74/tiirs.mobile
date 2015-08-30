@@ -190,7 +190,7 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	 * @return
 	 */
 
-	public long replace(String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, long type, long attempt_send_date, int attempt_count, boolean updated) {
+	public long replace(String uuid, String equipment_operation_uuid, long start_date, long end_date, String operation_result_uuid, long type, long attempt_send_date, int attempt_count, boolean updated, long createdAt, long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID, uuid);
@@ -202,6 +202,8 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_ATTEMPT_SEND_DATE, attempt_send_date);
 		values.put(FIELD_ATTEMPT_COUNT, attempt_count);
 		values.put(FIELD_UPDATED, updated == true ? 1 : 0);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -212,7 +214,7 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	 * @return
 	 */
 	public long replace(EquipmentOperationResult result) {
-		return replace(result.getUuid(), result.getEquipment_operation_uuid(), result.getStart_date(), result.getEnd_date(), result.getOperation_result_uuid(), result.getType(), result.getAttempt_send_date(), result.getAttempt_count(), result.isUpdated());
+		return replace(result.getUuid(), result.getEquipment_operation_uuid(), result.getStart_date(), result.getEnd_date(), result.getOperation_result_uuid(), result.getType(), result.getAttempt_send_date(), result.getAttempt_count(), result.isUpdated(), result.getCreatedAt(), result.getChangedAt());
 	}
 	
 	/**

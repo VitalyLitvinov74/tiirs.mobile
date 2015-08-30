@@ -152,15 +152,17 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @param operation_status_uuid
 	 * @return
 	 */
-	public long replace(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid, int operation_time) {
+	public long replace(String uuid, String task_uuid, String equipment_uuid, String operation_type_uuid, String operation_pattern_uuid, String operation_status_uuid, int operation_time, long createdAt, long changedAt) {
 		ContentValues values = new ContentValues();
-		values.put(EquipmentOperationDBAdapter.FIELD_UUID, uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_TASK_UUID, task_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_EQUIPMENT_UUID, equipment_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_PATTERN_UUID, operation_pattern_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_STATUS_UUID, operation_status_uuid);
-		values.put(EquipmentOperationDBAdapter.FIELD_OPERATION_TIME, operation_time);
+		values.put(FIELD_UUID, uuid);
+		values.put(FIELD_TASK_UUID, task_uuid);
+		values.put(FIELD_EQUIPMENT_UUID, equipment_uuid);
+		values.put(FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
+		values.put(FIELD_OPERATION_PATTERN_UUID, operation_pattern_uuid);
+		values.put(FIELD_OPERATION_STATUS_UUID, operation_status_uuid);
+		values.put(FIELD_OPERATION_TIME, operation_time);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		return mDb.replace(EquipmentOperationDBAdapter.TABLE_NAME, null, values);
 	}
 	
@@ -170,7 +172,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @return
 	 */
 	public long replace(EquipmentOperation operation) {
-		return replace(operation.getUuid(), operation.getTask_uuid(), operation.getEquipment_uuid(), operation.getOperation_type_uuid(), operation.getOperation_pattern_uuid(), operation.getOperation_status_uuid(), operation.getOperation_time());
+		return replace(operation.getUuid(), operation.getTask_uuid(), operation.getEquipment_uuid(), operation.getOperation_type_uuid(), operation.getOperation_pattern_uuid(), operation.getOperation_status_uuid(), operation.getOperation_time(), operation.getCreatedAt(), operation.getChangedAt());
 	}
 	
 	/**

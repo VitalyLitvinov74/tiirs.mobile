@@ -103,12 +103,14 @@ public class OperationPatternDBAdapter extends BaseDBAdapter {
 	 * @param title
 	 * @return
 	 */
-	public long replace(String uuid, String title, String operation_type_uuid) {
+	public long replace(String uuid, String title, String operation_type_uuid, long createdAt, long changedAt) {
 		long id;
 		ContentValues values = new ContentValues();
 		values.put(FIELD_UUID, uuid);
 		values.put(FIELD_TITLE, title);
 		values.put(FIELD_OPERATION_TYPE_UUID, operation_type_uuid);
+		values.put(FIELD_CREATED_AT, createdAt);
+		values.put(FIELD_CHANGED_AT, changedAt);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -123,7 +125,7 @@ public class OperationPatternDBAdapter extends BaseDBAdapter {
 	 */
 	public long replace(OperationPattern status) {
 		return replace(status.getUuid(), status.getTitle(),
-				status.getOperation_type_uuid());
+				status.getOperation_type_uuid(), status.getCreatedAt(), status.getChangedAt());
 	}
 
 	/**
