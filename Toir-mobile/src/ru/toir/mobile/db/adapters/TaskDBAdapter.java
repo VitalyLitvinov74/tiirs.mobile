@@ -33,6 +33,9 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		public static final String USER_UUID = TABLE_NAME + '_' + FIELD_USER_UUID;
 		public static final String CLOSE_DATE = TABLE_NAME + '_' + FIELD_CLOSE_DATE;
 		public static final String TASK_STATUS_UUID = TABLE_NAME + '_' + FIELD_TASK_STATUS_UUID;
+		public static final String ATTEMPT_SEND_DATE = TABLE_NAME + '_' + FIELD_ATTEMPT_SEND_DATE;
+		public static final String ATTEMPT_COUNT = TABLE_NAME + '_' + FIELD_ATTEMPT_COUNT;
+		public static final String UPDATED = TABLE_NAME + '_' + FIELD_UPDATED;
 		public static final String TASK_NAME = TABLE_NAME + '_' + FIELD_TASK_NAME;
 		
 	}
@@ -47,6 +50,9 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.USER_UUID, getFullName(TABLE_NAME, FIELD_USER_UUID) + " AS " + Projection.USER_UUID);
 		mProjection.put(Projection.CLOSE_DATE, getFullName(TABLE_NAME, FIELD_CLOSE_DATE) + " AS " + Projection.CLOSE_DATE);
 		mProjection.put(Projection.TASK_STATUS_UUID, getFullName(TABLE_NAME, FIELD_TASK_STATUS_UUID) + " AS " + Projection.TASK_STATUS_UUID);
+		mProjection.put(Projection.ATTEMPT_SEND_DATE, getFullName(TABLE_NAME, FIELD_ATTEMPT_SEND_DATE) + " AS " + Projection.ATTEMPT_SEND_DATE);
+		mProjection.put(Projection.ATTEMPT_COUNT, getFullName(TABLE_NAME, FIELD_ATTEMPT_COUNT) + " AS " + Projection.ATTEMPT_COUNT);
+		mProjection.put(Projection.UPDATED, getFullName(TABLE_NAME, FIELD_UPDATED) + " AS " + Projection.UPDATED);
 		mProjection.put(Projection.TASK_NAME, getFullName(TABLE_NAME, FIELD_TASK_NAME) + " AS " + Projection.TASK_NAME);
 	}
 
