@@ -214,8 +214,10 @@ public class TaskFragment extends Fragment {
 				}
 				
 				if (viewId == R.id.ti_Close) {
-					((TextView) view).setText(DataUtils.getDate(
-							cursor.getLong(columnIndex), dateFormat));
+					long closeDate = cursor.getLong(columnIndex);
+					
+					((TextView) view).setText(closeDate != 0 ? DataUtils
+							.getDate(closeDate, dateFormat) : "нет");
 					return true;
 				}
 

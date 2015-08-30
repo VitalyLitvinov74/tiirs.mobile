@@ -200,9 +200,6 @@ public class DataUtils {
 	}
 	
 	public static String getDate(long time, String format) {
-		if (time == 0) {
-			return "нет";
-		}
 
 		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.ENGLISH);
 		String date = sdf.format(time);

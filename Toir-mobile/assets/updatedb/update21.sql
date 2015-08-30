@@ -1,6 +1,6 @@
 drop table if exists 'task_new';
 create table 'task_new' ('_id' integer not null primary key, 'uuid' text not null unique, 'users_uuid' text not null, 'CreatedAt' integer not null, 'ChangedAt' integer not null, 'close_date' integer default null, 'task_status_uuid' text not null, 'attempt_send_date' integer not null default 0, 'attempt_count' integer not null default 0, 'updated' integer not null default 0, 'task_name' text);
-insert into 'task_new' ('uuid', 'users_uuid', 'CreatedAt', 'ChangedAt', 'close_date', 'task_status_uuid', 'attempt_send_date', 'attempt_count', 'updated', 'task_name') select "uuid", "users_uuid", "create_date", "modify_date", "close_date", "task_status_uuid", "attempt_send_date", "attempt_count", "successefull_send", "task_name" from 'task';
+insert into 'task_new' ('uuid', 'users_uuid', 'CreatedAt', 'ChangedAt', 'close_date', 'task_status_uuid', 'attempt_send_date', 'attempt_count', 'updated', 'task_name') select "uuid", "users_uuid", "create_date", "modify_date", "close_date", "task_status_uuid", "attempt_send_date", "attempt_count", "updated", "task_name" from 'task';
 drop table if exists 'task';
 alter table 'task_new' rename to 'task';
 

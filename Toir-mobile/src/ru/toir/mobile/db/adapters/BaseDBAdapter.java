@@ -46,7 +46,7 @@ public class BaseDBAdapter {
 	public Long getLastChangedAt() {
 		Long changed = null;
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, new String[]{ FIELD_CHANGED_AT }, null, null, FIELD_CHANGED_AT, null, FIELD_CHANGED_AT + " DESC" + " LIMIT 1");
+		cursor = mDb.query(TABLE_NAME, new String[]{ "MAX(" + FIELD_CHANGED_AT + ") as " + FIELD_CHANGED_AT }, null, null, null, null, null);
 		if (cursor.moveToFirst()) {
 			changed = cursor.getLong(cursor.getColumnIndex(FIELD_CHANGED_AT));
 		}

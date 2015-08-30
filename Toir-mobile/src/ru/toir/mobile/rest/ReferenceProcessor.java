@@ -109,8 +109,11 @@ public class ReferenceProcessor {
 				lastChangedAt = getLastChanged(name);
 				postData.setLength(0);
 				if (lastChangedAt != null) {
-					// формируем параметры для запроса
 					// TODO нужно изменить условие на сервере с >= на >
+					// внятного ответа не получено, оставляем костыль в виде +1 секунды
+					// это черевато тем, что если на сервере при создании записи дата изменения
+					// не будет равна дате создания, новые данные не получим, до тех пор пока
+					// запись не будет изменена
 					postData.append('?').append("ChangedAfter=").append(DataUtils.getDate(lastChangedAt + 1000, "yyyy-MM-dd'T'HH:mm:ss"));
 				}
 				
