@@ -4,8 +4,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
-
-import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -31,10 +29,12 @@ import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.ReferenceProcessor;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
-import ru.toir.mobile.rest.TaskServiceHelper;
-import ru.toir.mobile.rest.TaskServiceProvider;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -51,6 +51,7 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 //import android.widget.Toast;
 
@@ -65,11 +66,16 @@ public class ReferenceFragment extends Fragment {
 	ArrayAdapter<String> spinner_addict_adapter;
 	private ProgressDialog getReferencesDialog;
 	
-	public void cancelGetReferences() {
-		if (getReferencesDialog != null) {
-			getReferencesDialog.cancel();
+	private IntentFilter mFilterGetReference = new IntentFilter(ReferenceServiceProvider.Actions.ACTION_GET_REFERENCE);
+	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			getReferencesDialog.dismiss();
+			context.unregisterReceiver(mReceiverGetReference);
+			Toast.makeText(context, "Справочники обновлены", Toast.LENGTH_SHORT).show();
 		}
-	}
+	};
 
 	/*
 	 * (non-Javadoc)
@@ -556,11 +562,12 @@ public class ReferenceFragment extends Fragment {
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
-				
+
+				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
+
 				rsh.getReference(referenceNames);
-				
+
 				// показываем диалог обновления справочников
-				/*
 				getReferencesDialog = new ProgressDialog(getActivity());
 				getReferencesDialog.setMessage("Получаем справочники");
 				getReferencesDialog.setIndeterminate(true);
@@ -572,12 +579,12 @@ public class ReferenceFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// TODO необходимые операции для отмены приёма
-								// справочников
+								getActivity().unregisterReceiver(mReceiverGetReference);
+								Toast.makeText(getActivity(), "Обновление справочников отменено", Toast.LENGTH_SHORT).show();
 							}
 						});
 				getReferencesDialog.show();
-				*/
+
 				return true;
 			}
 		});
