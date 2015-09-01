@@ -182,7 +182,7 @@ public class OperationActivity extends Activity {
 				operationResult = equipmentOperationResultDBAdapter.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
 				operationResult.setEnd_date(new Date().getTime());
-				equipmentOperationResultDBAdapter.replace(operationResult);
+				equipmentOperationResultDBAdapter.update(operationResult);
 				finish();
 			}
 		});

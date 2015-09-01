@@ -471,7 +471,7 @@ public class TaskFragment extends Fragment {
 				final String operation_uuid = cursor.getString(cursor
 						.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
 				final String taskUuid = cursor.getString(cursor
-						.getColumnIndex(TaskDBAdapter.Projection.UUID));
+						.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
 
 				// диалог для отмены операции
 				final Dialog dialog = new Dialog(getActivity());

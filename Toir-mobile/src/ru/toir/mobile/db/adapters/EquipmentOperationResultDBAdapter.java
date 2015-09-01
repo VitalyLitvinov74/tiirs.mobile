@@ -1,5 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -200,6 +201,16 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_UPDATED, item.isUpdated() == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
+	}
+
+	/**
+	 * Метод делает то же что и replace, дополнительно меняет ChangedAt на текущее время.
+	 * @param item
+	 * @return
+	 */
+	public long update(EquipmentOperationResult item) {
+		item.setChangedAt(Calendar.getInstance().getTime().getTime());
+		return replace(item);
 	}
 
 	/**
