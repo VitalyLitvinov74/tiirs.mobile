@@ -19,14 +19,18 @@ import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.OperationType;
+import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -53,6 +57,7 @@ import android.widget.Button;
 
 public class TaskFragment extends Fragment {
 
+	private String TAG = "TaskFragment";
 	private int Level = 0;
 	private String currentTaskUuid = "";
 	private Spinner Spinner_references;
@@ -73,17 +78,52 @@ public class TaskFragment extends Fragment {
 	private ProgressDialog getOrderDialog;
 
 	private String dateFormat = "dd.MM.yyyy hh:mm";
-
-	public void cancelGetOrders() {
-		if (getOrderDialog != null) {
-			getOrderDialog.cancel();
-		}
-	}
 	
-	public void refreshTaskList() {
-		initView();
-	}
+	// фильтр для получения сообщений при получении нарядов с сервера
+	private IntentFilter mFilterGetTask = new IntentFilter(
+			TaskServiceProvider.Actions.ACTION_GET_TASK);
+	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int provider = intent.getIntExtra(
+					ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			Log.d(TAG, "" + provider);
+			if (provider == ProcessorService.Providers.TASK_PROVIDER) {
+				int method = intent.getIntExtra(
+						ProcessorService.Extras.METHOD_EXTRA, 0);
+				Log.d(TAG, "" + method);
+				if (method == TaskServiceProvider.Methods.GET_TASK) {
+					boolean result = intent.getBooleanExtra(
+							ProcessorService.Extras.RESULT_EXTRA, false);
+					Log.d(TAG, "" + result);
+					if (result == true) {
+						/*
+						 * нужно видимо что-то дёрнуть чтоб уведомить о том что
+						 * наряд(ы) получены вероятно нужно сделать попытку
+						 * отправить на сервер информацию о полученых нарядах
+						 * (которые изменили свой статус на "В работе")
+						 */
 
+						Toast.makeText(getActivity(),
+								"Наряды получены.", Toast.LENGTH_SHORT).show();
+					} else {
+						// если наряды по какой-то причине не удалось получить,
+						// видимо нужно вывести какое-то сообщение
+						Toast.makeText(getActivity(),
+								"Ошибка при получении нарядов.",
+								Toast.LENGTH_LONG).show();
+					}
+
+					// закрываем диалог получения наряда
+					getOrderDialog.dismiss();
+					getActivity().unregisterReceiver(mReceiverGetTask);
+					initView();
+				}
+			}
+
+		}
+	};
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -607,7 +647,11 @@ public class TaskFragment extends Fragment {
 				TaskServiceHelper tsh = new TaskServiceHelper(getActivity()
 						.getApplicationContext(),
 						TaskServiceProvider.Actions.ACTION_GET_TASK);
+
+				getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
+
 				tsh.GetTask(AuthorizedUser.getInstance().getToken());
+
 				// показываем диалог получения наряда
 				getOrderDialog = new ProgressDialog(getActivity());
 				getOrderDialog.setMessage("Получаем наряд");
@@ -620,8 +664,8 @@ public class TaskFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// TODO необходимые операции для отмены приёма
-								// нарядов
+								getActivity().unregisterReceiver(mReceiverGetTask);
+								Toast.makeText(getActivity(), "Получение нарядов отменено", Toast.LENGTH_SHORT).show();
 							}
 						});
 				getOrderDialog.show();

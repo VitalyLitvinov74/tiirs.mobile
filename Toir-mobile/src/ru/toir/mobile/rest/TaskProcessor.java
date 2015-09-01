@@ -374,7 +374,7 @@ public class TaskProcessor {
 		
 		item.setUuid(pattern.getId());
 		item.setTitle(pattern.getTitle());
-		// TODO уточнить приходит ли поле с сервера
+		// TODO данные не приходят с сервера
 		item.setOperation_type_uuid("");
 
 		// создаём объекты шагов шаблона выполнения операции
