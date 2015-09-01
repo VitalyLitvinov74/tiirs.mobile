@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.astuetz.PagerSlidingTabStrip;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +45,9 @@ public class MainActivity extends FragmentActivity {
 		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
 		public static final int READ_EQUIPMENT_TAG_BEFORE_OPERATION = 2;
 	}
+	
+	private ProgressDialog authorizationDialog;
+	private boolean processLogin = false;
 
 	// фильтр для сообщений при получении пользователя с сервера
 	private final IntentFilter mFilterGetUser = new IntentFilter(
@@ -76,6 +80,8 @@ public class MainActivity extends FragmentActivity {
 					} else {
 						// либо пользователя нет, либо произошла ошибка
 					}
+					authorizationDialog.dismiss();
+					processLogin = false;
 				}
 			}
 		}
@@ -121,12 +127,13 @@ public class MainActivity extends FragmentActivity {
 							Toast.makeText(getApplicationContext(),
 									"Нет доступа.",
 									Toast.LENGTH_LONG).show();
-
 						}
 
 						Toast.makeText(getApplicationContext(),
 								"Токен не получен.",
 								Toast.LENGTH_LONG).show();
+						authorizationDialog.dismiss();
+						processLogin = false;
 					}
 				}
 			}
@@ -254,13 +261,17 @@ public class MainActivity extends FragmentActivity {
 			int action = data.getIntExtra("action", 0);
 			switch (action) {
 			case RFIDReadAction.READ_USER_TAG_BEFORE_LOGIN:
+				// сохраняем ид метки для дальнейшего использования
+				AuthorizedUser.getInstance().setTagId(tagId);
+				
+				processLogin = true;
+
+				// запрашиваем токен
 				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
 						getApplicationContext(),
 						TokenServiceProvider.Actions.ACTION_GET_TOKEN);
 				tokenServiceHelper.GetTokenByTag(tagId);
-				
-				// сохраняем ид метки для дальнейшего использования
-				AuthorizedUser.getInstance().setTagId(tagId);
+
 				break;
 			case RFIDReadAction.READ_EQUIPMENT_TAG_BEFORE_OPERATION:
 				Intent operationActivity = new Intent(this,
@@ -364,17 +375,6 @@ public class MainActivity extends FragmentActivity {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
-	 */
-	/*
-	 * @Override protected void onRestoreInstanceState(Bundle
-	 * savedInstanceState) { super.onRestoreInstanceState(savedInstanceState);
-	 * isLogged = savedInstanceState.getBoolean("isLogged"); Log.d(TAG,
-	 * "onRestoreInstanceState: isLogged=" + isLogged); }
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
 	 */
 	@Override
@@ -418,4 +418,20 @@ public class MainActivity extends FragmentActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (processLogin) {
+			// показываем диалог входа
+			authorizationDialog = new ProgressDialog(MainActivity.this);
+			authorizationDialog.setMessage("Вход в систему");
+			authorizationDialog.setIndeterminate(true);
+			authorizationDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			authorizationDialog.setCancelable(false);
+			authorizationDialog.show();
+		}
+
+	}
+
 }
