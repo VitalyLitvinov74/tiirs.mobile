@@ -62,10 +62,15 @@ public class OperationActivity extends Activity {
 	private TextView stepDescrition;
 	private Button numStepButton;
 	private NumberPicker numberPicker;
-	private Spinner spinnerFrequencySuffix;
-	private ArrayAdapter<Suffixes> spinnerFrequencySuffixAdapter;
-	private ArrayList<Suffixes> list;
+	private Spinner spinnerSuffix;
+	private ArrayAdapter<Suffixes> spinnerSuffixAdapter;
+	private ArrayList<Suffixes> suffixList;
 
+	/**
+	 * Класс для представления множителей (частоты, напряжения, тока...)
+	 * @author Dmitriy Logachov
+	 *
+	 */
 	protected class Suffixes {
 		String title;
 		long multiplaer;
@@ -89,12 +94,6 @@ public class OperationActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.operation_layout);
-
-		list = new ArrayList<Suffixes>();
-		list.add(new Suffixes("Hz", 1));
-		list.add(new Suffixes("kHz", 1000));
-		list.add(new Suffixes("MHz", 1000000));
-		list.add(new Suffixes("GHz", 1000000000));
 
 		Bundle b = getIntent().getExtras();
 		operation_uuid = b.getString(OPERATION_UUID_EXTRA);
@@ -191,37 +190,10 @@ public class OperationActivity extends Activity {
 				.getUuid());
 		for (OperationPatternStepResult result : resultsList) {
 			final String measureType = result.getMeasure_type_uuid();
-
-			if (measureType.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
-				/*
-				 * выводим элементы интерфейса для ввода значения измеренной
-				 * частоты
-				 */
-				Toast.makeText(getApplicationContext(), "Фотографируем",
-						Toast.LENGTH_SHORT).show();
-
-				// выбор значения
-				if (numberPicker == null) {
-					numberPicker = new NumberPicker(getApplicationContext());
-				}
-				numberPicker.setOrientation(NumberPicker.VERTICAL);
-				numberPicker.setMaxValue(1000);
-				layout.addView(numberPicker);
-
-				// множитель
-				if (spinnerFrequencySuffix == null) {
-					spinnerFrequencySuffix = new Spinner(
-							getApplicationContext());
-				}
-				if (spinnerFrequencySuffixAdapter == null) {
-					spinnerFrequencySuffixAdapter = new ArrayAdapter<Suffixes>(
-							getApplicationContext(),
-							android.R.layout.simple_spinner_dropdown_item, list);
-				}
-				spinnerFrequencySuffix
-						.setAdapter(spinnerFrequencySuffixAdapter);
-				layout.addView(spinnerFrequencySuffix);
-
+			
+			// выводим элементы интерфейса для ввода значения измеренний
+			if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
+				measureUI(measureType);
 			}
 
 			// создаём кнопку для результата выполнения шага операции
@@ -256,6 +228,91 @@ public class OperationActivity extends Activity {
 			layout.addView(resultButton);
 		}
 	}
+	
+	private void measureUI(String measureType) {
+		// выбор значения
+		if (numberPicker == null) {
+			numberPicker = new NumberPicker(getApplicationContext());
+		}
+		numberPicker.setOrientation(NumberPicker.VERTICAL);
+		numberPicker.setMinValue(1);
+		numberPicker.setMaxValue(999);
+
+		// перечень множителей
+		if (suffixList == null) {
+			suffixList = new ArrayList<OperationActivity.Suffixes>();
+		} else {
+			suffixList.clear();
+		}
+
+		if (measureType.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
+			layout.addView(numberPicker);
+
+			suffixList.add(new Suffixes("Гц", 1));
+			suffixList.add(new Suffixes("кГц", 1000));
+			suffixList.add(new Suffixes("МГц", 1000000));
+			suffixList.add(new Suffixes("ГГц", 1000000000));
+			
+			// адаптер для множителей
+			spinnerSuffixAdapter = new ArrayAdapter<Suffixes>(
+					getApplicationContext(),
+					android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+			// выпадающий список с множителями
+			if (spinnerSuffix == null) {
+				spinnerSuffix = new Spinner(
+						getApplicationContext());
+			}
+			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+			layout.addView(spinnerSuffix);
+		} else if(measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
+			layout.addView(numberPicker);
+
+			suffixList.add(new Suffixes("В", 1));
+			suffixList.add(new Suffixes("кВ", 1000));
+			suffixList.add(new Suffixes("МВ", 1000000));
+			suffixList.add(new Suffixes("ГВ", 1000000000));
+
+			// адаптер для множителей
+			spinnerSuffixAdapter = new ArrayAdapter<Suffixes>(
+					getApplicationContext(),
+					android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+			// выпадающий список с множителями
+			if (spinnerSuffix == null) {
+				spinnerSuffix = new Spinner(
+						getApplicationContext());
+			}
+			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+			layout.addView(spinnerSuffix);
+		} else if(measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
+			layout.addView(numberPicker);
+
+			suffixList.add(new Suffixes("Па", 1));
+			suffixList.add(new Suffixes("кПа", 1000));
+			suffixList.add(new Suffixes("МПа", 1000000));
+			suffixList.add(new Suffixes("ГПа", 1000000000));
+
+			// адаптер для множителей
+			spinnerSuffixAdapter = new ArrayAdapter<Suffixes>(
+					getApplicationContext(),
+					android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+			// выпадающий список с множителями
+			if (spinnerSuffix == null) {
+				spinnerSuffix = new Spinner(
+						getApplicationContext());
+			}
+			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+			layout.addView(spinnerSuffix);
+		} else if(measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+			// инициализировать интерфейс для фотографии
+			
+		}
+	}
 
 	private void saveMeasureValue(String type, String resultUuid) {
 		if (type.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
@@ -267,7 +324,7 @@ public class OperationActivity extends Activity {
 			value.setOperation_pattern_step_result(resultUuid);
 			value.setDate(Calendar.getInstance().getTime().getTime());
 			long resultValue = numberPicker.getValue()
-					* ((Suffixes) spinnerFrequencySuffix.getSelectedItem()).multiplaer;
+					* ((Suffixes) spinnerSuffix.getSelectedItem()).multiplaer;
 			value.setValue(String.valueOf(resultValue));
 
 			adapter.replace(value);
