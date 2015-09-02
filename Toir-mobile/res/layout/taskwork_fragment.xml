@@ -77,6 +77,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/resultsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -89,7 +90,15 @@
             android:layout_weight="20.46"
             android:orientation="horizontal" >
         </LinearLayout>
-
+        
     </LinearLayout>
+
+    <RelativeLayout
+       	android:id="@+id/photoContainer"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_below="@+id/resultsLayout" >
+
+    </RelativeLayout>
 
 </RelativeLayout>

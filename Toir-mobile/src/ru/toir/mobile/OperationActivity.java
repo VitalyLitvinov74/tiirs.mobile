@@ -3,9 +3,16 @@
  */
 package ru.toir.mobile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
@@ -26,16 +33,24 @@ import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.Task;
 import android.app.Activity;
+import android.content.Context;
+import android.hardware.Camera;
 //import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-//import android.widget.RelativeLayout;
-//import android.widget.RelativeLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,10 +81,16 @@ public class OperationActivity extends Activity {
 	private ArrayAdapter<Suffixes> spinnerSuffixAdapter;
 	private ArrayList<Suffixes> suffixList;
 
+	private Camera mCamera;
+	private CameraPreview mPreview;
+	private View mCameraView;
+	private String lastPhotoFile;
+
 	/**
 	 * Класс для представления множителей (частоты, напряжения, тока...)
+	 * 
 	 * @author Dmitriy Logachov
-	 *
+	 * 
 	 */
 	protected class Suffixes {
 		String title;
@@ -93,7 +114,6 @@ public class OperationActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// setContentView(R.layout.operation_layout);
 
 		Bundle b = getIntent().getExtras();
 		operation_uuid = b.getString(OPERATION_UUID_EXTRA);
@@ -184,17 +204,16 @@ public class OperationActivity extends Activity {
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
+		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.photoContainer);
+		photoContainer.removeAllViewsInLayout();
+		photoContainer.invalidate();
+
 
 		// получаем список результатов шагов
 		ArrayList<OperationPatternStepResult> resultsList = getStepResult(step
 				.getUuid());
 		for (OperationPatternStepResult result : resultsList) {
 			final String measureType = result.getMeasure_type_uuid();
-			
-			// выводим элементы интерфейса для ввода значения измеренний
-			if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
-				measureUI(measureType);
-			}
 
 			// создаём кнопку для результата выполнения шага операции
 			Button resultButton = new Button(getApplicationContext());
@@ -226,9 +245,14 @@ public class OperationActivity extends Activity {
 			}
 
 			layout.addView(resultButton);
+
+			// выводим элементы интерфейса для ввода значения измеренний
+			if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
+				measureUI(measureType);
+			}
 		}
 	}
-	
+
 	private void measureUI(String measureType) {
 		// выбор значения
 		if (numberPicker == null) {
@@ -252,7 +276,7 @@ public class OperationActivity extends Activity {
 			suffixList.add(new Suffixes("кГц", 1000));
 			suffixList.add(new Suffixes("МГц", 1000000));
 			suffixList.add(new Suffixes("ГГц", 1000000000));
-			
+
 			// адаптер для множителей
 			spinnerSuffixAdapter = new ArrayAdapter<Suffixes>(
 					getApplicationContext(),
@@ -260,13 +284,12 @@ public class OperationActivity extends Activity {
 
 			// выпадающий список с множителями
 			if (spinnerSuffix == null) {
-				spinnerSuffix = new Spinner(
-						getApplicationContext());
+				spinnerSuffix = new Spinner(getApplicationContext());
 			}
 			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
 			layout.addView(spinnerSuffix);
-		} else if(measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
+		} else if (measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
 			layout.addView(numberPicker);
 
 			suffixList.add(new Suffixes("В", 1));
@@ -281,13 +304,12 @@ public class OperationActivity extends Activity {
 
 			// выпадающий список с множителями
 			if (spinnerSuffix == null) {
-				spinnerSuffix = new Spinner(
-						getApplicationContext());
+				spinnerSuffix = new Spinner(getApplicationContext());
 			}
 			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
 			layout.addView(spinnerSuffix);
-		} else if(measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
+		} else if (measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
 			layout.addView(numberPicker);
 
 			suffixList.add(new Suffixes("Па", 1));
@@ -302,33 +324,66 @@ public class OperationActivity extends Activity {
 
 			// выпадающий список с множителями
 			if (spinnerSuffix == null) {
-				spinnerSuffix = new Spinner(
-						getApplicationContext());
+				spinnerSuffix = new Spinner(getApplicationContext());
 			}
 			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
 			layout.addView(spinnerSuffix);
-		} else if(measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+		} else if (measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
 			// инициализировать интерфейс для фотографии
-			
+			View cameraView = View.inflate(getApplicationContext(),
+					R.layout.fragment_native_camera, null);
+			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.photoContainer);
+			RelativeLayout cameraLayout = new RelativeLayout(
+					getApplicationContext());
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+					320, 240);
+			cameraLayout.setLayoutParams(params);
+			cameraLayout.addView(cameraView);
+			photoContainer.addView(cameraLayout);
+
+			// Create our Preview view and set it as the content of our
+			// activity.
+			boolean opened = safeCameraOpenInView(cameraView);
+
+			if (opened == false) {
+				Log.d("CameraGuide", "Error, Camera failed to open");
+				return;
+			}
+
+			// Trap the capture button.
+			Button captureButton = (Button) cameraView
+					.findViewById(R.id.button_capture);
+			captureButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					// get an image from the camera
+					mCamera.takePicture(null, null, mPicture);
+				}
+			});
+
 		}
 	}
 
 	private void saveMeasureValue(String type, String resultUuid) {
-		if (type.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
-			MeasureValue value = new MeasureValue();
-			MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+		MeasureValue value = new MeasureValue();
+		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(
+				new TOiRDatabaseContext(getApplicationContext()));
 
-			value.setEquipment_operation_uuid(operation_uuid);
-			value.setOperation_pattern_step_result(resultUuid);
-			value.setDate(Calendar.getInstance().getTime().getTime());
+		value.setEquipment_operation_uuid(operation_uuid);
+		value.setOperation_pattern_step_result(resultUuid);
+		value.setDate(Calendar.getInstance().getTime().getTime());
+		if (type.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+			value.setValue(lastPhotoFile);
+		} else if (type.equals(MeasureTypeDBAdapter.Type.FREQUENCY)
+				|| type.equals(MeasureTypeDBAdapter.Type.PRESSURE)
+				|| type.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
 			long resultValue = numberPicker.getValue()
 					* ((Suffixes) spinnerSuffix.getSelectedItem()).multiplaer;
 			value.setValue(String.valueOf(resultValue));
-
-			adapter.replace(value);
 		}
+
+		adapter.replace(value);
 	}
 
 	private void ShowFinalStep() {
@@ -429,4 +484,385 @@ public class OperationActivity extends Activity {
 		}
 		return resultsList;
 	}
+
+	/**
+	 * Surface on which the camera projects it's capture results. This is
+	 * derived both from Google's docs and the excellent StackOverflow answer
+	 * provided below.
+	 * 
+	 * Reference / Credit:
+	 * http://stackoverflow.com/questions/7942378/android-camera
+	 * -will-not-work-startpreview-fails
+	 */
+	class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+
+		// SurfaceHolder
+		private SurfaceHolder mHolder;
+
+		// Our Camera.
+		private Camera mCamera;
+
+		// Parent Context.
+		private Context mContext;
+
+		// Camera Sizing (For rotation, orientation changes)
+		private Camera.Size mPreviewSize;
+
+		// List of supported preview sizes
+		private List<Camera.Size> mSupportedPreviewSizes;
+
+		// Flash modes supported by this camera
+		private List<String> mSupportedFlashModes;
+
+		// View holding this camera.
+		private View mCameraView;
+
+		public CameraPreview(Context context, Camera camera, View cameraView) {
+			super(context);
+
+			// Capture the context
+			mCameraView = cameraView;
+			mContext = context;
+			setCamera(camera);
+
+			// Install a SurfaceHolder.Callback so we get notified when the
+			// underlying surface is created and destroyed.
+			mHolder = getHolder();
+			mHolder.addCallback(this);
+			mHolder.setKeepScreenOn(true);
+		}
+
+		/**
+		 * Begin the preview of the camera input.
+		 */
+		public void startCameraPreview() {
+			try {
+				mCamera.setPreviewDisplay(mHolder);
+				mCamera.startPreview();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		/**
+		 * Extract supported preview and flash modes from the camera.
+		 * 
+		 * @param camera
+		 */
+		private void setCamera(Camera camera) {
+			// Source:
+			// http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+			mCamera = camera;
+			mSupportedPreviewSizes = mCamera.getParameters()
+					.getSupportedPreviewSizes();
+			mSupportedFlashModes = mCamera.getParameters()
+					.getSupportedFlashModes();
+
+			// Set the camera to Auto Flash mode.
+			if (mSupportedFlashModes != null
+					&& mSupportedFlashModes
+							.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+				Camera.Parameters parameters = mCamera.getParameters();
+				parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+				mCamera.setParameters(parameters);
+			}
+
+			requestLayout();
+		}
+
+		/**
+		 * The Surface has been created, now tell the camera where to draw the
+		 * preview.
+		 * 
+		 * @param holder
+		 */
+		public void surfaceCreated(SurfaceHolder holder) {
+			try {
+				mCamera.setPreviewDisplay(holder);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		/**
+		 * Dispose of the camera preview.
+		 * 
+		 * @param holder
+		 */
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			if (mCamera != null) {
+				mCamera.stopPreview();
+			}
+		}
+
+		/**
+		 * React to surface changed events
+		 * 
+		 * @param holder
+		 * @param format
+		 * @param w
+		 * @param h
+		 */
+		public void surfaceChanged(SurfaceHolder holder, int format, int w,
+				int h) {
+			// If your preview can change or rotate, take care of those events
+			// here.
+			// Make sure to stop the preview before resizing or reformatting it.
+
+			if (mHolder.getSurface() == null) {
+				// preview surface does not exist
+				return;
+			}
+
+			// stop preview before making changes
+			try {
+				Camera.Parameters parameters = mCamera.getParameters();
+
+				// Set the auto-focus mode to "continuous"
+				parameters
+						.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+
+				// Preview size must exist.
+				if (mPreviewSize != null) {
+					Camera.Size previewSize = mPreviewSize;
+					parameters.setPreviewSize(previewSize.width,
+							previewSize.height);
+				}
+
+				mCamera.setParameters(parameters);
+				mCamera.startPreview();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		/**
+		 * Calculate the measurements of the layout
+		 * 
+		 * @param widthMeasureSpec
+		 * @param heightMeasureSpec
+		 */
+		@Override
+		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+			// Source:
+			// http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+			final int width = resolveSize(getSuggestedMinimumWidth(),
+					widthMeasureSpec);
+			final int height = resolveSize(getSuggestedMinimumHeight(),
+					heightMeasureSpec);
+			setMeasuredDimension(width, height);
+
+			if (mSupportedPreviewSizes != null) {
+				mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes,
+						width, height);
+			}
+		}
+
+		/**
+		 * Update the layout based on rotation and orientation changes.
+		 * 
+		 * @param changed
+		 * @param left
+		 * @param top
+		 * @param right
+		 * @param bottom
+		 */
+		@Override
+		protected void onLayout(boolean changed, int left, int top, int right,
+				int bottom) {
+			// Source:
+			// http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+			if (changed) {
+				final int width = right - left;
+				final int height = bottom - top;
+
+				int previewWidth = width;
+				int previewHeight = height;
+
+				if (mPreviewSize != null) {
+					Display display = ((WindowManager) mContext
+							.getSystemService(Context.WINDOW_SERVICE))
+							.getDefaultDisplay();
+
+					switch (display.getRotation()) {
+					case Surface.ROTATION_0:
+						previewWidth = mPreviewSize.height;
+						previewHeight = mPreviewSize.width;
+						mCamera.setDisplayOrientation(90);
+						break;
+					case Surface.ROTATION_90:
+						previewWidth = mPreviewSize.width;
+						previewHeight = mPreviewSize.height;
+						break;
+					case Surface.ROTATION_180:
+						previewWidth = mPreviewSize.height;
+						previewHeight = mPreviewSize.width;
+						break;
+					case Surface.ROTATION_270:
+						previewWidth = mPreviewSize.width;
+						previewHeight = mPreviewSize.height;
+						mCamera.setDisplayOrientation(180);
+						break;
+					}
+				}
+
+				final int scaledChildHeight = previewHeight * width
+						/ previewWidth;
+				mCameraView
+						.layout(0, height - scaledChildHeight, width, height);
+			}
+		}
+
+		/**
+		 * 
+		 * @param sizes
+		 * @param width
+		 * @param height
+		 * @return
+		 */
+		private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes,
+				int width, int height) {
+			// Source:
+			// http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+			Camera.Size optimalSize = null;
+
+			final double ASPECT_TOLERANCE = 0.1;
+			double targetRatio = (double) height / width;
+
+			// Try to find a size match which suits the whole screen minus the
+			// menu on the left.
+			for (Camera.Size size : sizes) {
+
+				if (size.height != width)
+					continue;
+				double ratio = (double) size.width / size.height;
+				if (ratio <= targetRatio + ASPECT_TOLERANCE
+						&& ratio >= targetRatio - ASPECT_TOLERANCE) {
+					optimalSize = size;
+				}
+			}
+
+			// If we cannot find the one that matches the aspect ratio, ignore
+			// the requirement.
+			if (optimalSize == null) {
+				// TODO : Backup in case we don't get a size.
+			}
+
+			return optimalSize;
+		}
+	}
+
+	/**
+	 * Picture Callback for handling a picture capture and saving it out to a
+	 * file.
+	 */
+	private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+
+		@Override
+		public void onPictureTaken(byte[] data, Camera camera) {
+
+			File pictureFile = getOutputMediaFile();
+			if (pictureFile == null) {
+				Toast.makeText(getApplicationContext(),
+						"Image retrieval failed.", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			try {
+				FileOutputStream fos = new FileOutputStream(pictureFile);
+				fos.write(data);
+				fos.close();
+				lastPhotoFile = pictureFile.getAbsolutePath();
+				// Restart the camera preview.
+				safeCameraOpenInView(mCameraView);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	};
+
+	/**
+	 * Used to return the camera File output.
+	 * 
+	 * @return
+	 */
+	private File getOutputMediaFile() {
+
+		File mediaStorageDir = new File(
+				Environment
+						.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+				"toir");
+
+		if (!mediaStorageDir.exists()) {
+			if (!mediaStorageDir.mkdirs()) {
+				Log.d("Camera Guide", "Required media storage does not exist");
+				return null;
+			}
+		}
+
+		// Create a media file name
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+				.format(new Date());
+		File mediaFile;
+		mediaFile = new File(mediaStorageDir.getPath() + File.separator
+				+ "IMG_" + timeStamp + ".jpg");
+		return mediaFile;
+	}
+
+	/**
+	 * Recommended "safe" way to open the camera.
+	 * 
+	 * @param view
+	 * @return
+	 */
+	private boolean safeCameraOpenInView(View view) {
+		boolean qOpened = false;
+		releaseCameraAndPreview();
+		mCamera = getCameraInstance();
+		mCameraView = view;
+		qOpened = (mCamera != null);
+
+		if (qOpened == true) {
+			mPreview = new CameraPreview(getApplicationContext(), mCamera, view);
+			FrameLayout preview = (FrameLayout) view
+					.findViewById(R.id.camera_preview);
+			preview.addView(mPreview);
+			mPreview.startCameraPreview();
+		}
+		return qOpened;
+	}
+
+	/**
+	 * Safe method for getting a camera instance.
+	 * 
+	 * @return
+	 */
+	public static Camera getCameraInstance() {
+		Camera c = null;
+		try {
+			c = Camera.open(); // attempt to get a Camera instance
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return c; // returns null if camera is unavailable
+	}
+
+	/**
+	 * Clear any existing preview / camera.
+	 */
+	private void releaseCameraAndPreview() {
+
+		if (mCamera != null) {
+			mCamera.stopPreview();
+			mCamera.release();
+			mCamera = null;
+		}
+		if (mPreview != null) {
+			mPreview.destroyDrawingCache();
+			mPreview.mCamera = null;
+		}
+	}
+
 }
