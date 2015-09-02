@@ -4,6 +4,7 @@
 package ru.toir.mobile.db.tables;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 /**
  * @author Dmitriy Logachov
@@ -22,6 +23,7 @@ public class BaseTable {
 	 */
 	public BaseTable() {
 		long date = Calendar.getInstance().getTime().getTime();
+		uuid = UUID.randomUUID().toString();
 		CreatedAt = date;
 		ChangedAt = date;
 	}

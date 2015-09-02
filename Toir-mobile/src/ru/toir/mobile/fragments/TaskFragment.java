@@ -340,6 +340,7 @@ public class TaskFragment extends Fragment {
 				.getAllItems();
 
 		TaskStatus allStatus = new TaskStatus();
+		allStatus.setUuid(null);
 		allStatus.setTitle("Все статусы");
 		taskStatusList.add(0, allStatus);
 		taskStatusAdapter.clear();
@@ -422,12 +423,15 @@ public class TaskFragment extends Fragment {
 
 		OperationType allOperation = new OperationType();
 		allOperation.setTitle("Все операции");
+		allOperation.setUuid(null);
 		operationTypeList.add(0, allOperation);
 		operationTypeAdapter.clear();
 		operationTypeAdapter.addAll(operationTypeList);
 		Spinner_references.setAdapter(operationTypeAdapter);
 
-		criticalTypeList.add(0, new CriticalType());
+		CriticalType allCriticalType = new CriticalType();
+		allCriticalType.setUuid(null);
+		criticalTypeList.add(0, allCriticalType);
 		criticalTypeAdapter.clear();
 		criticalTypeAdapter.addAll(criticalTypeList);
 		Spinner_type.setAdapter(criticalTypeAdapter);
