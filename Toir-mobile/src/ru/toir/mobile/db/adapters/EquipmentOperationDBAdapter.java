@@ -310,6 +310,20 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		tables.append(' ').append(table);
 		projection.putAll(OperationStatusDBAdapter.getProjection());
 		
+		// результаты выполнения операций
+		table = getLeftJoinTables(TABLE_NAME,
+				EquipmentOperationResultDBAdapter.TABLE_NAME, FIELD_UUID,
+				EquipmentOperationResultDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID, false);
+		tables.append(' ').append(table);
+		projection.putAll(EquipmentOperationResultDBAdapter.getProjection());
+		
+		// справочник вариантов результатов выполнения операции
+		table = getLeftJoinTables(EquipmentOperationResultDBAdapter.TABLE_NAME,
+				OperationResultDBAdapter.TABLE_NAME, EquipmentOperationResultDBAdapter.FIELD_OPERATION_RESULT_UUID,
+				OperationResultDBAdapter.FIELD_UUID, false);
+		tables.append(' ').append(table);
+		projection.putAll(OperationResultDBAdapter.getProjection());
+		
 		queryBuilder.setTables(tables.toString());
 		queryBuilder.setProjectionMap(projection);
 		

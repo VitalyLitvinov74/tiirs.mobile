@@ -71,5 +71,25 @@
         android:layout_toRightOf="@+id/eoi_StatusLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+    <TextView
+        android:id="@+id/eoi_ResultStatusLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/eoi_ImageStatus"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/eoi_Status"
+        android:text="Результат:"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+    <TextView
+        android:id="@+id/eoi_ResultStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/eoi_ImageStatus"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/eoi_ResultStatusLabel"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
