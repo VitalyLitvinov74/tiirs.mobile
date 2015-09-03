@@ -22,6 +22,7 @@ import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentOperation;
@@ -31,6 +32,7 @@ import ru.toir.mobile.db.tables.OperationPattern;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
+import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
 import android.app.Activity;
 import android.content.Context;
@@ -47,6 +49,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -206,8 +210,7 @@ public class OperationActivity extends Activity {
 		layout.removeAllViewsInLayout();
 		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.photoContainer);
 		photoContainer.removeAllViewsInLayout();
-		photoContainer.invalidate();
-
+		photoContainer.setVisibility(View.INVISIBLE);
 
 		// получаем список результатов шагов
 		ArrayList<OperationPatternStepResult> resultsList = getStepResult(step
@@ -226,6 +229,12 @@ public class OperationActivity extends Activity {
 				resultButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						// если были измерения, сохраняем полученные значения
+						if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
+							saveMeasureValue(measureType, current_result_uuid);
+						}
+
+						// показываем финальный шаг
 						ShowFinalStep();
 					}
 				});
@@ -253,6 +262,11 @@ public class OperationActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Создание элементов интерфейса для шагов операции с измерениями значений
+	 * 
+	 * @param measureType
+	 */
 	private void measureUI(String measureType) {
 		// выбор значения
 		if (numberPicker == null) {
@@ -341,6 +355,7 @@ public class OperationActivity extends Activity {
 			cameraLayout.setLayoutParams(params);
 			cameraLayout.addView(cameraView);
 			photoContainer.addView(cameraLayout);
+			photoContainer.setVisibility(View.VISIBLE);
 
 			// Create our Preview view and set it as the content of our
 			// activity.
@@ -409,6 +424,15 @@ public class OperationActivity extends Activity {
 				operationResult.setOperation_result_uuid(result.getUuid());
 				operationResult.setEnd_date(new Date().getTime());
 				equipmentOperationResultDBAdapter.update(operationResult);
+				
+				// обновление статуса операции по результату выполнения
+				Spinner operationStatusSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
+				String operationStatusUuid = ((OperationStatus)operationStatusSpinner.getSelectedItem()).getUuid();
+				EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+				EquipmentOperation operation = operationDBAdapter.getItem(operation_uuid);
+				operation.setOperation_status_uuid(operationStatusUuid);
+				operationDBAdapter.update(operation);
+				
 				finish();
 			}
 		});
@@ -422,6 +446,37 @@ public class OperationActivity extends Activity {
 		layout.removeAllViewsInLayout();
 		layout.addView(spinner);
 		layout.addView(resultButton);
+		
+		// показ элементов отвечающих за статус выполнения операции
+		RelativeLayout alterOperationStatusLayout = (RelativeLayout) findViewById(R.id.alterOperationStatus);
+		alterOperationStatusLayout.setVisibility(View.VISIBLE);
+
+		Spinner alterSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
+		OperationStatusDBAdapter dbAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		ArrayList<OperationStatus> list = dbAdapter.getAllItems();
+		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
+		alterSpinner.setAdapter(adapter);
+		// по умолчанию ставим статус Выполнена
+		for(OperationStatus item : list) {
+			if (item.getUuid().equals(OperationStatusDBAdapter.Status.COMPLETE)) {
+				alterSpinner.setSelection(adapter.getPosition(item));
+				break;
+			}
+		}
+
+		CheckBox checkBox = (CheckBox) findViewById(R.id.showAltOperationStatusCheckbox);
+		checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Spinner alterSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
+				if (isChecked) {
+					alterSpinner.setVisibility(View.VISIBLE);
+				} else {
+					alterSpinner.setVisibility(View.INVISIBLE);
+				}
+			}
+		});
 	}
 
 	private void ShowFirstStep() {
@@ -745,7 +800,7 @@ public class OperationActivity extends Activity {
 			// If we cannot find the one that matches the aspect ratio, ignore
 			// the requirement.
 			if (optimalSize == null) {
-				// TODO : Backup in case we don't get a size.
+				// Backup in case we don't get a size.
 			}
 
 			return optimalSize;

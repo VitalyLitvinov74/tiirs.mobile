@@ -101,4 +101,26 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+       	android:id="@+id/alterOperationStatus"
+       	android:layout_width="wrap_content"
+       	android:layout_height="wrap_content"
+       	android:layout_below="@+id/resultsLayout"
+       	android:visibility="invisible" >
+
+        <CheckBox
+            android:id="@+id/showAltOperationStatusCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Изменить статус операции" />
+
+        <Spinner
+            android:id="@+id/altOperationStatusSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/showAltOperationStatusCheckbox"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
+
 </RelativeLayout>
