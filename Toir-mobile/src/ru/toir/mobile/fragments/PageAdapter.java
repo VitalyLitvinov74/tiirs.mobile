@@ -32,13 +32,13 @@ public class PageAdapter extends FragmentPagerAdapter {
 			fragment = new ReferenceFragment();
 			break;
 		case 3 :
-			fragment = new RFIDTestFragment();
-			break;			
-		case 4 :
 			fragment = new ChartsFragment();
 			break;
-		case 5 :
+		case 4 :
 			fragment = new GPSFragment();
+			break;
+		case 5 :
+			fragment = new EquipmentsFragment();
 			break;
 		case TASK_FRAGMENT :
 			if (taskFragment == null) {
@@ -49,9 +49,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 			fragment = new NativeCameraFragment();
 			break;
 		case 8 :
-			fragment = new EquipmentsFragment();
-			break;
-		case 9 :
 			fragment = new QRTestFragment();
 			break;
 		default :
@@ -63,7 +60,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 10;
+		return 9;
 	}
 
 	/* (non-Javadoc)
@@ -83,22 +80,19 @@ public class PageAdapter extends FragmentPagerAdapter {
 			title = "Справочники";
 			break;
 		case 3 :
-			title = "RFID";
-			break;
-		case 4 :
 			title = "Графики";
 			break;
-		case 5 :
+		case 4 :
 			title = "Тест GPS";
+			break;
+		case 5 :
+			title = "Оборудование";
 			break;
 		case TASK_FRAGMENT :
 			title = "Наряды";
 			break;
 		case 7 :
 			title = "Фото";
-			break;
-		case 8 :
-			title = "Оборудование";
 			break;
 		case 9 :
 			title = "QR test";

@@ -31,8 +31,7 @@ public class RFIDBarcode implements RFIDDriver {
 	@Override
 	public void read() {
 		IntentIntegrator integrator = new IntentIntegrator(mActivity);
-		integrator.initiateScan();
-		
+		integrator.initiateScan();		
 	}
 
 	/* (non-Javadoc)
