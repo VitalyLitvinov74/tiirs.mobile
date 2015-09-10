@@ -98,11 +98,11 @@ public class OperationActivity extends Activity {
 	 */
 	protected class Suffixes {
 		String title;
-		long multiplaer;
+		long multiplier;
 
 		public Suffixes(String t, int m) {
 			title = t;
-			multiplaer = m;
+			multiplier = m;
 		}
 
 		public String toString() {
@@ -394,7 +394,7 @@ public class OperationActivity extends Activity {
 				|| type.equals(MeasureTypeDBAdapter.Type.PRESSURE)
 				|| type.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
 			long resultValue = numberPicker.getValue()
-					* ((Suffixes) spinnerSuffix.getSelectedItem()).multiplaer;
+					* ((Suffixes) spinnerSuffix.getSelectedItem()).multiplier;
 			value.setValue(String.valueOf(resultValue));
 		}
 

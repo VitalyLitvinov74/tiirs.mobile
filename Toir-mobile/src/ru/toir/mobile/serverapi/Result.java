@@ -1,6 +1,8 @@
 
 package ru.toir.mobile.serverapi;
 
+import java.util.Date;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -18,6 +20,10 @@ public class Result {
     private ru.toir.mobile.serverapi.NextPatternStep NextPatternStep;
     @Expose
     private ru.toir.mobile.serverapi.MeasureType MeasureType;
+    @Expose
+	private Date CreatedAt;
+	@Expose
+	private Date ChangedAt;
 
     /**
      * 
@@ -90,5 +96,33 @@ public class Result {
     public void setMeasureType(ru.toir.mobile.serverapi.MeasureType MeasureType) {
         this.MeasureType = MeasureType;
     }
+
+	/**
+	 * @return the createdAt
+	 */
+	public Date getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(Date createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public Date getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(Date changedAt) {
+		ChangedAt = changedAt;
+	}
 
 }
