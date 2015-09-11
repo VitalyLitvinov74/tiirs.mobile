@@ -24,7 +24,7 @@
             android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:layout_weight="0.14"
+            android:layout_weight="0.02"
             android:background="@color/grey"
             android:ems="10" >
         </TextView>

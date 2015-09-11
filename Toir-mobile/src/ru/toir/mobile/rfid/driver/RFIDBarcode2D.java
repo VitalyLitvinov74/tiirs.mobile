@@ -1,14 +1,16 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
+import ru.toir.mobile.RFIDActivity;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-import ru.toir.mobile.rfid.Scanner;
+import android.hardware.barcode.Scanner;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * @author olejek
@@ -16,7 +18,7 @@ import android.widget.TextView;
  */
 public class RFIDBarcode2D implements RFIDDriver{
 	private Handler mHandler = new MainHandler();
-	Activity mActivity;
+	static Activity mActivity;
 	static private TextView scanText;
 	
     static private class MainHandler extends Handler {
@@ -24,7 +26,11 @@ public class RFIDBarcode2D implements RFIDDriver{
     	public void handleMessage(Message msg) {
     	switch (msg.what) {   
 	    	case Scanner.BARCODE_READ: {
+				Toast.makeText(mActivity.getApplicationContext(),
+						"Код: " + msg.obj,
+						Toast.LENGTH_LONG).show();						    		
 	    		scanText.setText((String)msg.obj);
+	    		((RFIDActivity)mActivity).Callback((String)msg.obj);
 	    		break;
 	    	}
 	    	case Scanner.BARCODE_NOREAD:{   
@@ -48,9 +54,10 @@ public class RFIDBarcode2D implements RFIDDriver{
 	public boolean init() {
 		Scanner.m_handler=mHandler;  
 		//initialize the scanner
-		Scanner.InitSCA();  		
-		mActivity.setContentView(R.layout.bar2d_read);
+		Scanner.InitSCA();		
+		mActivity.setContentView(R.layout.bar2d_read);		
 		mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);
 		return true;
 	}
 
@@ -60,8 +67,7 @@ public class RFIDBarcode2D implements RFIDDriver{
 	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
 	 */
 	@Override
-	public void read() {
-        scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);        
+	public void read() {                
 		// запускаем отдельную задачу для считывания метки
         Scanner.Read();
 	}

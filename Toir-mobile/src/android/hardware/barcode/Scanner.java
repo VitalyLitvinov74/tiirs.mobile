@@ -1,4 +1,4 @@
-package ru.toir.mobile.rfid;
+package android.hardware.barcode;
    
 import java.io.IOException;
 
@@ -34,20 +34,20 @@ public class Scanner {
 		 * It can scan 1D/2D barcode, If scan can't get anything, will wait for sometime,  ourself scanner if wait for 10sec.
 		 *  MOTOROLA is wait for 10sec.
 		 * @param nCommand
-		 *            :Scan head markï¿½ï¿½ourself scanner id 0x55,MOTOROLA is 0x00
+		 *            :Scan head mark£¬ourself scanner id 0x55,MOTOROLA is 0x00
 		 * @param nCode
-		 *            :Barcode encodingï¿½ï¿½GB2312 is 1,UTF is 0
-		 * @return ï¿½ï¿½return the barcode string, If can't get the barocde will show none string
+		 *            :Barcode encoding£¬GB2312 is 1,UTF is 0
+		 * @return £ºreturn the barcode string, If can't get the barocde will show none string
 		 */
 	 static public native String ReadSCAEx(int nCommand,int nCode);
 		/**
 		 * It can scan 1D/2D barcode, If scan can't get anything, will wait for sometime,  ourself scanner if wait for 10sec.
 		 *  MOTOROLA is wait for 10sec. 
 		 * @param nCommand
-		 *            :Scan head markï¿½ï¿½ourself scanner id 0x55,MOTOROLA is 0x00
+		 *            :Scan head mark£¬ourself scanner id 0x55,MOTOROLA is 0x00
 		 * @param buf
 		 *            : store the barcode information, convert the barcode to the string after readed.
-		 * @return ï¿½ï¿½return the barcode string, If can't get the barocde will show none string
+		 * @return £ºreturn the barcode string, If can't get the barocde will show none string
 		 */
 	 static public native int ReadDataSCA(int nCommand,byte []buf);
 		/**
@@ -55,14 +55,14 @@ public class Scanner {
 		 *  MOTOROLA is wait for 10sec. 
 		 * 
 		 * @param nCommand
-		 *            :Scan head markï¿½ï¿½ourself scanner id 0x55,MOTOROLA is 0x00
+		 *            :Scan head mark£¬ourself scanner id 0x55,MOTOROLA is 0x00
 		 * @return :return the scaned barcode information
 		 */
 	 static public native byte[] ReadData(int nCommand);
 		/**
 		 * Initializes the device
 		 * 
-		 * @return ï¿½ï¿½success return 0
+		 * @return £ºsuccess return 0
 		 */
 	 static public native int InitSCA();
 		/**
