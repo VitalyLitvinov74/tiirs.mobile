@@ -5,16 +5,13 @@ package ru.toir.mobile.rest;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.json.JSONArray;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
@@ -27,9 +24,6 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
-import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
-import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
-import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
@@ -53,6 +47,11 @@ import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
+import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
+import ru.toir.mobile.serializer.EquipmentOperationSerializer;
+import ru.toir.mobile.serializer.MeasureValueSerializer;
+import ru.toir.mobile.serializer.TaskResultSerializer;
+import ru.toir.mobile.serializer.TaskSerializer;
 import ru.toir.mobile.serverapi.CriticalityType;
 import ru.toir.mobile.serverapi.Document;
 import ru.toir.mobile.serverapi.DocumentType;
@@ -179,8 +178,25 @@ public class TaskProcessor {
 		
 		// всё полученные данные заносим в базу
 		saveAllData();
-		
-		return true;
+
+		// получаем данные по шаблонам
+		boolean result = false;
+		Set<String> set = equipmentOperations.keySet();
+		ArrayList<String> operationPatternUuids = new ArrayList<String>();
+		for (String uuid: set) {
+			operationPatternUuids.add(equipmentOperations.get(uuid).getOperation_pattern_uuid());
+		}
+		try {
+			ReferenceProcessor referenceProcessor = new ReferenceProcessor(mContext);
+			Bundle extra = new Bundle();
+			extra.putStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID, operationPatternUuids);
+			result = referenceProcessor.getOperationPattern(extra);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return result;
 
 	}
 	
@@ -229,12 +245,6 @@ public class TaskProcessor {
 			equipmentTypeDBAdapter.replace(equipmentTypes.get(uuid));
 		}
 		
-		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationPatterns.keySet();
-		for (String uuid: set) {
-			operationPatternDBAdapter.replace(operationPatterns.get(uuid));
-		}
-		
 		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		set = documentationTypes.keySet();
 		for (String uuid: set) {
@@ -245,18 +255,6 @@ public class TaskProcessor {
 		set = measureTypes.keySet();
 		for (String uuid: set) {
 			measureTypeDBAdapter.replace(measureTypes.get(uuid));
-		}
-		
-		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationPatternSteps.keySet();
-		for (String uuid: set) {
-			patternStepDBAdapter.replace(operationPatternSteps.get(uuid));
-		}
-		
-		OperationPatternStepResultDBAdapter patternStepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationPatternStepResults.keySet();
-		for (String uuid: set) {
-			patternStepResultDBAdapter.replace(operationPatternStepResults.get(uuid));
 		}
 		
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
@@ -276,6 +274,26 @@ public class TaskProcessor {
 		for (String uuid: set) {
 			equipmentStatusDBAdapter.replace(equipmentStatus.get(uuid));
 		}
+
+		/*
+		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
+		set = operationPatterns.keySet();
+		for (String uuid: set) {
+			operationPatternDBAdapter.replace(operationPatterns.get(uuid));
+		}
+		
+		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
+		set = operationPatternSteps.keySet();
+		for (String uuid: set) {
+			patternStepDBAdapter.replace(operationPatternSteps.get(uuid));
+		}
+		
+		OperationPatternStepResultDBAdapter patternStepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
+		set = operationPatternStepResults.keySet();
+		for (String uuid: set) {
+			patternStepResultDBAdapter.replace(operationPatternStepResults.get(uuid));
+		}
+		*/
 	}
 	
 	/**
@@ -633,11 +651,24 @@ public class TaskProcessor {
 			
 			if (tasks != null) {
 				StringBuilder postData = new StringBuilder();
-				for (TaskResult taskResult : tasks) {
-					// TODO реализовать упаковку результатов в json объект 
-					postData.append("tasks[]=");
-					postData.append(taskResult.mTask.getUuid());
-				}
+				// TODO реализовать упаковку результатов в json объект
+				//TaskResult taskResult = new TaskResult(getApplicationContext());
+				//taskResult.getTaskResult("a1f3a9af-d05b-4123-858f-a753a46f97d5");
+				//TaskResult[] resultArray = new TaskResult[] { taskResult };
+				Gson gson = new GsonBuilder()
+						//.setPrettyPrinting()
+						.registerTypeAdapter(Task.class, new TaskSerializer())
+						.registerTypeAdapter(TaskResult.class, new TaskResultSerializer())
+						.registerTypeAdapter(EquipmentOperation.class, new EquipmentOperationSerializer())
+						.registerTypeAdapter(EquipmentOperationResult.class, new EquipmentOperationResultSerializer())
+						.registerTypeAdapter(MeasureValue.class, new MeasureValueSerializer())
+						.create();
+				//String json = gson.toJson(resultArray);
+				String json = gson.toJson(tasks);
+				Log.d("test", json);
+
+				postData.append("tasks=");
+				postData.append(json);
 
 				Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
 				Response response = new RestClient().execute(request);

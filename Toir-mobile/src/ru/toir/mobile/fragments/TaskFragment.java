@@ -8,6 +8,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
@@ -176,9 +177,10 @@ public class TaskFragment extends Fragment {
 		String[] operationFrom = { EquipmentOperationDBAdapter.Projection._ID,
 				EquipmentDBAdapter.Projection.TITLE,
 				OperationTypeDBAdapter.Projection.TITLE,
-				OperationStatusDBAdapter.Projection.TITLE };
+				OperationStatusDBAdapter.Projection.TITLE,
+				OperationResultDBAdapter.Projection.TITLE};
 		int[] operationTo = { R.id.eoi_ImageStatus, R.id.eoi_Equipment,
-				R.id.eoi_Operation, R.id.eoi_Status };
+				R.id.eoi_Operation, R.id.eoi_Status, R.id.eoi_ResultStatus };
 		operationAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.equipment_operation_item, null, operationFrom,
 				operationTo, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -508,10 +510,7 @@ public class TaskFragment extends Fragment {
 						CriticalType criticalType = (CriticalType) Spinner_type
 								.getSelectedItem();
 						// обновляем содержимое курсора
-						operationAdapter.changeCursor(dbAdapter
-								.getOperationWithInfo(taskUuid,
-										operationType.getUuid(),
-										criticalType.getUuid()));
+						changeCursorOperations(taskUuid, operationType.getUuid(), criticalType.getUuid());
 
 						// закрываем диалог
 						dialog.dismiss();
@@ -583,13 +582,9 @@ public class TaskFragment extends Fragment {
 	private void FillListViewEquipment(String task_uuid,
 			String operation_type_uuid, String critical_type_uuid) {
 
-		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
-
 		// обновляем содержимое курсора
-		operationAdapter.changeCursor(eqOperationDBAdapter
-				.getOperationWithInfo(task_uuid, operation_type_uuid,
-						critical_type_uuid));
+		changeCursorOperations(task_uuid, operation_type_uuid,
+				critical_type_uuid);
 
 		// Setting the adapter to the listView
 		lv.setAdapter(operationAdapter);
@@ -713,6 +708,35 @@ public class TaskFragment extends Fragment {
 		public String toString() {
 			return Title;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.Fragment#onResume()
+	 */
+	@Override
+	public void onResume() {
+		super.onResume();
+		// сделано для того чтобы по возвращению из activity выполнения
+		// операции, обновить отображение обновившехся данных
+		// текущие значения фильтров
+		if (Level == 1) {
+			OperationType operationType = (OperationType) Spinner_references
+					.getSelectedItem();
+			CriticalType criticalType = (CriticalType) Spinner_type
+					.getSelectedItem();
+			changeCursorOperations(currentTaskUuid, operationType.getUuid(), criticalType.getUuid());
+		}
+
+	}
+	
+	private void changeCursorOperations(String taskUuid, String operationTypeUuid, String criticalTypeUuid) {
+		EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(getActivity()));
+		// обновляем содержимое курсора
+		operationAdapter.changeCursor(dbAdapter
+				.getOperationWithInfo(taskUuid,
+						operationTypeUuid,
+						criticalTypeUuid));
 	}
 
 }

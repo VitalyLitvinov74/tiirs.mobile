@@ -134,6 +134,15 @@ public class OperationPatternDBAdapter extends BaseDBAdapter {
 		return arrayList;
 	}
 
+	public void saveItems(ArrayList<OperationPattern> list) {
+		mDb.beginTransaction();
+		for (OperationPattern item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
+	}
+
 	/**
 	 * @return the mProjection
 	 */

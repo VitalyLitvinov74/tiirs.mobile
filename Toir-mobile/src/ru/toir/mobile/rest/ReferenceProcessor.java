@@ -19,11 +19,13 @@ import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
+import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.DocumentationType;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.OperationStatus;
@@ -36,10 +38,13 @@ import ru.toir.mobile.serverapi.Equipment;
 import ru.toir.mobile.serverapi.EquipmentStatus;
 import ru.toir.mobile.serverapi.EquipmentType;
 import ru.toir.mobile.serverapi.MeasureType;
+import ru.toir.mobile.serverapi.OperationPattern;
 import ru.toir.mobile.serverapi.OperationResult;
 import ru.toir.mobile.serverapi.OperationType;
 import ru.toir.mobile.serverapi.OrderStatus;
+import ru.toir.mobile.serverapi.Result;
 import ru.toir.mobile.serverapi.Status;
+import ru.toir.mobile.serverapi.Step;
 import ru.toir.mobile.utils.DataUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -88,7 +93,51 @@ public class ReferenceProcessor {
 			throw new Exception("URL сервера не указан!");
 		}
 	}
+
+	/**
+	 * Получаем шаблон выполнения операции с шагами и вариантами выполнения
+	 * шагов
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean getOperationPattern(Bundle bundle) {
+		final String OPERATION_PATTERN_URL = "api/operationpatterns/";
+		URI requestUri = null;
+		ArrayList<String> patternUuids = bundle
+				.getStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);
+
+		for (String uuid: patternUuids) {
+			try {
+				requestUri = new URI(mServerUrl + OPERATION_PATTERN_URL + uuid);
+				Log.d("test", "requestUri = " + requestUri.toString());
+					
+				Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+				List<String> tList = new ArrayList<String>();
+				tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+				headers.put("Authorization", tList);
+				
+				Request request = new Request(Method.GET, requestUri, headers, null);
+				Response response = new RestClient().execute(request);
 	
+				if (response.mStatus == 200) {
+					String jsonString = new String(response.mBody);
+					Log.d("test", jsonString);
+					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+					// разбираем полученные данные
+					//OperationPattern.saveAll(gson.fromJson(jsonString, OperationPattern[].class), mContext);
+					saveOperationPattern(gson.fromJson(jsonString, OperationPattern[].class));
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Получаем только "новые" данные из справочника(ов)
 	 * Если в таблице не окажется данных вообще, будет загружен весь справочник.
@@ -133,7 +182,8 @@ public class ReferenceProcessor {
 					Log.d("test", jsonString);
 					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
 					if (name.equals(ReferenceNames.CriticalTypeName)) {
-						saveCriticalType(gson.fromJson(jsonString, CriticalityType[].class));
+						CriticalityType.saveAll(gson.fromJson(jsonString,
+								CriticalityType[].class), mContext);
 					} else if(name.equals(ReferenceNames.DocumentTypeName)) {
 						saveDocumentType(gson.fromJson(jsonString, DocumentType[].class));
 					} else if(name.equals(ReferenceNames.EquipmentName)) {
@@ -200,29 +250,85 @@ public class ReferenceProcessor {
 		return changed;
 	}
 	
-	private void saveCriticalType(CriticalityType[] array) {
+	private void saveOperationPattern(OperationPattern[] array) {
 		
 		if (array == null) {
 			return;
 		}
-
-		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
-		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
 		
-		for (CriticalityType element : array) {
-			CriticalType item = new CriticalType();
+		OperationPatternDBAdapter adapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
+		ArrayList<ru.toir.mobile.db.tables.OperationPattern> list = new ArrayList<ru.toir.mobile.db.tables.OperationPattern>();
+		
+		for (OperationPattern element : array) {
+			ru.toir.mobile.db.tables.OperationPattern item = new ru.toir.mobile.db.tables.OperationPattern();
 			item.set_id(0);
 			item.setUuid(element.getId());
-			item.setType(element.getValue());
+			item.setTitle(element.getTitle());
+			// TODO когда на сервере появится - добавить
+			item.setOperation_type_uuid("");
+			saveOperationPatternStep((Step[])(element.getSteps().toArray()), element.getId());
 			item.setCreatedAt(element.getCreatedAt().getTime());
 			item.setChangedAt(element.getChangedAt().getTime());
 			list.add(item);
 		}
-		
 		adapter.saveItems(list);
+		
 	}
-	
+
+	private void saveOperationPatternStep(Step[] array, String operationPatternUuid) {
+		
+		if (array == null) {
+			return;
+		}
+		
+		OperationPatternStepDBAdapter adapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
+		ArrayList<ru.toir.mobile.db.tables.OperationPatternStep> list = new ArrayList<ru.toir.mobile.db.tables.OperationPatternStep>();
+		
+		for (Step element : array) {
+			ru.toir.mobile.db.tables.OperationPatternStep item = new ru.toir.mobile.db.tables.OperationPatternStep();
+			item.set_id(0);
+			item.setUuid(element.getId());
+			item.setOperation_pattern_uuid(operationPatternUuid);
+			item.setDescription(element.getDescription());
+			item.setImage(element.getImagePath());
+			item.setFirst_step(element.getIsFirstStep() == 1 ? true : false);
+			item.setLast_step(element.getIsLastStep() == 1 ? true : false);
+			item.setName(element.getTitle());
+			item.setCreatedAt(element.getCreatedAt().getTime());
+			item.setChangedAt(element.getChangedAt().getTime());
+			saveOperationPatternStepResult((Result[])element.getResults().toArray(), element.getId());
+			list.add(item);
+		}
+		adapter.saveItems(list);
+		
+	}
+
+	private void saveOperationPatternStepResult(Result[] array, String operationPatternStepUuid) {
+		
+		if (array == null) {
+			return;
+		}
+		
+		OperationPatternStepResultDBAdapter adapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
+		ArrayList<ru.toir.mobile.db.tables.OperationPatternStepResult> list = new ArrayList<ru.toir.mobile.db.tables.OperationPatternStepResult>();
+		
+		for (Result element : array) {
+			ru.toir.mobile.db.tables.OperationPatternStepResult item = new ru.toir.mobile.db.tables.OperationPatternStepResult();
+			item.set_id(0);
+			item.setUuid(element.getId());
+			item.setOperation_pattern_step_uuid(operationPatternStepUuid);
+			item.setNext_operation_pattern_step_uuid(element.getNextPatternStep().getId());
+			item.setTitle(element.getTitle());
+			item.setMeasure_type_uuid(element.getMeasureType().getId());
+			saveMeasureType(new MeasureType[] { element.getMeasureType() });
+			item.setCreatedAt(element.getCreatedAt().getTime());
+			item.setChangedAt(element.getChangedAt().getTime());
+			list.add(item);
+		}
+		adapter.saveItems(list);
+		
+	}
+
 	private void saveDocumentType(DocumentType[] array) {
 
 		if (array == null) {
@@ -397,7 +503,7 @@ public class ReferenceProcessor {
 		}
 		adapter.saveItems(list);
 	}
-	
+
 	private void saveEquipment(Equipment[] array) {
 
 		if (array == null) {
@@ -415,7 +521,7 @@ public class ReferenceProcessor {
 			item.setEquipment_type_uuid(element.getEquipmentType().getId());
 			saveEquipmentType(new EquipmentType[] { element.getEquipmentType() });
 			item.setCritical_type_uuid(element.getCriticalityType().getId());
-			saveCriticalType(new CriticalityType[]{ element.getCriticalityType() });
+			CriticalityType.saveAll(new CriticalityType[]{ element.getCriticalityType() }, mContext);
 			item.setStart_date(element.getStartupDate().getTime());
 			item.setLatitude(element.getGeoCoordinates().getLatitude());
 			item.setLongitude(element.getGeoCoordinates().getLongitude());
@@ -437,7 +543,7 @@ public class ReferenceProcessor {
 		}
 		adapter.saveItems(list);
 	}
-	
+
 	private void saveOperationStatus(Status[] array) {
 	
 		if (array == null) {

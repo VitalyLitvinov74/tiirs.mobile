@@ -1,6 +1,12 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
 import java.util.Date;
+
+import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.tables.CriticalType;
+import android.content.Context;
 
 import com.google.gson.annotations.Expose;
 /**
@@ -81,6 +87,33 @@ public class CriticalityType {
 	 */
 	public void setChangedAt(Date changedAt) {
 		ChangedAt = changedAt;
+	}
+	
+	public static ArrayList<CriticalType> getLocalFormat(CriticalityType[] array) {
+
+		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
+
+		if (array == null) {
+			return list;
+		}
+
+		for (CriticalityType element : array) {
+			CriticalType item = new CriticalType();
+			item.set_id(0);
+			item.setUuid(element.getId());
+			item.setType(element.getValue());
+			item.setCreatedAt(element.getCreatedAt().getTime());
+			item.setChangedAt(element.getChangedAt().getTime());
+			list.add(item);
+		}
+		
+		return list;
+	}
+	
+	public static void saveAll(CriticalityType[] array, Context context) {
+		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
+				new TOiRDatabaseContext(context));
+		adapter.saveItems(getLocalFormat(array));
 	}
 
 }

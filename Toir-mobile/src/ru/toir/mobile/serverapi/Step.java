@@ -2,6 +2,7 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 
@@ -26,6 +27,10 @@ public class Step {
     protected String Title;
     @Expose
     protected List<Result> Results = new ArrayList<Result>();
+    @Expose
+	private Date CreatedAt;
+	@Expose
+	private Date ChangedAt;
 
     /**
      * 
@@ -147,6 +152,34 @@ public class Step {
 	 */
 	public void setTitle(String title) {
 		Title = title;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public Date getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(Date createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public Date getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(Date changedAt) {
+		ChangedAt = changedAt;
 	}
 
 }

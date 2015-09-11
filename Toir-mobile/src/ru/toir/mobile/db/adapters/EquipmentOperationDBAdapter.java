@@ -1,6 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,7 +162,17 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
-	
+
+	/**
+	 * Метод делает то же что и replace, дополнительно меняет ChangedAt на текущее время.
+	 * @param item
+	 * @return
+	 */
+	public long update(EquipmentOperation item) {
+		item.setChangedAt(Calendar.getInstance().getTime().getTime());
+		return replace(item);
+	}
+
 	/**
 	 * Возвращает операцию над оборудованием по uuid
 	 * @param uuid
@@ -298,6 +309,20 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 				OperationStatusDBAdapter.FIELD_UUID, false);
 		tables.append(' ').append(table);
 		projection.putAll(OperationStatusDBAdapter.getProjection());
+		
+		// результаты выполнения операций
+		table = getLeftJoinTables(TABLE_NAME,
+				EquipmentOperationResultDBAdapter.TABLE_NAME, FIELD_UUID,
+				EquipmentOperationResultDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID, false);
+		tables.append(' ').append(table);
+		projection.putAll(EquipmentOperationResultDBAdapter.getProjection());
+		
+		// справочник вариантов результатов выполнения операции
+		table = getLeftJoinTables(EquipmentOperationResultDBAdapter.TABLE_NAME,
+				OperationResultDBAdapter.TABLE_NAME, EquipmentOperationResultDBAdapter.FIELD_OPERATION_RESULT_UUID,
+				OperationResultDBAdapter.FIELD_UUID, false);
+		tables.append(' ').append(table);
+		projection.putAll(OperationResultDBAdapter.getProjection());
 		
 		queryBuilder.setTables(tables.toString());
 		queryBuilder.setProjectionMap(projection);
