@@ -109,6 +109,9 @@ public class OperationActivity extends Activity {
 			return title;
 		}
 	}
+	
+	// TODO нужно сделать обработку выхода из activity по нажатию кнопки back
+	// и показ оператору диалога с выбором причины отказа от выполнения операции
 
 	/*
 	 * (non-Javadoc)
@@ -231,7 +234,10 @@ public class OperationActivity extends Activity {
 					public void onClick(View v) {
 						// если были измерения, сохраняем полученные значения
 						if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
-							saveMeasureValue(measureType, current_result_uuid);
+							if (!saveMeasureValue(measureType,
+									current_result_uuid)) {
+								return;
+							}
 						}
 
 						// показываем финальный шаг
@@ -244,7 +250,10 @@ public class OperationActivity extends Activity {
 					public void onClick(View v) {
 						// если были измерения, сохраняем полученные значения
 						if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
-							saveMeasureValue(measureType, current_result_uuid);
+							if (!saveMeasureValue(measureType,
+									current_result_uuid)) {
+								return;
+							}
 						}
 
 						// переходим к следующему шагу
@@ -356,6 +365,8 @@ public class OperationActivity extends Activity {
 			cameraLayout.addView(cameraView);
 			photoContainer.addView(cameraLayout);
 			photoContainer.setVisibility(View.VISIBLE);
+			
+			lastPhotoFile = null;
 
 			// Create our Preview view and set it as the content of our
 			// activity.
@@ -380,7 +391,8 @@ public class OperationActivity extends Activity {
 		}
 	}
 
-	private void saveMeasureValue(String type, String resultUuid) {
+	private boolean saveMeasureValue(String type, String resultUuid) {
+		
 		MeasureValue value = new MeasureValue();
 		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
@@ -388,7 +400,12 @@ public class OperationActivity extends Activity {
 		value.setEquipment_operation_uuid(operation_uuid);
 		value.setOperation_pattern_step_result_uuid(resultUuid);
 		value.setDate(Calendar.getInstance().getTime().getTime());
+		
 		if (type.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+			if (lastPhotoFile == null || lastPhotoFile.equals("")) {
+				Toast.makeText(getApplicationContext(), "Сфотографируйте объект!", Toast.LENGTH_SHORT).show();
+				return false;
+			}
 			value.setValue(lastPhotoFile);
 		} else if (type.equals(MeasureTypeDBAdapter.Type.FREQUENCY)
 				|| type.equals(MeasureTypeDBAdapter.Type.PRESSURE)
@@ -399,6 +416,7 @@ public class OperationActivity extends Activity {
 		}
 
 		adapter.replace(value);
+		return true;
 	}
 
 	private void ShowFinalStep() {
