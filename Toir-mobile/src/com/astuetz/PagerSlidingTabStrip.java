@@ -47,7 +47,6 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 	public interface IconTabProvider {
 		public int getPageIconResId(int position);
 	}
-
 	// @formatter:off
 	private static final int[] ATTRS = new int[] {
 		android.R.attr.textSize,

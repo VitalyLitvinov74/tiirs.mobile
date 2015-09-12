@@ -4,30 +4,20 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.AutoFocusCallback;
-//import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
-//import android.os.Environment;
 import android.os.Handler;
-import android.text.Editable;
-//import android.util.Log;
-//import android.view.Display;
 import android.view.LayoutInflater;
 //import android.view.Surface;
 //import android.view.SurfaceHolder;
 //import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.view.WindowManager;
-import android.text.TextWatcher;
-//import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-//import android.widget.Toast;
 import android.support.v4.app.Fragment;
 
 
@@ -43,14 +33,7 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
-//import java.io.File;
-//import java.io.FileNotFoundException;
-//import java.io.FileOutputStream;
-//import java.io.IOException;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
 import java.util.EnumMap;
-//import java.util.List;
 import java.util.Map;
 
 public class QRTestFragment extends Fragment {
@@ -61,8 +44,7 @@ public class QRTestFragment extends Fragment {
 	private Handler autoFocusHandler;
 	private FrameLayout preview;
 	private TextView scanText;
-	private ImageView bar_code;
-	private EditText code_for_bar;
+	//private ImageView bar_code;
 	private ImageScanner scanner;
 	//private boolean barcodeScanned = false;
 	private boolean previewing = true;
@@ -83,7 +65,6 @@ public class QRTestFragment extends Fragment {
     public void onResume() {
         super.onResume();
         resumeCamera();
-        //generateCodeImage(code_for_bar.getText().toString());
     }
 
     public void onPause() {
@@ -123,7 +104,7 @@ public class QRTestFragment extends Fragment {
 
         scanText = (TextView) rootView.findViewById(R.id.scanText);
 
-        bar_code = (ImageView) rootView.findViewById(R.id.bar_code);
+        //bar_code = (ImageView) rootView.findViewById(R.id.bar_code);
         //code_for_bar = (EditText) rootView.findViewById(R.id.code_for_bar);
         /*
         code_for_bar.addTextChangedListener(new TextWatcher() {
@@ -219,15 +200,6 @@ public class QRTestFragment extends Fragment {
             autoFocusHandler.postDelayed(doAutoFocus, 1000);
         }
     };
-
-    private void generateCodeImage(String text) {
-        try {
-            Bitmap bitmap = encodeAsBitmap(text, BarcodeFormat.QR_CODE, 150, 150);
-            bar_code.setImageBitmap(bitmap);
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Generate bitmap image with QR or BAR code.

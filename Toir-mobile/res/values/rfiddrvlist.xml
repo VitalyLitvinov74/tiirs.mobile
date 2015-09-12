@@ -6,6 +6,8 @@
         <item >Reader 666</item>
         <item >Barcode</item>
         <item >QRcode</item>        
+        <item >Barcode2D</item>
+        <item >Driver C5</item>
     </string-array>
     <string-array name="drvClassNameList">
         <item >RFIDDriverNull</item>
@@ -13,6 +15,8 @@
         <item >RFIDDriver666</item>
         <item >RFIDBarcode</item>
         <item >RFIDQRcode</item>
+        <item >RFIDBarcode2D</item>
+        <item >RFIDDriverC5</item>
     </string-array>
     
 </resources>

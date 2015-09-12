@@ -19,10 +19,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Bundle;
@@ -38,9 +37,7 @@ import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.*;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
-import ru.toir.mobile.utils.DataUtils;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.location.Location;
@@ -55,9 +52,10 @@ public class GPSFragment extends Fragment {
 	Location location;
 	TextView gpsLog;
 	ArrayList<OverlayItem> aOverlayItemArray;
-	private SimpleCursorAdapter equipmentAdapter;
-	private ListviewClickListener clickListener = new ListviewClickListener();
-
+	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+	//private SimpleCursorAdapter equipmentAdapter;
+	private	int LastItemPosition = -1;
+	
 	/**
 	 * Класс объекта оборудования для отображения на крате
 	 * 
@@ -85,6 +83,7 @@ public class GPSFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		String equipmentUUID = "";
+		Float	equipment_latitude=0f, equipment_longitude=0f;
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext()));
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
@@ -123,14 +122,14 @@ public class GPSFragment extends Fragment {
 		mapController.setCenter(point2);
 
 		// добавляем тестовый маркер
-		aOverlayItemArray = new ArrayList<OverlayItem>();
+		//aOverlayItemArray = new ArrayList<OverlayItem>();
 		OverlayItem overlayItem = new OverlayItem("We are here", "WAH",
 				new GeoPoint(curLatitude, curLongitude));
+		aOverlayItemArray = new ArrayList<OverlayItem>();
 		aOverlayItemArray.add(overlayItem);
 		ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
-		mapView.getOverlays().add(aItemizedIconOverlay);
-		ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+		mapView.getOverlays().add(aItemizedIconOverlay);		
 
 		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
 				getActivity().getApplicationContext()));
@@ -153,44 +152,41 @@ public class GPSFragment extends Fragment {
 			cnt2 = 0;
 			while (cnt2 < equipOperationList.size()) {
 				// equipOpList.get(cnt2).getUuid();
-				String location = "";
-				EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
+				EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 						new TOiRDatabaseContext(getActivity()
 								.getApplicationContext()));
 				equipmentUUID = equipOperationList.get(cnt2).getEquipment_uuid();
 				if (equipmentUUID != null) {
-					location = eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
+					//location = eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
 					HashMap<String, String> hm = new HashMap<String, String>();
-					hm.put("name", eqDBAdapter.getEquipsNameByUUID(equipmentUUID)
+					hm.put("name", equipmentDBAdapter.getEquipsNameByUUID(equipmentUUID)
 							//+ " ["
 							//+ eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
 							//+ "]"
 							);
 					// default
-					hm.put("location", eqDBAdapter.getLocationByUUID(equipmentUUID));
-					aList.add(hm);
-
-					
-					// TODO: добавить парсинг реальных координат
-					String coordinates[] = location.split("[NSWE]");
-					// coordinates[0]; // Latitude
-					// coordinates[1]; // Longitude
-					// N60.04535 E30.12754
+					hm.put("location", equipmentDBAdapter.getLocationByUUID(equipmentUUID));
+					aList.add(hm);					
+					// String coordinates[] = location.split("[NSWE]");
+					//equipment_latitude=equipmentDBAdapter.getLatitudeByUUID(equipmentUUID);
+					//equipment_longitude=equipmentDBAdapter.getLongitudeByUUID(equipmentUUID);
 					curLatitude = curLatitude - 0.0001 * cnt2;
 					curLongitude = curLongitude - 0.0001 * cnt2;
 
-					Equipment equipment = eqDBAdapter
+					Equipment equipment = equipmentDBAdapter
 							.getItem(equipOperationList.get(cnt2)
 									.getEquipment_uuid());
+					//EquipmentOverlayItem olItem = new EquipmentOverlayItem(
+					//		equipment.getTitle(), "Device", new GeoPoint(
+					//				curLatitude, curLongitude));
 					EquipmentOverlayItem olItem = new EquipmentOverlayItem(
 							equipment.getTitle(), "Device", new GeoPoint(
-									curLatitude, curLongitude));
+									equipment_latitude, equipment_longitude));
 					olItem.equipment = equipment;
 					Drawable newMarker = this.getResources().getDrawable(
 							R.drawable.marker_equip);
 					olItem.setMarker(newMarker);
 					overlayItemArray.add(olItem);
-
 					// aOverlayItemArray.add(olItem);
 				}
 				cnt2 = cnt2 + 1;
@@ -202,7 +198,25 @@ public class GPSFragment extends Fragment {
 				equipmentFrom, equipmentTo);
 		// Setting the adapter to the listView
 		lv_equipment.setAdapter(adapter);
-		lv_equipment.setOnItemClickListener(clickListener);
+		//lv_equipment.setOnItemClickListener(clickListener);
+		lv_equipment.setOnItemClickListener(new OnItemClickListener() {
+		      public void onItemClick(AdapterView<?> parent, View view,
+		          int position, long id) {
+		    	  // TODO связать нажатие в списке с картой: изменить цвет маркера
+		  			OverlayItem item = overlayItemArray.get(position);
+		  		  // Get the new Drawable
+		  			Drawable marker =view.getResources().getDrawable(R.drawable.marker_equip_selected);
+		  		  // Set the new marker
+		  			item.setMarker(marker);		
+		  			if (LastItemPosition>=0)
+		  				{
+			  			 OverlayItem item2 = overlayItemArray.get(LastItemPosition);
+			  			 marker =view.getResources().getDrawable(R.drawable.marker_equip);
+				  		 item2.setMarker(marker);				  				
+		  				}
+		  			LastItemPosition = position;
+		      	}
+		    });
 		
 		TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
@@ -250,16 +264,6 @@ public class GPSFragment extends Fragment {
 
 		return rootView;
 	}
-
-public class ListviewClickListener implements
-AdapterView.OnItemClickListener {
-	@Override
-	public void onItemClick(AdapterView<?> parent, View selectedItemView,
-		int position, long id) {
-		//Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-		// TODO связать нажатие в списке с картой: изменить цвет маркера
-	}
-}
 
 	public void onInit(View view) {
 
