@@ -195,18 +195,26 @@ public class OperationActivity extends Activity {
 				new TOiRDatabaseContext(getApplicationContext()));
 		equipmentOperationResultDBAdapter.replace(operationResult);
 
-		ShowFirstStep();
+		// TODO нужно отработать вариант когда activiti будет создаваться вновь после ухода в фон
+		// соответственно нужно показывать не первый шаг а текущий на котором приложение ушло в фон
+		showStep(getFirstStep().getUuid());
 	}
-
-	private void ShowNextStep(String step_uuid) {
-		OperationPatternStep step = getStep(step_uuid);
-		if (step == null) {
-			Toast.makeText(this, "Шаг с UUID: " + step_uuid + " не найден",
-					Toast.LENGTH_SHORT).show();
-			return;
+	
+	private void showStep(String uuid) {
+		
+		OperationPatternStep step = null;
+		
+		step = getStep(uuid);
+		
+		if (step != null) {
+			showStepContent(step);
+		} else {
+			Toast.makeText(this, "Шаг не найден", Toast.LENGTH_SHORT).show();
 		}
+	}
+	
+	private void showStepContent(OperationPatternStep step) {
 
-		// RelativeLayout.LayoutParams param;
 		stepTitle.setText(step.getTitle());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
@@ -257,7 +265,7 @@ public class OperationActivity extends Activity {
 						}
 
 						// переходим к следующему шагу
-						ShowNextStep(next_step_uuid);
+						showStep(next_step_uuid);
 					}
 				});
 			}
@@ -391,6 +399,12 @@ public class OperationActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Сохранение результата измерения
+	 * @param type
+	 * @param resultUuid
+	 * @return
+	 */
 	private boolean saveMeasureValue(String type, String resultUuid) {
 		
 		MeasureValue value = new MeasureValue();
@@ -419,6 +433,10 @@ public class OperationActivity extends Activity {
 		return true;
 	}
 
+	/**
+	 * Показываем экран с выбором результата(вердикта) выполнения операции
+	 * и возможностью изменить статус операции (вместо "Выполнена" по умолчанию)
+	 */
 	private void ShowFinalStep() {
 		Button resultButton = new Button(getApplicationContext());
 		resultButton.setText("Завершить операцию");
@@ -497,39 +515,10 @@ public class OperationActivity extends Activity {
 		});
 	}
 
-	private void ShowFirstStep() {
-		// получаем первый шаг операции
-		OperationPatternStep firstStep = getFirstStep();
-		if (firstStep == null) {
-			Toast.makeText(this, "Первый шаг не найден", Toast.LENGTH_SHORT)
-					.show();
-			return;
-		}
-
-		stepTitle.setText(firstStep.getTitle());
-		// firstStep.getImage();
-		stepDescrition.setText(firstStep.getDescription());
-		numStepButton.setText(firstStep.get_id() + "");
-
-		// получаем список результатов шагов
-		ArrayList<OperationPatternStepResult> resultsList = getStepResult(firstStep
-				.getUuid());
-		for (OperationPatternStepResult result : resultsList) {
-			Button resultButton = new Button(getApplicationContext());
-			final String next_step_uuid = result
-					.getNext_operation_pattern_step_uuid();
-			resultButton.setText(result.getTitle());
-			resultButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					ShowNextStep(next_step_uuid);
-				}
-			});
-			layout.addView(resultButton);
-		}
-
-	}
-
+	/**
+	 * Возвращает первый шаг операции
+	 * @return
+	 */
 	private OperationPatternStep getFirstStep() {
 		for (OperationPatternStep step : patternSteps) {
 			if (step.isFirst_step()) {
@@ -539,6 +528,11 @@ public class OperationActivity extends Activity {
 		return null;
 	}
 
+	/**
+	 * Возвращает шаг операции
+	 * @param uuid
+	 * @return
+	 */
 	private OperationPatternStep getStep(String uuid) {
 		for (OperationPatternStep step : patternSteps) {
 			if (uuid.equals(step.getUuid())) {
@@ -548,6 +542,11 @@ public class OperationActivity extends Activity {
 		return null;
 	}
 
+	/**
+	 * Возвращает список вариантов выполнения шага операции
+	 * @param step_uuid
+	 * @return
+	 */
 	private ArrayList<OperationPatternStepResult> getStepResult(String step_uuid) {
 		ArrayList<OperationPatternStepResult> resultsList = new ArrayList<OperationPatternStepResult>();
 		for (OperationPatternStepResult result : stepsResults) {
@@ -558,6 +557,7 @@ public class OperationActivity extends Activity {
 		return resultsList;
 	}
 
+	// класс для работы с камеров во фрагменте(возможно можно вынести в отдельный класс)
 	/**
 	 * Surface on which the camera projects it's capture results. This is
 	 * derived both from Google's docs and the excellent StackOverflow answer
