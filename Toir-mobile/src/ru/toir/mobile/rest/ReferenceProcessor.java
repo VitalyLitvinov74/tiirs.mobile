@@ -63,10 +63,10 @@ public class ReferenceProcessor {
 	private String mServerUrl;
 	private Context mContext;
 	public static class ReferenceNames {
-		// TODO отдельно нет справочника EquipmentDocumentation, OperationPattern, OperationPatternStep, OperationPatternStepResult
 		public static String CriticalTypeName = "CriticalityType";
 		public static String DocumentTypeName = "DocumentType";
-		public static String EquipmentName = "Equipment";
+		// TODO нужен отдельный метод для получения оборудования/документации по оборудованию(api/equipment)
+		//public static String EquipmentName = "Equipment";
 		public static String EquipmentStatusName = "EquipmentStatus";
 		public static String EquipmentTypeName = "EquipmentType";
 		public static String MeasureTypeName = "MeasureType";
@@ -186,8 +186,10 @@ public class ReferenceProcessor {
 								CriticalityType[].class), mContext);
 					} else if(name.equals(ReferenceNames.DocumentTypeName)) {
 						saveDocumentType(gson.fromJson(jsonString, DocumentType[].class));
+					/*
 					} else if(name.equals(ReferenceNames.EquipmentName)) {
 						saveEquipment(gson.fromJson(jsonString, Equipment[].class));
+					*/
 					} else if(name.equals(ReferenceNames.EquipmentStatusName)) {
 						saveEquipmentStatus(gson.fromJson(jsonString, EquipmentStatus[].class));
 					} else if(name.equals(ReferenceNames.EquipmentTypeName)) {
@@ -222,9 +224,11 @@ public class ReferenceProcessor {
 		} else if(referenceName.equals(ReferenceNames.DocumentTypeName)) {
 			DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
+		/*
 		} else if(referenceName.equals(ReferenceNames.EquipmentName)) {
 			EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
+		*/
 		} else if(referenceName.equals(ReferenceNames.EquipmentStatusName)) {
 			EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
@@ -527,7 +531,7 @@ public class ReferenceProcessor {
 			item.setLongitude(element.getGeoCoordinates().getLongitude());
 			item.setTag_id(element.getTag());
 			// TODO когда на сервере появится - добавить
-			item.setImg("");
+			item.setImage("");
 			item.setEquipmentStatus_uuid(element.getEquipmentStatus().getId());
 			saveEquipmentStatus(new EquipmentStatus[] { element.getEquipmentStatus() });
 			// TODO когда на сервере появится - добавить

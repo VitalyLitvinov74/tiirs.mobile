@@ -111,7 +111,7 @@ public class EquipmentInfoFragment extends Fragment {
 		if (equipmentOperationList.size()>0)
 			tv_equipment_tasks.setText("Результат обслуживания: " + eqOperationResultDBAdapter.getOperationResultByUUID(equipmentOperationList.get(0).getOperation_status_uuid()));
 		else tv_equipment_tasks.setText("Результат обслуживания: оборудование еще не обслуживалось");
-		File imgFile = new File(equipment.getImg());
+		File imgFile = new File(equipment.getImage());
 		if(imgFile.exists()){
 		    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 		    tv_equipment_image.setImageBitmap(myBitmap);

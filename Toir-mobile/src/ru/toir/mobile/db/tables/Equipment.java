@@ -16,7 +16,7 @@ public class Equipment extends BaseTable {
 	private float latitude;
 	private float longitude;
 	private String tag_id;
-	private String img;
+	private String image;
 	private String equipment_status_uuid;
 	private String inventory_number;
 	private String location;
@@ -27,27 +27,6 @@ public class Equipment extends BaseTable {
 	public Equipment() {
 	}
 	
-	/**
-	 * 
-	 */
-	public Equipment(long _id, String uuid, String title, String equipment_type_uuid, String critical_type_uuid, long start_date, float latitude, float longitude, String tag_id, String img, String equipment_status_uuid, String inventory_number, String location, long createdAt, long changedAt) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.title = title;
-		this.equipment_type_uuid = equipment_type_uuid;
-		this.critical_type_uuid = critical_type_uuid;
-		this.start_date = start_date;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.tag_id = tag_id;
-		this.img = img;
-		this.equipment_status_uuid = equipment_status_uuid;
-		this.inventory_number=inventory_number;
-		this.location=location;
-		this.CreatedAt = createdAt;
-		this.ChangedAt = changedAt;
-	}
-
 	/**
 	 * @return the title
 	 */
@@ -162,16 +141,16 @@ public class Equipment extends BaseTable {
 	}
 
 	/**
-	 * @return the img
+	 * @return the image
 	 */
-	public String getImg() {
-		return img;
+	public String getImage() {
+		return image;
 	}
 	/**
-	 * @param img to set
+	 * @param image to set
 	 */
-	public void setImg(String img) {
-		this.img = img;
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 	/**

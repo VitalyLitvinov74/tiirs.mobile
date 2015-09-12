@@ -105,9 +105,9 @@ public class EquipmentInfoActivity extends Activity {
 				tv_equipment_tasks.setText("" + eqOperationResultDBAdapter.getOperationResultByUUID(equipmentOperationList.get(0).getOperation_status_uuid()));
 			else tv_equipment_tasks.setText("оборудование еще не обслуживалось");
 			//File imgFile = new File(getApplicationInfo().dataDir + equipment.getImg());
-			File imgFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile" + equipment.getImg());			
+			File imgFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile" + equipment.getImage());			
 			// temporary!
-			tv_equipment_documentation.setText(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile" + equipment.getImg());
+			tv_equipment_documentation.setText(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile" + equipment.getImage());
 			if(imgFile.exists()){
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 			    tv_equipment_image.setImageBitmap(myBitmap);			    			    
