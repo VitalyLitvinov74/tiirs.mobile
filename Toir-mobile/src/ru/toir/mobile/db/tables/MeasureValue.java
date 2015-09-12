@@ -10,7 +10,7 @@ package ru.toir.mobile.db.tables;
 public class MeasureValue extends BaseTable {
 
 	private String equipment_operation_uuid;
-	private String operation_pattern_step_result;
+	private String operation_pattern_step_result_uuid;
 	private long date;
 	private String value;
 	private long attempt_send_date;
@@ -38,18 +38,18 @@ public class MeasureValue extends BaseTable {
 	}
 
 	/**
-	 * @return the operation_pattern_step_result
+	 * @return the operation_pattern_step_result_uuid
 	 */
-	public String getOperation_pattern_step_result() {
-		return operation_pattern_step_result;
+	public String getOperation_pattern_step_result_uuid() {
+		return operation_pattern_step_result_uuid;
 	}
 
 	/**
-	 * @param operation_pattern_step_result the operation_pattern_step_result to set
+	 * @param uuid the operation_pattern_step_result_uuid to set
 	 */
-	public void setOperation_pattern_step_result(
-			String operation_pattern_step_result) {
-		this.operation_pattern_step_result = operation_pattern_step_result;
+	public void setOperation_pattern_step_result_uuid(
+			String uuid) {
+		operation_pattern_step_result_uuid = uuid;
 	}
 
 	/**

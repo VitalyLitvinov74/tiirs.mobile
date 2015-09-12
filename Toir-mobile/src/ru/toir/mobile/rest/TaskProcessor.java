@@ -419,7 +419,7 @@ public class TaskProcessor {
 		item.setImage(step.getImagePath());
 		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
 		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
-		item.setName(step.getTitle());
+		item.setTitle(step.getTitle());
 		
 		// создаём объекты варантов результатов шагов
 		List<Result> results = step.getResults();

@@ -293,7 +293,7 @@ public class ReferenceProcessor {
 			item.setImage(element.getImagePath());
 			item.setFirst_step(element.getIsFirstStep() == 1 ? true : false);
 			item.setLast_step(element.getIsLastStep() == 1 ? true : false);
-			item.setName(element.getTitle());
+			item.setTitle(element.getTitle());
 			item.setCreatedAt(element.getCreatedAt().getTime());
 			item.setChangedAt(element.getChangedAt().getTime());
 			saveOperationPatternStepResult((Result[])element.getResults().toArray(), element.getId());

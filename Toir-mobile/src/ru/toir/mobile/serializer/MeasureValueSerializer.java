@@ -31,7 +31,7 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValue> {
 		JsonObject result = new JsonObject();
 		result.addProperty(BaseDBAdapter.FIELD_UUID, item.getUuid());
 		result.addProperty(MeasureValueDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID, item.getEquipment_operation_uuid());
-		result.addProperty(MeasureValueDBAdapter.FIELD_OPERATION_PATTERN_STEP_RESULT, item.getOperation_pattern_step_result());
+		result.addProperty(MeasureValueDBAdapter.FIELD_OPERATION_PATTERN_STEP_RESULT_UUID, item.getOperation_pattern_step_result_uuid());
 		result.addProperty(MeasureValueDBAdapter.FIELD_DATE, DataUtils.getDate(item.getDate(), "yyyy-MM-dd hh:mm:ss"));
 		result.addProperty(MeasureValueDBAdapter.FIELD_VALUE, item.getValue());
 		result.addProperty(BaseDBAdapter.FIELD_CREATED_AT, DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));

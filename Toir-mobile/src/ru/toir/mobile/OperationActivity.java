@@ -204,7 +204,7 @@ public class OperationActivity extends Activity {
 		}
 
 		// RelativeLayout.LayoutParams param;
-		stepTitle.setText(step.getName());
+		stepTitle.setText(step.getTitle());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
@@ -386,7 +386,7 @@ public class OperationActivity extends Activity {
 				new TOiRDatabaseContext(getApplicationContext()));
 
 		value.setEquipment_operation_uuid(operation_uuid);
-		value.setOperation_pattern_step_result(resultUuid);
+		value.setOperation_pattern_step_result_uuid(resultUuid);
 		value.setDate(Calendar.getInstance().getTime().getTime());
 		if (type.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
 			value.setValue(lastPhotoFile);
@@ -488,7 +488,7 @@ public class OperationActivity extends Activity {
 			return;
 		}
 
-		stepTitle.setText(firstStep.getName());
+		stepTitle.setText(firstStep.getTitle());
 		// firstStep.getImage();
 		stepDescrition.setText(firstStep.getDescription());
 		numStepButton.setText(firstStep.get_id() + "");

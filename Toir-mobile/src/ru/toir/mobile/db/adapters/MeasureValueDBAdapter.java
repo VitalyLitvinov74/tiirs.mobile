@@ -13,7 +13,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	public static final String TABLE_NAME = "measure_value";
 	
 	public static final String FIELD_EQUIPMENT_OPERATION_UUID = "equipment_operation_uuid";
-	public static final String FIELD_OPERATION_PATTERN_STEP_RESULT = "operation_pattern_step_result";
+	public static final String FIELD_OPERATION_PATTERN_STEP_RESULT_UUID = "operation_pattern_step_result_uuid";
 	public static final String FIELD_DATE = "date";
 	public static final String FIELD_VALUE = "value";
 	public static final String FIELD_ATTEMPT_SEND_DATE = "attempt_send_date";
@@ -27,7 +27,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
 		
 		public static final String EQUIPMENT_OPERATION_UUID = TABLE_NAME + '_' +  FIELD_EQUIPMENT_OPERATION_UUID;
-		public static final String OPERATION_PATTERN_STEP_RESULT = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_STEP_RESULT;
+		public static final String OPERATION_PATTERN_STEP_RESULT_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_STEP_RESULT_UUID;
 		public static final String DATE = TABLE_NAME + '_' + FIELD_DATE;
 		public static final String VALUE = TABLE_NAME + '_' + FIELD_VALUE;
 		public static final String ATTEMPT_SEND_DATE = TABLE_NAME + '_' + FIELD_ATTEMPT_SEND_DATE;
@@ -44,7 +44,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
 
 		mProjection.put(Projection.EQUIPMENT_OPERATION_UUID, getFullName(TABLE_NAME, FIELD_EQUIPMENT_OPERATION_UUID) + " AS " + Projection.EQUIPMENT_OPERATION_UUID);
-		mProjection.put(Projection.OPERATION_PATTERN_STEP_RESULT, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_STEP_RESULT) + " AS " + Projection.OPERATION_PATTERN_STEP_RESULT);
+		mProjection.put(Projection.OPERATION_PATTERN_STEP_RESULT_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_STEP_RESULT_UUID) + " AS " + Projection.OPERATION_PATTERN_STEP_RESULT_UUID);
 		mProjection.put(Projection.DATE, getFullName(TABLE_NAME, FIELD_DATE) + " AS " + Projection.DATE);
 		mProjection.put(Projection.VALUE, getFullName(TABLE_NAME, FIELD_VALUE) + " AS " + Projection.VALUE);
 		mProjection.put(Projection.ATTEMPT_SEND_DATE, getFullName(TABLE_NAME, FIELD_ATTEMPT_SEND_DATE) + " AS " + Projection.ATTEMPT_SEND_DATE);
@@ -103,7 +103,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		
 		getItem(cursor, item);
 		item.setEquipment_operation_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID)));
-		item.setOperation_pattern_step_result(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT)));
+		item.setOperation_pattern_step_result_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT_UUID)));
 		item.setDate(cursor.getInt(cursor.getColumnIndex(FIELD_DATE)));
 		item.setValue(cursor.getString(cursor.getColumnIndex(FIELD_VALUE)));
 		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));
@@ -123,7 +123,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		ContentValues values = putCommonFields(item);
 
 		values.put(FIELD_EQUIPMENT_OPERATION_UUID, item.getEquipment_operation_uuid());
-		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT, item.getOperation_pattern_step_result());
+		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT_UUID, item.getOperation_pattern_step_result_uuid());
 		values.put(FIELD_DATE, item.getDate());
 		values.put(FIELD_VALUE, item.getValue());
 		values.put(FIELD_ATTEMPT_SEND_DATE, item.getAttempt_send_date());
