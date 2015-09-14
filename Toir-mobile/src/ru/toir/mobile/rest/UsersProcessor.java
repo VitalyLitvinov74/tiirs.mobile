@@ -73,7 +73,11 @@ public class UsersProcessor {
 				
 				User serverUser = new Gson().fromJson(jsonString, User.class);
 				if (serverUser != null) {
-					Users user = new Users();
+					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
+					Users user = adapter.getItem(AuthorizedUser.getInstance().getTagId());
+					if (user == null) {
+						user = new Users();
+					}
 					user.setUuid(serverUser.getId());
 					user.setName(serverUser.getUserName());
 					user.setLogin(serverUser.getEmail());
@@ -82,13 +86,10 @@ public class UsersProcessor {
 					// TODO с сервера не приходит тип
 					user.setType(3);
 					// TODO реализовать сохранение хэша вместо ид метки
-					user.setTag_id("01234567");
-					boolean active = serverUser.isIsActive();
-					user.setActive(active);
+					user.setTag_id(AuthorizedUser.getInstance().getTagId());
+					user.setActive(serverUser.isIsActive());
 					// TODO с сервера не приходит должность
 					user.setWhois("Бугор");
-
-					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
 					adapter.replaceItem(user);
 				} else {
 					return false;

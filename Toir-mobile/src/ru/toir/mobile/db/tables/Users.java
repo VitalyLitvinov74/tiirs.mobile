@@ -25,18 +25,6 @@ public class Users {
 	public Users() {
 	}
 
-	public Users(long _id, String uuid, String name, String login, String pass, int type, String tag_id, String whois, boolean active) {
-		this._id = _id;
-		this.uuid = uuid;
-		this.name = name;
-		this.login = login;
-		this.pass = pass;
-		this.type = type;
-		this.tag_id = tag_id;
-		this.active = active;
-		this.whois = whois;
-	}
-
 	/**
 	 * @return the uuid
 	 */
