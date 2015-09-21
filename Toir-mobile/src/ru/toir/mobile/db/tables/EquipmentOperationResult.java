@@ -126,7 +126,7 @@ public class EquipmentOperationResult extends BaseTable {
 		this.type = type;
 	}
 
-	public long getType() {
+	public int getType() {
 		return type;
 	}
 }

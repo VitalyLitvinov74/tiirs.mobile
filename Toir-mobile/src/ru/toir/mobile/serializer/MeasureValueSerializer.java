@@ -4,12 +4,8 @@
 package ru.toir.mobile.serializer;
 
 import java.lang.reflect.Type;
-
-import ru.toir.mobile.db.adapters.BaseDBAdapter;
-import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
-import ru.toir.mobile.db.tables.MeasureValue;
+import ru.toir.mobile.serverapi.result.MeasureValue;
 import ru.toir.mobile.utils.DataUtils;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -26,16 +22,15 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValue> {
 	 */
 	@Override
 	public JsonElement serialize(MeasureValue item, Type arg1,
-			JsonSerializationContext arg2) {
+			JsonSerializationContext serializeContext) {
 
 		JsonObject result = new JsonObject();
-		result.addProperty(BaseDBAdapter.FIELD_UUID, item.getUuid());
-		result.addProperty(MeasureValueDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID, item.getEquipment_operation_uuid());
-		result.addProperty(MeasureValueDBAdapter.FIELD_OPERATION_PATTERN_STEP_RESULT_UUID, item.getOperation_pattern_step_result_uuid());
-		result.addProperty(MeasureValueDBAdapter.FIELD_DATE, DataUtils.getDate(item.getDate(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty(MeasureValueDBAdapter.FIELD_VALUE, item.getValue());
-		result.addProperty(BaseDBAdapter.FIELD_CREATED_AT, DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty(BaseDBAdapter.FIELD_CHANGED_AT, DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("Id", item.getUuid());
+		result.addProperty("OperationPatternStepResultId", item.getOperation_pattern_step_result_uuid());
+		result.addProperty("Date", DataUtils.getDate(item.getDate(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("Value", item.getValue());
+		result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("ChangedAt", DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
 		
 		return result;
 	}

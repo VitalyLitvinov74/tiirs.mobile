@@ -15,7 +15,6 @@ import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
-import ru.toir.mobile.TaskResult;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -60,6 +59,7 @@ import ru.toir.mobile.serverapi.OrderStatus;
 import ru.toir.mobile.serverapi.Result;
 import ru.toir.mobile.serverapi.Status;
 import ru.toir.mobile.serverapi.Step;
+import ru.toir.mobile.serverapi.result.TaskResult;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -591,8 +591,8 @@ public class TaskProcessor {
 		task = adapter.getTaskByUuidAndUpdated(taskUuid);
 
 		if (task != null) {
-			TaskResult taskResult = new TaskResult(mContext);
-			if (taskResult.getTaskResult(task.getUuid())) {
+			TaskResult taskResult = new TaskResult();
+			if (taskResult.load(mContext, task.getUuid())) {
 				ArrayList<TaskResult> taskResults = new ArrayList<TaskResult>();
 				taskResults.add(taskResult);
 				return TasksSendResults(taskResults, token);
@@ -622,8 +622,8 @@ public class TaskProcessor {
 		// получаем из базы результаты связанные с нарядами
 		ArrayList<TaskResult> taskResults = new ArrayList<TaskResult>();
 		for (Task task : tasks) {
-			TaskResult taskResult = new TaskResult(mContext);
-			taskResult.getTaskResult(task.getUuid());
+			TaskResult taskResult = new TaskResult();
+			taskResult.load(mContext, task.getUuid());
 			taskResults.add(taskResult);
 		}
 
@@ -652,18 +652,18 @@ public class TaskProcessor {
 			if (tasks != null) {
 				StringBuilder postData = new StringBuilder();
 				// TODO реализовать упаковку результатов в json объект
-				//TaskResult taskResult = new TaskResult(getApplicationContext());
-				//taskResult.getTaskResult("a1f3a9af-d05b-4123-858f-a753a46f97d5");
-				//TaskResult[] resultArray = new TaskResult[] { taskResult };
+				//ru.toir.mobile.serverapi.result.TaskResult taskResult = new ru.toir.mobile.serverapi.result.TaskResult();
+				//taskResult.loadTaskResult(mContext, "a1f3a9af-d05b-4123-858f-a753a46f97d5");
+				//ru.toir.mobile.serverapi.result.TaskResult[] resultArray = new ru.toir.mobile.serverapi.result.TaskResult[] { taskResult };
+
 				Gson gson = new GsonBuilder()
-						//.setPrettyPrinting()
+						.setPrettyPrinting()
 						.registerTypeAdapter(Task.class, new TaskSerializer())
 						.registerTypeAdapter(TaskResult.class, new TaskResultSerializer())
 						.registerTypeAdapter(EquipmentOperation.class, new EquipmentOperationSerializer())
 						.registerTypeAdapter(EquipmentOperationResult.class, new EquipmentOperationResultSerializer())
-						.registerTypeAdapter(MeasureValue.class, new MeasureValueSerializer())
-						.create();
-				//String json = gson.toJson(resultArray);
+						.registerTypeAdapter(MeasureValue.class, new MeasureValueSerializer()).create();
+				
 				String json = gson.toJson(tasks);
 				Log.d("test", json);
 
