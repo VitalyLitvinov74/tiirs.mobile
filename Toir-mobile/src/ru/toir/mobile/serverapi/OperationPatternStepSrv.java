@@ -11,7 +11,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class Step {
+public class OperationPatternStepSrv {
 
     @Expose
     protected String Id;
@@ -26,7 +26,7 @@ public class Step {
     @Expose
     protected String Title;
     @Expose
-    protected List<Result> Results = new ArrayList<Result>();
+    protected List<OperationPatternStepResultSrv> Results = new ArrayList<OperationPatternStepResultSrv>();
     @Expose
 	private Date CreatedAt;
 	@Expose
@@ -127,7 +127,7 @@ public class Step {
      * @return
      *     The Results
      */
-    public List<Result> getResults() {
+    public List<OperationPatternStepResultSrv> getResults() {
         return Results;
     }
 
@@ -136,7 +136,7 @@ public class Step {
      * @param Results
      *     The Results
      */
-    public void setResults(List<Result> Results) {
+    public void setResults(List<OperationPatternStepResultSrv> Results) {
         this.Results = Results;
     }
 

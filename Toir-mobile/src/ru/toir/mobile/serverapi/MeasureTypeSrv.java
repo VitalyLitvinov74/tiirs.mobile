@@ -5,11 +5,11 @@ import java.util.Date;
 import com.google.gson.annotations.Expose;
 
 /**
- * Тип операции
+ * Тип измерения
  * @author Dmitriy Logachov
  *
  */
-public class OperationType {
+public class MeasureTypeSrv {
 
 	@Expose
 	private String Id;

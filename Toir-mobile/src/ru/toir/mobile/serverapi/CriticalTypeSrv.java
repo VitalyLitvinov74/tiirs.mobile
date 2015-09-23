@@ -14,7 +14,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class CriticalityType {
+public class CriticalTypeSrv {
 
 	@Expose
 	private String Id;
@@ -89,7 +89,7 @@ public class CriticalityType {
 		ChangedAt = changedAt;
 	}
 	
-	public static ArrayList<CriticalType> getLocalFormat(CriticalityType[] array) {
+	public static ArrayList<CriticalType> getLocalFormat(CriticalTypeSrv[] array) {
 
 		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
 
@@ -97,7 +97,7 @@ public class CriticalityType {
 			return list;
 		}
 
-		for (CriticalityType element : array) {
+		for (CriticalTypeSrv element : array) {
 			CriticalType item = new CriticalType();
 			item.set_id(0);
 			item.setUuid(element.getId());
@@ -110,7 +110,7 @@ public class CriticalityType {
 		return list;
 	}
 	
-	public static void saveAll(CriticalityType[] array, Context context) {
+	public static void saveAll(CriticalTypeSrv[] array, Context context) {
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(context));
 		adapter.saveItems(getLocalFormat(array));

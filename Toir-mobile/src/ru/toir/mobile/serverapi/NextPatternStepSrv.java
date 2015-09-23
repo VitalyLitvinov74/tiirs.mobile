@@ -6,13 +6,14 @@ import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
+// TODO выяснить что это за объект и нужен ли он!!!!
 /**
- * Следующий шаг в операции {@link Step}
+ * Следующий шаг в операции {@link OperationPatternStepSrv}
  * Суть шаг, но здесь почему-то без Title
  * @author Dmitriy Logachov
  *
  */
-public class NextPatternStep {
+public class NextPatternStepSrv {
 
     @Expose
     private String Id;
@@ -25,7 +26,7 @@ public class NextPatternStep {
     @Expose
     private String ImagePath;
     @Expose
-    private List<Result> Results = new ArrayList<Result>();
+    private List<OperationPatternStepResultSrv> Results = new ArrayList<OperationPatternStepResultSrv>();
 
     /**
      * 
@@ -131,7 +132,7 @@ public class NextPatternStep {
      * @param Results
      *     The Results
      */
-    public void setResults(List<Result> Results) {
+    public void setResults(List<OperationPatternStepResultSrv> Results) {
         this.Results = Results;
     }
 

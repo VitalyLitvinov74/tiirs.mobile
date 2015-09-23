@@ -5,11 +5,11 @@ import java.util.Date;
 import com.google.gson.annotations.Expose;
 
 /**
- * Типы документов 
+ * Тип операции
  * @author Dmitriy Logachov
  *
  */
-public class DocumentType {
+public class OperationTypeSrv {
 
 	@Expose
 	private String Id;
@@ -62,7 +62,8 @@ public class DocumentType {
 	}
 
 	/**
-	 * @param createdAt the createdAt to set
+	 * @param createdAt
+	 *            the createdAt to set
 	 */
 	public void setCreatedAt(Date createdAt) {
 		CreatedAt = createdAt;
@@ -76,7 +77,8 @@ public class DocumentType {
 	}
 
 	/**
-	 * @param changedAt the changedAt to set
+	 * @param changedAt
+	 *            the changedAt to set
 	 */
 	public void setChangedAt(Date changedAt) {
 		ChangedAt = changedAt;

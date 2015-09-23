@@ -1,26 +1,25 @@
 
 package ru.toir.mobile.serverapi;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
 import com.google.gson.annotations.Expose;
 
 /**
- * Шаблон операции
+ * Вариант выполнения текущего шага операции
  * @author Dmitriy Logachov
  *
  */
-public class OperationPattern {
+public class OperationPatternStepResultSrv {
 
     @Expose
     private String Id;
     @Expose
     private String Title;
     @Expose
-    private OperationType operationType;
+    private NextPatternStepSrv NextPatternStep;
     @Expose
-    private List<Step> Steps = new ArrayList<Step>();
+    private MeasureTypeSrv MeasureType;
     @Expose
 	private Date CreatedAt;
 	@Expose
@@ -65,34 +64,38 @@ public class OperationPattern {
     /**
      * 
      * @return
-     *     The Steps
+     *     The NextPatternStep
      */
-    public List<Step> getSteps() {
-        return Steps;
+    public NextPatternStepSrv getNextPatternStep() {
+        return NextPatternStep;
     }
 
     /**
      * 
-     * @param Steps
-     *     The Steps
+     * @param NextPatternStep
+     *     The NextPatternStep
      */
-    public void setSteps(List<Step> Steps) {
-        this.Steps = Steps;
+    public void setNextPatternStep(NextPatternStepSrv NextPatternStep) {
+        this.NextPatternStep = NextPatternStep;
     }
 
-	/**
-	 * @return the operationType
-	 */
-	public OperationType getOperationType() {
-		return operationType;
-	}
+    /**
+     * 
+     * @return
+     *     The MeasureType
+     */
+    public MeasureTypeSrv getMeasureType() {
+        return MeasureType;
+    }
 
-	/**
-	 * @param operationType the operationType to set
-	 */
-	public void setOperationType(OperationType operationType) {
-		this.operationType = operationType;
-	}
+    /**
+     * 
+     * @param MeasureType
+     *     The MeasureType
+     */
+    public void setMeasureType(MeasureTypeSrv MeasureType) {
+        this.MeasureType = MeasureType;
+    }
 
 	/**
 	 * @return the createdAt

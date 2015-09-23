@@ -11,7 +11,7 @@ import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
-import ru.toir.mobile.serverapi.User;
+import ru.toir.mobile.serverapi.UserSrv;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -71,7 +71,7 @@ public class UsersProcessor {
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
 				
-				User serverUser = new Gson().fromJson(jsonString, User.class);
+				UserSrv serverUser = new Gson().fromJson(jsonString, UserSrv.class);
 				if (serverUser != null) {
 					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
 					Users user = adapter.getItem(AuthorizedUser.getInstance().getTagId());

@@ -130,7 +130,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 	 */
 	public long replace(OperationPatternStep item) {
 		long id;
-		ContentValues values = new ContentValues();
+		ContentValues values = putCommonFields(item);
 		
 		values.put(FIELD_OPERATION_PATTERN_UUID, item.getOperation_pattern_uuid());
 		values.put(FIELD_DESCRIPTION, item.getDescription());

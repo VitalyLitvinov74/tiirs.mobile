@@ -10,7 +10,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class User {
+public class UserSrv {
 
 	@Expose
 	private String Id;

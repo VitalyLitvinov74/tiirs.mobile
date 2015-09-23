@@ -5,16 +5,18 @@ import java.util.Date;
 import com.google.gson.annotations.Expose;
 
 /**
- * Текущий статус операции
+ * Статус оборудования
  * @author Dmitriy Logachov
  *
  */
-public class Status {
+public class EquipmentStatusSrv {
 
 	@Expose
 	private String Id;
 	@Expose
 	private String Title;
+	@Expose
+	private int Type;
 	@Expose
 	private Date CreatedAt;
 	@Expose
@@ -52,6 +54,21 @@ public class Status {
 	 */
 	public void setTitle(String Title) {
 		this.Title = Title;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public int getType() {
+		return Type;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public void setType(int type) {
+		Type = type;
 	}
 
 	/**

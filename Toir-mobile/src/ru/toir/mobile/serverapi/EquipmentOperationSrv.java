@@ -2,25 +2,25 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.Date;
-
 import com.google.gson.annotations.Expose;
+
 /**
  * Операция в наряде
  * @author Dmitriy Logachov
  *
  */
-public class Item {
+public class EquipmentOperationSrv {
 
     @Expose
     private Integer Position;
     @Expose
-    private ru.toir.mobile.serverapi.Status Status;
+    private OperationStatusSrv Status;
     @Expose
-    private ru.toir.mobile.serverapi.Equipment Equipment;
+    private EquipmentSrv Equipment;
     @Expose
-    private ru.toir.mobile.serverapi.OperationType OperationType;
+    private OperationTypeSrv OperationType;
     @Expose
-    private ru.toir.mobile.serverapi.OperationPattern OperationPattern;
+    private OperationPatternSrv OperationPattern;
     @Expose
     private String Id;
     @Expose
@@ -51,7 +51,7 @@ public class Item {
      * @return
      *     The Status
      */
-    public ru.toir.mobile.serverapi.Status getStatus() {
+    public OperationStatusSrv getStatus() {
         return Status;
     }
 
@@ -60,7 +60,7 @@ public class Item {
      * @param Status
      *     The Status
      */
-    public void setStatus(ru.toir.mobile.serverapi.Status Status) {
+    public void setStatus(OperationStatusSrv Status) {
         this.Status = Status;
     }
 
@@ -69,7 +69,7 @@ public class Item {
      * @return
      *     The Equipment
      */
-    public ru.toir.mobile.serverapi.Equipment getEquipment() {
+    public EquipmentSrv getEquipment() {
         return Equipment;
     }
 
@@ -78,7 +78,7 @@ public class Item {
      * @param Equipment
      *     The Equipment
      */
-    public void setEquipment(ru.toir.mobile.serverapi.Equipment Equipment) {
+    public void setEquipment(EquipmentSrv Equipment) {
         this.Equipment = Equipment;
     }
 
@@ -87,7 +87,7 @@ public class Item {
      * @return
      *     The OperationType
      */
-    public ru.toir.mobile.serverapi.OperationType getOperationType() {
+    public OperationTypeSrv getOperationType() {
         return OperationType;
     }
 
@@ -96,7 +96,7 @@ public class Item {
      * @param OperationType
      *     The OperationType
      */
-    public void setOperationType(ru.toir.mobile.serverapi.OperationType OperationType) {
+    public void setOperationType(OperationTypeSrv OperationType) {
         this.OperationType = OperationType;
     }
 
@@ -105,7 +105,7 @@ public class Item {
      * @return
      *     The OperationPattern
      */
-    public ru.toir.mobile.serverapi.OperationPattern getOperationPattern() {
+    public OperationPatternSrv getOperationPattern() {
         return OperationPattern;
     }
 
@@ -114,7 +114,7 @@ public class Item {
      * @param OperationPattern
      *     The OperationPattern
      */
-    public void setOperationPattern(ru.toir.mobile.serverapi.OperationPattern OperationPattern) {
+    public void setOperationPattern(OperationPatternSrv OperationPattern) {
         this.OperationPattern = OperationPattern;
     }
 

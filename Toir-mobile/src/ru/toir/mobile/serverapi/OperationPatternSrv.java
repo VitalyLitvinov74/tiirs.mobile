@@ -1,25 +1,26 @@
 
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.List;
 import com.google.gson.annotations.Expose;
 
 /**
- * Вариант выполнения текущего шага операции
+ * Шаблон операции
  * @author Dmitriy Logachov
  *
  */
-public class Result {
+public class OperationPatternSrv {
 
     @Expose
     private String Id;
     @Expose
     private String Title;
     @Expose
-    private ru.toir.mobile.serverapi.NextPatternStep NextPatternStep;
+    private OperationTypeSrv operationType;
     @Expose
-    private ru.toir.mobile.serverapi.MeasureType MeasureType;
+    private List<OperationPatternStepSrv> Steps = new ArrayList<OperationPatternStepSrv>();
     @Expose
 	private Date CreatedAt;
 	@Expose
@@ -64,38 +65,34 @@ public class Result {
     /**
      * 
      * @return
-     *     The NextPatternStep
+     *     The Steps
      */
-    public ru.toir.mobile.serverapi.NextPatternStep getNextPatternStep() {
-        return NextPatternStep;
+    public List<OperationPatternStepSrv> getSteps() {
+        return Steps;
     }
 
     /**
      * 
-     * @param NextPatternStep
-     *     The NextPatternStep
+     * @param Steps
+     *     The Steps
      */
-    public void setNextPatternStep(ru.toir.mobile.serverapi.NextPatternStep NextPatternStep) {
-        this.NextPatternStep = NextPatternStep;
+    public void setSteps(List<OperationPatternStepSrv> Steps) {
+        this.Steps = Steps;
     }
 
-    /**
-     * 
-     * @return
-     *     The MeasureType
-     */
-    public ru.toir.mobile.serverapi.MeasureType getMeasureType() {
-        return MeasureType;
-    }
+	/**
+	 * @return the operationType
+	 */
+	public OperationTypeSrv getOperationType() {
+		return operationType;
+	}
 
-    /**
-     * 
-     * @param MeasureType
-     *     The MeasureType
-     */
-    public void setMeasureType(ru.toir.mobile.serverapi.MeasureType MeasureType) {
-        this.MeasureType = MeasureType;
-    }
+	/**
+	 * @param operationType the operationType to set
+	 */
+	public void setOperationType(OperationTypeSrv operationType) {
+		this.operationType = operationType;
+	}
 
 	/**
 	 * @return the createdAt

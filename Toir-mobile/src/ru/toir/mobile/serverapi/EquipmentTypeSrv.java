@@ -5,11 +5,11 @@ import java.util.Date;
 import com.google.gson.annotations.Expose;
 
 /**
- * Текущий статус наряда
+ * Тип оборудования
  * @author Dmitriy Logachov
  *
  */
-public class OrderStatus {
+public class EquipmentTypeSrv {
 
 	@Expose
 	private String Id;
