@@ -2,7 +2,6 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.Date;
-
 import com.google.gson.annotations.Expose;
 
 /**
@@ -17,7 +16,7 @@ public class OperationPatternStepResultSrv {
     @Expose
     private String Title;
     @Expose
-    private NextPatternStepSrv NextPatternStep;
+    private OperationPatternStepSrv NextPatternStep;
     @Expose
     private MeasureTypeSrv MeasureType;
     @Expose
@@ -66,7 +65,7 @@ public class OperationPatternStepResultSrv {
      * @return
      *     The NextPatternStep
      */
-    public NextPatternStepSrv getNextPatternStep() {
+    public OperationPatternStepSrv getNextPatternStep() {
         return NextPatternStep;
     }
 
@@ -75,7 +74,7 @@ public class OperationPatternStepResultSrv {
      * @param NextPatternStep
      *     The NextPatternStep
      */
-    public void setNextPatternStep(NextPatternStepSrv NextPatternStep) {
+    public void setNextPatternStep(OperationPatternStepSrv NextPatternStep) {
         this.NextPatternStep = NextPatternStep;
     }
 
