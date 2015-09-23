@@ -102,7 +102,7 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getOperationPattern(Bundle bundle) {
-		final String OPERATION_PATTERN_URL = "api/operationpatterns/";
+		final String OPERATION_PATTERN_URL = "/api/operationpatterns/";
 		URI requestUri = null;
 		ArrayList<String> patternUuids = bundle
 				.getStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);

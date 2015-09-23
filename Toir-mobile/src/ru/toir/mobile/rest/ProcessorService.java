@@ -50,14 +50,18 @@ public class ProcessorService extends Service {
 	}
 
 	private String getTaskIdentifier(Bundle extras) {
-		// TODO разобраться что делает это код!
+		// получаем список имён всех параметров запроса, для создания "хэша"
 		String[] keys = extras.keySet().toArray(new String[0]);
 		java.util.Arrays.sort(keys);
 		StringBuilder identifier = new StringBuilder();
 		
 		for (int keyIndex = 0; keyIndex < keys.length; keyIndex++) {
 			String key = keys[keyIndex];
-			// TODO разобраться в этом коде!
+			/*
+			 * для идентификации запроса значение фильтра для сообщений не
+			 * добавляем, так как ответ на один запрос могут ждать разные части
+			 * приложения
+			 */
 			if (key.equals(Extras.RESULT_ACTION_EXTRA)) {
 				continue;
 			}

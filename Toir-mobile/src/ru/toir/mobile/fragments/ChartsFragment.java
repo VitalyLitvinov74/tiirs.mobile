@@ -247,14 +247,10 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        // TODO Auto-generated method stub
-
     }
 
     private void setData(int count, float range) {

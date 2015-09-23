@@ -188,6 +188,7 @@ public class OperationActivity extends Activity {
 		 * cоздаём запись с результатом выполнения операции для фиксации времени
 		 * начала выполнения
 		 */
+		// TODO сделать проверку на наличие результата выполнения!!! чтобы был только один! 
 		EquipmentOperationResult operationResult = new EquipmentOperationResult();
 		operationResult.setEquipment_operation_uuid(operation_uuid);
 		operationResult.setStart_date(new Date().getTime());

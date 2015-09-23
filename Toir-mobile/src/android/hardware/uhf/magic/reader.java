@@ -2,10 +2,8 @@
 package android.hardware.uhf.magic;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.regex.Matcher;
+import java.util.Locale;
 import java.util.regex.Pattern;
-
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
@@ -479,7 +477,6 @@ public class reader {
 				try {
 					Thread.sleep(60);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -829,8 +826,6 @@ public class reader {
 
 	static {
 		System.loadLibrary("uhf-tools");
-		//msound = mSoundPool.load("/system/media/audio/notifications/Argon.ogg",
-		//		1);
 		msound = mSoundPool.load("/system/media/audio/notifications/Altair.ogg",
 				1);
 	}
@@ -839,7 +834,7 @@ public class reader {
 		if (hexString == null || hexString.equals("")) {
 			return null;
 		}
-		hexString = hexString.toUpperCase();
+		hexString = hexString.toUpperCase(Locale.ENGLISH);
 		int length = hexString.length() / 2;
 		char[] hexChars = hexString.toCharArray();
 		byte[] d = new byte[length];
@@ -862,7 +857,7 @@ public class reader {
 			if (hex.length() == 1) {
 				hex = '0' + hex;
 			}
-			ret += hex.toUpperCase();
+			ret += hex.toUpperCase(Locale.ENGLISH);
 		}
 		return ret;
 	}
@@ -911,23 +906,25 @@ public class reader {
 		}
 		return result;
 	}
+
 	private static byte[] string2Bytes(String string) {
-		int blen=string.length()/2;
-		byte[]data=new byte[blen];
-		for(int i=0;i<blen;i++){
-		String bStr=string.substring(2*i,2*(i+1));
-		data[i]=(byte)Integer.parseInt(bStr,16);
+		int blen = string.length() / 2;
+		byte[] data = new byte[blen];
+		for (int i = 0; i < blen; i++) {
+			String bStr = string.substring(2 * i, 2 * (i + 1));
+			data[i] = (byte) Integer.parseInt(bStr, 16);
 		}
 		return data;
-		}
+	}
+
 	private static String decodeString(String string, String encoding) {
 		try {
-		byte[]data=string2Bytes(string);
-		return new String(data, encoding);
+			byte[] data = string2Bytes(string);
+			return new String(data, encoding);
 		} catch (UnsupportedEncodingException ex) {
-		ex.printStackTrace();
-		return null;
+			ex.printStackTrace();
+			return null;
 		}
-		} 
+	}
 
 }
