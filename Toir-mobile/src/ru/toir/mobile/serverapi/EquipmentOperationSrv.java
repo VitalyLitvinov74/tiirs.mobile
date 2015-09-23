@@ -20,7 +20,7 @@ public class EquipmentOperationSrv {
     @Expose
     private OperationTypeSrv OperationType;
     @Expose
-    private OperationPatternSrv OperationPattern;
+    private String OperationPatternId;
     @Expose
     private String Id;
     @Expose
@@ -105,8 +105,8 @@ public class EquipmentOperationSrv {
      * @return
      *     The OperationPattern
      */
-    public OperationPatternSrv getOperationPattern() {
-        return OperationPattern;
+    public String getOperationPatternId() {
+        return OperationPatternId;
     }
 
     /**
@@ -114,8 +114,8 @@ public class EquipmentOperationSrv {
      * @param OperationPattern
      *     The OperationPattern
      */
-    public void setOperationPattern(OperationPatternSrv OperationPattern) {
-        this.OperationPattern = OperationPattern;
+    public void setOperationPatternId(String OperationPattern) {
+        this.OperationPatternId = OperationPattern;
     }
 
     /**

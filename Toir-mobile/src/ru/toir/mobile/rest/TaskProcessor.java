@@ -81,7 +81,7 @@ import android.util.Log;
 public class TaskProcessor {
 
 	private Context mContext;
-	private static final String TASK_GET_URL = "/api/ordershierarchy/";
+	private static final String TASK_GET_URL = "/api/orders/";
 	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
 	private String mServerUrl;
 
@@ -276,14 +276,15 @@ public class TaskProcessor {
 			equipmentStatusDBAdapter.replace(equipmentStatus.get(uuid));
 		}
 
-		// TODO перед записью в базу операций, нужно получить отдельно шаблоны операций и связанную с ними информацию
-		/*
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
 		set = equipmentOperations.keySet();
 		for (String uuid: set) {
 			operationDBAdapter.replace(equipmentOperations.get(uuid));
 		}
 
+		// TODO перед записью в базу операций, нужно получить отдельно шаблоны операций и связанную с ними информацию
+		// шаблоны получаем, удалить/переписать лишний код!
+		/*
 		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationPatterns.keySet();
 		for (String uuid: set) {
@@ -366,12 +367,11 @@ public class TaskProcessor {
 		// создаём объект типа операции
 		operationTypes.put(operation.getOperationType().getId(), getOperationType(operation.getOperationType()));
 		
+		item.setOperation_pattern_uuid(operation.getOperationPatternId());
 		// TODO шаблоны теперь приходят в другом месте, реализовать получение!!!
-		/*
-		item.setOperation_pattern_uuid(operation.getOperationPattern().getId());
 		// создаём объект шаблона операции
-		operationPatterns.put(operation.getOperationPattern().getId(), getOperationPattern(operation.getOperationPattern()));
-		*/
+		//operationPatterns.put(operation.getOperationPatternId(), getOperationPattern(operation.getOperationPattern()));
+
 		
 		item.setOperation_status_uuid(operation.getStatus().getId());
 		// создаём объект статуса операции
@@ -451,7 +451,7 @@ public class TaskProcessor {
 		OperationPatternStepResult item = new OperationPatternStepResult();
 		item.setUuid(result.getId());
 		item.setOperation_pattern_step_uuid(parrentUuid);
-		String nextStepUuid = result.getNextPatternStep() == null ? "00000000-0000-0000-0000-000000000000" : result.getNextPatternStep().getId();
+		String nextStepUuid = result.getNextPatternStepId() == null ? "00000000-0000-0000-0000-000000000000" : result.getNextPatternStepId();
 		item.setNext_operation_pattern_step_uuid(nextStepUuid);
 		item.setTitle(result.getTitle());
 		item.setMeasure_type_uuid(result.getMeasureType().getId());

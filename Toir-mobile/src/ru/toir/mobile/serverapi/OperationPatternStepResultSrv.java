@@ -16,7 +16,7 @@ public class OperationPatternStepResultSrv {
     @Expose
     private String Title;
     @Expose
-    private OperationPatternStepSrv NextPatternStep;
+    private String NextPatternStepId;
     @Expose
     private MeasureTypeSrv MeasureType;
     @Expose
@@ -65,8 +65,8 @@ public class OperationPatternStepResultSrv {
      * @return
      *     The NextPatternStep
      */
-    public OperationPatternStepSrv getNextPatternStep() {
-        return NextPatternStep;
+    public String getNextPatternStepId() {
+        return NextPatternStepId;
     }
 
     /**
@@ -74,8 +74,8 @@ public class OperationPatternStepResultSrv {
      * @param NextPatternStep
      *     The NextPatternStep
      */
-    public void setNextPatternStep(OperationPatternStepSrv NextPatternStep) {
-        this.NextPatternStep = NextPatternStep;
+    public void setNextPatternStepId(String NextPatternStepId) {
+        this.NextPatternStepId = NextPatternStepId;
     }
 
     /**
