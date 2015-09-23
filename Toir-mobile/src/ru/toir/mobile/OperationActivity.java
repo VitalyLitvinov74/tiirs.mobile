@@ -131,7 +131,7 @@ public class OperationActivity extends Activity {
 		layout = (LinearLayout) findViewById(R.id.resultButtonLayout);
 		stepTitle = (TextView) findViewById(R.id.stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.step_description);
-		numStepButton = (Button) findViewById(R.id.button1);
+		numStepButton = (Button) findViewById(R.id.numStepButton);
 
 		// получаем статус и время наряда
 		TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(
@@ -179,9 +179,9 @@ public class OperationActivity extends Activity {
 		operationResults = resultDBAdapter.getItems(equipmentOperation
 				.getOperation_type_uuid());
 
-		TextView taskName = (TextView) findViewById(R.id.textView1);
+		TextView taskName = (TextView) findViewById(R.id.twf_task_title);
 		taskName.setText(taskname);
-		TextView operationName = (TextView) findViewById(R.id.textView2);
+		TextView operationName = (TextView) findViewById(R.id.twf_equipment_title);
 		operationName.setText(operationname);
 
 		/*

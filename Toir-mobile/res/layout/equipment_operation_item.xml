@@ -8,7 +8,7 @@
         android:id="@+id/eoi_ImageStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="Статус операции"
+        android:contentDescription="@string/operation_status_title"
         android:src="@drawable/img_status_1" />
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/eoi_ImageStatus"
-        android:text="Оборудование:"
+        android:text="@string/equipment_title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -38,7 +38,7 @@
         android:layout_alignBottom="@+id/eoi_ImageStatus"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/eoi_ImageStatus"
-        android:text="Операция:"
+        android:text="@string/operation_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -59,7 +59,7 @@
         android:layout_alignBottom="@+id/eoi_ImageStatus"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/eoi_Operation"
-        android:text="Статус:"
+        android:text="@string/status_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <TextView
@@ -79,7 +79,7 @@
         android:layout_alignBottom="@+id/eoi_ImageStatus"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/eoi_Status"
-        android:text="Результат:"
+        android:text="@string/result_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <TextView

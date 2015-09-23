@@ -55,4 +55,16 @@
     <string name="created">Создан:</string>
     <string name="status">Статус</string>
     <string name="closed">Закрыт:</string>
+    <string name="operation_status_title">Статус операции</string>
+    <string name="equipment_title">Оборудование:</string>
+    <string name="operation_title">Операция:</string>
+    <string name="status_title">Статус:</string>
+    <string name="result_title">Результат:</string>
+    <string name="step_image_descr">Изображение шага операции</string>
+    <string name="task_title">Наряд:</string>
+    <string name="operation_step_title">Название шага обслуживания</string>
+    <string name="operation_step_descr_title">Описание шага обслуживания</string>
+    <string name="operation_status_change_title">Изменить статус операции</string>
+    
+    
 </resources>
