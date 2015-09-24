@@ -299,4 +299,13 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		return projection;
 	}
 
+	public void saveItems(ArrayList<Task> list) {
+		mDb.beginTransaction();
+		for (Task item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
+	}
+
 }

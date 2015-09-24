@@ -1,6 +1,13 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.db.tables.OperationType;
+import ru.toir.mobile.db.tables.Equipment;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -130,5 +137,49 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 
 		return item;
 	}
+	
+	public static ArrayList<Equipment> getEquipments(ArrayList<EquipmentOperationSrv> operations) {
 
+		ArrayList<Equipment> list = new ArrayList<Equipment>();
+		for (EquipmentOperationSrv operation : operations) {
+			list.add(operation.getEquipment().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentSrv> getEquipmentSrvs(ArrayList<EquipmentOperationSrv> operations) {
+
+		ArrayList<EquipmentSrv> list = new ArrayList<EquipmentSrv>();
+		for (EquipmentOperationSrv operation : operations) {
+			list.add(operation.getEquipment());
+		}
+		return list;
+	}
+
+	public static ArrayList<OperationType> getOperationTypes(ArrayList<EquipmentOperationSrv> operations) {
+
+		ArrayList<OperationType> list = new ArrayList<OperationType>();
+		for (EquipmentOperationSrv operation : operations) {
+			list.add(operation.getOperationType().getLocal());
+		}
+		return list;
+	}
+	
+	public static Set<String> getOperationPatternUuids(ArrayList<EquipmentOperationSrv> operations) {
+
+		Set<String> list = new HashSet<String>();
+		for (EquipmentOperationSrv operation : operations) {
+			list.add(operation.getOperationPatternId());
+		}
+		return list;
+	}
+	
+	public static ArrayList<OperationStatus> getOperationStatuses(ArrayList<EquipmentOperationSrv> operations) {
+
+		ArrayList<OperationStatus> list = new ArrayList<OperationStatus>();
+		for (EquipmentOperationSrv operation : operations) {
+			list.add(operation.getStatus().getLocal());
+		}
+		return list;
+	}
 }

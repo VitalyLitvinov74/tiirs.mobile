@@ -4,7 +4,7 @@
 package ru.toir.mobile.serializer;
 
 import java.lang.reflect.Type;
-import ru.toir.mobile.serverapi.result.Task;
+import ru.toir.mobile.serverapi.result.TaskRes;
 import ru.toir.mobile.utils.DataUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,13 +15,13 @@ import com.google.gson.JsonSerializer;
  * @author Dmitriy Logachov
  *
  */
-public class TaskSerializer implements JsonSerializer<Task> {
+public class TaskSerializer implements JsonSerializer<TaskRes> {
 
 	/* (non-Javadoc)
 	 * @see com.google.gson.JsonSerializer#serialize(java.lang.Object, java.lang.reflect.Type, com.google.gson.JsonSerializationContext)
 	 */
 	@Override
-	public JsonElement serialize(Task item, Type arg1,
+	public JsonElement serialize(TaskRes item, Type arg1,
 			JsonSerializationContext serializeContext) {
 		JsonObject result = new JsonObject();
 		result.addProperty("Id", item.getUuid());

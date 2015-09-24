@@ -1,5 +1,7 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
+import java.util.List;
 import ru.toir.mobile.db.tables.DocumentationType;
 import com.google.gson.annotations.Expose;
 
@@ -47,6 +49,18 @@ public class DocumentationTypeSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<DocumentationType> getEquipmentDocumentationTypes(ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<DocumentationType> list = new ArrayList<DocumentationType>();
+		for (EquipmentSrv equipment : equipments) {
+			List<EquipmentDocumentationSrv> documentations = equipment.getDocuments(); 
+			for (EquipmentDocumentationSrv documentation : documentations) {
+				list.add(documentation.getDocumentType().getLocal());
+			}
+		}
+		return list;
 	}
 
 }

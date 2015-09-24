@@ -11,22 +11,22 @@ import android.content.Context;
  * @author Dmitriy Logachov
  *
  */
-public class EquipmentOperationResult extends ru.toir.mobile.db.tables.EquipmentOperationResult {
+public class EquipmentOperationResultRes extends ru.toir.mobile.db.tables.EquipmentOperationResult {
 
 	/**
 	 * 
 	 */
-	public EquipmentOperationResult() {
+	public EquipmentOperationResultRes() {
 	}
 	
-	public static EquipmentOperationResult load(Context context, String uuid) {
+	public static EquipmentOperationResultRes load(Context context, String uuid) {
 		EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(context));
 		
 		ru.toir.mobile.db.tables.EquipmentOperationResult result = new ru.toir.mobile.db.tables.EquipmentOperationResult();
 		result = adapter.getItemByOperation(uuid);
 		if (result != null) {
 
-			EquipmentOperationResult item = new EquipmentOperationResult();
+			EquipmentOperationResultRes item = new EquipmentOperationResultRes();
 			item._id = result.get_id();
 			item.uuid = result.getUuid();
 			item.setEquipment_operation_uuid(result.getEquipment_operation_uuid());

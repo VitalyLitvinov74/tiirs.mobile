@@ -3,7 +3,10 @@ package ru.toir.mobile.serverapi;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.TaskStatus;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -153,6 +156,45 @@ public class TaskSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<Task> getTasks(TaskSrv[] tasks) {
+
+		ArrayList<Task> list = new ArrayList<Task>();
+		for (TaskSrv task : tasks) {
+				list.add(task.getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentOperation> getEquipmentOperations(TaskSrv[] tasks) {
+
+		ArrayList<EquipmentOperation> list = new ArrayList<EquipmentOperation>();
+		for (TaskSrv task : tasks) {
+			List<EquipmentOperationSrv> operations = task.getItems(); 
+			for (EquipmentOperationSrv operation : operations) {
+				list.add(operation.getLocal(task.getId()));
+			}
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentOperationSrv> getEquipmentOperationSrvs(TaskSrv[] tasks) {
+
+		ArrayList<EquipmentOperationSrv> list = new ArrayList<EquipmentOperationSrv>();
+		for (TaskSrv task : tasks) {
+			list.addAll(task.getItems());
+		}
+		return list;
+	}
+
+	public static ArrayList<TaskStatus> getTaskStatuses(TaskSrv[] tasks) {
+
+		ArrayList<TaskStatus> list = new ArrayList<TaskStatus>();
+		for (TaskSrv task : tasks) {
+			list.add(task.getOrderStatus().getLocal());
+		}
+		return list;
 	}
 
 }

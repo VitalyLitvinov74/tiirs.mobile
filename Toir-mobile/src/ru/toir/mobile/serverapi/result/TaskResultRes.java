@@ -9,14 +9,14 @@ import android.content.Context;
  * @author Dmitriy Logachov
  *
  */
-public class TaskResult {
+public class TaskResultRes {
 
-	public Task task;
+	public TaskRes task;
 
 	/**
 	 * 
 	 */
-	public TaskResult() {
+	public TaskResultRes() {
 	}
 	
 	/**
@@ -28,7 +28,7 @@ public class TaskResult {
 	 */
 	public boolean load(Context context, String taskUuid) {
 
-		task = Task.load(context, taskUuid);
+		task = TaskRes.load(context, taskUuid);
 		if (task != null) {
 			return true;
 		} else {

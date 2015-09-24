@@ -13,27 +13,27 @@ import android.content.Context;
  * @author Dmitriy Logachov
  *
  */
-public class EquipmentOperation extends ru.toir.mobile.db.tables.EquipmentOperation {
+public class EquipmentOperationRes extends ru.toir.mobile.db.tables.EquipmentOperation {
 	
-	public EquipmentOperationResult equipmentOperationResult;
-	public ArrayList<MeasureValue> measureValues;
+	public EquipmentOperationResultRes equipmentOperationResult;
+	public ArrayList<MeasureValueRes> measureValues;
 
 	/**
 	 * 
 	 */
-	public EquipmentOperation() {
+	public EquipmentOperationRes() {
 	}
 
-	public static ArrayList<EquipmentOperation> load(Context context, String taskUuid) {
+	public static ArrayList<EquipmentOperationRes> load(Context context, String taskUuid) {
 
 		EquipmentOperationDBAdapter adapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(context));
 		
 		ArrayList<ru.toir.mobile.db.tables.EquipmentOperation> operationList = adapter.getItems(taskUuid);
 		if (operationList != null) {
 			
-			ArrayList<EquipmentOperation> returnList = new ArrayList<EquipmentOperation>();
+			ArrayList<EquipmentOperationRes> returnList = new ArrayList<EquipmentOperationRes>();
 			for (ru.toir.mobile.db.tables.EquipmentOperation operation: operationList) {
-				EquipmentOperation item = new EquipmentOperation();
+				EquipmentOperationRes item = new EquipmentOperationRes();
 				item.set_id(operation.get_id());
 				item.setUuid(operation.getUuid());
 				item.setTask_uuid(operation.getTask_uuid());
@@ -44,8 +44,8 @@ public class EquipmentOperation extends ru.toir.mobile.db.tables.EquipmentOperat
 				item.setOperation_time(operation.getOperation_time());
 				item.CreatedAt = operation.getCreatedAt();
 				item.ChangedAt = operation.getChangedAt();
-				item.equipmentOperationResult = EquipmentOperationResult.load(context, item.uuid);
-				item.measureValues = MeasureValue.load(context, item.uuid);
+				item.equipmentOperationResult = EquipmentOperationResultRes.load(context, item.uuid);
+				item.measureValues = MeasureValueRes.load(context, item.uuid);
 				
 				returnList.add(item);
 			}

@@ -344,4 +344,13 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		return cursor;
 	}
 
+	public void saveItems(ArrayList<EquipmentOperation> list) {
+		mDb.beginTransaction();
+		for (EquipmentOperation item : list) {
+			replace(item);
+		}
+		mDb.setTransactionSuccessful();
+		mDb.endTransaction();
+	}
+
 }
