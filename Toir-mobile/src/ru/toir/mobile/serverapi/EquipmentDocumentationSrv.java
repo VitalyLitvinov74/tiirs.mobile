@@ -1,8 +1,6 @@
 
 package ru.toir.mobile.serverapi;
 
-import java.util.Date;
-
 import com.google.gson.annotations.Expose;
 
 /**
@@ -10,38 +8,14 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class EquipmentDocumentationSrv {
+public class EquipmentDocumentationSrv extends BaseObjectSrv {
 
-    @Expose
-    private String Id;
     @Expose
     private String Title;
     @Expose
     private String Path;
     @Expose
     private DocumentationTypeSrv DocumentType;
-    @Expose
-	private Date CreatedAt;
-	@Expose
-	private Date ChangedAt;
-
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
 
     /**
      * 
@@ -96,33 +70,5 @@ public class EquipmentDocumentationSrv {
     public void setDocumentType(DocumentationTypeSrv DocumentType) {
         this.DocumentType = DocumentType;
     }
-
-	/**
-	 * @return the createdAt
-	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
-	}
-
-	/**
-	 * @param createdAt the createdAt to set
-	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
-	}
-
-	/**
-	 * @return the changedAt
-	 */
-	public Date getChangedAt() {
-		return ChangedAt;
-	}
-
-	/**
-	 * @param changedAt the changedAt to set
-	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
-	}
 
 }

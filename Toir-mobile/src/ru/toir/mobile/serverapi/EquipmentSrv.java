@@ -11,7 +11,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class EquipmentSrv {
+public class EquipmentSrv extends BaseObjectSrv {
 
     @Expose
     private String Name;
@@ -24,17 +24,18 @@ public class EquipmentSrv {
     @Expose
     private List<EquipmentDocumentationSrv> Documents = new ArrayList<EquipmentDocumentationSrv>();
     @Expose
-    private String Id;
-    @Expose
     private String Tag;
     @Expose
     private Date StartupDate;
     @Expose
-    private Date CreatedAt;
-    @Expose
-    private Date ChangedAt;
-    @Expose
     private EquipmentStatusSrv EquipmentStatus;
+
+	/**
+	 * @return
+	 */
+	public long getStartupDateTime() {
+		return StartupDate == null ? 0 : StartupDate.getTime();
+	}
 
     /**
      * 
@@ -124,60 +125,6 @@ public class EquipmentSrv {
      */
     public void setDocuments(List<EquipmentDocumentationSrv> Documents) {
         this.Documents = Documents;
-    }
-
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
-
-    /**
-     * 
-     * @return
-     *     The CreatedAt
-     */
-    public Date getCreatedAt() {
-        return CreatedAt;
-    }
-
-    /**
-     * 
-     * @param CreatedAt
-     *     The CreatedAt
-     */
-    public void setCreatedAt(Date CreatedAt) {
-        this.CreatedAt = CreatedAt;
-    }
-
-    /**
-     * 
-     * @return
-     *     The ChangedAt
-     */
-    public Date getChangedAt() {
-        return ChangedAt;
-    }
-
-    /**
-     * 
-     * @param ChangedAt
-     *     The ChangedAt
-     */
-    public void setChangedAt(Date ChangedAt) {
-        this.ChangedAt = ChangedAt;
     }
 
 	/**

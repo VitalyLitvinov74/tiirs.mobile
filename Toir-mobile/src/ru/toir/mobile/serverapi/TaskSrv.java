@@ -1,4 +1,3 @@
-
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
@@ -8,137 +7,116 @@ import com.google.gson.annotations.Expose;
 
 /**
  * Наряд
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class TaskSrv {
+public class TaskSrv extends BaseObjectSrv {
 
-    @Expose
-    private List<EquipmentOperationSrv> Items = new ArrayList<EquipmentOperationSrv>();
-    @Expose
-    private String Number;
-    @Expose
-    private String Comment;
-    @Expose
-    private TaskStatusSrv OrderStatus;
-    @Expose
-    private Date CloseDate;
-    @Expose
-    private String Id;
-    @Expose
-    private String EmployeeId;
-    @Expose
-    private Date CreatedAt;
-    @Expose
-    private Date ChangedAt;
+	@Expose
+	private List<EquipmentOperationSrv> Items = new ArrayList<EquipmentOperationSrv>();
+	@Expose
+	private String Number;
+	@Expose
+	private String Comment;
+	@Expose
+	private TaskStatusSrv OrderStatus;
+	@Expose
+	private Date CloseDate;
+	@Expose
+	private String EmployeeId;
 
-    /**
-     * 
-     * @return
-     *     The Items
-     */
-    public List<EquipmentOperationSrv> getItems() {
-        return Items;
-    }
+	/**
+	 * @return
+	 */
+	public long getCloseDateTime() {
+		return CloseDate == null ? 0 : CloseDate.getTime();
+	}
 
-    /**
-     * 
-     * @param Items
-     *     The Items
-     */
-    public void setItems(List<EquipmentOperationSrv> Items) {
-        this.Items = Items;
-    }
+	/**
+	 * 
+	 * @return The Items
+	 */
+	public List<EquipmentOperationSrv> getItems() {
+		return Items;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Number
-     */
-    public String getNumber() {
-        return Number;
-    }
+	/**
+	 * 
+	 * @param Items
+	 *            The Items
+	 */
+	public void setItems(List<EquipmentOperationSrv> Items) {
+		this.Items = Items;
+	}
 
-    /**
-     * 
-     * @param Number
-     *     The Number
-     */
-    public void setNumber(String Number) {
-        this.Number = Number;
-    }
+	/**
+	 * 
+	 * @return The Number
+	 */
+	public String getNumber() {
+		return Number;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Comment
-     */
-    public String getComment() {
-        return Comment;
-    }
+	/**
+	 * 
+	 * @param Number
+	 *            The Number
+	 */
+	public void setNumber(String Number) {
+		this.Number = Number;
+	}
 
-    /**
-     * 
-     * @param Comment
-     *     The Comment
-     */
-    public void setComment(String Comment) {
-        this.Comment = Comment;
-    }
+	/**
+	 * 
+	 * @return The Comment
+	 */
+	public String getComment() {
+		return Comment;
+	}
 
-    /**
-     * 
-     * @return
-     *     The OrderStatus
-     */
-    public TaskStatusSrv getOrderStatus() {
-        return OrderStatus;
-    }
+	/**
+	 * 
+	 * @param Comment
+	 *            The Comment
+	 */
+	public void setComment(String Comment) {
+		this.Comment = Comment;
+	}
 
-    /**
-     * 
-     * @param OrderStatus
-     *     The OrderStatus
-     */
-    public void setOrderStatus(TaskStatusSrv OrderStatus) {
-        this.OrderStatus = OrderStatus;
-    }
+	/**
+	 * 
+	 * @return The OrderStatus
+	 */
+	public TaskStatusSrv getOrderStatus() {
+		return OrderStatus;
+	}
 
-    /**
-     * 
-     * @return
-     *     The CloseDate
-     */
-    public Date getCloseDate() {
-        return CloseDate;
-    }
+	/**
+	 * 
+	 * @param OrderStatus
+	 *            The OrderStatus
+	 */
+	public void setOrderStatus(TaskStatusSrv OrderStatus) {
+		this.OrderStatus = OrderStatus;
+	}
 
-    /**
-     * 
-     * @param CloseDate
-     *     The CloseDate
-     */
-    public void setCloseDate(Date CloseDate) {
-        this.CloseDate = CloseDate;
-    }
+	/**
+	 * 
+	 * @return The CloseDate
+	 */
+	public Date getCloseDate() {
+		return CloseDate;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
+	/**
+	 * 
+	 * @param CloseDate
+	 *            The CloseDate
+	 */
+	public void setCloseDate(Date CloseDate) {
+		this.CloseDate = CloseDate;
+	}
 
 	/**
 	 * @return the employeeId
@@ -148,38 +126,11 @@ public class TaskSrv {
 	}
 
 	/**
-	 * @param employeeId the employeeId to set
+	 * @param employeeId
+	 *            the employeeId to set
 	 */
 	public void setEmployeeId(String employeeId) {
 		EmployeeId = employeeId;
-	}
-
-	/**
-	 * @param createdAt the createdAt to set
-	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
-	}
-
-	/**
-	 * @param changedAt the changedAt to set
-	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
-	}
-
-	/**
-	 * @return the createdAt
-	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
-	}
-
-	/**
-	 * @return the changedAt
-	 */
-	public Date getChangedAt() {
-		return ChangedAt;
 	}
 
 }

@@ -278,8 +278,8 @@ public class ReferenceProcessor {
 		// TODO когда на сервере появится - добавить
 		item.setOperation_type_uuid("");
 		saveOperationPatternStep((pattern.getSteps()), pattern.getId());
-		item.setCreatedAt(getDateTimeField(pattern.getCreatedAt()));
-		item.setChangedAt(getDateTimeField(pattern.getChangedAt()));
+		item.setCreatedAt(pattern.getCreatedAtTime());
+		item.setChangedAt(pattern.getChangedAtTime());
 		adapter.replace(item);
 		
 	}
@@ -303,8 +303,8 @@ public class ReferenceProcessor {
 			item.setFirst_step(element.getIsFirstStep() == 1 ? true : false);
 			item.setLast_step(element.getIsLastStep() == 1 ? true : false);
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			saveOperationPatternStepResult(element.getResults(), element.getId());
 			list.add(item);
 		}
@@ -330,8 +330,8 @@ public class ReferenceProcessor {
 			item.setTitle(element.getTitle());
 			item.setMeasure_type_uuid(element.getMeasureType().getId());
 			saveMeasureType(new MeasureTypeSrv[] { element.getMeasureType() });
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -352,8 +352,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -377,8 +377,8 @@ public class ReferenceProcessor {
 			saveDocumentType(new DocumentationTypeSrv[] { element.getDocumentType() });
 			item.setTitle(element.getTitle());
 			item.setPath(element.getPath());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -399,8 +399,8 @@ public class ReferenceProcessor {
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
 			item.setType(element.getType());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -420,8 +420,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -441,15 +441,11 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
-	}
-	
-	private long getDateTimeField(Date date) {
-		return date == null ? 0 : date.getTime();
 	}
 	
 	private void saveOperationResult(OperationResultSrv[] array) {
@@ -468,8 +464,8 @@ public class ReferenceProcessor {
 			item.setTitle(element.getTitle());
 			item.setOperation_type_uuid(element.getOperationType().getId());
 			saveOperationType(new OperationTypeSrv[] { element.getOperationType() });
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -489,8 +485,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -510,8 +506,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -547,8 +543,8 @@ public class ReferenceProcessor {
 			item.setInventoryNumber("");
 			// TODO когда на сервере появится - добавить
 			item.setLocation("");
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			
 			saveDocuments(element.getDocuments(), element.getId());
 			
@@ -571,8 +567,8 @@ public class ReferenceProcessor {
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
-			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			item.setCreatedAt(element.getCreatedAtTime());
+			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);

@@ -1,7 +1,6 @@
 
 package ru.toir.mobile.serverapi;
 
-import java.util.Date;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -9,7 +8,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class EquipmentOperationSrv {
+public class EquipmentOperationSrv extends BaseObjectSrv {
 
     @Expose
     private Integer Position;
@@ -21,12 +20,6 @@ public class EquipmentOperationSrv {
     private OperationTypeSrv OperationType;
     @Expose
     private String OperationPatternId;
-    @Expose
-    private String Id;
-    @Expose
-    private Date CreatedAt;
-    @Expose
-    private Date ChangedAt;
 
     /**
      * 
@@ -116,60 +109,6 @@ public class EquipmentOperationSrv {
      */
     public void setOperationPatternId(String OperationPattern) {
         this.OperationPatternId = OperationPattern;
-    }
-
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
-
-    /**
-     * 
-     * @return
-     *     The CreatedAt
-     */
-    public Date getCreatedAt() {
-        return CreatedAt;
-    }
-
-    /**
-     * 
-     * @param CreatedAt
-     *     The CreatedAt
-     */
-    public void setCreatedAt(Date CreatedAt) {
-        this.CreatedAt = CreatedAt;
-    }
-
-    /**
-     * 
-     * @return
-     *     The ChangedAt
-     */
-    public Date getChangedAt() {
-        return ChangedAt;
-    }
-
-    /**
-     * 
-     * @param ChangedAt
-     *     The ChangedAt
-     */
-    public void setChangedAt(Date ChangedAt) {
-        this.ChangedAt = ChangedAt;
     }
 
 }

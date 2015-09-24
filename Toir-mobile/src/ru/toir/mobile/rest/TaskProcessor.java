@@ -315,9 +315,9 @@ public class TaskProcessor {
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
 		item.setUsers_uuid(serverTask.getEmployeeId());
-		item.setCreatedAt(serverTask.getCreatedAt().getTime());
-		item.setChangedAt(serverTask.getChangedAt().getTime());
-		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDate().getTime());
+		item.setCreatedAt(serverTask.getCreatedAtTime());
+		item.setChangedAt(serverTask.getChangedAtTime());
+		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDateTime());
 		
 		item.setTask_status_uuid(serverTask.getOrderStatus().getId());
 		// добавляем объект статуса наряда
@@ -331,6 +331,9 @@ public class TaskProcessor {
 				equipmentOperations.put(operations.get(i).getId(), getOperation(operations.get(i), item.getUuid()));
 			}
 		}
+		
+		item.setCreatedAt(serverTask.getCreatedAtTime());
+		item.setChangedAt(serverTask.getChangedAtTime());
 
 		return item;
 	}
@@ -344,6 +347,8 @@ public class TaskProcessor {
 		TaskStatus item = new TaskStatus();
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
+		item.setCreatedAt(status.getCreatedAtTime());
+		item.setChangedAt(status.getChangedAtTime());
 		return item;
 	}
 
@@ -376,6 +381,9 @@ public class TaskProcessor {
 		item.setOperation_status_uuid(operation.getStatus().getId());
 		// создаём объект статуса операции
 		operationStatus.put(operation.getStatus().getId(), getOperationStatus(operation.getStatus()));
+		
+		item.setCreatedAt(operation.getCreatedAtTime());
+		item.setChangedAt(operation.getChangedAtTime());
 
 		return item;
 	}
@@ -389,6 +397,8 @@ public class TaskProcessor {
 		OperationStatus item = new OperationStatus();
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
+		item.setCreatedAt(status.getCreatedAtTime());
+		item.setChangedAt(status.getChangedAtTime());
 		return item;
 	}
 	
@@ -405,6 +415,8 @@ public class TaskProcessor {
 		item.setTitle(pattern.getTitle());
 		// TODO данные не приходят с сервера
 		item.setOperation_type_uuid("");
+		item.setCreatedAt(pattern.getCreatedAtTime());
+		item.setChangedAt(pattern.getChangedAtTime());
 
 		// создаём объекты шагов шаблона выполнения операции
 		List<OperationPatternStepSrv> steps = pattern.getSteps();
@@ -431,6 +443,8 @@ public class TaskProcessor {
 		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
 		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
 		item.setTitle(step.getTitle());
+		item.setCreatedAt(step.getCreatedAtTime());
+		item.setChangedAt(step.getChangedAtTime());
 		
 		// создаём объекты варантов результатов шагов
 		List<OperationPatternStepResultSrv> results = step.getResults();
@@ -457,6 +471,8 @@ public class TaskProcessor {
 		item.setMeasure_type_uuid(result.getMeasureType().getId());
 		// создаём объект варианта измерения
 		measureTypes.put(result.getMeasureType().getId(), getMeasureType(result.getMeasureType()));
+		item.setCreatedAt(result.getCreatedAtTime());
+		item.setChangedAt(result.getChangedAtTime());
 		return item;
 	}
 	
@@ -469,6 +485,8 @@ public class TaskProcessor {
 		MeasureType item = new MeasureType();
 		item.setUuid(type.getId());
 		item.setTitle(type.getTitle());
+		item.setCreatedAt(type.getCreatedAtTime());
+		item.setChangedAt(type.getChangedAtTime());
 		return item;
 	}
 	
@@ -481,6 +499,8 @@ public class TaskProcessor {
 		OperationType item = new OperationType();
 		item.setUuid(operationType.getId());
 		item.setTitle(operationType.getTitle());
+		item.setCreatedAt(operationType.getCreatedAtTime());
+		item.setChangedAt(operationType.getChangedAtTime());
 		return item;
 	}
 	
@@ -502,7 +522,7 @@ public class TaskProcessor {
 		item.setCritical_type_uuid(equipment.getCriticalityType().getId());
 		// создаём объект типа критичности оборудования
 		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
-		item.setStart_date(equipment.getStartupDate().getTime());
+		item.setStart_date(equipment.getStartupDateTime());
 
 		List<EquipmentDocumentationSrv> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
@@ -521,8 +541,8 @@ public class TaskProcessor {
 		item.setInventory_number("");
 		// TODO данные не приходят с сервера
 		item.setLocation("");
-		item.setCreatedAt(equipment.getCreatedAt().getTime());
-		item.setChangedAt(equipment.getChangedAt().getTime());
+		item.setCreatedAt(equipment.getCreatedAtTime());
+		item.setChangedAt(equipment.getChangedAtTime());
 		
 		return item;
 	}
@@ -532,6 +552,8 @@ public class TaskProcessor {
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
 		item.setType(status.getType());
+		item.setCreatedAt(status.getCreatedAtTime());
+		item.setChangedAt(status.getChangedAtTime());
 		return item;
 	}
 	
@@ -549,6 +571,8 @@ public class TaskProcessor {
 		item.setEquipment_uuid(parrentUuid);
 		item.setTitle(document.getTitle());
 		item.setPath(document.getPath());
+		item.setCreatedAt(document.getCreatedAtTime());
+		item.setChangedAt(document.getChangedAtTime());
 		return item;
 	}
 	
@@ -561,6 +585,8 @@ public class TaskProcessor {
 		DocumentationType item = new DocumentationType();
 		item.setUuid(type.getId());
 		item.setTitle(type.getTitle());
+		item.setCreatedAt(type.getCreatedAtTime());
+		item.setChangedAt(type.getChangedAtTime());
 		return item;
 	}
 	
@@ -573,6 +599,8 @@ public class TaskProcessor {
 		EquipmentType item = new EquipmentType();
 		item.setUuid(type.getId());
 		item.setTitle(type.getTitle());
+		item.setCreatedAt(type.getCreatedAtTime());
+		item.setChangedAt(type.getChangedAtTime());
 		return item;
 	}
 	
@@ -585,6 +613,8 @@ public class TaskProcessor {
 		CriticalType item = new CriticalType();
 		item.setUuid(type.getId());
 		item.setType(type.getValue());
+		item.setCreatedAt(type.getCreatedAtTime());
+		item.setChangedAt(type.getChangedAtTime());
 		return item;
 	}
 
