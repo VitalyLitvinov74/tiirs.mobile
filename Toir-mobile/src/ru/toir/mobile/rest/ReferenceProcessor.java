@@ -133,7 +133,7 @@ public class ReferenceProcessor {
 					String jsonString = new String(response.mBody);
 					Log.d("test", jsonString);
 					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
-					// разбираем полученные данные
+					// разбираем и сохраняем полученные данные
 					saveOperationPattern(gson.fromJson(jsonString, OperationPatternSrv.class));
 				} else {
 					return false;

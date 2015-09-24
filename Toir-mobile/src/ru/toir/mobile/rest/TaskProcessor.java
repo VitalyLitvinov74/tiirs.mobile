@@ -6,10 +6,15 @@ package ru.toir.mobile.rest;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.json.JSONArray;
+
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
@@ -22,29 +27,15 @@ import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.CriticalType;
-import ru.toir.mobile.db.tables.DocumentationType;
-import ru.toir.mobile.db.tables.Equipment;
-import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentOperationResult;
-import ru.toir.mobile.db.tables.EquipmentStatus;
-import ru.toir.mobile.db.tables.EquipmentType;
-import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.MeasureValue;
-import ru.toir.mobile.db.tables.OperationPattern;
-import ru.toir.mobile.db.tables.OperationPatternStep;
-import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
-import ru.toir.mobile.db.tables.OperationStatus;
-import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
-import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
 import ru.toir.mobile.serializer.EquipmentOperationSerializer;
@@ -58,14 +49,10 @@ import ru.toir.mobile.serverapi.EquipmentOperationSrv;
 import ru.toir.mobile.serverapi.EquipmentSrv;
 import ru.toir.mobile.serverapi.EquipmentStatusSrv;
 import ru.toir.mobile.serverapi.EquipmentTypeSrv;
-import ru.toir.mobile.serverapi.MeasureTypeSrv;
-import ru.toir.mobile.serverapi.OperationPatternSrv;
 import ru.toir.mobile.serverapi.OperationTypeSrv;
 import ru.toir.mobile.serverapi.TaskSrv;
 import ru.toir.mobile.serverapi.TaskStatusSrv;
-import ru.toir.mobile.serverapi.OperationPatternStepResultSrv;
 import ru.toir.mobile.serverapi.OperationStatusSrv;
-import ru.toir.mobile.serverapi.OperationPatternStepSrv;
 import ru.toir.mobile.serverapi.result.TaskResult;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -85,26 +72,7 @@ public class TaskProcessor {
 	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
 	private String mServerUrl;
 
-	
-	Map<String, Task> tasks = null;
-	Map<String, EquipmentOperation> equipmentOperations = null;
-	Map<String, Equipment> equipments = null;
-	Map<String, TaskStatus> taskStatus = null;
-	Map<String, CriticalType> criticalTypes = null;
-	Map<String, OperationType> operationTypes = null;
-	Map<String, EquipmentType> equipmentTypes = null;
-	Map<String, OperationPattern> operationPatterns = null;
-	Map<String, MeasureType> measureTypes = null;
-	Map<String, OperationPatternStep> operationPatternSteps = null;
-	Map<String, OperationPatternStepResult> operationPatternStepResults = null;
-	Map<String, OperationStatus> operationStatus = null;
-	Map<String, DocumentationType> documentationTypes = null;
-	Map<String, EquipmentDocumentation> equipmentDocumentations = null;
-	Map<String, EquipmentStatus> equipmentStatus = null;
-
-	ArrayList<OperationResult> operationResults = null;
-	ArrayList<MeasureValue> measureValues = null;
-	ArrayList<EquipmentOperationResult> equipmentOperationResults = null;
+	Set<String> patternUuids;
 	
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
@@ -118,27 +86,6 @@ public class TaskProcessor {
 		if (mServerUrl.equals("")) {
 			throw new Exception("URL сервера не указан!");
 		}
-		
-		tasks = new ArrayMap<String, Task>();
-		equipments = new ArrayMap<String, Equipment>();
-		equipmentOperations = new ArrayMap<String, EquipmentOperation>();
-		taskStatus = new ArrayMap<String, TaskStatus>();
-		criticalTypes = new ArrayMap<String, CriticalType>();
-		operationTypes = new ArrayMap<String, OperationType>();
-		equipmentTypes = new ArrayMap<String, EquipmentType>();
-		operationPatterns = new ArrayMap<String, OperationPattern>();
-		documentationTypes = new ArrayMap<String, DocumentationType>();
-		measureTypes = new ArrayMap<String, MeasureType>();
-		operationPatternSteps = new ArrayMap<String, OperationPatternStep>();
-		operationPatternStepResults = new ArrayMap<String, OperationPatternStepResult>();
-		equipmentDocumentations = new ArrayMap<String, EquipmentDocumentation>();
-		operationStatus = new ArrayMap<String, OperationStatus>();
-		equipmentStatus = new ArrayMap<String, EquipmentStatus>();
-		
-		operationResults = new ArrayList<OperationResult>();
-		measureValues = new ArrayList<MeasureValue>();
-		equipmentOperationResults = new ArrayList<EquipmentOperationResult>();
-		
 	}
 
 	/**
@@ -147,6 +94,26 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public boolean GetTask(Bundle bundle) {
+
+		// TODO сделать вызов двух медотодов - получить наряды, получить шаблоны
+		// TODO реализовать внятное поведение с возвратом кода и еще нереализованой транзакцией
+		boolean result = false;
+		
+		result = getTasks();
+		if (!result) {
+			return false;
+		}
+		
+		result = getPatterns();
+		if (!result) {
+			return false;
+		}
+
+		return result;
+	}
+	
+	private boolean getTasks() {
+		
 		URI requestUri = null;
 		String token = AuthorizedUser.getInstance().getToken();
 		String jsonString = null;
@@ -170,11 +137,18 @@ public class TaskProcessor {
 				
 				TaskSrv[] serverTasks = gson.fromJson(jsonString, TaskSrv[].class);
 				if (serverTasks != null) {
-					for (int i = 0; i < serverTasks.length; i++) {
-						tasks.put(serverTasks[i].getId(), getTask(serverTasks[i]));
-					}
-				}
+					// разбираем и сохраняем полученные данные
+					// TODO нужен механизм для запуска транзакции т.е. операций вставки в базу много
+					saveTasks(serverTasks);
+					
+					// TODO нужна проверка на то что успешно разобрали и сохранили в базу,
+					return false;
 
+				} else {
+					// TODO нужно решить что делать если нарядов нет!!!
+					return false;
+				}
+				
 			} else {
 				return false;
 			}
@@ -182,17 +156,14 @@ public class TaskProcessor {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	private boolean getPatterns() {
 		
-		// всё полученные данные заносим в базу
-		saveAllData();
+		boolean result = false;
 
 		// получаем данные по шаблонам
-		boolean result = false;
-		Set<String> set = equipmentOperations.keySet();
-		ArrayList<String> operationPatternUuids = new ArrayList<String>();
-		for (String uuid: set) {
-			operationPatternUuids.add(equipmentOperations.get(uuid).getOperation_pattern_uuid());
-		}
+		ArrayList<String> operationPatternUuids = new ArrayList<String>(patternUuids);
 		try {
 			ReferenceProcessor referenceProcessor = new ReferenceProcessor(mContext);
 			Bundle extra = new Bundle();
@@ -204,250 +175,117 @@ public class TaskProcessor {
 		}
 
 		return result;
+	}
 
+	public void saveTasks(TaskSrv[] tasks) {
+
+		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
+		patternUuids = new HashSet<String>();
+
+		for(TaskSrv task : tasks) {
+			adapter.replace(task.getLocal());
+
+			// разбираем статус наряда
+			saveTaskStatus(task.getOrderStatus());
+
+			// разбираем операции
+			List<EquipmentOperationSrv> operations = task.getItems();
+			if (operations != null) {
+				for (EquipmentOperationSrv operation : operations) {
+					saveEquipmentOperation(operation, task.getId());
+					patternUuids.add(operation.getOperationPatternId());
+				}
+			}	
+		}
 	}
 	
-	public void saveAllData() {
-		Set<String> set;
+	public void saveTaskStatus(TaskStatusSrv status) {
 		
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
-		set = tasks.keySet();
-		for (String uuid: set) {
-			taskDBAdapter.replace(tasks.get(uuid));
-		}
-		
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
-		set = equipments.keySet();
-		for (String uuid: set) {
-			equipmentDBAdapter.replace(equipments.get(uuid));
-		}
-		
-		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		set = taskStatus.keySet();
-		for (String uuid: set) {
-			taskStatusDBAdapter.replace(taskStatus.get(uuid));
-		}
-		
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		set = criticalTypes.keySet();
-		for (String uuid: set) {
-			criticalTypeDBAdapter.replace(criticalTypes.get(uuid));
-		}
-		
-		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationTypes.keySet();
-		for (String uuid: set) {
-			operationTypeDBAdapter.replace(operationTypes.get(uuid));
-		}
-		
-		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		set = equipmentTypes.keySet();
-		for (String uuid: set) {
-			equipmentTypeDBAdapter.replace(equipmentTypes.get(uuid));
-		}
-		
-		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		set = documentationTypes.keySet();
-		for (String uuid: set) {
-			documentationTypeDBAdapter.replace(documentationTypes.get(uuid));
-		}
-		
-		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		set = measureTypes.keySet();
-		for (String uuid: set) {
-			measureTypeDBAdapter.replace(measureTypes.get(uuid));
-		}
-		
-		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
-		set = equipmentDocumentations.keySet();
-		for (String uuid: set) {
-			documentationDBAdapter.replace(equipmentDocumentations.get(uuid));
-		}
-		
-		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationStatus.keySet();
-		for (String uuid: set) {
-			operationStatusDBAdapter.replace(operationStatus.get(uuid));
-		}
-		
-		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		set = equipmentStatus.keySet();
-		for (String uuid: set) {
-			equipmentStatusDBAdapter.replace(equipmentStatus.get(uuid));
-		}
-
-		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
-		set = equipmentOperations.keySet();
-		for (String uuid: set) {
-			operationDBAdapter.replace(equipmentOperations.get(uuid));
-		}
-
-		// TODO перед записью в базу операций, нужно получить отдельно шаблоны операций и связанную с ними информацию
-		// шаблоны получаем, удалить/переписать лишний код!
-		/*
-		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationPatterns.keySet();
-		for (String uuid: set) {
-			operationPatternDBAdapter.replace(operationPatterns.get(uuid));
-		}
-		
-		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationPatternSteps.keySet();
-		for (String uuid: set) {
-			patternStepDBAdapter.replace(operationPatternSteps.get(uuid));
-		}
-		
-		OperationPatternStepResultDBAdapter patternStepResultDBAdapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
-		set = operationPatternStepResults.keySet();
-		for (String uuid: set) {
-			patternStepResultDBAdapter.replace(operationPatternStepResults.get(uuid));
-		}
-		*/
+		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(status.getLocal());
 	}
 	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param serverTask
-	 * @return
-	 */
-	public Task getTask(TaskSrv serverTask) {
+	public void saveEquipmentOperation(EquipmentOperationSrv operation, String taskUuid) {
 
-		Task item = serverTask.getLocal();
-
-		// добавляем объект статуса наряда
-		taskStatus.put(serverTask.getOrderStatus().getId(), serverTask.getOrderStatus().getLocal());
-
-		List<EquipmentOperationSrv> operations = serverTask.getItems();
-		if (operations != null) {
-			for (int i = 0; i < operations.size(); i++) {
-				equipmentOperations.put(operations.get(i).getId(), getOperation(operations.get(i), item.getUuid()));
-			}
-		}
-
-		return item;
-	}
-
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param operation
-	 * @return
-	 */
-	public EquipmentOperation getOperation(EquipmentOperationSrv operation, String parentUuid) {
-
-		EquipmentOperation item = operation.getLocal(parentUuid);
-
-		// создаём объект оборудования
-		equipments.put(operation.getEquipment().getId(), getEquipment(operation.getEquipment()));
-
-		// создаём объект типа операции
-		operationTypes.put(operation.getOperationType().getId(), operation.getOperationType().getLocal());
-
-		// TODO шаблоны теперь приходят в другом месте, реализовать получение!!!
-		// создаём объект шаблона операции
-		//operationPatterns.put(operation.getOperationPatternId(), getOperationPattern(operation.getOperationPattern()));
-
-		// создаём объект статуса операции
-		operationStatus.put(operation.getStatus().getId(), operation.getStatus().getLocal());
-
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param pattern
-	 * @return
-	 */
-	public OperationPattern getOperationPattern(OperationPatternSrv pattern) {
+		EquipmentOperationDBAdapter adapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(operation.getLocal(taskUuid));
 		
-		OperationPattern item = pattern.getLocal();
+		// разбираем оборудование
+		saveEquipment(operation.getEquipment());
 
-		// создаём объекты шагов шаблона выполнения операции
-		List<OperationPatternStepSrv> steps = pattern.getSteps();
-		if (steps != null) {
-			for (int i = 0; i < steps.size(); i++) {
-				operationPatternSteps.put(steps.get(i).getId(), getStep(steps.get(i), item.getUuid()));
-			}
-		}
+		// разбираем тип операции
+		saveOperationType(operation.getOperationType());
 		
-		return item;
+		// разбираем статус операции
+		saveOperationStatus(operation.getStatus());
 	}
 	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param step
-	 * @return
-	 */
-	public OperationPatternStep getStep(OperationPatternStepSrv step, String patternUuid) {
+	public void saveOperationStatus(OperationStatusSrv status) {
 
-		OperationPatternStep item = step.getLocal(patternUuid);
+		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(status.getLocal());
+	}
+	
+	public void saveOperationType(OperationTypeSrv type) {
+
+		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(type.getLocal());
+	}
+	
+	public void saveEquipment(EquipmentSrv equipment) {
+
+		EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(equipment.getLocal());
+
+		// разбираем тип оборудования
+		parseEquipmentType(equipment.getEquipmentType());
+
+		// разбираем тип критичности оборудования
+		parseCriticalType(equipment.getCriticalityType());
+
+		// разбираем статус оборудования
+		saveEquipmentStatus(equipment.getEquipmentStatus());
+
+		List<EquipmentDocumentationSrv> documentations = equipment.getDocuments();
+		for (EquipmentDocumentationSrv documentation : documentations) {
+			// разбираем докуметацию
+			parseDocumentation(documentation, equipment.getId());
+		}
+	}
+	
+	public void saveEquipmentStatus(EquipmentStatusSrv status) {
+
+		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(status.getLocal());
+	}
+	
+	public void parseDocumentation(EquipmentDocumentationSrv documentation, String equipmentUuid) {
+
+		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(documentation.getLocal(equipmentUuid));
 		
-		// создаём объекты варантов результатов шагов
-		List<OperationPatternStepResultSrv> results = step.getResults();
-		if (results != null) {
-			for (int i = 0; i < results.size(); i++) {
-				operationPatternStepResults.put(results.get(i).getId(), getStepResult(results.get(i), item.getUuid()));
-			} 
-		}
-
-		return item;
+		// разбираем тип документации
+		parseDocumentationType(documentation.getDocumentType());
 	}
 	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param result
-	 * @return
-	 */
-	public OperationPatternStepResult getStepResult(OperationPatternStepResultSrv result, String parrentUuid) {
+	public void parseDocumentationType(DocumentationTypeSrv type) {
 
-		OperationPatternStepResult item = result.getLocal(parrentUuid);
+		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(type.getLocal());
+	}
 
-		// создаём объект варианта измерения
-		measureTypes.put(result.getMeasureType().getId(), result.getMeasureType().getLocal());
+	public void parseCriticalType(CriticalTypeSrv type) {
 
-		return item;
+		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(type.getLocal());
 	}
 	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param equipment
-	 * @return
-	 */
-	public Equipment getEquipment(EquipmentSrv equipment) {
+	public void parseEquipmentType(EquipmentTypeSrv type) {
 
-		Equipment item = equipment.getLocal();
-
-		// создаём объект типа оборудования
-		equipmentTypes.put(equipment.getEquipmentType().getId(), equipment.getEquipmentType().getLocal());
-
-		// создаём объект типа критичности оборудования
-		criticalTypes.put(equipment.getCriticalityType().getId(), equipment.getCriticalityType().getLocal());
-
-		List<EquipmentDocumentationSrv> documents = equipment.getDocuments();
-		for (int i = 0; i < documents.size(); i++) {
-			equipmentDocumentations.put(documents.get(i).getId(), getDocumentation(documents.get(i), item.getUuid()));
-		}
-
-		// создаём объект статуса оборудования
-		equipmentStatus.put(equipment.getEquipmentStatus().getId(), equipment.getEquipmentStatus().getLocal());
-
-		return item;
+		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter.replace(type.getLocal());
 	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param document
-	 * @return
-	 */
-	public EquipmentDocumentation getDocumentation(EquipmentDocumentationSrv document, String parrentUuid) {
 
-		EquipmentDocumentation item = document.getLocal(parrentUuid);
-
-		// создаём объект типа документации
-		documentationTypes.put(document.getDocumentType().getId(), document.getDocumentType().getLocal());
-
-		return item;
-	}
-	
 	/**
 	 * Отправка результатов выполнения наряда.
 	 * @param bundle
