@@ -5,7 +5,6 @@ package ru.toir.mobile.rest;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -270,16 +269,8 @@ public class ReferenceProcessor {
 		}
 		
 		OperationPatternDBAdapter adapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
-		OperationPattern item = new OperationPattern();
-		
-		item.set_id(0);
-		item.setUuid(pattern.getId());
-		item.setTitle(pattern.getTitle());
-		// TODO когда на сервере появится - добавить
-		item.setOperation_type_uuid("");
-		saveOperationPatternStep((pattern.getSteps()), pattern.getId());
-		item.setCreatedAt(pattern.getCreatedAtTime());
-		item.setChangedAt(pattern.getChangedAtTime());
+		OperationPattern item = pattern.getLocal();
+		saveOperationPatternStep(pattern.getSteps(), pattern.getId());
 		adapter.replace(item);
 		
 	}
@@ -294,17 +285,7 @@ public class ReferenceProcessor {
 		ArrayList<OperationPatternStep> list = new ArrayList<OperationPatternStep>();
 		
 		for (OperationPatternStepSrv element : array) {
-			OperationPatternStep item = new OperationPatternStep();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setOperation_pattern_uuid(operationPatternUuid);
-			item.setDescription(element.getDescription());
-			item.setImage(element.getImagePath());
-			item.setFirst_step(element.getIsFirstStep() == 1 ? true : false);
-			item.setLast_step(element.getIsLastStep() == 1 ? true : false);
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			OperationPatternStep item = element.getLocal(operationPatternUuid);
 			saveOperationPatternStepResult(element.getResults(), element.getId());
 			list.add(item);
 		}
@@ -313,29 +294,21 @@ public class ReferenceProcessor {
 	}
 
 	private void saveOperationPatternStepResult(List<OperationPatternStepResultSrv> array, String operationPatternStepUuid) {
-		
+
 		if (array == null) {
 			return;
 		}
-		
+
 		OperationPatternStepResultDBAdapter adapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
 		ArrayList<OperationPatternStepResult> list = new ArrayList<OperationPatternStepResult>();
-		
+
 		for (OperationPatternStepResultSrv element : array) {
-			OperationPatternStepResult item = new OperationPatternStepResult();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setOperation_pattern_step_uuid(operationPatternStepUuid);
-			item.setNext_operation_pattern_step_uuid(element.getNextPatternStepId());
-			item.setTitle(element.getTitle());
-			item.setMeasure_type_uuid(element.getMeasureType().getId());
+			OperationPatternStepResult item = element.getLocal(operationPatternStepUuid);
 			saveMeasureType(new MeasureTypeSrv[] { element.getMeasureType() });
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
-		
+
 	}
 
 	private void saveDocumentType(DocumentationTypeSrv[] array) {
@@ -348,12 +321,7 @@ public class ReferenceProcessor {
 		ArrayList<DocumentationType> list = new ArrayList<DocumentationType>();
 		
 		for(DocumentationTypeSrv element : array) {
-			DocumentationType item = new DocumentationType();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			DocumentationType item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -369,16 +337,8 @@ public class ReferenceProcessor {
 		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
 		
 		for(EquipmentDocumentationSrv element : array) {
-			EquipmentDocumentation item = new EquipmentDocumentation();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setEquipment_uuid(equipmentUuid);
-			item.setDocumentation_type_uuid(element.getDocumentType().getId());
+			EquipmentDocumentation item = element.getLocal(equipmentUuid);
 			saveDocumentType(new DocumentationTypeSrv[] { element.getDocumentType() });
-			item.setTitle(element.getTitle());
-			item.setPath(element.getPath());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -394,13 +354,7 @@ public class ReferenceProcessor {
 		ArrayList<EquipmentStatus> list = new ArrayList<EquipmentStatus>();
 		
 		for(EquipmentStatusSrv element : array) {
-			EquipmentStatus item = new EquipmentStatus();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setType(element.getType());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			EquipmentStatus item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -416,12 +370,7 @@ public class ReferenceProcessor {
 		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
 		
 		for(EquipmentTypeSrv element : array) {
-			EquipmentType item = new EquipmentType();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			EquipmentType item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -437,12 +386,7 @@ public class ReferenceProcessor {
 		ArrayList<MeasureType> list = new ArrayList<MeasureType>();
 		
 		for(MeasureTypeSrv element : array) {
-			MeasureType item = new MeasureType();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			MeasureType item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -458,14 +402,8 @@ public class ReferenceProcessor {
 		ArrayList<OperationResult> list = new ArrayList<OperationResult>();
 		
 		for(OperationResultSrv element : array) {
-			OperationResult item = new OperationResult();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setOperation_type_uuid(element.getOperationType().getId());
+			OperationResult item = element.getLocal();
 			saveOperationType(new OperationTypeSrv[] { element.getOperationType() });
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -481,12 +419,7 @@ public class ReferenceProcessor {
 		ArrayList<OperationType> list = new ArrayList<OperationType>();
 		
 		for(OperationTypeSrv element : array) {
-			OperationType item = new OperationType();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			OperationType item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -502,12 +435,7 @@ public class ReferenceProcessor {
 		ArrayList<TaskStatus> list = new ArrayList<TaskStatus>();
 		
 		for(TaskStatusSrv element : array) {
-			TaskStatus item = new TaskStatus();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			TaskStatus item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -523,31 +451,12 @@ public class ReferenceProcessor {
 		ArrayList<Equipment> list = new ArrayList<Equipment>();
 		
 		for(EquipmentSrv element : array) {
-			Equipment item = new Equipment();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getName());
-			item.setEquipment_type_uuid(element.getEquipmentType().getId());
+			Equipment item = element.getLocal();
 			saveEquipmentType(new EquipmentTypeSrv[] { element.getEquipmentType() });
-			item.setCritical_type_uuid(element.getCriticalityType().getId());
+			// TODO разобраться / переписать !!!!
 			CriticalTypeSrv.saveAll(new CriticalTypeSrv[]{ element.getCriticalityType() }, mContext);
-			item.setStart_date(element.getStartupDate().getTime());
-			item.setLatitude(element.getGeoCoordinates().getLatitude());
-			item.setLongitude(element.getGeoCoordinates().getLongitude());
-			item.setTag_id(element.getTag());
-			// TODO когда на сервере появится - добавить
-			item.setImage("");
-			item.setEquipmentStatus_uuid(element.getEquipmentStatus().getId());
 			saveEquipmentStatus(new EquipmentStatusSrv[] { element.getEquipmentStatus() });
-			// TODO когда на сервере появится - добавить
-			item.setInventoryNumber("");
-			// TODO когда на сервере появится - добавить
-			item.setLocation("");
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
-			
 			saveDocuments(element.getDocuments(), element.getId());
-			
 			list.add(item);
 		}
 		adapter.saveItems(list);
@@ -563,12 +472,7 @@ public class ReferenceProcessor {
 		ArrayList<OperationStatus> list = new ArrayList<OperationStatus>();
 		
 		for(OperationStatusSrv element : array) {
-			OperationStatus item = new OperationStatus();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAtTime());
-			item.setChangedAt(element.getChangedAtTime());
+			OperationStatus item = element.getLocal();
 			list.add(item);
 		}
 		adapter.saveItems(list);

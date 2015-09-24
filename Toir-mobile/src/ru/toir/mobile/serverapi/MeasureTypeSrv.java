@@ -1,5 +1,6 @@
 package ru.toir.mobile.serverapi;
 
+import ru.toir.mobile.db.tables.MeasureType;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -27,6 +28,23 @@ public class MeasureTypeSrv extends BaseObjectSrv {
 	 */
 	public void setTitle(String Title) {
 		this.Title = Title;
+	}
+
+    /**
+	 * Возвращает объект в локальном представлении
+	 * @return MeasureType
+	 */
+    public MeasureType getLocal() {
+
+		MeasureType item = new MeasureType();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setTitle(Title);
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
 	}
 
 }

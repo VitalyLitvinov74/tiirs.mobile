@@ -1,11 +1,13 @@
 package ru.toir.mobile.serverapi;
 
+import ru.toir.mobile.db.tables.EquipmentType;
 import com.google.gson.annotations.Expose;
 
 /**
  * Тип оборудования
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
 public class EquipmentTypeSrv extends BaseObjectSrv {
 
@@ -27,6 +29,24 @@ public class EquipmentTypeSrv extends BaseObjectSrv {
 	 */
 	public void setTitle(String Title) {
 		this.Title = Title;
+	}
+
+	/**
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @return EquipmentType
+	 */
+	public EquipmentType getLocal() {
+
+		EquipmentType item = new EquipmentType();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setTitle(Title);
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
 	}
 
 }

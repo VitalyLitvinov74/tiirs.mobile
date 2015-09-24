@@ -3,6 +3,7 @@ package ru.toir.mobile.serverapi;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import ru.toir.mobile.db.tables.Task;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -131,6 +132,27 @@ public class TaskSrv extends BaseObjectSrv {
 	 */
 	public void setEmployeeId(String employeeId) {
 		EmployeeId = employeeId;
+	}
+
+	/**
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @return Task
+	 */
+	public Task getLocal() {
+
+		Task item = new Task();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setUsers_uuid(EmployeeId);
+		item.setClose_date(getCloseDateTime());
+		item.setTask_status_uuid(OrderStatus.getId());
+		item.setTask_name(Number);
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
 	}
 
 }

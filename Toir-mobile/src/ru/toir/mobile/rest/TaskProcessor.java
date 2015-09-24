@@ -312,43 +312,18 @@ public class TaskProcessor {
 	 */
 	public Task getTask(TaskSrv serverTask) {
 
-		Task item = new Task();
-		item.setUuid(serverTask.getId());
-		item.setUsers_uuid(serverTask.getEmployeeId());
-		item.setCreatedAt(serverTask.getCreatedAtTime());
-		item.setChangedAt(serverTask.getChangedAtTime());
-		item.setClose_date(serverTask.getCloseDate() == null ? 0 : serverTask.getCloseDateTime());
-		
-		item.setTask_status_uuid(serverTask.getOrderStatus().getId());
+		Task item = serverTask.getLocal();
+
 		// добавляем объект статуса наряда
-		taskStatus.put(serverTask.getOrderStatus().getId(), getTaskStatus(serverTask.getOrderStatus()));
-		
-		item.setTask_name("номер " + serverTask.getNumber());
-		
+		taskStatus.put(serverTask.getOrderStatus().getId(), serverTask.getOrderStatus().getLocal());
+
 		List<EquipmentOperationSrv> operations = serverTask.getItems();
 		if (operations != null) {
 			for (int i = 0; i < operations.size(); i++) {
 				equipmentOperations.put(operations.get(i).getId(), getOperation(operations.get(i), item.getUuid()));
 			}
 		}
-		
-		item.setCreatedAt(serverTask.getCreatedAtTime());
-		item.setChangedAt(serverTask.getChangedAtTime());
 
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param status
-	 * @return
-	 */
-	public TaskStatus getTaskStatus(TaskStatusSrv status) {
-		TaskStatus item = new TaskStatus();
-		item.setUuid(status.getId());
-		item.setTitle(status.getTitle());
-		item.setCreatedAt(status.getCreatedAtTime());
-		item.setChangedAt(status.getChangedAtTime());
 		return item;
 	}
 
@@ -358,47 +333,22 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public EquipmentOperation getOperation(EquipmentOperationSrv operation, String parentUuid) {
-		EquipmentOperation item = new EquipmentOperation();
-		
-		item.setUuid(operation.getId());
-		
-		item.setTask_uuid(parentUuid);
-		
-		item.setEquipment_uuid(operation.getEquipment().getId());
+
+		EquipmentOperation item = operation.getLocal(parentUuid);
+
 		// создаём объект оборудования
 		equipments.put(operation.getEquipment().getId(), getEquipment(operation.getEquipment()));
-		
-		item.setOperation_type_uuid(operation.getOperationType().getId());
+
 		// создаём объект типа операции
-		operationTypes.put(operation.getOperationType().getId(), getOperationType(operation.getOperationType()));
-		
-		item.setOperation_pattern_uuid(operation.getOperationPatternId());
+		operationTypes.put(operation.getOperationType().getId(), operation.getOperationType().getLocal());
+
 		// TODO шаблоны теперь приходят в другом месте, реализовать получение!!!
 		// создаём объект шаблона операции
 		//operationPatterns.put(operation.getOperationPatternId(), getOperationPattern(operation.getOperationPattern()));
 
-		
-		item.setOperation_status_uuid(operation.getStatus().getId());
 		// создаём объект статуса операции
-		operationStatus.put(operation.getStatus().getId(), getOperationStatus(operation.getStatus()));
-		
-		item.setCreatedAt(operation.getCreatedAtTime());
-		item.setChangedAt(operation.getChangedAtTime());
+		operationStatus.put(operation.getStatus().getId(), operation.getStatus().getLocal());
 
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param status
-	 * @return
-	 */
-	public OperationStatus getOperationStatus(OperationStatusSrv status) {
-		OperationStatus item = new OperationStatus();
-		item.setUuid(status.getId());
-		item.setTitle(status.getTitle());
-		item.setCreatedAt(status.getCreatedAtTime());
-		item.setChangedAt(status.getChangedAtTime());
 		return item;
 	}
 	
@@ -409,14 +359,7 @@ public class TaskProcessor {
 	 */
 	public OperationPattern getOperationPattern(OperationPatternSrv pattern) {
 		
-		OperationPattern item = new OperationPattern();
-		
-		item.setUuid(pattern.getId());
-		item.setTitle(pattern.getTitle());
-		// TODO данные не приходят с сервера
-		item.setOperation_type_uuid("");
-		item.setCreatedAt(pattern.getCreatedAtTime());
-		item.setChangedAt(pattern.getChangedAtTime());
+		OperationPattern item = pattern.getLocal();
 
 		// создаём объекты шагов шаблона выполнения операции
 		List<OperationPatternStepSrv> steps = pattern.getSteps();
@@ -434,17 +377,9 @@ public class TaskProcessor {
 	 * @param step
 	 * @return
 	 */
-	public OperationPatternStep getStep(OperationPatternStepSrv step, String parentUuid) {
-		OperationPatternStep item = new OperationPatternStep();
-		item.setUuid(step.getId());
-		item.setOperation_pattern_uuid(parentUuid);
-		item.setDescription(step.getDescription());
-		item.setImage(step.getImagePath());
-		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
-		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
-		item.setTitle(step.getTitle());
-		item.setCreatedAt(step.getCreatedAtTime());
-		item.setChangedAt(step.getChangedAtTime());
+	public OperationPatternStep getStep(OperationPatternStepSrv step, String patternUuid) {
+
+		OperationPatternStep item = step.getLocal(patternUuid);
 		
 		// создаём объекты варантов результатов шагов
 		List<OperationPatternStepResultSrv> results = step.getResults();
@@ -453,6 +388,7 @@ public class TaskProcessor {
 				operationPatternStepResults.put(results.get(i).getId(), getStepResult(results.get(i), item.getUuid()));
 			} 
 		}
+
 		return item;
 	}
 	
@@ -462,45 +398,12 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public OperationPatternStepResult getStepResult(OperationPatternStepResultSrv result, String parrentUuid) {
-		OperationPatternStepResult item = new OperationPatternStepResult();
-		item.setUuid(result.getId());
-		item.setOperation_pattern_step_uuid(parrentUuid);
-		String nextStepUuid = result.getNextPatternStepId() == null ? "00000000-0000-0000-0000-000000000000" : result.getNextPatternStepId();
-		item.setNext_operation_pattern_step_uuid(nextStepUuid);
-		item.setTitle(result.getTitle());
-		item.setMeasure_type_uuid(result.getMeasureType().getId());
+
+		OperationPatternStepResult item = result.getLocal(parrentUuid);
+
 		// создаём объект варианта измерения
-		measureTypes.put(result.getMeasureType().getId(), getMeasureType(result.getMeasureType()));
-		item.setCreatedAt(result.getCreatedAtTime());
-		item.setChangedAt(result.getChangedAtTime());
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param type
-	 * @return
-	 */
-	public MeasureType getMeasureType(MeasureTypeSrv type) {
-		MeasureType item = new MeasureType();
-		item.setUuid(type.getId());
-		item.setTitle(type.getTitle());
-		item.setCreatedAt(type.getCreatedAtTime());
-		item.setChangedAt(type.getChangedAtTime());
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param operationType
-	 * @return
-	 */
-	public OperationType getOperationType(OperationTypeSrv operationType) {
-		OperationType item = new OperationType();
-		item.setUuid(operationType.getId());
-		item.setTitle(operationType.getTitle());
-		item.setCreatedAt(operationType.getCreatedAtTime());
-		item.setChangedAt(operationType.getChangedAtTime());
+		measureTypes.put(result.getMeasureType().getId(), result.getMeasureType().getLocal());
+
 		return item;
 	}
 	
@@ -510,50 +413,23 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public Equipment getEquipment(EquipmentSrv equipment) {
-		
-		Equipment item = new Equipment();
-		item.setUuid(equipment.getId());
-		item.setTitle(equipment.getName());
-		
-		item.setEquipment_type_uuid(equipment.getEquipmentType().getId());
+
+		Equipment item = equipment.getLocal();
+
 		// создаём объект типа оборудования
-		equipmentTypes.put(equipment.getEquipmentType().getId(), getEquipmentType(equipment.getEquipmentType()));
-		
-		item.setCritical_type_uuid(equipment.getCriticalityType().getId());
+		equipmentTypes.put(equipment.getEquipmentType().getId(), equipment.getEquipmentType().getLocal());
+
 		// создаём объект типа критичности оборудования
-		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
-		item.setStart_date(equipment.getStartupDateTime());
+		criticalTypes.put(equipment.getCriticalityType().getId(), equipment.getCriticalityType().getLocal());
 
 		List<EquipmentDocumentationSrv> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
 			equipmentDocumentations.put(documents.get(i).getId(), getDocumentation(documents.get(i), item.getUuid()));
 		}
-		
-		item.setLatitude(equipment.getGeoCoordinates().getLatitude());
-		item.setLongitude(equipment.getGeoCoordinates().getLongitude());
-		item.setTag_id(equipment.getTag());
-		
-		item.setEquipmentStatus_uuid(equipment.getEquipmentStatus().getId());
-		// создаём объект статуса оборудования
-		equipmentStatus.put(equipment.getEquipmentStatus().getId(), getEquipmentStatus(equipment.getEquipmentStatus()));
 
-		// TODO данные не приходят с сервера
-		item.setInventory_number("");
-		// TODO данные не приходят с сервера
-		item.setLocation("");
-		item.setCreatedAt(equipment.getCreatedAtTime());
-		item.setChangedAt(equipment.getChangedAtTime());
-		
-		return item;
-	}
-	
-	public EquipmentStatus getEquipmentStatus(EquipmentStatusSrv status) {
-		EquipmentStatus item = new EquipmentStatus();
-		item.setUuid(status.getId());
-		item.setTitle(status.getTitle());
-		item.setType(status.getType());
-		item.setCreatedAt(status.getCreatedAtTime());
-		item.setChangedAt(status.getChangedAtTime());
+		// создаём объект статуса оборудования
+		equipmentStatus.put(equipment.getEquipmentStatus().getId(), equipment.getEquipmentStatus().getLocal());
+
 		return item;
 	}
 	
@@ -563,61 +439,15 @@ public class TaskProcessor {
 	 * @return
 	 */
 	public EquipmentDocumentation getDocumentation(EquipmentDocumentationSrv document, String parrentUuid) {
-		EquipmentDocumentation item = new EquipmentDocumentation();
-		item.setUuid(document.getId());
-		item.setDocumentation_type_uuid(document.getDocumentType().getId());
-		// создаём объект типа документации
-		documentationTypes.put(document.getDocumentType().getId(), getDocumentationType(document.getDocumentType()));
-		item.setEquipment_uuid(parrentUuid);
-		item.setTitle(document.getTitle());
-		item.setPath(document.getPath());
-		item.setCreatedAt(document.getCreatedAtTime());
-		item.setChangedAt(document.getChangedAtTime());
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param type
-	 * @return
-	 */
-	public DocumentationType getDocumentationType(DocumentationTypeSrv type) {
-		DocumentationType item = new DocumentationType();
-		item.setUuid(type.getId());
-		item.setTitle(type.getTitle());
-		item.setCreatedAt(type.getCreatedAtTime());
-		item.setChangedAt(type.getChangedAtTime());
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param type
-	 * @return
-	 */
-	public EquipmentType getEquipmentType(EquipmentTypeSrv type) {
-		EquipmentType item = new EquipmentType();
-		item.setUuid(type.getId());
-		item.setTitle(type.getTitle());
-		item.setCreatedAt(type.getCreatedAtTime());
-		item.setChangedAt(type.getChangedAtTime());
-		return item;
-	}
-	
-	/**
-	 * преобразуем объект с сервера в локальный объект
-	 * @param type
-	 * @return
-	 */
-	public CriticalType getCriticalType(CriticalTypeSrv type) {
-		CriticalType item = new CriticalType();
-		item.setUuid(type.getId());
-		item.setType(type.getValue());
-		item.setCreatedAt(type.getCreatedAtTime());
-		item.setChangedAt(type.getChangedAtTime());
-		return item;
-	}
 
+		EquipmentDocumentation item = document.getLocal(parrentUuid);
+
+		// создаём объект типа документации
+		documentationTypes.put(document.getDocumentType().getId(), document.getDocumentType().getLocal());
+
+		return item;
+	}
+	
 	/**
 	 * Отправка результатов выполнения наряда.
 	 * @param bundle
