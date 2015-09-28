@@ -74,6 +74,22 @@ public class EquipmentStatusDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
+	 * 
+	 * @param UUID
+	 * @return
+	 */
+	public String getNameByPartOfUUID(String uuid) {
+		Cursor cur;
+		cur = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "LIKE ?",
+				new String[] {"%" + uuid + "%"}, null, null, null);
+		if (cur.getCount() > 0) {
+			cur.moveToFirst();
+			return cur.getString(1);
+		} else
+			return "неизвестен";
+	}
+
+	/**
 	 * @return
 	 */
 	public Cursor getAllItems_cursor() {

@@ -137,8 +137,7 @@ public class EquipmentInfoFragment extends Fragment {
 		 	 HashMap<String, String> hm = new HashMap<String,String>();
 		 	 hm.put("name", "Операция: " + operationTypeDBAdapter.getOperationTypeByUUID(equipmentOperationList.get(cnt).getOperation_type_uuid()));
 		 	 hm.put("descr","Критичность: " + criticalTypeDBAdapter.getNameByUUID(eqDBAdapter.getCriticalByUUID(equipmentOperationList.get(cnt).getEquipment_uuid())) 
-		 			 		+ " [" + DataUtils.getDate(equipmentOperationResultDBAdapter.getStartDateByUUID(equipmentOperationList.get(cnt).getEquipment_uuid()),"dd-MM-yyyy hh:mm") + "]");
-			 // Creation row
+		 			 		+ " [" + DataUtils.getDate(equipmentOperationResultDBAdapter.getStartDateByUUID(equipmentOperationList.get(cnt).getEquipment_uuid()),"dd-MM-yyyy hh:mm") + "]");			 // Creation row
 		 	 operation_type = equipmentOperationResultDBAdapter.getOperationResultTypeByUUID(equipmentOperationList.get(cnt).getOperation_status_uuid());
 		 	 switch (operation_type)
 		 		{

@@ -12,21 +12,17 @@ import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.*;
 import ru.toir.mobile.db.tables.*;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
-import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
-import ru.toir.mobile.utils.DataUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -63,7 +59,7 @@ public class EquipmentInfoActivity extends Activity {
 		private TextView tv_equipment_name;
 		private TextView tv_equipment_type;
 		private TextView tv_equipment_position;
-		private TextView tv_equipment_date;	
+		//private TextView tv_equipment_date;	
 		private TextView tv_equipment_tasks;	
 		private TextView tv_equipment_critical;
 		private ImageView tv_equipment_image;
@@ -180,10 +176,21 @@ public class EquipmentInfoActivity extends Activity {
 				tv_equipment_tasks.setText("" + eqOperationResultDBAdapter.getOperationResultByUUID(equipmentOperationList.get(0).getOperation_status_uuid()));
 			else tv_equipment_tasks.setText("еще не обслуживалось");
 			//File imgFile = new File(getApplicationInfo().dataDir + equipment.getImg());
-			File imgFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile/" + equipment.getImg());			
+			File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ equipment.getImg());			
+			
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img";
+			Log.d("Files", "Path: " + path);
+			File f = new File(path);        
+			File file[] = f.listFiles();
+			Log.d("Files", "Size: "+ file.length);
+			for (int i=0; i < file.length; i++)
+			{
+			    Log.d("Files", "FileName:" + file[i].getName());
+			}
 			// temporary!
 			tv_equipment_documentation.setText("Tag UUID: " + equipment.getUuid());
 			//tv_equipment_documentation.setText(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile" + equipment.getImg());
+			Long sd=imgFile.length();			
 			if(imgFile.exists() && imgFile.isFile()){
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 			    tv_equipment_image.setImageBitmap(myBitmap);			    			    
@@ -228,8 +235,7 @@ public class EquipmentInfoActivity extends Activity {
 		}
 
 		public void Callback(String result) {
-			Intent data = null;
-			String temp="";
+			//Intent data = null;
 			if(result == null){
 				setResult(RFID.RESULT_RFID_READ_ERROR);	
 			} else {
@@ -259,11 +265,12 @@ public class EquipmentInfoActivity extends Activity {
 			    EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 				OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 				EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
-				
+				EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		
 				tv_equipment_name.setText("Название: " + eqDBAdapter.getEquipsNameByUUID(equipmenttag.get_equipment_uuid()));		
 				tv_equipment_type.setText("Тип: " + eqTypeDBAdapter.getNameByUUID(eqDBAdapter.getEquipsTypeByUUID(equipmenttag.get_equipment_uuid())));
 				tv_equipment_position.setText("" + eqDBAdapter.getLocationCoordinatesByUUID(equipmenttag.get_equipment_uuid()));
-				tv_equipment_status.setText(equipmenttag.get_status());
+				tv_equipment_status.setText(equipmentStatusDBAdapter.getNameByPartOfUUID(equipmenttag.get_status()));
 				tv_equipment_documentation.setText("TAGID: " + equipmenttag.get_equipment_uuid());
 				
 			 	int cnt=0, operation_type=0;

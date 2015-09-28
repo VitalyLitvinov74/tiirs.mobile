@@ -150,6 +150,7 @@ public class GPSFragment extends Fragment {
 					.getItems(ordersList.get(cnt).getUuid());
 			// запрашиваем перечень оборудования
 			cnt2 = 0;
+			if (equipOperationList!=null)
 			while (cnt2 < equipOperationList.size()) {
 				// equipOpList.get(cnt2).getUuid();
 				EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(

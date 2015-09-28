@@ -4,7 +4,6 @@
 package ru.toir.mobile.rfid;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import ru.toir.mobile.rfid.TagRecordStructure;
 
 /**
@@ -12,8 +11,6 @@ import ru.toir.mobile.rfid.TagRecordStructure;
  *
  */
 public class EquipmentTagStructure {	
-	private static int BufferLength=2;	// длина буфера записей	
-	
 	private String tag;					// 01234567 [16]
 	private String equipment_uuid;		// BDFF4E95-F0AB-4E07-9DFD-4CA314FFE05B [16]
 	private String status;				// D818A97E-B6EB-4AEC-9168-174C780E365B [2!] B6EB

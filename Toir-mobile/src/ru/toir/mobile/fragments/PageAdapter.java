@@ -9,7 +9,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public final static int ORDER_FRAGMENT = 1; 
 	public final static int TASK_FRAGMENT = 5;
 
-	private OrdersFragment ordersFragment;
+	//private OrdersFragment ordersFragment;
 	private TaskFragment taskFragment;
 
 	public PageAdapter(FragmentManager fm) {	
@@ -55,7 +55,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 9;
+		return 8;
 	}
 
 	/* (non-Javadoc)
