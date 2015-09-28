@@ -139,12 +139,10 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<DocumentationType> array) {
-		mDb.beginTransaction();
+
 		for (DocumentationType item : array) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

@@ -1,9 +1,9 @@
 package ru.toir.mobile.db.adapters;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -221,6 +221,13 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 		projection.putAll(mProjection);
 		projection.remove(Projection._ID);
 		return projection;
+	}
+
+	public void saveItems(ArrayList<EquipmentOperationResult> list) {
+
+		for (EquipmentOperationResult item : list) {
+			replace(item);
+		}
 	}
 
 }

@@ -154,12 +154,10 @@ public class OperationPatternStepResultDBAdapter extends BaseDBAdapter {
 	}
 	
 	public void saveItems(ArrayList<OperationPatternStepResult> list) {
-		mDb.beginTransaction();
+
 		for (OperationPatternStepResult item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

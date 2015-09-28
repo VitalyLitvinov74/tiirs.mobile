@@ -145,12 +145,10 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<CriticalType> list) {
-		mDb.beginTransaction();
+
 		for (CriticalType item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

@@ -15,6 +15,9 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.EquipmentStatus;
 import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.db.tables.MeasureType;
+import ru.toir.mobile.db.tables.OperationPatternStep;
+import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
@@ -177,6 +180,41 @@ public class ParseHelper {
 		ArrayList<OperationStatus> list = new ArrayList<OperationStatus>();
 		for (EquipmentOperationSrv operation : operations) {
 			list.add(operation.getStatus().getLocal());
+		}
+		return list;
+	}
+	
+	public static ArrayList<OperationPatternStep> getOperationPatternSteps(OperationPatternSrv pattern) {
+
+		ArrayList<OperationPatternStep> list = new ArrayList<OperationPatternStep>();
+		List<OperationPatternStepSrv> steps = pattern.getSteps();
+		for (OperationPatternStepSrv step : steps) {
+			list.add(step.getLocal(pattern.getId()));
+		}
+		return list;
+	}
+	
+	public static ArrayList<OperationPatternStepResult> getOperationPatternStepResults(OperationPatternSrv pattern) {
+
+		ArrayList<OperationPatternStepResult> list = new ArrayList<OperationPatternStepResult>();
+		List<OperationPatternStepSrv> steps = pattern.getSteps();
+		for (OperationPatternStepSrv step : steps) {
+			List<OperationPatternStepResultSrv> results = step.getResults();
+			for (OperationPatternStepResultSrv result : results) {
+				list.add(result.getLocal(step.getId()));
+			}
+		}
+		return list;
+	}
+
+	public static ArrayList<MeasureType> getMeasureTypes(List<OperationPatternStepSrv> patternSteps) {
+
+		ArrayList<MeasureType> list = new ArrayList<MeasureType>();
+		for (OperationPatternStepSrv step : patternSteps) {
+			List<OperationPatternStepResultSrv> results = step.getResults();
+			for (OperationPatternStepResultSrv result : results) {
+				list.add(result.getMeasureType().getLocal());
+			}
 		}
 		return list;
 	}

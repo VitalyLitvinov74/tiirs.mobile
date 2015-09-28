@@ -10,8 +10,10 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.db.adapters.BaseDBAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -50,6 +52,7 @@ import ru.toir.mobile.serverapi.MeasureTypeSrv;
 import ru.toir.mobile.serverapi.OperationPatternSrv;
 import ru.toir.mobile.serverapi.OperationResultSrv;
 import ru.toir.mobile.serverapi.OperationTypeSrv;
+import ru.toir.mobile.serverapi.ParseHelper;
 import ru.toir.mobile.serverapi.TaskStatusSrv;
 import ru.toir.mobile.serverapi.OperationPatternStepResultSrv;
 import ru.toir.mobile.serverapi.OperationStatusSrv;
@@ -57,6 +60,7 @@ import ru.toir.mobile.serverapi.OperationPatternStepSrv;
 import ru.toir.mobile.utils.DataUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.util.ArrayMap;
@@ -133,8 +137,13 @@ public class ReferenceProcessor {
 					String jsonString = new String(response.mBody);
 					Log.d("test", jsonString);
 					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+
 					// разбираем и сохраняем полученные данные
-					saveOperationPattern(gson.fromJson(jsonString, OperationPatternSrv.class));
+					SQLiteDatabase db = DatabaseHelper.getInstance(mContext).getWritableDatabase();
+					db.beginTransaction();
+					savePattern(gson.fromJson(jsonString, OperationPatternSrv.class));
+					db.setTransactionSuccessful();
+					db.endTransaction();
 				} else {
 					return false;
 				}
@@ -261,54 +270,25 @@ public class ReferenceProcessor {
 		}
 		return changed;
 	}
-	
-	private void saveOperationPattern(OperationPatternSrv pattern) {
-		
-		if (pattern == null) {
-			return;
-		}
-		
-		OperationPatternDBAdapter adapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
-		OperationPattern item = pattern.getLocal();
-		saveOperationPatternStep(pattern.getSteps(), pattern.getId());
-		adapter.replace(item);
-		
-	}
 
-	private void saveOperationPatternStep(List<OperationPatternStepSrv> array, String operationPatternUuid) {
-		
-		if (array == null) {
-			return;
-		}
-		
-		OperationPatternStepDBAdapter adapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<OperationPatternStep> list = new ArrayList<OperationPatternStep>();
-		
-		for (OperationPatternStepSrv element : array) {
-			OperationPatternStep item = element.getLocal(operationPatternUuid);
-			saveOperationPatternStepResult(element.getResults(), element.getId());
-			list.add(item);
-		}
-		adapter.saveItems(list);
-		
-	}
+	/**
+	 * Сохраняем в базу информацию по шаблону операции и связанные с ним данные.
+	 * 
+	 * @param pattern
+	 */
+	private void savePattern(OperationPatternSrv pattern) {
 
-	private void saveOperationPatternStepResult(List<OperationPatternStepResultSrv> array, String operationPatternStepUuid) {
+		OperationPatternDBAdapter adapter0 = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter0.replace(pattern.getLocal());
 
-		if (array == null) {
-			return;
-		}
+		OperationPatternStepDBAdapter adapter1 = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter1.saveItems(ParseHelper.getOperationPatternSteps(pattern));
 
-		OperationPatternStepResultDBAdapter adapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<OperationPatternStepResult> list = new ArrayList<OperationPatternStepResult>();
+		OperationPatternStepResultDBAdapter adapter2 = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter2.saveItems(ParseHelper.getOperationPatternStepResults(pattern));
 
-		for (OperationPatternStepResultSrv element : array) {
-			OperationPatternStepResult item = element.getLocal(operationPatternStepUuid);
-			saveMeasureType(new MeasureTypeSrv[] { element.getMeasureType() });
-			list.add(item);
-		}
-		adapter.saveItems(list);
-
+		MeasureTypeDBAdapter adapter3 = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		adapter3.saveItems(ParseHelper.getMeasureTypes(pattern.getSteps()));
 	}
 
 	private void saveDocumentType(DocumentationTypeSrv[] array) {

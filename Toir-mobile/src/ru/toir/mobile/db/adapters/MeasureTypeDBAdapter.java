@@ -126,12 +126,10 @@ public class MeasureTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<MeasureType> list) {
-		mDb.beginTransaction();
+
 		for (MeasureType item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

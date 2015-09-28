@@ -163,12 +163,10 @@ public class OperationResultDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<OperationResult> list) {
-		mDb.beginTransaction();
+
 		for (OperationResult item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

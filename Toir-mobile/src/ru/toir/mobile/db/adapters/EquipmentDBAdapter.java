@@ -365,12 +365,10 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<Equipment> list) {
-		mDb.beginTransaction();
+
 		for (Equipment item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

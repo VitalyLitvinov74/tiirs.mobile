@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
@@ -42,6 +43,7 @@ import ru.toir.mobile.serverapi.TaskSrv;
 import ru.toir.mobile.serverapi.result.TaskResultRes;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.util.ArrayMap;
@@ -127,8 +129,11 @@ public class TaskProcessor {
 					// TODO нужен механизм для запуска транзакции т.е. операций вставки в базу много
 
 					// разбираем и сохраняем полученные данные
+					SQLiteDatabase db = DatabaseHelper.getInstance(mContext).getWritableDatabase();
+					db.beginTransaction();
 					saveTasks(serverTasks);
-					
+					db.setTransactionSuccessful();
+					db.endTransaction();
 					
 					// TODO нужна проверка на то что успешно разобрали и сохранили в базу,
 					return false;

@@ -136,12 +136,10 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<OperationStatus> list) {
-		mDb.beginTransaction();
+
 		for (OperationStatus item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**

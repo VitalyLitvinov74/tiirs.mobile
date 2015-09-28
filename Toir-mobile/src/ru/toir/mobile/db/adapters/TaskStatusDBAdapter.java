@@ -140,12 +140,10 @@ public class TaskStatusDBAdapter extends BaseDBAdapter {
 	}
 
 	public void saveItems(ArrayList<TaskStatus> list) {
-		mDb.beginTransaction();
+
 		for (TaskStatus item : list) {
 			replace(item);
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
 	}
 
 	/**
