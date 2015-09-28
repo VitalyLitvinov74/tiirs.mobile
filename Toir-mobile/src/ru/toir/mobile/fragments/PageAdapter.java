@@ -7,7 +7,7 @@ import ru.toir.mobile.fragments.EquipmentsFragment;
 
 public class PageAdapter extends FragmentPagerAdapter {
 	public final static int ORDER_FRAGMENT = 1; 
-	public final static int TASK_FRAGMENT = 6;
+	public final static int TASK_FRAGMENT = 5;
 
 	private OrdersFragment ordersFragment;
 	private TaskFragment taskFragment;
@@ -23,21 +23,16 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 0 :
 			fragment = new UserInfoFragment();
 			break;
-		case ORDER_FRAGMENT :
-			if (ordersFragment == null) {
-				ordersFragment = new OrdersFragment();
-			}
-			return ordersFragment;
-		case 2 :
+		case 1 :
 			fragment = new ReferenceFragment();
 			break;
-		case 3 :
+		case 2 :
 			fragment = new ChartsFragment();
 			break;
-		case 4 :
+		case 3 :
 			fragment = new GPSFragment();
 			break;
-		case 5 :
+		case 4 :
 			fragment = new EquipmentsFragment();
 			break;
 		case TASK_FRAGMENT :
@@ -45,10 +40,10 @@ public class PageAdapter extends FragmentPagerAdapter {
 				taskFragment = new TaskFragment();
 			}
 			return taskFragment;
-		case 7 :
+		case 6 :
 			fragment = new NativeCameraFragment();
 			break;
-		case 8 :
+		case 7 :
 			fragment = new QRTestFragment();
 			break;
 		default :
@@ -73,28 +68,25 @@ public class PageAdapter extends FragmentPagerAdapter {
 		case 0 :
 			title = "Пользователь";
 			break;
-		case ORDER_FRAGMENT :
-			title = "Наряды таблица";
-			break;
-		case 2 :
+		case 1 :
 			title = "Справочники";
 			break;
-		case 3 :
+		case 2 :
 			title = "Графики";
 			break;
-		case 4 :
+		case 3 :
 			title = "Тест GPS";
 			break;
-		case 5 :
+		case 4 :
 			title = "Оборудование";
 			break;
 		case TASK_FRAGMENT :
 			title = "Наряды";
 			break;
-		case 7 :
+		case 6 :
 			title = "Фото";
 			break;
-		case 9 :
+		case 7 :
 			title = "QR test";
 			break;
 		default :
