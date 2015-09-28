@@ -53,7 +53,7 @@ public class RFIDQRcode implements RFIDDriver{
 	 * @return boolean
 	 */
 	@Override
-	public boolean init() {
+	public boolean init(byte type) {
 		mActivity.setContentView(R.layout.qr_read);
 		mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		return true;
@@ -65,7 +65,7 @@ public class RFIDQRcode implements RFIDDriver{
 	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
 	 */
 	@Override
-	public void read() {
+	public void read(byte type) {
 		preview = (FrameLayout) mActivity.findViewById(R.id.cameraPreview);       
         scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);        
 		// запускаем отдельную задачу для считывания метки

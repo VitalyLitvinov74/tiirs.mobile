@@ -2,6 +2,8 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
+import ru.toir.mobile.EquipmentInfoActivity;
+import ru.toir.mobile.rfid.UserTagStructure;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.hardware.uhf.magic.reader;
@@ -10,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -25,7 +28,8 @@ public class RFIDDriverC5 implements RFIDDriver{
 	static int m_nCount=0;
 	CheckBox m_check;  
 	EditText m_address;
-	
+	static byte types=0;	
+		
 	@Override
 	public void setActivity(Activity activity) {
 		mActivity = activity;
@@ -36,11 +40,14 @@ public class RFIDDriverC5 implements RFIDDriver{
 	 * @return boolean
 	 */
 	@Override
-	public boolean init() {
-		mActivity.setContentView(R.layout.bar2d_read);
+	public boolean init(byte type) {
+		types=type;
+		if (type==0)
+			{
+			 mActivity.setContentView(R.layout.bar2d_read);			 
+			 mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			}
 		reader.m_handler=mHandler;
-		mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
         android.hardware.uhf.magic.reader.init("/dev/ttyMT1");
         android.hardware.uhf.magic.reader.Open("/dev/ttyMT1");
         Log.e("7777777777","111111111111111111111111111111111111");
@@ -60,11 +67,15 @@ public class RFIDDriverC5 implements RFIDDriver{
 	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
 	 */
 	@Override
-	public void read() {
+	public void read(byte type) {
         //scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);        
-        android.hardware.uhf.magic.reader.InventoryLablesLoop();
+		if (type <= 1)			
+			android.hardware.uhf.magic.reader.InventoryLablesLoop();
+		else
+			android.hardware.uhf.magic.reader.InventoryLables();
+		reader.m_strPCEPC = "";
 	}
-	
+
 	/**
 	 * <p>Записываем в метку</p>
 	 * @param outBuffer
@@ -89,7 +100,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 	@Override
 	public void getMenu(Menu menu) {
 	}
-	
+
 	static private class MainHandler extends Handler {  
     	@Override           
     	public void handleMessage(Message msg) {
@@ -97,15 +108,50 @@ public class RFIDDriverC5 implements RFIDDriver{
     		{  
     			if(m_strresult.indexOf((String)msg.obj)<0)
     			{  
-    				Log.e("8888888888",(String)msg.obj+"\r\n");
+    				//Log.e("8888888888",(String)msg.obj+"\r\n");
 					m_strresult +=(String)msg.obj;
-    				Toast.makeText(mActivity.getApplicationContext(),
-							"Код: " + m_strresult,
-							Toast.LENGTH_LONG).show();					
-					m_strresult+="\r\n";
-					m_strresult = "01234567";
-					reader.StopLoop();
-					((RFIDActivity)mActivity).Callback(m_strresult);					
+    				Toast.makeText(mActivity.getApplicationContext(),"Код: " + m_strresult,Toast.LENGTH_LONG).show();					
+					//m_strresult+="\r\n";
+					if (types < 1)
+						{
+						 m_strresult = "01234567";					
+						 reader.StopLoop();
+						}
+					if (types==0)
+						{
+						 //m_strresult+="\r\n";
+						 ((RFIDActivity)mActivity).Callback(m_strresult);
+						}
+					if (types>0)				
+						{
+						 if (reader.m_strPCEPC!=null && !reader.m_strPCEPC.equals(""))							 
+						 	{
+							 if (!reader.m_strPCEPC.equals(m_strresult))
+							 	((EquipmentInfoActivity)mActivity).Callback(m_strresult);
+						 	}
+						 else
+						 	{
+							 reader.m_strPCEPC = m_strresult;						 						 
+							 if (reader.m_strPCEPC!=null && !reader.m_strPCEPC.equals(""))
+						 		{								 	
+								 byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
+								 byte memoryBank = 3; 		// user memory
+								 int address = 0;			// читаем всегда с начала
+								 int dataLength = 32;		// длина памяти данных
+								 String passwordString = "00000000";		// пароль
+								 byte[] password = reader.stringToBytes(passwordString);
+								 try {
+									Thread.sleep(690);
+								 	} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									 e.printStackTrace();
+								 	}
+								 m_strresult="";
+								 reader.ReadLables(password, epc.length, epc, memoryBank, address, dataLength);
+						 		}
+						 	}
+						}
+					m_strresult="";
     			}  
     			m_nCount++;
     			//Log.e("8888888888",m_nCount+"\r\n");

@@ -24,8 +24,8 @@ public class RFIDBarcode2D implements RFIDDriver{
     static private class MainHandler extends Handler {
     	@Override          
     	public void handleMessage(Message msg) {
-    	switch (msg.what) {   
-	    	case Scanner.BARCODE_READ: {
+    		switch (msg.what) {   
+    		case Scanner.BARCODE_READ: {
 				Toast.makeText(mActivity.getApplicationContext(),
 						"Код: " + msg.obj,
 						Toast.LENGTH_LONG).show();						    		
@@ -51,7 +51,7 @@ public class RFIDBarcode2D implements RFIDDriver{
 	 * @return boolean
 	 */
 	@Override
-	public boolean init() {
+	public boolean init(byte type) {
 		Scanner.m_handler=mHandler;  
 		//initialize the scanner
 		Scanner.InitSCA();		
@@ -67,7 +67,7 @@ public class RFIDBarcode2D implements RFIDDriver{
 	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
 	 */
 	@Override
-	public void read() {                
+	public void read(byte type) {                
 		// запускаем отдельную задачу для считывания метки
         Scanner.Read();
 	}

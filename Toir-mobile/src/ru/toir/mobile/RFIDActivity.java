@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import ru.toir.mobile.rfid.RFID;
+import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
 
 /**
@@ -26,6 +27,8 @@ public class RFIDActivity extends Activity {
 	private Class<?> driverClass;
 	private RFIDDriver driver;
 
+	UserTagStructure usertag;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -63,9 +66,9 @@ public class RFIDActivity extends Activity {
 		rfid.setActivity(this);
 
 		// инициализируем драйвер
-		if (rfid.init()) {
+		if (rfid.init((byte)0)) {
 			// запускаем процедуру считывания
-			rfid.read();
+			rfid.read((byte)1);
 		} else {
 			setResult(RFID.RESULT_RFID_INIT_ERROR);
 			finish();
@@ -121,6 +124,7 @@ public class RFIDActivity extends Activity {
 			setResult(RFID.RESULT_RFID_READ_ERROR);	
 		} else {
 			data = new Intent();
+			// TODO parse data from tag
 			data.setData(Uri.parse(result));
 			data.putExtras(getIntent().getExtras());
 			setResult(RESULT_OK, data);

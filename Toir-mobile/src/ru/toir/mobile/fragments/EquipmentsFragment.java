@@ -201,7 +201,7 @@ public class EquipmentsFragment extends Fragment {
 			hm.put("descr",
 					"Тип: "
 							+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(
-									cnt).getEquipment_type_uuid())
+							cnt).getEquipment_type_uuid())
 							+ " ["
 							+ equipmentList.get(cnt).getLocation()
 							+ "]"

@@ -128,7 +128,7 @@ public class OperationActivity extends Activity {
 		layout = (LinearLayout) findViewById(R.id.resultButtonLayout);
 		stepTitle = (TextView) findViewById(R.id.stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.step_description);
-		numStepButton = (Button) findViewById(R.id.button1);
+		numStepButton = (Button) findViewById(R.id.button_read);
 
 		// получаем статус и время наряда
 		TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(

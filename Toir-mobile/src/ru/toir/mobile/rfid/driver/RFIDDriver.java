@@ -15,14 +15,14 @@ public interface RFIDDriver {
 	 * <p>Инициализация драйвера</p>
 	 * @return
 	 */
-	public boolean init();
+	public boolean init(byte type);
 
 	/**
 	 * <p>Считывание метки</p>
 	 * @return
 	 */
-	public void read();
-	
+	public void read(byte type);
+
 	/**
 	 * <p>Запись в метку</p>
 	 * @param outBuffer

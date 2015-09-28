@@ -33,16 +33,16 @@ public class RFID {
 	 * <p>Инициализация драйвера</p>
 	 * @return boolean
 	 */
-	public boolean init(){
-		return mDriver.init();
+	public boolean init(byte type){
+		return mDriver.init(type);
 	}
 
 	/**
 	 * <p>Считывание метки</p>
 	 * @return byte[]
 	 */
-	public void read(){
-		mDriver.read();
+	public void read(byte type){
+		mDriver.read(type);
 	}
 	
 	/**

@@ -21,7 +21,7 @@ public class RFIDBarcode implements RFIDDriver {
 	}
 
 	@Override
-	public boolean init() {
+	public boolean init(byte type) {
 		return true;
 	}
 
@@ -29,7 +29,7 @@ public class RFIDBarcode implements RFIDDriver {
 	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#read()
 	 */
 	@Override
-	public void read() {
+	public void read(byte type) {
 		IntentIntegrator integrator = new IntentIntegrator(mActivity);
 		integrator.initiateScan();		
 	}

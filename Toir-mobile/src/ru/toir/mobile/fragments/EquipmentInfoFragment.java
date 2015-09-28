@@ -64,21 +64,21 @@ public class EquipmentInfoFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.equipment_layout, container, false);
-		tv_equipment_id = (TextView) rootView.findViewById(R.id.equipment_text_id);
+		//tv_equipment_id = (TextView) rootView.findViewById(R.id.equipment_text_id);
 		tv_equipment_name = (TextView) rootView.findViewById(R.id.equipment_text_name);
 		tv_equipment_type = (TextView) rootView.findViewById(R.id.equipment_text_type);		
 		tv_equipment_position = (TextView) rootView.findViewById(R.id.equipment_position);
-		tv_equipment_date = (TextView) rootView.findViewById(R.id.equipment_start_date);	
+		//tv_equipment_date = (TextView) rootView.findViewById(R.id.equipment_start_date);	
 		tv_equipment_critical = (TextView) rootView.findViewById(R.id.equipment_critical);	
 		tv_equipment_task_date = (TextView) rootView.findViewById(R.id.equipment_text_date);
 		tv_equipment_tasks = (TextView) rootView.findViewById(R.id.equipment_text_tasks);	
 		tv_equipment_image = (ImageView) rootView.findViewById(R.id.equipment_image);
-	 	lv = (ListView) rootView.findViewById(R.id.equipment_listView_main);		 			 
-		FillListViewOperations(rootView);
-		initView(rootView);
+	 	lv = (ListView) rootView.findViewById(R.id.equipment_listView_main);	 	
+	 	FillListViewOperations(rootView);
+	 	initView(rootView);
 		return rootView;
 	}
-
+	
 	private void initView(View view) {		
 		
 		spinner_operation_adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, list);

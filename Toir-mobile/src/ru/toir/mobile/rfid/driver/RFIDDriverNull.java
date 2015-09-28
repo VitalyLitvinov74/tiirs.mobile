@@ -10,7 +10,7 @@ import android.view.Menu;
 public class RFIDDriverNull implements RFIDDriver{
 	
 	@Override
-	public boolean init() {
+	public boolean init(byte type) {
 		return true;
 	}
 	
@@ -19,7 +19,7 @@ public class RFIDDriverNull implements RFIDDriver{
 	 * @return
 	 */
 	@Override
-	public void read() {
+	public void read(byte type) {
 	}
 	
 	/**

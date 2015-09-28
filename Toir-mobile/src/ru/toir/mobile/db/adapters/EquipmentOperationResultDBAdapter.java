@@ -86,6 +86,23 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	}		
 
 	/**
+	 * <p>
+	 * Временная функция
+	 * Возвращает по uuid дату начала выполнения операции</p>
+	 * @param uuid
+	 */
+	public Long getStartDateByPartOfUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID  + " LIKE ?", new String[]{"%" + uuid + "%"}, null, null, null);				
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getLong(cursor.getColumnIndex(FIELD_START_DATE));			 
+			}
+		else return 0l;
+	}		
+
+	/**
 	 * <p>Возвращает по uuid дату завершения операции</p>
 	 * @param uuid
 	 */
@@ -101,7 +118,8 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>Возвращает по uuid, uuid (статуса) результата выполнения операции</p>
+	 * <p> Временная функция
+	 * Возвращает по uuid, uuid (статуса) результата выполнения операции</p>
 	 * @param uuid
 	 */
 	public String getOperationResultByUUID(String uuid) {
@@ -121,7 +139,39 @@ public class EquipmentOperationResultDBAdapter extends BaseDBAdapter {
 	 */
 	public int getOperationResultTypeByUUID(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?", new String[]{uuid}, null, null, null);				
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID  + "=?", new String[]{uuid}, null, null, null);				
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getInt(cursor.getColumnIndex(FIELD_TYPE));
+			}
+		// unknown type
+		else return 3;
+	}
+
+	/**
+	 * <p> Временная функция
+	 * Возвращает по uuid, uuid (статуса) результата выполнения операции</p>
+	 * @param uuid
+	 */
+	public String getOperationResultByPartOfUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + " LIKE ?", new String[]{"%" + uuid + "%"}, null, null, null);				
+		if (cursor.getCount()>0)
+			{
+			 cursor.moveToFirst();
+			 return cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_RESULT_UUID));
+			}
+		else return "неизвестна";
+	}
+
+	/**
+	 * <p>Возвращает тип по uuid (статуса) результата выполнения операции</p>
+	 * @param uuid
+	 */
+	public int getOperationResultTypeByPartOfUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID  + " LIKE ?", new String[]{"%" + uuid + "%"}, null, null, null);				
 		if (cursor.getCount()>0)
 			{
 			 cursor.moveToFirst();

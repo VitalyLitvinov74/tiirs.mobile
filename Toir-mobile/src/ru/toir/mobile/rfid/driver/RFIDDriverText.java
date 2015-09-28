@@ -28,7 +28,7 @@ public class RFIDDriverText implements RFIDDriver{
 	 * @return boolean
 	 */
 	@Override
-	public boolean init() {
+	public boolean init(byte type) {
 		return true;
 	}
 	
@@ -38,7 +38,7 @@ public class RFIDDriverText implements RFIDDriver{
 	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
 	 */
 	@Override
-	public void read() {
+	public void read(byte type) {
 		// запускаем отдельную задачу для считывания метки
 		mTask = (ReadTagAsyncTask)new ReadTagAsyncTask().execute();
 	}

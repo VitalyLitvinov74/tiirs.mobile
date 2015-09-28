@@ -227,7 +227,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex(FIELD_TITLE));
 		} else
@@ -245,7 +245,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor
 					.getColumnIndex(FIELD_EQUIPMENT_TYPE_UUID));
@@ -264,7 +264,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor
 					.getColumnIndex(FIELD_CRITICAL_TYPE_UUID));
@@ -283,7 +283,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getFloat(cursor.getColumnIndex(FIELD_LATITUDE)) + " "
 					+ cursor.getFloat(cursor.getColumnIndex(FIELD_LONGITUDE));
@@ -302,7 +302,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex(FIELD_LOCATION));
 		} else
@@ -320,7 +320,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex(FIELD_IMG));
 		} else
@@ -338,7 +338,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID));
 		} else
@@ -356,7 +356,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor
 					.getColumnIndex(FIELD_INVENTORY_NUMBER));

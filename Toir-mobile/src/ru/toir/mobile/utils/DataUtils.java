@@ -206,4 +206,11 @@ public class DataUtils {
 		
 		return date;
 	}
+
+	public static String StringToUUID(String temp) {
+		temp = temp.toLowerCase(Locale.ENGLISH);
+		if (temp.length() == 32)
+			temp=temp.substring(0, 8) + "-" + temp.substring(8, 12) + "-" + temp.substring(12, 16) + "-" + temp.substring(16, 20) + "-" + temp.substring(20, 32);
+		return temp;
+	}
 }

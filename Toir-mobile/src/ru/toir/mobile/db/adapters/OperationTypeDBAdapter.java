@@ -127,7 +127,26 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
-		if (cursor.getColumnCount() > 0) {
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			return cursor.getString(cursor.getColumnIndex(FIELD_TITLE));
+		} else
+			return "неизвестно";
+	}
+
+	/**
+	 * <p>
+	 * Временная функция
+	 * Возвращает название типа обслуживания по части uuid
+	 * </p>
+	 * 
+	 * @param uuid
+	 */
+	public String getOperationTypeByPartOfUUID(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + " LIKE ?",
+				new String[] { "%"+uuid+"%"}, null, null, null);
+		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex(FIELD_TITLE));
 		} else
