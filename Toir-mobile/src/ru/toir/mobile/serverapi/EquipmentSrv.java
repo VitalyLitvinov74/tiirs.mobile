@@ -3,11 +3,8 @@ package ru.toir.mobile.serverapi;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.Equipment;
-import ru.toir.mobile.db.tables.EquipmentType;
 import com.google.gson.annotations.Expose;
-import ru.toir.mobile.db.tables.EquipmentStatus;
 
 /**
  * Оборудование
@@ -202,31 +199,4 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return item;
 	}
 	
-	public static ArrayList<EquipmentType> getEquipmentTypes(ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
-		for (EquipmentSrv equipment : equipments) {
-			list.add(equipment.getEquipmentType().getLocal());
-		}
-		return list;
-	}
-	
-	public static ArrayList<CriticalType> getCriticalTypes(ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
-		for (EquipmentSrv equipment : equipments) {
-			list.add(equipment.getCriticalityType().getLocal());
-		}
-		return list;
-	}
-	
-	public static ArrayList<EquipmentStatus> getEquipmentStatuses(ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<EquipmentStatus> list = new ArrayList<EquipmentStatus>();
-		for (EquipmentSrv equipment : equipments) {
-			list.add(equipment.getEquipmentStatus().getLocal());
-		}
-		return list;
-	}
-
 }

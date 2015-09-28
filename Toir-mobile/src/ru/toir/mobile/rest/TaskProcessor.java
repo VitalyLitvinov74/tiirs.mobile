@@ -35,10 +35,9 @@ import ru.toir.mobile.serializer.EquipmentOperationSerializer;
 import ru.toir.mobile.serializer.MeasureValueSerializer;
 import ru.toir.mobile.serializer.TaskResultSerializer;
 import ru.toir.mobile.serializer.TaskSerializer;
-import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
-import ru.toir.mobile.serverapi.DocumentationTypeSrv;
 import ru.toir.mobile.serverapi.EquipmentOperationSrv;
 import ru.toir.mobile.serverapi.EquipmentSrv;
+import ru.toir.mobile.serverapi.ParseHelper;
 import ru.toir.mobile.serverapi.TaskSrv;
 import ru.toir.mobile.serverapi.result.TaskResultRes;
 import android.content.Context;
@@ -171,41 +170,41 @@ public class TaskProcessor {
 
 		// новый вариант разбора и сохранения данных с сервера
 		TaskDBAdapter adapter0 = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter0.saveItems(TaskSrv.getTasks(tasks));						
+		adapter0.saveItems(ParseHelper.getTasks(tasks));						
 		
 		TaskStatusDBAdapter adapter1 = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter1.saveItems(TaskSrv.getTaskStatuses(tasks));
+		adapter1.saveItems(ParseHelper.getTaskStatuses(tasks));
 		
 		EquipmentOperationDBAdapter adapter2 = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter2.saveItems(TaskSrv.getEquipmentOperations(tasks));
+		adapter2.saveItems(ParseHelper.getEquipmentOperations(tasks));
 		
-		ArrayList<EquipmentOperationSrv> operations = TaskSrv.getEquipmentOperationSrvs(tasks);
+		ArrayList<EquipmentOperationSrv> operations = ParseHelper.getEquipmentOperationSrvs(tasks);
 		EquipmentDBAdapter adapter3 = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter3.saveItems(EquipmentOperationSrv.getEquipments(operations));
+		adapter3.saveItems(ParseHelper.getEquipments(operations));
 		
 		OperationTypeDBAdapter adapter4 = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter4.saveItems(EquipmentOperationSrv.getOperationTypes(operations));
+		adapter4.saveItems(ParseHelper.getOperationTypes(operations));
 		
 		OperationStatusDBAdapter adapter5 = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter5.saveItems(EquipmentOperationSrv.getOperationStatuses(operations));
+		adapter5.saveItems(ParseHelper.getOperationStatuses(operations));
 		
-		patternUuids = EquipmentOperationSrv.getOperationPatternUuids(operations);
+		patternUuids = ParseHelper.getOperationPatternUuids(operations);
 		
-		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv.getEquipmentSrvs(operations);
+		ArrayList<EquipmentSrv> equipments = ParseHelper.getEquipmentSrvs(operations);
 		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));			
-		adapter6.saveItems(EquipmentSrv.getEquipmentTypes(equipments));
+		adapter6.saveItems(ParseHelper.getEquipmentTypes(equipments));
 		
 		CriticalTypeDBAdapter adapter7 = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter7.saveItems(EquipmentSrv.getCriticalTypes(equipments));
+		adapter7.saveItems(ParseHelper.getCriticalTypes(equipments));
 		
 		EquipmentStatusDBAdapter adapter8 = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter8.saveItems(EquipmentSrv.getEquipmentStatuses(equipments));
+		adapter8.saveItems(ParseHelper.getEquipmentStatuses(equipments));
 		
 		EquipmentDocumentationDBAdapter adapter9 = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter9.saveItems(EquipmentDocumentationSrv.getEquipmentDocumentations(equipments));
+		adapter9.saveItems(ParseHelper.getEquipmentDocumentations(equipments));
 
 		DocumentationTypeDBAdapter adapter10 = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter10.saveItems(DocumentationTypeSrv.getEquipmentDocumentationTypes(equipments));
+		adapter10.saveItems(ParseHelper.getEquipmentDocumentationTypes(equipments));
 	}
 
 	/**
