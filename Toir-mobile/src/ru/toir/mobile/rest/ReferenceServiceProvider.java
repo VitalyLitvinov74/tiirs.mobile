@@ -15,16 +15,33 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	private final Context mContext;
 
 	public static class Methods {
-		public static final int GET_REFERENCE = 1;
-		public static final String GET_REFERENCE_PARAMETER_NAME = "name";
-		
+		public static final int GET_OPERATION_RESULT = 1;
 		public static final int GET_OPERATION_PATTERN = 2;
+		public static final int GET_DOCUMENT_TYPE = 3;
+		public static final int GET_EQUIPMENT_STATUS = 4;
+		public static final int GET_EQUIPMENT_TYPE = 5;
+		public static final int GET_MEASURE_TYPE = 6;
+		public static final int GET_OPERATION_STATUS = 7;
+		public static final int GET_OPERATION_TYPE = 8;
+		public static final int GET_TASK_STATUS = 9;
+		public static final int GET_EQUIPMENT = 10;
+		public static final int GET_CRITICAL_TYPE = 11;
+
 		public static final String GET_OPERATION_PATTERN_PARAMETER_UUID = "uuid";
 	}
 	
 	public static class Actions {
-		public static final String ACTION_GET_REFERENCE = "action_get_reference";
+		public static final String ACTION_GET_OPERATION_RESULT = "action_get_operation_result";
 		public static final String ACTION_GET_OPERATION_PATTERN = "action_get_operation_pattern";
+		public static final String ACTION_GET_DOCUMENT_TYPE = "action_get_document_type";
+		public static final String ACTION_GET_EQUIPMENT_STATUS = "action_get_equipment_status";
+		public static final String ACTION_GET_EQUIPMENT_TYPE = "action_get_equipment_type";
+		public static final String ACTION_GET_MEASURE_TYPE = "action_get_measure_type";
+		public static final String ACTION_GET_OPERATION_STATUS = "action_get_operation_status";
+		public static final String ACTION_GET_OPERATION_TYPE = "action_get_operation_type";
+		public static final String ACTION_GET_TASK_STATUS = "action_get_task_status";
+		public static final String ACTION_GET_EQUIPMENT = "action_get_equipment";
+		public static final String ACTION_GET_CRITICAL_TYPE = "action_get_critical_type";
 	}
 
 	/**
@@ -42,10 +59,28 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	@Override
 	public boolean RunTask(int method, Bundle extras) {
 		switch (method) {
-		case Methods.GET_REFERENCE:
-			return getReference(extras);
+		case Methods.GET_OPERATION_RESULT:
+			return getOperationResult(extras);
 		case Methods.GET_OPERATION_PATTERN:
 			return getOperationPattern(extras);
+		case Methods.GET_DOCUMENT_TYPE:
+			return getDocumentType(extras);
+		case Methods.GET_EQUIPMENT_STATUS:
+			return getEquipmentStatus(extras);
+		case Methods.GET_EQUIPMENT_TYPE:
+			return getEquipmentType(extras);
+		case Methods.GET_MEASURE_TYPE:
+			return getMeasureType(extras);
+		case Methods.GET_OPERATION_STATUS:
+			return getOperationStatus(extras);
+		case Methods.GET_OPERATION_TYPE:
+			return getOperationType(extras);
+		case Methods.GET_TASK_STATUS:
+			return getTaskStatus(extras);
+		case Methods.GET_EQUIPMENT:
+			return getEquipment(extras);
+		case Methods.GET_CRITICAL_TYPE:
+			return getCriticalType(extras);
 		}
 		return false;
 	}
@@ -53,9 +88,9 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	/**
 	 * 
 	 */
-	private boolean getReference(Bundle extras) {
+	private boolean getOperationResult(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getReference(extras);
+			return new ReferenceProcessor(mContext).getOperationResult(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -68,6 +103,114 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	private boolean getOperationPattern(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getOperationPattern(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private boolean getDocumentType(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getDocumentType(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private boolean getEquipmentStatus(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getEquipmentStatus(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getEquipmentType(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getEquipmentType(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getMeasureType(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getMeasureType(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getOperationStatus(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getOperationStatus(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getOperationType(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getOperationType(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getTaskStatus(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getTaskStatus(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getEquipment(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getEquipment(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private boolean getCriticalType(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getCriticalType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

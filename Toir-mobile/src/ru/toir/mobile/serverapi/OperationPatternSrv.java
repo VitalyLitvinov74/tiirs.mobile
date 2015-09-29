@@ -1,84 +1,60 @@
-
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import ru.toir.mobile.db.tables.OperationPattern;
+
 import com.google.gson.annotations.Expose;
 
 /**
  * Шаблон операции
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class OperationPatternSrv {
+public class OperationPatternSrv extends BaseObjectSrv {
 
-    @Expose
-    private String Id;
-    @Expose
-    private String Title;
-    @Expose
-    private OperationTypeSrv operationType;
-    @Expose
-    private List<OperationPatternStepSrv> Steps = new ArrayList<OperationPatternStepSrv>();
-    @Expose
-	private Date CreatedAt;
 	@Expose
-	private Date ChangedAt;
+	private String Title;
+	@Expose
+	private OperationTypeSrv operationType;
+	@Expose
+	private List<OperationPatternStepSrv> Steps = new ArrayList<OperationPatternStepSrv>();
 
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
+	/**
+	 * 
+	 * @return The Title
+	 */
+	public String getTitle() {
+		return Title;
+	}
 
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
+	/**
+	 * 
+	 * @param Title
+	 *            The Title
+	 */
+	public void setTitle(String Title) {
+		this.Title = Title;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Title
-     */
-    public String getTitle() {
-        return Title;
-    }
+	/**
+	 * 
+	 * @return The Steps
+	 */
+	public List<OperationPatternStepSrv> getSteps() {
+		return Steps;
+	}
 
-    /**
-     * 
-     * @param Title
-     *     The Title
-     */
-    public void setTitle(String Title) {
-        this.Title = Title;
-    }
-
-    /**
-     * 
-     * @return
-     *     The Steps
-     */
-    public List<OperationPatternStepSrv> getSteps() {
-        return Steps;
-    }
-
-    /**
-     * 
-     * @param Steps
-     *     The Steps
-     */
-    public void setSteps(List<OperationPatternStepSrv> Steps) {
-        this.Steps = Steps;
-    }
+	/**
+	 * 
+	 * @param Steps
+	 *            The Steps
+	 */
+	public void setSteps(List<OperationPatternStepSrv> Steps) {
+		this.Steps = Steps;
+	}
 
 	/**
 	 * @return the operationType
@@ -88,38 +64,31 @@ public class OperationPatternSrv {
 	}
 
 	/**
-	 * @param operationType the operationType to set
+	 * @param operationType
+	 *            the operationType to set
 	 */
 	public void setOperationType(OperationTypeSrv operationType) {
 		this.operationType = operationType;
 	}
 
 	/**
-	 * @return the createdAt
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @return OperationPattern
 	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
-	}
+	public OperationPattern getLocal() {
 
-	/**
-	 * @param createdAt the createdAt to set
-	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
-	}
+		OperationPattern item = new OperationPattern();
 
-	/**
-	 * @return the changedAt
-	 */
-	public Date getChangedAt() {
-		return ChangedAt;
-	}
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setTitle(Title);
+		// TODO когда на сервере появится - добавить
+		item.setOperation_type_uuid("");
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
 
-	/**
-	 * @param changedAt the changedAt to set
-	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
+		return item;
 	}
 
 }

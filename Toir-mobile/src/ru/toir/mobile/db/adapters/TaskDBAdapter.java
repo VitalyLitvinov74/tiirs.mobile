@@ -299,4 +299,15 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		return projection;
 	}
 
+	public boolean saveItems(ArrayList<Task> list) {
+
+		for (Task item : list) {
+			if (replace(item) == -1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 }

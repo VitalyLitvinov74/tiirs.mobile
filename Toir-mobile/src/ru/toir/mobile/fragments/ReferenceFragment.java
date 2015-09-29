@@ -66,7 +66,9 @@ public class ReferenceFragment extends Fragment {
 	ArrayAdapter<String> spinner_addict_adapter;
 	private ProgressDialog getReferencesDialog;
 	
-	private IntentFilter mFilterGetReference = new IntentFilter(ReferenceServiceProvider.Actions.ACTION_GET_REFERENCE);
+	/*
+	// TODO реализовать новый вариант обновления справочников
+	private IntentFilter mFilterGetReference = new IntentFilter(ReferenceServiceProvider.Actions.ACTION_GET_OPERATION_RESULT);
 	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
 		
 		@Override
@@ -76,6 +78,7 @@ public class ReferenceFragment extends Fragment {
 			Toast.makeText(context, "Справочники обновлены", Toast.LENGTH_SHORT).show();
 		}
 	};
+	*/
 
 	/*
 	 * (non-Javadoc)
@@ -550,6 +553,7 @@ public class ReferenceFragment extends Fragment {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				Log.d("test", "Обновляем справочники.");
+				/*
 				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity()
 						.getApplicationContext(),
 						ReferenceServiceProvider.Actions.ACTION_GET_REFERENCE);
@@ -584,7 +588,7 @@ public class ReferenceFragment extends Fragment {
 							}
 						});
 				getReferencesDialog.show();
-
+				*/
 				return true;
 			}
 		});

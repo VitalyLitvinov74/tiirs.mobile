@@ -1,128 +1,95 @@
-
 package ru.toir.mobile.serverapi;
 
-import java.util.Date;
-
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import com.google.gson.annotations.Expose;
 
 /**
  * Документы связанные с оборудованием
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class EquipmentDocumentationSrv {
+public class EquipmentDocumentationSrv extends BaseObjectSrv {
 
-    @Expose
-    private String Id;
-    @Expose
-    private String Title;
-    @Expose
-    private String Path;
-    @Expose
-    private DocumentationTypeSrv DocumentType;
-    @Expose
-	private Date CreatedAt;
 	@Expose
-	private Date ChangedAt;
-
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
-
-    /**
-     * 
-     * @return
-     *     The Title
-     */
-    public String getTitle() {
-        return Title;
-    }
-
-    /**
-     * 
-     * @param Title
-     *     The Title
-     */
-    public void setTitle(String Title) {
-        this.Title = Title;
-    }
-
-    /**
-     * 
-     * @return
-     *     The Path
-     */
-    public String getPath() {
-        return Path;
-    }
-
-    /**
-     * 
-     * @param Path
-     *     The Path
-     */
-    public void setPath(String Path) {
-        this.Path = Path;
-    }
-
-    /**
-     * 
-     * @return
-     *     The DocumentType
-     */
-    public DocumentationTypeSrv getDocumentType() {
-        return DocumentType;
-    }
-
-    /**
-     * 
-     * @param DocumentType
-     *     The DocumentType
-     */
-    public void setDocumentType(DocumentationTypeSrv DocumentType) {
-        this.DocumentType = DocumentType;
-    }
+	private String Title;
+	@Expose
+	private String Path;
+	@Expose
+	private DocumentationTypeSrv DocumentType;
 
 	/**
-	 * @return the createdAt
+	 * 
+	 * @return The Title
 	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
+	public String getTitle() {
+		return Title;
 	}
 
 	/**
-	 * @param createdAt the createdAt to set
+	 * 
+	 * @param Title
+	 *            The Title
 	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
+	public void setTitle(String Title) {
+		this.Title = Title;
 	}
 
 	/**
-	 * @return the changedAt
+	 * 
+	 * @return The Path
 	 */
-	public Date getChangedAt() {
-		return ChangedAt;
+	public String getPath() {
+		return Path;
 	}
 
 	/**
-	 * @param changedAt the changedAt to set
+	 * 
+	 * @param Path
+	 *            The Path
 	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
+	public void setPath(String Path) {
+		this.Path = Path;
+	}
+
+	/**
+	 * 
+	 * @return The DocumentType
+	 */
+	public DocumentationTypeSrv getDocumentType() {
+		return DocumentType;
+	}
+
+	/**
+	 * 
+	 * @param DocumentType
+	 *            The DocumentType
+	 */
+	public void setDocumentType(DocumentationTypeSrv DocumentType) {
+		this.DocumentType = DocumentType;
+	}
+
+	/**
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @param uuid
+	 *            единицы оборудования
+	 * @return EquipmentDocumentation
+	 */
+	public EquipmentDocumentation getLocal(String uuid) {
+
+		EquipmentDocumentation item = new EquipmentDocumentation();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setEquipment_uuid(uuid);
+		item.setDocumentation_type_uuid(DocumentType.getId());
+		item.setTitle(Title);
+		item.setPath(Path);
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
 	}
 
 }

@@ -1,127 +1,96 @@
-
 package ru.toir.mobile.serverapi;
 
-import java.util.Date;
+import ru.toir.mobile.db.tables.OperationPatternStepResult;
+
 import com.google.gson.annotations.Expose;
 
 /**
  * Вариант выполнения текущего шага операции
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class OperationPatternStepResultSrv {
+public class OperationPatternStepResultSrv extends BaseObjectSrv {
 
-    @Expose
-    private String Id;
-    @Expose
-    private String Title;
-    @Expose
-    private String NextPatternStepId;
-    @Expose
-    private MeasureTypeSrv MeasureType;
-    @Expose
-	private Date CreatedAt;
 	@Expose
-	private Date ChangedAt;
-
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
-
-    /**
-     * 
-     * @return
-     *     The Title
-     */
-    public String getTitle() {
-        return Title;
-    }
-
-    /**
-     * 
-     * @param Title
-     *     The Title
-     */
-    public void setTitle(String Title) {
-        this.Title = Title;
-    }
-
-    /**
-     * 
-     * @return
-     *     The NextPatternStep
-     */
-    public String getNextPatternStepId() {
-        return NextPatternStepId;
-    }
-
-    /**
-     * 
-     * @param NextPatternStep
-     *     The NextPatternStep
-     */
-    public void setNextPatternStepId(String NextPatternStepId) {
-        this.NextPatternStepId = NextPatternStepId;
-    }
-
-    /**
-     * 
-     * @return
-     *     The MeasureType
-     */
-    public MeasureTypeSrv getMeasureType() {
-        return MeasureType;
-    }
-
-    /**
-     * 
-     * @param MeasureType
-     *     The MeasureType
-     */
-    public void setMeasureType(MeasureTypeSrv MeasureType) {
-        this.MeasureType = MeasureType;
-    }
+	private String Title;
+	@Expose
+	private String NextPatternStepId;
+	@Expose
+	private MeasureTypeSrv MeasureType;
 
 	/**
-	 * @return the createdAt
+	 * 
+	 * @return The Title
 	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
+	public String getTitle() {
+		return Title;
 	}
 
 	/**
-	 * @param createdAt the createdAt to set
+	 * 
+	 * @param Title
+	 *            The Title
 	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
+	public void setTitle(String Title) {
+		this.Title = Title;
 	}
 
 	/**
-	 * @return the changedAt
+	 * 
+	 * @return The NextPatternStep
 	 */
-	public Date getChangedAt() {
-		return ChangedAt;
+	public String getNextPatternStepId() {
+		return NextPatternStepId;
 	}
 
 	/**
-	 * @param changedAt the changedAt to set
+	 * 
+	 * @param NextPatternStep
+	 *            The NextPatternStep
 	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
+	public void setNextPatternStepId(String NextPatternStepId) {
+		this.NextPatternStepId = NextPatternStepId;
+	}
+
+	/**
+	 * 
+	 * @return The MeasureType
+	 */
+	public MeasureTypeSrv getMeasureType() {
+		return MeasureType;
+	}
+
+	/**
+	 * 
+	 * @param MeasureType
+	 *            The MeasureType
+	 */
+	public void setMeasureType(MeasureTypeSrv MeasureType) {
+		this.MeasureType = MeasureType;
+	}
+
+	/**
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @param uuid
+	 *            шага шаблона операции
+	 * @return OperationPatternStepResult
+	 */
+	public OperationPatternStepResult getLocal(String uuid) {
+
+		OperationPatternStepResult item = new OperationPatternStepResult();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setOperation_pattern_step_uuid(uuid);
+		item.setNext_operation_pattern_step_uuid(NextPatternStepId == null ? "00000000-0000-0000-0000-000000000000" : NextPatternStepId);
+		item.setTitle(Title);
+		item.setMeasure_type_uuid(MeasureType.getId());
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
 	}
 
 }

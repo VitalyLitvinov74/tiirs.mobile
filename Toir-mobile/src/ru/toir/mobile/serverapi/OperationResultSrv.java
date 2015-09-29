@@ -1,43 +1,20 @@
 package ru.toir.mobile.serverapi;
 
-import java.util.Date;
-
+import ru.toir.mobile.db.tables.OperationResult;
 import com.google.gson.annotations.Expose;
 
 /**
  * Результат выполнения операции (вердикт)
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class OperationResultSrv {
+public class OperationResultSrv extends BaseObjectSrv {
 
-	@Expose
-	private String Id;
 	@Expose
 	private String Title;
 	@Expose
-	private Date CreatedAt;
-	@Expose
-	private Date ChangedAt;
-	@Expose
-	private OperationTypeSrv OperationType; 
-
-	/**
-	 * 
-	 * @return The Id
-	 */
-	public String getId() {
-		return Id;
-	}
-
-	/**
-	 * 
-	 * @param Id
-	 *            The Id
-	 */
-	public void setId(String Id) {
-		this.Id = Id;
-	}
+	private OperationTypeSrv OperationType;
 
 	/**
 	 * 
@@ -57,36 +34,6 @@ public class OperationResultSrv {
 	}
 
 	/**
-	 * @return the createdAt
-	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
-	}
-
-	/**
-	 * @param createdAt
-	 *            the createdAt to set
-	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
-	}
-
-	/**
-	 * @return the changedAt
-	 */
-	public Date getChangedAt() {
-		return ChangedAt;
-	}
-
-	/**
-	 * @param changedAt
-	 *            the changedAt to set
-	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
-	}
-
-	/**
 	 * @return the operationType
 	 */
 	public OperationTypeSrv getOperationType() {
@@ -94,10 +41,30 @@ public class OperationResultSrv {
 	}
 
 	/**
-	 * @param operationType the operationType to set
+	 * @param operationType
+	 *            the operationType to set
 	 */
 	public void setOperationType(OperationTypeSrv operationType) {
 		OperationType = operationType;
+	}
+
+	/**
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @return OperationResult
+	 */
+	public OperationResult getLocal() {
+
+		OperationResult item = new OperationResult();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setTitle(Title);
+		item.setOperation_type_uuid(OperationType.getId());
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
 	}
 
 }

@@ -1,41 +1,18 @@
 package ru.toir.mobile.serverapi;
 
-import java.util.Date;
-
+import ru.toir.mobile.db.tables.TaskStatus;
 import com.google.gson.annotations.Expose;
 
 /**
  * Текущий статус наряда
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class TaskStatusSrv {
+public class TaskStatusSrv extends BaseObjectSrv {
 
-	@Expose
-	private String Id;
 	@Expose
 	private String Title;
-	@Expose
-	private Date CreatedAt;
-	@Expose
-	private Date ChangedAt;
-
-	/**
-	 * 
-	 * @return The Id
-	 */
-	public String getId() {
-		return Id;
-	}
-
-	/**
-	 * 
-	 * @param Id
-	 *            The Id
-	 */
-	public void setId(String Id) {
-		this.Id = Id;
-	}
 
 	/**
 	 * 
@@ -55,33 +32,21 @@ public class TaskStatusSrv {
 	}
 
 	/**
-	 * @return the createdAt
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @return TaskStatus
 	 */
-	public Date getCreatedAt() {
-		return CreatedAt;
-	}
+	public TaskStatus getLocal() {
 
-	/**
-	 * @param createdAt
-	 *            the createdAt to set
-	 */
-	public void setCreatedAt(Date createdAt) {
-		CreatedAt = createdAt;
-	}
+		TaskStatus item = new TaskStatus();
 
-	/**
-	 * @return the changedAt
-	 */
-	public Date getChangedAt() {
-		return ChangedAt;
-	}
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setTitle(Title);
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
 
-	/**
-	 * @param changedAt
-	 *            the changedAt to set
-	 */
-	public void setChangedAt(Date changedAt) {
-		ChangedAt = changedAt;
+		return item;
 	}
 
 }

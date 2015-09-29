@@ -12,22 +12,22 @@ import ru.toir.mobile.db.adapters.TaskDBAdapter;
  * @author Dmitriy Logachov
  *
  */
-public class Task extends ru.toir.mobile.db.tables.Task {
+public class TaskRes extends ru.toir.mobile.db.tables.Task {
 
-	public ArrayList<EquipmentOperation> equipmentOperations;
+	public ArrayList<EquipmentOperationRes> equipmentOperations;
 
 	/**
 	 * 
 	 */
-	public Task() {
+	public TaskRes() {
 	}
 	
-	public static Task load(Context context, String uuid) {
+	public static TaskRes load(Context context, String uuid) {
 
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(context));
 		ru.toir.mobile.db.tables.Task task = taskDBAdapter.getItem(uuid);
 		if (task != null) {
-			Task item = new Task();
+			TaskRes item = new TaskRes();
 			item._id = task.get_id();
 			item.uuid = task.getUuid();
 			item.setUsers_uuid(task.getUsers_uuid());
@@ -39,7 +39,7 @@ public class Task extends ru.toir.mobile.db.tables.Task {
 			item.setTask_name(task.getTask_name());
 			item.CreatedAt = task.getCreatedAt();
 			item.ChangedAt = task.getChangedAt();
-			item.equipmentOperations = EquipmentOperation.load(context, uuid);
+			item.equipmentOperations = EquipmentOperationRes.load(context, uuid);
 			return item;
 		} else {
 			return null;

@@ -135,13 +135,15 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 		return id;
 	}
 
-	public void saveItems(ArrayList<OperationStatus> list) {
-		mDb.beginTransaction();
+	public boolean saveItems(ArrayList<OperationStatus> list) {
+
 		for (OperationStatus item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
+
+		return true;
 	}
 
 	/**

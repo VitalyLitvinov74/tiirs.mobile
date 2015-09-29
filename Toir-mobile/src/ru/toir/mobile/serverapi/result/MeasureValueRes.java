@@ -13,22 +13,22 @@ import android.content.Context;
  * @author Dmitriy Logachov
  *
  */
-public class MeasureValue extends ru.toir.mobile.db.tables.MeasureValue {
+public class MeasureValueRes extends ru.toir.mobile.db.tables.MeasureValue {
 
 	/**
 	 * 
 	 */
-	public MeasureValue() {
+	public MeasureValueRes() {
 	}
 	
-	public static ArrayList<MeasureValue> load(Context context, String uuid) {
+	public static ArrayList<MeasureValueRes> load(Context context, String uuid) {
 		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(new TOiRDatabaseContext(context));
 		ArrayList<ru.toir.mobile.db.tables.MeasureValue> valuesList = adapter.getItems(uuid);
 		if (valuesList != null) {
-			ArrayList<MeasureValue> returnList = new ArrayList<MeasureValue>();
+			ArrayList<MeasureValueRes> returnList = new ArrayList<MeasureValueRes>();
 			for (ru.toir.mobile.db.tables.MeasureValue value: valuesList) {
 
-				MeasureValue item = new MeasureValue();
+				MeasureValueRes item = new MeasureValueRes();
 				item._id = value.get_id();
 				item.uuid = value.getUuid();
 				item.setEquipment_operation_uuid(value.getEquipment_operation_uuid());
@@ -41,7 +41,7 @@ public class MeasureValue extends ru.toir.mobile.db.tables.MeasureValue {
 				item.CreatedAt = value.getCreatedAt();
 				item.ChangedAt = value.getChangedAt();
 
-				returnList.add((MeasureValue) item);
+				returnList.add((MeasureValueRes) item);
 			}
 			return returnList;
 			

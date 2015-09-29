@@ -142,13 +142,15 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 		return id;
 	}
 
-	public void saveItems(ArrayList<OperationPatternStep> list) {
-		mDb.beginTransaction();
+	public boolean saveItems(ArrayList<OperationPatternStep> list) {
+
 		for (OperationPatternStep item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
+
+		return true;
 	}
 
 	/**

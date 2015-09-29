@@ -153,13 +153,15 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 			return "неизвестно";
 	}
 
-	public void saveItems(ArrayList<OperationType> list) {
-		mDb.beginTransaction();
+	public boolean saveItems(ArrayList<OperationType> list) {
+
 		for (OperationType item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
-		mDb.setTransactionSuccessful();
-		mDb.endTransaction();
+
+		return true;
 	}
 	
 	/**

@@ -1,184 +1,127 @@
-
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import ru.toir.mobile.db.tables.Equipment;
 import com.google.gson.annotations.Expose;
 
 /**
  * Оборудование
+ * 
  * @author Dmitriy Logachov
- *
+ * 
  */
-public class EquipmentSrv {
+public class EquipmentSrv extends BaseObjectSrv {
 
-    @Expose
-    private String Name;
-    @Expose
-    private EquipmentTypeSrv EquipmentType;
-    @Expose
-    private GeoCoordinatesSrv GeoCoordinates;
-    @Expose
-    private CriticalTypeSrv CriticalityType;
-    @Expose
-    private List<EquipmentDocumentationSrv> Documents = new ArrayList<EquipmentDocumentationSrv>();
-    @Expose
-    private String Id;
-    @Expose
-    private String Tag;
-    @Expose
-    private Date StartupDate;
-    @Expose
-    private Date CreatedAt;
-    @Expose
-    private Date ChangedAt;
-    @Expose
-    private EquipmentStatusSrv EquipmentStatus;
+	@Expose
+	private String Name;
+	@Expose
+	private EquipmentTypeSrv EquipmentType;
+	@Expose
+	private GeoCoordinatesSrv GeoCoordinates;
+	@Expose
+	private CriticalTypeSrv CriticalityType;
+	@Expose
+	private List<EquipmentDocumentationSrv> Documents = new ArrayList<EquipmentDocumentationSrv>();
+	@Expose
+	private String Tag;
+	@Expose
+	private Date StartupDate;
+	@Expose
+	private EquipmentStatusSrv EquipmentStatus;
 
-    /**
-     * 
-     * @return
-     *     The Name
-     */
-    public String getName() {
-        return Name;
-    }
+	/**
+	 * @return
+	 */
+	public long getStartupDateTime() {
+		return StartupDate == null ? 0 : StartupDate.getTime();
+	}
 
-    /**
-     * 
-     * @param Name
-     *     The Name
-     */
-    public void setName(String Name) {
-        this.Name = Name;
-    }
+	/**
+	 * 
+	 * @return The Name
+	 */
+	public String getName() {
+		return Name;
+	}
 
-    /**
-     * 
-     * @return
-     *     The EquipmentType
-     */
-    public EquipmentTypeSrv getEquipmentType() {
-        return EquipmentType;
-    }
+	/**
+	 * 
+	 * @param Name
+	 *            The Name
+	 */
+	public void setName(String Name) {
+		this.Name = Name;
+	}
 
-    /**
-     * 
-     * @param EquipmentType
-     *     The EquipmentType
-     */
-    public void setEquipmentType(EquipmentTypeSrv EquipmentType) {
-        this.EquipmentType = EquipmentType;
-    }
+	/**
+	 * 
+	 * @return The EquipmentType
+	 */
+	public EquipmentTypeSrv getEquipmentType() {
+		return EquipmentType;
+	}
 
-    /**
-     * 
-     * @return
-     *     The GeoCoordinates
-     */
-    public GeoCoordinatesSrv getGeoCoordinates() {
-        return GeoCoordinates;
-    }
+	/**
+	 * 
+	 * @param EquipmentType
+	 *            The EquipmentType
+	 */
+	public void setEquipmentType(EquipmentTypeSrv EquipmentType) {
+		this.EquipmentType = EquipmentType;
+	}
 
-    /**
-     * 
-     * @param GeoCoordinates
-     *     The GeoCoordinates
-     */
-    public void setGeoCoordinates(GeoCoordinatesSrv GeoCoordinates) {
-        this.GeoCoordinates = GeoCoordinates;
-    }
+	/**
+	 * 
+	 * @return The GeoCoordinates
+	 */
+	public GeoCoordinatesSrv getGeoCoordinates() {
+		return GeoCoordinates;
+	}
 
-    /**
-     * 
-     * @return
-     *     The CriticalityType
-     */
-    public CriticalTypeSrv getCriticalityType() {
-        return CriticalityType;
-    }
+	/**
+	 * 
+	 * @param GeoCoordinates
+	 *            The GeoCoordinates
+	 */
+	public void setGeoCoordinates(GeoCoordinatesSrv GeoCoordinates) {
+		this.GeoCoordinates = GeoCoordinates;
+	}
 
-    /**
-     * 
-     * @param CriticalityType
-     *     The CriticalityType
-     */
-    public void setCriticalityType(CriticalTypeSrv CriticalityType) {
-        this.CriticalityType = CriticalityType;
-    }
+	/**
+	 * 
+	 * @return The CriticalityType
+	 */
+	public CriticalTypeSrv getCriticalityType() {
+		return CriticalityType;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Documents
-     */
-    public List<EquipmentDocumentationSrv> getDocuments() {
-        return Documents;
-    }
+	/**
+	 * 
+	 * @param CriticalityType
+	 *            The CriticalityType
+	 */
+	public void setCriticalityType(CriticalTypeSrv CriticalityType) {
+		this.CriticalityType = CriticalityType;
+	}
 
-    /**
-     * 
-     * @param Documents
-     *     The Documents
-     */
-    public void setDocuments(List<EquipmentDocumentationSrv> Documents) {
-        this.Documents = Documents;
-    }
+	/**
+	 * 
+	 * @return The Documents
+	 */
+	public List<EquipmentDocumentationSrv> getDocuments() {
+		return Documents;
+	}
 
-    /**
-     * 
-     * @return
-     *     The Id
-     */
-    public String getId() {
-        return Id;
-    }
-
-    /**
-     * 
-     * @param Id
-     *     The Id
-     */
-    public void setId(String Id) {
-        this.Id = Id;
-    }
-
-    /**
-     * 
-     * @return
-     *     The CreatedAt
-     */
-    public Date getCreatedAt() {
-        return CreatedAt;
-    }
-
-    /**
-     * 
-     * @param CreatedAt
-     *     The CreatedAt
-     */
-    public void setCreatedAt(Date CreatedAt) {
-        this.CreatedAt = CreatedAt;
-    }
-
-    /**
-     * 
-     * @return
-     *     The ChangedAt
-     */
-    public Date getChangedAt() {
-        return ChangedAt;
-    }
-
-    /**
-     * 
-     * @param ChangedAt
-     *     The ChangedAt
-     */
-    public void setChangedAt(Date ChangedAt) {
-        this.ChangedAt = ChangedAt;
-    }
+	/**
+	 * 
+	 * @param Documents
+	 *            The Documents
+	 */
+	public void setDocuments(List<EquipmentDocumentationSrv> Documents) {
+		this.Documents = Documents;
+	}
 
 	/**
 	 * @return the tag
@@ -188,7 +131,8 @@ public class EquipmentSrv {
 	}
 
 	/**
-	 * @param tag the tag to set
+	 * @param tag
+	 *            the tag to set
 	 */
 	public void setTag(String tag) {
 		Tag = tag;
@@ -202,7 +146,8 @@ public class EquipmentSrv {
 	}
 
 	/**
-	 * @param startupDate the startupDate to set
+	 * @param startupDate
+	 *            the startupDate to set
 	 */
 	public void setStartupDate(Date startupDate) {
 		StartupDate = startupDate;
@@ -216,10 +161,42 @@ public class EquipmentSrv {
 	}
 
 	/**
-	 * @param equipmentStatus the equipmentStatus to set
+	 * @param equipmentStatus
+	 *            the equipmentStatus to set
 	 */
 	public void setEquipmentStatus(EquipmentStatusSrv equipmentStatus) {
 		EquipmentStatus = equipmentStatus;
 	}
 
+	/**
+	 * Возвращает объект в локальном представлении
+	 * 
+	 * @return Equipment
+	 */
+	public Equipment getLocal() {
+
+		Equipment item = new Equipment();
+
+		item.set_id(0);
+		item.setUuid(Id);
+		item.setTitle(Name);
+		item.setEquipment_type_uuid(EquipmentType.getId());
+		item.setCritical_type_uuid(CriticalityType.getId());
+		item.setStart_date(getStartupDate().getTime());
+		item.setLatitude(GeoCoordinates.getLatitude());
+		item.setLongitude(GeoCoordinates.getLongitude());
+		item.setTag_id(Tag);
+		// TODO когда на сервере появится - добавить
+		item.setImage("");
+		item.setEquipmentStatus_uuid(EquipmentStatus.getId());
+		// TODO когда на сервере появится - добавить
+		item.setInventoryNumber("");
+		// TODO когда на сервере появится - добавить
+		item.setLocation("");
+		item.setCreatedAt(getCreatedAtTime());
+		item.setChangedAt(getChangedAtTime());
+
+		return item;
+	}
+	
 }
