@@ -28,6 +28,8 @@ import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.tables.DocumentationType;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
 import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
@@ -727,7 +729,7 @@ public class ReferenceProcessor {
 		getTaskStatus(bundle);
 
 		//getDocumentation(bundle);
-		//getEquipment(bundle);
+		getEquipment(bundle);
 
 		return false;
 	}
@@ -963,22 +965,66 @@ public class ReferenceProcessor {
 
 		EquipmentDBAdapter adapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		adapter.saveItems(EquipmentSrv.getEquipments(array));
 
-		for (EquipmentSrv element : array) {
-			ArrayList<EquipmentTypeSrv> list0 = new ArrayList<EquipmentTypeSrv>();
-			list0.add(element.getEquipmentType());
-			saveEquipmentType(list0);
-			ArrayList<CriticalTypeSrv> list1 = new ArrayList<CriticalTypeSrv>();
-			list1.add(element.getCriticalityType());
-			saveCriticalType(list1);
-			ArrayList<EquipmentStatusSrv> list2 = new ArrayList<EquipmentStatusSrv>();
-			list2.add(element.getEquipmentStatus());
-			saveEquipmentStatus(list2);
-			saveDocumentations(element.getDocuments(), element.getId());
+		if (!adapter.saveItems(EquipmentSrv.getEquipments(array))) {
+			return false;
 		}
-		// TODO перипасать верный алгоритм получения оборудования!!!
-		return false;
+
+		if (!saveEquipmentType(EquipmentSrv.getEquipmentTypesSrv(array))) {
+			return false;
+		}
+
+		if (!saveCriticalType(EquipmentSrv.getCriticalTypesSrv(array))) {
+			return false;
+		}
+
+		if (!saveEquipmentStatus(EquipmentSrv.getEquipmentStatusesSrv(array))) {
+			return false;
+		}
+
+		if (!saveDocumentations(EquipmentSrv.getEquipmentDocumentations(array))) {
+			return false;
+		}
+		
+		if (!saveDocumentTypes(EquipmentSrv.getDocumentationTypes(array))) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// TODO пересмотреть реализацию
+	private boolean saveDocumentTypes(ArrayList<DocumentationType> array) {
+
+		if (array == null) {
+			return false;
+		}
+
+		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		if (adapter.saveItems(array)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// TODO пересмотреть реализацию
+	private boolean saveDocumentations(ArrayList<EquipmentDocumentation> array) {
+
+		if (array == null) {
+			return false;
+		}
+
+		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		if (!adapter.saveItems(array)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

@@ -237,12 +237,32 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
+	public static ArrayList<EquipmentStatusSrv> getEquipmentStatusesSrv(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<EquipmentStatusSrv> list = new ArrayList<EquipmentStatusSrv>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getEquipmentStatus());
+		}
+		return list;
+	}
+
 	public static ArrayList<EquipmentType> getEquipmentTypes(
 			ArrayList<EquipmentSrv> equipments) {
 
 		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
 		for (EquipmentSrv equipment : equipments) {
 			list.add(equipment.getEquipmentType().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentTypeSrv> getEquipmentTypesSrv(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<EquipmentTypeSrv> list = new ArrayList<EquipmentTypeSrv>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getEquipmentType());
 		}
 		return list;
 	}
@@ -257,6 +277,16 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
+	public static ArrayList<CriticalTypeSrv> getCriticalTypesSrv(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<CriticalTypeSrv> list = new ArrayList<CriticalTypeSrv>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getCriticalityType());
+		}
+		return list;
+	}
+
 	public static ArrayList<EquipmentDocumentation> getEquipmentDocumentations(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -266,6 +296,20 @@ public class EquipmentSrv extends BaseObjectSrv {
 					.getDocuments();
 			for (EquipmentDocumentationSrv documentation : documentations) {
 				list.add(documentation.getLocal(equipment.getId()));
+			}
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentDocumentationSrv> getEquipmentDocumentationsSrv(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<EquipmentDocumentationSrv> list = new ArrayList<EquipmentDocumentationSrv>();
+		for (EquipmentSrv equipment : equipments) {
+			ArrayList<EquipmentDocumentationSrv> documentations = equipment
+					.getDocuments();
+			for (EquipmentDocumentationSrv documentation : documentations) {
+				list.add(documentation);
 			}
 		}
 		return list;
