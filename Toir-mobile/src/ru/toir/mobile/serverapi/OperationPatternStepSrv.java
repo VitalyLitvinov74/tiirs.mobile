@@ -1,10 +1,8 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import ru.toir.mobile.db.tables.OperationPatternStep;
-
+import ru.toir.mobile.db.tables.MeasureType;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -26,7 +24,7 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 	@Expose
 	protected String Title;
 	@Expose
-	protected List<OperationPatternStepResultSrv> Results = new ArrayList<OperationPatternStepResultSrv>();
+	protected ArrayList<OperationPatternStepResultSrv> Results = new ArrayList<OperationPatternStepResultSrv>();
 
 	/**
 	 * 
@@ -100,7 +98,7 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 	 * 
 	 * @return The Results
 	 */
-	public List<OperationPatternStepResultSrv> getResults() {
+	public ArrayList<OperationPatternStepResultSrv> getResults() {
 		return Results;
 	}
 
@@ -109,7 +107,7 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 	 * @param Results
 	 *            The Results
 	 */
-	public void setResults(List<OperationPatternStepResultSrv> Results) {
+	public void setResults(ArrayList<OperationPatternStepResultSrv> Results) {
 		this.Results = Results;
 	}
 
@@ -151,6 +149,18 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<MeasureType> getMeasureTypes(ArrayList<OperationPatternStepSrv> patternSteps) {
+
+		ArrayList<MeasureType> list = new ArrayList<MeasureType>();
+		for (OperationPatternStepSrv step : patternSteps) {
+			ArrayList<OperationPatternStepResultSrv> results = step.getResults();
+			for (OperationPatternStepResultSrv result : results) {
+				list.add(result.getMeasureType().getLocal());
+			}
+		}
+		return list;
 	}
 
 }

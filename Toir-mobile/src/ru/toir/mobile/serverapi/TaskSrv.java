@@ -2,8 +2,10 @@ package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
+import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.TaskStatus;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -15,7 +17,7 @@ import com.google.gson.annotations.Expose;
 public class TaskSrv extends BaseObjectSrv {
 
 	@Expose
-	private List<EquipmentOperationSrv> Items = new ArrayList<EquipmentOperationSrv>();
+	private ArrayList<EquipmentOperationSrv> Items = new ArrayList<EquipmentOperationSrv>();
 	@Expose
 	private String Number;
 	@Expose
@@ -38,7 +40,7 @@ public class TaskSrv extends BaseObjectSrv {
 	 * 
 	 * @return The Items
 	 */
-	public List<EquipmentOperationSrv> getItems() {
+	public ArrayList<EquipmentOperationSrv> getItems() {
 		return Items;
 	}
 
@@ -47,7 +49,7 @@ public class TaskSrv extends BaseObjectSrv {
 	 * @param Items
 	 *            The Items
 	 */
-	public void setItems(List<EquipmentOperationSrv> Items) {
+	public void setItems(ArrayList<EquipmentOperationSrv> Items) {
 		this.Items = Items;
 	}
 
@@ -153,6 +155,47 @@ public class TaskSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<TaskStatus> getTaskStatuses(ArrayList<TaskSrv> tasks) {
+
+		ArrayList<TaskStatus> list = new ArrayList<TaskStatus>();
+		for (TaskSrv task : tasks) {
+			list.add(task.getOrderStatus().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<Task> getTasks(ArrayList<TaskSrv> tasks) {
+
+		ArrayList<Task> list = new ArrayList<Task>();
+		for (TaskSrv task : tasks) {
+			list.add(task.getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentOperation> getEquipmentOperations(
+			ArrayList<TaskSrv> tasks) {
+
+		ArrayList<EquipmentOperation> list = new ArrayList<EquipmentOperation>();
+		for (TaskSrv task : tasks) {
+			ArrayList<EquipmentOperationSrv> operations = task.getItems();
+			for (EquipmentOperationSrv operation : operations) {
+				list.add(operation.getLocal(task.getId()));
+			}
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentOperationSrv> getEquipmentOperationSrvs(
+			ArrayList<TaskSrv> tasks) {
+
+		ArrayList<EquipmentOperationSrv> list = new ArrayList<EquipmentOperationSrv>();
+		for (TaskSrv task : tasks) {
+			list.addAll(task.getItems());
+		}
+		return list;
 	}
 
 }

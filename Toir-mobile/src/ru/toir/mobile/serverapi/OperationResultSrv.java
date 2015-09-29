@@ -1,7 +1,9 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
 import ru.toir.mobile.db.tables.OperationResult;
 import com.google.gson.annotations.Expose;
+import ru.toir.mobile.db.tables.OperationType;
 
 /**
  * Результат выполнения операции (вердикт)
@@ -65,6 +67,27 @@ public class OperationResultSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<OperationResult> getOperationResults(ArrayList<OperationResultSrv> results) {
+
+		ArrayList<OperationResult> list = new ArrayList<OperationResult>();
+		
+		for(OperationResultSrv element : results) {
+			OperationResult item = element.getLocal();
+			list.add(item);
+		}
+		return list;
+	}
+
+	public static ArrayList<OperationType> getOperationTypes(ArrayList<OperationResultSrv> results) {
+
+		ArrayList<OperationType> list = new ArrayList<OperationType>();
+		
+		for(OperationResultSrv element : results) {
+			list.add(element.getOperationType().getLocal());
+		}
+		return list;
 	}
 
 }

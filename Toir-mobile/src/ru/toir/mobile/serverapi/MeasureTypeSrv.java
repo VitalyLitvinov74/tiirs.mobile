@@ -1,5 +1,7 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.db.tables.MeasureType;
 import com.google.gson.annotations.Expose;
 
@@ -45,6 +47,15 @@ public class MeasureTypeSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<MeasureType> getMeasureTypes(ArrayList<MeasureTypeSrv> types) {
+
+		ArrayList<MeasureType> list = new ArrayList<MeasureType>();
+		for (MeasureTypeSrv type : types) {
+			list.add(type.getLocal());
+		}
+		return list;
 	}
 
 }

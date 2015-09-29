@@ -1,5 +1,6 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
 import ru.toir.mobile.db.tables.DocumentationType;
 import com.google.gson.annotations.Expose;
 
@@ -47,6 +48,16 @@ public class DocumentationTypeSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<DocumentationType> getDocumentationTypes(
+			ArrayList<DocumentationTypeSrv> types) {
+
+		ArrayList<DocumentationType> list = new ArrayList<DocumentationType>();
+		for (DocumentationTypeSrv type : types) {
+			list.add(type.getLocal());
+		}
+		return list;
 	}
 
 }

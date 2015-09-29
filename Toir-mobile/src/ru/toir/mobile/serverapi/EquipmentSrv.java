@@ -2,9 +2,13 @@ package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import ru.toir.mobile.db.tables.DocumentationType;
 import ru.toir.mobile.db.tables.Equipment;
 import com.google.gson.annotations.Expose;
+import ru.toir.mobile.db.tables.EquipmentStatus;
+import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.db.tables.CriticalType;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 
 /**
  * Оборудование
@@ -23,7 +27,7 @@ public class EquipmentSrv extends BaseObjectSrv {
 	@Expose
 	private CriticalTypeSrv CriticalityType;
 	@Expose
-	private List<EquipmentDocumentationSrv> Documents = new ArrayList<EquipmentDocumentationSrv>();
+	private ArrayList<EquipmentDocumentationSrv> Documents = new ArrayList<EquipmentDocumentationSrv>();
 	@Expose
 	private String Tag;
 	@Expose
@@ -110,7 +114,7 @@ public class EquipmentSrv extends BaseObjectSrv {
 	 * 
 	 * @return The Documents
 	 */
-	public List<EquipmentDocumentationSrv> getDocuments() {
+	public ArrayList<EquipmentDocumentationSrv> getDocuments() {
 		return Documents;
 	}
 
@@ -119,7 +123,7 @@ public class EquipmentSrv extends BaseObjectSrv {
 	 * @param Documents
 	 *            The Documents
 	 */
-	public void setDocuments(List<EquipmentDocumentationSrv> Documents) {
+	public void setDocuments(ArrayList<EquipmentDocumentationSrv> Documents) {
 		this.Documents = Documents;
 	}
 
@@ -199,4 +203,72 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return item;
 	}
 	
+	public static ArrayList<DocumentationType> getDocumentationTypes(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<DocumentationType> list = new ArrayList<DocumentationType>();
+		for (EquipmentSrv equipment : equipments) {
+			ArrayList<EquipmentDocumentationSrv> documentations = equipment
+					.getDocuments();
+			for (EquipmentDocumentationSrv documentation : documentations) {
+				list.add(documentation.getDocumentType().getLocal());
+			}
+		}
+		return list;
+	}
+
+	public static ArrayList<Equipment> getEquipments(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<Equipment> list = new ArrayList<Equipment>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentStatus> getEquipmentStatuses(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<EquipmentStatus> list = new ArrayList<EquipmentStatus>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getEquipmentStatus().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentType> getEquipmentTypes(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getEquipmentType().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<CriticalType> getCriticalTypes(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getCriticalityType().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<EquipmentDocumentation> getEquipmentDocumentations(
+			ArrayList<EquipmentSrv> equipments) {
+
+		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
+		for (EquipmentSrv equipment : equipments) {
+			ArrayList<EquipmentDocumentationSrv> documentations = equipment
+					.getDocuments();
+			for (EquipmentDocumentationSrv documentation : documentations) {
+				list.add(documentation.getLocal(equipment.getId()));
+			}
+		}
+		return list;
+	}
+
 }

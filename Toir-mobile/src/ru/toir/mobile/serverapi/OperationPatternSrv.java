@@ -1,9 +1,9 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import ru.toir.mobile.db.tables.OperationPattern;
+import ru.toir.mobile.db.tables.OperationPatternStep;
+import ru.toir.mobile.db.tables.OperationPatternStepResult;
 
 import com.google.gson.annotations.Expose;
 
@@ -20,7 +20,7 @@ public class OperationPatternSrv extends BaseObjectSrv {
 	@Expose
 	private OperationTypeSrv operationType;
 	@Expose
-	private List<OperationPatternStepSrv> Steps = new ArrayList<OperationPatternStepSrv>();
+	private ArrayList<OperationPatternStepSrv> Steps = new ArrayList<OperationPatternStepSrv>();
 
 	/**
 	 * 
@@ -43,7 +43,7 @@ public class OperationPatternSrv extends BaseObjectSrv {
 	 * 
 	 * @return The Steps
 	 */
-	public List<OperationPatternStepSrv> getSteps() {
+	public ArrayList<OperationPatternStepSrv> getSteps() {
 		return Steps;
 	}
 
@@ -52,7 +52,7 @@ public class OperationPatternSrv extends BaseObjectSrv {
 	 * @param Steps
 	 *            The Steps
 	 */
-	public void setSteps(List<OperationPatternStepSrv> Steps) {
+	public void setSteps(ArrayList<OperationPatternStepSrv> Steps) {
 		this.Steps = Steps;
 	}
 
@@ -91,4 +91,27 @@ public class OperationPatternSrv extends BaseObjectSrv {
 		return item;
 	}
 
+	public static ArrayList<OperationPatternStep> getOperationPatternSteps(OperationPatternSrv pattern) {
+
+		ArrayList<OperationPatternStep> list = new ArrayList<OperationPatternStep>();
+		ArrayList<OperationPatternStepSrv> steps = pattern.getSteps();
+		for (OperationPatternStepSrv step : steps) {
+			list.add(step.getLocal(pattern.getId()));
+		}
+		return list;
+	}
+
+	public static ArrayList<OperationPatternStepResult> getOperationPatternStepResults(OperationPatternSrv pattern) {
+
+		ArrayList<OperationPatternStepResult> list = new ArrayList<OperationPatternStepResult>();
+		ArrayList<OperationPatternStepSrv> steps = pattern.getSteps();
+		for (OperationPatternStepSrv step : steps) {
+			ArrayList<OperationPatternStepResultSrv> results = step.getResults();
+			for (OperationPatternStepResultSrv result : results) {
+				list.add(result.getLocal(step.getId()));
+			}
+		}
+		return list;
+	}
+	
 }

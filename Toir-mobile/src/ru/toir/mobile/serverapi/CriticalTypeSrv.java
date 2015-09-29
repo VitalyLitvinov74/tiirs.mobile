@@ -1,5 +1,6 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
 import ru.toir.mobile.db.tables.CriticalType;
 import com.google.gson.annotations.Expose;
 
@@ -47,6 +48,15 @@ public class CriticalTypeSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<CriticalType> getCriticalTypes(ArrayList<CriticalTypeSrv> types) {
+
+		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
+		for (CriticalTypeSrv type : types) {
+			list.add(type.getLocal());
+		}
+		return list;
 	}
 
 }

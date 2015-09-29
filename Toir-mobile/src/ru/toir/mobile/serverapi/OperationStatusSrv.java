@@ -1,5 +1,7 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.db.tables.OperationStatus;
 import com.google.gson.annotations.Expose;
 
@@ -47,6 +49,16 @@ public class OperationStatusSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<OperationStatus> getOperationStatuses(
+			ArrayList<OperationStatusSrv> statuses) {
+
+		ArrayList<OperationStatus> list = new ArrayList<OperationStatus>();
+		for (OperationStatusSrv status : statuses) {
+			list.add(status.getLocal());
+		}
+		return list;
 	}
 
 }

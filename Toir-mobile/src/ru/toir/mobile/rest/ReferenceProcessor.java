@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
@@ -27,15 +28,6 @@ import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.CriticalType;
-import ru.toir.mobile.db.tables.DocumentationType;
-import ru.toir.mobile.db.tables.EquipmentDocumentation;
-import ru.toir.mobile.db.tables.EquipmentStatus;
-import ru.toir.mobile.db.tables.EquipmentType;
-import ru.toir.mobile.db.tables.MeasureType;
-import ru.toir.mobile.db.tables.OperationStatus;
-import ru.toir.mobile.db.tables.OperationType;
-import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
 import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
@@ -45,9 +37,9 @@ import ru.toir.mobile.serverapi.EquipmentStatusSrv;
 import ru.toir.mobile.serverapi.EquipmentTypeSrv;
 import ru.toir.mobile.serverapi.MeasureTypeSrv;
 import ru.toir.mobile.serverapi.OperationPatternSrv;
+import ru.toir.mobile.serverapi.OperationPatternStepSrv;
 import ru.toir.mobile.serverapi.OperationResultSrv;
 import ru.toir.mobile.serverapi.OperationTypeSrv;
-import ru.toir.mobile.serverapi.ParseHelper;
 import ru.toir.mobile.serverapi.TaskStatusSrv;
 import ru.toir.mobile.serverapi.OperationStatusSrv;
 import ru.toir.mobile.utils.DataUtils;
@@ -219,8 +211,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveOperationResult(gson.fromJson(jsonString,
-					OperationResultSrv[].class));
+			ArrayList<OperationResultSrv> results = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<OperationResultSrv>>() {
+					}.getType());
+			boolean result = saveOperationResult(results);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -265,8 +259,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveDocumentType(gson.fromJson(jsonString,
-					DocumentationTypeSrv[].class));
+			ArrayList<DocumentationTypeSrv> types = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<DocumentationTypeSrv>>() {
+					}.getType());
+			boolean result = saveDocumentType(types);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -310,8 +306,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveEquipmentStatus(gson.fromJson(jsonString,
-					EquipmentStatusSrv[].class));
+			ArrayList<EquipmentStatusSrv> statuses = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<EquipmentStatusSrv>>() {
+					}.getType());
+			boolean result = saveEquipmentStatus(statuses);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -355,8 +353,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveEquipmentType(gson.fromJson(jsonString,
-					EquipmentTypeSrv[].class));
+			ArrayList<EquipmentTypeSrv> types = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<EquipmentTypeSrv>>() {
+					}.getType());
+			boolean result = saveEquipmentType(types);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -400,8 +400,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveMeasureType(gson.fromJson(jsonString,
-					MeasureTypeSrv[].class));
+			ArrayList<MeasureTypeSrv> list = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<MeasureTypeSrv>>() {
+					}.getType());
+			boolean result = saveMeasureType(list);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -445,8 +447,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveOperationStatus(gson.fromJson(jsonString,
-					OperationStatusSrv[].class));
+			ArrayList<OperationStatusSrv> list = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<OperationStatusSrv>>() {
+					}.getType());
+			boolean result = saveOperationStatus(list);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -490,8 +494,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveOperationType(gson.fromJson(jsonString,
-					OperationTypeSrv[].class));
+			ArrayList<OperationTypeSrv> operations = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<OperationTypeSrv>>() {
+					}.getType());
+			boolean result = saveOperationType(operations);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -535,8 +541,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveTaskStatus(gson.fromJson(jsonString,
-					TaskStatusSrv[].class));
+			ArrayList<TaskStatusSrv> list = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<TaskStatusSrv>>() {
+					}.getType());
+			boolean result = saveTaskStatus(list);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -582,8 +590,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveEquipment(gson.fromJson(jsonString,
-					EquipmentSrv[].class));
+			ArrayList<EquipmentSrv> equipments = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<EquipmentSrv>>() {
+					}.getType());
+			boolean result = saveEquipment(equipments);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -627,8 +637,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveCriticalType(gson.fromJson(jsonString,
-					CriticalTypeSrv[].class));
+			ArrayList<CriticalTypeSrv> types = gson.fromJson(jsonString,
+					new TypeToken<ArrayList<CriticalTypeSrv>>() {
+					}.getType());
+			boolean result = saveCriticalType(types);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -653,7 +665,8 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(String.format(ReferenceURL.Documentation, equipmentUuid));
+		url.append(mServerUrl).append(
+				String.format(ReferenceURL.Documentation, equipmentUuid));
 
 		// получаем дату последней модификации содержимого таблицы
 		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
@@ -674,8 +687,11 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
-			boolean result = saveDocuments(gson.fromJson(jsonString,
-					EquipmentDocumentationSrv[].class), equipmentUuid);
+			ArrayList<EquipmentDocumentationSrv> list = gson.fromJson(
+					jsonString,
+					new TypeToken<ArrayList<EquipmentDocumentationSrv>>() {
+					}.getType());
+			boolean result = saveDocumentations(list, equipmentUuid);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -696,7 +712,8 @@ public class ReferenceProcessor {
 
 		// TODO определиться как всё-таки будут обновляться справочники
 		// на каждом устройстве будет копия всех данных с сервера?
-		// совершенно не нужно тащить все объекты оборудования на каждое устройство.
+		// совершенно не нужно тащить все объекты оборудования на каждое
+		// устройство.
 		// обновлять будем только те данные которые есть на устройстве?
 		// можно пропустить новые данные.
 		getCriticalType(bundle);
@@ -708,10 +725,10 @@ public class ReferenceProcessor {
 		getOperationStatus(bundle);
 		getOperationType(bundle);
 		getTaskStatus(bundle);
-		/*
-		getDocumentation(bundle);
-		Equipment(bundle);
-		*/
+
+		//getDocumentation(bundle);
+		//getEquipment(bundle);
+
 		return false;
 	}
 
@@ -730,21 +747,22 @@ public class ReferenceProcessor {
 
 		OperationPatternStepDBAdapter adapter1 = new OperationPatternStepDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter1.saveItems(ParseHelper.getOperationPatternSteps(pattern))) {
+		if (!adapter1.saveItems(OperationPatternSrv
+				.getOperationPatternSteps(pattern))) {
 			return false;
 		}
 
 		OperationPatternStepResultDBAdapter adapter2 = new OperationPatternStepResultDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter2.saveItems(ParseHelper
+		if (!adapter2.saveItems(OperationPatternSrv
 				.getOperationPatternStepResults(pattern))) {
 			return false;
 		}
 
 		MeasureTypeDBAdapter adapter3 = new MeasureTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter3
-				.saveItems(ParseHelper.getMeasureTypes(pattern.getSteps()))) {
+		if (!adapter3.saveItems(OperationPatternStepSrv.getMeasureTypes(pattern
+				.getSteps()))) {
 			return false;
 		}
 
@@ -757,17 +775,19 @@ public class ReferenceProcessor {
 	 * @param results
 	 * @return
 	 */
-	private boolean saveOperationResult(OperationResultSrv[] results) {
+	private boolean saveOperationResult(ArrayList<OperationResultSrv> results) {
 
 		OperationResultDBAdapter adapter0 = new OperationResultDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter0.saveItems(ParseHelper.getOperationResults(results))) {
+		if (!adapter0
+				.saveItems(OperationResultSrv.getOperationResults(results))) {
 			return false;
 		}
 
 		OperationTypeDBAdapter adapter1 = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter1.saveItems(ParseHelper.getOperationTypes(results))) {
+
+		if (!adapter1.saveItems(OperationResultSrv.getOperationTypes(results))) {
 			return false;
 		}
 
@@ -780,7 +800,7 @@ public class ReferenceProcessor {
 	 * @param results
 	 * @return
 	 */
-	private boolean saveDocumentType(DocumentationTypeSrv[] array) {
+	private boolean saveDocumentType(ArrayList<DocumentationTypeSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -788,14 +808,9 @@ public class ReferenceProcessor {
 
 		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<DocumentationType> list = new ArrayList<DocumentationType>();
 
-		for (DocumentationTypeSrv element : array) {
-			DocumentationType item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter
+				.saveItems(DocumentationTypeSrv.getDocumentationTypes(array))) {
 			return true;
 		} else {
 			return false;
@@ -808,7 +823,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveEquipmentStatus(EquipmentStatusSrv[] array) {
+	private boolean saveEquipmentStatus(ArrayList<EquipmentStatusSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -816,14 +831,8 @@ public class ReferenceProcessor {
 
 		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<EquipmentStatus> list = new ArrayList<EquipmentStatus>();
 
-		for (EquipmentStatusSrv element : array) {
-			EquipmentStatus item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(EquipmentStatusSrv.getEquipmentStatuses(array))) {
 			return true;
 		} else {
 			return false;
@@ -836,7 +845,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveEquipmentType(EquipmentTypeSrv[] array) {
+	private boolean saveEquipmentType(ArrayList<EquipmentTypeSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -844,14 +853,8 @@ public class ReferenceProcessor {
 
 		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
 
-		for (EquipmentTypeSrv element : array) {
-			EquipmentType item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(EquipmentTypeSrv.getEquipmentTypes(array))) {
 			return true;
 		} else {
 			return false;
@@ -864,7 +867,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveMeasureType(MeasureTypeSrv[] array) {
+	private boolean saveMeasureType(ArrayList<MeasureTypeSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -872,14 +875,8 @@ public class ReferenceProcessor {
 
 		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<MeasureType> list = new ArrayList<MeasureType>();
 
-		for (MeasureTypeSrv element : array) {
-			MeasureType item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(MeasureTypeSrv.getMeasureTypes(array))) {
 			return true;
 		} else {
 			return false;
@@ -892,7 +889,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveTaskStatus(TaskStatusSrv[] array) {
+	private boolean saveTaskStatus(ArrayList<TaskStatusSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -900,14 +897,8 @@ public class ReferenceProcessor {
 
 		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<TaskStatus> list = new ArrayList<TaskStatus>();
 
-		for (TaskStatusSrv element : array) {
-			TaskStatus item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(TaskStatusSrv.getTaskStatuses(array))) {
 			return true;
 		} else {
 			return false;
@@ -920,7 +911,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveOperationStatus(OperationStatusSrv[] array) {
+	private boolean saveOperationStatus(ArrayList<OperationStatusSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -928,14 +919,8 @@ public class ReferenceProcessor {
 
 		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<OperationStatus> list = new ArrayList<OperationStatus>();
 
-		for (OperationStatusSrv element : array) {
-			OperationStatus item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(OperationStatusSrv.getOperationStatuses(array))) {
 			return true;
 		} else {
 			return false;
@@ -948,7 +933,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveOperationType(OperationTypeSrv[] array) {
+	private boolean saveOperationType(ArrayList<OperationTypeSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -956,14 +941,8 @@ public class ReferenceProcessor {
 
 		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<OperationType> list = new ArrayList<OperationType>();
 
-		for (OperationTypeSrv element : array) {
-			OperationType item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(OperationTypeSrv.getOperationTypes(array))) {
 			return true;
 		} else {
 			return false;
@@ -976,7 +955,7 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveEquipment(EquipmentSrv[] array) {
+	private boolean saveEquipment(ArrayList<EquipmentSrv> array) {
 
 		if (array == null) {
 			return false;
@@ -984,15 +963,19 @@ public class ReferenceProcessor {
 
 		EquipmentDBAdapter adapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		adapter.saveItems(ParseHelper.getEquipments(array));
+		adapter.saveItems(EquipmentSrv.getEquipments(array));
 
 		for (EquipmentSrv element : array) {
-			saveEquipmentType(new EquipmentTypeSrv[] { element
-					.getEquipmentType() });
-			saveCriticalType(element.getCriticalityType());
-			saveEquipmentStatus(new EquipmentStatusSrv[] { element
-					.getEquipmentStatus() });
-			saveDocuments(element.getDocuments(), element.getId());
+			ArrayList<EquipmentTypeSrv> list0 = new ArrayList<EquipmentTypeSrv>();
+			list0.add(element.getEquipmentType());
+			saveEquipmentType(list0);
+			ArrayList<CriticalTypeSrv> list1 = new ArrayList<CriticalTypeSrv>();
+			list1.add(element.getCriticalityType());
+			saveCriticalType(list1);
+			ArrayList<EquipmentStatusSrv> list2 = new ArrayList<EquipmentStatusSrv>();
+			list2.add(element.getEquipmentStatus());
+			saveEquipmentStatus(list2);
+			saveDocumentations(element.getDocuments(), element.getId());
 		}
 		// TODO перипасать верный алгоритм получения оборудования!!!
 		return false;
@@ -1004,57 +987,27 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private void saveDocuments(List<EquipmentDocumentationSrv> array,
+	private boolean saveDocumentations(ArrayList<EquipmentDocumentationSrv> array,
 			String equipmentUuid) {
 
-		// TODO удалить двоение
-		if (array == null) {
-			return;
-		}
-
-		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
-		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
-
-		for (EquipmentDocumentationSrv element : array) {
-			EquipmentDocumentation item = element.getLocal(equipmentUuid);
-			saveDocumentType(new DocumentationTypeSrv[] { element
-					.getDocumentType() });
-			list.add(item);
-		}
-		adapter.saveItems(list);
-	}
-
-	/**
-	 * Сохраняем в базу документацию
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private boolean saveDocuments(EquipmentDocumentationSrv[] array,
-			String equipmentUuid) {
-
-		// TODO удалить двоение
 		if (array == null) {
 			return false;
 		}
 
 		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
 
-		for (EquipmentDocumentationSrv element : array) {
-			EquipmentDocumentation item = element.getLocal(equipmentUuid);
-			saveDocumentType(new DocumentationTypeSrv[] { element
-					.getDocumentType() });
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
-			return true;
-		} else {
+		if (!adapter.saveItems(EquipmentDocumentationSrv
+				.getEquipmentDocumentations(array, equipmentUuid))) {
 			return false;
 		}
+
+		if (!saveDocumentType(EquipmentDocumentationSrv
+				.getDocumentationTypesSrv(array))) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -1063,41 +1016,20 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveCriticalType(CriticalTypeSrv[] array) {
+	private boolean saveCriticalType(ArrayList<CriticalTypeSrv> array) {
 
-		// TODO удалить двоение
 		if (array == null) {
 			return false;
 		}
 
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		ArrayList<CriticalType> list = new ArrayList<CriticalType>();
 
-		for (CriticalTypeSrv element : array) {
-			CriticalType item = element.getLocal();
-			list.add(item);
-		}
-
-		if (adapter.saveItems(list)) {
+		if (adapter.saveItems(CriticalTypeSrv.getCriticalTypes(array))) {
 			return true;
 		} else {
 			return false;
 		}
-	}
-
-	/**
-	 * Сохраняем в базу типы критичности оборудования
-	 * 
-	 * @param array
-	 * @return
-	 */
-	private void saveCriticalType(CriticalTypeSrv type) {
-
-		// TODO удалить двоение
-		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
-		adapter.replace(type.getLocal());
 	}
 
 }

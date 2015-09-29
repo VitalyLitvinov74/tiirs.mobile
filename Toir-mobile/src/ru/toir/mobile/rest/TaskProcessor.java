@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.json.JSONArray;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
@@ -38,7 +39,6 @@ import ru.toir.mobile.serializer.TaskResultSerializer;
 import ru.toir.mobile.serializer.TaskSerializer;
 import ru.toir.mobile.serverapi.EquipmentOperationSrv;
 import ru.toir.mobile.serverapi.EquipmentSrv;
-import ru.toir.mobile.serverapi.ParseHelper;
 import ru.toir.mobile.serverapi.TaskSrv;
 import ru.toir.mobile.serverapi.result.TaskResultRes;
 import android.content.Context;
@@ -61,7 +61,7 @@ public class TaskProcessor {
 	private String mServerUrl;
 
 	Set<String> patternUuids;
-	
+
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
 
@@ -78,23 +78,24 @@ public class TaskProcessor {
 
 	/**
 	 * Получение нарядов со статусом "Новый"
+	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean GetTask(Bundle bundle) {
 
 		boolean result;
-		
+
 		result = getTasks();
 		if (!result) {
 			return false;
 		}
-		
+
 		result = getPatterns();
 		if (!result) {
 			return false;
 		}
-		
+
 		result = getOperationResults();
 		if (!result) {
 			return false;
@@ -109,7 +110,7 @@ public class TaskProcessor {
 	 * @return
 	 */
 	private boolean getTasks() {
-		
+
 		URI requestUri = null;
 		String token = AuthorizedUser.getInstance().getToken();
 		String jsonString = null;
@@ -117,7 +118,7 @@ public class TaskProcessor {
 		try {
 			requestUri = new URI(mServerUrl + TASK_GET_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
-			
+
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();
 			tList.add("bearer " + token);
@@ -128,14 +129,18 @@ public class TaskProcessor {
 			if (response.mStatus == 200) {
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
-				
-				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
-				
-				TaskSrv[] serverTasks = gson.fromJson(jsonString, TaskSrv[].class);
+
+				Gson gson = new GsonBuilder().setDateFormat(
+						"yyyy-MM-dd'T'hh:mm:ss").create();
+
+				ArrayList<TaskSrv> serverTasks = gson.fromJson(jsonString,
+						new TypeToken<ArrayList<TaskSrv>>() {
+						}.getType());
 				if (serverTasks != null) {
 
 					// разбираем и сохраняем полученные данные
-					SQLiteDatabase db = DatabaseHelper.getInstance(mContext).getWritableDatabase();
+					SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+							.getWritableDatabase();
 					db.beginTransaction();
 					boolean result = saveTasks(serverTasks);
 					if (result) {
@@ -145,8 +150,11 @@ public class TaskProcessor {
 
 					return result;
 				} else {
-					// TODO нужен механизм который при наличии полученных нарядов выведет диалог с их колличеством, либо с надписью "Новых нарядов нет"
-					// нарядов нет - считаем что процедура получения прошла успешно
+					// TODO нужен механизм который при наличии полученных
+					// нарядов выведет диалог с их колличеством, либо с надписью
+					// "Новых нарядов нет"
+					// нарядов нет - считаем что процедура получения прошла
+					// успешно
 					return true;
 				}
 			} else {
@@ -164,15 +172,19 @@ public class TaskProcessor {
 	 * @return
 	 */
 	private boolean getPatterns() {
-		
+
 		try {
-			ArrayList<String> operationPatternUuids = new ArrayList<String>(patternUuids);
-			ReferenceProcessor referenceProcessor = new ReferenceProcessor(mContext);
+			ArrayList<String> operationPatternUuids = new ArrayList<String>(
+					patternUuids);
+			ReferenceProcessor referenceProcessor = new ReferenceProcessor(
+					mContext);
 			Bundle extra = new Bundle();
-			extra.putStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID, operationPatternUuids);
+			extra.putStringArrayList(
+					ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID,
+					operationPatternUuids);
 			boolean result = referenceProcessor.getOperationPattern(extra);
 			return result;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -190,87 +202,110 @@ public class TaskProcessor {
 			Bundle bundle = new Bundle();
 			boolean result = processor.getOperationResult(bundle);
 			return result;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
 
-	public boolean saveTasks(TaskSrv[] tasks) {
+	public boolean saveTasks(ArrayList<TaskSrv> tasks) {
 
 		// новый вариант разбора и сохранения данных с сервера
-		TaskDBAdapter adapter0 = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter0.saveItems(ParseHelper.getTasks(tasks))) {
-			return false;
-		}
-		
-		TaskStatusDBAdapter adapter1 = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter1.saveItems(ParseHelper.getTaskStatuses(tasks))) {
-			return false;
-		}
-		
-		EquipmentOperationDBAdapter adapter2 = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter2.saveItems(ParseHelper.getEquipmentOperations(tasks))) {
-			return false;
-		}
-		
-		ArrayList<EquipmentOperationSrv> operations = ParseHelper.getEquipmentOperationSrvs(tasks);
-		EquipmentDBAdapter adapter3 = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter3.saveItems(ParseHelper.getEquipments(operations))) {
-			return false;
-		}
-		
-		OperationTypeDBAdapter adapter4 = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter4.saveItems(ParseHelper.getOperationTypes(operations))) {
-			return false;
-		}
-		
-		OperationStatusDBAdapter adapter5 = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter5.saveItems(ParseHelper.getOperationStatuses(operations))) {
-			return false;
-		}
-		
-		patternUuids = ParseHelper.getOperationPatternUuids(operations);
-		
-		ArrayList<EquipmentSrv> equipments = ParseHelper.getEquipmentSrvs(operations);
-		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));			
-		if (!adapter6.saveItems(ParseHelper.getEquipmentTypes(equipments))) {
-			return false;
-		}
-		
-		CriticalTypeDBAdapter adapter7 = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter7.saveItems(ParseHelper.getCriticalTypes(equipments))) {
-			return false;
-		}
-		
-		EquipmentStatusDBAdapter adapter8 = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter8.saveItems(ParseHelper.getEquipmentStatuses(equipments))) {
-			return false;
-		}
-		
-		EquipmentDocumentationDBAdapter adapter9 = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter9.saveItems(ParseHelper.getEquipmentDocumentations(equipments))) {
+		TaskDBAdapter adapter0 = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
+		if (!adapter0.saveItems(TaskSrv.getTasks(tasks))) {
 			return false;
 		}
 
-		DocumentationTypeDBAdapter adapter10 = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!adapter10.saveItems(ParseHelper.getEquipmentDocumentationTypes(equipments))) {
+		TaskStatusDBAdapter adapter1 = new TaskStatusDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter1.saveItems(TaskSrv.getTaskStatuses(tasks))) {
 			return false;
 		}
-		
+
+		EquipmentOperationDBAdapter adapter2 = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter2.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
+			return false;
+		}
+
+		ArrayList<EquipmentOperationSrv> operations = TaskSrv
+				.getEquipmentOperationSrvs(tasks);
+		EquipmentDBAdapter adapter3 = new EquipmentDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter3
+				.saveItems(EquipmentOperationSrv.getEquipments(operations))) {
+			return false;
+		}
+
+		OperationTypeDBAdapter adapter4 = new OperationTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter4.saveItems(EquipmentOperationSrv
+				.getOperationTypes(operations))) {
+			return false;
+		}
+
+		OperationStatusDBAdapter adapter5 = new OperationStatusDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter5.saveItems(EquipmentOperationSrv
+				.getOperationStatuses(operations))) {
+			return false;
+		}
+
+		patternUuids = EquipmentOperationSrv
+				.getOperationPatternUuids(operations);
+
+		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
+				.getEquipmentSrvs(operations);
+		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter6.saveItems(EquipmentSrv.getEquipmentTypes(equipments))) {
+			return false;
+		}
+
+		CriticalTypeDBAdapter adapter7 = new CriticalTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter7.saveItems(EquipmentSrv.getCriticalTypes(equipments))) {
+			return false;
+		}
+
+		EquipmentStatusDBAdapter adapter8 = new EquipmentStatusDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter8.saveItems(EquipmentSrv.getEquipmentStatuses(equipments))) {
+			return false;
+		}
+
+		EquipmentDocumentationDBAdapter adapter9 = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter9.saveItems(EquipmentSrv
+				.getEquipmentDocumentations(equipments))) {
+			return false;
+		}
+
+		DocumentationTypeDBAdapter adapter10 = new DocumentationTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!adapter10
+				.saveItems(EquipmentSrv.getDocumentationTypes(equipments))) {
+			return false;
+		}
+
 		return true;
 	}
 
 	/**
 	 * Отправка результатов выполнения наряда.
+	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean TaskSendResult(Bundle bundle) {
-		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
-		String taskUuid = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
+		String token = bundle
+				.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+		String taskUuid = bundle
+				.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
+		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
 		Task task;
 		task = adapter.getTaskByUuidAndUpdated(taskUuid);
 
@@ -290,17 +325,21 @@ public class TaskProcessor {
 
 	/**
 	 * Отправка результатов выполнения нарядов.
+	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean TasksSendResult(Bundle bundle) {
-		
-		String token = bundle.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
-		
+
+		String token = bundle
+				.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+
 		String user_uuid = AuthorizedUser.getInstance().getUuid();
 		ArrayList<Task> tasks;
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
-		// TODO необходимо решить и реализовать выборку не отправленных нарядов, либо по текущему пользователю либо все какие есть неотправленные.
+		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
+		// TODO необходимо решить и реализовать выборку не отправленных нарядов,
+		// либо по текущему пользователю либо все какие есть неотправленные.
 		tasks = adapter.getTaskByUserAndUpdated(user_uuid);
 
 		// получаем из базы результаты связанные с нарядами
@@ -313,12 +352,14 @@ public class TaskProcessor {
 
 		return TasksSendResults(taskResults, token);
 	}
-	
+
 	/**
 	 * Отправка результатов выполнения нарядов на сервер
+	 * 
 	 * @return
 	 */
-	private boolean TasksSendResults(ArrayList<TaskResultRes> tasks, String token) {
+	private boolean TasksSendResults(ArrayList<TaskResultRes> tasks,
+			String token) {
 
 		URI requestUri = null;
 		String jsonString = null;
@@ -326,44 +367,51 @@ public class TaskProcessor {
 		try {
 			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
-			
-			
+
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();
 			tList.add("Bearer " + token);
 			headers.put("Authorization", tList);
-			
+
 			if (tasks != null) {
 				StringBuilder postData = new StringBuilder();
 				// TODO реализовать упаковку результатов в json объект
-				//TaskResult taskResult = new TaskResult();
-				//taskResult.loadTaskResult(mContext, "a1f3a9af-d05b-4123-858f-a753a46f97d5");
-				//TaskResult[] resultArray = new TaskResult[] { taskResult };
+				// TaskResult taskResult = new TaskResult();
+				// taskResult.loadTaskResult(mContext,
+				// "a1f3a9af-d05b-4123-858f-a753a46f97d5");
+				// TaskResult[] resultArray = new TaskResult[] { taskResult };
 
 				Gson gson = new GsonBuilder()
 						.setPrettyPrinting()
 						.registerTypeAdapter(Task.class, new TaskSerializer())
-						.registerTypeAdapter(TaskResultRes.class, new TaskResultSerializer())
-						.registerTypeAdapter(EquipmentOperation.class, new EquipmentOperationSerializer())
-						.registerTypeAdapter(EquipmentOperationResult.class, new EquipmentOperationResultSerializer())
-						.registerTypeAdapter(MeasureValue.class, new MeasureValueSerializer()).create();
-				
+						.registerTypeAdapter(TaskResultRes.class,
+								new TaskResultSerializer())
+						.registerTypeAdapter(EquipmentOperation.class,
+								new EquipmentOperationSerializer())
+						.registerTypeAdapter(EquipmentOperationResult.class,
+								new EquipmentOperationResultSerializer())
+						.registerTypeAdapter(MeasureValue.class,
+								new MeasureValueSerializer()).create();
+
 				String json = gson.toJson(tasks);
 				Log.d("test", json);
 
 				postData.append("tasks=");
 				postData.append(json);
 
-				Request request = new Request(Method.POST, requestUri, headers, postData.toString().getBytes());
+				Request request = new Request(Method.POST, requestUri, headers,
+						postData.toString().getBytes());
 				Response response = new RestClient().execute(request);
 				if (response.mStatus == 200) {
-					// TODO реализовать разбор ответа с подтверждением об отправке результатов
-					// TODO реализовать изменение статусов данных(updated) на "отправлено"
+					// TODO реализовать разбор ответа с подтверждением об
+					// отправке результатов
+					// TODO реализовать изменение статусов данных(updated) на
+					// "отправлено"
 					jsonString = new String(response.mBody, "UTF-8");
 					JSONArray jsonArray = new JSONArray(jsonString);
 				} else {
 					return false;
-				}				
+				}
 			}
 
 		} catch (Exception e) {
@@ -373,5 +421,5 @@ public class TaskProcessor {
 
 		return true;
 	}
-	
+
 }

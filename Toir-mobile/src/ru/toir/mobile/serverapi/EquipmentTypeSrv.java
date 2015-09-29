@@ -1,5 +1,7 @@
 package ru.toir.mobile.serverapi;
 
+import java.util.ArrayList;
+
 import ru.toir.mobile.db.tables.EquipmentType;
 import com.google.gson.annotations.Expose;
 
@@ -47,6 +49,16 @@ public class EquipmentTypeSrv extends BaseObjectSrv {
 		item.setChangedAt(getChangedAtTime());
 
 		return item;
+	}
+
+	public static ArrayList<EquipmentType> getEquipmentTypes(
+			ArrayList<EquipmentTypeSrv> types) {
+
+		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
+		for (EquipmentTypeSrv type : types) {
+			list.add(type.getLocal());
+		}
+		return list;
 	}
 
 }
