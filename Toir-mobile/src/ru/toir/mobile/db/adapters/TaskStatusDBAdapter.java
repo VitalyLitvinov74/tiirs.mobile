@@ -139,11 +139,15 @@ public class TaskStatusDBAdapter extends BaseDBAdapter {
 		return id;
 	}
 
-	public void saveItems(ArrayList<TaskStatus> list) {
+	public boolean saveItems(ArrayList<TaskStatus> list) {
 
 		for (TaskStatus item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

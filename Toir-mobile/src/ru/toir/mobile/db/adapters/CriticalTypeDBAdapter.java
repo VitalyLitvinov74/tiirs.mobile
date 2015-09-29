@@ -144,11 +144,15 @@ public class CriticalTypeDBAdapter extends BaseDBAdapter {
 			return "";
 	}
 
-	public void saveItems(ArrayList<CriticalType> list) {
+	public boolean saveItems(ArrayList<CriticalType> list) {
 
 		for (CriticalType item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

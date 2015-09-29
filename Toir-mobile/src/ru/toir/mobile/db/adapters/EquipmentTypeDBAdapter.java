@@ -139,11 +139,15 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 			return "";
 	}
 
-	public void saveItems(ArrayList<EquipmentType> list) {
+	public boolean saveItems(ArrayList<EquipmentType> list) {
 
 		for (EquipmentType item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

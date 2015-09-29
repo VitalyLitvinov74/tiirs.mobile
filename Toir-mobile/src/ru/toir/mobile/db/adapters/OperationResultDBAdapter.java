@@ -162,11 +162,21 @@ public class OperationResultDBAdapter extends BaseDBAdapter {
 			return "";
 	}
 
-	public void saveItems(ArrayList<OperationResult> list) {
+	/**
+	 * Сохраняем пачкой
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public boolean saveItems(ArrayList<OperationResult> list) {
 
 		for (OperationResult item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

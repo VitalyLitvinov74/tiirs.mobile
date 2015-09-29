@@ -125,11 +125,15 @@ public class MeasureTypeDBAdapter extends BaseDBAdapter {
 		return arrayList;
 	}
 
-	public void saveItems(ArrayList<MeasureType> list) {
+	public boolean saveItems(ArrayList<MeasureType> list) {
 
 		for (MeasureType item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

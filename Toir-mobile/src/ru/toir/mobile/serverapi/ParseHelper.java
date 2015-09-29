@@ -18,6 +18,7 @@ import ru.toir.mobile.db.tables.EquipmentType;
 import ru.toir.mobile.db.tables.MeasureType;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.db.tables.OperationPatternStepResult;
+import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
@@ -144,6 +145,16 @@ public class ParseHelper {
 		return list;
 	}
 
+	public static ArrayList<Equipment> getEquipments(
+			EquipmentSrv[] equipments) {
+
+		ArrayList<Equipment> list = new ArrayList<Equipment>();
+		for (EquipmentSrv equipment : equipments) {
+			list.add(equipment.getLocal());
+		}
+		return list;
+	}
+
 	public static ArrayList<EquipmentSrv> getEquipmentSrvs(
 			ArrayList<EquipmentOperationSrv> operations) {
 
@@ -160,6 +171,16 @@ public class ParseHelper {
 		ArrayList<OperationType> list = new ArrayList<OperationType>();
 		for (EquipmentOperationSrv operation : operations) {
 			list.add(operation.getOperationType().getLocal());
+		}
+		return list;
+	}
+
+	public static ArrayList<OperationType> getOperationTypes(
+			OperationResultSrv[] results) {
+
+		ArrayList<OperationType> list = new ArrayList<OperationType>();
+		for (OperationResultSrv result : results) {
+			list.add(result.getOperationType().getLocal());
 		}
 		return list;
 	}
@@ -215,6 +236,17 @@ public class ParseHelper {
 			for (OperationPatternStepResultSrv result : results) {
 				list.add(result.getMeasureType().getLocal());
 			}
+		}
+		return list;
+	}
+	
+	public static ArrayList<OperationResult> getOperationResults(OperationResultSrv[] results) {
+
+		ArrayList<OperationResult> list = new ArrayList<OperationResult>();
+		
+		for(OperationResultSrv element : results) {
+			OperationResult item = element.getLocal();
+			list.add(item);
 		}
 		return list;
 	}

@@ -153,11 +153,15 @@ public class OperationPatternStepResultDBAdapter extends BaseDBAdapter {
 		return id;
 	}
 	
-	public void saveItems(ArrayList<OperationPatternStepResult> list) {
+	public boolean saveItems(ArrayList<OperationPatternStepResult> list) {
 
 		for (OperationPatternStepResult item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

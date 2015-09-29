@@ -83,9 +83,7 @@ public class TaskProcessor {
 	 */
 	public boolean GetTask(Bundle bundle) {
 
-		// TODO сделать вызов двух медотодов - получить наряды, получить шаблоны
-		// TODO реализовать внятное поведение с возвратом кода и еще нереализованой транзакцией
-		boolean result = false;
+		boolean result;
 		
 		result = getTasks();
 		if (!result) {
@@ -96,10 +94,20 @@ public class TaskProcessor {
 		if (!result) {
 			return false;
 		}
+		
+		result = getOperationResults();
+		if (!result) {
+			return false;
+		}
 
-		return result;
+		return true;
 	}
-	
+
+	/**
+	 * Получаем данные по нарядам
+	 * 
+	 * @return
+	 */
 	private boolean getTasks() {
 		
 		URI requestUri = null;
@@ -126,25 +134,23 @@ public class TaskProcessor {
 				TaskSrv[] serverTasks = gson.fromJson(jsonString, TaskSrv[].class);
 				if (serverTasks != null) {
 
-					// TODO нужен механизм для запуска транзакции т.е. операций вставки в базу много
-
 					// разбираем и сохраняем полученные данные
 					SQLiteDatabase db = DatabaseHelper.getInstance(mContext).getWritableDatabase();
 					db.beginTransaction();
-					saveTasks(serverTasks);
-					db.setTransactionSuccessful();
+					boolean result = saveTasks(serverTasks);
+					if (result) {
+						db.setTransactionSuccessful();
+					}
 					db.endTransaction();
-					
-					// TODO нужна проверка на то что успешно разобрали и сохранили в базу,
-					return false;
 
+					return result;
 				} else {
-					// TODO нужно решить что делать если нарядов нет!!!
-					return false;
+					// TODO нужен механизм который при наличии полученных нарядов выведет диалог с их колличеством, либо с надписью "Новых нарядов нет"
+					// нарядов нет - считаем что процедура получения прошла успешно
+					return true;
 				}
-				
 			} else {
-				return false;
+				throw new Exception("Не удалось получить наряды.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -152,64 +158,107 @@ public class TaskProcessor {
 		}
 	}
 
+	/**
+	 * Получаем данные по шаблонам
+	 * 
+	 * @return
+	 */
 	private boolean getPatterns() {
 		
-		boolean result = false;
-
-		// получаем данные по шаблонам
-		ArrayList<String> operationPatternUuids = new ArrayList<String>(patternUuids);
 		try {
+			ArrayList<String> operationPatternUuids = new ArrayList<String>(patternUuids);
 			ReferenceProcessor referenceProcessor = new ReferenceProcessor(mContext);
 			Bundle extra = new Bundle();
 			extra.putStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID, operationPatternUuids);
-			result = referenceProcessor.getOperationPattern(extra);
+			boolean result = referenceProcessor.getOperationPattern(extra);
+			return result;
 		} catch(Exception e) {
 			e.printStackTrace();
 			return false;
 		}
-
-		return result;
 	}
-	
-	public void saveTasks(TaskSrv[] tasks) {
+
+	/**
+	 * Получаем данные по результатам операций
+	 * 
+	 * @return
+	 */
+	public boolean getOperationResults() {
+
+		try {
+			ReferenceProcessor processor = new ReferenceProcessor(mContext);
+			Bundle bundle = new Bundle();
+			boolean result = processor.getOperationResult(bundle);
+			return result;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean saveTasks(TaskSrv[] tasks) {
 
 		// новый вариант разбора и сохранения данных с сервера
 		TaskDBAdapter adapter0 = new TaskDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter0.saveItems(ParseHelper.getTasks(tasks));						
+		if (!adapter0.saveItems(ParseHelper.getTasks(tasks))) {
+			return false;
+		}
 		
 		TaskStatusDBAdapter adapter1 = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter1.saveItems(ParseHelper.getTaskStatuses(tasks));
+		if (!adapter1.saveItems(ParseHelper.getTaskStatuses(tasks))) {
+			return false;
+		}
 		
 		EquipmentOperationDBAdapter adapter2 = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter2.saveItems(ParseHelper.getEquipmentOperations(tasks));
+		if (!adapter2.saveItems(ParseHelper.getEquipmentOperations(tasks))) {
+			return false;
+		}
 		
 		ArrayList<EquipmentOperationSrv> operations = ParseHelper.getEquipmentOperationSrvs(tasks);
 		EquipmentDBAdapter adapter3 = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter3.saveItems(ParseHelper.getEquipments(operations));
+		if (!adapter3.saveItems(ParseHelper.getEquipments(operations))) {
+			return false;
+		}
 		
 		OperationTypeDBAdapter adapter4 = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter4.saveItems(ParseHelper.getOperationTypes(operations));
+		if (!adapter4.saveItems(ParseHelper.getOperationTypes(operations))) {
+			return false;
+		}
 		
 		OperationStatusDBAdapter adapter5 = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter5.saveItems(ParseHelper.getOperationStatuses(operations));
+		if (!adapter5.saveItems(ParseHelper.getOperationStatuses(operations))) {
+			return false;
+		}
 		
 		patternUuids = ParseHelper.getOperationPatternUuids(operations);
 		
 		ArrayList<EquipmentSrv> equipments = ParseHelper.getEquipmentSrvs(operations);
 		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));			
-		adapter6.saveItems(ParseHelper.getEquipmentTypes(equipments));
+		if (!adapter6.saveItems(ParseHelper.getEquipmentTypes(equipments))) {
+			return false;
+		}
 		
 		CriticalTypeDBAdapter adapter7 = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter7.saveItems(ParseHelper.getCriticalTypes(equipments));
+		if (!adapter7.saveItems(ParseHelper.getCriticalTypes(equipments))) {
+			return false;
+		}
 		
 		EquipmentStatusDBAdapter adapter8 = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter8.saveItems(ParseHelper.getEquipmentStatuses(equipments));
+		if (!adapter8.saveItems(ParseHelper.getEquipmentStatuses(equipments))) {
+			return false;
+		}
 		
 		EquipmentDocumentationDBAdapter adapter9 = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter9.saveItems(ParseHelper.getEquipmentDocumentations(equipments));
+		if (!adapter9.saveItems(ParseHelper.getEquipmentDocumentations(equipments))) {
+			return false;
+		}
 
 		DocumentationTypeDBAdapter adapter10 = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		adapter10.saveItems(ParseHelper.getEquipmentDocumentationTypes(equipments));
+		if (!adapter10.saveItems(ParseHelper.getEquipmentDocumentationTypes(equipments))) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

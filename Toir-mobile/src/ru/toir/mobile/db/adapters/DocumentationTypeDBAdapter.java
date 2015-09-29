@@ -138,11 +138,15 @@ public class DocumentationTypeDBAdapter extends BaseDBAdapter {
 			return "";
 	}
 
-	public void saveItems(ArrayList<DocumentationType> array) {
+	public boolean saveItems(ArrayList<DocumentationType> array) {
 
 		for (DocumentationType item : array) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

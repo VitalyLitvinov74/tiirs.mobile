@@ -134,11 +134,15 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 			return "неизвестно";
 	}
 
-	public void saveItems(ArrayList<OperationType> list) {
+	public boolean saveItems(ArrayList<OperationType> list) {
 
 		for (OperationType item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 	
 	/**

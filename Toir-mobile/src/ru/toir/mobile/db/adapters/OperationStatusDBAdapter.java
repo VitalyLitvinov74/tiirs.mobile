@@ -135,11 +135,15 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 		return id;
 	}
 
-	public void saveItems(ArrayList<OperationStatus> list) {
+	public boolean saveItems(ArrayList<OperationStatus> list) {
 
 		for (OperationStatus item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**

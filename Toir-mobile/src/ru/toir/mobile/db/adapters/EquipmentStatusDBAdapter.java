@@ -134,11 +134,15 @@ public class EquipmentStatusDBAdapter extends BaseDBAdapter {
 		return id;
 	}
 
-	public void saveItems(ArrayList<EquipmentStatus> list) {
+	public boolean saveItems(ArrayList<EquipmentStatus> list) {
 
 		for (EquipmentStatus item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**
