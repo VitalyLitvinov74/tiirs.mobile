@@ -14,7 +14,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public final static int EQUIPMENTS_FRAGMENT = 4;
 	public final static int TASK_FRAGMENT = 5;
 	public final static int NATIVE_CAMERA_FRAGMENT = 6;
-	public final static int QRTEST_FRAGMENT = 7;
 
 	private UserInfoFragment userInfoFragment;
 	private ReferenceFragment referenceFragment;
@@ -23,7 +22,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 	private EquipmentsFragment equipmentsFragment;
 	private TaskFragment taskFragment;
 	private NativeCameraFragment nativeCameraFragment;
-	private QRTestFragment qrTestFragment;
 	
 	public PageAdapter(FragmentManager fm) {	
 		super(fm);
@@ -67,11 +65,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 				nativeCameraFragment = new NativeCameraFragment();
 			}
 			return nativeCameraFragment;
-		case QRTEST_FRAGMENT :
-			if (qrTestFragment == null) {
-				qrTestFragment = new QRTestFragment();
-			}
-			return qrTestFragment;
 		default :
 			return null;
 		}
@@ -80,7 +73,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 8;
+		return 7;
 	}
 
 	/* (non-Javadoc)
@@ -110,9 +103,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 			break;
 		case NATIVE_CAMERA_FRAGMENT :
 			title = "Фото";
-			break;
-		case QRTEST_FRAGMENT :
-			title = "QR test";
 			break;
 		default :
 			title = "";
