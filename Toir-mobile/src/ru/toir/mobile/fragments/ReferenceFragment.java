@@ -1,6 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
-import ru.toir.mobile.rest.ReferenceProcessor;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
 import android.app.ProgressDialog;
@@ -45,15 +43,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView;
 import android.widget.Toast;
-
-//import android.widget.Toast;
 
 public class ReferenceFragment extends Fragment {
 	private Spinner Spinner_references;
@@ -65,10 +60,8 @@ public class ReferenceFragment extends Fragment {
 	ArrayAdapter<String> spinner_type_adapter;
 	ArrayAdapter<String> spinner_addict_adapter;
 	private ProgressDialog getReferencesDialog;
-	
-	/*
-	// TODO реализовать новый вариант обновления справочников
-	private IntentFilter mFilterGetReference = new IntentFilter(ReferenceServiceProvider.Actions.ACTION_GET_OPERATION_RESULT);
+
+	private IntentFilter mFilterGetReference = new IntentFilter(ReferenceServiceProvider.Actions.ACTION_GET_ALL);
 	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
 		
 		@Override
@@ -78,7 +71,6 @@ public class ReferenceFragment extends Fragment {
 			Toast.makeText(context, "Справочники обновлены", Toast.LENGTH_SHORT).show();
 		}
 	};
-	*/
 
 	/*
 	 * (non-Javadoc)
@@ -553,23 +545,14 @@ public class ReferenceFragment extends Fragment {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				Log.d("test", "Обновляем справочники.");
-				/*
+
 				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity()
 						.getApplicationContext(),
-						ReferenceServiceProvider.Actions.ACTION_GET_REFERENCE);
-				Field[] fields = ReferenceProcessor.ReferenceNames.class.getDeclaredFields();
-				ArrayList<String> referenceNames = new ArrayList<String>();
-				try {
-					for (Field field: fields) {
-						referenceNames.add((String) field.get(String.class));
-					}
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
+						ReferenceServiceProvider.Actions.ACTION_GET_ALL);
 
 				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
 
-				rsh.getReference(referenceNames);
+				rsh.getAll();
 
 				// показываем диалог обновления справочников
 				getReferencesDialog = new ProgressDialog(getActivity());
@@ -588,7 +571,7 @@ public class ReferenceFragment extends Fragment {
 							}
 						});
 				getReferencesDialog.show();
-				*/
+
 				return true;
 			}
 		});

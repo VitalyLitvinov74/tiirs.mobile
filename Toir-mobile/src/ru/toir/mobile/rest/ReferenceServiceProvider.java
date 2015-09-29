@@ -27,6 +27,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 		public static final int GET_EQUIPMENT = 10;
 		public static final int GET_CRITICAL_TYPE = 11;
 		public static final int GET_DOCUMENTATION = 12;
+		public static final int GET_ALL = 13;
 
 		public static final String GET_OPERATION_PATTERN_PARAMETER_UUID = "uuid";
 		public static final String GET_DOCUMENTATION_PARAMETER_UUID = "uuid";
@@ -34,7 +35,6 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	
 	public static class Actions {
 		public static final String ACTION_GET_ALL = "action_get_all";
-
 		public static final String ACTION_GET_OPERATION_RESULT = "action_get_operation_result";
 		public static final String ACTION_GET_OPERATION_PATTERN = "action_get_operation_pattern";
 		public static final String ACTION_GET_DOCUMENT_TYPE = "action_get_document_type";
@@ -88,6 +88,8 @@ public class ReferenceServiceProvider implements IServiceProvider {
 			return getCriticalType(extras);
 		case Methods.GET_DOCUMENTATION:
 			return getDocumentation(extras);
+		case Methods.GET_ALL:
+			return getAll(extras);
 		}
 		return false;
 	}
@@ -230,6 +232,18 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	private boolean getDocumentation(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getDocumentation(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private boolean getAll(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getAll(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

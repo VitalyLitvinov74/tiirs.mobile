@@ -129,4 +129,11 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION, bundle);
 	}
 
+	/**
+	 * Получаем/сохраняем
+	 */
+	public void getAll() {
+		Bundle bundle = new Bundle();
+		RunMethod(ReferenceServiceProvider.Methods.GET_ALL, bundle);
+	}
 }

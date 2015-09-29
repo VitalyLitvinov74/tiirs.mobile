@@ -687,6 +687,35 @@ public class ReferenceProcessor {
 	}
 
 	/**
+	 * Получаем все справочники
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean getAll(Bundle bundle) {
+
+		// TODO определиться как всё-таки будут обновляться справочники
+		// на каждом устройстве будет копия всех данных с сервера?
+		// совершенно не нужно тащить все объекты оборудования на каждое устройство.
+		// обновлять будем только те данные которые есть на устройстве?
+		// можно пропустить новые данные.
+		getCriticalType(bundle);
+		getDocumentType(bundle);
+		getEquipmentStatus(bundle);
+		getEquipmentType(bundle);
+		getMeasureType(bundle);
+		getOperationResult(bundle);
+		getOperationStatus(bundle);
+		getOperationType(bundle);
+		getTaskStatus(bundle);
+		/*
+		getDocumentation(bundle);
+		Equipment(bundle);
+		*/
+		return false;
+	}
+
+	/**
 	 * Сохраняем в базу информацию по шаблону операции и связанные с ним данные.
 	 * 
 	 * @param pattern
