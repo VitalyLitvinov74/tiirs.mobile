@@ -17,7 +17,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	public static class Methods {
 		public static final int GET_OPERATION_RESULT = 1;
 		public static final int GET_OPERATION_PATTERN = 2;
-		public static final int GET_DOCUMENT_TYPE = 3;
+		public static final int GET_DOCUMENTATION_TYPE = 3;
 		public static final int GET_EQUIPMENT_STATUS = 4;
 		public static final int GET_EQUIPMENT_TYPE = 5;
 		public static final int GET_MEASURE_TYPE = 6;
@@ -26,11 +26,15 @@ public class ReferenceServiceProvider implements IServiceProvider {
 		public static final int GET_TASK_STATUS = 9;
 		public static final int GET_EQUIPMENT = 10;
 		public static final int GET_CRITICAL_TYPE = 11;
+		public static final int GET_DOCUMENTATION = 12;
 
 		public static final String GET_OPERATION_PATTERN_PARAMETER_UUID = "uuid";
+		public static final String GET_DOCUMENTATION_PARAMETER_UUID = "uuid";
 	}
 	
 	public static class Actions {
+		public static final String ACTION_GET_ALL = "action_get_all";
+
 		public static final String ACTION_GET_OPERATION_RESULT = "action_get_operation_result";
 		public static final String ACTION_GET_OPERATION_PATTERN = "action_get_operation_pattern";
 		public static final String ACTION_GET_DOCUMENT_TYPE = "action_get_document_type";
@@ -42,6 +46,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 		public static final String ACTION_GET_TASK_STATUS = "action_get_task_status";
 		public static final String ACTION_GET_EQUIPMENT = "action_get_equipment";
 		public static final String ACTION_GET_CRITICAL_TYPE = "action_get_critical_type";
+		public static final String ACTION_GET_DOCUMENTATION = "action_get_documentation";
 	}
 
 	/**
@@ -63,7 +68,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 			return getOperationResult(extras);
 		case Methods.GET_OPERATION_PATTERN:
 			return getOperationPattern(extras);
-		case Methods.GET_DOCUMENT_TYPE:
+		case Methods.GET_DOCUMENTATION_TYPE:
 			return getDocumentType(extras);
 		case Methods.GET_EQUIPMENT_STATUS:
 			return getEquipmentStatus(extras);
@@ -81,6 +86,8 @@ public class ReferenceServiceProvider implements IServiceProvider {
 			return getEquipment(extras);
 		case Methods.GET_CRITICAL_TYPE:
 			return getCriticalType(extras);
+		case Methods.GET_DOCUMENTATION:
+			return getDocumentation(extras);
 		}
 		return false;
 	}
@@ -211,6 +218,18 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	private boolean getCriticalType(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getCriticalType(extras);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private boolean getDocumentation(Bundle extras) {
+		try {
+			return new ReferenceProcessor(mContext).getDocumentation(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

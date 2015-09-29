@@ -69,20 +69,18 @@ public class ReferenceProcessor {
 	private String mServerUrl;
 	private Context mContext;
 
-	public static class ReferenceNames {
-		public static String CriticalTypeName = "CriticalityType";
-		public static String DocumentTypeName = "DocumentType";
-		public static String EquipmentName = "Equipment";
-		public static String EquipmentStatusName = "EquipmentStatus";
-		public static String EquipmentTypeName = "EquipmentType";
-		public static String MeasureTypeName = "MeasureType";
-		public static String OperationResultName = "OperationResult";
-		public static String OperationStatusName = "OperationStatus";
-		public static String OperationTypeName = "OperationType";
-		public static String TaskStatusName = "TaskStatus";
-		public static String DocumentationName = "";
-		// TODO реализовать получение документов по конкретному оборудованию
-		// api/equipment/{equipment_id}/documents
+	private static class ReferenceURL {
+		public static String CriticalType = GET_REFERENCE_URL + "CriticalityType";
+		public static String DocumentType = GET_REFERENCE_URL + "DocumentType";
+		public static String Equipment = "/api/equipment";
+		public static String EquipmentStatus = GET_REFERENCE_URL + "EquipmentStatus";
+		public static String EquipmentType = GET_REFERENCE_URL + "EquipmentType";
+		public static String MeasureType = GET_REFERENCE_URL + "MeasureType";
+		public static String OperationResult = GET_REFERENCE_URL + "OperationResult";
+		public static String OperationStatus = GET_REFERENCE_URL + "OperationStatus";
+		public static String OperationType = GET_REFERENCE_URL + "OperationType";
+		public static String TaskStatus = GET_REFERENCE_URL + "TaskStatus";
+		public static String Documentation = "/api/equipment/%s/documents";
 	}
 
 	// TODO нужно изменить условие на сервере с >= на > для lastChangedAt
@@ -200,8 +198,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.OperationResultName);
+		url.append(mServerUrl).append(ReferenceURL.OperationResult);
 
 		// получаем дату последней модификации содержимого таблицы
 		OperationResultDBAdapter adapter = new OperationResultDBAdapter(
@@ -247,8 +244,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.DocumentTypeName);
+		url.append(mServerUrl).append(ReferenceURL.DocumentType);
 
 		// получаем дату последней модификации содержимого таблицы
 		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
@@ -293,8 +289,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.EquipmentStatusName);
+		url.append(mServerUrl).append(ReferenceURL.EquipmentStatus);
 
 		// получаем дату последней модификации содержимого таблицы
 		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
@@ -339,8 +334,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.EquipmentTypeName);
+		url.append(mServerUrl).append(ReferenceURL.EquipmentType);
 
 		// получаем дату последней модификации содержимого таблицы
 		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
@@ -385,8 +379,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.MeasureTypeName);
+		url.append(mServerUrl).append(ReferenceURL.MeasureType);
 
 		// получаем дату последней модификации содержимого таблицы
 		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
@@ -431,8 +424,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.OperationStatusName);
+		url.append(mServerUrl).append(ReferenceURL.OperationStatus);
 
 		// получаем дату последней модификации содержимого таблицы
 		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
@@ -477,8 +469,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.OperationTypeName);
+		url.append(mServerUrl).append(ReferenceURL.OperationType);
 
 		// получаем дату последней модификации содержимого таблицы
 		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
@@ -523,8 +514,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.TaskStatusName);
+		url.append(mServerUrl).append(ReferenceURL.TaskStatus);
 
 		// получаем дату последней модификации содержимого таблицы
 		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
@@ -571,7 +561,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append("/api/equipment/");
+		url.append(mServerUrl).append(ReferenceURL.Equipment);
 
 		// получаем дату последней модификации содержимого таблицы
 		EquipmentDBAdapter adapter = new EquipmentDBAdapter(
@@ -616,8 +606,7 @@ public class ReferenceProcessor {
 		String jsonString;
 		Long lastChangedAt;
 
-		url.append(mServerUrl).append(GET_REFERENCE_URL)
-				.append(ReferenceNames.CriticalTypeName);
+		url.append(mServerUrl).append(ReferenceURL.CriticalType);
 
 		// получаем дату последней модификации содержимого таблицы
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
@@ -640,6 +629,53 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			boolean result = saveCriticalType(gson.fromJson(jsonString,
 					CriticalTypeSrv[].class));
+			if (result) {
+				db.setTransactionSuccessful();
+			}
+			db.endTransaction();
+			return result;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Получаем документацию
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean getDocumentation(Bundle bundle) {
+
+		String equipmentUuid = bundle
+				.getString(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
+		StringBuilder url = new StringBuilder();
+		String jsonString;
+		Long lastChangedAt;
+
+		url.append(mServerUrl).append(String.format(ReferenceURL.Documentation, equipmentUuid));
+
+		// получаем дату последней модификации содержимого таблицы
+		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		lastChangedAt = adapter.getLastChangedAt();
+		if (lastChangedAt != null) {
+			url.append('?')
+					.append("ChangedAfter=")
+					.append(DataUtils.getDate(lastChangedAt + 1000,
+							"yyyy-MM-dd'T'HH:mm:ss"));
+		}
+
+		jsonString = getReferenceData(url.toString());
+		if (jsonString != null) {
+			Gson gson = new GsonBuilder()
+					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			// разбираем и сохраняем полученные данные
+			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+					.getWritableDatabase();
+			db.beginTransaction();
+			boolean result = saveDocuments(gson.fromJson(jsonString,
+					EquipmentDocumentationSrv[].class), equipmentUuid);
 			if (result) {
 				db.setTransactionSuccessful();
 			}
@@ -942,6 +978,7 @@ public class ReferenceProcessor {
 	private void saveDocuments(List<EquipmentDocumentationSrv> array,
 			String equipmentUuid) {
 
+		// TODO удалить двоение
 		if (array == null) {
 			return;
 		}
@@ -960,6 +997,38 @@ public class ReferenceProcessor {
 	}
 
 	/**
+	 * Сохраняем в базу документацию
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private boolean saveDocuments(EquipmentDocumentationSrv[] array,
+			String equipmentUuid) {
+
+		// TODO удалить двоение
+		if (array == null) {
+			return false;
+		}
+
+		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
+
+		for (EquipmentDocumentationSrv element : array) {
+			EquipmentDocumentation item = element.getLocal(equipmentUuid);
+			saveDocumentType(new DocumentationTypeSrv[] { element
+					.getDocumentType() });
+			list.add(item);
+		}
+
+		if (adapter.saveItems(list)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Сохраняем в базу типы критичности оборудования
 	 * 
 	 * @param array
@@ -967,6 +1036,7 @@ public class ReferenceProcessor {
 	 */
 	private boolean saveCriticalType(CriticalTypeSrv[] array) {
 
+		// TODO удалить двоение
 		if (array == null) {
 			return false;
 		}
@@ -995,6 +1065,7 @@ public class ReferenceProcessor {
 	 */
 	private void saveCriticalType(CriticalTypeSrv type) {
 
+		// TODO удалить двоение
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		adapter.replace(type.getLocal());

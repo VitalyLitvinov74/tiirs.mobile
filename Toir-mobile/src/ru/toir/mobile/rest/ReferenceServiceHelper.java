@@ -50,7 +50,8 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 */
 	public void getDocumentType() {
 		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENT_TYPE, bundle);
+		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_TYPE,
+				bundle);
 	}
 
 	/**
@@ -115,6 +116,17 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	public void getCriticalType() {
 		Bundle bundle = new Bundle();
 		RunMethod(ReferenceServiceProvider.Methods.GET_CRITICAL_TYPE, bundle);
+	}
+
+	/**
+	 * Получаем/сохраняем
+	 */
+	public void getDocumentation(String equipmentUuid) {
+		Bundle bundle = new Bundle();
+		bundle.putString(
+				ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID,
+				equipmentUuid);
+		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION, bundle);
 	}
 
 }
