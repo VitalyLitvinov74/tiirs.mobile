@@ -176,21 +176,8 @@ public class EquipmentInfoActivity extends Activity {
 				tv_equipment_tasks.setText("" + eqOperationResultDBAdapter.getOperationResultByUUID(equipmentOperationList.get(0).getOperation_status_uuid()));
 			else tv_equipment_tasks.setText("еще не обслуживалось");
 			//File imgFile = new File(getApplicationInfo().dataDir + equipment.getImg());
-			File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ equipment.getImg());			
-			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img";
-			Log.d("Files", "Path: " + path);
-			File f = new File(path);        
-			File file[] = f.listFiles();
-			Log.d("Files", "Size: "+ file.length);
-			for (int i=0; i < file.length; i++)
-			{
-			    Log.d("Files", "FileName:" + file[i].getName());
-			}
-			// temporary!
 			tv_equipment_documentation.setText("Tag UUID: " + equipment.getUuid());
-			//tv_equipment_documentation.setText(Environment.getExternalStorageDirectory() + "/Android/data/ru.toir.mobile" + equipment.getImg());
-			Long sd=imgFile.length();			
+			File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ equipment.getImage());						
 			if(imgFile.exists() && imgFile.isFile()){
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 			    tv_equipment_image.setImageBitmap(myBitmap);			    			    

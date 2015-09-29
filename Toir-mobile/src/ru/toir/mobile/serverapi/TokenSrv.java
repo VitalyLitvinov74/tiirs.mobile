@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Dmitriy Logachov
  *
  */
-public class Token {
+public class TokenSrv {
 
 	@SerializedName("access_token")
 	@Expose

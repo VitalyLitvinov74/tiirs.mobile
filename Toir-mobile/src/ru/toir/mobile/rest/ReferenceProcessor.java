@@ -5,6 +5,7 @@ package ru.toir.mobile.rest;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -27,24 +28,33 @@ import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.DocumentationType;
+import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
+import ru.toir.mobile.db.tables.EquipmentStatus;
+import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.db.tables.MeasureType;
+import ru.toir.mobile.db.tables.OperationPattern;
+import ru.toir.mobile.db.tables.OperationPatternStep;
+import ru.toir.mobile.db.tables.OperationPatternStepResult;
+import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
 import ru.toir.mobile.rest.RestClient.Method;
-import ru.toir.mobile.serverapi.CriticalityType;
-import ru.toir.mobile.serverapi.Document;
-import ru.toir.mobile.serverapi.DocumentType;
-import ru.toir.mobile.serverapi.Equipment;
-import ru.toir.mobile.serverapi.EquipmentStatus;
-import ru.toir.mobile.serverapi.EquipmentType;
-import ru.toir.mobile.serverapi.MeasureType;
-import ru.toir.mobile.serverapi.OperationPattern;
-import ru.toir.mobile.serverapi.OperationResult;
-import ru.toir.mobile.serverapi.OperationType;
-import ru.toir.mobile.serverapi.OrderStatus;
-import ru.toir.mobile.serverapi.Result;
-import ru.toir.mobile.serverapi.Status;
-import ru.toir.mobile.serverapi.Step;
+import ru.toir.mobile.serverapi.CriticalTypeSrv;
+import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
+import ru.toir.mobile.serverapi.DocumentationTypeSrv;
+import ru.toir.mobile.serverapi.EquipmentSrv;
+import ru.toir.mobile.serverapi.EquipmentStatusSrv;
+import ru.toir.mobile.serverapi.EquipmentTypeSrv;
+import ru.toir.mobile.serverapi.MeasureTypeSrv;
+import ru.toir.mobile.serverapi.OperationPatternSrv;
+import ru.toir.mobile.serverapi.OperationResultSrv;
+import ru.toir.mobile.serverapi.OperationTypeSrv;
+import ru.toir.mobile.serverapi.TaskStatusSrv;
+import ru.toir.mobile.serverapi.OperationPatternStepResultSrv;
+import ru.toir.mobile.serverapi.OperationStatusSrv;
+import ru.toir.mobile.serverapi.OperationPatternStepSrv;
 import ru.toir.mobile.utils.DataUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -63,10 +73,10 @@ public class ReferenceProcessor {
 	private String mServerUrl;
 	private Context mContext;
 	public static class ReferenceNames {
-		// TODO отдельно нет справочника EquipmentDocumentation, OperationPattern, OperationPatternStep, OperationPatternStepResult
 		public static String CriticalTypeName = "CriticalityType";
 		public static String DocumentTypeName = "DocumentType";
-		public static String EquipmentName = "Equipment";
+		// TODO нужен отдельный метод для получения оборудования/документации по оборудованию(api/equipment)
+		//public static String EquipmentName = "Equipment";
 		public static String EquipmentStatusName = "EquipmentStatus";
 		public static String EquipmentTypeName = "EquipmentType";
 		public static String MeasureTypeName = "MeasureType";
@@ -102,7 +112,7 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getOperationPattern(Bundle bundle) {
-		final String OPERATION_PATTERN_URL = "api/operationpatterns/";
+		final String OPERATION_PATTERN_URL = "/api/operationpatterns/";
 		URI requestUri = null;
 		ArrayList<String> patternUuids = bundle
 				.getStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);
@@ -125,8 +135,7 @@ public class ReferenceProcessor {
 					Log.d("test", jsonString);
 					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
 					// разбираем полученные данные
-					//OperationPattern.saveAll(gson.fromJson(jsonString, OperationPattern[].class), mContext);
-					saveOperationPattern(gson.fromJson(jsonString, OperationPattern[].class));
+					saveOperationPattern(gson.fromJson(jsonString, OperationPatternSrv.class));
 				} else {
 					return false;
 				}
@@ -182,26 +191,28 @@ public class ReferenceProcessor {
 					Log.d("test", jsonString);
 					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
 					if (name.equals(ReferenceNames.CriticalTypeName)) {
-						CriticalityType.saveAll(gson.fromJson(jsonString,
-								CriticalityType[].class), mContext);
+						CriticalTypeSrv.saveAll(gson.fromJson(jsonString,
+								CriticalTypeSrv[].class), mContext);
 					} else if(name.equals(ReferenceNames.DocumentTypeName)) {
-						saveDocumentType(gson.fromJson(jsonString, DocumentType[].class));
+						saveDocumentType(gson.fromJson(jsonString, DocumentationTypeSrv[].class));
+					/*
 					} else if(name.equals(ReferenceNames.EquipmentName)) {
 						saveEquipment(gson.fromJson(jsonString, Equipment[].class));
+					*/
 					} else if(name.equals(ReferenceNames.EquipmentStatusName)) {
-						saveEquipmentStatus(gson.fromJson(jsonString, EquipmentStatus[].class));
+						saveEquipmentStatus(gson.fromJson(jsonString, EquipmentStatusSrv[].class));
 					} else if(name.equals(ReferenceNames.EquipmentTypeName)) {
-						saveEquipmentType(gson.fromJson(jsonString, EquipmentType[].class));
+						saveEquipmentType(gson.fromJson(jsonString, EquipmentTypeSrv[].class));
 					} else if(name.equals(ReferenceNames.MeasureTypeName)) {
-						saveMeasureType(gson.fromJson(jsonString, MeasureType[].class));
+						saveMeasureType(gson.fromJson(jsonString, MeasureTypeSrv[].class));
 					} else if(name.equals(ReferenceNames.OperationResultName)) {
-						saveOperationResult(gson.fromJson(jsonString, OperationResult[].class));
+						saveOperationResult(gson.fromJson(jsonString, OperationResultSrv[].class));
 					} else if(name.equals(ReferenceNames.OperationStatusName)) {
-						saveOperationStatus(gson.fromJson(jsonString, Status[].class));
+						saveOperationStatus(gson.fromJson(jsonString, OperationStatusSrv[].class));
 					} else if(name.equals(ReferenceNames.OperationTypeName)) {
-						saveOperationType(gson.fromJson(jsonString, OperationType[].class));
+						saveOperationType(gson.fromJson(jsonString, OperationTypeSrv[].class));
 					} else if(name.equals(ReferenceNames.TaskStatusName)) {
-						saveTaskStatus(gson.fromJson(jsonString, OrderStatus[].class));
+						saveTaskStatus(gson.fromJson(jsonString, TaskStatusSrv[].class));
 					}
 				} else {
 					return false;
@@ -222,9 +233,11 @@ public class ReferenceProcessor {
 		} else if(referenceName.equals(ReferenceNames.DocumentTypeName)) {
 			DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
+		/*
 		} else if(referenceName.equals(ReferenceNames.EquipmentName)) {
 			EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
+		*/
 		} else if(referenceName.equals(ReferenceNames.EquipmentStatusName)) {
 			EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
 			changed = adapter.getLastChangedAt();
@@ -250,42 +263,38 @@ public class ReferenceProcessor {
 		return changed;
 	}
 	
-	private void saveOperationPattern(OperationPattern[] array) {
+	private void saveOperationPattern(OperationPatternSrv pattern) {
 		
-		if (array == null) {
+		if (pattern == null) {
 			return;
 		}
 		
 		OperationPatternDBAdapter adapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.OperationPattern> list = new ArrayList<ru.toir.mobile.db.tables.OperationPattern>();
+		OperationPattern item = new OperationPattern();
 		
-		for (OperationPattern element : array) {
-			ru.toir.mobile.db.tables.OperationPattern item = new ru.toir.mobile.db.tables.OperationPattern();
-			item.set_id(0);
-			item.setUuid(element.getId());
-			item.setTitle(element.getTitle());
-			// TODO когда на сервере появится - добавить
-			item.setOperation_type_uuid("");
-			saveOperationPatternStep((Step[])(element.getSteps().toArray()), element.getId());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
-			list.add(item);
-		}
-		adapter.saveItems(list);
+		item.set_id(0);
+		item.setUuid(pattern.getId());
+		item.setTitle(pattern.getTitle());
+		// TODO когда на сервере появится - добавить
+		item.setOperation_type_uuid("");
+		saveOperationPatternStep((pattern.getSteps()), pattern.getId());
+		item.setCreatedAt(getDateTimeField(pattern.getCreatedAt()));
+		item.setChangedAt(getDateTimeField(pattern.getChangedAt()));
+		adapter.replace(item);
 		
 	}
 
-	private void saveOperationPatternStep(Step[] array, String operationPatternUuid) {
+	private void saveOperationPatternStep(List<OperationPatternStepSrv> array, String operationPatternUuid) {
 		
 		if (array == null) {
 			return;
 		}
 		
 		OperationPatternStepDBAdapter adapter = new OperationPatternStepDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.OperationPatternStep> list = new ArrayList<ru.toir.mobile.db.tables.OperationPatternStep>();
+		ArrayList<OperationPatternStep> list = new ArrayList<OperationPatternStep>();
 		
-		for (Step element : array) {
-			ru.toir.mobile.db.tables.OperationPatternStep item = new ru.toir.mobile.db.tables.OperationPatternStep();
+		for (OperationPatternStepSrv element : array) {
+			OperationPatternStep item = new OperationPatternStep();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setOperation_pattern_uuid(operationPatternUuid);
@@ -293,43 +302,43 @@ public class ReferenceProcessor {
 			item.setImage(element.getImagePath());
 			item.setFirst_step(element.getIsFirstStep() == 1 ? true : false);
 			item.setLast_step(element.getIsLastStep() == 1 ? true : false);
-			item.setName(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
-			saveOperationPatternStepResult((Result[])element.getResults().toArray(), element.getId());
+			item.setTitle(element.getTitle());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
+			saveOperationPatternStepResult(element.getResults(), element.getId());
 			list.add(item);
 		}
 		adapter.saveItems(list);
 		
 	}
 
-	private void saveOperationPatternStepResult(Result[] array, String operationPatternStepUuid) {
+	private void saveOperationPatternStepResult(List<OperationPatternStepResultSrv> array, String operationPatternStepUuid) {
 		
 		if (array == null) {
 			return;
 		}
 		
 		OperationPatternStepResultDBAdapter adapter = new OperationPatternStepResultDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.OperationPatternStepResult> list = new ArrayList<ru.toir.mobile.db.tables.OperationPatternStepResult>();
+		ArrayList<OperationPatternStepResult> list = new ArrayList<OperationPatternStepResult>();
 		
-		for (Result element : array) {
-			ru.toir.mobile.db.tables.OperationPatternStepResult item = new ru.toir.mobile.db.tables.OperationPatternStepResult();
+		for (OperationPatternStepResultSrv element : array) {
+			OperationPatternStepResult item = new OperationPatternStepResult();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setOperation_pattern_step_uuid(operationPatternStepUuid);
-			item.setNext_operation_pattern_step_uuid(element.getNextPatternStep().getId());
+			item.setNext_operation_pattern_step_uuid(element.getNextPatternStepId());
 			item.setTitle(element.getTitle());
 			item.setMeasure_type_uuid(element.getMeasureType().getId());
-			saveMeasureType(new MeasureType[] { element.getMeasureType() });
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			saveMeasureType(new MeasureTypeSrv[] { element.getMeasureType() });
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 		
 	}
 
-	private void saveDocumentType(DocumentType[] array) {
+	private void saveDocumentType(DocumentationTypeSrv[] array) {
 
 		if (array == null) {
 			return;
@@ -338,19 +347,19 @@ public class ReferenceProcessor {
 		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
 		ArrayList<DocumentationType> list = new ArrayList<DocumentationType>();
 		
-		for(DocumentType element : array) {
+		for(DocumentationTypeSrv element : array) {
 			DocumentationType item = new DocumentationType();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 	
-	private void saveDocuments(List<Document> array, String equipmentUuid) {
+	private void saveDocuments(List<EquipmentDocumentationSrv> array, String equipmentUuid) {
 
 		if (array == null) {
 			return;
@@ -359,131 +368,135 @@ public class ReferenceProcessor {
 		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
 		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
 		
-		for(Document element : array) {
+		for(EquipmentDocumentationSrv element : array) {
 			EquipmentDocumentation item = new EquipmentDocumentation();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setEquipment_uuid(equipmentUuid);
 			item.setDocumentation_type_uuid(element.getDocumentType().getId());
-			saveDocumentType(new DocumentType[] { element.getDocumentType() });
+			saveDocumentType(new DocumentationTypeSrv[] { element.getDocumentType() });
 			item.setTitle(element.getTitle());
 			item.setPath(element.getPath());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 
-	private void saveEquipmentStatus(EquipmentStatus[] array) {
+	private void saveEquipmentStatus(EquipmentStatusSrv[] array) {
 
 		if (array == null) {
 			return;
 		}
 		
 		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.EquipmentStatus> list = new ArrayList<ru.toir.mobile.db.tables.EquipmentStatus>();
+		ArrayList<EquipmentStatus> list = new ArrayList<EquipmentStatus>();
 		
-		for(EquipmentStatus element : array) {
-			ru.toir.mobile.db.tables.EquipmentStatus item = new ru.toir.mobile.db.tables.EquipmentStatus();
+		for(EquipmentStatusSrv element : array) {
+			EquipmentStatus item = new EquipmentStatus();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
 			item.setType(element.getType());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 	
-	private void saveEquipmentType(EquipmentType[] array) {
+	private void saveEquipmentType(EquipmentTypeSrv[] array) {
 
 		if (array == null) {
 			return;
 		}
 		
 		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.EquipmentType> list = new ArrayList<ru.toir.mobile.db.tables.EquipmentType>();
+		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
 		
-		for(EquipmentType element : array) {
-			ru.toir.mobile.db.tables.EquipmentType item = new ru.toir.mobile.db.tables.EquipmentType();
+		for(EquipmentTypeSrv element : array) {
+			EquipmentType item = new EquipmentType();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 	
-	private void saveMeasureType(MeasureType[] array) {
+	private void saveMeasureType(MeasureTypeSrv[] array) {
 
 		if (array == null) {
 			return;
 		}
 		
 		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.MeasureType> list = new ArrayList<ru.toir.mobile.db.tables.MeasureType>();
+		ArrayList<MeasureType> list = new ArrayList<MeasureType>();
 		
-		for(MeasureType element : array) {
-			ru.toir.mobile.db.tables.MeasureType item = new ru.toir.mobile.db.tables.MeasureType();
+		for(MeasureTypeSrv element : array) {
+			MeasureType item = new MeasureType();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 	
-	private void saveOperationResult(OperationResult[] array) {
+	private long getDateTimeField(Date date) {
+		return date == null ? 0 : date.getTime();
+	}
+	
+	private void saveOperationResult(OperationResultSrv[] array) {
 
 		if (array == null) {
 			return;
 		}
 		
 		OperationResultDBAdapter adapter = new OperationResultDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.OperationResult> list = new ArrayList<ru.toir.mobile.db.tables.OperationResult>();
+		ArrayList<OperationResult> list = new ArrayList<OperationResult>();
 		
-		for(OperationResult element : array) {
-			ru.toir.mobile.db.tables.OperationResult item = new ru.toir.mobile.db.tables.OperationResult();
+		for(OperationResultSrv element : array) {
+			OperationResult item = new OperationResult();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
 			item.setOperation_type_uuid(element.getOperationType().getId());
-			saveOperationType(new OperationType[] { element.getOperationType() });
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			saveOperationType(new OperationTypeSrv[] { element.getOperationType() });
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 
-	private void saveOperationType(OperationType[] array) {
+	private void saveOperationType(OperationTypeSrv[] array) {
 
 		if (array == null) {
 			return;
 		}
 		
 		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.OperationType> list = new ArrayList<ru.toir.mobile.db.tables.OperationType>();
+		ArrayList<OperationType> list = new ArrayList<OperationType>();
 		
-		for(OperationType element : array) {
-			ru.toir.mobile.db.tables.OperationType item = new ru.toir.mobile.db.tables.OperationType();
+		for(OperationTypeSrv element : array) {
+			OperationType item = new OperationType();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 
-	private void saveTaskStatus(OrderStatus[] array) {
+	private void saveTaskStatus(TaskStatusSrv[] array) {
 
 		if (array == null) {
 			return;
@@ -492,50 +505,50 @@ public class ReferenceProcessor {
 		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
 		ArrayList<TaskStatus> list = new ArrayList<TaskStatus>();
 		
-		for(OrderStatus element : array) {
+		for(TaskStatusSrv element : array) {
 			TaskStatus item = new TaskStatus();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);
 	}
 
-	private void saveEquipment(Equipment[] array) {
+	private void saveEquipment(EquipmentSrv[] array) {
 
 		if (array == null) {
 			return;
 		}
 		
 		EquipmentDBAdapter adapter = new EquipmentDBAdapter(new TOiRDatabaseContext(mContext));
-		ArrayList<ru.toir.mobile.db.tables.Equipment> list = new ArrayList<ru.toir.mobile.db.tables.Equipment>();
+		ArrayList<Equipment> list = new ArrayList<Equipment>();
 		
-		for(Equipment element : array) {
-			ru.toir.mobile.db.tables.Equipment item = new ru.toir.mobile.db.tables.Equipment();
+		for(EquipmentSrv element : array) {
+			Equipment item = new Equipment();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getName());
 			item.setEquipment_type_uuid(element.getEquipmentType().getId());
-			saveEquipmentType(new EquipmentType[] { element.getEquipmentType() });
+			saveEquipmentType(new EquipmentTypeSrv[] { element.getEquipmentType() });
 			item.setCritical_type_uuid(element.getCriticalityType().getId());
-			CriticalityType.saveAll(new CriticalityType[]{ element.getCriticalityType() }, mContext);
+			CriticalTypeSrv.saveAll(new CriticalTypeSrv[]{ element.getCriticalityType() }, mContext);
 			item.setStart_date(element.getStartupDate().getTime());
 			item.setLatitude(element.getGeoCoordinates().getLatitude());
 			item.setLongitude(element.getGeoCoordinates().getLongitude());
 			item.setTag_id(element.getTag());
 			// TODO когда на сервере появится - добавить
-			item.setImg("");
+			item.setImage("");
 			item.setEquipmentStatus_uuid(element.getEquipmentStatus().getId());
-			saveEquipmentStatus(new EquipmentStatus[] { element.getEquipmentStatus() });
+			saveEquipmentStatus(new EquipmentStatusSrv[] { element.getEquipmentStatus() });
 			// TODO когда на сервере появится - добавить
 			item.setInventoryNumber("");
 			// TODO когда на сервере появится - добавить
 			item.setLocation("");
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			
 			saveDocuments(element.getDocuments(), element.getId());
 			
@@ -544,7 +557,7 @@ public class ReferenceProcessor {
 		adapter.saveItems(list);
 	}
 
-	private void saveOperationStatus(Status[] array) {
+	private void saveOperationStatus(OperationStatusSrv[] array) {
 	
 		if (array == null) {
 			return;
@@ -553,13 +566,13 @@ public class ReferenceProcessor {
 		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(mContext));
 		ArrayList<OperationStatus> list = new ArrayList<OperationStatus>();
 		
-		for(Status element : array) {
+		for(OperationStatusSrv element : array) {
 			OperationStatus item = new OperationStatus();
 			item.set_id(0);
 			item.setUuid(element.getId());
 			item.setTitle(element.getTitle());
-			item.setCreatedAt(element.getCreatedAt().getTime());
-			item.setChangedAt(element.getChangedAt().getTime());
+			item.setCreatedAt(getDateTimeField(element.getCreatedAt()));
+			item.setChangedAt(getDateTimeField(element.getChangedAt()));
 			list.add(item);
 		}
 		adapter.saveItems(list);

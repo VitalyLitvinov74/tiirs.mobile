@@ -109,6 +109,9 @@ public class OperationActivity extends Activity {
 			return title;
 		}
 	}
+	
+	// TODO нужно сделать обработку выхода из activity по нажатию кнопки back
+	// и показ оператору диалога с выбором причины отказа от выполнения операции
 
 	/*
 	 * (non-Javadoc)
@@ -128,7 +131,7 @@ public class OperationActivity extends Activity {
 		layout = (LinearLayout) findViewById(R.id.resultButtonLayout);
 		stepTitle = (TextView) findViewById(R.id.stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.step_description);
-		numStepButton = (Button) findViewById(R.id.button_read);
+		numStepButton = (Button) findViewById(R.id.numStepButton);
 
 		// получаем статус и время наряда
 		TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(
@@ -176,15 +179,16 @@ public class OperationActivity extends Activity {
 		operationResults = resultDBAdapter.getItems(equipmentOperation
 				.getOperation_type_uuid());
 
-		TextView taskName = (TextView) findViewById(R.id.textView1);
+		TextView taskName = (TextView) findViewById(R.id.twf_task_title);
 		taskName.setText(taskname);
-		TextView operationName = (TextView) findViewById(R.id.textView2);
+		TextView operationName = (TextView) findViewById(R.id.twf_equipment_title);
 		operationName.setText(operationname);
 
 		/*
 		 * cоздаём запись с результатом выполнения операции для фиксации времени
 		 * начала выполнения
 		 */
+		// TODO сделать проверку на наличие результата выполнения!!! чтобы был только один! 
 		EquipmentOperationResult operationResult = new EquipmentOperationResult();
 		operationResult.setEquipment_operation_uuid(operation_uuid);
 		operationResult.setStart_date(new Date().getTime());
@@ -192,19 +196,27 @@ public class OperationActivity extends Activity {
 				new TOiRDatabaseContext(getApplicationContext()));
 		equipmentOperationResultDBAdapter.replace(operationResult);
 
-		ShowFirstStep();
+		// TODO нужно отработать вариант когда activiti будет создаваться вновь после ухода в фон
+		// соответственно нужно показывать не первый шаг а текущий на котором приложение ушло в фон
+		showStep(getFirstStep().getUuid());
 	}
-
-	private void ShowNextStep(String step_uuid) {
-		OperationPatternStep step = getStep(step_uuid);
-		if (step == null) {
-			Toast.makeText(this, "Шаг с UUID: " + step_uuid + " не найден",
-					Toast.LENGTH_SHORT).show();
-			return;
+	
+	private void showStep(String uuid) {
+		
+		OperationPatternStep step = null;
+		
+		step = getStep(uuid);
+		
+		if (step != null) {
+			showStepContent(step);
+		} else {
+			Toast.makeText(this, "Шаг не найден", Toast.LENGTH_SHORT).show();
 		}
+	}
+	
+	private void showStepContent(OperationPatternStep step) {
 
-		// RelativeLayout.LayoutParams param;
-		stepTitle.setText(step.getName());
+		stepTitle.setText(step.getTitle());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
@@ -231,7 +243,10 @@ public class OperationActivity extends Activity {
 					public void onClick(View v) {
 						// если были измерения, сохраняем полученные значения
 						if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
-							saveMeasureValue(measureType, current_result_uuid);
+							if (!saveMeasureValue(measureType,
+									current_result_uuid)) {
+								return;
+							}
 						}
 
 						// показываем финальный шаг
@@ -244,11 +259,14 @@ public class OperationActivity extends Activity {
 					public void onClick(View v) {
 						// если были измерения, сохраняем полученные значения
 						if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
-							saveMeasureValue(measureType, current_result_uuid);
+							if (!saveMeasureValue(measureType,
+									current_result_uuid)) {
+								return;
+							}
 						}
 
 						// переходим к следующему шагу
-						ShowNextStep(next_step_uuid);
+						showStep(next_step_uuid);
 					}
 				});
 			}
@@ -356,6 +374,8 @@ public class OperationActivity extends Activity {
 			cameraLayout.addView(cameraView);
 			photoContainer.addView(cameraLayout);
 			photoContainer.setVisibility(View.VISIBLE);
+			
+			lastPhotoFile = null;
 
 			// Create our Preview view and set it as the content of our
 			// activity.
@@ -380,15 +400,27 @@ public class OperationActivity extends Activity {
 		}
 	}
 
-	private void saveMeasureValue(String type, String resultUuid) {
+	/**
+	 * Сохранение результата измерения
+	 * @param type
+	 * @param resultUuid
+	 * @return
+	 */
+	private boolean saveMeasureValue(String type, String resultUuid) {
+		
 		MeasureValue value = new MeasureValue();
 		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 
 		value.setEquipment_operation_uuid(operation_uuid);
-		value.setOperation_pattern_step_result(resultUuid);
+		value.setOperation_pattern_step_result_uuid(resultUuid);
 		value.setDate(Calendar.getInstance().getTime().getTime());
+		
 		if (type.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+			if (lastPhotoFile == null || lastPhotoFile.equals("")) {
+				Toast.makeText(getApplicationContext(), "Сфотографируйте объект!", Toast.LENGTH_SHORT).show();
+				return false;
+			}
 			value.setValue(lastPhotoFile);
 		} else if (type.equals(MeasureTypeDBAdapter.Type.FREQUENCY)
 				|| type.equals(MeasureTypeDBAdapter.Type.PRESSURE)
@@ -399,8 +431,13 @@ public class OperationActivity extends Activity {
 		}
 
 		adapter.replace(value);
+		return true;
 	}
 
+	/**
+	 * Показываем экран с выбором результата(вердикта) выполнения операции
+	 * и возможностью изменить статус операции (вместо "Выполнена" по умолчанию)
+	 */
 	private void ShowFinalStep() {
 		Button resultButton = new Button(getApplicationContext());
 		resultButton.setText("Завершить операцию");
@@ -479,39 +516,10 @@ public class OperationActivity extends Activity {
 		});
 	}
 
-	private void ShowFirstStep() {
-		// получаем первый шаг операции
-		OperationPatternStep firstStep = getFirstStep();
-		if (firstStep == null) {
-			Toast.makeText(this, "Первый шаг не найден", Toast.LENGTH_SHORT)
-					.show();
-			return;
-		}
-
-		stepTitle.setText(firstStep.getName());
-		// firstStep.getImage();
-		stepDescrition.setText(firstStep.getDescription());
-		numStepButton.setText(firstStep.get_id() + "");
-
-		// получаем список результатов шагов
-		ArrayList<OperationPatternStepResult> resultsList = getStepResult(firstStep
-				.getUuid());
-		for (OperationPatternStepResult result : resultsList) {
-			Button resultButton = new Button(getApplicationContext());
-			final String next_step_uuid = result
-					.getNext_operation_pattern_step_uuid();
-			resultButton.setText(result.getTitle());
-			resultButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					ShowNextStep(next_step_uuid);
-				}
-			});
-			layout.addView(resultButton);
-		}
-
-	}
-
+	/**
+	 * Возвращает первый шаг операции
+	 * @return
+	 */
 	private OperationPatternStep getFirstStep() {
 		for (OperationPatternStep step : patternSteps) {
 			if (step.isFirst_step()) {
@@ -521,6 +529,11 @@ public class OperationActivity extends Activity {
 		return null;
 	}
 
+	/**
+	 * Возвращает шаг операции
+	 * @param uuid
+	 * @return
+	 */
 	private OperationPatternStep getStep(String uuid) {
 		for (OperationPatternStep step : patternSteps) {
 			if (uuid.equals(step.getUuid())) {
@@ -530,6 +543,11 @@ public class OperationActivity extends Activity {
 		return null;
 	}
 
+	/**
+	 * Возвращает список вариантов выполнения шага операции
+	 * @param step_uuid
+	 * @return
+	 */
 	private ArrayList<OperationPatternStepResult> getStepResult(String step_uuid) {
 		ArrayList<OperationPatternStepResult> resultsList = new ArrayList<OperationPatternStepResult>();
 		for (OperationPatternStepResult result : stepsResults) {
@@ -540,6 +558,7 @@ public class OperationActivity extends Activity {
 		return resultsList;
 	}
 
+	// класс для работы с камеров во фрагменте(возможно можно вынести в отдельный класс)
 	/**
 	 * Surface on which the camera projects it's capture results. This is
 	 * derived both from Google's docs and the excellent StackOverflow answer

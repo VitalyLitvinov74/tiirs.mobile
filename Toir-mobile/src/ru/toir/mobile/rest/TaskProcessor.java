@@ -15,7 +15,6 @@ import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
-import ru.toir.mobile.TaskResult;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -52,14 +51,22 @@ import ru.toir.mobile.serializer.EquipmentOperationSerializer;
 import ru.toir.mobile.serializer.MeasureValueSerializer;
 import ru.toir.mobile.serializer.TaskResultSerializer;
 import ru.toir.mobile.serializer.TaskSerializer;
-import ru.toir.mobile.serverapi.CriticalityType;
-import ru.toir.mobile.serverapi.Document;
-import ru.toir.mobile.serverapi.DocumentType;
-import ru.toir.mobile.serverapi.Item;
-import ru.toir.mobile.serverapi.OrderStatus;
-import ru.toir.mobile.serverapi.Result;
-import ru.toir.mobile.serverapi.Status;
-import ru.toir.mobile.serverapi.Step;
+import ru.toir.mobile.serverapi.CriticalTypeSrv;
+import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
+import ru.toir.mobile.serverapi.DocumentationTypeSrv;
+import ru.toir.mobile.serverapi.EquipmentOperationSrv;
+import ru.toir.mobile.serverapi.EquipmentSrv;
+import ru.toir.mobile.serverapi.EquipmentStatusSrv;
+import ru.toir.mobile.serverapi.EquipmentTypeSrv;
+import ru.toir.mobile.serverapi.MeasureTypeSrv;
+import ru.toir.mobile.serverapi.OperationPatternSrv;
+import ru.toir.mobile.serverapi.OperationTypeSrv;
+import ru.toir.mobile.serverapi.TaskSrv;
+import ru.toir.mobile.serverapi.TaskStatusSrv;
+import ru.toir.mobile.serverapi.OperationPatternStepResultSrv;
+import ru.toir.mobile.serverapi.OperationStatusSrv;
+import ru.toir.mobile.serverapi.OperationPatternStepSrv;
+import ru.toir.mobile.serverapi.result.TaskResult;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -74,7 +81,7 @@ import android.util.Log;
 public class TaskProcessor {
 
 	private Context mContext;
-	private static final String TASK_GET_URL = "/api/ordershierarchy/";
+	private static final String TASK_GET_URL = "/api/orders/";
 	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
 	private String mServerUrl;
 
@@ -161,7 +168,7 @@ public class TaskProcessor {
 				
 				Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
 				
-				ru.toir.mobile.serverapi.Task[] serverTasks = gson.fromJson(jsonString, ru.toir.mobile.serverapi.Task[].class);
+				TaskSrv[] serverTasks = gson.fromJson(jsonString, TaskSrv[].class);
 				if (serverTasks != null) {
 					for (int i = 0; i < serverTasks.length; i++) {
 						tasks.put(serverTasks[i].getId(), getTask(serverTasks[i]));
@@ -213,12 +220,6 @@ public class TaskProcessor {
 		set = equipments.keySet();
 		for (String uuid: set) {
 			equipmentDBAdapter.replace(equipments.get(uuid));
-		}
-		
-		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
-		set = equipmentOperations.keySet();
-		for (String uuid: set) {
-			operationDBAdapter.replace(equipmentOperations.get(uuid));
 		}
 		
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(new TOiRDatabaseContext(mContext));
@@ -275,6 +276,14 @@ public class TaskProcessor {
 			equipmentStatusDBAdapter.replace(equipmentStatus.get(uuid));
 		}
 
+		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(mContext));
+		set = equipmentOperations.keySet();
+		for (String uuid: set) {
+			operationDBAdapter.replace(equipmentOperations.get(uuid));
+		}
+
+		// TODO перед записью в базу операций, нужно получить отдельно шаблоны операций и связанную с ними информацию
+		// шаблоны получаем, удалить/переписать лишний код!
 		/*
 		OperationPatternDBAdapter operationPatternDBAdapter = new OperationPatternDBAdapter(new TOiRDatabaseContext(mContext));
 		set = operationPatterns.keySet();
@@ -301,7 +310,7 @@ public class TaskProcessor {
 	 * @param serverTask
 	 * @return
 	 */
-	public Task getTask(ru.toir.mobile.serverapi.Task serverTask) {
+	public Task getTask(TaskSrv serverTask) {
 
 		Task item = new Task();
 		item.setUuid(serverTask.getId());
@@ -316,7 +325,7 @@ public class TaskProcessor {
 		
 		item.setTask_name("номер " + serverTask.getNumber());
 		
-		List<Item> operations = serverTask.getItems();
+		List<EquipmentOperationSrv> operations = serverTask.getItems();
 		if (operations != null) {
 			for (int i = 0; i < operations.size(); i++) {
 				equipmentOperations.put(operations.get(i).getId(), getOperation(operations.get(i), item.getUuid()));
@@ -331,7 +340,7 @@ public class TaskProcessor {
 	 * @param status
 	 * @return
 	 */
-	public TaskStatus getTaskStatus(OrderStatus status) {
+	public TaskStatus getTaskStatus(TaskStatusSrv status) {
 		TaskStatus item = new TaskStatus();
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
@@ -343,7 +352,7 @@ public class TaskProcessor {
 	 * @param operation
 	 * @return
 	 */
-	public EquipmentOperation getOperation(Item operation, String parentUuid) {
+	public EquipmentOperation getOperation(EquipmentOperationSrv operation, String parentUuid) {
 		EquipmentOperation item = new EquipmentOperation();
 		
 		item.setUuid(operation.getId());
@@ -358,9 +367,11 @@ public class TaskProcessor {
 		// создаём объект типа операции
 		operationTypes.put(operation.getOperationType().getId(), getOperationType(operation.getOperationType()));
 		
-		item.setOperation_pattern_uuid(operation.getOperationPattern().getId());
+		item.setOperation_pattern_uuid(operation.getOperationPatternId());
+		// TODO шаблоны теперь приходят в другом месте, реализовать получение!!!
 		// создаём объект шаблона операции
-		operationPatterns.put(operation.getOperationPattern().getId(), getOperationPattern(operation.getOperationPattern()));
+		//operationPatterns.put(operation.getOperationPatternId(), getOperationPattern(operation.getOperationPattern()));
+
 		
 		item.setOperation_status_uuid(operation.getStatus().getId());
 		// создаём объект статуса операции
@@ -374,7 +385,7 @@ public class TaskProcessor {
 	 * @param status
 	 * @return
 	 */
-	public OperationStatus getOperationStatus(Status status) {
+	public OperationStatus getOperationStatus(OperationStatusSrv status) {
 		OperationStatus item = new OperationStatus();
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
@@ -386,7 +397,7 @@ public class TaskProcessor {
 	 * @param pattern
 	 * @return
 	 */
-	public OperationPattern getOperationPattern(ru.toir.mobile.serverapi.OperationPattern pattern) {
+	public OperationPattern getOperationPattern(OperationPatternSrv pattern) {
 		
 		OperationPattern item = new OperationPattern();
 		
@@ -396,7 +407,7 @@ public class TaskProcessor {
 		item.setOperation_type_uuid("");
 
 		// создаём объекты шагов шаблона выполнения операции
-		List<Step> steps = pattern.getSteps();
+		List<OperationPatternStepSrv> steps = pattern.getSteps();
 		if (steps != null) {
 			for (int i = 0; i < steps.size(); i++) {
 				operationPatternSteps.put(steps.get(i).getId(), getStep(steps.get(i), item.getUuid()));
@@ -411,7 +422,7 @@ public class TaskProcessor {
 	 * @param step
 	 * @return
 	 */
-	public OperationPatternStep getStep(Step step, String parentUuid) {
+	public OperationPatternStep getStep(OperationPatternStepSrv step, String parentUuid) {
 		OperationPatternStep item = new OperationPatternStep();
 		item.setUuid(step.getId());
 		item.setOperation_pattern_uuid(parentUuid);
@@ -419,10 +430,10 @@ public class TaskProcessor {
 		item.setImage(step.getImagePath());
 		item.setFirst_step(step.getIsFirstStep() == 0 ? false : true);
 		item.setLast_step(step.getIsLastStep() == 0 ? false : true);
-		item.setName(step.getTitle());
+		item.setTitle(step.getTitle());
 		
 		// создаём объекты варантов результатов шагов
-		List<Result> results = step.getResults();
+		List<OperationPatternStepResultSrv> results = step.getResults();
 		if (results != null) {
 			for (int i = 0; i < results.size(); i++) {
 				operationPatternStepResults.put(results.get(i).getId(), getStepResult(results.get(i), item.getUuid()));
@@ -436,11 +447,11 @@ public class TaskProcessor {
 	 * @param result
 	 * @return
 	 */
-	public OperationPatternStepResult getStepResult(Result result, String parrentUuid) {
+	public OperationPatternStepResult getStepResult(OperationPatternStepResultSrv result, String parrentUuid) {
 		OperationPatternStepResult item = new OperationPatternStepResult();
 		item.setUuid(result.getId());
 		item.setOperation_pattern_step_uuid(parrentUuid);
-		String nextStepUuid = result.getNextPatternStep() == null ? "00000000-0000-0000-0000-000000000000" : result.getNextPatternStep().getId();
+		String nextStepUuid = result.getNextPatternStepId() == null ? "00000000-0000-0000-0000-000000000000" : result.getNextPatternStepId();
 		item.setNext_operation_pattern_step_uuid(nextStepUuid);
 		item.setTitle(result.getTitle());
 		item.setMeasure_type_uuid(result.getMeasureType().getId());
@@ -454,7 +465,7 @@ public class TaskProcessor {
 	 * @param type
 	 * @return
 	 */
-	public MeasureType getMeasureType(ru.toir.mobile.serverapi.MeasureType type) {
+	public MeasureType getMeasureType(MeasureTypeSrv type) {
 		MeasureType item = new MeasureType();
 		item.setUuid(type.getId());
 		item.setTitle(type.getTitle());
@@ -466,7 +477,7 @@ public class TaskProcessor {
 	 * @param operationType
 	 * @return
 	 */
-	public OperationType getOperationType(ru.toir.mobile.serverapi.OperationType operationType) {
+	public OperationType getOperationType(OperationTypeSrv operationType) {
 		OperationType item = new OperationType();
 		item.setUuid(operationType.getId());
 		item.setTitle(operationType.getTitle());
@@ -478,7 +489,7 @@ public class TaskProcessor {
 	 * @param equipment
 	 * @return
 	 */
-	public Equipment getEquipment(ru.toir.mobile.serverapi.Equipment equipment) {
+	public Equipment getEquipment(EquipmentSrv equipment) {
 		
 		Equipment item = new Equipment();
 		item.setUuid(equipment.getId());
@@ -493,7 +504,7 @@ public class TaskProcessor {
 		criticalTypes.put(equipment.getCriticalityType().getId(), getCriticalType(equipment.getCriticalityType()));
 		item.setStart_date(equipment.getStartupDate().getTime());
 
-		List<Document> documents = equipment.getDocuments();
+		List<EquipmentDocumentationSrv> documents = equipment.getDocuments();
 		for (int i = 0; i < documents.size(); i++) {
 			equipmentDocumentations.put(documents.get(i).getId(), getDocumentation(documents.get(i), item.getUuid()));
 		}
@@ -516,7 +527,7 @@ public class TaskProcessor {
 		return item;
 	}
 	
-	public EquipmentStatus getEquipmentStatus(ru.toir.mobile.serverapi.EquipmentStatus status) {
+	public EquipmentStatus getEquipmentStatus(EquipmentStatusSrv status) {
 		EquipmentStatus item = new EquipmentStatus();
 		item.setUuid(status.getId());
 		item.setTitle(status.getTitle());
@@ -529,7 +540,7 @@ public class TaskProcessor {
 	 * @param document
 	 * @return
 	 */
-	public EquipmentDocumentation getDocumentation(Document document, String parrentUuid) {
+	public EquipmentDocumentation getDocumentation(EquipmentDocumentationSrv document, String parrentUuid) {
 		EquipmentDocumentation item = new EquipmentDocumentation();
 		item.setUuid(document.getId());
 		item.setDocumentation_type_uuid(document.getDocumentType().getId());
@@ -546,7 +557,7 @@ public class TaskProcessor {
 	 * @param type
 	 * @return
 	 */
-	public DocumentationType getDocumentationType(DocumentType type) {
+	public DocumentationType getDocumentationType(DocumentationTypeSrv type) {
 		DocumentationType item = new DocumentationType();
 		item.setUuid(type.getId());
 		item.setTitle(type.getTitle());
@@ -558,7 +569,7 @@ public class TaskProcessor {
 	 * @param type
 	 * @return
 	 */
-	public EquipmentType getEquipmentType(ru.toir.mobile.serverapi.EquipmentType type) {
+	public EquipmentType getEquipmentType(EquipmentTypeSrv type) {
 		EquipmentType item = new EquipmentType();
 		item.setUuid(type.getId());
 		item.setTitle(type.getTitle());
@@ -570,7 +581,7 @@ public class TaskProcessor {
 	 * @param type
 	 * @return
 	 */
-	public CriticalType getCriticalType(CriticalityType type) {
+	public CriticalType getCriticalType(CriticalTypeSrv type) {
 		CriticalType item = new CriticalType();
 		item.setUuid(type.getId());
 		item.setType(type.getValue());
@@ -591,8 +602,8 @@ public class TaskProcessor {
 		task = adapter.getTaskByUuidAndUpdated(taskUuid);
 
 		if (task != null) {
-			TaskResult taskResult = new TaskResult(mContext);
-			if (taskResult.getTaskResult(task.getUuid())) {
+			TaskResult taskResult = new TaskResult();
+			if (taskResult.load(mContext, task.getUuid())) {
 				ArrayList<TaskResult> taskResults = new ArrayList<TaskResult>();
 				taskResults.add(taskResult);
 				return TasksSendResults(taskResults, token);
@@ -622,8 +633,8 @@ public class TaskProcessor {
 		// получаем из базы результаты связанные с нарядами
 		ArrayList<TaskResult> taskResults = new ArrayList<TaskResult>();
 		for (Task task : tasks) {
-			TaskResult taskResult = new TaskResult(mContext);
-			taskResult.getTaskResult(task.getUuid());
+			TaskResult taskResult = new TaskResult();
+			taskResult.load(mContext, task.getUuid());
 			taskResults.add(taskResult);
 		}
 
@@ -652,18 +663,18 @@ public class TaskProcessor {
 			if (tasks != null) {
 				StringBuilder postData = new StringBuilder();
 				// TODO реализовать упаковку результатов в json объект
-				//TaskResult taskResult = new TaskResult(getApplicationContext());
-				//taskResult.getTaskResult("a1f3a9af-d05b-4123-858f-a753a46f97d5");
+				//TaskResult taskResult = new TaskResult();
+				//taskResult.loadTaskResult(mContext, "a1f3a9af-d05b-4123-858f-a753a46f97d5");
 				//TaskResult[] resultArray = new TaskResult[] { taskResult };
+
 				Gson gson = new GsonBuilder()
-						//.setPrettyPrinting()
+						.setPrettyPrinting()
 						.registerTypeAdapter(Task.class, new TaskSerializer())
 						.registerTypeAdapter(TaskResult.class, new TaskResultSerializer())
 						.registerTypeAdapter(EquipmentOperation.class, new EquipmentOperationSerializer())
 						.registerTypeAdapter(EquipmentOperationResult.class, new EquipmentOperationResultSerializer())
-						.registerTypeAdapter(MeasureValue.class, new MeasureValueSerializer())
-						.create();
-				//String json = gson.toJson(resultArray);
+						.registerTypeAdapter(MeasureValue.class, new MeasureValueSerializer()).create();
+				
 				String json = gson.toJson(tasks);
 				Log.d("test", json);
 

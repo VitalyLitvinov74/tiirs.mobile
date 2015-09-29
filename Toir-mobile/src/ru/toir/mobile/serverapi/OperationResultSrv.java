@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class OperationResult {
+public class OperationResultSrv {
 
 	@Expose
 	private String Id;
@@ -20,7 +20,7 @@ public class OperationResult {
 	@Expose
 	private Date ChangedAt;
 	@Expose
-	private OperationType OperationType; 
+	private OperationTypeSrv OperationType; 
 
 	/**
 	 * 
@@ -89,14 +89,14 @@ public class OperationResult {
 	/**
 	 * @return the operationType
 	 */
-	public OperationType getOperationType() {
+	public OperationTypeSrv getOperationType() {
 		return OperationType;
 	}
 
 	/**
 	 * @param operationType the operationType to set
 	 */
-	public void setOperationType(OperationType operationType) {
+	public void setOperationType(OperationTypeSrv operationType) {
 		OperationType = operationType;
 	}
 

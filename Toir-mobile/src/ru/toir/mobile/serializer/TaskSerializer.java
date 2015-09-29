@@ -4,10 +4,7 @@
 package ru.toir.mobile.serializer;
 
 import java.lang.reflect.Type;
-
-import ru.toir.mobile.db.adapters.BaseDBAdapter;
-import ru.toir.mobile.db.adapters.TaskDBAdapter;
-import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.serverapi.result.Task;
 import ru.toir.mobile.utils.DataUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,15 +22,17 @@ public class TaskSerializer implements JsonSerializer<Task> {
 	 */
 	@Override
 	public JsonElement serialize(Task item, Type arg1,
-			JsonSerializationContext arg2) {
+			JsonSerializationContext serializeContext) {
 		JsonObject result = new JsonObject();
-		result.addProperty(BaseDBAdapter.FIELD_UUID, item.getUuid());
-		result.addProperty(TaskDBAdapter.FIELD_USER_UUID, item.getUsers_uuid());
-		result.addProperty(TaskDBAdapter.FIELD_CLOSE_DATE, DataUtils.getDate(item.getClose_date(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty(TaskDBAdapter.FIELD_TASK_STATUS_UUID, item.getTask_status_uuid());
-		result.addProperty(TaskDBAdapter.FIELD_TASK_NAME, item.getTask_name());
-		result.addProperty(BaseDBAdapter.FIELD_CREATED_AT, DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty(BaseDBAdapter.FIELD_CHANGED_AT, DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("Id", item.getUuid());
+		result.addProperty("EmployeeId", item.getUsers_uuid());
+		result.addProperty("CloseDate", DataUtils.getDate(item.getClose_date(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("TaskStatusId", item.getTask_status_uuid());
+		result.addProperty("TaskName", item.getTask_name());
+		result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("ChangedAt", DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.add("EquipmentOperations", serializeContext.serialize(item.equipmentOperations));
+
 		return result;
 	}
 

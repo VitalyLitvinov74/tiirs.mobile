@@ -57,10 +57,14 @@ public class UsersDBAdapter {
 	 * @return
 	 */
 	public Users getUserByLoginAndPass(String login, String pass) {
-		
-		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
-		return getUser(cur);
+		Cursor cursor;
+
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_LOGIN_NAME + "=? AND " + FIELD_PASS_NAME + "=?", new String[]{login, pass}, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		}
+
+		return null;
 	}
 
 	/**
@@ -69,38 +73,53 @@ public class UsersDBAdapter {
 	 * @return
 	 */
 	public Users getUserByTagId(String tagId) {
-		
-		Cursor cur;
-		cur = mDb.query(TABLE_NAME, mColumns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
-		return getUser(cur);
-	}
-	
-	public Users getUser(Cursor cursor) {
+		Cursor cursor;
+
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TAGID_NAME + "=?", new String[]{tagId}, null, null, null);
 		if (cursor.moveToFirst()) {
-			Users user = new Users();
-			user = new Users(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_NAME_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_LOGIN_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_PASS_NAME)),
-					cursor.getInt(cursor.getColumnIndex(FIELD_TYPE_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_TAGID_NAME)),
-					cursor.getString(cursor.getColumnIndex(FIELD_WHOIS_NAME)),
-					(cursor.getInt(cursor.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
-			return user;
+			return getItem(cursor);
 		}
+
 		return null;
 	}
 
 	/**
 	 * <p>Возвращает запись из таблицы users</p>
 	 * @param uuid
-	 * @return Cursor
+	 * @return Users
 	 */
-	public Cursor getItem(String uuid) {
-		return mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+	public Users getItem(String uuid) {
+		Cursor cursor;
+
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID_NAME + "=?", new String[]{uuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		}
+
+		return null;
 	}
-	
+
+	/**
+	 * 
+	 * @param cursor
+	 * @return
+	 */
+	public Users getItem(Cursor cursor) {
+		Users item = new Users();
+
+		item.set_id(cursor.getLong(cursor.getColumnIndex(FIELD__ID_NAME)));
+		item.setUuid(cursor.getString(cursor.getColumnIndex(FIELD_UUID_NAME)));
+		item.setName(cursor.getString(cursor.getColumnIndex(FIELD_NAME_NAME)));
+		item.setLogin(cursor.getString(cursor.getColumnIndex(FIELD_LOGIN_NAME)));
+		item.setPass(cursor.getString(cursor.getColumnIndex(FIELD_PASS_NAME)));
+		item.setType(cursor.getInt(cursor.getColumnIndex(FIELD_TYPE_NAME)));
+		item.setTag_id(cursor.getString(cursor.getColumnIndex(FIELD_TAGID_NAME)));
+		item.setWhois(cursor.getString(cursor.getColumnIndex(FIELD_WHOIS_NAME)));
+		item.setActive((cursor.getInt(cursor.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
+
+		return item;
+	}
+
 	/**
 	 * <p>Добавляет/изменяет запись в таблице users</p>
 	 * @param uuid

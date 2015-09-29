@@ -85,7 +85,7 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 	 */
 	public long replace(EquipmentType item) {
 		long id;
-		ContentValues values = new ContentValues();
+		ContentValues values = putCommonFields(item);
 
 		values.put(FIELD_TITLE, item.getTitle());
 		id = mDb.replace(TABLE_NAME, null, values);

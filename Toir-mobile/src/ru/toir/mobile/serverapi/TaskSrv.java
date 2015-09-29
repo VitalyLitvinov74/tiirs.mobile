@@ -11,16 +11,16 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class Task {
+public class TaskSrv {
 
     @Expose
-    private List<Item> Items = new ArrayList<Item>();
+    private List<EquipmentOperationSrv> Items = new ArrayList<EquipmentOperationSrv>();
     @Expose
     private String Number;
     @Expose
     private String Comment;
     @Expose
-    private ru.toir.mobile.serverapi.OrderStatus OrderStatus;
+    private TaskStatusSrv OrderStatus;
     @Expose
     private Date CloseDate;
     @Expose
@@ -37,7 +37,7 @@ public class Task {
      * @return
      *     The Items
      */
-    public List<Item> getItems() {
+    public List<EquipmentOperationSrv> getItems() {
         return Items;
     }
 
@@ -46,7 +46,7 @@ public class Task {
      * @param Items
      *     The Items
      */
-    public void setItems(List<Item> Items) {
+    public void setItems(List<EquipmentOperationSrv> Items) {
         this.Items = Items;
     }
 
@@ -91,7 +91,7 @@ public class Task {
      * @return
      *     The OrderStatus
      */
-    public ru.toir.mobile.serverapi.OrderStatus getOrderStatus() {
+    public TaskStatusSrv getOrderStatus() {
         return OrderStatus;
     }
 
@@ -100,7 +100,7 @@ public class Task {
      * @param OrderStatus
      *     The OrderStatus
      */
-    public void setOrderStatus(ru.toir.mobile.serverapi.OrderStatus OrderStatus) {
+    public void setOrderStatus(TaskStatusSrv OrderStatus) {
         this.OrderStatus = OrderStatus;
     }
 

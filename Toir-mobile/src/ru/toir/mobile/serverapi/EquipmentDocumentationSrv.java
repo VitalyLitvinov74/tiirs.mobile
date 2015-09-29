@@ -10,7 +10,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class Document {
+public class EquipmentDocumentationSrv {
 
     @Expose
     private String Id;
@@ -19,7 +19,7 @@ public class Document {
     @Expose
     private String Path;
     @Expose
-    private ru.toir.mobile.serverapi.DocumentType DocumentType;
+    private DocumentationTypeSrv DocumentType;
     @Expose
 	private Date CreatedAt;
 	@Expose
@@ -84,7 +84,7 @@ public class Document {
      * @return
      *     The DocumentType
      */
-    public ru.toir.mobile.serverapi.DocumentType getDocumentType() {
+    public DocumentationTypeSrv getDocumentType() {
         return DocumentType;
     }
 
@@ -93,7 +93,7 @@ public class Document {
      * @param DocumentType
      *     The DocumentType
      */
-    public void setDocumentType(ru.toir.mobile.serverapi.DocumentType DocumentType) {
+    public void setDocumentType(DocumentationTypeSrv DocumentType) {
         this.DocumentType = DocumentType;
     }
 

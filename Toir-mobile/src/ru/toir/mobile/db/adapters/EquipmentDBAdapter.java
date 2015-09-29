@@ -26,7 +26,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_LATITUDE = "latitude";
 	public static final String FIELD_LONGITUDE = "longitude";
 	public static final String FIELD_TAG_ID = "tag_id";
-	public static final String FIELD_IMG = "img";
+	public static final String FIELD_IMAGE = "image";
 	public static final String FIELD_EQUIPMENT_STATUS_UUID = "equipment_status_uuid";
 	public static final String FIELD_INVENTORY_NUMBER = "inventory_number";
 	public static final String FIELD_LOCATION = "location";
@@ -50,7 +50,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		public static final String LONGITUDE = TABLE_NAME + '_'
 				+ FIELD_LONGITUDE;
 		public static final String TAG_ID = TABLE_NAME + '_' + FIELD_TAG_ID;
-		public static final String IMG = TABLE_NAME + '_' + FIELD_IMG;
+		public static final String IMAGE = TABLE_NAME + '_' + FIELD_IMAGE;
 		public static final String EQUIPMENT_STATUS_UUID = TABLE_NAME + '_'
 				+ FIELD_EQUIPMENT_STATUS_UUID;
 		public static final String INVENTORY_NUMBER = TABLE_NAME + '_'
@@ -181,7 +181,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		equipment.setLongitude(cursor.getFloat(cursor
 				.getColumnIndex(FIELD_LONGITUDE)));
 		equipment.setTag_id(cursor.getString(cursor.getColumnIndex(FIELD_TAG_ID)));
-		equipment.setImg(cursor.getString(cursor.getColumnIndex(FIELD_IMG)));
+		equipment.setImage(cursor.getString(cursor.getColumnIndex(FIELD_IMAGE)));
 		equipment.setEquipmentStatus_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_EQUIPMENT_STATUS_UUID)));
 		equipment.setInventoryNumber(cursor.getString(cursor
@@ -208,7 +208,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_LATITUDE, item.getLatitude());
 		values.put(FIELD_LONGITUDE, item.getLongitude());
 		values.put(FIELD_TAG_ID, item.getTag_id());
-		values.put(FIELD_IMG, item.getImg());
+		values.put(FIELD_IMAGE, item.getImage());
 		values.put(FIELD_EQUIPMENT_STATUS_UUID, item.getEquipmentStatus_uuid());
 		values.put(FIELD_INVENTORY_NUMBER, item.getInventoryNumber());
 		values.put(FIELD_LOCATION, item.getLocation());
@@ -322,7 +322,7 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 				new String[] { uuid }, null, null, null);
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
-			return cursor.getString(cursor.getColumnIndex(FIELD_IMG));
+			return cursor.getString(cursor.getColumnIndex(FIELD_IMAGE));
 		} else
 			return "/data/img/img.png";
 	}

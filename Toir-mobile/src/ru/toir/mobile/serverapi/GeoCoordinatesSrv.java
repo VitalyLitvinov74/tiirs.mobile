@@ -8,7 +8,7 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class GeoCoordinates {
+public class GeoCoordinatesSrv {
 
     @Expose
     private float Latitude;

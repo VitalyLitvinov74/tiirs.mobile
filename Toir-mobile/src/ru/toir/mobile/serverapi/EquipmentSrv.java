@@ -11,18 +11,18 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class Equipment {
+public class EquipmentSrv {
 
     @Expose
     private String Name;
     @Expose
-    private ru.toir.mobile.serverapi.EquipmentType EquipmentType;
+    private EquipmentTypeSrv EquipmentType;
     @Expose
-    private ru.toir.mobile.serverapi.GeoCoordinates GeoCoordinates;
+    private GeoCoordinatesSrv GeoCoordinates;
     @Expose
-    private ru.toir.mobile.serverapi.CriticalityType CriticalityType;
+    private CriticalTypeSrv CriticalityType;
     @Expose
-    private List<Document> Documents = new ArrayList<Document>();
+    private List<EquipmentDocumentationSrv> Documents = new ArrayList<EquipmentDocumentationSrv>();
     @Expose
     private String Id;
     @Expose
@@ -34,7 +34,7 @@ public class Equipment {
     @Expose
     private Date ChangedAt;
     @Expose
-    private ru.toir.mobile.serverapi.EquipmentStatus EquipmentStatus;
+    private EquipmentStatusSrv EquipmentStatus;
 
     /**
      * 
@@ -59,7 +59,7 @@ public class Equipment {
      * @return
      *     The EquipmentType
      */
-    public ru.toir.mobile.serverapi.EquipmentType getEquipmentType() {
+    public EquipmentTypeSrv getEquipmentType() {
         return EquipmentType;
     }
 
@@ -68,7 +68,7 @@ public class Equipment {
      * @param EquipmentType
      *     The EquipmentType
      */
-    public void setEquipmentType(ru.toir.mobile.serverapi.EquipmentType EquipmentType) {
+    public void setEquipmentType(EquipmentTypeSrv EquipmentType) {
         this.EquipmentType = EquipmentType;
     }
 
@@ -77,7 +77,7 @@ public class Equipment {
      * @return
      *     The GeoCoordinates
      */
-    public ru.toir.mobile.serverapi.GeoCoordinates getGeoCoordinates() {
+    public GeoCoordinatesSrv getGeoCoordinates() {
         return GeoCoordinates;
     }
 
@@ -86,7 +86,7 @@ public class Equipment {
      * @param GeoCoordinates
      *     The GeoCoordinates
      */
-    public void setGeoCoordinates(ru.toir.mobile.serverapi.GeoCoordinates GeoCoordinates) {
+    public void setGeoCoordinates(GeoCoordinatesSrv GeoCoordinates) {
         this.GeoCoordinates = GeoCoordinates;
     }
 
@@ -95,7 +95,7 @@ public class Equipment {
      * @return
      *     The CriticalityType
      */
-    public ru.toir.mobile.serverapi.CriticalityType getCriticalityType() {
+    public CriticalTypeSrv getCriticalityType() {
         return CriticalityType;
     }
 
@@ -104,7 +104,7 @@ public class Equipment {
      * @param CriticalityType
      *     The CriticalityType
      */
-    public void setCriticalityType(ru.toir.mobile.serverapi.CriticalityType CriticalityType) {
+    public void setCriticalityType(CriticalTypeSrv CriticalityType) {
         this.CriticalityType = CriticalityType;
     }
 
@@ -113,7 +113,7 @@ public class Equipment {
      * @return
      *     The Documents
      */
-    public List<Document> getDocuments() {
+    public List<EquipmentDocumentationSrv> getDocuments() {
         return Documents;
     }
 
@@ -122,7 +122,7 @@ public class Equipment {
      * @param Documents
      *     The Documents
      */
-    public void setDocuments(List<Document> Documents) {
+    public void setDocuments(List<EquipmentDocumentationSrv> Documents) {
         this.Documents = Documents;
     }
 
@@ -211,15 +211,14 @@ public class Equipment {
 	/**
 	 * @return the equipmentStatus
 	 */
-	public ru.toir.mobile.serverapi.EquipmentStatus getEquipmentStatus() {
+	public EquipmentStatusSrv getEquipmentStatus() {
 		return EquipmentStatus;
 	}
 
 	/**
 	 * @param equipmentStatus the equipmentStatus to set
 	 */
-	public void setEquipmentStatus(
-			ru.toir.mobile.serverapi.EquipmentStatus equipmentStatus) {
+	public void setEquipmentStatus(EquipmentStatusSrv equipmentStatus) {
 		EquipmentStatus = equipmentStatus;
 	}
 

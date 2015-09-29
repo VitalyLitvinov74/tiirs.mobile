@@ -17,7 +17,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_IMAGE = "image";
 	public static final String FIELD_FIRST_STEP = "first_step";
 	public static final String FIELD_LAST_STEP = "last_step";
-	public static final String FIELD_NAME = "name";
+	public static final String FIELD_TITLE = "title";
 	
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
@@ -30,7 +30,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 		public static final String IMAGE = TABLE_NAME + '_' + FIELD_IMAGE;
 		public static final String FIRST_STEP = TABLE_NAME + '_' + FIELD_FIRST_STEP;
 		public static final String LAST_STEP = TABLE_NAME + '_' + FIELD_LAST_STEP;
-		public static final String NAME = TABLE_NAME + '_' + FIELD_NAME;
+		public static final String TITLE = TABLE_NAME + '_' + FIELD_TITLE;
 
 
 	}
@@ -47,7 +47,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.IMAGE, getFullName(TABLE_NAME, FIELD_IMAGE) + " AS " + Projection.IMAGE);
 		mProjection.put(Projection.FIRST_STEP, getFullName(TABLE_NAME, FIELD_FIRST_STEP) + " AS " + Projection.FIRST_STEP);
 		mProjection.put(Projection.LAST_STEP, getFullName(TABLE_NAME, FIELD_LAST_STEP) + " AS " + Projection.LAST_STEP);
-		mProjection.put(Projection.NAME, getFullName(TABLE_NAME, FIELD_NAME) + " AS " + Projection.NAME);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
 
 	}
 	
@@ -87,7 +87,7 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 		patternStep.setImage(cursor.getString(cursor.getColumnIndex(FIELD_IMAGE)));
 		patternStep.setFirst_step(cursor.getInt(cursor.getColumnIndex(FIELD_FIRST_STEP)) == 1);
 		patternStep.setLast_step(cursor.getInt(cursor.getColumnIndex(FIELD_LAST_STEP)) == 1);
-		patternStep.setName(cursor.getString(cursor.getColumnIndex(FIELD_NAME)));		
+		patternStep.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));		
 		return patternStep;
 	}
 
@@ -130,14 +130,14 @@ public class OperationPatternStepDBAdapter extends BaseDBAdapter {
 	 */
 	public long replace(OperationPatternStep item) {
 		long id;
-		ContentValues values = new ContentValues();
+		ContentValues values = putCommonFields(item);
 		
 		values.put(FIELD_OPERATION_PATTERN_UUID, item.getOperation_pattern_uuid());
 		values.put(FIELD_DESCRIPTION, item.getDescription());
 		values.put(FIELD_IMAGE, item.getImage());
 		values.put(FIELD_FIRST_STEP, item.isFirst_step() ? 1 : 0);
 		values.put(FIELD_LAST_STEP, item.isLast_step() ? 1 : 0);
-		values.put(FIELD_NAME, item.getName());
+		values.put(FIELD_TITLE, item.getTitle());
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}

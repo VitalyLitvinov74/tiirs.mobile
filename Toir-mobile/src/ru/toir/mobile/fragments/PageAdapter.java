@@ -6,11 +6,24 @@ import android.support.v4.app.FragmentPagerAdapter;
 import ru.toir.mobile.fragments.EquipmentsFragment;
 
 public class PageAdapter extends FragmentPagerAdapter {
-	public final static int ORDER_FRAGMENT = 1; 
-	public final static int TASK_FRAGMENT = 5;
 
-	//private OrdersFragment ordersFragment;
+	public final static int USER_FRAGMENT = 0;
+	public final static int REFERENCE_FRAGMENT = 1;
+	public final static int CHARTS_FRAGMENT = 2;
+	public final static int GPS_FRAGMENT = 3;
+	public final static int EQUIPMENTS_FRAGMENT = 4;
+	public final static int TASK_FRAGMENT = 5;
+	public final static int NATIVE_CAMERA_FRAGMENT = 6;
+	public final static int QRTEST_FRAGMENT = 7;
+
+	private UserInfoFragment userInfoFragment;
+	private ReferenceFragment referenceFragment;
+	private ChartsFragment chartsFragment;
+	private GPSFragment gpsFragment;
+	private EquipmentsFragment equipmentsFragment;
 	private TaskFragment taskFragment;
+	private NativeCameraFragment nativeCameraFragment;
+	private QRTestFragment qrTestFragment;
 
 	public PageAdapter(FragmentManager fm) {	
 		super(fm);
@@ -18,39 +31,50 @@ public class PageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public Fragment getItem(int arg0) {
-		Fragment fragment;
 		switch (arg0) {
-		case 0 :
-			fragment = new UserInfoFragment();
-			break;
-		case 1 :
-			fragment = new ReferenceFragment();
-			break;
-		case 2 :
-			fragment = new ChartsFragment();
-			break;
-		case 3 :
-			fragment = new GPSFragment();
-			break;
-		case 4 :
-			fragment = new EquipmentsFragment();
-			break;
+		case USER_FRAGMENT :
+			if (userInfoFragment == null) {
+				userInfoFragment = new UserInfoFragment();
+			}
+			return userInfoFragment;
+		case REFERENCE_FRAGMENT :
+			if (referenceFragment == null) {
+				referenceFragment = new ReferenceFragment();
+			}
+			return referenceFragment;
+		case CHARTS_FRAGMENT :
+			if (chartsFragment == null) {
+				chartsFragment = new ChartsFragment();
+			}
+			return chartsFragment;
+		case GPS_FRAGMENT :
+			if (gpsFragment == null) {
+				gpsFragment = new GPSFragment();
+			}
+			return gpsFragment;
+		case EQUIPMENTS_FRAGMENT :
+			if (equipmentsFragment == null) {
+				equipmentsFragment = new EquipmentsFragment();
+			}
+			return equipmentsFragment;
 		case TASK_FRAGMENT :
 			if (taskFragment == null) {
 				taskFragment = new TaskFragment();
 			}
 			return taskFragment;
-		case 6 :
-			fragment = new NativeCameraFragment();
-			break;
-		case 7 :
-			fragment = new QRTestFragment();
-			break;
+		case NATIVE_CAMERA_FRAGMENT :
+			if (nativeCameraFragment == null) {
+				nativeCameraFragment = new NativeCameraFragment();
+			}
+			return nativeCameraFragment;
+		case QRTEST_FRAGMENT :
+			if (qrTestFragment == null) {
+				qrTestFragment = new QRTestFragment();
+			}
+			return qrTestFragment;
 		default :
-			fragment = null;
-			break;
+			return null;		
 		}
-		return fragment;
 	}
 
 	@Override
@@ -65,28 +89,28 @@ public class PageAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
 		CharSequence title;
 		switch (position) {
-		case 0 :
+		case USER_FRAGMENT :
 			title = "Пользователь";
 			break;
-		case 1 :
+		case REFERENCE_FRAGMENT :
 			title = "Справочники";
 			break;
-		case 2 :
+		case CHARTS_FRAGMENT :
 			title = "Графики";
 			break;
-		case 3 :
+		case GPS_FRAGMENT :
 			title = "Тест GPS";
 			break;
-		case 4 :
+		case EQUIPMENTS_FRAGMENT :
 			title = "Оборудование";
 			break;
 		case TASK_FRAGMENT :
 			title = "Наряды";
 			break;
-		case 6 :
+		case NATIVE_CAMERA_FRAGMENT :
 			title = "Фото";
 			break;
-		case 7 :
+		case QRTEST_FRAGMENT :
 			title = "QR test";
 			break;
 		default :

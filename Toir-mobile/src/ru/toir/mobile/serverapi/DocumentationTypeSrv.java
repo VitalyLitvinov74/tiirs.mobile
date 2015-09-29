@@ -5,18 +5,16 @@ import java.util.Date;
 import com.google.gson.annotations.Expose;
 
 /**
- * Статус оборудования
+ * Типы документов 
  * @author Dmitriy Logachov
  *
  */
-public class EquipmentStatus {
+public class DocumentationTypeSrv {
 
 	@Expose
 	private String Id;
 	@Expose
 	private String Title;
-	@Expose
-	private int Type;
 	@Expose
 	private Date CreatedAt;
 	@Expose
@@ -57,21 +55,6 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @return the type
-	 */
-	public int getType() {
-		return Type;
-	}
-
-	/**
-	 * @param type
-	 *            the type to set
-	 */
-	public void setType(int type) {
-		Type = type;
-	}
-
-	/**
 	 * @return the createdAt
 	 */
 	public Date getCreatedAt() {
@@ -79,8 +62,7 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @param createdAt
-	 *            the createdAt to set
+	 * @param createdAt the createdAt to set
 	 */
 	public void setCreatedAt(Date createdAt) {
 		CreatedAt = createdAt;
@@ -94,8 +76,7 @@ public class EquipmentStatus {
 	}
 
 	/**
-	 * @param changedAt
-	 *            the changedAt to set
+	 * @param changedAt the changedAt to set
 	 */
 	public void setChangedAt(Date changedAt) {
 		ChangedAt = changedAt;

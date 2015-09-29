@@ -1,6 +1,10 @@
 package android.hardware.uhf.magic;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 import java.util.regex.Pattern;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -923,15 +927,15 @@ public class reader {
 
 	static {
 		System.loadLibrary("uhf-tools");
-		msound = mSoundPool.load(
-				"/system/media/audio/notifications/Altair.ogg", 1);
+		msound = mSoundPool.load("/system/media/audio/notifications/Altair.ogg",
+				1);
 	}
 
 	public static byte[] stringToBytes(String hexString) {
 		if (hexString == null || hexString.equals("")) {
 			return null;
 		}
-		hexString = hexString.toUpperCase();
+		hexString = hexString.toUpperCase(Locale.ENGLISH);
 		int length = hexString.length() / 2;
 		char[] hexChars = hexString.toCharArray();
 		byte[] d = new byte[length];
@@ -954,7 +958,7 @@ public class reader {
 			if (hex.length() == 1) {
 				hex = '0' + hex;
 			}
-			ret += hex.toUpperCase();
+			ret += hex.toUpperCase(Locale.ENGLISH);
 		}
 		return ret;
 	}

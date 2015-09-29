@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rest.RestClient.Method;
+import ru.toir.mobile.serverapi.TokenSrv;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -61,7 +62,7 @@ public class TokenProcessor {
 
 			if (response.mStatus == 200) {
 				String jsonString = new String(response.mBody);
-				ru.toir.mobile.serverapi.Token serverToken = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Token.class);
+				TokenSrv serverToken = new Gson().fromJson(jsonString, TokenSrv.class);
 				if (serverToken != null) {
 					AuthorizedUser.getInstance().setToken(serverToken.getAccessToken());
 					return true;
@@ -105,7 +106,7 @@ public class TokenProcessor {
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
 				String jsonString = new String(response.mBody);
-				ru.toir.mobile.serverapi.Token serverToken = new Gson().fromJson(jsonString, ru.toir.mobile.serverapi.Token.class);
+				TokenSrv serverToken = new Gson().fromJson(jsonString, TokenSrv.class);
 				if (serverToken != null) {
 					AuthorizedUser.getInstance().setToken(serverToken.getAccessToken());
 					return true;

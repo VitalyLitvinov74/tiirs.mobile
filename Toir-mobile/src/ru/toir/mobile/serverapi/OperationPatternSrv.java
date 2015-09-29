@@ -11,16 +11,16 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class OperationPattern {
+public class OperationPatternSrv {
 
     @Expose
     private String Id;
     @Expose
     private String Title;
     @Expose
-    private OperationType operationType;
+    private OperationTypeSrv operationType;
     @Expose
-    private List<Step> Steps = new ArrayList<Step>();
+    private List<OperationPatternStepSrv> Steps = new ArrayList<OperationPatternStepSrv>();
     @Expose
 	private Date CreatedAt;
 	@Expose
@@ -67,7 +67,7 @@ public class OperationPattern {
      * @return
      *     The Steps
      */
-    public List<Step> getSteps() {
+    public List<OperationPatternStepSrv> getSteps() {
         return Steps;
     }
 
@@ -76,21 +76,21 @@ public class OperationPattern {
      * @param Steps
      *     The Steps
      */
-    public void setSteps(List<Step> Steps) {
+    public void setSteps(List<OperationPatternStepSrv> Steps) {
         this.Steps = Steps;
     }
 
 	/**
 	 * @return the operationType
 	 */
-	public OperationType getOperationType() {
+	public OperationTypeSrv getOperationType() {
 		return operationType;
 	}
 
 	/**
 	 * @param operationType the operationType to set
 	 */
-	public void setOperationType(OperationType operationType) {
+	public void setOperationType(OperationTypeSrv operationType) {
 		this.operationType = operationType;
 	}
 

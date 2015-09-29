@@ -2,7 +2,6 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.Date;
-
 import com.google.gson.annotations.Expose;
 
 /**
@@ -10,16 +9,16 @@ import com.google.gson.annotations.Expose;
  * @author Dmitriy Logachov
  *
  */
-public class Result {
+public class OperationPatternStepResultSrv {
 
     @Expose
     private String Id;
     @Expose
     private String Title;
     @Expose
-    private ru.toir.mobile.serverapi.NextPatternStep NextPatternStep;
+    private String NextPatternStepId;
     @Expose
-    private ru.toir.mobile.serverapi.MeasureType MeasureType;
+    private MeasureTypeSrv MeasureType;
     @Expose
 	private Date CreatedAt;
 	@Expose
@@ -66,8 +65,8 @@ public class Result {
      * @return
      *     The NextPatternStep
      */
-    public ru.toir.mobile.serverapi.NextPatternStep getNextPatternStep() {
-        return NextPatternStep;
+    public String getNextPatternStepId() {
+        return NextPatternStepId;
     }
 
     /**
@@ -75,8 +74,8 @@ public class Result {
      * @param NextPatternStep
      *     The NextPatternStep
      */
-    public void setNextPatternStep(ru.toir.mobile.serverapi.NextPatternStep NextPatternStep) {
-        this.NextPatternStep = NextPatternStep;
+    public void setNextPatternStepId(String NextPatternStepId) {
+        this.NextPatternStepId = NextPatternStepId;
     }
 
     /**
@@ -84,7 +83,7 @@ public class Result {
      * @return
      *     The MeasureType
      */
-    public ru.toir.mobile.serverapi.MeasureType getMeasureType() {
+    public MeasureTypeSrv getMeasureType() {
         return MeasureType;
     }
 
@@ -93,7 +92,7 @@ public class Result {
      * @param MeasureType
      *     The MeasureType
      */
-    public void setMeasureType(ru.toir.mobile.serverapi.MeasureType MeasureType) {
+    public void setMeasureType(MeasureTypeSrv MeasureType) {
         this.MeasureType = MeasureType;
     }
 

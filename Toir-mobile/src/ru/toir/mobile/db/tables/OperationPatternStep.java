@@ -14,7 +14,7 @@ public class OperationPatternStep extends BaseTable {
 	private String image;
 	private boolean first_step;
 	private boolean last_step;
-	private String name;
+	private String title;
 
 	/**
 	 * 
@@ -44,10 +44,10 @@ public class OperationPatternStep extends BaseTable {
 	}
 
 	/**
-	 * @return the name
+	 * @return the title
 	 */
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
 	/**
@@ -99,8 +99,8 @@ public class OperationPatternStep extends BaseTable {
 		this.last_step = last_step;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }

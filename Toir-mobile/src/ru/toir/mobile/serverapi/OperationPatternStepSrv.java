@@ -2,30 +2,35 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 import com.google.gson.annotations.Expose;
 
 /**
- * Следующий шаг в операции {@link Step}
- * Суть шаг, но здесь почему-то без Title
+ * Шаг операции
  * @author Dmitriy Logachov
  *
  */
-public class NextPatternStep {
+public class OperationPatternStepSrv {
 
     @Expose
-    private String Id;
+    protected String Id;
     @Expose
-    private Object Description;
+    protected String Description;
     @Expose
-    private Integer IsLastStep;
+    protected Integer IsLastStep;
     @Expose
-    private Integer IsFirstStep;
+    protected Integer IsFirstStep;
     @Expose
-    private String ImagePath;
+    protected String ImagePath;
     @Expose
-    private List<Result> Results = new ArrayList<Result>();
+    protected String Title;
+    @Expose
+    protected List<OperationPatternStepResultSrv> Results = new ArrayList<OperationPatternStepResultSrv>();
+    @Expose
+	private Date CreatedAt;
+	@Expose
+	private Date ChangedAt;
 
     /**
      * 
@@ -50,7 +55,7 @@ public class NextPatternStep {
      * @return
      *     The Description
      */
-    public Object getDescription() {
+    public String getDescription() {
         return Description;
     }
 
@@ -59,7 +64,7 @@ public class NextPatternStep {
      * @param Description
      *     The Description
      */
-    public void setDescription(Object Description) {
+    public void setDescription(String Description) {
         this.Description = Description;
     }
 
@@ -104,7 +109,7 @@ public class NextPatternStep {
      * @return
      *     The ImagePath
      */
-    public Object getImagePath() {
+    public String getImagePath() {
         return ImagePath;
     }
 
@@ -122,7 +127,7 @@ public class NextPatternStep {
      * @return
      *     The Results
      */
-    public Object getResults() {
+    public List<OperationPatternStepResultSrv> getResults() {
         return Results;
     }
 
@@ -131,8 +136,50 @@ public class NextPatternStep {
      * @param Results
      *     The Results
      */
-    public void setResults(List<Result> Results) {
+    public void setResults(List<OperationPatternStepResultSrv> Results) {
         this.Results = Results;
     }
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return Title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		Title = title;
+	}
+
+	/**
+	 * @return the createdAt
+	 */
+	public Date getCreatedAt() {
+		return CreatedAt;
+	}
+
+	/**
+	 * @param createdAt the createdAt to set
+	 */
+	public void setCreatedAt(Date createdAt) {
+		CreatedAt = createdAt;
+	}
+
+	/**
+	 * @return the changedAt
+	 */
+	public Date getChangedAt() {
+		return ChangedAt;
+	}
+
+	/**
+	 * @param changedAt the changedAt to set
+	 */
+	public void setChangedAt(Date changedAt) {
+		ChangedAt = changedAt;
+	}
 
 }
