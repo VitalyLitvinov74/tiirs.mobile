@@ -135,6 +135,7 @@ public class TaskProcessor {
 
 				ArrayList<TaskSrv> serverTasks = gson.fromJson(jsonString,
 						new TypeToken<ArrayList<TaskSrv>>() {
+							private static final long serialVersionUID = 1l;
 						}.getType());
 				if (serverTasks != null) {
 

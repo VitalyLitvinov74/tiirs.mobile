@@ -28,8 +28,6 @@ import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.DocumentationType;
-import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
 import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
@@ -213,8 +211,10 @@ public class ReferenceProcessor {
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
 			db.beginTransaction();
+
 			ArrayList<OperationResultSrv> results = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<OperationResultSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveOperationResult(results);
 			if (result) {
@@ -227,7 +227,7 @@ public class ReferenceProcessor {
 		}
 
 	}
-
+	
 	/**
 	 * Получаем типы документов
 	 * 
@@ -263,6 +263,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<DocumentationTypeSrv> types = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<DocumentationTypeSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveDocumentType(types);
 			if (result) {
@@ -310,6 +311,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<EquipmentStatusSrv> statuses = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<EquipmentStatusSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveEquipmentStatus(statuses);
 			if (result) {
@@ -357,6 +359,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<EquipmentTypeSrv> types = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<EquipmentTypeSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveEquipmentType(types);
 			if (result) {
@@ -404,6 +407,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<MeasureTypeSrv> list = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<MeasureTypeSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveMeasureType(list);
 			if (result) {
@@ -451,6 +455,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<OperationStatusSrv> list = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<OperationStatusSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveOperationStatus(list);
 			if (result) {
@@ -498,6 +503,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<OperationTypeSrv> operations = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<OperationTypeSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveOperationType(operations);
 			if (result) {
@@ -545,6 +551,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<TaskStatusSrv> list = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<TaskStatusSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveTaskStatus(list);
 			if (result) {
@@ -594,6 +601,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<EquipmentSrv> equipments = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<EquipmentSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveEquipment(equipments);
 			if (result) {
@@ -641,6 +649,7 @@ public class ReferenceProcessor {
 			db.beginTransaction();
 			ArrayList<CriticalTypeSrv> types = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<CriticalTypeSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveCriticalType(types);
 			if (result) {
@@ -692,6 +701,7 @@ public class ReferenceProcessor {
 			ArrayList<EquipmentDocumentationSrv> list = gson.fromJson(
 					jsonString,
 					new TypeToken<ArrayList<EquipmentDocumentationSrv>>() {
+						private static final long serialVersionUID = 1l;
 					}.getType());
 			boolean result = saveDocumentations(list, equipmentUuid);
 			if (result) {
@@ -963,64 +973,35 @@ public class ReferenceProcessor {
 			return false;
 		}
 
-		EquipmentDBAdapter adapter = new EquipmentDBAdapter(
+		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
-		if (!adapter.saveItems(EquipmentSrv.getEquipments(array))) {
+		if (!equipmentAdapter.saveItems(EquipmentSrv.getEquipments(array))) {
 			return false;
 		}
 
-		if (!saveEquipmentType(EquipmentSrv.getEquipmentTypesSrv(array))) {
+		EquipmentTypeDBAdapter equipmentTypeAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		if (!equipmentTypeAdapter.saveItems(EquipmentSrv.getEquipmentTypes(array))) {
 			return false;
 		}
 
-		if (!saveCriticalType(EquipmentSrv.getCriticalTypesSrv(array))) {
+		CriticalTypeDBAdapter criticalTypeAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		if (!criticalTypeAdapter.saveItems(EquipmentSrv.getCriticalTypes(array))) {
 			return false;
 		}
 
-		if (!saveEquipmentStatus(EquipmentSrv.getEquipmentStatusesSrv(array))) {
+		EquipmentStatusDBAdapter equipmentStatusAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
+		if (!equipmentStatusAdapter.saveItems(EquipmentSrv.getEquipmentStatuses(array))) {
 			return false;
 		}
 
-		if (!saveDocumentations(EquipmentSrv.getEquipmentDocumentations(array))) {
-			return false;
-		}
-		
-		if (!saveDocumentTypes(EquipmentSrv.getDocumentationTypes(array))) {
+		EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
+		if (!documentationAdapter.saveItems(EquipmentSrv.getEquipmentDocumentations(array))) {
 			return false;
 		}
 
-		return true;
-	}
-
-	// TODO пересмотреть реализацию
-	private boolean saveDocumentTypes(ArrayList<DocumentationType> array) {
-
-		if (array == null) {
-			return false;
-		}
-
-		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
-
-		if (adapter.saveItems(array)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// TODO пересмотреть реализацию
-	private boolean saveDocumentations(ArrayList<EquipmentDocumentation> array) {
-
-		if (array == null) {
-			return false;
-		}
-
-		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
-
-		if (!adapter.saveItems(array)) {
+		DocumentationTypeDBAdapter documentationTypeAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
+		if (!documentationTypeAdapter.saveItems(EquipmentSrv.getDocumentationTypes(array))) {
 			return false;
 		}
 
@@ -1028,9 +1009,12 @@ public class ReferenceProcessor {
 	}
 
 	/**
-	 * Сохраняем в базу документацию
+	 * Сохраняем документацию
 	 * 
 	 * @param array
+	 *            Список документации в серверном представлении
+	 * @param equipmentUuid
+	 *            UUID оборудования к которому привязана документация
 	 * @return
 	 */
 	private boolean saveDocumentations(ArrayList<EquipmentDocumentationSrv> array,
