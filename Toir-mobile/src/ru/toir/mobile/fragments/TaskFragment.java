@@ -1,6 +1,8 @@
 package ru.toir.mobile.fragments;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.OperationActivity;
@@ -17,6 +19,7 @@ import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
+import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.OperationType;
@@ -79,7 +82,7 @@ public class TaskFragment extends Fragment {
 	private ProgressDialog getOrderDialog;
 
 	private String dateFormat = "dd.MM.yyyy hh:mm";
-	
+
 	// фильтр для получения сообщений при получении нарядов с сервера
 	private IntentFilter mFilterGetTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_GET_TASK);
@@ -105,8 +108,8 @@ public class TaskFragment extends Fragment {
 						 * (которые изменили свой статус на "В работе")
 						 */
 
-						Toast.makeText(getActivity(),
-								"Наряды получены.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "Наряды получены.",
+								Toast.LENGTH_SHORT).show();
 					} else {
 						// если наряды по какой-то причине не удалось получить,
 						// видимо нужно вывести какое-то сообщение
@@ -124,7 +127,7 @@ public class TaskFragment extends Fragment {
 
 		}
 	};
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -178,7 +181,7 @@ public class TaskFragment extends Fragment {
 				EquipmentDBAdapter.Projection.TITLE,
 				OperationTypeDBAdapter.Projection.TITLE,
 				OperationStatusDBAdapter.Projection.TITLE,
-				OperationResultDBAdapter.Projection.TITLE};
+				OperationResultDBAdapter.Projection.TITLE };
 		int[] operationTo = { R.id.eoi_ImageStatus, R.id.eoi_Equipment,
 				R.id.eoi_Operation, R.id.eoi_Status, R.id.eoi_ResultStatus };
 		operationAdapter = new SimpleCursorAdapter(getActivity(),
@@ -228,14 +231,15 @@ public class TaskFragment extends Fragment {
 				TaskDBAdapter.Projection.TASK_NAME,
 				TaskDBAdapter.Projection.CREATED_AT,
 				TaskDBAdapter.Projection.CLOSE_DATE,
-				TaskStatusDBAdapter.Projection.TITLE};
+				TaskStatusDBAdapter.Projection.TITLE };
 		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create,
 				R.id.ti_Close, R.id.ti_Status };
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
-		// это нужно для отображения произвольных изображений и конвертации в строку дат
+		// это нужно для отображения произвольных изображений и конвертации в
+		// строку дат
 		taskAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 
 			@Override
@@ -254,10 +258,10 @@ public class TaskFragment extends Fragment {
 							cursor.getLong(columnIndex), dateFormat));
 					return true;
 				}
-				
+
 				if (viewId == R.id.ti_Close) {
 					long closeDate = cursor.getLong(columnIndex);
-					
+
 					((TextView) view).setText(closeDate != 0 ? DataUtils
 							.getDate(closeDate, dateFormat) : "нет");
 					return true;
@@ -449,9 +453,11 @@ public class TaskFragment extends Fragment {
 			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 
 			if (Level == 1) {
-				initOperationPattern(cursor.getString(cursor
-						.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID)),
-						cursor.getString(cursor.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID)),
+				initOperationPattern(
+						cursor.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID)),
+						cursor.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID)),
 						cursor.getString(cursor
 								.getColumnIndex(EquipmentDBAdapter.Projection.UUID)));
 			}
@@ -474,11 +480,27 @@ public class TaskFragment extends Fragment {
 
 			if (Level == 1) {
 				Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-				final String operation_uuid = cursor.getString(cursor
-						.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
-				final String taskUuid = cursor.getString(cursor
-						.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
+				final String operation_uuid = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
+				final String taskUuid = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
 
+				EquipmentOperationDBAdapter operationDbAdapter = new EquipmentOperationDBAdapter(
+						new TOiRDatabaseContext(getActivity()));
+				EquipmentOperation operation = operationDbAdapter
+						.getItem(operation_uuid);
+				String operationStatus = operation.getOperation_status_uuid();
+				// менять произвольно статус операции позволяем только если
+				// статус операции "Новая"
+				if (!operationStatus
+						.equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+					Toast.makeText(getActivity(),
+							"Изменить статус операции нельзя!",
+							Toast.LENGTH_SHORT).show();
+					return true;
+				}
 				// диалог для отмены операции
 				final Dialog dialog = new Dialog(getActivity());
 				dialog.setContentView(R.layout.operation_cancel_dialog);
@@ -489,10 +511,6 @@ public class TaskFragment extends Fragment {
 					@Override
 					public void onClick(View v) {
 
-						// TODO перед установкой статуса проверить что статус
-						// операции либо "новая" либо "не выполнена", нужно уточнить
-						// и видимо часть статусов оператору не должна показываться
-						// например "Новая"
 						View parent = (View) v.getParent();
 						Spinner spinner = (Spinner) parent
 								.findViewById(R.id.statusSpinner);
@@ -510,7 +528,8 @@ public class TaskFragment extends Fragment {
 						CriticalType criticalType = (CriticalType) Spinner_type
 								.getSelectedItem();
 						// обновляем содержимое курсора
-						changeCursorOperations(taskUuid, operationType.getUuid(), criticalType.getUuid());
+						changeCursorOperations(taskUuid,
+								operationType.getUuid(), criticalType.getUuid());
 
 						// закрываем диалог
 						dialog.dismiss();
@@ -528,12 +547,25 @@ public class TaskFragment extends Fragment {
 				// список статусов операций в выпадающем списке для выбора
 				OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
 						new TOiRDatabaseContext(getActivity()));
-				ArrayList<OperationStatus> operationStatus = statusDBAdapter
+				ArrayList<OperationStatus> operationStatusList = statusDBAdapter
 						.getItems();
+				Iterator<OperationStatus> iterator = operationStatusList
+						.iterator();
+				// удаляем из списка статус "Новая", "Выполнена"
+				while (iterator.hasNext()) {
+					OperationStatus item = iterator.next();
+					if (item.getUuid().equals(
+							OperationStatus.Extras.STATUS_UUID_NEW)) {
+						iterator.remove();
+					} else if (item.getUuid().equals(
+							OperationStatus.Extras.STATUS_UUID_COMPLETE)) {
+						iterator.remove();
+					}
+				}
 
 				ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
 						getActivity(), android.R.layout.simple_spinner_item,
-						operationStatus);
+						operationStatusList);
 				Spinner statusSpinner = (Spinner) dialog
 						.findViewById(R.id.statusSpinner);
 				statusSpinner.setAdapter(adapter);
@@ -647,7 +679,8 @@ public class TaskFragment extends Fragment {
 						.getApplicationContext(),
 						TaskServiceProvider.Actions.ACTION_GET_TASK);
 
-				getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
+				getActivity()
+						.registerReceiver(mReceiverGetTask, mFilterGetTask);
 
 				tsh.GetTask(AuthorizedUser.getInstance().getToken());
 
@@ -663,8 +696,11 @@ public class TaskFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								getActivity().unregisterReceiver(mReceiverGetTask);
-								Toast.makeText(getActivity(), "Получение нарядов отменено", Toast.LENGTH_SHORT).show();
+								getActivity().unregisterReceiver(
+										mReceiverGetTask);
+								Toast.makeText(getActivity(),
+										"Получение нарядов отменено",
+										Toast.LENGTH_SHORT).show();
 							}
 						});
 				getOrderDialog.show();
@@ -710,7 +746,9 @@ public class TaskFragment extends Fragment {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.support.v4.app.Fragment#onResume()
 	 */
 	@Override
@@ -724,19 +762,19 @@ public class TaskFragment extends Fragment {
 					.getSelectedItem();
 			CriticalType criticalType = (CriticalType) Spinner_type
 					.getSelectedItem();
-			changeCursorOperations(currentTaskUuid, operationType.getUuid(), criticalType.getUuid());
+			changeCursorOperations(currentTaskUuid, operationType.getUuid(),
+					criticalType.getUuid());
 		}
 
 	}
-	
-	private void changeCursorOperations(String taskUuid, String operationTypeUuid, String criticalTypeUuid) {
+
+	private void changeCursorOperations(String taskUuid,
+			String operationTypeUuid, String criticalTypeUuid) {
 		EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
 				new TOiRDatabaseContext(getActivity()));
 		// обновляем содержимое курсора
-		operationAdapter.changeCursor(dbAdapter
-				.getOperationWithInfo(taskUuid,
-						operationTypeUuid,
-						criticalTypeUuid));
+		operationAdapter.changeCursor(dbAdapter.getOperationWithInfo(taskUuid,
+				operationTypeUuid, criticalTypeUuid));
 	}
 
 }

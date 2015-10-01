@@ -1,6 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import ru.toir.mobile.db.tables.MeasureValue;
@@ -144,5 +145,32 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 			replace(item);
 		}
 	}
+
+	/**
+	 * Возвращает результат измерений по операции и результату шага
+	 * 
+	 * @param operationUuid
+	 * @param resultUuid
+	 * @return
+	 */
+	public MeasureValue getItem(String operationUuid, String resultUuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID + "=? AND " + FIELD_OPERATION_PATTERN_STEP_RESULT_UUID + "=?", new String[]{operationUuid, resultUuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		} else {
+			return null;
+		}		
+	}
+
+	/**
+     * Метод делает то же что и replace, дополнительно меняет ChangedAt на текущее время.
+     * @param item
+     * @return
+     */
+    public long update(MeasureValue item) {
+            item.setChangedAt(Calendar.getInstance().getTime().getTime());
+            return replace(item);
+    }
 
 }
