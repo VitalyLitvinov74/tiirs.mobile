@@ -33,7 +33,6 @@ public class MeasureValueRes extends ru.toir.mobile.db.tables.MeasureValue {
 				item.uuid = value.getUuid();
 				item.setEquipment_operation_uuid(value.getEquipment_operation_uuid());
 				item.setOperation_pattern_step_result_uuid(value.getOperation_pattern_step_result_uuid());
-				item.setDate(value.getDate());
 				item.setValue(value.getValue());
 				item.setAttempt_send_date(value.getAttempt_send_date());
 				item.setAttempt_count(value.getAttempt_count());

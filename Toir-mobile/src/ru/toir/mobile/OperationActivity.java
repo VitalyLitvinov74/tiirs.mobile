@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -414,7 +413,6 @@ public class OperationActivity extends Activity {
 
 		value.setEquipment_operation_uuid(operation_uuid);
 		value.setOperation_pattern_step_result_uuid(resultUuid);
-		value.setDate(Calendar.getInstance().getTime().getTime());
 		
 		if (type.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
 			if (lastPhotoFile == null || lastPhotoFile.equals("")) {

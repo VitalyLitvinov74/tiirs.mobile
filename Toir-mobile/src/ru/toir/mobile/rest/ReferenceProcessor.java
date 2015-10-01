@@ -780,20 +780,49 @@ public class ReferenceProcessor {
 		// устройство.
 		// обновлять будем только те данные которые есть на устройстве?
 		// можно пропустить новые данные.
-		getCriticalType(bundle);
-		getDocumentType(bundle);
-		getEquipmentStatus(bundle);
-		getEquipmentType(bundle);
-		getMeasureType(bundle);
-		getOperationResult(bundle);
-		getOperationStatus(bundle);
-		getOperationType(bundle);
-		getTaskStatus(bundle);
+		if (!getCriticalType(bundle)) {
+			return false;
+		}
 
-		//getDocumentation(bundle);
-		getEquipment(bundle);
+		if (getDocumentType(bundle)) {
+			return false;
+		}
 
-		return false;
+		if (getEquipmentStatus(bundle)) {
+			return false;
+		}
+
+		if (getEquipmentType(bundle)) {
+			return false;
+		}
+
+		if (getMeasureType(bundle)) {
+			return false;
+		}
+
+		if (getOperationResult(bundle)) {
+			return false;
+		}
+
+		if (getOperationStatus(bundle)) {
+			return false;
+		}
+
+		if (getOperationType(bundle)) {
+			return false;
+		}
+
+		if (getTaskStatus(bundle)) {
+			return false;
+		}
+
+		// getDocumentation(bundle);
+
+		if (getEquipment(bundle)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private String getReferenceURL(String referenceName) {
