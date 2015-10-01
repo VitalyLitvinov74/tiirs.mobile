@@ -10,19 +10,19 @@
         android:layout_alignParentTop="true" />
 
     <Button
-        android:id="@+id/cancelOK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/statusSpinner"
-        android:text="OK" />
-    
-    <Button
         android:id="@+id/cancelCancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/statusSpinner"
-        android:layout_toRightOf="@+id/cancelOK"
-        android:text="Отмена" />
+        android:text="@android:string/cancel"
+        android:layout_toLeftOf="@+id/cancelOK" />
+
+    <Button
+        android:id="@+id/cancelOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/statusSpinner"
+        android:text="@android:string/ok" />
 
 </RelativeLayout>

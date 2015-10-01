@@ -34,13 +34,15 @@ import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.hardware.Camera;
-//import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -108,9 +110,6 @@ public class OperationActivity extends Activity {
 			return title;
 		}
 	}
-
-	// TODO нужно сделать обработку выхода из activity по нажатию кнопки back
-	// и показ оператору диалога с выбором причины отказа от выполнения операции
 
 	/*
 	 * (non-Javadoc)
@@ -200,9 +199,6 @@ public class OperationActivity extends Activity {
 			equipmentOperationResultDBAdapter.replace(operationResult);
 		}
 
-		// TODO нужно отработать вариант когда activity будет создаваться вновь
-		// после ухода в фон соответственно нужно показывать не первый шаг а
-		// текущий на котором приложение ушло в фон
 		showStep(getFirstStep().getUuid());
 	}
 
@@ -967,6 +963,36 @@ public class OperationActivity extends Activity {
 			mPreview.destroyDrawingCache();
 			mPreview.mCamera = null;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			// показываем диалог с вопросом почему прекращаем выполнение операции
+			final AlertDialog.Builder dialog = new AlertDialog.Builder(OperationActivity.this);
+			dialog.setTitle("Отмена выполнения операции");
+			dialog.setPositiveButton("Продолжить", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
+			dialog.setNegativeButton("Выйти", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
+			dialog.show();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 }
