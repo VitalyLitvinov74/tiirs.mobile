@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -470,7 +471,8 @@ public class OperationActivity extends Activity {
 				EquipmentOperationResult operationResult = null;
 				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 						new TOiRDatabaseContext(getApplicationContext()));
-				// к этому моменту запись с установленной датой начала выполнения уже должна существовать
+				// к этому моменту запись с установленной датой начала
+				// выполнения уже должна существовать
 				operationResult = equipmentOperationResultDBAdapter
 						.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
@@ -510,6 +512,17 @@ public class OperationActivity extends Activity {
 		OperationStatusDBAdapter dbAdapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		ArrayList<OperationStatus> list = dbAdapter.getAllItems();
+		Iterator<OperationStatus> iterator = list.iterator();
+		// удаляем из списка статус "Новая", "Отменена"
+		while (iterator.hasNext()) {
+			OperationStatus item = iterator.next();
+			if (item.getUuid().equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+				iterator.remove();
+			} else if (item.getUuid().equals(
+					OperationStatus.Extras.STATUS_UUID_CANCELED)) {
+				iterator.remove();
+			}
+		}
 		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
 				getApplicationContext(),
 				android.R.layout.simple_spinner_dropdown_item, list);
@@ -965,30 +978,36 @@ public class OperationActivity extends Activity {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			// показываем диалог с вопросом почему прекращаем выполнение операции
-			final AlertDialog.Builder dialog = new AlertDialog.Builder(OperationActivity.this);
+			// показываем диалог с вопросом почему прекращаем выполнение
+			// операции
+			final AlertDialog.Builder dialog = new AlertDialog.Builder(
+					OperationActivity.this);
 			dialog.setTitle("Отмена выполнения операции");
-			dialog.setPositiveButton("Продолжить", new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			});
-			dialog.setNegativeButton("Выйти", new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					finish();
-				}
-			});
+			dialog.setPositiveButton("Продолжить",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			dialog.setNegativeButton("Выйти",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					});
 			dialog.show();
 			return true;
 		}
