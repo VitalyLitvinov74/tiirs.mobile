@@ -1,6 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import ru.toir.mobile.db.tables.MeasureValue;
@@ -14,7 +15,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 	
 	public static final String FIELD_EQUIPMENT_OPERATION_UUID = "equipment_operation_uuid";
 	public static final String FIELD_OPERATION_PATTERN_STEP_RESULT_UUID = "operation_pattern_step_result_uuid";
-	public static final String FIELD_DATE = "date";
 	public static final String FIELD_VALUE = "value";
 	public static final String FIELD_ATTEMPT_SEND_DATE = "attempt_send_date";
 	public static final String FIELD_ATTEMPT_COUNT = "attempt_count";
@@ -28,7 +28,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		
 		public static final String EQUIPMENT_OPERATION_UUID = TABLE_NAME + '_' +  FIELD_EQUIPMENT_OPERATION_UUID;
 		public static final String OPERATION_PATTERN_STEP_RESULT_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_STEP_RESULT_UUID;
-		public static final String DATE = TABLE_NAME + '_' + FIELD_DATE;
 		public static final String VALUE = TABLE_NAME + '_' + FIELD_VALUE;
 		public static final String ATTEMPT_SEND_DATE = TABLE_NAME + '_' + FIELD_ATTEMPT_SEND_DATE;
 		public static final String ATTEMPT_COUNT = TABLE_NAME + '_' + FIELD_ATTEMPT_COUNT;
@@ -45,7 +44,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 
 		mProjection.put(Projection.EQUIPMENT_OPERATION_UUID, getFullName(TABLE_NAME, FIELD_EQUIPMENT_OPERATION_UUID) + " AS " + Projection.EQUIPMENT_OPERATION_UUID);
 		mProjection.put(Projection.OPERATION_PATTERN_STEP_RESULT_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_STEP_RESULT_UUID) + " AS " + Projection.OPERATION_PATTERN_STEP_RESULT_UUID);
-		mProjection.put(Projection.DATE, getFullName(TABLE_NAME, FIELD_DATE) + " AS " + Projection.DATE);
 		mProjection.put(Projection.VALUE, getFullName(TABLE_NAME, FIELD_VALUE) + " AS " + Projection.VALUE);
 		mProjection.put(Projection.ATTEMPT_SEND_DATE, getFullName(TABLE_NAME, FIELD_ATTEMPT_SEND_DATE) + " AS " + Projection.ATTEMPT_SEND_DATE);
 		mProjection.put(Projection.ATTEMPT_COUNT, getFullName(TABLE_NAME, FIELD_ATTEMPT_COUNT) + " AS " + Projection.ATTEMPT_COUNT);
@@ -104,7 +102,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		getItem(cursor, item);
 		item.setEquipment_operation_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_OPERATION_UUID)));
 		item.setOperation_pattern_step_result_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_STEP_RESULT_UUID)));
-		item.setDate(cursor.getInt(cursor.getColumnIndex(FIELD_DATE)));
 		item.setValue(cursor.getString(cursor.getColumnIndex(FIELD_VALUE)));
 		item.setAttempt_send_date(cursor.getLong(cursor.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));
 		item.setAttempt_count(cursor.getInt(cursor.getColumnIndex(FIELD_ATTEMPT_COUNT)));
@@ -124,7 +121,6 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 
 		values.put(FIELD_EQUIPMENT_OPERATION_UUID, item.getEquipment_operation_uuid());
 		values.put(FIELD_OPERATION_PATTERN_STEP_RESULT_UUID, item.getOperation_pattern_step_result_uuid());
-		values.put(FIELD_DATE, item.getDate());
 		values.put(FIELD_VALUE, item.getValue());
 		values.put(FIELD_ATTEMPT_SEND_DATE, item.getAttempt_send_date());
 		values.put(FIELD_ATTEMPT_COUNT, item.getAttempt_count());
@@ -149,5 +145,32 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 			replace(item);
 		}
 	}
+
+	/**
+	 * Возвращает результат измерений по операции и результату шага
+	 * 
+	 * @param operationUuid
+	 * @param resultUuid
+	 * @return
+	 */
+	public MeasureValue getItem(String operationUuid, String resultUuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_OPERATION_UUID + "=? AND " + FIELD_OPERATION_PATTERN_STEP_RESULT_UUID + "=?", new String[]{operationUuid, resultUuid}, null, null, null);
+		if (cursor.moveToFirst()) {
+			return getItem(cursor);
+		} else {
+			return null;
+		}		
+	}
+
+	/**
+     * Метод делает то же что и replace, дополнительно меняет ChangedAt на текущее время.
+     * @param item
+     * @return
+     */
+    public long update(MeasureValue item) {
+            item.setChangedAt(Calendar.getInstance().getTime().getTime());
+            return replace(item);
+    }
 
 }

@@ -11,7 +11,6 @@ public class MeasureValue extends BaseTable {
 
 	private String equipment_operation_uuid;
 	private String operation_pattern_step_result_uuid;
-	private long date;
 	private String value;
 	private long attempt_send_date;
 	private int attempt_count;
@@ -50,20 +49,6 @@ public class MeasureValue extends BaseTable {
 	public void setOperation_pattern_step_result_uuid(
 			String uuid) {
 		operation_pattern_step_result_uuid = uuid;
-	}
-
-	/**
-	 * @return the date
-	 */
-	public long getDate() {
-		return date;
-	}
-
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(long date) {
-		this.date = date;
 	}
 
 	/**

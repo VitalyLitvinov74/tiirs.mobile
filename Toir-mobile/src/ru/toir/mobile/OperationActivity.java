@@ -9,17 +9,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
@@ -27,7 +24,6 @@ import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
-import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentOperation;
@@ -39,7 +35,6 @@ import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
-import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
@@ -47,15 +42,17 @@ import ru.toir.mobile.rfid.driver.RFIDDriver;
 import ru.toir.mobile.rfid.driver.RFIDDriverC5;
 import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.hardware.Camera;
-//import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -69,7 +66,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +79,7 @@ public class OperationActivity extends Activity {
 	public static final String TASK_UUID_EXTRA = "task_uuid";
 	public static final String EQUIPMENT_UUID_EXTRA = "equipment_uuid";
 	public static final String EQUIPMENT_TAG_EXTRA = "equipment_tag";
-	// private EquipmentOperation operation;
+
 	private OperationPattern pattern;
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
@@ -134,9 +130,6 @@ public class OperationActivity extends Activity {
 			return title;
 		}
 	}
-	
-	// TODO нужно сделать обработку выхода из activity по нажатию кнопки back
-	// и показ оператору диалога с выбором причины отказа от выполнения операции
 
 	/*
 	 * (non-Javadoc)
@@ -211,15 +204,20 @@ public class OperationActivity extends Activity {
 
 		/*
 		 * cоздаём запись с результатом выполнения операции для фиксации времени
-		 * начала выполнения
+		 * начала выполнения (в текущем варианте просто предотвращаем создание
+		 * кучи записей для одной операции)
 		 */
-		// TODO сделать проверку на наличие результата выполнения!!! чтобы был только один! 
-		EquipmentOperationResult operationResult = new EquipmentOperationResult();
-		operationResult.setEquipment_operation_uuid(operation_uuid);
-		operationResult.setStart_date(new Date().getTime());
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
-		equipmentOperationResultDBAdapter.replace(operationResult);
+		EquipmentOperationResult operationResult;
+		operationResult = equipmentOperationResultDBAdapter
+				.getItemByOperation(operation_uuid);
+		if (operationResult == null) {
+			operationResult = new EquipmentOperationResult();
+			operationResult.setEquipment_operation_uuid(operation_uuid);
+			operationResult.setStart_date(new Date().getTime());
+			equipmentOperationResultDBAdapter.replace(operationResult);
+		}
 
 		// инициализируем драйвер для работы с метками
 		// получаем текущий драйвер считывателя
@@ -256,24 +254,22 @@ public class OperationActivity extends Activity {
 			finish();
 		}	
 
-		// TODO нужно отработать вариант когда activiti будет создаваться вновь после ухода в фон
-		// соответственно нужно показывать не первый шаг а текущий на котором приложение ушло в фон
 		showStep(getFirstStep().getUuid());
 	}
-	
+
 	private void showStep(String uuid) {
-		
+
 		OperationPatternStep step = null;
-		
+
 		step = getStep(uuid);
-		
+
 		if (step != null) {
 			showStepContent(step);
 		} else {
 			Toast.makeText(this, "Шаг не найден", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	private void showStepContent(OperationPatternStep step) {
 
 		stepTitle.setText(step.getTitle());
@@ -434,7 +430,7 @@ public class OperationActivity extends Activity {
 			cameraLayout.addView(cameraView);
 			photoContainer.addView(cameraLayout);
 			photoContainer.setVisibility(View.VISIBLE);
-			
+
 			lastPhotoFile = null;
 
 			// Create our Preview view and set it as the content of our
@@ -462,23 +458,32 @@ public class OperationActivity extends Activity {
 
 	/**
 	 * Сохранение результата измерения
+	 * 
 	 * @param type
 	 * @param resultUuid
 	 * @return
 	 */
 	private boolean saveMeasureValue(String type, String resultUuid) {
-		
-		MeasureValue value = new MeasureValue();
+
+		boolean valueExists = true;
+		MeasureValue value;
 		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 
+		// проверка на существование записи измерения
+		value = adapter.getItem(operation_uuid, resultUuid);
+		if (value == null) {
+			value = new MeasureValue();
+			valueExists = false;
+		}
+
 		value.setEquipment_operation_uuid(operation_uuid);
 		value.setOperation_pattern_step_result_uuid(resultUuid);
-		value.setDate(Calendar.getInstance().getTime().getTime());
-		
+
 		if (type.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
 			if (lastPhotoFile == null || lastPhotoFile.equals("")) {
-				Toast.makeText(getApplicationContext(), "Сфотографируйте объект!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(),
+						"Сфотографируйте объект!", Toast.LENGTH_SHORT).show();
 				return false;
 			}
 			value.setValue(lastPhotoFile);
@@ -490,13 +495,17 @@ public class OperationActivity extends Activity {
 			value.setValue(String.valueOf(resultValue));
 		}
 
-		adapter.replace(value);
+		if (valueExists) {
+			adapter.update(value);
+		} else {
+			adapter.replace(value);
+		}
 		return true;
 	}
 
 	/**
-	 * Показываем экран с выбором результата(вердикта) выполнения операции
-	 * и возможностью изменить статус операции (вместо "Выполнена" по умолчанию)
+	 * Показываем экран с выбором результата(вердикта) выполнения операции и
+	 * возможностью изменить статус операции (вместо "Выполнена" по умолчанию)
 	 */
 	private void ShowFinalStep() {
 		Button resultButton = new Button(getApplicationContext());
@@ -516,20 +525,25 @@ public class OperationActivity extends Activity {
 				EquipmentOperationResult operationResult = null;
 				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 						new TOiRDatabaseContext(getApplicationContext()));
+				// к этому моменту запись с установленной датой начала
+				// выполнения уже должна существовать
 				operationResult = equipmentOperationResultDBAdapter
 						.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
 				operationResult.setEnd_date(new Date().getTime());
 				equipmentOperationResultDBAdapter.update(operationResult);
-				
+
 				// обновление статуса операции по результату выполнения
 				Spinner operationStatusSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
-				String operationStatusUuid = ((OperationStatus)operationStatusSpinner.getSelectedItem()).getUuid();
-				EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
-				EquipmentOperation operation = operationDBAdapter.getItem(operation_uuid);
+				String operationStatusUuid = ((OperationStatus) operationStatusSpinner
+						.getSelectedItem()).getUuid();
+				EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
+						new TOiRDatabaseContext(getApplicationContext()));
+				EquipmentOperation operation = operationDBAdapter
+						.getItem(operation_uuid);
 				operation.setOperation_status_uuid(operationStatusUuid);
 				operationDBAdapter.update(operation);
-				
+
 				// обновляем информацию об операции в метке устройства
 				// читаем > обновляем > записываем		
 				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null) 
@@ -549,18 +563,32 @@ public class OperationActivity extends Activity {
 		layout.removeAllViewsInLayout();
 		layout.addView(spinner);
 		layout.addView(resultButton);
-		
+
 		// показ элементов отвечающих за статус выполнения операции
 		RelativeLayout alterOperationStatusLayout = (RelativeLayout) findViewById(R.id.alterOperationStatus);
 		alterOperationStatusLayout.setVisibility(View.VISIBLE);
 
 		Spinner alterSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
-		OperationStatusDBAdapter dbAdapter = new OperationStatusDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		OperationStatusDBAdapter dbAdapter = new OperationStatusDBAdapter(
+				new TOiRDatabaseContext(getApplicationContext()));
 		ArrayList<OperationStatus> list = dbAdapter.getAllItems();
-		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, list);
+		Iterator<OperationStatus> iterator = list.iterator();
+		// удаляем из списка статус "Новая", "Отменена"
+		while (iterator.hasNext()) {
+			OperationStatus item = iterator.next();
+			if (item.getUuid().equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+				iterator.remove();
+			} else if (item.getUuid().equals(
+					OperationStatus.Extras.STATUS_UUID_CANCELED)) {
+				iterator.remove();
+			}
+		}
+		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
+				getApplicationContext(),
+				android.R.layout.simple_spinner_dropdown_item, list);
 		alterSpinner.setAdapter(adapter);
 		// по умолчанию ставим статус Выполнена
-		for(OperationStatus item : list) {
+		for (OperationStatus item : list) {
 			if (item.getUuid().equals(OperationStatusDBAdapter.Status.COMPLETE)) {
 				alterSpinner.setSelection(adapter.getPosition(item));
 				break;
@@ -569,9 +597,10 @@ public class OperationActivity extends Activity {
 
 		CheckBox checkBox = (CheckBox) findViewById(R.id.showAltOperationStatusCheckbox);
 		checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			
+
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
 				Spinner alterSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
 				if (isChecked) {
 					alterSpinner.setVisibility(View.VISIBLE);
@@ -584,6 +613,7 @@ public class OperationActivity extends Activity {
 
 	/**
 	 * Возвращает первый шаг операции
+	 * 
 	 * @return
 	 */
 	private OperationPatternStep getFirstStep() {
@@ -597,6 +627,7 @@ public class OperationActivity extends Activity {
 
 	/**
 	 * Возвращает шаг операции
+	 * 
 	 * @param uuid
 	 * @return
 	 */
@@ -611,6 +642,7 @@ public class OperationActivity extends Activity {
 
 	/**
 	 * Возвращает список вариантов выполнения шага операции
+	 * 
 	 * @param step_uuid
 	 * @return
 	 */
@@ -624,7 +656,8 @@ public class OperationActivity extends Activity {
 		return resultsList;
 	}
 
-	// класс для работы с камеров во фрагменте(возможно можно вынести в отдельный класс)
+	// класс для работы с камеров во фрагменте(возможно можно вынести в
+	// отдельный класс)
 	/**
 	 * Surface on which the camera projects it's capture results. This is
 	 * derived both from Google's docs and the excellent StackOverflow answer
@@ -1037,4 +1070,40 @@ public class OperationActivity extends Activity {
 			EquipmentTagStructure.getInstance().set_last(result.substring(36, 40));
 		}
 	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			// показываем диалог с вопросом почему прекращаем выполнение
+			// операции
+			final AlertDialog.Builder dialog = new AlertDialog.Builder(
+					OperationActivity.this);
+			dialog.setTitle("Отмена выполнения операции");
+			dialog.setPositiveButton("Продолжить",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			dialog.setNegativeButton("Выйти",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					});
+			dialog.show();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
 }

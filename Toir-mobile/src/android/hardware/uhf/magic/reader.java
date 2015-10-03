@@ -8,9 +8,6 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.media.AudioManager;
-import android.media.SoundPool;
-import java.io.UnsupportedEncodingException;
 
 public class reader {
 	static public Handler m_handler = null;

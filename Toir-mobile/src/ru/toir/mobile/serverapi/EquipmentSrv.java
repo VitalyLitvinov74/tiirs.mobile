@@ -202,7 +202,13 @@ public class EquipmentSrv extends BaseObjectSrv {
 
 		return item;
 	}
-	
+
+	/**
+	 * Возвращает список типов документов связанных с оборудованием в локальном представлении
+	 * 
+	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @return {@link ArrayList}<{@link DocumentationType}>
+	 */
 	public static ArrayList<DocumentationType> getDocumentationTypes(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -217,6 +223,12 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
+	/**
+	 * Возвращает список оборудования в локальном представлении
+	 * 
+	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @return {@link ArrayList}<{@link Equipment}>
+	 */
 	public static ArrayList<Equipment> getEquipments(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -227,6 +239,12 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
+	/**
+	 * Возвращает список статусов оборудования в локальном представлении
+	 * 
+	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @return {@link ArrayList}<{@link EquipmentStatus}>
+	 */
 	public static ArrayList<EquipmentStatus> getEquipmentStatuses(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -237,16 +255,12 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
-	public static ArrayList<EquipmentStatusSrv> getEquipmentStatusesSrv(
-			ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<EquipmentStatusSrv> list = new ArrayList<EquipmentStatusSrv>();
-		for (EquipmentSrv equipment : equipments) {
-			list.add(equipment.getEquipmentStatus());
-		}
-		return list;
-	}
-
+	/**
+	 * Возвращает список типов оборудования в локальном представлении
+	 * 
+	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @return {@link ArrayList}<{@link EquipmentType}>
+	 */
 	public static ArrayList<EquipmentType> getEquipmentTypes(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -257,16 +271,12 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
-	public static ArrayList<EquipmentTypeSrv> getEquipmentTypesSrv(
-			ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<EquipmentTypeSrv> list = new ArrayList<EquipmentTypeSrv>();
-		for (EquipmentSrv equipment : equipments) {
-			list.add(equipment.getEquipmentType());
-		}
-		return list;
-	}
-
+	/**
+	 * Возвращает список типов критичности оборудования в локальном представлении
+	 * 
+	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @return {@link ArrayList}<{@link CriticalType}>
+	 */
 	public static ArrayList<CriticalType> getCriticalTypes(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -277,16 +287,12 @@ public class EquipmentSrv extends BaseObjectSrv {
 		return list;
 	}
 
-	public static ArrayList<CriticalTypeSrv> getCriticalTypesSrv(
-			ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<CriticalTypeSrv> list = new ArrayList<CriticalTypeSrv>();
-		for (EquipmentSrv equipment : equipments) {
-			list.add(equipment.getCriticalityType());
-		}
-		return list;
-	}
-
+	/**
+	 * Возвращает список документации оборудования в локальном представлении
+	 * 
+	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @return {@link ArrayList}<{@link EquipmentDocumentation}>
+	 */
 	public static ArrayList<EquipmentDocumentation> getEquipmentDocumentations(
 			ArrayList<EquipmentSrv> equipments) {
 
@@ -296,20 +302,6 @@ public class EquipmentSrv extends BaseObjectSrv {
 					.getDocuments();
 			for (EquipmentDocumentationSrv documentation : documentations) {
 				list.add(documentation.getLocal(equipment.getId()));
-			}
-		}
-		return list;
-	}
-
-	public static ArrayList<EquipmentDocumentationSrv> getEquipmentDocumentationsSrv(
-			ArrayList<EquipmentSrv> equipments) {
-
-		ArrayList<EquipmentDocumentationSrv> list = new ArrayList<EquipmentDocumentationSrv>();
-		for (EquipmentSrv equipment : equipments) {
-			ArrayList<EquipmentDocumentationSrv> documentations = equipment
-					.getDocuments();
-			for (EquipmentDocumentationSrv documentation : documentations) {
-				list.add(documentation);
 			}
 		}
 		return list;
