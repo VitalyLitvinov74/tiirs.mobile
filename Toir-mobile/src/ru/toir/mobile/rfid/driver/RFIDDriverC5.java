@@ -1,5 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
+import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.EquipmentInfoActivity;
@@ -20,6 +21,10 @@ import android.widget.Toast;
  * <p>Драйвер считывателя RFID который "считывает" содержимое меток из текстового файла.</p>
  */
 public class RFIDDriverC5 implements RFIDDriver{
+	public final static int READ_USER_LABLE = 1;
+	public final static int READ_EQUIPMENT_LABLE = 2;
+	public final static int RW_OPERATION_LABLE = 3;
+
 	static Activity mActivity;	
 	private Handler mHandler = new MainHandler();
 	static String m_strresult="";
@@ -40,7 +45,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 	@Override
 	public boolean init(byte type) {
 		types=type;
-		if (type==0)
+		if (type==READ_USER_LABLE)
 			{
 			 mActivity.setContentView(R.layout.bar2d_read);			 
 			 mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -67,7 +72,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 	@Override
 	public void read(byte type) {
         //scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);        
-		if (type <= 1)			
+		if (type <= READ_USER_LABLE)			
 			android.hardware.uhf.magic.reader.InventoryLablesLoop();
 		else
 			android.hardware.uhf.magic.reader.InventoryLables();
@@ -110,22 +115,25 @@ public class RFIDDriverC5 implements RFIDDriver{
 					m_strresult +=(String)msg.obj;
     				Toast.makeText(mActivity.getApplicationContext(),"Код: " + m_strresult,Toast.LENGTH_LONG).show();					
 					//m_strresult+="\r\n";
-					if (types < 1)
+					if (types < READ_USER_LABLE)
 						{
 						 m_strresult = "01234567";					
 						 reader.StopLoop();
 						}
-					if (types==0)
+					if (types==READ_USER_LABLE)
 						{
 						 //m_strresult+="\r\n";
 						 ((RFIDActivity)mActivity).Callback(m_strresult);
 						}
-					if (types>0)				
+					if (types>READ_USER_LABLE)				
 						{
 						 if (reader.m_strPCEPC!=null && !reader.m_strPCEPC.equals(""))							 
 						 	{
 							 if (!reader.m_strPCEPC.equals(m_strresult))
-							 	((EquipmentInfoActivity)mActivity).Callback(m_strresult);
+							 	{
+								 if (types==READ_EQUIPMENT_LABLE) ((EquipmentInfoActivity)mActivity).Callback(m_strresult);
+								 if (types==RW_OPERATION_LABLE) ((OperationActivity)mActivity).Callback(m_strresult);
+							 	}
 						 	}
 						 else
 						 	{
@@ -162,5 +170,4 @@ public class RFIDDriverC5 implements RFIDDriver{
   
     	}
     }; 
-	
 }

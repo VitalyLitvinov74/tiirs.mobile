@@ -29,4 +29,46 @@ public class UserTagStructure {
 	public void set_user_uuid(String user_uuid) {
 		this.uuid = user_uuid;
 	}
+	
+	/**
+	 * @return the user name
+	 */
+	public String get_name() {
+		return name;
+	}
+
+	/**
+	 * @param user name the user name to set
+	 */
+	public void set_name(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the user type
+	 */
+	public short get_type() {
+		return type;
+	}
+
+	/**
+	 * @param user type the user type to set
+	 */
+	public void set_type(short type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the who is user  
+	 */
+	public String get_whois() {
+		return whois;
+	}
+
+	/**
+	 * @param who is user name to set
+	 */
+	public void set_whois(String whois) {
+		this.whois = whois;
+	}
 }

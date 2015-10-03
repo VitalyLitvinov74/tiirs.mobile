@@ -15,6 +15,7 @@ import android.view.View;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
+import ru.toir.mobile.rfid.driver.RFIDDriverC5;
 
 /**
  * @author Dmitriy Logachov
@@ -66,9 +67,9 @@ public class RFIDActivity extends Activity {
 		rfid.setActivity(this);
 
 		// инициализируем драйвер
-		if (rfid.init((byte)0)) {
+		if (rfid.init((byte)RFIDDriverC5.READ_USER_LABLE)) {
 			// запускаем процедуру считывания
-			rfid.read((byte)1);
+			rfid.read((byte)RFIDDriverC5.READ_USER_LABLE);
 		} else {
 			setResult(RFID.RESULT_RFID_INIT_ERROR);
 			finish();

@@ -23,7 +23,7 @@ import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
-import android.util.Log;
+import ru.toir.mobile.rfid.driver.RFIDDriverC5;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -126,13 +126,13 @@ public class EquipmentInfoActivity extends Activity {
 
 			read_rfid_button = (Button) findViewById(R.id.button_read);		
     		// инициализируем драйвер
-    		if (rfid.init((byte)1)) {
+    		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE)) {
     			read_rfid_button.setOnClickListener(
 		            new View.OnClickListener() {
 		                @Override
 		                public void onClick(View v) {		            		
 		            			// запускаем процедуру считывания
-		            			rfid.read((byte)2);		            			
+		            			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE);		            			
 		            		} 
 		                });
     			}
@@ -231,7 +231,7 @@ public class EquipmentInfoActivity extends Activity {
 					 Toast.makeText(this, "Ответ слишком короткий",Toast.LENGTH_SHORT).show();					
 					 return;
 					}
-
+				// парсим ответ
 				equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
 				equipmenttag.set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
 				equipmenttag.set_last(result.substring(36, 40));
@@ -247,7 +247,12 @@ public class EquipmentInfoActivity extends Activity {
 				tagrecord2.operation_result = result.substring(96, 100).toLowerCase(Locale.ENGLISH);
 				tagrecord2.user = result.substring(100, 104).toLowerCase(Locale.ENGLISH);
 				tagrecords.add(1,tagrecord2);
-				
+
+				// вариант 2 с хранением данных в глобальной структуре 
+				EquipmentTagStructure.getInstance().set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
+				EquipmentTagStructure.getInstance().set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
+				EquipmentTagStructure.getInstance().set_last(result.substring(36, 40));
+
 				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			    EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 				OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
@@ -264,7 +269,7 @@ public class EquipmentInfoActivity extends Activity {
 				List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 				String[] from = { "name","descr","img"};
 				int[] to = { R.id.lv_firstLine,R.id.lv_secondLine,R.id.lv_icon};
-				// пока одна запись
+				// пока две записи
 			    while (cnt < 2)
 			    	{	 		 		
 					 HashMap<String, String> hm = new HashMap<String,String>();

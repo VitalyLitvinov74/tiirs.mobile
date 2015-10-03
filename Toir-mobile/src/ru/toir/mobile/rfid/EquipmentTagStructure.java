@@ -4,6 +4,7 @@
 package ru.toir.mobile.rfid;
 
 import java.util.ArrayList;
+
 import ru.toir.mobile.rfid.TagRecordStructure;
 
 /**
@@ -16,6 +17,15 @@ public class EquipmentTagStructure {
 	private String status;				// D818A97E-B6EB-4AEC-9168-174C780E365B [2!] B6EB
 	private String last;				// 1 [1]
 	private ArrayList<TagRecordStructure> records = new ArrayList<TagRecordStructure>();
+
+	private static EquipmentTagStructure mInstance;
+	
+	public static synchronized EquipmentTagStructure getInstance() {
+		if (mInstance == null) {
+			mInstance = new EquipmentTagStructure();
+		}
+		return mInstance;
+	}
 
 	public EquipmentTagStructure() {
 	}

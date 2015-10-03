@@ -11,11 +11,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
@@ -23,6 +27,7 @@ import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentOperation;
@@ -34,12 +39,21 @@ import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.rfid.EquipmentTagStructure;
+import ru.toir.mobile.rfid.RFID;
+import ru.toir.mobile.rfid.TagRecordStructure;
+import ru.toir.mobile.rfid.driver.RFIDDriver;
+import ru.toir.mobile.rfid.driver.RFIDDriverC5;
+import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 //import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -55,6 +69,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,6 +104,16 @@ public class OperationActivity extends Activity {
 	private CameraPreview mPreview;
 	private View mCameraView;
 	private String lastPhotoFile;
+
+	private String driverClassName;
+	private Class<?> driverClass;
+	private RFIDDriver driver;
+	private	RFID rfid;
+
+	TagRecordStructure tagrecord = new TagRecordStructure();
+	TagRecordStructure tagrecord2 = new TagRecordStructure();
+	private ArrayList<TagRecordStructure> tagrecords = new ArrayList<TagRecordStructure>();
+	EquipmentTagStructure equipmenttag = new EquipmentTagStructure();
 
 	/**
 	 * Класс для представления множителей (частоты, напряжения, тока...)
@@ -195,6 +220,41 @@ public class OperationActivity extends Activity {
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		equipmentOperationResultDBAdapter.replace(operationResult);
+
+		// инициализируем драйвер для работы с метками
+		// получаем текущий драйвер считывателя
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		driverClassName = sp.getString(getString(R.string.RFIDDriver), "RFIDDriverNull");
+
+		// пытаемся получить класс драйвера
+		try {
+			driverClass = Class.forName("ru.toir.mobile.rfid.driver." + driverClassName);
+		}catch(ClassNotFoundException e){
+			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
+			finish();
+		}
+		
+		// пытаемся создать объект драйвера
+		try{
+			driver = (RFIDDriver)driverClass.newInstance();
+		}catch(InstantiationException e){
+			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
+			e.printStackTrace();
+			finish();
+		}catch(IllegalAccessException e){
+			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
+			e.printStackTrace();
+			finish();
+		}
+
+		rfid = new RFID(driver);
+		rfid.setActivity(this);
+
+		// инициализируем драйвер
+		if (!rfid.init((byte)RFIDDriverC5.RW_OPERATION_LABLE)) {
+			setResult(RFID.RESULT_RFID_INIT_ERROR);
+			finish();
+		}	
 
 		// TODO нужно отработать вариант когда activiti будет создаваться вновь после ухода в фон
 		// соответственно нужно показывать не первый шаг а текущий на котором приложение ушло в фон
@@ -470,6 +530,12 @@ public class OperationActivity extends Activity {
 				operation.setOperation_status_uuid(operationStatusUuid);
 				operationDBAdapter.update(operation);
 				
+				// обновляем информацию об операции в метке устройства
+				// читаем > обновляем > записываем		
+				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null) 
+					 rfid.read((byte)RFIDDriverC5.RW_OPERATION_LABLE);
+				
+
 				finish();
 			}
 		});
@@ -939,4 +1005,36 @@ public class OperationActivity extends Activity {
 		}
 	}
 
+	public void Callback(String result) {
+		if(result == null){
+			setResult(RFID.RESULT_RFID_READ_ERROR);	
+		} else {
+			if (result.length()<100)
+				{
+				 Toast.makeText(this, "Ответ слишком короткий",Toast.LENGTH_SHORT).show();					
+				 return;
+				}
+			// парсим ответ
+			equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
+			equipmenttag.set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
+			equipmenttag.set_last(result.substring(36, 40));
+			tagrecord.operation_date=Long.parseLong(result.substring(40, 56),16);
+			tagrecord.operation_length = Short.parseShort(result.substring(56, 60),16);
+			tagrecord.operation_type = result.substring(60, 64).toLowerCase(Locale.ENGLISH);
+			tagrecord.operation_result = result.substring(64, 68).toLowerCase(Locale.ENGLISH);
+			tagrecord.user = result.substring(68, 72).toLowerCase(Locale.ENGLISH);
+			tagrecords.add(0,tagrecord);
+			tagrecord2.operation_date=Long.parseLong(result.substring(72, 88),16);
+			tagrecord2.operation_length = Short.parseShort(result.substring(88, 92),16);
+			tagrecord2.operation_type = result.substring(92, 96).toLowerCase(Locale.ENGLISH);
+			tagrecord2.operation_result = result.substring(96, 100).toLowerCase(Locale.ENGLISH);
+			tagrecord2.user = result.substring(100, 104).toLowerCase(Locale.ENGLISH);
+			tagrecords.add(1,tagrecord2);
+
+			// вариант 2 с хранением данных в глобальной структуре 
+			EquipmentTagStructure.getInstance().set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
+			EquipmentTagStructure.getInstance().set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
+			EquipmentTagStructure.getInstance().set_last(result.substring(36, 40));
+		}
+	}
 }
