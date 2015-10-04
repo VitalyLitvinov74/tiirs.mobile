@@ -182,56 +182,52 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationResult(Bundle bundle) {
 
-		// TODO для OperationResult нужен параметр - OperationTypeId - для
-		// выборки результатов только по определённому типу операции
-		// получаем урл справочника
+		String[] operationTypeUuids = bundle
+				.getStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID);
 		StringBuilder url = new StringBuilder();
 		String jsonString;
-		Long lastChangedAt;
 
 		String referenceUrl = getReferenceURL(ReferenceName.OperationResult);
 		if (referenceUrl == null) {
 			return false;
 		}
 
-		url.append(mServerUrl).append('/').append(referenceUrl);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss")
+				.create();
 
-		// получаем дату последней модификации содержимого таблицы
-		OperationResultDBAdapter adapter = new OperationResultDBAdapter(
-				new TOiRDatabaseContext(mContext));
-		lastChangedAt = adapter.getLastChangedAt();
-		if (lastChangedAt != null) {
-			url.append('?')
-					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
-		}
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
 
-		jsonString = getReferenceData(url.toString());
-		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
-			// разбираем и сохраняем полученные данные
-			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-					.getWritableDatabase();
-			db.beginTransaction();
-
-			ArrayList<OperationResultSrv> results = gson.fromJson(jsonString,
-					new TypeToken<ArrayList<OperationResultSrv>>() {
-						private static final long serialVersionUID = 1l;
-					}.getType());
-			boolean result = saveOperationResult(results);
-			if (result) {
-				db.setTransactionSuccessful();
+		for (String typeUuid : operationTypeUuids) {
+			url.setLength(0);
+			url.append(mServerUrl).append('/').append(referenceUrl).append('?')
+					.append("OperationTypeId=").append(typeUuid);
+			jsonString = getReferenceData(url.toString());
+			if (jsonString != null) {
+				// разбираем и сохраняем полученные данные
+				ArrayList<OperationResultSrv> results = gson.fromJson(
+						jsonString,
+						new TypeToken<ArrayList<OperationResultSrv>>() {
+							private static final long serialVersionUID = 1l;
+						}.getType());
+				boolean result = saveOperationResult(results);
+				if (!result) {
+					db.endTransaction();
+					return false;
+				}
+			} else {
+				db.endTransaction();
+				return false;
 			}
-			db.endTransaction();
-			return result;
-		} else {
-			return false;
 		}
+
+		db.setTransactionSuccessful();
+		db.endTransaction();
+		return true;
 
 	}
-	
+
 	/**
 	 * Получаем типы документов
 	 * 
@@ -671,7 +667,7 @@ public class ReferenceProcessor {
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
-		
+
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.CriticalType);
 		if (referenceUrl == null) {
@@ -837,12 +833,11 @@ public class ReferenceProcessor {
 		if (jsonString != null) {
 			Gson gson = new GsonBuilder().create();
 			// разбираем полученные данные
-			ArrayList<ReferenceListSrv> list = gson.fromJson(
-					jsonString,
+			ArrayList<ReferenceListSrv> list = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<ReferenceListSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			for(ReferenceListSrv item : list) {
+			for (ReferenceListSrv item : list) {
 				if (item.getReferenceName().equals(referenceName)) {
 					referenceUrl = item.getLinks().get(0).getLink();
 					break;
@@ -1088,28 +1083,38 @@ public class ReferenceProcessor {
 			return false;
 		}
 
-		EquipmentTypeDBAdapter equipmentTypeAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!equipmentTypeAdapter.saveItems(EquipmentSrv.getEquipmentTypes(array))) {
+		EquipmentTypeDBAdapter equipmentTypeAdapter = new EquipmentTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!equipmentTypeAdapter.saveItems(EquipmentSrv
+				.getEquipmentTypes(array))) {
 			return false;
 		}
 
-		CriticalTypeDBAdapter criticalTypeAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!criticalTypeAdapter.saveItems(EquipmentSrv.getCriticalTypes(array))) {
+		CriticalTypeDBAdapter criticalTypeAdapter = new CriticalTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!criticalTypeAdapter
+				.saveItems(EquipmentSrv.getCriticalTypes(array))) {
 			return false;
 		}
 
-		EquipmentStatusDBAdapter equipmentStatusAdapter = new EquipmentStatusDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!equipmentStatusAdapter.saveItems(EquipmentSrv.getEquipmentStatuses(array))) {
+		EquipmentStatusDBAdapter equipmentStatusAdapter = new EquipmentStatusDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!equipmentStatusAdapter.saveItems(EquipmentSrv
+				.getEquipmentStatuses(array))) {
 			return false;
 		}
 
-		EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!documentationAdapter.saveItems(EquipmentSrv.getEquipmentDocumentations(array))) {
+		EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!documentationAdapter.saveItems(EquipmentSrv
+				.getEquipmentDocumentations(array))) {
 			return false;
 		}
 
-		DocumentationTypeDBAdapter documentationTypeAdapter = new DocumentationTypeDBAdapter(new TOiRDatabaseContext(mContext));
-		if (!documentationTypeAdapter.saveItems(EquipmentSrv.getDocumentationTypes(array))) {
+		DocumentationTypeDBAdapter documentationTypeAdapter = new DocumentationTypeDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!documentationTypeAdapter.saveItems(EquipmentSrv
+				.getDocumentationTypes(array))) {
 			return false;
 		}
 
@@ -1125,8 +1130,8 @@ public class ReferenceProcessor {
 	 *            UUID оборудования к которому привязана документация
 	 * @return
 	 */
-	private boolean saveDocumentations(ArrayList<EquipmentDocumentationSrv> array,
-			String equipmentUuid) {
+	private boolean saveDocumentations(
+			ArrayList<EquipmentDocumentationSrv> array, String equipmentUuid) {
 
 		if (array == null) {
 			return false;

@@ -31,6 +31,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 
 		public static final String GET_OPERATION_PATTERN_PARAMETER_UUID = "uuid";
 		public static final String GET_DOCUMENTATION_PARAMETER_UUID = "uuid";
+		public static final String GET_OPERATION_RESULT_PARAMETER_UUID = "uuid";
 	}
 	
 	public static class Actions {

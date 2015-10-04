@@ -187,4 +187,14 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 		return list;
 	}
 
+	public static Set<String> getOperationTypeUuids(
+			ArrayList<EquipmentOperationSrv> operations) {
+
+		Set<String> list = new HashSet<String>();
+		for (EquipmentOperationSrv operation : operations) {
+			list.add(operation.getOperationType().getId());
+		}
+		return list;
+	}
+
 }

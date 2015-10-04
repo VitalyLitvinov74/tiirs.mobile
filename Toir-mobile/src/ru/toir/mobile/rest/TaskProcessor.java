@@ -60,7 +60,8 @@ public class TaskProcessor {
 	private static final String TASK_SEND_RESULT_URL = "/api/orders/";
 	private String mServerUrl;
 
-	Set<String> patternUuids;
+	private Set<String> patternUuids;
+	private Set<String> operationTypeUuids;
 
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
@@ -201,6 +202,9 @@ public class TaskProcessor {
 		try {
 			ReferenceProcessor processor = new ReferenceProcessor(mContext);
 			Bundle bundle = new Bundle();
+			bundle.putStringArray(
+					ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
+					operationTypeUuids.toArray(new String[] {}));
 			boolean result = processor.getOperationResult(bundle);
 			return result;
 		} catch (Exception e) {
@@ -255,6 +259,9 @@ public class TaskProcessor {
 
 		patternUuids = EquipmentOperationSrv
 				.getOperationPatternUuids(operations);
+
+		operationTypeUuids = EquipmentOperationSrv
+				.getOperationTypeUuids(operations);
 
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
