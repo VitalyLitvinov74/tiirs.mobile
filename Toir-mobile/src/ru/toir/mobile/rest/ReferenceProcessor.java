@@ -723,48 +723,43 @@ public class ReferenceProcessor {
 	 */
 	public boolean getDocumentation(Bundle bundle) {
 
-		String equipmentUuid = bundle
-				.getString(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
+		String[] equipmentUuids = bundle
+				.getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
 		StringBuilder url = new StringBuilder();
 		String jsonString;
-		Long lastChangedAt;
 
-		url.append(mServerUrl).append(
-				String.format("/api/equipment/%s/documents", equipmentUuid));
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
 
-		// получаем дату последней модификации содержимого таблицы
-		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
-		lastChangedAt = adapter.getLastChangedAt();
-		if (lastChangedAt != null) {
-			url.append('?')
-					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
-		}
-
-		jsonString = getReferenceData(url.toString());
-		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
-			// разбираем и сохраняем полученные данные
-			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-					.getWritableDatabase();
-			db.beginTransaction();
-			ArrayList<EquipmentDocumentationSrv> list = gson.fromJson(
-					jsonString,
-					new TypeToken<ArrayList<EquipmentDocumentationSrv>>() {
-						private static final long serialVersionUID = 1l;
-					}.getType());
-			boolean result = saveDocumentations(list, equipmentUuid);
-			if (result) {
-				db.setTransactionSuccessful();
+		for (String equipmentUuid : equipmentUuids) {
+			url.setLength(0);
+			url.append(mServerUrl)
+					.append(String.format("/api/equipment/%s/documents",
+							equipmentUuid));
+			jsonString = getReferenceData(url.toString());
+			if (jsonString != null) {
+				Gson gson = new GsonBuilder().setDateFormat(
+						"yyyy-MM-dd'T'hh:mm:ss").create();
+				// разбираем и сохраняем полученные данные
+				ArrayList<EquipmentDocumentationSrv> list = gson.fromJson(
+						jsonString,
+						new TypeToken<ArrayList<EquipmentDocumentationSrv>>() {
+							private static final long serialVersionUID = 1l;
+						}.getType());
+				boolean result = saveDocumentations(list, equipmentUuid);
+				if (!result) {
+					db.endTransaction();
+					return false;
+				}
+			} else {
+				db.endTransaction();
+				return false;
 			}
-			db.endTransaction();
-			return result;
-		} else {
-			return false;
 		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
+		return true;
 	}
 
 	/**
@@ -785,19 +780,19 @@ public class ReferenceProcessor {
 			return false;
 		}
 
-		if (getDocumentType(bundle)) {
+		if (!getDocumentType(bundle)) {
 			return false;
 		}
 
-		if (getEquipmentStatus(bundle)) {
+		if (!getEquipmentStatus(bundle)) {
 			return false;
 		}
 
-		if (getEquipmentType(bundle)) {
+		if (!getEquipmentType(bundle)) {
 			return false;
 		}
 
-		if (getMeasureType(bundle)) {
+		if (!getMeasureType(bundle)) {
 			return false;
 		}
 
@@ -813,25 +808,22 @@ public class ReferenceProcessor {
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
 					typeUuids.toArray(new String[] {}));
-			if (getOperationResult(bundle)) {
+			if (!getOperationResult(bundle)) {
 				return false;
 			}
 		}
 
-		if (getOperationStatus(bundle)) {
+		if (!getOperationStatus(bundle)) {
 			return false;
 		}
 
-		if (getOperationType(bundle)) {
+		if (!getOperationType(bundle)) {
 			return false;
 		}
 
-		if (getTaskStatus(bundle)) {
+		if (!getTaskStatus(bundle)) {
 			return false;
 		}
-
-		// TODO сделать выборку всей документации!!!
-		// getDocumentation(bundle);
 
 		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
@@ -841,12 +833,22 @@ public class ReferenceProcessor {
 			for (Equipment equipment : equipments) {
 				uuids.add(equipment.getUuid());
 			}
+
+			bundle.putStringArray(
+					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID,
+					uuids.toArray(new String[] {}));
+			if (!getDocumentation(bundle)) {
+				return false;
+			}
+
+			bundle.clear();
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID,
 					uuids.toArray(new String[] {}));
-			if (getEquipment(bundle)) {
+			if (!getEquipment(bundle)) {
 				return false;
 			}
+			
 		}
 
 		return true;

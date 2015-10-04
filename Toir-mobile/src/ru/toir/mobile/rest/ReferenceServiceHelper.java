@@ -24,11 +24,14 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	/**
 	 * Получаем/сохраняем варианты результатов выполнения операции
 	 * 
-	 * @param operationTypeUuids Набор uuid типов операций
+	 * @param operationTypeUuids
+	 *            Набор uuid типов операций
 	 */
 	public void getOperationResult(String[] operationTypeUuids) {
 		Bundle bundle = new Bundle();
-		bundle.putStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID, operationTypeUuids);
+		bundle.putStringArray(
+				ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
+				operationTypeUuids);
 		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT, bundle);
 	}
 
@@ -106,10 +109,15 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 
 	/**
 	 * Получаем/сохраняем
+	 * 
+	 * @param equipmentUuids
+	 *            Набор uuid оборудования
 	 */
 	public void getEquipment(String[] equipmentUuids) {
 		Bundle bundle = new Bundle();
-		bundle.putStringArray(ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID, equipmentUuids);
+		bundle.putStringArray(
+				ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID,
+				equipmentUuids);
 		RunMethod(ReferenceServiceProvider.Methods.GET_EQUIPMENT, bundle);
 	}
 
@@ -123,12 +131,15 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 
 	/**
 	 * Получаем/сохраняем
+	 * 
+	 * @param equipmentUuids
+	 *            Набор uuid оборудования
 	 */
-	public void getDocumentation(String equipmentUuid) {
+	public void getDocumentation(String[] equipmentUuids) {
 		Bundle bundle = new Bundle();
-		bundle.putString(
+		bundle.putStringArray(
 				ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID,
-				equipmentUuid);
+				equipmentUuids);
 		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION, bundle);
 	}
 

@@ -25,6 +25,7 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
+import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
 import android.app.ProgressDialog;
@@ -68,7 +69,13 @@ public class ReferenceFragment extends Fragment {
 		public void onReceive(Context context, Intent intent) {
 			getReferencesDialog.dismiss();
 			context.unregisterReceiver(mReceiverGetReference);
-			Toast.makeText(context, "Справочники обновлены", Toast.LENGTH_SHORT).show();
+			boolean result = intent.getBooleanExtra(
+					ProcessorService.Extras.RESULT_EXTRA, false);
+			if (result) {
+				Toast.makeText(context, "Справочники обновлены", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(context, "Справочники не обновлены", Toast.LENGTH_SHORT).show();
+			}
 		}
 	};
 
