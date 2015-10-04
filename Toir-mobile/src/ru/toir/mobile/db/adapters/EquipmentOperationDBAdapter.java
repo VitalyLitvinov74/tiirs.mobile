@@ -256,13 +256,17 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	
 	/**
 	 * Возвращает список операций над оборудованием по наряду
-	 * @param taskUuid
+	 * @param taskUuid, если null, возвращает все операции в базе
 	 * @return если нет наряда, возвращает null
 	 */
 	public ArrayList<EquipmentOperation> getItems(String taskUuid) {
 		ArrayList<EquipmentOperation> arrayList = null;
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID + "=?", new String[]{taskUuid}, null, null, null);		
+		if (taskUuid != null) {
+			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_TASK_UUID + "=?", new String[]{taskUuid}, null, null, null);
+		} else {
+			cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
+		}
 		if (cursor.moveToFirst()) {
 			arrayList = new ArrayList<EquipmentOperation>();
 			do	{
