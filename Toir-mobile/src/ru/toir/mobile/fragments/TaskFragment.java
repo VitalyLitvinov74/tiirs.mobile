@@ -21,6 +21,7 @@ import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.rest.ProcessorService;
@@ -385,31 +386,30 @@ public class TaskFragment extends Fragment {
 			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
 					user.getUuid(), taskStatus, orderByField));
 
-			/*
-			Integer cnt = 0;
-			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-			while (cnt < ordersList.size()) {
-				HashMap<String, String> hm = new HashMap<String, String>();
-				hm.put("name",
-						"Создан: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getCreate_date(), "dd-MM-yyyy hh:mm")
-								+ " | Изменен: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getModify_date(), "dd-MM-yyyy hh:mm"));
-				hm.put("descr",
-						"Статус: "
-								+ taskStatusDBAdapter.getNameByUUID(ordersList
-										.get(cnt).getTask_status_uuid())
-								+ " | Отправлялся: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getAttempt_send_date(),
-										"dd-MM-yyyy hh:mm") + " [Count="
-								+ ordersList.get(cnt).getAttempt_count() + "]");
-				aList.add(hm);
-				cnt++;
-			}
-			*/
+//			Integer cnt = 0;
+//			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+//			while (cnt < ordersList.size()) {
+//				HashMap<String, String> hm = new HashMap<String, String>();
+//				hm.put("name",
+//						"Создан: "
+//								+ DataUtils.getDate(ordersList.get(cnt)
+//										.getCreate_date(), "dd-MM-yyyy hh:mm")
+//								+ " | Изменен: "
+//								+ DataUtils.getDate(ordersList.get(cnt)
+//										.getModify_date(), "dd-MM-yyyy hh:mm"));
+//				hm.put("descr",
+//						"Статус: "
+//								+ taskStatusDBAdapter.getNameByUUID(ordersList
+//										.get(cnt).getTask_status_uuid())
+//								+ " | Отправлялся: "
+//								+ DataUtils.getDate(ordersList.get(cnt)
+//										.getAttempt_send_date(),
+//										"dd-MM-yyyy hh:mm") + " [Count="
+//								+ ordersList.get(cnt).getAttempt_count() + "]");
+//				aList.add(hm);
+//				cnt++;
+//			}
+
 			// Setting the adapter to the listView
 			lv.setAdapter(taskAdapter);
 			button.setVisibility(View.INVISIBLE);
@@ -682,7 +682,7 @@ public class TaskFragment extends Fragment {
 				getActivity()
 						.registerReceiver(mReceiverGetTask, mFilterGetTask);
 
-				tsh.GetTask(AuthorizedUser.getInstance().getToken());
+				tsh.GetTask();
 
 				// показываем диалог получения наряда
 				getOrderDialog = new ProgressDialog(getActivity());
@@ -704,6 +704,24 @@ public class TaskFragment extends Fragment {
 							}
 						});
 				getOrderDialog.show();
+				return true;
+			}
+		});
+		
+		// добавляем элемент меню для отправки результатов выполнения нарядов
+		MenuItem sendTaskResult = menu.add("Отправить результаты");
+		sendTaskResult.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				// костыль для проверки
+				TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(getActivity()));
+				Task task = adapter.getItem("a1f3a9af-d05b-4123-858f-a753a46f97d5");
+				task.setUpdated(true);
+				adapter.replace(task);
+				// конец костыля
+				TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+				tsh.SendTaskResult("a1f3a9af-d05b-4123-858f-a753a46f97d5");
 				return true;
 			}
 		});
