@@ -31,7 +31,7 @@ public class TaskSerializer implements JsonSerializer<TaskRes> {
 		result.addProperty("TaskName", item.getTask_name());
 		result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
 		result.addProperty("ChangedAt", DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
-		result.add("EquipmentOperations", serializeContext.serialize(item.equipmentOperations));
+		result.add("EquipmentOperations", serializeContext.serialize(item.getEquipmentOperations()));
 
 		return result;
 	}

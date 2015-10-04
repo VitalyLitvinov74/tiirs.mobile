@@ -20,8 +20,10 @@ import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
@@ -392,8 +394,7 @@ public class TaskProcessor {
 				Response response = new RestClient().execute(request);
 				// если ответ 204 значит всё сохранилось на сервере
 				if (response.mStatus == 204) {
-					// TODO реализовать изменение статусов данных(updated) на
-					// "отправлено"
+					clearUpdated(results);
 				} else {
 					// TODO реализовать увеличение счётчика попыток отправки
 					// данных чтоб не плодить одинаковый код, выбросить
@@ -409,6 +410,52 @@ public class TaskProcessor {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Сбрасываем флаг изменнённого состояния(данные отправленны на сервер)
+	 * 
+	 * @param resultsList
+	 */
+	private void clearUpdated(ArrayList<TaskRes> resultsList) {
+
+		TaskDBAdapter taskAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
+		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		EquipmentOperationResultDBAdapter operationResultAdapter = new EquipmentOperationResultDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		MeasureValueDBAdapter valueAdapter = new MeasureValueDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
+		for (TaskRes task : resultsList) {
+			task.setUpdated(false);
+			taskAdapter.replace(task);
+
+			ArrayList<EquipmentOperationRes> operations = task
+					.getEquipmentOperations();
+			for (EquipmentOperationRes operation : operations) {
+				operation.setUpdated(false);
+				operationAdapter.replace(operation);
+
+				ArrayList<MeasureValueRes> values = operation
+						.getMeasureValues();
+				for (MeasureValueRes value : values) {
+					value.setUpdated(false);
+					valueAdapter.replace(value);
+				}
+
+				EquipmentOperationResultRes result = operation
+						.getEquipmentOperationResult();
+				result.setUpdated(false);
+				operationResultAdapter.replace(result);
+			}
+		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 	}
 
 }

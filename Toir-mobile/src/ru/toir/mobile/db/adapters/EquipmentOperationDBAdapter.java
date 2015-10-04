@@ -27,6 +27,10 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_OPERATION_PATTERN_UUID = "operation_pattern_uuid";
 	public static final String FIELD_OPERATION_STATUS_UUID = "operation_status_uuid";
 	public static final String FIELD_OPERATION_TIME = "operation_time";
+	public static final String FIELD_ATTEMPT_SEND_DATE = "attempt_send_date";
+	public static final String FIELD_ATTEMPT_COUNT = "attempt_count";
+	public static final String FIELD_UPDATED = "updated";
+
 	
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
@@ -40,6 +44,9 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		public static final String OPERATION_PATTERN_UUID = TABLE_NAME + '_' + FIELD_OPERATION_PATTERN_UUID;
 		public static final String OPERATION_STATUS_UUID = TABLE_NAME + '_' + FIELD_OPERATION_STATUS_UUID;
 		public static final String OPERATION_TIME = TABLE_NAME + '_' + FIELD_OPERATION_TIME;
+		public static final String ATTEMPT_SEND_DATE = TABLE_NAME + '_' + FIELD_ATTEMPT_SEND_DATE;
+		public static final String ATTEMPT_COUNT = TABLE_NAME + '_' + FIELD_ATTEMPT_COUNT;
+		public static final String UPDATED = TABLE_NAME + '_' + FIELD_UPDATED;
 		
 	}
 	
@@ -56,6 +63,9 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		mProjection.put(Projection.OPERATION_PATTERN_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_PATTERN_UUID) + " AS " + Projection.OPERATION_PATTERN_UUID);
 		mProjection.put(Projection.OPERATION_STATUS_UUID, getFullName(TABLE_NAME, FIELD_OPERATION_STATUS_UUID) + " AS " + Projection.OPERATION_STATUS_UUID);
 		mProjection.put(Projection.OPERATION_TIME, getFullName(TABLE_NAME, FIELD_OPERATION_TIME) + " AS " + Projection.OPERATION_TIME);
+		mProjection.put(Projection.ATTEMPT_SEND_DATE, getFullName(TABLE_NAME, FIELD_ATTEMPT_SEND_DATE) + " AS " + Projection.ATTEMPT_SEND_DATE);
+		mProjection.put(Projection.ATTEMPT_COUNT, getFullName(TABLE_NAME, FIELD_ATTEMPT_COUNT) + " AS " + Projection.ATTEMPT_COUNT);
+		mProjection.put(Projection.UPDATED, getFullName(TABLE_NAME, FIELD_UPDATED) + " AS " + Projection.UPDATED);
 	}
 	
 	/**
@@ -159,6 +169,9 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		values.put(FIELD_OPERATION_PATTERN_UUID, item.getOperation_pattern_uuid());
 		values.put(FIELD_OPERATION_STATUS_UUID, item.getOperation_status_uuid());
 		values.put(FIELD_OPERATION_TIME, item.getOperation_time());
+		values.put(FIELD_ATTEMPT_SEND_DATE, item.getAttempt_send_date());
+		values.put(FIELD_ATTEMPT_COUNT, item.getAttempt_count());
+		values.put(FIELD_UPDATED, item.isUpdated() == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -216,16 +229,29 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 	 * @return
 	 */
 	public EquipmentOperation getItem(Cursor cursor) {
-		EquipmentOperation equipmentOperation = new EquipmentOperation();
-		
-		getItem(cursor, equipmentOperation);
-		equipmentOperation.setTask_uuid(cursor.getString(cursor.getColumnIndex(FIELD_TASK_UUID)));
-		equipmentOperation.setEquipment_uuid(cursor.getString(cursor.getColumnIndex(FIELD_EQUIPMENT_UUID)));
-		equipmentOperation.setOperation_type_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_TYPE_UUID)));
-		equipmentOperation.setOperation_pattern_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_PATTERN_UUID)));
-		equipmentOperation.setOperation_status_uuid(cursor.getString(cursor.getColumnIndex(FIELD_OPERATION_STATUS_UUID)));
-		equipmentOperation.setOperation_time(cursor.getInt(cursor.getColumnIndex(FIELD_OPERATION_TIME)));
-		return equipmentOperation;
+		EquipmentOperation operation = new EquipmentOperation();
+
+		getItem(cursor, operation);
+		operation.setTask_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_TASK_UUID)));
+		operation.setEquipment_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_EQUIPMENT_UUID)));
+		operation.setOperation_type_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_OPERATION_TYPE_UUID)));
+		operation.setOperation_pattern_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_OPERATION_PATTERN_UUID)));
+		operation.setOperation_status_uuid(cursor.getString(cursor
+				.getColumnIndex(FIELD_OPERATION_STATUS_UUID)));
+		operation.setOperation_time(cursor.getInt(cursor
+				.getColumnIndex(FIELD_OPERATION_TIME)));
+		operation.setAttempt_send_date(cursor.getLong(cursor
+				.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));
+		operation.setAttempt_count(cursor.getInt(cursor
+				.getColumnIndex(FIELD_ATTEMPT_COUNT)));
+		operation
+				.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 0 ? false
+						: true);
+		return operation;
 	}
 	
 	/**

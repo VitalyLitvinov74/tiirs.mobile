@@ -14,7 +14,7 @@ import ru.toir.mobile.db.adapters.TaskDBAdapter;
  */
 public class TaskRes extends ru.toir.mobile.db.tables.Task {
 
-	public ArrayList<EquipmentOperationRes> equipmentOperations;
+	private ArrayList<EquipmentOperationRes> equipmentOperations;
 
 	/**
 	 * 
@@ -45,6 +45,21 @@ public class TaskRes extends ru.toir.mobile.db.tables.Task {
 			return null;
 		}
 		
+	}
+
+	/**
+	 * @return the equipmentOperations
+	 */
+	public ArrayList<EquipmentOperationRes> getEquipmentOperations() {
+		return equipmentOperations;
+	}
+
+	/**
+	 * @param equipmentOperations the equipmentOperations to set
+	 */
+	public void setEquipmentOperations(
+			ArrayList<EquipmentOperationRes> equipmentOperations) {
+		this.equipmentOperations = equipmentOperations;
 	}
 	
 }
