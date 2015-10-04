@@ -20,7 +20,6 @@ public class TaskServiceProvider implements IServiceProvider {
 		public static final int TASK_SEND_RESULT = 3;
 		public static final int TASKS_SEND_RESULT = 4;
 		// список параметров к методам
-		public static final String PARAMETER_TOKEN = "token";
 		public static final String PARAMETER_TASK_UUID = "taskUuid";
 	}
 	

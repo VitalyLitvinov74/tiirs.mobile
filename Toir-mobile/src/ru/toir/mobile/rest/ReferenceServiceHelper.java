@@ -4,7 +4,6 @@
 package ru.toir.mobile.rest;
 
 import java.util.ArrayList;
-
 import android.content.Context;
 import android.os.Bundle;
 
@@ -24,9 +23,12 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 
 	/**
 	 * Получаем/сохраняем варианты результатов выполнения операции
+	 * 
+	 * @param operationTypeUuids Набор uuid типов операций
 	 */
-	public void getOperationResult() {
+	public void getOperationResult(String[] operationTypeUuids) {
 		Bundle bundle = new Bundle();
+		bundle.putStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID, operationTypeUuids);
 		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT, bundle);
 	}
 
@@ -105,8 +107,9 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	/**
 	 * Получаем/сохраняем
 	 */
-	public void getEquipment() {
+	public void getEquipment(String[] equipmentUuids) {
 		Bundle bundle = new Bundle();
+		bundle.putStringArray(ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID, equipmentUuids);
 		RunMethod(ReferenceServiceProvider.Methods.GET_EQUIPMENT, bundle);
 	}
 

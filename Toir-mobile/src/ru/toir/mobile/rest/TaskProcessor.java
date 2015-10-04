@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.json.JSONArray;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,26 +20,27 @@ import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.db.tables.EquipmentOperationResult;
-import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
 import ru.toir.mobile.serializer.EquipmentOperationSerializer;
 import ru.toir.mobile.serializer.MeasureValueSerializer;
-import ru.toir.mobile.serializer.TaskResultSerializer;
 import ru.toir.mobile.serializer.TaskSerializer;
 import ru.toir.mobile.serverapi.EquipmentOperationSrv;
 import ru.toir.mobile.serverapi.EquipmentSrv;
 import ru.toir.mobile.serverapi.TaskSrv;
-import ru.toir.mobile.serverapi.result.TaskResultRes;
+import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
+import ru.toir.mobile.serverapi.result.EquipmentOperationResultRes;
+import ru.toir.mobile.serverapi.result.MeasureValueRes;
+import ru.toir.mobile.serverapi.result.TaskRes;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -57,10 +57,11 @@ public class TaskProcessor {
 
 	private Context mContext;
 	private static final String TASK_GET_URL = "/api/orders/";
-	private static final String TASK_SEND_RESULT_URL = "/taskresult.php";
+	private static final String TASK_SEND_RESULT_URL = "/api/orders/";
 	private String mServerUrl;
 
-	Set<String> patternUuids;
+	private Set<String> patternUuids;
+	private Set<String> operationTypeUuids;
 
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
@@ -201,6 +202,9 @@ public class TaskProcessor {
 		try {
 			ReferenceProcessor processor = new ReferenceProcessor(mContext);
 			Bundle bundle = new Bundle();
+			bundle.putStringArray(
+					ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
+					operationTypeUuids.toArray(new String[] {}));
 			boolean result = processor.getOperationResult(bundle);
 			return result;
 		} catch (Exception e) {
@@ -256,6 +260,9 @@ public class TaskProcessor {
 		patternUuids = EquipmentOperationSrv
 				.getOperationPatternUuids(operations);
 
+		operationTypeUuids = EquipmentOperationSrv
+				.getOperationTypeUuids(operations);
+
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
 		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(
@@ -294,14 +301,13 @@ public class TaskProcessor {
 	}
 
 	/**
-	 * Отправка результатов выполнения наряда.
+	 * Отправка результата выполнения наряда.
 	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean TaskSendResult(Bundle bundle) {
-		String token = bundle
-				.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
+
 		String taskUuid = bundle
 				.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
@@ -311,11 +317,11 @@ public class TaskProcessor {
 		task = adapter.getTaskByUuidAndUpdated(taskUuid);
 
 		if (task != null) {
-			TaskResultRes taskResult = new TaskResultRes();
-			if (taskResult.load(mContext, task.getUuid())) {
-				ArrayList<TaskResultRes> taskResults = new ArrayList<TaskResultRes>();
+			TaskRes taskResult = TaskRes.load(mContext, task.getUuid());
+			if (taskResult != null) {
+				ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
 				taskResults.add(taskResult);
-				return TasksSendResults(taskResults, token);
+				return TasksSendResults(taskResults);
 			} else {
 				return false;
 			}
@@ -332,9 +338,6 @@ public class TaskProcessor {
 	 */
 	public boolean TasksSendResult(Bundle bundle) {
 
-		String token = bundle
-				.getString(TaskServiceProvider.Methods.PARAMETER_TOKEN);
-
 		String user_uuid = AuthorizedUser.getInstance().getUuid();
 		ArrayList<Task> tasks;
 		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
@@ -344,14 +347,13 @@ public class TaskProcessor {
 		tasks = adapter.getTaskByUserAndUpdated(user_uuid);
 
 		// получаем из базы результаты связанные с нарядами
-		ArrayList<TaskResultRes> taskResults = new ArrayList<TaskResultRes>();
+		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
 		for (Task task : tasks) {
-			TaskResultRes taskResult = new TaskResultRes();
-			taskResult.load(mContext, task.getUuid());
+			TaskRes taskResult = TaskRes.load(mContext, task.getUuid());
 			taskResults.add(taskResult);
 		}
 
-		return TasksSendResults(taskResults, token);
+		return TasksSendResults(taskResults);
 	}
 
 	/**
@@ -359,68 +361,150 @@ public class TaskProcessor {
 	 * 
 	 * @return
 	 */
-	private boolean TasksSendResults(ArrayList<TaskResultRes> tasks,
-			String token) {
+	private boolean TasksSendResults(ArrayList<TaskRes> results) {
 
 		URI requestUri = null;
-		String jsonString = null;
 
 		try {
 			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
-			List<String> tList = new ArrayList<String>();
-			tList.add("Bearer " + token);
-			headers.put("Authorization", tList);
+			List<String> aList = new ArrayList<String>();
+			aList.add("Bearer " + AuthorizedUser.getInstance().getToken());
+			headers.put("Authorization", aList);
+			List<String> cList = new ArrayList<String>();
+			cList.add("application/json");
+			headers.put("Content-Type", cList);
 
-			if (tasks != null) {
+			if (results != null) {
 				StringBuilder postData = new StringBuilder();
-				// TODO реализовать упаковку результатов в json объект
-				// TaskResult taskResult = new TaskResult();
-				// taskResult.loadTaskResult(mContext,
-				// "a1f3a9af-d05b-4123-858f-a753a46f97d5");
-				// TaskResult[] resultArray = new TaskResult[] { taskResult };
 
 				Gson gson = new GsonBuilder()
 						.setPrettyPrinting()
-						.registerTypeAdapter(Task.class, new TaskSerializer())
-						.registerTypeAdapter(TaskResultRes.class,
-								new TaskResultSerializer())
-						.registerTypeAdapter(EquipmentOperation.class,
+						.registerTypeAdapter(TaskRes.class,
+								new TaskSerializer())
+						.registerTypeAdapter(EquipmentOperationRes.class,
 								new EquipmentOperationSerializer())
-						.registerTypeAdapter(EquipmentOperationResult.class,
+						.registerTypeAdapter(EquipmentOperationResultRes.class,
 								new EquipmentOperationResultSerializer())
-						.registerTypeAdapter(MeasureValue.class,
+						.registerTypeAdapter(MeasureValueRes.class,
 								new MeasureValueSerializer()).create();
 
-				String json = gson.toJson(tasks);
+				String json = gson.toJson(results);
 				Log.d("test", json);
 
-				postData.append("tasks=");
 				postData.append(json);
 
 				Request request = new Request(Method.POST, requestUri, headers,
 						postData.toString().getBytes());
 				Response response = new RestClient().execute(request);
-				if (response.mStatus == 200) {
-					// TODO реализовать разбор ответа с подтверждением об
-					// отправке результатов
-					// TODO реализовать изменение статусов данных(updated) на
-					// "отправлено"
-					jsonString = new String(response.mBody, "UTF-8");
-					JSONArray jsonArray = new JSONArray(jsonString);
+				// если ответ 204 значит всё сохранилось на сервере
+				if (response.mStatus == 204) {
+					clearUpdated(results);
 				} else {
-					return false;
+					throw new Exception("Не удалось отправить результаты");
 				}
 			}
 
 		} catch (Exception e) {
+			riseUpdated(results);
 			e.printStackTrace();
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Увеличиваем счётчик попыток отправки результатов
+	 * 
+	 * @param resultsList
+	 */
+	private void riseUpdated(ArrayList<TaskRes> resultsList) {
+		TaskDBAdapter taskAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
+		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		EquipmentOperationResultDBAdapter operationResultAdapter = new EquipmentOperationResultDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		MeasureValueDBAdapter valueAdapter = new MeasureValueDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
+		for (TaskRes task : resultsList) {
+			task.setAttempt_count(task.getAttempt_count() + 1);
+			taskAdapter.replace(task);
+
+			ArrayList<EquipmentOperationRes> operations = task
+					.getEquipmentOperations();
+			for (EquipmentOperationRes operation : operations) {
+				operation.setAttempt_count(operation.getAttempt_count() + 1);
+				operationAdapter.replace(operation);
+
+				ArrayList<MeasureValueRes> values = operation
+						.getMeasureValues();
+				for (MeasureValueRes value : values) {
+					value.setAttempt_count(value.getAttempt_count() + 1);
+					valueAdapter.replace(value);
+				}
+
+				EquipmentOperationResultRes result = operation
+						.getEquipmentOperationResult();
+				result.setAttempt_count(result.getAttempt_count() + 1);
+				operationResultAdapter.replace(result);
+			}
+		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
+	}
+
+	/**
+	 * Сбрасываем флаг изменнённого состояния(данные отправленны на сервер)
+	 * 
+	 * @param resultsList
+	 */
+	private void clearUpdated(ArrayList<TaskRes> resultsList) {
+
+		TaskDBAdapter taskAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
+		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		EquipmentOperationResultDBAdapter operationResultAdapter = new EquipmentOperationResultDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		MeasureValueDBAdapter valueAdapter = new MeasureValueDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
+		for (TaskRes task : resultsList) {
+			task.setUpdated(false);
+			taskAdapter.replace(task);
+
+			ArrayList<EquipmentOperationRes> operations = task
+					.getEquipmentOperations();
+			for (EquipmentOperationRes operation : operations) {
+				operation.setUpdated(false);
+				operationAdapter.replace(operation);
+
+				ArrayList<MeasureValueRes> values = operation
+						.getMeasureValues();
+				for (MeasureValueRes value : values) {
+					value.setUpdated(false);
+					valueAdapter.replace(value);
+				}
+
+				EquipmentOperationResultRes result = operation
+						.getEquipmentOperationResult();
+				result.setUpdated(false);
+				operationResultAdapter.replace(result);
+			}
+		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 	}
 
 }

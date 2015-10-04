@@ -15,6 +15,9 @@ public class EquipmentOperation extends BaseTable {
 	private String operation_pattern_uuid;
 	private String operation_status_uuid;
 	private int operation_time;
+	private long attempt_send_date;
+	private int attempt_count;
+	private boolean updated;
 
 	public EquipmentOperation() {
 	}
@@ -101,6 +104,48 @@ public class EquipmentOperation extends BaseTable {
 	 */
 	public void setOperation_time(int operation_time ) {
 		this.operation_time = operation_time;
+	}
+
+	/**
+	 * @return the attempt_send_date
+	 */
+	public long getAttempt_send_date() {
+		return attempt_send_date;
+	}
+
+	/**
+	 * @param attempt_send_date the attempt_send_date to set
+	 */
+	public void setAttempt_send_date(long attempt_send_date) {
+		this.attempt_send_date = attempt_send_date;
+	}
+
+	/**
+	 * @return the attempt_count
+	 */
+	public int getAttempt_count() {
+		return attempt_count;
+	}
+
+	/**
+	 * @param attempt_count the attempt_count to set
+	 */
+	public void setAttempt_count(int attempt_count) {
+		this.attempt_count = attempt_count;
+	}
+
+	/**
+	 * @return the updated
+	 */
+	public boolean isUpdated() {
+		return updated;
+	}
+
+	/**
+	 * @param updated the updated to set
+	 */
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 
 }
