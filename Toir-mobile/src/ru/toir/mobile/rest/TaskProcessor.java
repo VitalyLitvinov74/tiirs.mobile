@@ -396,20 +396,62 @@ public class TaskProcessor {
 				if (response.mStatus == 204) {
 					clearUpdated(results);
 				} else {
-					// TODO реализовать увеличение счётчика попыток отправки
-					// данных чтоб не плодить одинаковый код, выбросить
-					// исключение и попасть в блок ниже
-					return false;
+					throw new Exception("Не удалось отправить результаты");
 				}
 			}
 
 		} catch (Exception e) {
-			// TODO реализовать увеличение счётчика попыток отправки данных
+			riseUpdated(results);
 			e.printStackTrace();
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Увеличиваем счётчик попыток отправки результатов
+	 * 
+	 * @param resultsList
+	 */
+	private void riseUpdated(ArrayList<TaskRes> resultsList) {
+		TaskDBAdapter taskAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
+				mContext));
+		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		EquipmentOperationResultDBAdapter operationResultAdapter = new EquipmentOperationResultDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		MeasureValueDBAdapter valueAdapter = new MeasureValueDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
+		for (TaskRes task : resultsList) {
+			task.setAttempt_count(task.getAttempt_count() + 1);
+			taskAdapter.replace(task);
+
+			ArrayList<EquipmentOperationRes> operations = task
+					.getEquipmentOperations();
+			for (EquipmentOperationRes operation : operations) {
+				operation.setAttempt_count(operation.getAttempt_count() + 1);
+				operationAdapter.replace(operation);
+
+				ArrayList<MeasureValueRes> values = operation
+						.getMeasureValues();
+				for (MeasureValueRes value : values) {
+					value.setAttempt_count(value.getAttempt_count() + 1);
+					valueAdapter.replace(value);
+				}
+
+				EquipmentOperationResultRes result = operation
+						.getEquipmentOperationResult();
+				result.setAttempt_count(result.getAttempt_count() + 1);
+				operationResultAdapter.replace(result);
+			}
+		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 	}
 
 	/**
