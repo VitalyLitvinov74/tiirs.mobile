@@ -160,7 +160,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/read_15693"
                             android:textColor="@color/lightgray"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:textStyle="normal"
                             android:typeface="normal" />
 

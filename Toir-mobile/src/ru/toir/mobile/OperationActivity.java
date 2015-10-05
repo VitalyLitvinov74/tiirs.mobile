@@ -47,6 +47,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
@@ -148,6 +149,7 @@ public class OperationActivity extends Activity {
 		task_uuid = b.getString(TASK_UUID_EXTRA);
 		equipment_uuid = b.getString(EQUIPMENT_UUID_EXTRA);
 		setContentView(R.layout.taskwork_fragment);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 		layout = (LinearLayout) findViewById(R.id.resultButtonLayout);
 		stepTitle = (TextView) findViewById(R.id.stepTitle);
@@ -300,6 +302,7 @@ public class OperationActivity extends Activity {
 			final String next_step_uuid = result
 					.getNext_operation_pattern_step_uuid();
 			resultButton.setText(result.getTitle());
+			resultButton.setWidth(200);
 			if (result.getNext_operation_pattern_step_uuid().equals(
 					"00000000-0000-0000-0000-000000000000") || result.getNext_operation_pattern_step_uuid().equals("")) {
 				resultButton.setOnClickListener(new View.OnClickListener() {
@@ -560,6 +563,7 @@ public class OperationActivity extends Activity {
 				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null)
 					{
 					 setContentView(R.layout.rfid_read);
+					 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 					 rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
 					}				
 				//finish();

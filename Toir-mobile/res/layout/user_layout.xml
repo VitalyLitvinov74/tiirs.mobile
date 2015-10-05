@@ -132,7 +132,7 @@
                         android:background="@color/black" >
 
                         <TextView
-                            android:id="@+id/user_text08"
+                            android:id="@+id/user_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@color/black"
@@ -171,7 +171,8 @@
                         <TextView
                             android:id="@+id/user_text_date"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:text="05-10-2015 22:45" />
 
                     </TableRow>
 
@@ -190,7 +191,9 @@
                             android:id="@+id/user_text_tasks"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12/11" />
+                            android:layout_gravity="center"
+                            android:text="2/1" />
+
                     </TableRow>
 
                     <TableRow
@@ -233,8 +236,21 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.25"
-                                android:src="@drawable/checkmark_32"
-                                android:contentDescription="@string/image_description" />
+                                android:contentDescription="@string/image_description"
+                                android:src="@drawable/checkmark_32" />
+
+                        </LinearLayout>
+
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/user_tablerow12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
 
                             <TextView
                                 android:id="@+id/user_text_gps"
@@ -247,18 +263,12 @@
                                 android:id="@+id/user_status_gps"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="0.25"
-                                android:src="@drawable/checkmark_32" 
-                                android:contentDescription="@string/image_description" />
+                                android:layout_weight="0.42"
+                                android:contentDescription="@string/image_description"
+                                android:src="@drawable/forbidden_32" />
 
                         </LinearLayout>
 
-                    </TableRow>
-
-                    <TableRow
-                        android:id="@+id/user_tablerow12"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" >
                     </TableRow>
 
                     <TableRow

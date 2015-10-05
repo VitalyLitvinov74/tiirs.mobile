@@ -124,7 +124,6 @@ public class TaskFragment extends Fragment {
 					initView();
 				}
 			}
-
 		}
 	};
 

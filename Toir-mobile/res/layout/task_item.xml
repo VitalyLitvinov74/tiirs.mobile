@@ -1,87 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="horizontal" >
 
     <ImageView
         android:id="@+id/ti_ImageStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/img_status_1"
-        android:contentDescription="@string/status" />
+        android:contentDescription="@string/status"
+        android:src="@drawable/img_status_1" />
 
-    <TextView
-        android:id="@+id/ti_Name"
+    <TableLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_ImageStatus"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    
-   
-    <TextView
-        android:id="@+id/ti_CreateLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_Name"
-        android:text="@string/created"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/ti_Create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_CreateLabel"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/ti_CloseLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_Create"
-        android:text="@string/closed"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/ti_Name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="16sp" />
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/divider"
+                    android:layout_marginRight="5dp"
+                    android:textSize="16sp" />
+                
+                <TextView
+                    android:id="@+id/ti_StatusLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/status"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/ti_Close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_CloseLabel"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    
-    <TextView
-        android:id="@+id/ti_StatusLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_Close"
-        android:text="@string/status"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/ti_Status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="15sp" />
 
-    <TextView
-        android:id="@+id/ti_Status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/ti_StatusLabel"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/divider"
+                    android:layout_marginRight="5dp"
+                    android:textSize="16sp" />
+                
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/status"
+                    android:src="@drawable/help_32" />
 
-</RelativeLayout>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/ti_CreateLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="6dp"
+                    android:text="@string/created"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/ti_Create"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/divider"
+                    android:layout_marginRight="5dp"
+                    android:textSize="16sp" />
+                
+                <TextView
+                    android:id="@+id/ti_CloseLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/closed"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/ti_Close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="14sp" />
+
+        </TableRow>
+    </TableLayout>
+
+</LinearLayout>

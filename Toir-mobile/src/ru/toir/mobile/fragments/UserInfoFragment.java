@@ -28,7 +28,7 @@ public class UserInfoFragment extends Fragment {
 	private TextView tv_user_type;
 	private TextView tv_user_gps;
 	private TextView tv_user_status;
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -54,9 +54,9 @@ public class UserInfoFragment extends Fragment {
 		tv_user_id = (TextView) view.findViewById(R.id.user_text_id);
 		tv_user_name = (TextView) view.findViewById(R.id.user_text_name);
 		tv_user_type = (TextView) view.findViewById(R.id.equipment_text_type);
-		tv_user_gps = (TextView) view.findViewById(R.id.user_text_gps);
-		tv_user_status = (TextView) view.findViewById(R.id.user_position);
-
+		tv_user_gps = (TextView) view.findViewById(R.id.user_position);
+		tv_user_status = (TextView) view.findViewById(R.id.user_status);
+		
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
