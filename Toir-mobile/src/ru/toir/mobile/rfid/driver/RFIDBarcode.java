@@ -4,6 +4,7 @@
 package ru.toir.mobile.rfid.driver;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+
 import android.app.Activity;
 import android.view.Menu;
 
@@ -14,6 +15,7 @@ import android.view.Menu;
 public class RFIDBarcode implements RFIDDriver {
 	
 	Activity mActivity;
+	static byte types=0;	
 
 	@Override
 	public void setActivity(Activity activity) {
@@ -54,6 +56,16 @@ public class RFIDBarcode implements RFIDDriver {
 	 */
 	@Override
 	public void getMenu(Menu menu) {
+	}
+
+	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	@Override
+	public boolean SetOperationType(byte type) {
+		types=type;
+		return true;
 	}
 
 }

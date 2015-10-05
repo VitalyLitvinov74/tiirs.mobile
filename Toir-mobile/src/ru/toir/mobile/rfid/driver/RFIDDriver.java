@@ -8,6 +8,7 @@ import android.view.Menu;
  * <p>Интерфейс драйвера считывателя RFID</p>
  */
 public interface RFIDDriver {
+	static byte types=0;	
 	
 	public void setActivity(Activity activity);
 	
@@ -29,7 +30,13 @@ public interface RFIDDriver {
 	 * @return
 	 */
 	public boolean write(byte[] outBuffer);
-	
+
+	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	public boolean SetOperationType(byte type);
+
 	/**
 	 * <p>Завершение работы драйвера</p>
 	 */

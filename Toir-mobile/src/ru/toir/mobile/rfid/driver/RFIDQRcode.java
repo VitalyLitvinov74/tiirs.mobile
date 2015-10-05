@@ -29,7 +29,9 @@ public class RFIDQRcode implements RFIDDriver{
 	
 	ReadTagAsyncTask mTask;
 	Activity mActivity;
-	
+
+	static byte types=0;	
+
 	private Camera mCamera;
 	private CameraPreview mPreview;
 	private Handler autoFocusHandler;
@@ -73,7 +75,17 @@ public class RFIDQRcode implements RFIDDriver{
 		resumeCamera();
 		//mTask = (ReadTagAsyncTask)new ReadTagAsyncTask().execute();
 	}
-	
+
+	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	@Override
+	public boolean SetOperationType(byte type) {
+		types=type;
+		return true;
+	}
+
 	/**
 	 * <p>Записываем в метку</p>
 	 * @param outBuffer

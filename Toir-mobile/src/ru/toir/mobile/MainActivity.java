@@ -277,7 +277,7 @@ public class MainActivity extends FragmentActivity {
 				Intent operationActivity = new Intent(this,
 						OperationActivity.class);
 				Bundle bundle = data.getExtras();
-				if (bundle.getString(OperationActivity.EQUIPMENT_TAG_EXTRA).equals(tagId)) {
+				if (!bundle.getString(OperationActivity.EQUIPMENT_TAG_EXTRA).equals(tagId)) {
 					operationActivity.putExtras(bundle);
 					startActivity(operationActivity);
 				} else {

@@ -17,6 +17,8 @@ public class RFIDDriverText implements RFIDDriver{
 	
 	ReadTagAsyncTask mTask;
 	Activity mActivity;
+
+	static byte types=0;	
 	
 	@Override
 	public void setActivity(Activity activity) {
@@ -58,6 +60,16 @@ public class RFIDDriverText implements RFIDDriver{
 	 */
 	@Override
 	public void close() {
+	}
+
+	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	@Override
+	public boolean SetOperationType(byte type) {
+		types=type;
+		return true;
 	}
 
 	/** 

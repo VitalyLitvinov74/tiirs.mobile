@@ -43,6 +43,7 @@ import ru.toir.mobile.rfid.driver.RFIDDriverC5;
 import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
+//import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.DialogInterface;
@@ -50,6 +51,8 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+//import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -84,7 +87,7 @@ public class OperationActivity extends Activity {
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
 	private ArrayList<OperationResult> operationResults;
-	private String task_uuid, operation_uuid, equipment_uuid;
+	private String task_uuid, operation_uuid, equipment_uuid,operation_result_uuid,operation_type_uuid;
 	private String taskname = "";
 	private String operationname = "";
 	private LinearLayout layout;
@@ -249,12 +252,17 @@ public class OperationActivity extends Activity {
 		rfid.setActivity(this);
 
 		// инициализируем драйвер
-		if (!rfid.init((byte)RFIDDriverC5.RW_OPERATION_LABLE)) {
+		if (!rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID)) {
 			setResult(RFID.RESULT_RFID_INIT_ERROR);
 			finish();
 		}	
 
 		showStep(getFirstStep().getUuid());
+	}
+
+	public void cancelOnClick(View view){
+		setResult(RESULT_CANCELED);
+		finish();
 	}
 
 	private void showStep(String uuid) {
@@ -293,7 +301,7 @@ public class OperationActivity extends Activity {
 					.getNext_operation_pattern_step_uuid();
 			resultButton.setText(result.getTitle());
 			if (result.getNext_operation_pattern_step_uuid().equals(
-					"00000000-0000-0000-0000-000000000000")) {
+					"00000000-0000-0000-0000-000000000000") || result.getNext_operation_pattern_step_uuid().equals("")) {
 				resultButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -530,6 +538,7 @@ public class OperationActivity extends Activity {
 				operationResult = equipmentOperationResultDBAdapter
 						.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
+				operation_result_uuid = result.getUuid();
 				operationResult.setEnd_date(new Date().getTime());
 				equipmentOperationResultDBAdapter.update(operationResult);
 
@@ -541,16 +550,19 @@ public class OperationActivity extends Activity {
 						new TOiRDatabaseContext(getApplicationContext()));
 				EquipmentOperation operation = operationDBAdapter
 						.getItem(operation_uuid);
+				operation_type_uuid = operation.getOperation_type_uuid();
+
 				operation.setOperation_status_uuid(operationStatusUuid);
 				operationDBAdapter.update(operation);
 
 				// обновляем информацию об операции в метке устройства
 				// читаем > обновляем > записываем		
-				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null) 
-					 rfid.read((byte)RFIDDriverC5.RW_OPERATION_LABLE);
-				
-
-				finish();
+				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null)
+					{
+					 setContentView(R.layout.rfid_read);
+					 rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
+					}				
+				//finish();
 			}
 		});
 
@@ -1038,6 +1050,11 @@ public class OperationActivity extends Activity {
 		}
 	}
 
+	public void CallbackOnReadLable(String result) {
+		rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
+		rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
+	}
+
 	public void Callback(String result) {
 		if(result == null){
 			setResult(RFID.RESULT_RFID_READ_ERROR);	
@@ -1047,10 +1064,12 @@ public class OperationActivity extends Activity {
 				 Toast.makeText(this, "Ответ слишком короткий",Toast.LENGTH_SHORT).show();					
 				 return;
 				}
+			byte out_buffer[];
+			
 			// парсим ответ
 			equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
-			equipmenttag.set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
 			equipmenttag.set_last(result.substring(36, 40));
+			equipmenttag.set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
 			tagrecord.operation_date=Long.parseLong(result.substring(40, 56),16);
 			tagrecord.operation_length = Short.parseShort(result.substring(56, 60),16);
 			tagrecord.operation_type = result.substring(60, 64).toLowerCase(Locale.ENGLISH);
@@ -1068,6 +1087,44 @@ public class OperationActivity extends Activity {
 			EquipmentTagStructure.getInstance().set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
 			EquipmentTagStructure.getInstance().set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
 			EquipmentTagStructure.getInstance().set_last(result.substring(36, 40));
+			
+			// заполоняем структуру результата обследования 
+			if (equipmenttag.get_last()=="1")
+				equipmenttag.set_last("2");
+			else equipmenttag.set_last("1");
+			// TODO добавить статус оборудования после обслуживания
+			// equipmenttag.set_status("?");
+			Time now = new Time();
+			now.setToNow();
+			tagrecord.operation_date = now.toMillis(false);
+			// TODO решить как считать время выполнения операции
+			tagrecord.operation_length = 0;
+			tagrecord.operation_result = operation_result_uuid;
+			
+			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
+					new TOiRDatabaseContext(getApplicationContext()));
+			EquipmentOperation operation = operationDBAdapter
+					.getItem(operation_uuid);
+			operation.getOperation_type_uuid();
+			tagrecord.operation_result = operation_result_uuid;
+			tagrecord.operation_type = operation_type_uuid;
+			tagrecord.user = AuthorizedUser.getInstance().getUuid();
+
+			if (equipmenttag.get_last()=="1")
+				tagrecords.set(0,tagrecord);
+			else tagrecords.set(1, tagrecord);
+			
+			//for (int pointer=0; pointer<equipmenttag.toString().length()+2*tagrecord.toString().length())
+			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2.toString()).getBytes();
+			rfid.SetOperationType((byte)RFIDDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
+			rfid.write(out_buffer);
+		}
+	}
+	public void CallbackOnWrite(String result) {
+		if(result == null){
+			setResult(RFID.RESULT_RFID_WRITE_ERROR);	
+		} else {
+			finish();
 		}
 	}
 	/*

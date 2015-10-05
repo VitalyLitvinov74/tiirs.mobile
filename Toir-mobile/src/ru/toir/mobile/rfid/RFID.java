@@ -15,6 +15,7 @@ public class RFID {
 	public static final int RESULT_RFID_READ_ERROR = android.app.Activity.RESULT_FIRST_USER;
 	public static final int RESULT_RFID_INIT_ERROR = android.app.Activity.RESULT_FIRST_USER + 1;
 	public static final int RESULT_RFID_CLASS_NOT_FOUND = android.app.Activity.RESULT_FIRST_USER + 2;
+	public static final int RESULT_RFID_WRITE_ERROR = android.app.Activity.RESULT_FIRST_USER + 3;
 	RFIDDriver mDriver;
 	
 	public void setActivity(Activity activity) {
@@ -53,7 +54,15 @@ public class RFID {
 	public boolean write(byte[] outBuffer){
 		return mDriver.write(outBuffer);
 	}
-	
+
+	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	public boolean SetOperationType(byte type){
+		 return mDriver.SetOperationType(type);
+		}
+
 	/**
 	 * <p>Завершаем работу</p> 
 	 */

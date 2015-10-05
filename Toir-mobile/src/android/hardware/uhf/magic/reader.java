@@ -895,7 +895,7 @@ public class reader {
 						}
 						if (tag_find) {
 
-							mSoundPool.play(msound, 1.0f, 1.0f, 0, 0, 1.0f);
+							//mSoundPool.play(msound, 1.0f, 1.0f, 0, 0, 1.0f);
 						}
 						if (m_bLoop) {
 							m_nCount = 0;

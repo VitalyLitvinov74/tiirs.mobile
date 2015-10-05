@@ -22,8 +22,13 @@ import android.widget.Toast;
  */
 public class RFIDDriverC5 implements RFIDDriver{
 	public final static int READ_USER_LABLE = 1;
-	public final static int READ_EQUIPMENT_LABLE = 2;
-	public final static int RW_OPERATION_LABLE = 3;
+	public final static int READ_EQUIPMENT_LABLE_ID = 2;
+	public final static int READ_EQUIPMENT_OPERATION_LABLE_ID = 3;
+	public final static int READ_EQUIPMENT_MEMORY = 4;
+	public final static int READ_EQUIPMENT_OPERATION_MEMORY = 5;
+	public final static int WRITE_EQUIPMENT_OPERATION_MEMORY = 6;
+	
+	public final static int USER_MEMORY_BANK = 3;
 
 	static Activity mActivity;	
 	private Handler mHandler = new MainHandler();
@@ -31,7 +36,8 @@ public class RFIDDriverC5 implements RFIDDriver{
 	static int m_nCount=0;
 	CheckBox m_check;  
 	EditText m_address;
-	static byte types=0;	
+	static byte types=0;
+	static String mPCEPC="";
 		
 	@Override
 	public void setActivity(Activity activity) {
@@ -65,18 +71,46 @@ public class RFIDDriverC5 implements RFIDDriver{
 	}
 
 	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	@Override
+	public boolean SetOperationType(byte type) {
+		types=type;
+		return true;
+	}
+
+	/**
 	 * <p>Считываем метку</p>
 	 * <p>Здесь нужно запустить отдельную задачу в которой пытаемся считать метку</p>
 	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
 	 */
 	@Override
 	public void read(byte type) {
+		types=type;
         //scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);        
 		if (type <= READ_USER_LABLE)			
 			android.hardware.uhf.magic.reader.InventoryLablesLoop();
-		else
+		if (type == READ_EQUIPMENT_LABLE_ID || type == READ_EQUIPMENT_OPERATION_LABLE_ID)
 			android.hardware.uhf.magic.reader.InventoryLables();
-		reader.m_strPCEPC = "";
+		if (type == READ_EQUIPMENT_MEMORY || type == READ_EQUIPMENT_OPERATION_MEMORY)
+			{
+			reader.m_strPCEPC=mPCEPC;
+			byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
+			 byte memoryBank = USER_MEMORY_BANK;	// user memory
+			 int address = 0;						// читаем всегда с начала
+			 int dataLength = 32;					// длина памяти данных
+			 String passwordString = "00000000";	// пароль
+			 byte[] password = reader.stringToBytes(passwordString);
+			 try {
+				 Thread.sleep(690);
+		 		} catch (InterruptedException e) {
+		 			e.printStackTrace();
+		 		}
+			 m_strresult="";
+			 reader.ReadLables(password, epc.length, epc, memoryBank, address, dataLength);
+			}
+		//reader.m_strPCEPC = "";
 	}
 
 	/**
@@ -85,7 +119,35 @@ public class RFIDDriverC5 implements RFIDDriver{
 	 * @return
 	 */
 	@Override
-	public boolean write(byte[] outBuffer){
+	public boolean write(byte[] outBuffer){		
+		if (types==WRITE_EQUIPMENT_OPERATION_MEMORY)
+			{
+			 //byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
+			 byte[] epc = reader.stringToBytes(mPCEPC);
+			 byte memoryBank = USER_MEMORY_BANK;		// user memory
+			 int address = 0;							// пишем буфер с начала
+			 int dataLength = 32;						// длина памяти данных
+			 //int dataLength = Integer.valueOf(outBuffer.length) * 2;
+			 String passwordString = "00000000";		// пароль
+			 byte[] password = reader.stringToBytes(passwordString);
+			 
+			 int rc = reader.Writelables(password, epc.length, epc,
+						memoryBank, (byte) address, (byte) 16,
+						outBuffer);
+		
+			 int realDataLength = outBuffer.length > dataLength ? dataLength
+					 : outBuffer.length;
+			 byte[] dataForWrite = new byte[realDataLength];
+			 System.arraycopy(outBuffer, 0, dataForWrite, 0, realDataLength);
+			 /*
+			 int rc = reader.Writelables(password, epc.length, epc,
+					memoryBank, (byte) address, (byte) realDataLength,
+					dataForWrite);
+				*/		 
+			 if (rc>=0) return true;
+			 else return false;
+			 
+			}
 		return false;
 	}
 
@@ -115,48 +177,39 @@ public class RFIDDriverC5 implements RFIDDriver{
 					m_strresult +=(String)msg.obj;
     				Toast.makeText(mActivity.getApplicationContext(),"Код: " + m_strresult,Toast.LENGTH_LONG).show();					
 					//m_strresult+="\r\n";
-					if (types < READ_USER_LABLE)
+    				// возврат при чтении метки пользователя
+					if (types == READ_USER_LABLE)
 						{
 						 m_strresult = "01234567";					
-						 reader.StopLoop();
-						}
-					if (types==READ_USER_LABLE)
-						{
-						 //m_strresult+="\r\n";
+						 reader.StopLoop();						 
 						 ((RFIDActivity)mActivity).Callback(m_strresult);
 						}
-					if (types>READ_USER_LABLE)				
+					// возврат при чтении метки оборудования
+					if (types==READ_EQUIPMENT_LABLE_ID || types==READ_EQUIPMENT_OPERATION_LABLE_ID)				
 						{
-						 if (reader.m_strPCEPC!=null && !reader.m_strPCEPC.equals(""))							 
-						 	{
-							 if (!reader.m_strPCEPC.equals(m_strresult))
-							 	{
-								 if (types==READ_EQUIPMENT_LABLE) ((EquipmentInfoActivity)mActivity).Callback(m_strresult);
-								 if (types==RW_OPERATION_LABLE) ((OperationActivity)mActivity).Callback(m_strresult);
-							 	}
-						 	}
-						 else
-						 	{
-							 reader.m_strPCEPC = m_strresult;						 						 
-							 if (reader.m_strPCEPC!=null && !reader.m_strPCEPC.equals(""))
-						 		{								 	
-								 byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
-								 byte memoryBank = 3; 		// user memory
-								 int address = 0;			// читаем всегда с начала
-								 int dataLength = 32;		// длина памяти данных
-								 String passwordString = "00000000";		// пароль
-								 byte[] password = reader.stringToBytes(passwordString);
-								 try {
-									Thread.sleep(690);
-								 	} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									 e.printStackTrace();
-								 	}
-								 m_strresult="";
-								 reader.ReadLables(password, epc.length, epc, memoryBank, address, dataLength);
-						 		}
+						 reader.m_strPCEPC = m_strresult;
+						 mPCEPC = m_strresult;
+						 if (types==READ_EQUIPMENT_LABLE_ID)
+							 ((EquipmentInfoActivity)mActivity).CallbackOnReadLable(m_strresult);
+						 if (types==READ_EQUIPMENT_OPERATION_LABLE_ID)
+							 ((OperationActivity)mActivity).CallbackOnReadLable(m_strresult);
+						}
+					// возврат при чтении памяти оборудования
+					if (types==READ_EQUIPMENT_MEMORY || types==READ_EQUIPMENT_OPERATION_MEMORY)				
+						{
+						 if (mPCEPC!=null && !mPCEPC.equals(""))
+						 	{							 
+							 if (types==READ_EQUIPMENT_MEMORY)
+								 ((EquipmentInfoActivity)mActivity).Callback(m_strresult);
+							 if (types==READ_EQUIPMENT_OPERATION_MEMORY)
+								 ((OperationActivity)mActivity).Callback(m_strresult);
 						 	}
 						}
+					// возврат при записи памяти оборудования
+					if (types==WRITE_EQUIPMENT_OPERATION_MEMORY)				
+						{
+						 ((OperationActivity)mActivity).CallbackOnWrite(m_strresult);
+						}							 
 					m_strresult="";
     			}  
     			m_nCount++;

@@ -20,6 +20,7 @@ public class RFIDBarcode2D implements RFIDDriver{
 	private Handler mHandler = new MainHandler();
 	static Activity mActivity;
 	static private TextView scanText;
+	static byte types=0;	
 	
     static private class MainHandler extends Handler {
     	@Override          
@@ -71,7 +72,7 @@ public class RFIDBarcode2D implements RFIDDriver{
 		// запускаем отдельную задачу для считывания метки
         Scanner.Read();
 	}
-	
+
 	/**
 	 * <p>Записываем в метку</p>
 	 * @param outBuffer
@@ -87,6 +88,16 @@ public class RFIDBarcode2D implements RFIDDriver{
 	 */
 	@Override
 	public void close() {
+	}
+
+	/**
+	 * <p>Устанавливаем тип операции</p>
+	 * @return boolean
+	 */
+	@Override
+	public boolean SetOperationType(byte type) {
+		types=type;
+		return true;
 	}
 
 	/** 

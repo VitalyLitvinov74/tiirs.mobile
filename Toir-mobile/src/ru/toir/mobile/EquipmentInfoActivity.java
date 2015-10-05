@@ -126,13 +126,13 @@ public class EquipmentInfoActivity extends Activity {
 
 			read_rfid_button = (Button) findViewById(R.id.button_read);		
     		// инициализируем драйвер
-    		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE)) {
+    		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID)) {
     			read_rfid_button.setOnClickListener(
 		            new View.OnClickListener() {
 		                @Override
 		                public void onClick(View v) {		            		
-		            			// запускаем процедуру считывания
-		            			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE);		            			
+		            			// запускаем процедуру считывания тега метки
+		            			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID);		            			
 		            		} 
 		                });
     			}
@@ -220,7 +220,12 @@ public class EquipmentInfoActivity extends Activity {
 			// Setting the adapter to the listView
 			lv.setAdapter(adapter);
 		}
-
+	 	
+		public void CallbackOnReadLable(String result) {
+			rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);
+			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);
+		}
+	
 		public void Callback(String result) {
 			//Intent data = null;
 			if(result == null){
