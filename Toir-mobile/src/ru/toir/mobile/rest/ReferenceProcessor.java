@@ -3,13 +3,14 @@
  */
 package ru.toir.mobile.rest;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,6 +34,7 @@ import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
@@ -66,6 +68,8 @@ public class ReferenceProcessor {
 
 	private String mServerUrl;
 	private Context mContext;
+
+	private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
 	private static class ReferenceName {
 		public static String CriticalType = "CriticalityType";
@@ -128,8 +132,8 @@ public class ReferenceProcessor {
 				Log.d("test", jsonString);
 				return jsonString;
 			} else {
-				throw new Exception("Не удалось получить справочник. URL: "
-						+ url);
+				throw new Exception(
+						"Не удалось получить данные справочника. URL: " + url);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -146,14 +150,24 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationPattern(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		ArrayList<String> patternUuids = bundle
 				.getStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);
+		boolean inParrentTransaction;
 
 		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 				.getWritableDatabase();
-		db.beginTransaction();
+		inParrentTransaction = db.inTransaction();
+
+		// если транзакция не открыта раньше, открываем её
+		if (!inParrentTransaction) {
+			db.beginTransaction();
+		}
 
 		for (String uuid : patternUuids) {
 			url.setLength(0);
@@ -162,21 +176,31 @@ public class ReferenceProcessor {
 			jsonString = getReferenceData(url.toString());
 
 			if (jsonString != null) {
-				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'hh:mm:ss").create();
+				Gson gson = new GsonBuilder().setDateFormat(dateFormat)
+						.create();
+
 				// разбираем и сохраняем полученные данные
-				if (!savePattern(gson.fromJson(jsonString,
-						OperationPatternSrv.class))) {
-					db.endTransaction();
+				boolean result = savePattern(gson.fromJson(jsonString,
+						OperationPatternSrv.class));
+				if (!result) {
+					if (!inParrentTransaction) {
+						db.endTransaction();
+					}
 					return false;
 				}
 			} else {
+				if (!inParrentTransaction) {
+					db.endTransaction();
+				}
 				return false;
 			}
 		}
 
-		db.setTransactionSuccessful();
-		db.endTransaction();
+		if (!inParrentTransaction) {
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		}
+
 		return true;
 	}
 
@@ -188,22 +212,30 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationResult(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		String[] operationTypeUuids = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID);
 		StringBuilder url = new StringBuilder();
 		String jsonString;
+		boolean inParrentTransaction;
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		inParrentTransaction = db.inTransaction();
 
 		String referenceUrl = getReferenceURL(ReferenceName.OperationResult);
 		if (referenceUrl == null) {
 			return false;
 		}
 
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss")
-				.create();
+		Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 
-		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-				.getWritableDatabase();
-		db.beginTransaction();
+		if (!inParrentTransaction) {
+			db.beginTransaction();
+		}
 
 		for (String typeUuid : operationTypeUuids) {
 			url.setLength(0);
@@ -219,17 +251,23 @@ public class ReferenceProcessor {
 						}.getType());
 				boolean result = saveOperationResult(results);
 				if (!result) {
-					db.endTransaction();
+					if (!inParrentTransaction) {
+						db.endTransaction();
+					}
 					return false;
 				}
 			} else {
-				db.endTransaction();
+				if (!inParrentTransaction) {
+					db.endTransaction();
+				}
 				return false;
 			}
 		}
 
-		db.setTransactionSuccessful();
-		db.endTransaction();
+		if (!inParrentTransaction) {
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		}
 		return true;
 
 	}
@@ -241,6 +279,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getDocumentType(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		StringBuilder url = new StringBuilder();
 		String jsonString;
@@ -261,14 +303,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -289,12 +329,81 @@ public class ReferenceProcessor {
 	}
 
 	/**
+	 * Получаем файл документации
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean getDocumentaionFile(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
+
+		StringBuilder url = new StringBuilder();
+		String fileUuids[] = bundle
+				.getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID);
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		for (String fileUuid : fileUuids) {
+			EquipmentDocumentation document = documentationDBAdapter
+					.getItem(fileUuid);
+			Equipment equipment = equipmentDBAdapter.getItem(document
+					.getEquipment_uuid());
+
+			url.setLength(0);
+			url.append(mServerUrl).append(document.getPath());
+
+			try {
+				URI requestUri = new URI(url.toString());
+				Log.d("test", "requestUri = " + requestUri.toString());
+
+				Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+				List<String> tList = new ArrayList<String>();
+				tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+				headers.put("Authorization", tList);
+
+				Request request = new Request(Method.GET, requestUri, headers,
+						null);
+				Response response = new RestClient().execute(request);
+
+				if (response.mStatus == 200) {
+					File file = new File(
+							mContext.getExternalFilesDir("documentation") + "/"
+									+ equipment.getEquipment_type_uuid() + "/"
+									+ equipment.getUuid(), document.getPath());
+					if (!file.getParentFile().exists()) {
+						file.getParentFile().mkdirs();
+					}
+					FileOutputStream fos = new FileOutputStream(file);
+					fos.write(response.mBody);
+					fos.close();
+				} else {
+					throw new Exception("Не удалось получить файл. URL: " + url);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Получаем статусы оборудования
 	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean getEquipmentStatus(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		StringBuilder url = new StringBuilder();
 		String jsonString;
@@ -315,14 +424,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -350,6 +457,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getEquipmentType(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -369,14 +480,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -404,6 +513,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getMeasureType(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -423,14 +536,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -458,6 +569,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationStatus(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -477,14 +592,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -512,6 +625,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationType(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -531,14 +648,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -566,6 +681,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getTaskStatus(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -585,14 +704,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -620,11 +737,14 @@ public class ReferenceProcessor {
 	 */
 	public boolean getEquipment(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss")
-				.create();
+		Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 
 		String[] equipmentUuids = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID);
@@ -669,6 +789,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getCriticalType(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -688,14 +812,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -723,6 +845,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getDocumentation(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		String[] equipmentUuids = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
 		StringBuilder url = new StringBuilder();
@@ -739,8 +865,8 @@ public class ReferenceProcessor {
 							equipmentUuid));
 			jsonString = getReferenceData(url.toString());
 			if (jsonString != null) {
-				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'hh:mm:ss").create();
+				Gson gson = new GsonBuilder().setDateFormat(dateFormat)
+						.create();
 				// разбираем и сохраняем полученные данные
 				ArrayList<EquipmentDocumentationSrv> list = gson.fromJson(
 						jsonString,
@@ -769,6 +895,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getAll(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		// TODO определиться как всё-таки будут обновляться справочники
 		// на каждом устройстве будет копия всех данных с сервера?
@@ -848,7 +978,7 @@ public class ReferenceProcessor {
 			if (!getEquipment(bundle)) {
 				return false;
 			}
-			
+
 		}
 
 		return true;
@@ -1205,6 +1335,30 @@ public class ReferenceProcessor {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Получаем токен. Метод использульзуется для проверки наличия токена, так
+	 * как может сложится ситуация когда пользователь вошел в систему но токен
+	 * не получил из за отсутствия связи.
+	 */
+	private boolean checkToken() {
+		AuthorizedUser au = AuthorizedUser.getInstance();
+		if (au.getToken() == null) {
+			try {
+				TokenProcessor tp = new TokenProcessor(mContext);
+				Bundle bundle = new Bundle();
+				bundle.putString(
+						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
+						au.getTagId());
+				return tp.getTokenByTag(bundle);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return true;
 		}
 	}
 

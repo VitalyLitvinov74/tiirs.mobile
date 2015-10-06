@@ -13,26 +13,35 @@ import com.google.gson.JsonSerializer;
 
 /**
  * @author Dmitriy Logachov
- *
+ * 
  */
 public class EquipmentOperationResultSerializer implements
 		JsonSerializer<EquipmentOperationResultRes> {
 
-	/* (non-Javadoc)
-	 * @see com.google.gson.JsonSerializer#serialize(java.lang.Object, java.lang.reflect.Type, com.google.gson.JsonSerializationContext)
+	private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.google.gson.JsonSerializer#serialize(java.lang.Object,
+	 * java.lang.reflect.Type, com.google.gson.JsonSerializationContext)
 	 */
 	@Override
 	public JsonElement serialize(EquipmentOperationResultRes item, Type arg1,
 			JsonSerializationContext serializeContext) {
-		
+
 		JsonObject result = new JsonObject();
 		result.addProperty("Id", item.getUuid());
-		result.addProperty("StartDate", DataUtils.getDate(item.getStart_date(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty("EndDate", DataUtils.getDate(item.getEnd_date(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("StartDate",
+				DataUtils.getDate(item.getStart_date(), dateFormat));
+		result.addProperty("EndDate",
+				DataUtils.getDate(item.getEnd_date(), dateFormat));
 		result.addProperty("OperationResultId", item.getOperation_result_uuid());
 		result.addProperty("Type", item.getType());
-		result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty("ChangedAt", DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("CreatedAt",
+				DataUtils.getDate(item.getCreatedAt(), dateFormat));
+		result.addProperty("ChangedAt",
+				DataUtils.getDate(item.getChangedAt(), dateFormat));
 
 		return result;
 	}

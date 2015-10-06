@@ -85,23 +85,37 @@ public class TaskProcessor {
 	 */
 	public boolean GetTask(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
+
 		boolean result;
 
 		result = getTasks();
 		if (!result) {
+			db.endTransaction();
 			return false;
 		}
 
 		result = getPatterns();
 		if (!result) {
+			db.endTransaction();
 			return false;
 		}
 
 		result = getOperationResults();
 		if (!result) {
+			db.endTransaction();
 			return false;
 		}
 
+		db.setTransactionSuccessful();
+		db.endTransaction();
+		
 		return true;
 	}
 
@@ -132,7 +146,7 @@ public class TaskProcessor {
 				Log.d("test", jsonString);
 
 				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'hh:mm:ss").create();
+						"yyyy-MM-dd'T'HH:mm:ss").create();
 
 				ArrayList<TaskSrv> serverTasks = gson.fromJson(jsonString,
 						new TypeToken<ArrayList<TaskSrv>>() {
@@ -141,15 +155,7 @@ public class TaskProcessor {
 				if (serverTasks != null) {
 
 					// разбираем и сохраняем полученные данные
-					SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-							.getWritableDatabase();
-					db.beginTransaction();
 					boolean result = saveTasks(serverTasks);
-					if (result) {
-						db.setTransactionSuccessful();
-					}
-					db.endTransaction();
-
 					return result;
 				} else {
 					// TODO нужен механизм который при наличии полученных
@@ -216,43 +222,51 @@ public class TaskProcessor {
 	public boolean saveTasks(ArrayList<TaskSrv> tasks) {
 
 		// новый вариант разбора и сохранения данных с сервера
-		TaskDBAdapter adapter0 = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext));
-		if (!adapter0.saveItems(TaskSrv.getTasks(tasks))) {
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		ArrayList<Task> taskList = TaskSrv.getTasks(tasks);
+		// для новых нарядов выставляем статус "В работе"
+		for (Task item : taskList) {
+			if (item.getTask_status_uuid().equals(Task.Extras.STATUS_UUID_NEW)) {
+				item.setTask_status_uuid(Task.Extras.STATUS_UUID_IN_PROCESS);
+			}
+		}
+		if (!taskDBAdapter.saveItems(taskList)) {
 			return false;
 		}
 
-		TaskStatusDBAdapter adapter1 = new TaskStatusDBAdapter(
+		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter1.saveItems(TaskSrv.getTaskStatuses(tasks))) {
+		if (!taskStatusDBAdapter.saveItems(TaskSrv.getTaskStatuses(tasks))) {
 			return false;
 		}
 
-		EquipmentOperationDBAdapter adapter2 = new EquipmentOperationDBAdapter(
+		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter2.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
+		if (!operationDBAdapter
+				.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
 			return false;
 		}
 
 		ArrayList<EquipmentOperationSrv> operations = TaskSrv
 				.getEquipmentOperationSrvs(tasks);
-		EquipmentDBAdapter adapter3 = new EquipmentDBAdapter(
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter3
-				.saveItems(EquipmentOperationSrv.getEquipments(operations))) {
+		if (!equipmentDBAdapter.saveItems(EquipmentOperationSrv
+				.getEquipments(operations))) {
 			return false;
 		}
 
-		OperationTypeDBAdapter adapter4 = new OperationTypeDBAdapter(
+		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter4.saveItems(EquipmentOperationSrv
+		if (!operationTypeDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationTypes(operations))) {
 			return false;
 		}
 
-		OperationStatusDBAdapter adapter5 = new OperationStatusDBAdapter(
+		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter5.saveItems(EquipmentOperationSrv
+		if (!operationStatusDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationStatuses(operations))) {
 			return false;
 		}
@@ -265,35 +279,38 @@ public class TaskProcessor {
 
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
-		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(
+		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter6.saveItems(EquipmentSrv.getEquipmentTypes(equipments))) {
+		if (!equipmentTypeDBAdapter.saveItems(EquipmentSrv
+				.getEquipmentTypes(equipments))) {
 			return false;
 		}
 
-		CriticalTypeDBAdapter adapter7 = new CriticalTypeDBAdapter(
+		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter7.saveItems(EquipmentSrv.getCriticalTypes(equipments))) {
+		if (!criticalTypeDBAdapter.saveItems(EquipmentSrv
+				.getCriticalTypes(equipments))) {
 			return false;
 		}
 
-		EquipmentStatusDBAdapter adapter8 = new EquipmentStatusDBAdapter(
+		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter8.saveItems(EquipmentSrv.getEquipmentStatuses(equipments))) {
+		if (!equipmentStatusDBAdapter.saveItems(EquipmentSrv
+				.getEquipmentStatuses(equipments))) {
 			return false;
 		}
 
-		EquipmentDocumentationDBAdapter adapter9 = new EquipmentDocumentationDBAdapter(
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter9.saveItems(EquipmentSrv
+		if (!documentationDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentDocumentations(equipments))) {
 			return false;
 		}
 
-		DocumentationTypeDBAdapter adapter10 = new DocumentationTypeDBAdapter(
+		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter10
-				.saveItems(EquipmentSrv.getDocumentationTypes(equipments))) {
+		if (!documentationTypeDBAdapter.saveItems(EquipmentSrv
+				.getDocumentationTypes(equipments))) {
 			return false;
 		}
 
@@ -308,52 +325,27 @@ public class TaskProcessor {
 	 */
 	public boolean TaskSendResult(Bundle bundle) {
 
-		String taskUuid = bundle
-				.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
+		if (!checkToken()) {
+			return false;
+		}
 
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext));
-		Task task;
-		task = adapter.getTaskByUuidAndUpdated(taskUuid);
+		String[] taskUuids = bundle
+				.getStringArray(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
-		if (task != null) {
-			TaskRes taskResult = TaskRes.load(mContext, task.getUuid());
+		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
+		
+		for (String taskUuid : taskUuids) {
+			TaskRes taskResult = TaskRes.load(mContext, taskUuid);
 			if (taskResult != null) {
-				ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
 				taskResults.add(taskResult);
-				return TasksSendResults(taskResults);
 			} else {
 				return false;
 			}
-		} else {
-			return false;
 		}
-	}
-
-	/**
-	 * Отправка результатов выполнения нарядов.
-	 * 
-	 * @param bundle
-	 * @return
-	 */
-	public boolean TasksSendResult(Bundle bundle) {
-
-		String user_uuid = AuthorizedUser.getInstance().getUuid();
-		ArrayList<Task> tasks;
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext));
-		// TODO необходимо решить и реализовать выборку не отправленных нарядов,
-		// либо по текущему пользователю либо все какие есть неотправленные.
-		tasks = adapter.getTaskByUserAndUpdated(user_uuid);
-
-		// получаем из базы результаты связанные с нарядами
-		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
-		for (Task task : tasks) {
-			TaskRes taskResult = TaskRes.load(mContext, task.getUuid());
-			taskResults.add(taskResult);
-		}
-
-		return TasksSendResults(taskResults);
+		
+		boolean result = TasksSendResults(taskResults);
+		
+		return result;
 	}
 
 	/**
@@ -364,6 +356,10 @@ public class TaskProcessor {
 	private boolean TasksSendResults(ArrayList<TaskRes> results) {
 
 		URI requestUri = null;
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		try {
 			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
@@ -414,6 +410,30 @@ public class TaskProcessor {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Получаем токен. Метод использульзуется для проверки наличия токена, так
+	 * как может сложится ситуация когда пользователь вошел в систему но токен
+	 * не получил из за отсутствия связи.
+	 */
+	private boolean checkToken() {
+		AuthorizedUser au = AuthorizedUser.getInstance();
+		if (au.getToken() == null) {
+			try {
+				TokenProcessor tp = new TokenProcessor(mContext);
+				Bundle bundle = new Bundle();
+				bundle.putString(
+						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
+						au.getTagId());
+				return tp.getTokenByTag(bundle);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -482,24 +502,28 @@ public class TaskProcessor {
 		db.beginTransaction();
 		for (TaskRes task : resultsList) {
 			task.setUpdated(false);
+			task.setAttempt_count(0);
 			taskAdapter.replace(task);
 
 			ArrayList<EquipmentOperationRes> operations = task
 					.getEquipmentOperations();
 			for (EquipmentOperationRes operation : operations) {
 				operation.setUpdated(false);
+				operation.setAttempt_count(0);
 				operationAdapter.replace(operation);
 
 				ArrayList<MeasureValueRes> values = operation
 						.getMeasureValues();
 				for (MeasureValueRes value : values) {
 					value.setUpdated(false);
+					value.setAttempt_count(0);
 					valueAdapter.replace(value);
 				}
 
 				EquipmentOperationResultRes result = operation
 						.getEquipmentOperationResult();
 				result.setUpdated(false);
+				result.setAttempt_count(0);
 				operationResultAdapter.replace(result);
 			}
 		}
