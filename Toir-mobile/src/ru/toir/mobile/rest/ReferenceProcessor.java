@@ -146,6 +146,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationPattern(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		ArrayList<String> patternUuids = bundle
@@ -187,6 +191,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getOperationResult(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		String[] operationTypeUuids = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID);
@@ -242,6 +250,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getDocumentType(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -295,6 +307,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getEquipmentStatus(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		StringBuilder url = new StringBuilder();
 		String jsonString;
@@ -350,6 +366,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getEquipmentType(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -403,6 +423,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getMeasureType(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		StringBuilder url = new StringBuilder();
 		String jsonString;
@@ -458,6 +482,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getOperationStatus(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -511,6 +539,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getOperationType(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		StringBuilder url = new StringBuilder();
 		String jsonString;
@@ -566,6 +598,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getTaskStatus(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 		Long lastChangedAt;
@@ -620,6 +656,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getEquipment(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 
@@ -668,6 +708,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getCriticalType(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		StringBuilder url = new StringBuilder();
 		String jsonString;
@@ -723,6 +767,10 @@ public class ReferenceProcessor {
 	 */
 	public boolean getDocumentation(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		String[] equipmentUuids = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
 		StringBuilder url = new StringBuilder();
@@ -769,6 +817,10 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public boolean getAll(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		// TODO определиться как всё-таки будут обновляться справочники
 		// на каждом устройстве будет копия всех данных с сервера?
@@ -848,7 +900,7 @@ public class ReferenceProcessor {
 			if (!getEquipment(bundle)) {
 				return false;
 			}
-			
+
 		}
 
 		return true;
@@ -1205,6 +1257,30 @@ public class ReferenceProcessor {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Получаем токен. Метод использульзуется для проверки наличия токена, так
+	 * как может сложится ситуация когда пользователь вошел в систему но токен
+	 * не получил из за отсутствия связи.
+	 */
+	private boolean checkToken() {
+		AuthorizedUser au = AuthorizedUser.getInstance();
+		if (au.getToken() == null) {
+			try {
+				TokenProcessor tp = new TokenProcessor(mContext);
+				Bundle bundle = new Bundle();
+				bundle.putString(
+						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
+						au.getTagId());
+				return tp.getTokenByTag(bundle);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return true;
 		}
 	}
 

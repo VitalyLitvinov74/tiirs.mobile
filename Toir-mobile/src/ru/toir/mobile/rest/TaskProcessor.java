@@ -85,6 +85,10 @@ public class TaskProcessor {
 	 */
 	public boolean GetTask(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		boolean result;
 
 		result = getTasks();
@@ -308,6 +312,10 @@ public class TaskProcessor {
 	 */
 	public boolean TaskSendResult(Bundle bundle) {
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		String taskUuid = bundle
 				.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
@@ -365,6 +373,10 @@ public class TaskProcessor {
 
 		URI requestUri = null;
 
+		if (!checkToken()) {
+			return false;
+		}
+
 		try {
 			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
@@ -414,6 +426,30 @@ public class TaskProcessor {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Получаем токен. Метод использульзуется для проверки наличия токена, так
+	 * как может сложится ситуация когда пользователь вошел в систему но токен
+	 * не получил из за отсутствия связи.
+	 */
+	private boolean checkToken() {
+		AuthorizedUser au = AuthorizedUser.getInstance();
+		if (au.getToken() == null) {
+			try {
+				TokenProcessor tp = new TokenProcessor(mContext);
+				Bundle bundle = new Bundle();
+				bundle.putString(
+						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
+						au.getTagId());
+				return tp.getTokenByTag(bundle);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	/**
