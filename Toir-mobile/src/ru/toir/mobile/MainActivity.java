@@ -70,6 +70,7 @@ public class MainActivity extends FragmentActivity {
 						// в зависимости от результата либо дать работать, либо не дать
 						if (user != null && user.isActive()) {
 							isLogged = true;
+							AuthorizedUser.getInstance().setUuid(user.getUuid());
 							setMainLayout();
 						} else {
 							Toast.makeText(getApplicationContext(),
@@ -122,6 +123,7 @@ public class MainActivity extends FragmentActivity {
 						// в зависимости от результата либо дать работать, либо не дать
 						if (user != null && user.isActive()) {
 							isLogged = true;
+							AuthorizedUser.getInstance().setUuid(user.getUuid());
 							setMainLayout();
 						} else {
 							Toast.makeText(getApplicationContext(),

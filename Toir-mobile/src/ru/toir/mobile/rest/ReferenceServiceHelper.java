@@ -150,4 +150,19 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 		Bundle bundle = new Bundle();
 		RunMethod(ReferenceServiceProvider.Methods.GET_ALL, bundle);
 	}
+
+	/**
+	 * Получаем/сохраняем
+	 * 
+	 * @param documentationUuids
+	 *            Набор uuid файлов документации
+	 */
+	public void getDocumentationFile(String[] documentationUuids) {
+		Bundle bundle = new Bundle();
+		bundle.putStringArray(
+				ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
+				documentationUuids);
+		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE, bundle);
+	}
+
 }

@@ -35,25 +35,14 @@ public class TaskServiceHelper extends ServiceHelperBase {
 	 * Отправляет результат выполнения наряда
 	 * 
 	 * @param token
-	 * @param taskUuid
+	 * @param taskUuids набор uuid нарядов для отправки их результатов
 	 */
-	public void SendTaskResult(String taskUuid) {
+	public void SendTaskResult(String[] taskUuids) {
 
 		Bundle bundle = new Bundle();
-		bundle.putString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID,
-				taskUuid);
+		bundle.putStringArray(TaskServiceProvider.Methods.PARAMETER_TASK_UUID,
+				taskUuids);
 		RunMethod(TaskServiceProvider.Methods.TASK_SEND_RESULT, bundle);
-	}
-
-	/**
-	 * Отправляет результаты выполнения нарядов
-	 * 
-	 * @param taskUuid
-	 */
-	public void SendTasksResult() {
-
-		Bundle bundle = new Bundle();
-		RunMethod(TaskServiceProvider.Methods.TASKS_SEND_RESULT, bundle);
 	}
 
 }

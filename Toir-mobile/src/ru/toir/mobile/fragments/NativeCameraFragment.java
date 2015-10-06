@@ -37,7 +37,7 @@ public class NativeCameraFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.e("test", "onCreateView");
+
 		rootView = inflater.inflate(R.layout.fragment_native_camera, container,
 				false);
 		rootView.setFocusableInTouchMode(true);
@@ -86,10 +86,9 @@ public class NativeCameraFragment extends Fragment {
 
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
+
 		super.setUserVisibleHint(isVisibleToUser);
-		Log.e("test", "setUserVisibleHint");
 		if (isVisibleToUser) {
-			Log.e("test", "visible");
 			if (fragmentCreated && !fragmentShowed) {
 				mPreview = new Preview(getActivity().getApplicationContext());
 				FrameLayout frame = ((FrameLayout) rootView
@@ -107,8 +106,6 @@ public class NativeCameraFragment extends Fragment {
 				});
 			}
 			fragmentShowed = true;
-		} else {
-			Log.e("test", "invisible");
 		}
 	}
 
@@ -144,14 +141,12 @@ public class NativeCameraFragment extends Fragment {
 
 		public Preview(Context context) {
 			super(context);
-			Log.e("test", "Preview constructor");
 			mHolder = getHolder();
 			mHolder.addCallback(this);
 		}
 
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
-			Log.e("test", "surfaceCreated");
 			mCamera = Camera.open();
 			try {
 				mCamera.setPreviewDisplay(holder);
@@ -163,14 +158,12 @@ public class NativeCameraFragment extends Fragment {
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-			Log.e("test", "surfaceChanged");
 			mCamera.startPreview();
 
 		}
 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
-			Log.e("test", "surfaceDestroyed");
 			mCamera.stopPreview();
 			mCamera.release();
 			mCamera = null;

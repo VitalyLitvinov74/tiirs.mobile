@@ -21,34 +21,38 @@ import android.util.Log;
 
 /**
  * @author Dmitriy Logachov
- *
+ * 
  */
 
 public class UsersProcessor {
 	private Context mContext;
 	private static final String USERS_GET_USER_URL = "/api/account/me";
 	private String mServerUrl;
-	
 
 	public UsersProcessor(Context context) throws Exception {
 		mContext = context;
-		
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-		
+
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
 		// урл к которому будем обращаться с запросами
 		mServerUrl = sp.getString(context.getString(R.string.serverUrl), "");
-		
+
 		if (mServerUrl.equals("")) {
 			throw new Exception("URL сервера не указан!");
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean getUser(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
 
 		URI requestUri = null;
 		String token = AuthorizedUser.getInstance().getToken();
@@ -57,7 +61,7 @@ public class UsersProcessor {
 		try {
 			requestUri = new URI(mServerUrl + USERS_GET_USER_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
-			
+
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
 			List<String> tList = new ArrayList<String>();
 			tList.add("bearer " + token);
@@ -70,11 +74,14 @@ public class UsersProcessor {
 
 				jsonString = new String(response.mBody, "UTF-8");
 				Log.d("test", jsonString);
-				
-				UserSrv serverUser = new Gson().fromJson(jsonString, UserSrv.class);
+
+				UserSrv serverUser = new Gson().fromJson(jsonString,
+						UserSrv.class);
 				if (serverUser != null) {
-					UsersDBAdapter adapter = new UsersDBAdapter(new TOiRDatabaseContext(mContext));
-					Users user = adapter.getItem(AuthorizedUser.getInstance().getTagId());
+					UsersDBAdapter adapter = new UsersDBAdapter(
+							new TOiRDatabaseContext(mContext));
+					Users user = adapter.getItem(AuthorizedUser.getInstance()
+							.getTagId());
 					if (user == null) {
 						user = new Users();
 					}
@@ -94,7 +101,7 @@ public class UsersProcessor {
 				} else {
 					return false;
 				}
-				
+
 				return true;
 			} else {
 				return false;
@@ -102,6 +109,30 @@ public class UsersProcessor {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	/**
+	 * Получаем токен. Метод использульзуется для проверки наличия токена, так
+	 * как может сложится ситуация когда пользователь вошел в систему но токен
+	 * не получил из за отсутствия связи.
+	 */
+	private boolean checkToken() {
+		AuthorizedUser au = AuthorizedUser.getInstance();
+		if (au.getToken() == null) {
+			try {
+				TokenProcessor tp = new TokenProcessor(mContext);
+				Bundle bundle = new Bundle();
+				bundle.putString(
+						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
+						au.getTagId());
+				return tp.getTokenByTag(bundle);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return true;
 		}
 	}
 
