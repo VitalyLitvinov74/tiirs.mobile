@@ -154,10 +154,16 @@ public class ReferenceProcessor {
 		String jsonString;
 		ArrayList<String> patternUuids = bundle
 				.getStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);
+		boolean inParrentTransaction;
 
 		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 				.getWritableDatabase();
-		db.beginTransaction();
+		inParrentTransaction = db.inTransaction();
+
+		// если транзакция не открыта раньше, открываем её
+		if (!inParrentTransaction) {
+			db.beginTransaction();
+		}
 
 		for (String uuid : patternUuids) {
 			url.setLength(0);
@@ -168,19 +174,29 @@ public class ReferenceProcessor {
 			if (jsonString != null) {
 				Gson gson = new GsonBuilder().setDateFormat(
 						"yyyy-MM-dd'T'hh:mm:ss").create();
+
 				// разбираем и сохраняем полученные данные
-				if (!savePattern(gson.fromJson(jsonString,
-						OperationPatternSrv.class))) {
-					db.endTransaction();
+				boolean result = savePattern(gson.fromJson(jsonString,
+						OperationPatternSrv.class));
+				if (!result) {
+					if (!inParrentTransaction) {
+						db.endTransaction();
+					}
 					return false;
 				}
 			} else {
+				if (!inParrentTransaction) {
+					db.endTransaction();
+				}
 				return false;
 			}
 		}
 
-		db.setTransactionSuccessful();
-		db.endTransaction();
+		if (!inParrentTransaction) {
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		}
+
 		return true;
 	}
 
@@ -200,6 +216,11 @@ public class ReferenceProcessor {
 				.getStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID);
 		StringBuilder url = new StringBuilder();
 		String jsonString;
+		boolean inParrentTransaction;
+
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		inParrentTransaction = db.inTransaction();
 
 		String referenceUrl = getReferenceURL(ReferenceName.OperationResult);
 		if (referenceUrl == null) {
@@ -209,9 +230,9 @@ public class ReferenceProcessor {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss")
 				.create();
 
-		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-				.getWritableDatabase();
-		db.beginTransaction();
+		if (!inParrentTransaction) {
+			db.beginTransaction();
+		}
 
 		for (String typeUuid : operationTypeUuids) {
 			url.setLength(0);
@@ -227,17 +248,23 @@ public class ReferenceProcessor {
 						}.getType());
 				boolean result = saveOperationResult(results);
 				if (!result) {
-					db.endTransaction();
+					if (!inParrentTransaction) {
+						db.endTransaction();
+					}
 					return false;
 				}
 			} else {
-				db.endTransaction();
+				if (!inParrentTransaction) {
+					db.endTransaction();
+				}
 				return false;
 			}
 		}
 
-		db.setTransactionSuccessful();
-		db.endTransaction();
+		if (!inParrentTransaction) {
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		}
 		return true;
 
 	}

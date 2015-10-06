@@ -89,23 +89,33 @@ public class TaskProcessor {
 			return false;
 		}
 
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		db.beginTransaction();
+
 		boolean result;
 
 		result = getTasks();
 		if (!result) {
+			db.endTransaction();
 			return false;
 		}
 
 		result = getPatterns();
 		if (!result) {
+			db.endTransaction();
 			return false;
 		}
 
 		result = getOperationResults();
 		if (!result) {
+			db.endTransaction();
 			return false;
 		}
 
+		db.setTransactionSuccessful();
+		db.endTransaction();
+		
 		return true;
 	}
 
@@ -145,15 +155,7 @@ public class TaskProcessor {
 				if (serverTasks != null) {
 
 					// разбираем и сохраняем полученные данные
-					SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-							.getWritableDatabase();
-					db.beginTransaction();
 					boolean result = saveTasks(serverTasks);
-					if (result) {
-						db.setTransactionSuccessful();
-					}
-					db.endTransaction();
-
 					return result;
 				} else {
 					// TODO нужен механизм который при наличии полученных
@@ -220,43 +222,44 @@ public class TaskProcessor {
 	public boolean saveTasks(ArrayList<TaskSrv> tasks) {
 
 		// новый вариант разбора и сохранения данных с сервера
-		TaskDBAdapter adapter0 = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext));
-		if (!adapter0.saveItems(TaskSrv.getTasks(tasks))) {
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!taskDBAdapter.saveItems(TaskSrv.getTasks(tasks))) {
 			return false;
 		}
 
-		TaskStatusDBAdapter adapter1 = new TaskStatusDBAdapter(
+		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter1.saveItems(TaskSrv.getTaskStatuses(tasks))) {
+		if (!taskStatusDBAdapter.saveItems(TaskSrv.getTaskStatuses(tasks))) {
 			return false;
 		}
 
-		EquipmentOperationDBAdapter adapter2 = new EquipmentOperationDBAdapter(
+		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter2.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
+		if (!operationDBAdapter
+				.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
 			return false;
 		}
 
 		ArrayList<EquipmentOperationSrv> operations = TaskSrv
 				.getEquipmentOperationSrvs(tasks);
-		EquipmentDBAdapter adapter3 = new EquipmentDBAdapter(
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter3
-				.saveItems(EquipmentOperationSrv.getEquipments(operations))) {
+		if (!equipmentDBAdapter.saveItems(EquipmentOperationSrv
+				.getEquipments(operations))) {
 			return false;
 		}
 
-		OperationTypeDBAdapter adapter4 = new OperationTypeDBAdapter(
+		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter4.saveItems(EquipmentOperationSrv
+		if (!operationTypeDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationTypes(operations))) {
 			return false;
 		}
 
-		OperationStatusDBAdapter adapter5 = new OperationStatusDBAdapter(
+		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter5.saveItems(EquipmentOperationSrv
+		if (!operationStatusDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationStatuses(operations))) {
 			return false;
 		}
@@ -269,35 +272,38 @@ public class TaskProcessor {
 
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
-		EquipmentTypeDBAdapter adapter6 = new EquipmentTypeDBAdapter(
+		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter6.saveItems(EquipmentSrv.getEquipmentTypes(equipments))) {
+		if (!equipmentTypeDBAdapter.saveItems(EquipmentSrv
+				.getEquipmentTypes(equipments))) {
 			return false;
 		}
 
-		CriticalTypeDBAdapter adapter7 = new CriticalTypeDBAdapter(
+		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter7.saveItems(EquipmentSrv.getCriticalTypes(equipments))) {
+		if (!criticalTypeDBAdapter.saveItems(EquipmentSrv
+				.getCriticalTypes(equipments))) {
 			return false;
 		}
 
-		EquipmentStatusDBAdapter adapter8 = new EquipmentStatusDBAdapter(
+		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter8.saveItems(EquipmentSrv.getEquipmentStatuses(equipments))) {
+		if (!equipmentStatusDBAdapter.saveItems(EquipmentSrv
+				.getEquipmentStatuses(equipments))) {
 			return false;
 		}
 
-		EquipmentDocumentationDBAdapter adapter9 = new EquipmentDocumentationDBAdapter(
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter9.saveItems(EquipmentSrv
+		if (!documentationDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentDocumentations(equipments))) {
 			return false;
 		}
 
-		DocumentationTypeDBAdapter adapter10 = new DocumentationTypeDBAdapter(
+		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!adapter10
-				.saveItems(EquipmentSrv.getDocumentationTypes(equipments))) {
+		if (!documentationTypeDBAdapter.saveItems(EquipmentSrv
+				.getDocumentationTypes(equipments))) {
 			return false;
 		}
 
