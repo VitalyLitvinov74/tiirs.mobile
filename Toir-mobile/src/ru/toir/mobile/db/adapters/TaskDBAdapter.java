@@ -1,6 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import ru.toir.mobile.db.tables.Task;
@@ -309,5 +310,15 @@ public class TaskDBAdapter extends BaseDBAdapter {
 
 		return true;
 	}
+
+	/**
+     * Метод делает то же что и replace, дополнительно меняет ChangedAt на текущее время.
+     * @param item
+     * @return
+     */
+    public long update(Task item) {
+            item.setChangedAt(Calendar.getInstance().getTime().getTime());
+            return replace(item);
+    }
 
 }

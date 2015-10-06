@@ -28,7 +28,6 @@ import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
 import ru.toir.mobile.serializer.EquipmentOperationSerializer;
@@ -322,52 +321,23 @@ public class TaskProcessor {
 			return false;
 		}
 
-		String taskUuid = bundle
-				.getString(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
+		String[] taskUuids = bundle
+				.getStringArray(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext));
-		Task task;
-		task = adapter.getTaskByUuidAndUpdated(taskUuid);
-
-		if (task != null) {
-			TaskRes taskResult = TaskRes.load(mContext, task.getUuid());
+		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
+		
+		for (String taskUuid : taskUuids) {
+			TaskRes taskResult = TaskRes.load(mContext, taskUuid);
 			if (taskResult != null) {
-				ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
 				taskResults.add(taskResult);
-				return TasksSendResults(taskResults);
 			} else {
 				return false;
 			}
-		} else {
-			return false;
 		}
-	}
-
-	/**
-	 * Отправка результатов выполнения нарядов.
-	 * 
-	 * @param bundle
-	 * @return
-	 */
-	public boolean TasksSendResult(Bundle bundle) {
-
-		String user_uuid = AuthorizedUser.getInstance().getUuid();
-		ArrayList<Task> tasks;
-		TaskDBAdapter adapter = new TaskDBAdapter(new TOiRDatabaseContext(
-				mContext));
-		// TODO необходимо решить и реализовать выборку не отправленных нарядов,
-		// либо по текущему пользователю либо все какие есть неотправленные.
-		tasks = adapter.getTaskByUserAndUpdated(user_uuid);
-
-		// получаем из базы результаты связанные с нарядами
-		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
-		for (Task task : tasks) {
-			TaskRes taskResult = TaskRes.load(mContext, task.getUuid());
-			taskResults.add(taskResult);
-		}
-
-		return TasksSendResults(taskResults);
+		
+		boolean result = TasksSendResults(taskResults);
+		
+		return result;
 	}
 
 	/**
@@ -524,24 +494,28 @@ public class TaskProcessor {
 		db.beginTransaction();
 		for (TaskRes task : resultsList) {
 			task.setUpdated(false);
+			task.setAttempt_count(0);
 			taskAdapter.replace(task);
 
 			ArrayList<EquipmentOperationRes> operations = task
 					.getEquipmentOperations();
 			for (EquipmentOperationRes operation : operations) {
 				operation.setUpdated(false);
+				operation.setAttempt_count(0);
 				operationAdapter.replace(operation);
 
 				ArrayList<MeasureValueRes> values = operation
 						.getMeasureValues();
 				for (MeasureValueRes value : values) {
 					value.setUpdated(false);
+					value.setAttempt_count(0);
 					valueAdapter.replace(value);
 				}
 
 				EquipmentOperationResultRes result = operation
 						.getEquipmentOperationResult();
 				result.setUpdated(false);
+				result.setAttempt_count(0);
 				operationResultAdapter.replace(result);
 			}
 		}

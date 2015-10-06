@@ -1,8 +1,8 @@
 package ru.toir.mobile.fragments;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
-
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.OperationActivity;
@@ -27,8 +27,11 @@ import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
+import ru.toir.mobile.serverapi.result.TaskRes;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -129,7 +132,8 @@ public class TaskFragment extends Fragment {
 		}
 	};
 
-	// TODO решить нужны ли фильтры на все возможные варианты отправки состояния/результатов 
+	// TODO решить нужны ли фильтры на все возможные варианты отправки
+	// состояния/результатов
 	// фильтр для получения сообщений при получении нарядов с сервера
 	private IntentFilter mFilterSendTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
@@ -363,6 +367,8 @@ public class TaskFragment extends Fragment {
 		lv.setOnItemClickListener(clickListener);
 		lv.setOnItemLongClickListener(longClickListener);
 
+		lv.setLongClickable(true);
+
 		initView();
 
 		return rootView;
@@ -422,29 +428,30 @@ public class TaskFragment extends Fragment {
 			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
 					user.getUuid(), taskStatus, orderByField));
 
-//			Integer cnt = 0;
-//			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-//			while (cnt < ordersList.size()) {
-//				HashMap<String, String> hm = new HashMap<String, String>();
-//				hm.put("name",
-//						"Создан: "
-//								+ DataUtils.getDate(ordersList.get(cnt)
-//										.getCreate_date(), "dd-MM-yyyy hh:mm")
-//								+ " | Изменен: "
-//								+ DataUtils.getDate(ordersList.get(cnt)
-//										.getModify_date(), "dd-MM-yyyy hh:mm"));
-//				hm.put("descr",
-//						"Статус: "
-//								+ taskStatusDBAdapter.getNameByUUID(ordersList
-//										.get(cnt).getTask_status_uuid())
-//								+ " | Отправлялся: "
-//								+ DataUtils.getDate(ordersList.get(cnt)
-//										.getAttempt_send_date(),
-//										"dd-MM-yyyy hh:mm") + " [Count="
-//								+ ordersList.get(cnt).getAttempt_count() + "]");
-//				aList.add(hm);
-//				cnt++;
-//			}
+			// Integer cnt = 0;
+			// List<HashMap<String, String>> aList = new
+			// ArrayList<HashMap<String, String>>();
+			// while (cnt < ordersList.size()) {
+			// HashMap<String, String> hm = new HashMap<String, String>();
+			// hm.put("name",
+			// "Создан: "
+			// + DataUtils.getDate(ordersList.get(cnt)
+			// .getCreate_date(), "dd-MM-yyyy hh:mm")
+			// + " | Изменен: "
+			// + DataUtils.getDate(ordersList.get(cnt)
+			// .getModify_date(), "dd-MM-yyyy hh:mm"));
+			// hm.put("descr",
+			// "Статус: "
+			// + taskStatusDBAdapter.getNameByUUID(ordersList
+			// .get(cnt).getTask_status_uuid())
+			// + " | Отправлялся: "
+			// + DataUtils.getDate(ordersList.get(cnt)
+			// .getAttempt_send_date(),
+			// "dd-MM-yyyy hh:mm") + " [Count="
+			// + ordersList.get(cnt).getAttempt_count() + "]");
+			// aList.add(hm);
+			// cnt++;
+			// }
 
 			// Setting the adapter to the listView
 			lv.setAdapter(taskAdapter);
@@ -514,8 +521,8 @@ public class TaskFragment extends Fragment {
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {
 
+			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 			if (Level == 1) {
-				Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 				final String operation_uuid = cursor
 						.getString(cursor
 								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
@@ -605,6 +612,63 @@ public class TaskFragment extends Fragment {
 				Spinner statusSpinner = (Spinner) dialog
 						.findViewById(R.id.statusSpinner);
 				statusSpinner.setAdapter(adapter);
+			} else if (Level == 0) {
+				final String taskUuid = cursor.getString(cursor
+						.getColumnIndex(TaskDBAdapter.Projection.UUID));
+
+				final AlertDialog.Builder dialog = new AlertDialog.Builder(
+						TaskFragment.this.getActivity());
+				dialog.setTitle("Закрытие наряда");
+				dialog.setPositiveButton("Закрыть наряд",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// закрываем наряд
+								// в зависимости от результата выполнения
+								// операций выставляем
+								// статус наряда
+								boolean complete = true;
+								TaskRes task = TaskRes.load(
+										new TOiRDatabaseContext(getActivity()),
+										taskUuid);
+								ArrayList<EquipmentOperationRes> operations = task
+										.getEquipmentOperations();
+								for (EquipmentOperationRes operation : operations) {
+									if (operation
+											.getOperation_status_uuid()
+											.equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+										complete = false;
+										break;
+									}
+								}
+
+								if (complete) {
+									task.setTask_status_uuid(Task.Extras.STATUS_UUID_COMPLETE);
+								} else {
+									task.setTask_status_uuid(Task.Extras.STATUS_UUID_NOT_COMPLETE);
+								}
+								TaskDBAdapter adapter = new TaskDBAdapter(
+										new TOiRDatabaseContext(getActivity()));
+								task.setClose_date(Calendar.getInstance()
+										.getTime().getTime());
+								task.setUpdated(true);
+								adapter.update(task);
+								FillListViewTasks(null, null);
+								dialog.dismiss();
+							}
+						});
+				dialog.setNegativeButton("Отмена",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+							}
+						});
+
+				dialog.show();
 			}
 			return true;
 		}
@@ -744,20 +808,29 @@ public class TaskFragment extends Fragment {
 		});
 
 		// добавляем элемент меню для отправки результатов выполнения нарядов
-		MenuItem sendTaskResult = menu.add("Отправить результаты");
-		sendTaskResult
+		MenuItem sendTaskResultMenu = menu.add("Отправить результаты");
+		sendTaskResultMenu
 				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
-						// костыль для проверки
+
 						TaskDBAdapter adapter = new TaskDBAdapter(
 								new TOiRDatabaseContext(getActivity()));
-						Task task = adapter
-								.getItem("a1f3a9af-d05b-4123-858f-a753a46f97d5");
-						task.setUpdated(true);
-						adapter.replace(task);
-						// конец костыля
+						ArrayList<Task> tasks = adapter
+								.getTaskByUserAndUpdated(AuthorizedUser
+										.getInstance().getUuid());
+						String[] sendTaskUuids = new String[tasks.size()];
+						int i = 0;
+						for (Task task : tasks) {
+							sendTaskUuids[i] = task.getUuid();
+							// устанавливаем дату попытки отправки
+							// (пока только для наряда)
+							task.setAttempt_send_date(Calendar.getInstance()
+									.getTime().getTime());
+							adapter.replace(task);
+							i++;
+						}
 
 						getActivity().registerReceiver(mReceiverSendTaskResult,
 								mFilterSendTask);
@@ -765,7 +838,7 @@ public class TaskFragment extends Fragment {
 						TaskServiceHelper tsh = new TaskServiceHelper(
 								getActivity(),
 								TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
-						tsh.SendTaskResult("a1f3a9af-d05b-4123-858f-a753a46f97d5");
+						tsh.SendTaskResult(sendTaskUuids);
 
 						// показываем диалог отправки результатов
 						processDialog = new ProgressDialog(getActivity());

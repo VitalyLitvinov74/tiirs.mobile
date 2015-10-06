@@ -16,12 +16,15 @@ import com.google.gson.JsonSerializer;
 
 /**
  * @author Dmitriy Logachov
- *
+ * 
  */
 public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 
-	/* (non-Javadoc)
-	 * @see com.google.gson.JsonSerializer#serialize(java.lang.Object, java.lang.reflect.Type, com.google.gson.JsonSerializationContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.google.gson.JsonSerializer#serialize(java.lang.Object,
+	 * java.lang.reflect.Type, com.google.gson.JsonSerializationContext)
 	 */
 	@Override
 	public JsonElement serialize(MeasureValueRes item, Type arg1,
@@ -29,7 +32,8 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 
 		JsonObject result = new JsonObject();
 		result.addProperty("Id", item.getUuid());
-		result.addProperty("OperationPatternStepResultId", item.getOperation_pattern_step_result_uuid());
+		result.addProperty("OperationPatternStepResultId",
+				item.getOperation_pattern_step_result_uuid());
 		String value = item.getValue();
 		result.addProperty("Value", value);
 		// пока тупо считаем что если значение начинается с '/' то это файл
@@ -42,17 +46,22 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				while ((count = fis.read(buffer)) > 0) {
-					valueBase64.append(Base64.encodeToString(buffer, 0, count, Base64.NO_CLOSE));
+					valueBase64.append(Base64.encodeToString(buffer, 0, count,
+							Base64.NO_CLOSE));
 				}
-				result.addProperty("BinaryValue", valueBase64.toString());
+				// TODO решить каким образом будут передаваться на сервер
+				// бинарные данные
+				// result.addProperty("BinaryValue", valueBase64.toString());
 				fis.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
-		result.addProperty("ChangedAt", DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
-		
+		result.addProperty("CreatedAt",
+				DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
+		result.addProperty("ChangedAt",
+				DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
+
 		return result;
 	}
 
