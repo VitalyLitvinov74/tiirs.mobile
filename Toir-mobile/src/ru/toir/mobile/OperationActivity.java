@@ -825,6 +825,7 @@ public class OperationActivity extends Activity {
 			rfid.write(out_buffer);
 		}
 	}
+
 	public void CallbackOnWrite(String result) {
 		if(result == null){
 			setResult(RFID.RESULT_RFID_WRITE_ERROR);	

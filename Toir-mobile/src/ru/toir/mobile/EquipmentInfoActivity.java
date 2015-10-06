@@ -1,6 +1,7 @@
 package ru.toir.mobile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,15 +36,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class EquipmentInfoActivity extends Activity {
+		public final static int READ_USER_LABLE = 1;
+		public final static int WRITE_USER_LABLE = 2;
+
 		private String equipment_uuid;
 		private Spinner Spinner_operation;
+		private	byte regim; 
 		private ListView lv;
 		private ArrayAdapter<String> spinner_operation_adapter;
 		private ArrayList<String> list = new ArrayList<String>();
 
 		private String driverClassName;
 		private Class<?> driverClass;
-		private RFIDDriver driver;
+		private RFIDDriver driver;		
 
 		TagRecordStructure tagrecord = new TagRecordStructure();
 		TagRecordStructure tagrecord2 = new TagRecordStructure();
@@ -69,7 +74,8 @@ public class EquipmentInfoActivity extends Activity {
 		private TextView tv_equipment_task_date;
 		private TextView tv_equipment_documentation;
 		private Button read_rfid_button;
-
+		private Button write_rfid_button;
+		
 		private	RFID rfid;
 		
 		/* (non-Javadoc)
@@ -125,6 +131,8 @@ public class EquipmentInfoActivity extends Activity {
     		rfid.setActivity(this);
 
 			read_rfid_button = (Button) findViewById(R.id.button_read);		
+			write_rfid_button = (Button) findViewById(R.id.button_write);
+			
     		// инициализируем драйвер
     		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID)) {
     			read_rfid_button.setOnClickListener(
@@ -132,9 +140,18 @@ public class EquipmentInfoActivity extends Activity {
 		                @Override
 		                public void onClick(View v) {		            		
 		            			// запускаем процедуру считывания тега метки
+		                		regim = READ_USER_LABLE;
 		            			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID);		            			
 		            		} 
 		                });
+    			write_rfid_button.setOnClickListener(
+    		            new View.OnClickListener() {
+    		                @Override
+    		                public void onClick(View v) {
+    		                	regim = WRITE_USER_LABLE;
+    		                	rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID);    		                	
+    		            	} 
+    		            });
     			}
     		else {
     			setResult(RFID.RESULT_RFID_INIT_ERROR);
@@ -182,6 +199,11 @@ public class EquipmentInfoActivity extends Activity {
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 			    tv_equipment_image.setImageBitmap(myBitmap);			    			    
 			}			
+
+			// заполняем структуру для записи в метку
+			equipmenttag.set_equipment_uuid(equipment.getUuid());
+			equipmenttag.set_status(equipment.getEquipment_status_uuid().substring(9, 13));
+			equipmenttag.set_last("0001");
 		}
 
 	 private void FillListViewOperations()
@@ -191,8 +213,10 @@ public class EquipmentInfoActivity extends Activity {
 	     CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		 EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 		 OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		 EquipmentOperationResult equipmentOperationResult;
 	     ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment_uuid);		
 	     int operation_type;
+	     String temp;
 	 	 int cnt=0;
 		 List<HashMap<String,String>> aList = new ArrayList<HashMap<String,String>>();
 		 String[] from = { "name","descr","img"};
@@ -214,6 +238,24 @@ public class EquipmentInfoActivity extends Activity {
 			 		 default: hm.put("img", Integer.toString(R.drawable.img_status_1));
 			 		}
 			 	 aList.add(hm);
+
+ 				 // заполняем структуру для записи в метку
+			 	 // TODO должны записываться последние две записи об обслуживании
+				 tagrecord.operation_date=Long.parseLong(equipmentOperationResultDBAdapter.getStartDateByUUID(equipmentOperationList.get(cnt).getEquipment_uuid()).toString(),16);
+				 tagrecord.operation_length = Short.parseShort("2050",16);
+				 tagrecord.operation_type = equipmentOperationList.get(cnt).getOperation_type_uuid().substring(9, 13).toLowerCase(Locale.ENGLISH);
+				 temp = equipmentOperationList.get(cnt).getUuid();
+				 if (!temp.equals("") && temp!=null)
+				 	{
+					 equipmentOperationResult = equipmentOperationResultDBAdapter.getItemByOperation(temp);
+					 if (equipmentOperationResult!=null)						 
+						 tagrecord.operation_result = equipmentOperationResultDBAdapter.getItemByOperation(equipmentOperationList.get(cnt).getUuid()).getOperation_result_uuid().substring(9, 13).toLowerCase(Locale.ENGLISH);
+					 else tagrecord.operation_result = "8888";
+				 	}
+				 //tagrecord.user = AuthorizedUser.getInstance().getUuid().substring(9, 13).toLowerCase(Locale.ENGLISH);
+				 tagrecord.user = "9bf0";
+				 if (cnt<2) 
+					 tagrecords.add(cnt,tagrecord);
 	 			 cnt++;	 
 				}
 			SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), aList, R.layout.listview, from, to);		 
@@ -222,8 +264,35 @@ public class EquipmentInfoActivity extends Activity {
 		}
 	 	
 		public void CallbackOnReadLable(String result) {
-			rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);
-			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);
+			if (result.length()>=20)
+				{
+				 if (regim == WRITE_USER_LABLE)
+					{			
+					 rfid.SetOperationType((byte)RFIDDriverC5.WRITE_EQUIPMENT_MEMORY);
+					 byte out_buffer[]={};
+					 try {
+						 	out_buffer = DataUtils.PackToSend (equipmenttag,tagrecords);
+					 	} catch (IOException e) {
+						e.printStackTrace();	}
+					 rfid.write(out_buffer);	
+					}
+				 if (regim == READ_USER_LABLE)
+					{			
+					 rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);
+					 rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);	
+					}				 
+				}
+			else
+				Toast.makeText(this, "Ответ некорректен: " + result,Toast.LENGTH_SHORT).show();
+		}
+
+		public void CallbackOnWrite(String result) {
+			if(result == null){
+				setResult(RFID.RESULT_RFID_WRITE_ERROR);	
+			} else {
+				Toast.makeText(this, "Запись успешно завершена",Toast.LENGTH_SHORT).show();
+				finish();
+			}
 		}
 	
 		public void Callback(String result) {
@@ -240,17 +309,17 @@ public class EquipmentInfoActivity extends Activity {
 				equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
 				equipmenttag.set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
 				equipmenttag.set_last(result.substring(36, 40));
-				tagrecord.operation_date=Long.parseLong(result.substring(40, 56),16);
-				tagrecord.operation_length = Short.parseShort(result.substring(56, 60),16);
-				tagrecord.operation_type = result.substring(60, 64).toLowerCase(Locale.ENGLISH);
-				tagrecord.operation_result = result.substring(64, 68).toLowerCase(Locale.ENGLISH);
-				tagrecord.user = result.substring(68, 72).toLowerCase(Locale.ENGLISH);
+				tagrecord.operation_date=Long.parseLong(result.substring(40, 48),16);
+				tagrecord.operation_length = Short.parseShort(result.substring(48, 50),16);
+				tagrecord.operation_type = result.substring(50, 54).toLowerCase(Locale.ENGLISH);
+				tagrecord.operation_result = result.substring(54, 58).toLowerCase(Locale.ENGLISH);
+				tagrecord.user = result.substring(58, 62).toLowerCase(Locale.ENGLISH);
 				tagrecords.add(0,tagrecord);
-				tagrecord2.operation_date=Long.parseLong(result.substring(72, 88),16);
-				tagrecord2.operation_length = Short.parseShort(result.substring(88, 92),16);
-				tagrecord2.operation_type = result.substring(92, 96).toLowerCase(Locale.ENGLISH);
-				tagrecord2.operation_result = result.substring(96, 100).toLowerCase(Locale.ENGLISH);
-				tagrecord2.user = result.substring(100, 104).toLowerCase(Locale.ENGLISH);
+				tagrecord2.operation_date=Long.parseLong(result.substring(62, 70),16);
+				tagrecord2.operation_length = Short.parseShort(result.substring(70, 72),16);
+				tagrecord2.operation_type = result.substring(72, 76).toLowerCase(Locale.ENGLISH);
+				tagrecord2.operation_result = result.substring(76, 80).toLowerCase(Locale.ENGLISH);
+				tagrecord2.user = result.substring(80, 84).toLowerCase(Locale.ENGLISH);
 				tagrecords.add(1,tagrecord2);
 
 				// вариант 2 с хранением данных в глобальной структуре 

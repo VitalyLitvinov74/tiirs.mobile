@@ -64,7 +64,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@color/black"
-                            android:text="ID"
                             android:textSize="12sp" />
 
                     </TableRow>
@@ -92,30 +91,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@color/black" >
-
-                        <TextView
-                            android:id="@+id/equipment_text_position"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/black"
-                            android:text="@string/current_location"
-                            android:textSize="12sp" />
                     </TableRow>
 
-                    <TableRow
-                        android:id="@+id/equipment_tableRow5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" >
-
-                        <TextView
-                            android:id="@+id/equipment_position"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ems="10"
-                            android:text="@string/no_gps_data"
-                            android:textSize="12sp" />
-
-                    </TableRow>
 
                     <TableRow
                         android:id="@+id/equipment_tableRow10"
@@ -158,6 +135,7 @@
                             android:id="@+id/button_read"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:minHeight="32dp"
                             android:text="@string/read_15693"
                             android:textColor="@color/lightgray"
                             android:textSize="14sp"
@@ -166,12 +144,53 @@
 
                     </TableRow>
 
+                    <TableRow
+                        android:id="@+id/equipment_tableRow5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+                        
+                        <Button
+                            android:id="@+id/button_write"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:minHeight="32dp"
+                            android:text="@string/write_15693"
+                            android:textColor="@color/lightgray"
+                            android:textSize="14sp"
+                            android:textStyle="normal"
+                            android:typeface="normal" />
+                        
+                    </TableRow>
+                    
                 </TableLayout>
 
                 <TableLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" >
+
+                    <TableRow
+                        android:id="@+id/equipment_tablerow13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/equipment_text_position"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@color/black"
+                            android:text="@string/current_location"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/equipment_position"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:text="@string/no_gps_data"
+                            android:textSize="12sp" />
+
+                    </TableRow>
 
                     <TableRow
                         android:id="@+id/equipment_TableRow08"
@@ -234,18 +253,6 @@
 
                     </TableRow>
 
-                    <TableRow
-                        android:id="@+id/equipment_tablerow12"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" >
-                    </TableRow>
-
-                    <TableRow
-                        android:id="@+id/equipment_tablerow13"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" >
-
-                    </TableRow>
                 </TableLayout>
 
             </LinearLayout>

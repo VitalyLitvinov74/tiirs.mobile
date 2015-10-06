@@ -3,10 +3,16 @@ package ru.toir.mobile.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.ArrayList;
 import java.util.Locale;
+
+import ru.toir.mobile.rfid.EquipmentTagStructure;
+import ru.toir.mobile.rfid.TagRecordStructure;
 import android.text.TextUtils;
 
 
@@ -212,5 +218,74 @@ public class DataUtils {
 		if (temp.length() == 32)
 			temp=temp.substring(0, 8) + "-" + temp.substring(8, 12) + "-" + temp.substring(12, 16) + "-" + temp.substring(16, 20) + "-" + temp.substring(20, 32);
 		return temp;
+	}
+	
+	public static byte[] PackToSend(EquipmentTagStructure equipmenttag, ArrayList<TagRecordStructure> tagrecords) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		byte out_buffer[] = new byte[256];
+		byte temp_buffer[] = new byte[32];
+		String temp;
+		int cur=0;
+		temp = equipmenttag.get_equipment_uuid().replace("-", "");
+		temp_buffer = hexStringToByteArray(temp);
+		outputStream.write(temp_buffer);		
+		temp = equipmenttag.get_status();
+		temp_buffer = hexStringToByteArray(temp);
+		outputStream.write(temp_buffer);
+		temp = equipmenttag.get_last();
+		temp_buffer = hexStringToByteArray(temp);
+		outputStream.write(temp_buffer);
+		for (cur=0; cur<tagrecords.size(); cur++)
+			{
+			 temp_buffer = longToBytes(tagrecords.get(0).operation_date);
+			 outputStream.write(temp_buffer);
+			 temp_buffer = shortToBytes((short)tagrecords.get(0).operation_length);
+			 outputStream.write(temp_buffer);
+			 temp = tagrecords.get(0).operation_type;
+			 temp_buffer = hexStringToByteArray(temp);
+			 outputStream.write(temp_buffer);
+			 temp = tagrecords.get(0).operation_result;
+			 temp_buffer = hexStringToByteArray(temp);
+			 outputStream.write(temp_buffer);			 
+			 temp = tagrecords.get(0).user;
+			 temp_buffer = hexStringToByteArray(temp);
+			 outputStream.write(temp_buffer);
+			}
+		for (cur=outputStream.size(); cur<64; cur++)
+			 outputStream.write((byte)0);
+		out_buffer = outputStream.toByteArray( );
+		return out_buffer;
+	}
+	
+	public static byte[] hexStringToByteArray(String s) {		
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
+	}
+	
+	public static byte[] longToBytes(long x) {
+		byte[] b = new byte[8];
+		for (int i = 0; i < 8; ++i) {
+		  b[i] = (byte) (x >> (8 - i - 1 << 3));
+		}
+	    return b;
+	}
+
+	public static long bytesToLong(byte[] bytes) {
+		ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
+	    buffer.put(bytes);
+	    buffer.flip();//need flip 
+	    return buffer.getLong();
+	}
+
+	public static byte[] shortToBytes(short x) {
+		byte[] bytes = new byte[2];
+		bytes[0] = (byte)(x & 0xff);
+		bytes[1] = (byte)((x >> 8) & 0xff);
+	    return bytes;
 	}
 }

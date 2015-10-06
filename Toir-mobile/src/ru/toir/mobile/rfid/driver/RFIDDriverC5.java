@@ -27,6 +27,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 	public final static int READ_EQUIPMENT_MEMORY = 4;
 	public final static int READ_EQUIPMENT_OPERATION_MEMORY = 5;
 	public final static int WRITE_EQUIPMENT_OPERATION_MEMORY = 6;
+	public final static int WRITE_EQUIPMENT_MEMORY = 7;
 	
 	public final static int USER_MEMORY_BANK = 3;
 
@@ -120,25 +121,26 @@ public class RFIDDriverC5 implements RFIDDriver{
 	 */
 	@Override
 	public boolean write(byte[] outBuffer){		
-		if (types==WRITE_EQUIPMENT_OPERATION_MEMORY)
+		if (types==WRITE_EQUIPMENT_OPERATION_MEMORY || types==WRITE_EQUIPMENT_MEMORY)
 			{
 			 //byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
 			 byte[] epc = reader.stringToBytes(mPCEPC);
 			 byte memoryBank = USER_MEMORY_BANK;		// user memory
 			 int address = 0;							// пишем буфер с начала
-			 int dataLength = 32;						// длина памяти данных
+			 //int dataLength = 32;						// длина памяти данных
+			 byte[] dataForWrite = new byte[50];
 			 //int dataLength = Integer.valueOf(outBuffer.length) * 2;
 			 String passwordString = "00000000";		// пароль
 			 byte[] password = reader.stringToBytes(passwordString);
 			 
 			 int rc = reader.Writelables(password, epc.length, epc,
-						memoryBank, (byte) address, (byte) 16,
+						memoryBank, (byte) address, (byte) 24,
 						outBuffer);
-		
-			 int realDataLength = outBuffer.length > dataLength ? dataLength
-					 : outBuffer.length;
-			 byte[] dataForWrite = new byte[realDataLength];
-			 System.arraycopy(outBuffer, 0, dataForWrite, 0, realDataLength);
+			 System.arraycopy(outBuffer, 24, dataForWrite, 0, 24);
+			 
+			 rc = reader.Writelables(password, epc.length, epc,
+						memoryBank, (byte) address+48, (byte) 12,
+						dataForWrite);
 			 /*
 			 int rc = reader.Writelables(password, epc.length, epc,
 					memoryBank, (byte) address, (byte) realDataLength,
@@ -207,9 +209,10 @@ public class RFIDDriverC5 implements RFIDDriver{
 						}
 					// возврат при записи памяти оборудования
 					if (types==WRITE_EQUIPMENT_OPERATION_MEMORY)				
-						{
 						 ((OperationActivity)mActivity).CallbackOnWrite(m_strresult);
-						}							 
+					// возврат при записи памяти оборудования
+					if (types==WRITE_EQUIPMENT_MEMORY)
+						 ((EquipmentInfoActivity)mActivity).CallbackOnWrite(m_strresult);						
 					m_strresult="";
     			}  
     			m_nCount++;
