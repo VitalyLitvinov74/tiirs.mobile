@@ -3,13 +3,14 @@
  */
 package ru.toir.mobile.rest;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,6 +34,7 @@ import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
@@ -128,8 +130,8 @@ public class ReferenceProcessor {
 				Log.d("test", jsonString);
 				return jsonString;
 			} else {
-				throw new Exception("Не удалось получить справочник. URL: "
-						+ url);
+				throw new Exception(
+						"Не удалось получить данные справочника. URL: " + url);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -325,6 +327,71 @@ public class ReferenceProcessor {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Получаем файл документации
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean getDocumentaionFile(Bundle bundle) {
+
+		if (!checkToken()) {
+			return false;
+		}
+
+		StringBuilder url = new StringBuilder();
+		String fileUuids[] = bundle
+				.getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID);
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+				new TOiRDatabaseContext(mContext));
+
+		for (String fileUuid : fileUuids) {
+			EquipmentDocumentation document = documentationDBAdapter
+					.getItem(fileUuid);
+			Equipment equipment = equipmentDBAdapter.getItem(document
+					.getEquipment_uuid());
+
+			url.setLength(0);
+			url.append(mServerUrl).append(document.getPath());
+
+			try {
+				URI requestUri = new URI(url.toString());
+				Log.d("test", "requestUri = " + requestUri.toString());
+
+				Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+				List<String> tList = new ArrayList<String>();
+				tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+				headers.put("Authorization", tList);
+
+				Request request = new Request(Method.GET, requestUri, headers,
+						null);
+				Response response = new RestClient().execute(request);
+
+				if (response.mStatus == 200) {
+					File file = new File(
+							mContext.getExternalFilesDir("documentation") + "/"
+									+ equipment.getEquipment_type_uuid() + "/"
+									+ equipment.getUuid(), document.getPath());
+					if (!file.getParentFile().exists()) {
+						file.getParentFile().mkdirs();
+					}
+					FileOutputStream fos = new FileOutputStream(file);
+					fos.write(response.mBody);
+					fos.close();
+				} else {
+					throw new Exception("Не удалось получить файл. URL: " + url);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
