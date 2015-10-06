@@ -20,6 +20,8 @@ import com.google.gson.JsonSerializer;
  */
 public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 
+	private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -58,9 +60,9 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 			}
 		}
 		result.addProperty("CreatedAt",
-				DataUtils.getDate(item.getCreatedAt(), "yyyy-MM-dd hh:mm:ss"));
+				DataUtils.getDate(item.getCreatedAt(), dateFormat));
 		result.addProperty("ChangedAt",
-				DataUtils.getDate(item.getChangedAt(), "yyyy-MM-dd hh:mm:ss"));
+				DataUtils.getDate(item.getChangedAt(), dateFormat));
 
 		return result;
 	}

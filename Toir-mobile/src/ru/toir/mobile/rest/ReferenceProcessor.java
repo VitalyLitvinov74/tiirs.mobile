@@ -69,6 +69,8 @@ public class ReferenceProcessor {
 	private String mServerUrl;
 	private Context mContext;
 
+	private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
+
 	private static class ReferenceName {
 		public static String CriticalType = "CriticalityType";
 		public static String DocumentType = "DocumentType";
@@ -174,8 +176,8 @@ public class ReferenceProcessor {
 			jsonString = getReferenceData(url.toString());
 
 			if (jsonString != null) {
-				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'hh:mm:ss").create();
+				Gson gson = new GsonBuilder().setDateFormat(dateFormat)
+						.create();
 
 				// разбираем и сохраняем полученные данные
 				boolean result = savePattern(gson.fromJson(jsonString,
@@ -229,8 +231,7 @@ public class ReferenceProcessor {
 			return false;
 		}
 
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss")
-				.create();
+		Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 
 		if (!inParrentTransaction) {
 			db.beginTransaction();
@@ -302,14 +303,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -425,14 +424,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -483,14 +480,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -541,14 +536,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -599,14 +592,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -657,14 +648,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -715,14 +704,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -757,8 +744,7 @@ public class ReferenceProcessor {
 		StringBuilder url = new StringBuilder();
 		String jsonString;
 
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'hh:mm:ss")
-				.create();
+		Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 
 		String[] equipmentUuids = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID);
@@ -826,14 +812,12 @@ public class ReferenceProcessor {
 		if (lastChangedAt != null) {
 			url.append('?')
 					.append("ChangedAfter=")
-					.append(DataUtils.getDate(lastChangedAt + 1000,
-							"yyyy-MM-dd'T'HH:mm:ss"));
+					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
-			Gson gson = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'hh:mm:ss").create();
+			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
 			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 					.getWritableDatabase();
@@ -881,8 +865,8 @@ public class ReferenceProcessor {
 							equipmentUuid));
 			jsonString = getReferenceData(url.toString());
 			if (jsonString != null) {
-				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'hh:mm:ss").create();
+				Gson gson = new GsonBuilder().setDateFormat(dateFormat)
+						.create();
 				// разбираем и сохраняем полученные данные
 				ArrayList<EquipmentDocumentationSrv> list = gson.fromJson(
 						jsonString,

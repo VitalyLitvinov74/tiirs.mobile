@@ -201,7 +201,7 @@ public class DataUtils {
 	
 	public static String getDate(long time, String format) {
 
-		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.ENGLISH);
+		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
 		String date = sdf.format(time);
 		
 		return date;

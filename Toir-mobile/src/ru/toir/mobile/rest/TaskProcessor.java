@@ -28,6 +28,7 @@ import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
 import ru.toir.mobile.serializer.EquipmentOperationSerializer;
@@ -145,7 +146,7 @@ public class TaskProcessor {
 				Log.d("test", jsonString);
 
 				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'hh:mm:ss").create();
+						"yyyy-MM-dd'T'HH:mm:ss").create();
 
 				ArrayList<TaskSrv> serverTasks = gson.fromJson(jsonString,
 						new TypeToken<ArrayList<TaskSrv>>() {
@@ -223,7 +224,14 @@ public class TaskProcessor {
 		// новый вариант разбора и сохранения данных с сервера
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!taskDBAdapter.saveItems(TaskSrv.getTasks(tasks))) {
+		ArrayList<Task> taskList = TaskSrv.getTasks(tasks);
+		// для новых нарядов выставляем статус "В работе"
+		for (Task item : taskList) {
+			if (item.getTask_status_uuid().equals(Task.Extras.STATUS_UUID_NEW)) {
+				item.setTask_status_uuid(Task.Extras.STATUS_UUID_IN_PROCESS);
+			}
+		}
+		if (!taskDBAdapter.saveItems(taskList)) {
 			return false;
 		}
 

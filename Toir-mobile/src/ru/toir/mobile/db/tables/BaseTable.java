@@ -22,7 +22,7 @@ public class BaseTable {
 	 * 
 	 */
 	public BaseTable() {
-		long date = Calendar.getInstance().getTime().getTime();
+		long date = Calendar.getInstance().getTimeInMillis();
 		uuid = UUID.randomUUID().toString();
 		CreatedAt = date;
 		ChangedAt = date;

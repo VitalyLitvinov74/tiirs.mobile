@@ -85,8 +85,6 @@ public class TaskFragment extends Fragment {
 
 	private ProgressDialog processDialog;
 
-	private String dateFormat = "dd.MM.yyyy hh:mm";
-
 	// фильтр для получения сообщений при получении нарядов с сервера
 	private IntentFilter mFilterGetTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_GET_TASK);
@@ -295,16 +293,21 @@ public class TaskFragment extends Fragment {
 				}
 
 				if (viewId == R.id.ti_Create) {
-					((TextView) view).setText(DataUtils.getDate(
-							cursor.getLong(columnIndex), dateFormat));
+					long lDate = cursor.getLong(columnIndex);
+					String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
+					((TextView) view).setText(sDate);
 					return true;
 				}
 
 				if (viewId == R.id.ti_Close) {
-					long closeDate = cursor.getLong(columnIndex);
-
-					((TextView) view).setText(closeDate != 0 ? DataUtils
-							.getDate(closeDate, dateFormat) : "нет");
+					long lDate = cursor.getLong(columnIndex);
+					String sDate;
+					if (lDate != 0) {
+						sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
+					} else {
+						sDate = "нет";
+					}
+					((TextView) view).setText(sDate);
 					return true;
 				}
 
@@ -652,7 +655,7 @@ public class TaskFragment extends Fragment {
 								TaskDBAdapter adapter = new TaskDBAdapter(
 										new TOiRDatabaseContext(getActivity()));
 								task.setClose_date(Calendar.getInstance()
-										.getTime().getTime());
+										.getTimeInMillis());
 								task.setUpdated(true);
 								adapter.update(task);
 								FillListViewTasks(null, null);
