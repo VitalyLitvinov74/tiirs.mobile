@@ -21,6 +21,7 @@ import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.rest.ProcessorService;
@@ -79,7 +80,7 @@ public class TaskFragment extends Fragment {
 	private ArrayAdapter<SortField> sortFieldAdapter;
 	private SimpleCursorAdapter taskAdapter;
 
-	private ProgressDialog getOrderDialog;
+	private ProgressDialog processDialog;
 
 	private String dateFormat = "dd.MM.yyyy hh:mm";
 
@@ -119,9 +120,45 @@ public class TaskFragment extends Fragment {
 					}
 
 					// закрываем диалог получения наряда
-					getOrderDialog.dismiss();
+					processDialog.dismiss();
 					getActivity().unregisterReceiver(mReceiverGetTask);
 					initView();
+				}
+			}
+
+		}
+	};
+
+	// TODO решить нужны ли фильтры на все возможные варианты отправки состояния/результатов 
+	// фильтр для получения сообщений при получении нарядов с сервера
+	private IntentFilter mFilterSendTask = new IntentFilter(
+			TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+	private BroadcastReceiver mReceiverSendTaskResult = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int provider = intent.getIntExtra(
+					ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			Log.d(TAG, "" + provider);
+			if (provider == ProcessorService.Providers.TASK_PROVIDER) {
+				int method = intent.getIntExtra(
+						ProcessorService.Extras.METHOD_EXTRA, 0);
+				Log.d(TAG, "" + method);
+				if (method == TaskServiceProvider.Methods.TASK_SEND_RESULT) {
+					boolean result = intent.getBooleanExtra(
+							ProcessorService.Extras.RESULT_EXTRA, false);
+					Log.d(TAG, "" + result);
+					if (result == true) {
+						Toast.makeText(getActivity(), "Результаты отправлены.",
+								Toast.LENGTH_SHORT).show();
+					} else {
+						Toast.makeText(getActivity(),
+								"Ошибка при отправке результатов.",
+								Toast.LENGTH_LONG).show();
+					}
+
+					// закрываем диалог получения наряда
+					processDialog.dismiss();
+					getActivity().unregisterReceiver(mReceiverSendTaskResult);
 				}
 			}
 		}
@@ -384,31 +421,30 @@ public class TaskFragment extends Fragment {
 			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
 					user.getUuid(), taskStatus, orderByField));
 
-			/*
-			Integer cnt = 0;
-			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-			while (cnt < ordersList.size()) {
-				HashMap<String, String> hm = new HashMap<String, String>();
-				hm.put("name",
-						"Создан: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getCreate_date(), "dd-MM-yyyy hh:mm")
-								+ " | Изменен: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getModify_date(), "dd-MM-yyyy hh:mm"));
-				hm.put("descr",
-						"Статус: "
-								+ taskStatusDBAdapter.getNameByUUID(ordersList
-										.get(cnt).getTask_status_uuid())
-								+ " | Отправлялся: "
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getAttempt_send_date(),
-										"dd-MM-yyyy hh:mm") + " [Count="
-								+ ordersList.get(cnt).getAttempt_count() + "]");
-				aList.add(hm);
-				cnt++;
-			}
-			*/
+//			Integer cnt = 0;
+//			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+//			while (cnt < ordersList.size()) {
+//				HashMap<String, String> hm = new HashMap<String, String>();
+//				hm.put("name",
+//						"Создан: "
+//								+ DataUtils.getDate(ordersList.get(cnt)
+//										.getCreate_date(), "dd-MM-yyyy hh:mm")
+//								+ " | Изменен: "
+//								+ DataUtils.getDate(ordersList.get(cnt)
+//										.getModify_date(), "dd-MM-yyyy hh:mm"));
+//				hm.put("descr",
+//						"Статус: "
+//								+ taskStatusDBAdapter.getNameByUUID(ordersList
+//										.get(cnt).getTask_status_uuid())
+//								+ " | Отправлялся: "
+//								+ DataUtils.getDate(ordersList.get(cnt)
+//										.getAttempt_send_date(),
+//										"dd-MM-yyyy hh:mm") + " [Count="
+//								+ ordersList.get(cnt).getAttempt_count() + "]");
+//				aList.add(hm);
+//				cnt++;
+//			}
+
 			// Setting the adapter to the listView
 			lv.setAdapter(taskAdapter);
 			button.setVisibility(View.INVISIBLE);
@@ -681,16 +717,15 @@ public class TaskFragment extends Fragment {
 				getActivity()
 						.registerReceiver(mReceiverGetTask, mFilterGetTask);
 
-				tsh.GetTask(AuthorizedUser.getInstance().getToken());
+				tsh.GetTask();
 
 				// показываем диалог получения наряда
-				getOrderDialog = new ProgressDialog(getActivity());
-				getOrderDialog.setMessage("Получаем наряд");
-				getOrderDialog.setIndeterminate(true);
-				getOrderDialog
-						.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				getOrderDialog.setCancelable(false);
-				getOrderDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+				processDialog = new ProgressDialog(getActivity());
+				processDialog.setMessage("Получаем наряд");
+				processDialog.setIndeterminate(true);
+				processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				processDialog.setCancelable(false);
+				processDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
 						"Отмена", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
@@ -702,10 +737,60 @@ public class TaskFragment extends Fragment {
 										Toast.LENGTH_SHORT).show();
 							}
 						});
-				getOrderDialog.show();
+				processDialog.show();
 				return true;
 			}
 		});
+
+		// добавляем элемент меню для отправки результатов выполнения нарядов
+		MenuItem sendTaskResult = menu.add("Отправить результаты");
+		sendTaskResult
+				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						// костыль для проверки
+						TaskDBAdapter adapter = new TaskDBAdapter(
+								new TOiRDatabaseContext(getActivity()));
+						Task task = adapter
+								.getItem("a1f3a9af-d05b-4123-858f-a753a46f97d5");
+						task.setUpdated(true);
+						adapter.replace(task);
+						// конец костыля
+
+						getActivity().registerReceiver(mReceiverSendTaskResult,
+								mFilterSendTask);
+
+						TaskServiceHelper tsh = new TaskServiceHelper(
+								getActivity(),
+								TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+						tsh.SendTaskResult("a1f3a9af-d05b-4123-858f-a753a46f97d5");
+
+						// показываем диалог отправки результатов
+						processDialog = new ProgressDialog(getActivity());
+						processDialog.setMessage("Отправляем результаты");
+						processDialog.setIndeterminate(true);
+						processDialog
+								.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+						processDialog.setCancelable(false);
+						processDialog.setButton(
+								DialogInterface.BUTTON_NEGATIVE, "Отмена",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										getActivity().unregisterReceiver(
+												mReceiverGetTask);
+										Toast.makeText(
+												getActivity(),
+												"Отправка результатов отменена",
+												Toast.LENGTH_SHORT).show();
+									}
+								});
+						processDialog.show();
+						return true;
+					}
+				});
 	}
 
 	/**

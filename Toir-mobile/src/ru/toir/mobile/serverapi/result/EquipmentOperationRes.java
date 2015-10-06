@@ -15,8 +15,8 @@ import android.content.Context;
  */
 public class EquipmentOperationRes extends ru.toir.mobile.db.tables.EquipmentOperation {
 	
-	public EquipmentOperationResultRes equipmentOperationResult;
-	public ArrayList<MeasureValueRes> measureValues;
+	private EquipmentOperationResultRes equipmentOperationResult;
+	private ArrayList<MeasureValueRes> measureValues;
 
 	/**
 	 * 
@@ -54,6 +54,35 @@ public class EquipmentOperationRes extends ru.toir.mobile.db.tables.EquipmentOpe
 			return null;
 		}
 
+	}
+
+	/**
+	 * @return the equipmentOperationResult
+	 */
+	public EquipmentOperationResultRes getEquipmentOperationResult() {
+		return equipmentOperationResult;
+	}
+
+	/**
+	 * @param equipmentOperationResult the equipmentOperationResult to set
+	 */
+	public void setEquipmentOperationResult(
+			EquipmentOperationResultRes equipmentOperationResult) {
+		this.equipmentOperationResult = equipmentOperationResult;
+	}
+
+	/**
+	 * @return the measureValues
+	 */
+	public ArrayList<MeasureValueRes> getMeasureValues() {
+		return measureValues;
+	}
+
+	/**
+	 * @param measureValues the measureValues to set
+	 */
+	public void setMeasureValues(ArrayList<MeasureValueRes> measureValues) {
+		this.measureValues = measureValues;
 	}
 
 }
