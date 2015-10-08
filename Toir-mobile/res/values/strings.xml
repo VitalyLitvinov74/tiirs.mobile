@@ -66,6 +66,6 @@
     <string name="operation_step_descr_title">Описание шага обслуживания</string>
     <string name="operation_status_change_title">Изменить статус операции</string>
     <string name="divider"> | </string>
-   
+    <string name="application_full_name">Мобильный ТОиР</string>
     
 </resources>

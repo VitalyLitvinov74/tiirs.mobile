@@ -46,6 +46,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
@@ -62,6 +64,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
@@ -94,6 +97,7 @@ public class OperationActivity extends Activity {
 	private Spinner spinnerSuffix;
 	private ArrayAdapter<Suffixes> spinnerSuffixAdapter;
 	private ArrayList<Suffixes> suffixList;
+	private ImageView step_image;
 
 	private String lastPhotoFile;
 	Preview mPreview;
@@ -148,7 +152,8 @@ public class OperationActivity extends Activity {
 		stepTitle = (TextView) findViewById(R.id.stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.step_description);
 		numStepButton = (Button) findViewById(R.id.numStepButton);
-
+		step_image = (ImageView) findViewById(R.id.step_image);
+		
 		// получаем статус и время наряда
 		TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(
 				getApplicationContext()));
@@ -275,13 +280,20 @@ public class OperationActivity extends Activity {
 
 	private void showStepContent(OperationPatternStep step) {
 
-		stepTitle.setText(step.getTitle());
+		//stepTitle.setText(step.getTitle());
+		stepTitle.setText(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ step.getImage());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
 		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.photoContainer);
 		photoContainer.removeAllViewsInLayout();
 		photoContainer.setVisibility(View.INVISIBLE);
+
+		File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ step.getImage());						
+		if(imgFile.exists() && imgFile.isFile()){
+		    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+		    step_image.setImageBitmap(myBitmap);			    			    
+		}			
 
 		// получаем список результатов шагов
 		ArrayList<OperationPatternStepResult> resultsList = getStepResult(step
@@ -295,7 +307,8 @@ public class OperationActivity extends Activity {
 			final String next_step_uuid = result
 					.getNext_operation_pattern_step_uuid();
 			resultButton.setText(result.getTitle());
-			resultButton.setWidth(200);
+			resultButton.setWidth(300);
+			resultButton.setTextSize(14);
 			if (result.getNext_operation_pattern_step_uuid().equals(
 					"00000000-0000-0000-0000-000000000000") || result.getNext_operation_pattern_step_uuid().equals("")) {
 				resultButton.setOnClickListener(new View.OnClickListener() {

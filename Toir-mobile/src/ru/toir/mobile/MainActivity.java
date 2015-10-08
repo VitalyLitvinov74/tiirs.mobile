@@ -14,6 +14,7 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -144,7 +145,8 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
+		setContentView(R.layout.start_screen);
 		// инициализация приложения
 		init();
 
@@ -157,11 +159,20 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		Log.d(TAG, "onCreate");
+
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            public void run() {
+    			setContentView(R.layout.login_layout);
+    			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+        }, 3000);
+
 		if (isLogged) {
 			setMainLayout();
 		} else {
-			setContentView(R.layout.login_layout);
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			//setContentView(R.layout.login_layout);
+			//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 
 	}
@@ -169,7 +180,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Инициализация приложения при запуске
 	 */
-	public void init() {
+	public void init() {		
 		if (!initDB()) {
 			// принудительное обновление приложения
 			finish();
