@@ -104,11 +104,12 @@ public class Scanner {
 				if (m_handler != null) {
 
 					String str = ReadSCAAuto();
+					
 					Message msg = new Message();
 					msg.what = str.length() > 0 ? BARCODE_READ : BARCODE_NOREAD;
 					msg.obj = str;
-
-					m_handler.sendMessage(msg);
+					if (!str.equals(""))
+						m_handler.sendMessage(msg);
 
 				}
 

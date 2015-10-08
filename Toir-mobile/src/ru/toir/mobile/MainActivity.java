@@ -204,7 +204,7 @@ public class MainActivity extends FragmentActivity {
 			} else {
 				Toast toast = Toast.makeText(this, "База данных актуальна!",
 						Toast.LENGTH_SHORT);
-				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.setGravity(Gravity.BOTTOM, 0, 0);
 				toast.show();
 				success = true;
 			}
@@ -212,7 +212,7 @@ public class MainActivity extends FragmentActivity {
 			Toast toast = Toast.makeText(this,
 					"Не удалось открыть/обновить базу данных!",
 					Toast.LENGTH_LONG);
-			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.setGravity(Gravity.BOTTOM, 0, 0);
 			toast.show();
 		}
 

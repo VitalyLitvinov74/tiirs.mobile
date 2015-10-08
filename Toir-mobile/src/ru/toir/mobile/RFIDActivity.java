@@ -16,7 +16,6 @@ import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
 import ru.toir.mobile.rfid.driver.RFIDDriverC5;
-
 /**
  * @author Dmitriy Logachov
  *
@@ -27,9 +26,17 @@ public class RFIDActivity extends Activity {
 	private String driverClassName;
 	private Class<?> driverClass;
 	private RFIDDriver driver;
+	private static RFID rfid;
 
 	UserTagStructure usertag;
 	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		// запускаем процедуру считывания
+		rfid.read((byte)RFIDDriverC5.READ_USER_LABLE);	
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -63,14 +70,11 @@ public class RFIDActivity extends Activity {
 			finish();
 		}
 		
-		RFID rfid = new RFID(driver);
+		rfid = new RFID(driver);
 		rfid.setActivity(this);
 
 		// инициализируем драйвер
-		if (rfid.init((byte)RFIDDriverC5.READ_USER_LABLE)) {
-			// запускаем процедуру считывания
-			rfid.read((byte)RFIDDriverC5.READ_USER_LABLE);
-		} else {
+		if (!rfid.init((byte)RFIDDriverC5.READ_USER_LABLE)) {
 			setResult(RFID.RESULT_RFID_INIT_ERROR);
 			finish();
 		}
