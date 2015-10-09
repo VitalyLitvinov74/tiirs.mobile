@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 /**
  * @author Dmitriy Logachov
- *
+ * 
  */
 public class TaskServiceProvider implements IServiceProvider {
 
@@ -21,11 +21,11 @@ public class TaskServiceProvider implements IServiceProvider {
 
 		// список параметров к методам
 		public static final String PARAMETER_TASK_UUID = "taskUuid";
-		
+
 		// список возвращаемых значений
 		public static final String RESULT_GET_TASK_COUNT = "taskCount";
 	}
-	
+
 	public static class Actions {
 		public final static String ACTION_GET_TASK = "action_get_task";
 		public final static String ACTION_TASK_SEND_RESULT = "action_task_send_result";
@@ -35,7 +35,9 @@ public class TaskServiceProvider implements IServiceProvider {
 		mContext = context;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ru.toir.mobile.rest.IServiceProvider#RunTask(int, android.os.Bundle)
 	 */
 	@Override
@@ -50,9 +52,16 @@ public class TaskServiceProvider implements IServiceProvider {
 
 		Bundle result = new Bundle();
 		result.putBoolean(IServiceProvider.RESULT, false);
+		result.putString(MESSAGE, "Запуск не существующей задачи сервиса.");
 		return result;
 	}
-	
+
+	/**
+	 * Отправка результата выполнения наряда на сервер
+	 * 
+	 * @param extras
+	 * @return
+	 */
 	private Bundle taskSendResult(Bundle extras) {
 		try {
 			return new TaskProcessor(mContext).TaskSendResult(extras);
@@ -60,10 +69,17 @@ public class TaskServiceProvider implements IServiceProvider {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
 			return result;
 		}
 	}
-	
+
+	/**
+	 * Получение нарядов с сервера
+	 * 
+	 * @param extras
+	 * @return
+	 */
 	private Bundle getTask(Bundle extras) {
 		try {
 			return new TaskProcessor(mContext).GetTask(extras);
@@ -71,6 +87,7 @@ public class TaskServiceProvider implements IServiceProvider {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
 			return result;
 		}
 	}

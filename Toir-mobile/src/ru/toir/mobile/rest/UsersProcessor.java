@@ -44,14 +44,19 @@ public class UsersProcessor {
 	}
 
 	/**
+	 * Получаем и сохраняем информацию по пользователю
 	 * 
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getUser(Bundle bundle) {
+	public Bundle getUser(Bundle bundle) {
+
+		Bundle result = new Bundle();
 
 		if (!checkToken()) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		URI requestUri = null;
@@ -98,17 +103,27 @@ public class UsersProcessor {
 					// TODO с сервера не приходит должность
 					user.setWhois("Бугор");
 					adapter.replaceItem(user);
+					result.putBoolean(IServiceProvider.RESULT, true);
+					return result;
 				} else {
-					return false;
+					result.putBoolean(IServiceProvider.RESULT, true);
+					result.putString(IServiceProvider.MESSAGE,
+							"Ошибка разбора ответа сервера на запрос информации о пользователе.");
+					return result;
 				}
-
-				return true;
 			} else {
-				return false;
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE,
+						"Ошибка получения информации о пользователе. RESPONSE STATUS = "
+								+ response.mStatus);
+				return result;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			e.printStackTrace();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
