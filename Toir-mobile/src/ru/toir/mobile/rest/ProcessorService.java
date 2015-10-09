@@ -19,15 +19,20 @@ import android.util.Log;
  *
  */
 public class ProcessorService extends Service {
+
 	private Integer lastStarId;
 	private final Context mContext = this;
+
 	public static class Extras {
 		public static final String PROVIDER_EXTRA = "PROVIDER_EXTRA";
 		public static final String METHOD_EXTRA = "METHOD_EXTRA";
 		public static final String RESULT_ACTION_EXTRA = "RESULT_ACTION_EXTRA";
 		public static final String RESULT_EXTRA = "RESULT_EXTRA";
+		public static final String RESULT_BUNDLE = "RESULT_BUNDLE";
 	}
+
 	private final HashMap<String, AsyncServiceTask> mTasks = new  HashMap<String, AsyncServiceTask>();
+
 	public class Providers {
 		public static final int USERS_PROVIDER = 1;
 		public static final int TOKEN_PROVIDER = 2;
@@ -99,7 +104,7 @@ public class ProcessorService extends Service {
 		return START_STICKY;
 	}
 	
-	public class AsyncServiceTask extends AsyncTask<Void, Integer, Boolean> {
+	public class AsyncServiceTask extends AsyncTask<Void, Integer, Bundle> {
 		private final Bundle mExtras;
 		private final ArrayList<String> mResultAction = new ArrayList<String>();
 		private final String mTaskIdentifier;
@@ -116,8 +121,10 @@ public class ProcessorService extends Service {
 		}
 
 		@Override
-		protected Boolean doInBackground(Void... params) {
-			Boolean result = false;
+		protected Bundle doInBackground(Void... params) {
+
+			Bundle result;
+			
 			final int providerId = mExtras.getInt(Extras.PROVIDER_EXTRA);
 			final int methodId = mExtras.getInt(Extras.METHOD_EXTRA);
 			
@@ -125,22 +132,27 @@ public class ProcessorService extends Service {
 				final IServiceProvider provider = GetProvider(providerId);
 				if (provider != null) {
 					try {
-						result = provider.RunTask(methodId, mExtras);
+						return provider.RunTask(methodId, mExtras);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 			}
+			
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
 			return result;
 		}
 
 		@Override
-		protected void onPostExecute(Boolean result) {
+		protected void onPostExecute(Bundle result) {
 			synchronized (mTasks) {
 				// бежим по списку строк фильтров для broadcastreceiver`ов которым нужно отправить уведомление о завершении операции
 				for (int i = 0; i < mResultAction.size(); i++) {
 					Intent resultIntent = new Intent(mResultAction.get(i));
-					resultIntent.putExtra(Extras.RESULT_EXTRA, result.booleanValue());
+					boolean success = result.getBoolean(IServiceProvider.RESULT);
+					resultIntent.putExtra(Extras.RESULT_EXTRA, success);
+					resultIntent.putExtra(Extras.RESULT_BUNDLE, result);
 					resultIntent.putExtras(mExtras);
 					resultIntent.setPackage(mContext.getPackageName());
 					mContext.sendBroadcast(resultIntent);

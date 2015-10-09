@@ -40,14 +40,24 @@ public class TokenServiceProvider implements IServiceProvider {
 	 * @see ru.toir.mobile.rest.IServiceProvider#RunTask(int, android.os.Bundle)
 	 */
 	@Override
-	public boolean RunTask(int method, Bundle extras) {
+	public Bundle RunTask(int method, Bundle extras) {
+		
+		Bundle result = new Bundle();
+		boolean success;
+
 		switch (method) {
 		case Methods.GET_TOKEN_BY_TAG:
-			return getTokenByTag(extras);
+			success = getTokenByTag(extras);
+			result.putBoolean(IServiceProvider.RESULT, success);
+			return result;
 		case Methods.GET_TOKEN_BY_USERNAME_AND_PASSWORD:
-			return getTokenByUsernameAndPassword(extras);
+			success = getTokenByUsernameAndPassword(extras);
+			result.putBoolean(IServiceProvider.RESULT, success);
+			return result;
 		}
-		return false;
+
+		result.putBoolean(IServiceProvider.RESULT, false);
+		return result;
 	}
 
 	/**

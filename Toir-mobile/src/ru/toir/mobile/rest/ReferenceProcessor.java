@@ -148,10 +148,14 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getOperationPattern(Bundle bundle) {
+	public Bundle getOperationPattern(Bundle bundle) {
 
+		Bundle result;
+		
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -180,19 +184,22 @@ public class ReferenceProcessor {
 						.create();
 
 				// разбираем и сохраняем полученные данные
-				boolean result = savePattern(gson.fromJson(jsonString,
+				result = savePattern(gson.fromJson(jsonString,
 						OperationPatternSrv.class));
-				if (!result) {
+				boolean success = result.getBoolean(IServiceProvider.RESULT);
+				if (!success) {
 					if (!inParrentTransaction) {
 						db.endTransaction();
 					}
-					return false;
+					return result;
 				}
 			} else {
 				if (!inParrentTransaction) {
 					db.endTransaction();
 				}
-				return false;
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				return result;
 			}
 		}
 
@@ -201,7 +208,9 @@ public class ReferenceProcessor {
 			db.endTransaction();
 		}
 
-		return true;
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**
@@ -210,10 +219,14 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getOperationResult(Bundle bundle) {
+	public Bundle getOperationResult(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		String[] operationTypeUuids = bundle
@@ -228,7 +241,9 @@ public class ReferenceProcessor {
 
 		String referenceUrl = getReferenceURL(ReferenceName.OperationResult);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
@@ -249,18 +264,21 @@ public class ReferenceProcessor {
 						new TypeToken<ArrayList<OperationResultSrv>>() {
 							private static final long serialVersionUID = 1l;
 						}.getType());
-				boolean result = saveOperationResult(results);
-				if (!result) {
+				result = saveOperationResult(results);
+				boolean success = result.getBoolean(IServiceProvider.RESULT);
+				if (!success) {
 					if (!inParrentTransaction) {
 						db.endTransaction();
 					}
-					return false;
+					return result;
 				}
 			} else {
 				if (!inParrentTransaction) {
 					db.endTransaction();
 				}
-				return false;
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				return result;
 			}
 		}
 
@@ -268,7 +286,10 @@ public class ReferenceProcessor {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 		}
-		return true;
+
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 
 	}
 
@@ -939,7 +960,13 @@ public class ReferenceProcessor {
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
 					typeUuids.toArray(new String[] {}));
-			if (!getOperationResult(bundle)) {
+			Bundle result = getOperationResult(bundle);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (!success) {
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				// TODO сделать правильный возврат!!!
+				// return result;
 				return false;
 			}
 		}
@@ -1016,36 +1043,43 @@ public class ReferenceProcessor {
 	 * 
 	 * @param pattern
 	 */
-	private boolean savePattern(OperationPatternSrv pattern) {
+	private Bundle savePattern(OperationPatternSrv pattern) {
+
+		Bundle result = new Bundle();
 
 		OperationPatternDBAdapter adapter0 = new OperationPatternDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (adapter0.replace(pattern.getLocal()) == -1) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		OperationPatternStepDBAdapter adapter1 = new OperationPatternStepDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!adapter1.saveItems(OperationPatternSrv
 				.getOperationPatternSteps(pattern))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		OperationPatternStepResultDBAdapter adapter2 = new OperationPatternStepResultDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!adapter2.saveItems(OperationPatternSrv
 				.getOperationPatternStepResults(pattern))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		MeasureTypeDBAdapter adapter3 = new MeasureTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!adapter3.saveItems(OperationPatternStepSrv.getMeasureTypes(pattern
 				.getSteps()))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
-		return true;
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**
@@ -1054,23 +1088,28 @@ public class ReferenceProcessor {
 	 * @param results
 	 * @return
 	 */
-	private boolean saveOperationResult(ArrayList<OperationResultSrv> results) {
+	private Bundle saveOperationResult(ArrayList<OperationResultSrv> results) {
+
+		Bundle result = new Bundle();
 
 		OperationResultDBAdapter adapter0 = new OperationResultDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!adapter0
 				.saveItems(OperationResultSrv.getOperationResults(results))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
 		OperationTypeDBAdapter adapter1 = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (!adapter1.saveItems(OperationResultSrv.getOperationTypes(results))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 
-		return true;
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**

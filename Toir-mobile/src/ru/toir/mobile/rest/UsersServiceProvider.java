@@ -17,7 +17,7 @@ public class UsersServiceProvider implements IServiceProvider {
 	public static class Methods {
 		public static final int GET_USER = 1;
 	}
-	
+
 	public static class Actions {
 		public static final String ACTION_GET_USER = "action_get_user";
 	}
@@ -27,12 +27,20 @@ public class UsersServiceProvider implements IServiceProvider {
 	}
 
 	@Override
-	public boolean RunTask(int method, Bundle extras) {
+	public Bundle RunTask(int method, Bundle extras) {
+
+		Bundle result = new Bundle();
+		boolean success;
+
 		switch (method) {
 		case Methods.GET_USER:
-			return getUser(extras);
+			success = getUser(extras);
+			result.putBoolean(IServiceProvider.RESULT, success);
+			return result;
 		}
-		return false;
+
+		result.putBoolean(IServiceProvider.RESULT, false);
+		return result;
 	}
 
 	private boolean getUser(Bundle extras) {

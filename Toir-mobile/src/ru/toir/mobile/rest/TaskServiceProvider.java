@@ -17,10 +17,13 @@ public class TaskServiceProvider implements IServiceProvider {
 	public static class Methods {
 		// список методов
 		public static final int GET_TASK = 1;
-		public static final int TASK_SEND_RESULT = 3;
+		public static final int TASK_SEND_RESULT = 2;
 
 		// список параметров к методам
 		public static final String PARAMETER_TASK_UUID = "taskUuid";
+		
+		// список возвращаемых значений
+		public static final String RESULT_GET_TASK_COUNT = "taskCount";
 	}
 	
 	public static class Actions {
@@ -36,31 +39,39 @@ public class TaskServiceProvider implements IServiceProvider {
 	 * @see ru.toir.mobile.rest.IServiceProvider#RunTask(int, android.os.Bundle)
 	 */
 	@Override
-	public boolean RunTask(int method, Bundle extras) {
+	public Bundle RunTask(int method, Bundle extras) {
+
 		switch (method) {
 		case Methods.GET_TASK:
 			return getTask(extras);
 		case Methods.TASK_SEND_RESULT:
 			return taskSendResult(extras);
 		}
-		return false;
+
+		Bundle result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, false);
+		return result;
 	}
 	
-	private boolean taskSendResult(Bundle extras) {
+	private Bundle taskSendResult(Bundle extras) {
 		try {
 			return new TaskProcessor(mContext).TaskSendResult(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 	}
 	
-	private boolean getTask(Bundle extras) {
+	private Bundle getTask(Bundle extras) {
 		try {
 			return new TaskProcessor(mContext).GetTask(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			return result;
 		}
 	}
 
