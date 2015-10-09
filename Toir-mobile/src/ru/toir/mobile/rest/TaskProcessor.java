@@ -90,6 +90,7 @@ public class TaskProcessor {
 		if (!checkToken()) {
 			result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
 			return result;
 		}
 
@@ -99,30 +100,39 @@ public class TaskProcessor {
 
 		boolean success;
 
+		// получаем наряды
 		Bundle taskResult = getTasks();
 		success = taskResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
 			db.endTransaction();
 			return taskResult;
 		} else {
+			// добавляем в результат все элементы ответа
 			result.putAll(taskResult);
 		}
 
-		Bundle patternResult = getPatterns();
+		// получаем шаблоны
+		ArrayList<String> operationPatternUuids = new ArrayList<String>(
+				patternUuids);
+		Bundle patternResult = getPatterns(operationPatternUuids);
 		success = patternResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
 			db.endTransaction();
 			return patternResult;
 		} else {
+			// добавляем в результат все элементы ответа
 			result.putAll(patternResult);
 		}
 
-		Bundle operationResultsResult = getOperationResults();
+		// получаем возможные результаты выполнения операций
+		Bundle operationResultsResult = getOperationResults(operationTypeUuids
+				.toArray(new String[] {}));
 		success = operationResultsResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
 			db.endTransaction();
 			return operationResultsResult;
 		} else {
+			// добавляем в результат все элементы ответа
 			result.putAll(operationResultsResult);
 		}
 
@@ -168,188 +178,243 @@ public class TaskProcessor {
 							private static final long serialVersionUID = 1l;
 						}.getType());
 				if (serverTasks != null) {
-
 					// разбираем и сохраняем полученные данные
 					return saveTasks(serverTasks);
 				} else {
-					// TODO нужен механизм который при наличии полученных
-					// нарядов выведет диалог с их колличеством, либо с надписью
-					// "Новых нарядов нет"
-					// нарядов нет - считаем что процедура получения прошла
-					// успешно
-					result.putBoolean(IServiceProvider.RESULT, true);
+					result.putBoolean(IServiceProvider.RESULT, false);
+					result.putString(IServiceProvider.MESSAGE,
+							"Ошибка разбора ответа сервера на запрос нарядов.");
 					return result;
 				}
 			} else {
-				throw new Exception("Не удалось получить наряды.");
+				throw new Exception(
+						"Не удалось получить наряды. RESPONSE STATUS = "
+								+ response.mStatus);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
 			return result;
 		}
 	}
 
 	/**
-	 * Получаем данные по шаблонам
+	 * Получаем данные по шаблонам. Напрямую вызываем метод из процессора
+	 * справочников.
 	 * 
+	 * @param uuids
+	 *            список uuid шаблонов которые нужно получить
 	 * @return
 	 */
-	private Bundle getPatterns() {
+	private Bundle getPatterns(ArrayList<String> uuids) {
 
 		try {
-			ArrayList<String> operationPatternUuids = new ArrayList<String>(
-					patternUuids);
 			ReferenceProcessor referenceProcessor = new ReferenceProcessor(
 					mContext);
 			Bundle extra = new Bundle();
 			extra.putStringArrayList(
 					ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID,
-					operationPatternUuids);
+					uuids);
 
 			return referenceProcessor.getOperationPattern(extra);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
 			return result;
 		}
 	}
 
 	/**
-	 * Получаем данные по результатам операций
+	 * Получаем данные по возможным результатам выполнения операций. Напрямую
+	 * вызываем метод из процессора справочников.
 	 * 
+	 * @param uuids
+	 *            список uuid типов операций для которых нужно получить данные
 	 * @return
 	 */
-	public Bundle getOperationResults() {
+	private Bundle getOperationResults(String[] uuids) {
 
 		try {
 			ReferenceProcessor processor = new ReferenceProcessor(mContext);
 			Bundle bundle = new Bundle();
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
-					operationTypeUuids.toArray(new String[] {}));
+					uuids);
 
 			return processor.getOperationResult(bundle);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
 			return result;
 		}
 	}
 
-	public Bundle saveTasks(ArrayList<TaskSrv> tasks) {
+	/**
+	 * Сохраняем в базу составные части наряда
+	 * 
+	 * @param tasks
+	 *            Список нарядов в серверном представлении
+	 * @return Bundle
+	 */
+	private Bundle saveTasks(ArrayList<TaskSrv> tasks) {
 
 		Bundle result = new Bundle();
-		// новый вариант разбора и сохранения данных с сервера
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
-				new TOiRDatabaseContext(mContext));
-		ArrayList<Task> taskList = TaskSrv.getTasks(tasks);
+
+		ArrayList<Task> localTasks = TaskSrv.getTasks(tasks);
 
 		// добавляем в результат колличество полученных нарядов
-		result.putInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT, taskList.size());
+		result.putInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT,
+				localTasks.size());
 
 		// для новых нарядов выставляем статус "В работе"
-		for (Task item : taskList) {
+		for (Task item : localTasks) {
 			if (item.getTask_status_uuid().equals(Task.Extras.STATUS_UUID_NEW)) {
 				item.setTask_status_uuid(Task.Extras.STATUS_UUID_IN_PROCESS);
 			}
 		}
-		if (!taskDBAdapter.saveItems(taskList)) {
+
+		// сохраняем
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+				new TOiRDatabaseContext(mContext));
+		if (!taskDBAdapter.saveItems(localTasks)) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении нарядов.");
 			return result;
 		}
 
+		// сохраняем
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!taskStatusDBAdapter.saveItems(TaskSrv.getTaskStatuses(tasks))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении статусов нарядов.");
 			return result;
 		}
 
+		// сохраняем
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!operationDBAdapter
 				.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении операций.");
 			return result;
 		}
 
 		ArrayList<EquipmentOperationSrv> operations = TaskSrv
 				.getEquipmentOperationSrvs(tasks);
+
+		// сохраняем
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!equipmentDBAdapter.saveItems(EquipmentOperationSrv
 				.getEquipments(operations))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении оборудования.");
 			return result;
 		}
 
+		// сохраняем
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!operationTypeDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationTypes(operations))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов операций.");
 			return result;
 		}
 
+		// сохраняем
 		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!operationStatusDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationStatuses(operations))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении статусов операций.");
 			return result;
 		}
 
+		// получаем список шаблонов для того чтобы позже загрузить их
 		patternUuids = EquipmentOperationSrv
 				.getOperationPatternUuids(operations);
 
+		/*
+		 * получаем список типов операций чтобы позже загрузить варианты
+		 * результатов выполнения операций
+		 */
 		operationTypeUuids = EquipmentOperationSrv
 				.getOperationTypeUuids(operations);
 
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
+
+		// сохраняем
 		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!equipmentTypeDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentTypes(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов оборудования.");
 			return result;
 		}
 
+		// сохраняем
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!criticalTypeDBAdapter.saveItems(EquipmentSrv
 				.getCriticalTypes(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов критичности оборудования.");
 			return result;
 		}
 
+		// сохраняем
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!equipmentStatusDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentStatuses(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении статусов оборудования.");
 			return result;
 		}
 
+		// сохраняем
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!documentationDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentDocumentations(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении документации.");
 			return result;
 		}
 
+		// сохраняем
 		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!documentationTypeDBAdapter.saveItems(EquipmentSrv
 				.getDocumentationTypes(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов документации.");
 			return result;
 		}
 
+		// если добрались сюда, значит всё в порядке
 		result.putBoolean(IServiceProvider.RESULT, true);
 		return result;
 	}
@@ -358,7 +423,7 @@ public class TaskProcessor {
 	 * Отправка результата выполнения наряда.
 	 * 
 	 * @param bundle
-	 * @return
+	 * @return {@link Bundle}
 	 */
 	public Bundle TaskSendResult(Bundle bundle) {
 
@@ -367,14 +432,17 @@ public class TaskProcessor {
 		if (!checkToken()) {
 			result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
 			return result;
 		}
 
+		// список uuid нарядов(результатов) для отправки на сервер
 		String[] taskUuids = bundle
 				.getStringArray(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
 		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
 
+		// загружаем данные в формат понятный серверу
 		for (String taskUuid : taskUuids) {
 			TaskRes taskResult = TaskRes.load(mContext, taskUuid);
 			if (taskResult != null) {
@@ -382,6 +450,8 @@ public class TaskProcessor {
 			} else {
 				result = new Bundle();
 				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE,
+						"Ошибка при чтении результатов выполнения наряда.");
 				return result;
 			}
 		}
@@ -390,9 +460,10 @@ public class TaskProcessor {
 	}
 
 	/**
-	 * Отправка результатов выполнения нарядов на сервер
+	 * Вспомогательный метод для отправки результатов выполнения нарядов на
+	 * сервер
 	 * 
-	 * @return
+	 * @return {@link Bundle}
 	 */
 	private Bundle TasksSendResults(ArrayList<TaskRes> results) {
 
@@ -402,6 +473,7 @@ public class TaskProcessor {
 		if (!checkToken()) {
 			result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
 			return result;
 		}
 
@@ -443,7 +515,9 @@ public class TaskProcessor {
 				if (response.mStatus == 204) {
 					clearUpdated(results);
 				} else {
-					throw new Exception("Не удалось отправить результаты");
+					throw new Exception(
+							"Не удалось отправить результаты. RESPONSE STATUS = "
+									+ response.mStatus);
 				}
 			}
 
@@ -452,6 +526,7 @@ public class TaskProcessor {
 			e.printStackTrace();
 			result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
 			return result;
 		}
 
