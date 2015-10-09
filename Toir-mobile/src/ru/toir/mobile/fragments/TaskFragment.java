@@ -113,7 +113,7 @@ public class TaskFragment extends Fragment {
 						 * отправить на сервер информацию о полученых нарядах
 						 * (которые изменили свой статус на "В работе")
 						 */
-						
+
 						// сообщаем количество полученных нарядов
 						int count = bundle
 								.getInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT);
@@ -127,7 +127,8 @@ public class TaskFragment extends Fragment {
 						}
 					} else {
 						// сообщаем описание неудачи
-						String message = bundle.getString(IServiceProvider.MESSAGE);
+						String message = bundle
+								.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getActivity(),
 								"Ошибка при получении нарядов.\r\n" + message,
 								Toast.LENGTH_LONG).show();
@@ -835,6 +836,13 @@ public class TaskFragment extends Fragment {
 						ArrayList<Task> tasks = adapter
 								.getTaskByUserAndUpdated(AuthorizedUser
 										.getInstance().getUuid());
+						if (tasks == null) {
+							Toast.makeText(getActivity(),
+									"Нет результатов для отправки.",
+									Toast.LENGTH_SHORT);
+							return true;
+						}
+
 						String[] sendTaskUuids = new String[tasks.size()];
 						int i = 0;
 						for (Task task : tasks) {
