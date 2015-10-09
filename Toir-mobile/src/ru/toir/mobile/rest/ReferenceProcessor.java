@@ -151,7 +151,7 @@ public class ReferenceProcessor {
 	public Bundle getOperationPattern(Bundle bundle) {
 
 		Bundle result;
-		
+
 		if (!checkToken()) {
 			result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1385,6 +1385,7 @@ public class ReferenceProcessor {
 	 * не получил из за отсутствия связи.
 	 */
 	private boolean checkToken() {
+
 		AuthorizedUser au = AuthorizedUser.getInstance();
 		if (au.getToken() == null) {
 			try {
@@ -1393,7 +1394,8 @@ public class ReferenceProcessor {
 				bundle.putString(
 						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
 						au.getTagId());
-				return tp.getTokenByTag(bundle);
+				Bundle result = tp.getTokenByTag(bundle);
+				return result.getBoolean(IServiceProvider.RESULT);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;

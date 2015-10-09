@@ -42,11 +42,14 @@ public class TokenProcessor {
 	}
 
 	/**
+	 * Получаем токен для доступа к серверу
 	 * 
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getTokenByTag(Bundle bundle) {
+	public Bundle getTokenByTag(Bundle bundle) {
+
+		Bundle result = new Bundle();
 		URI requestUri = null;
 		String tag = bundle
 				.getString(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG);
@@ -62,19 +65,31 @@ public class TokenProcessor {
 
 			if (response.mStatus == 200) {
 				String jsonString = new String(response.mBody);
-				TokenSrv serverToken = new Gson().fromJson(jsonString, TokenSrv.class);
+				TokenSrv serverToken = new Gson().fromJson(jsonString,
+						TokenSrv.class);
 				if (serverToken != null) {
-					AuthorizedUser.getInstance().setToken(serverToken.getAccessToken());
-					return true;
+					AuthorizedUser.getInstance().setToken(
+							serverToken.getAccessToken());
+					result.putBoolean(IServiceProvider.RESULT, true);
+					return result;
 				} else {
-					return false;
+					result.putBoolean(IServiceProvider.RESULT, false);
+					result.putString(IServiceProvider.MESSAGE,
+							"Ошибка разбора ответа сервера на запрос токена.");
+					return result;
 				}
 			} else {
-				return false;
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE,
+						"Ошибка получения токена. RESPONSE STATUS = "
+								+ response.mStatus);
+				return result;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
@@ -83,7 +98,9 @@ public class TokenProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getTokenByUsernameAndPassword(Bundle bundle) {
+	public Bundle getTokenByUsernameAndPassword(Bundle bundle) {
+
+		Bundle result = new Bundle();
 		URI requestUri = null;
 		String username = bundle
 				.getString(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_USERNAME);
@@ -100,25 +117,38 @@ public class TokenProcessor {
 					.append(username)
 					.append("&")
 					.append(TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_PASSWORD)
-					.append("=").append(password).append("&grant_type=password");
+					.append("=").append(password)
+					.append("&grant_type=password");
 			Request request = new Request(Method.POST, requestUri, null,
 					postData.toString().getBytes());
 			Response response = new RestClient().execute(request);
 			if (response.mStatus == 200) {
 				String jsonString = new String(response.mBody);
-				TokenSrv serverToken = new Gson().fromJson(jsonString, TokenSrv.class);
+				TokenSrv serverToken = new Gson().fromJson(jsonString,
+						TokenSrv.class);
 				if (serverToken != null) {
-					AuthorizedUser.getInstance().setToken(serverToken.getAccessToken());
-					return true;
+					AuthorizedUser.getInstance().setToken(
+							serverToken.getAccessToken());
+					result.putBoolean(IServiceProvider.RESULT, true);
+					return result;
 				} else {
-					return false;
+					result.putBoolean(IServiceProvider.RESULT, false);
+					result.putString(IServiceProvider.MESSAGE,
+							"Ошибка разбора ответа сервера на запрос токена.");
+					return result;
 				}
 			} else {
-				return false;
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE,
+						"Ошибка получения токена. RESPONSE STATUS = "
+								+ response.mStatus);
+				return result;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 }

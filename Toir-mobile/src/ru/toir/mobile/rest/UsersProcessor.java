@@ -126,7 +126,8 @@ public class UsersProcessor {
 				bundle.putString(
 						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
 						au.getTagId());
-				return tp.getTokenByTag(bundle);
+				Bundle result = tp.getTokenByTag(bundle);
+				return result.getBoolean(IServiceProvider.RESULT);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
