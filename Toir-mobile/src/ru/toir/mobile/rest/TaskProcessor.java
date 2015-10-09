@@ -544,7 +544,7 @@ public class TaskProcessor {
 						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
 						au.getTagId());
 				Bundle result = tp.getTokenByTag(bundle);
-				return result.getBoolean(IServiceProvider.RESULT); 
+				return result.getBoolean(IServiceProvider.RESULT);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;

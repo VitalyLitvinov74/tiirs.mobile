@@ -25,6 +25,7 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.TaskStatus;
+import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
@@ -62,19 +63,26 @@ public class ReferenceFragment extends Fragment {
 	ArrayAdapter<String> spinner_addict_adapter;
 	private ProgressDialog getReferencesDialog;
 
-	private IntentFilter mFilterGetReference = new IntentFilter(ReferenceServiceProvider.Actions.ACTION_GET_ALL);
+	private IntentFilter mFilterGetReference = new IntentFilter(
+			ReferenceServiceProvider.Actions.ACTION_GET_ALL);
 	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
-		
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			getReferencesDialog.dismiss();
 			context.unregisterReceiver(mReceiverGetReference);
 			boolean result = intent.getBooleanExtra(
 					ProcessorService.Extras.RESULT_EXTRA, false);
+			Bundle bundle = intent
+					.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 			if (result) {
-				Toast.makeText(context, "Справочники обновлены", Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, "Справочники обновлены",
+						Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(context, "Справочники не обновлены", Toast.LENGTH_SHORT).show();
+				// сообщаем описание неудачи
+				String message = bundle.getString(IServiceProvider.MESSAGE);
+				Toast.makeText(context, message,
+						Toast.LENGTH_SHORT).show();
 			}
 		}
 	};
@@ -544,7 +552,7 @@ public class ReferenceFragment extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 		super.onCreateOptionsMenu(menu, inflater);
-		
+
 		// добавляем элемент меню для получения наряда
 		MenuItem getTask = menu.add("Обновить справочники");
 		getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -553,11 +561,12 @@ public class ReferenceFragment extends Fragment {
 			public boolean onMenuItemClick(MenuItem item) {
 				Log.d("test", "Обновляем справочники.");
 
-				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity()
-						.getApplicationContext(),
+				ReferenceServiceHelper rsh = new ReferenceServiceHelper(
+						getActivity().getApplicationContext(),
 						ReferenceServiceProvider.Actions.ACTION_GET_ALL);
 
-				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
+				getActivity().registerReceiver(mReceiverGetReference,
+						mFilterGetReference);
 
 				rsh.getAll();
 
@@ -573,8 +582,11 @@ public class ReferenceFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								getActivity().unregisterReceiver(mReceiverGetReference);
-								Toast.makeText(getActivity(), "Обновление справочников отменено", Toast.LENGTH_SHORT).show();
+								getActivity().unregisterReceiver(
+										mReceiverGetReference);
+								Toast.makeText(getActivity(),
+										"Обновление справочников отменено",
+										Toast.LENGTH_SHORT).show();
 							}
 						});
 				getReferencesDialog.show();

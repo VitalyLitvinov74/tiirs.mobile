@@ -29,6 +29,7 @@ import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
@@ -67,6 +68,8 @@ public class MainActivity extends FragmentActivity {
 				if (method == UsersServiceProvider.Methods.GET_USER) {
 					boolean result = intent.getBooleanExtra(
 							ProcessorService.Extras.RESULT_EXTRA, false);
+					Bundle bundle = intent
+							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					if (result == true) {
 						UsersDBAdapter users = new UsersDBAdapter(
 								new TOiRDatabaseContext(getApplicationContext()));
@@ -85,7 +88,11 @@ public class MainActivity extends FragmentActivity {
 
 						}
 					} else {
-						// либо пользователя нет, либо произошла ошибка
+						// сообщаем описание неудачи
+						String message = bundle
+								.getString(IServiceProvider.MESSAGE);
+						Toast.makeText(getApplicationContext(), message,
+								Toast.LENGTH_LONG).show();
 					}
 					authorizationDialog.dismiss();
 					processLogin = false;
@@ -110,6 +117,8 @@ public class MainActivity extends FragmentActivity {
 				if (method == TokenServiceProvider.Methods.GET_TOKEN_BY_TAG) {
 					boolean result = intent.getBooleanExtra(
 							ProcessorService.Extras.RESULT_EXTRA, false);
+					Bundle bundle = intent
+							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					Log.d(TAG, "" + result);
 					if (result == true) {
 						// запрашиваем актуальную информацию по пользователю
@@ -142,8 +151,9 @@ public class MainActivity extends FragmentActivity {
 									"Нет доступа.", Toast.LENGTH_LONG).show();
 						}
 
+						String message = bundle.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getApplicationContext(),
-								"Токен не получен.", Toast.LENGTH_LONG).show();
+								message, Toast.LENGTH_LONG).show();
 						authorizationDialog.dismiss();
 						processLogin = false;
 					}

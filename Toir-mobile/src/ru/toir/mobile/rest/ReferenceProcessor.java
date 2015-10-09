@@ -1151,7 +1151,6 @@ public class ReferenceProcessor {
 			return result;
 		}
 
-
 		result = getTaskStatus(bundle);
 		success = result.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
