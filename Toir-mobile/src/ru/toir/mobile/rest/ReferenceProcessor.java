@@ -761,11 +761,12 @@ public class ReferenceProcessor {
 			jsonString = getReferenceData(url.toString());
 			if (jsonString != null) {
 				// разбираем и сохраняем полученные данные
-				ArrayList<EquipmentSrv> equipments = gson.fromJson(jsonString,
-						new TypeToken<ArrayList<EquipmentSrv>>() {
+				EquipmentSrv equipment = gson.fromJson(jsonString,
+						new TypeToken<EquipmentSrv>() {
 							private static final long serialVersionUID = 1l;
 						}.getType());
-				boolean result = saveEquipment(equipments);
+
+				boolean result = saveEquipment(equipment);
 				if (!result) {
 					db.endTransaction();
 					return false;
@@ -1230,54 +1231,55 @@ public class ReferenceProcessor {
 	/**
 	 * Сохраняем в базу оборудование
 	 * 
-	 * @param array
+	 * @param element
 	 * @return
 	 */
-	private boolean saveEquipment(ArrayList<EquipmentSrv> array) {
+	private boolean saveEquipment(EquipmentSrv element) {
 
-		if (array == null) {
+		if (element == null) {
 			return false;
 		}
 
 		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
-		if (!equipmentAdapter.saveItems(EquipmentSrv.getEquipments(array))) {
+		if (equipmentAdapter.replace(element.getLocal()) == -1) {
 			return false;
 		}
 
 		EquipmentTypeDBAdapter equipmentTypeAdapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!equipmentTypeAdapter.saveItems(EquipmentSrv
-				.getEquipmentTypes(array))) {
+		if (equipmentTypeAdapter.replace(element.getEquipmentType().getLocal()) == -1) {
 			return false;
 		}
 
 		CriticalTypeDBAdapter criticalTypeAdapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!criticalTypeAdapter
-				.saveItems(EquipmentSrv.getCriticalTypes(array))) {
+		if (criticalTypeAdapter
+				.replace(element.getCriticalityType().getLocal()) == -1) {
 			return false;
 		}
 
 		EquipmentStatusDBAdapter equipmentStatusAdapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
-		if (!equipmentStatusAdapter.saveItems(EquipmentSrv
-				.getEquipmentStatuses(array))) {
+		if (equipmentStatusAdapter.replace(element.getEquipmentStatus()
+				.getLocal()) == -1) {
 			return false;
 		}
 
 		EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(
 				new TOiRDatabaseContext(mContext));
+		ArrayList<EquipmentSrv> elements = new ArrayList<EquipmentSrv>();
+		elements.add(element);
 		if (!documentationAdapter.saveItems(EquipmentSrv
-				.getEquipmentDocumentations(array))) {
+				.getEquipmentDocumentations(elements))) {
 			return false;
 		}
 
 		DocumentationTypeDBAdapter documentationTypeAdapter = new DocumentationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!documentationTypeAdapter.saveItems(EquipmentSrv
-				.getDocumentationTypes(array))) {
+				.getDocumentationTypes(elements))) {
 			return false;
 		}
 
