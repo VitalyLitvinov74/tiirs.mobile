@@ -470,13 +470,6 @@ public class TaskProcessor {
 		URI requestUri = null;
 		Bundle result;
 
-		if (!checkToken()) {
-			result = new Bundle();
-			result.putBoolean(IServiceProvider.RESULT, false);
-			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
-			return result;
-		}
-
 		try {
 			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());

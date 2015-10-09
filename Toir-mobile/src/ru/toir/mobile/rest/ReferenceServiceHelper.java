@@ -28,6 +28,7 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 *            Набор uuid типов операций
 	 */
 	public void getOperationResult(String[] operationTypeUuids) {
+
 		Bundle bundle = new Bundle();
 		bundle.putStringArray(
 				ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
@@ -42,6 +43,7 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 *            Список uuid шаблонов которые нужно получить
 	 */
 	public void getOperationPattern(ArrayList<String> uuids) {
+
 		Bundle bundle = new Bundle();
 		bundle.putStringArrayList(
 				ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID,
@@ -54,57 +56,56 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 * Получаем/сохраняем
 	 */
 	public void getDocumentType() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_TYPE,
-				bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_TYPE);
 	}
 
 	/**
 	 * Получаем/сохраняем
 	 */
 	public void getEquipmentStatus() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_EQUIPMENT_STATUS, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_EQUIPMENT_STATUS);
 	}
 
 	/**
 	 * Получаем/сохраняем
 	 */
 	public void getEquipmentType() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_EQUIPMENT_TYPE, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_EQUIPMENT_TYPE);
 	}
 
 	/**
 	 * Получаем/сохраняем
 	 */
 	public void getMeasureType() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_MEASURE_TYPE, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_MEASURE_TYPE);
 	}
 
 	/**
 	 * Получаем/сохраняем
 	 */
 	public void getOperationStatus() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_STATUS, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_STATUS);
 	}
 
 	/**
 	 * Получаем/сохраняем
 	 */
 	public void getOperationType() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_TYPE, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_TYPE);
 	}
 
 	/**
 	 * Получаем/сохраняем
 	 */
 	public void getTaskStatus() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_TASK_STATUS, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_TASK_STATUS);
 	}
 
 	/**
@@ -114,6 +115,7 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 *            Набор uuid оборудования
 	 */
 	public void getEquipment(String[] equipmentUuids) {
+
 		Bundle bundle = new Bundle();
 		bundle.putStringArray(
 				ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID,
@@ -125,8 +127,8 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 * Получаем/сохраняем
 	 */
 	public void getCriticalType() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_CRITICAL_TYPE, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_CRITICAL_TYPE);
 	}
 
 	/**
@@ -136,6 +138,7 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 *            Набор uuid оборудования
 	 */
 	public void getDocumentation(String[] equipmentUuids) {
+
 		Bundle bundle = new Bundle();
 		bundle.putStringArray(
 				ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID,
@@ -147,8 +150,8 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 * Получаем/сохраняем
 	 */
 	public void getAll() {
-		Bundle bundle = new Bundle();
-		RunMethod(ReferenceServiceProvider.Methods.GET_ALL, bundle);
+
+		RunMethod(ReferenceServiceProvider.Methods.GET_ALL);
 	}
 
 	/**
@@ -158,11 +161,13 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 	 *            Набор uuid файлов документации
 	 */
 	public void getDocumentationFile(String[] documentationUuids) {
+
 		Bundle bundle = new Bundle();
 		bundle.putStringArray(
 				ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
 				documentationUuids);
-		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE, bundle);
+		RunMethod(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE,
+				bundle);
 	}
 
 }

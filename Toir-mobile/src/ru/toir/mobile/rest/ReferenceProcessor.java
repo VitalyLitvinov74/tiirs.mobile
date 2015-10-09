@@ -299,10 +299,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getDocumentType(Bundle bundle) {
+	public Bundle getDocumentType(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -312,7 +317,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.DocumentType);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -338,14 +347,19 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<DocumentationTypeSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveDocumentType(types);
-			if (result) {
+			result = saveDocumentType(types);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -355,10 +369,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getDocumentaionFile(Bundle bundle) {
+	public Bundle getDocumentaionFile(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -407,11 +426,16 @@ public class ReferenceProcessor {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return false;
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE, e.getMessage());
+				return result;
 			}
 		}
 
-		return true;
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**
@@ -420,10 +444,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getEquipmentStatus(Bundle bundle) {
+	public Bundle getEquipmentStatus(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -433,7 +462,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.EquipmentStatus);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -459,14 +492,19 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<EquipmentStatusSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveEquipmentStatus(statuses);
-			if (result) {
+			result = saveEquipmentStatus(statuses);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -476,10 +514,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getEquipmentType(Bundle bundle) {
+	public Bundle getEquipmentType(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -489,7 +532,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.EquipmentType);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -515,14 +562,20 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<EquipmentTypeSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveEquipmentType(types);
-			if (result) {
+
+			result = saveEquipmentType(types);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -532,10 +585,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getMeasureType(Bundle bundle) {
+	public Bundle getMeasureType(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -545,7 +603,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.MeasureType);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -571,14 +633,21 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<MeasureTypeSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveMeasureType(list);
-			if (result) {
+
+			result = saveMeasureType(list);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
+
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -588,10 +657,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getOperationStatus(Bundle bundle) {
+	public Bundle getOperationStatus(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -601,7 +675,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.OperationStatus);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -627,14 +705,20 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<OperationStatusSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveOperationStatus(list);
-			if (result) {
+
+			result = saveOperationStatus(list);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -644,10 +728,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getOperationType(Bundle bundle) {
+	public Bundle getOperationType(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -657,7 +746,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.OperationType);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -683,14 +776,20 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<OperationTypeSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveOperationType(operations);
-			if (result) {
+
+			result = saveOperationType(operations);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -700,10 +799,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getTaskStatus(Bundle bundle) {
+	public Bundle getTaskStatus(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -713,7 +817,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.TaskStatus);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -739,14 +847,20 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<TaskStatusSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveTaskStatus(list);
-			if (result) {
+
+			result = saveTaskStatus(list);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -756,10 +870,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getEquipment(Bundle bundle) {
+	public Bundle getEquipment(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -787,20 +906,28 @@ public class ReferenceProcessor {
 							private static final long serialVersionUID = 1l;
 						}.getType());
 
-				boolean result = saveEquipment(equipment);
-				if (!result) {
+				result = saveEquipment(equipment);
+				boolean success = result.getBoolean(IServiceProvider.RESULT);
+				if (!success) {
 					db.endTransaction();
-					return false;
+					return result;
 				}
 			} else {
 				db.endTransaction();
-				return false;
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE,
+						"Ошибка получения данных справочника.");
+				return result;
 			}
 		}
 
 		db.setTransactionSuccessful();
 		db.endTransaction();
-		return true;
+
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, false);
+		return result;
 	}
 
 	/**
@@ -809,10 +936,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getCriticalType(Bundle bundle) {
+	public Bundle getCriticalType(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		StringBuilder url = new StringBuilder();
@@ -822,7 +954,11 @@ public class ReferenceProcessor {
 		// получаем урл справочника
 		String referenceUrl = getReferenceURL(ReferenceName.CriticalType);
 		if (referenceUrl == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Не известный справочник.");
+			return result;
 		}
 
 		url.append(mServerUrl).append('/').append(referenceUrl);
@@ -848,14 +984,20 @@ public class ReferenceProcessor {
 					new TypeToken<ArrayList<CriticalTypeSrv>>() {
 						private static final long serialVersionUID = 1l;
 					}.getType());
-			boolean result = saveCriticalType(types);
-			if (result) {
+
+			result = saveCriticalType(types);
+			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			if (success) {
 				db.setTransactionSuccessful();
 			}
 			db.endTransaction();
 			return result;
 		} else {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка получения данных справочника.");
+			return result;
 		}
 	}
 
@@ -865,10 +1007,15 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getDocumentation(Bundle bundle) {
+	public Bundle getDocumentation(Bundle bundle) {
+
+		Bundle result;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		String[] equipmentUuids = bundle
@@ -895,19 +1042,28 @@ public class ReferenceProcessor {
 						new TypeToken<ArrayList<EquipmentDocumentationSrv>>() {
 							private static final long serialVersionUID = 1l;
 						}.getType());
-				boolean result = saveDocumentations(list, equipmentUuid);
-				if (!result) {
+				result = saveDocumentations(list, equipmentUuid);
+				boolean success = result.getBoolean(IServiceProvider.RESULT);
+				if (!success) {
 					db.endTransaction();
-					return false;
+					return result;
 				}
 			} else {
 				db.endTransaction();
-				return false;
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE,
+						"Ошибка получения данных справочника.");
+				return result;
 			}
 		}
+
 		db.setTransactionSuccessful();
 		db.endTransaction();
-		return true;
+
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**
@@ -916,10 +1072,16 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public boolean getAll(Bundle bundle) {
+	public Bundle getAll(Bundle bundle) {
+
+		Bundle result;
+		boolean success;
 
 		if (!checkToken()) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
 		}
 
 		// TODO определиться как всё-таки будут обновляться справочники
@@ -928,24 +1090,34 @@ public class ReferenceProcessor {
 		// устройство.
 		// обновлять будем только те данные которые есть на устройстве?
 		// можно пропустить новые данные.
-		if (!getCriticalType(bundle)) {
-			return false;
+		result = getCriticalType(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
-		if (!getDocumentType(bundle)) {
-			return false;
+		result = getDocumentType(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
-		if (!getEquipmentStatus(bundle)) {
-			return false;
+		result = getEquipmentStatus(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
-		if (!getEquipmentType(bundle)) {
-			return false;
+		result = getEquipmentType(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
-		if (!getMeasureType(bundle)) {
-			return false;
+		result = getMeasureType(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
 		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
@@ -960,27 +1132,30 @@ public class ReferenceProcessor {
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID,
 					typeUuids.toArray(new String[] {}));
-			Bundle result = getOperationResult(bundle);
-			boolean success = result.getBoolean(IServiceProvider.RESULT);
+			result = getOperationResult(bundle);
+			success = result.getBoolean(IServiceProvider.RESULT);
 			if (!success) {
-				result = new Bundle();
-				result.putBoolean(IServiceProvider.RESULT, false);
-				// TODO сделать правильный возврат!!!
-				// return result;
-				return false;
+				return result;
 			}
 		}
 
-		if (!getOperationStatus(bundle)) {
-			return false;
+		result = getOperationStatus(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
-		if (!getOperationType(bundle)) {
-			return false;
+		result = getOperationType(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
-		if (!getTaskStatus(bundle)) {
-			return false;
+
+		result = getTaskStatus(bundle);
+		success = result.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			return result;
 		}
 
 		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
@@ -995,21 +1170,26 @@ public class ReferenceProcessor {
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID,
 					uuids.toArray(new String[] {}));
-			if (!getDocumentation(bundle)) {
-				return false;
+			result = getDocumentation(bundle);
+			success = result.getBoolean(IServiceProvider.RESULT);
+			if (!success) {
+				return result;
 			}
 
 			bundle.clear();
 			bundle.putStringArray(
 					ReferenceServiceProvider.Methods.GET_EQUIPMENT_PARAMETER_UUID,
 					uuids.toArray(new String[] {}));
-			if (!getEquipment(bundle)) {
-				return false;
+			result = getEquipment(bundle);
+			success = result.getBoolean(IServiceProvider.RESULT);
+			if (!success) {
+				return result;
 			}
-
 		}
 
-		return true;
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	private String getReferenceURL(String referenceName) {
@@ -1118,10 +1298,15 @@ public class ReferenceProcessor {
 	 * @param results
 	 * @return
 	 */
-	private boolean saveDocumentType(ArrayList<DocumentationTypeSrv> array) {
+	private Bundle saveDocumentType(ArrayList<DocumentationTypeSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют типы документации для сохранения.");
+			return result;
 		}
 
 		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
@@ -1129,9 +1314,13 @@ public class ReferenceProcessor {
 
 		if (adapter
 				.saveItems(DocumentationTypeSrv.getDocumentationTypes(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов документации.");
+			return result;
 		}
 	}
 
@@ -1141,19 +1330,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveEquipmentStatus(ArrayList<EquipmentStatusSrv> array) {
+	private Bundle saveEquipmentStatus(ArrayList<EquipmentStatusSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют статусы оборудования для сохранения.");
+			return result;
 		}
 
 		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(EquipmentStatusSrv.getEquipmentStatuses(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении статусов оборудования.");
+			return result;
 		}
 	}
 
@@ -1163,19 +1361,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveEquipmentType(ArrayList<EquipmentTypeSrv> array) {
+	private Bundle saveEquipmentType(ArrayList<EquipmentTypeSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют типы оборудования для сохранения.");
+			return result;
 		}
 
 		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(EquipmentTypeSrv.getEquipmentTypes(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов оборудования.");
+			return result;
 		}
 	}
 
@@ -1185,19 +1392,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveMeasureType(ArrayList<MeasureTypeSrv> array) {
+	private Bundle saveMeasureType(ArrayList<MeasureTypeSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют типы измерений для сохранения.");
+			return result;
 		}
 
 		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(MeasureTypeSrv.getMeasureTypes(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов измерений.");
+			return result;
 		}
 	}
 
@@ -1207,19 +1423,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveTaskStatus(ArrayList<TaskStatusSrv> array) {
+	private Bundle saveTaskStatus(ArrayList<TaskStatusSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют типы документации для сохранения.");
+			return result;
 		}
 
 		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(TaskStatusSrv.getTaskStatuses(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов документации.");
+			return result;
 		}
 	}
 
@@ -1229,19 +1454,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveOperationStatus(ArrayList<OperationStatusSrv> array) {
+	private Bundle saveOperationStatus(ArrayList<OperationStatusSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют статусы операций для сохранения.");
+			return result;
 		}
 
 		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(OperationStatusSrv.getOperationStatuses(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении статусов операций.");
+			return result;
 		}
 	}
 
@@ -1251,19 +1485,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveOperationType(ArrayList<OperationTypeSrv> array) {
+	private Bundle saveOperationType(ArrayList<OperationTypeSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют типы операций для сохранения.");
+			return result;
 		}
 
 		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(OperationTypeSrv.getOperationTypes(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов операций.");
+			return result;
 		}
 	}
 
@@ -1273,37 +1516,54 @@ public class ReferenceProcessor {
 	 * @param element
 	 * @return
 	 */
-	private boolean saveEquipment(EquipmentSrv element) {
+	private Bundle saveEquipment(EquipmentSrv element) {
+
+		Bundle result = new Bundle();
 
 		if (element == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствует оборудование для сохранения.");
+			return result;
 		}
 
 		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (equipmentAdapter.replace(element.getLocal()) == -1) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения оборудования.");
+			return result;
 		}
 
 		EquipmentTypeDBAdapter equipmentTypeAdapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (equipmentTypeAdapter.replace(element.getEquipmentType().getLocal()) == -1) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения типа оборудования.");
+			return result;
 		}
 
 		CriticalTypeDBAdapter criticalTypeAdapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (criticalTypeAdapter
 				.replace(element.getCriticalityType().getLocal()) == -1) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения критичности оборудования.");
+			return result;
 		}
 
 		EquipmentStatusDBAdapter equipmentStatusAdapter = new EquipmentStatusDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (equipmentStatusAdapter.replace(element.getEquipmentStatus()
 				.getLocal()) == -1) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения статуса оборудования.");
+			return result;
 		}
 
 		EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(
@@ -1312,17 +1572,24 @@ public class ReferenceProcessor {
 		elements.add(element);
 		if (!documentationAdapter.saveItems(EquipmentSrv
 				.getEquipmentDocumentations(elements))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения документации оборудования.");
+			return result;
 		}
 
 		DocumentationTypeDBAdapter documentationTypeAdapter = new DocumentationTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 		if (!documentationTypeAdapter.saveItems(EquipmentSrv
 				.getDocumentationTypes(elements))) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения типов документации оборудования.");
+			return result;
 		}
 
-		return true;
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**
@@ -1334,11 +1601,17 @@ public class ReferenceProcessor {
 	 *            UUID оборудования к которому привязана документация
 	 * @return
 	 */
-	private boolean saveDocumentations(
+	private Bundle saveDocumentations(
 			ArrayList<EquipmentDocumentationSrv> array, String equipmentUuid) {
 
+		Bundle result;
+
 		if (array == null) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствует документация для сохранения.");
+			return result;
 		}
 
 		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
@@ -1346,15 +1619,17 @@ public class ReferenceProcessor {
 
 		if (!adapter.saveItems(EquipmentDocumentationSrv
 				.getEquipmentDocumentations(array, equipmentUuid))) {
-			return false;
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка сохранения документации.");
+			return result;
 		}
 
-		if (!saveDocumentType(EquipmentDocumentationSrv
-				.getDocumentationTypesSrv(array))) {
-			return false;
-		}
+		result = saveDocumentType(EquipmentDocumentationSrv
+				.getDocumentationTypesSrv(array));
 
-		return true;
+		return result;
 	}
 
 	/**
@@ -1363,19 +1638,28 @@ public class ReferenceProcessor {
 	 * @param array
 	 * @return
 	 */
-	private boolean saveCriticalType(ArrayList<CriticalTypeSrv> array) {
+	private Bundle saveCriticalType(ArrayList<CriticalTypeSrv> array) {
+
+		Bundle result = new Bundle();
 
 		if (array == null) {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Остсутствуют типы критичности для сохранения.");
+			return result;
 		}
 
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
 				new TOiRDatabaseContext(mContext));
 
 		if (adapter.saveItems(CriticalTypeSrv.getCriticalTypes(array))) {
-			return true;
+			result.putBoolean(IServiceProvider.RESULT, true);
+			return result;
 		} else {
-			return false;
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении типов критичности.");
+			return result;
 		}
 	}
 
