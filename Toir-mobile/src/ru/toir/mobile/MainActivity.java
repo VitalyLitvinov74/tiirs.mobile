@@ -24,11 +24,11 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-//import android.view.Window;
 import android.widget.Toast;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
@@ -42,13 +42,16 @@ public class MainActivity extends FragmentActivity {
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
+
 	public static class RFIDReadAction {
 		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
 		public static final int READ_EQUIPMENT_TAG_BEFORE_OPERATION = 2;
 	}
-	
+
 	private ProgressDialog authorizationDialog;
 	private boolean processLogin = false;
+
+	private boolean splashShown = false;
 
 	// фильтр для сообщений при получении пользователя с сервера
 	private final IntentFilter mFilterGetUser = new IntentFilter(
@@ -64,23 +67,31 @@ public class MainActivity extends FragmentActivity {
 				if (method == UsersServiceProvider.Methods.GET_USER) {
 					boolean result = intent.getBooleanExtra(
 							ProcessorService.Extras.RESULT_EXTRA, false);
+					Bundle bundle = intent
+							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					if (result == true) {
 						UsersDBAdapter users = new UsersDBAdapter(
 								new TOiRDatabaseContext(getApplicationContext()));
-						Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
-						// в зависимости от результата либо дать работать, либо не дать
+						Users user = users.getUserByTagId(AuthorizedUser
+								.getInstance().getTagId());
+						// в зависимости от результата либо дать работать, либо
+						// не дать
 						if (user != null && user.isActive()) {
 							isLogged = true;
-							AuthorizedUser.getInstance().setUuid(user.getUuid());
+							AuthorizedUser.getInstance()
+									.setUuid(user.getUuid());
 							setMainLayout();
 						} else {
 							Toast.makeText(getApplicationContext(),
-									"Нет доступа.",
-									Toast.LENGTH_LONG).show();
+									"Нет доступа.", Toast.LENGTH_LONG).show();
 
 						}
 					} else {
-						// либо пользователя нет, либо произошла ошибка
+						// сообщаем описание неудачи
+						String message = bundle
+								.getString(IServiceProvider.MESSAGE);
+						Toast.makeText(getApplicationContext(), message,
+								Toast.LENGTH_LONG).show();
 					}
 					authorizationDialog.dismiss();
 					processLogin = false;
@@ -88,7 +99,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 	};
-	
+
 	// фильтр для получения сообщений при получении токена с сервера
 	private final IntentFilter mFilterGetToken = new IntentFilter(
 			TokenServiceProvider.Actions.ACTION_GET_TOKEN);
@@ -105,36 +116,43 @@ public class MainActivity extends FragmentActivity {
 				if (method == TokenServiceProvider.Methods.GET_TOKEN_BY_TAG) {
 					boolean result = intent.getBooleanExtra(
 							ProcessorService.Extras.RESULT_EXTRA, false);
+					Bundle bundle = intent
+							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					Log.d(TAG, "" + result);
 					if (result == true) {
 						// запрашиваем актуальную информацию по пользователю
-						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(getApplicationContext(), UsersServiceProvider.Actions.ACTION_GET_USER);
+						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(
+								getApplicationContext(),
+								UsersServiceProvider.Actions.ACTION_GET_USER);
 						usersServiceHelper.getUser();
-						
+
 						Toast.makeText(getApplicationContext(),
 								"Токен получен.", Toast.LENGTH_SHORT).show();
 					} else {
-						// TODO реализовать проверку на то что пользователя нет на сервере
+						// TODO реализовать проверку на то что пользователя нет
+						// на сервере
 						// токен не получен, сервер не ответил...
 						// проверяем наличие пользователя в локальной базе
 						UsersDBAdapter users = new UsersDBAdapter(
 								new TOiRDatabaseContext(getApplicationContext()));
-						Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
+						Users user = users.getUserByTagId(AuthorizedUser
+								.getInstance().getTagId());
 
-						// в зависимости от результата либо дать работать, либо не дать
+						// в зависимости от результата либо дать работать, либо
+						// не дать
 						if (user != null && user.isActive()) {
 							isLogged = true;
-							AuthorizedUser.getInstance().setUuid(user.getUuid());
+							AuthorizedUser.getInstance()
+									.setUuid(user.getUuid());
 							setMainLayout();
 						} else {
 							Toast.makeText(getApplicationContext(),
-									"Нет доступа.",
-									Toast.LENGTH_LONG).show();
+									"Нет доступа.", Toast.LENGTH_LONG).show();
 						}
 
+						String message = bundle.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getApplicationContext(),
-								"Токен не получен.",
-								Toast.LENGTH_LONG).show();
+								message, Toast.LENGTH_LONG).show();
 						authorizationDialog.dismiss();
 						processLogin = false;
 					}
@@ -145,8 +163,9 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);		
-		setContentView(R.layout.start_screen);
+
+		super.onCreate(savedInstanceState);
+
 		// инициализация приложения
 		init();
 
@@ -155,24 +174,35 @@ public class MainActivity extends FragmentActivity {
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
 		if (savedInstanceState != null) {
 			isLogged = savedInstanceState.getBoolean("isLogged");
+			splashShown = savedInstanceState.getBoolean("splashShown");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
 		}
 
 		Log.d(TAG, "onCreate");
 
-        Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            public void run() {
-    			setContentView(R.layout.login_layout);
-    			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }, 3000);
+		if (!splashShown) {
+			// показываем приветствие
+			setContentView(R.layout.start_screen);
 
-		if (isLogged) {
-			setMainLayout();
+			// запускаем таймер для показа экрана входа
+			Handler h = new Handler();
+			h.postDelayed(new Runnable() {
+				public void run() {
+					splashShown = true;
+
+					if (isLogged) {
+						setMainLayout();
+					} else {
+						setContentView(R.layout.login_layout);
+					}
+				}
+			}, 3000);
 		} else {
-			//setContentView(R.layout.login_layout);
-			//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			if (isLogged) {
+				setMainLayout();
+			} else {
+				setContentView(R.layout.login_layout);
+			}
 		}
 
 	}
@@ -180,7 +210,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Инициализация приложения при запуске
 	 */
-	public void init() {		
+	public void init() {
 		if (!initDB()) {
 			// принудительное обновление приложения
 			finish();
@@ -276,7 +306,7 @@ public class MainActivity extends FragmentActivity {
 			case RFIDReadAction.READ_USER_TAG_BEFORE_LOGIN:
 				// сохраняем ид метки для дальнейшего использования
 				AuthorizedUser.getInstance().setTagId(tagId);
-				
+
 				processLogin = true;
 
 				// запрашиваем токен
@@ -290,7 +320,8 @@ public class MainActivity extends FragmentActivity {
 				Intent operationActivity = new Intent(this,
 						OperationActivity.class);
 				Bundle bundle = data.getExtras();
-				if (!bundle.getString(OperationActivity.EQUIPMENT_TAG_EXTRA).equals(tagId)) {
+				if (!bundle.getString(OperationActivity.EQUIPMENT_TAG_EXTRA)
+						.equals(tagId)) {
 					operationActivity.putExtras(bundle);
 					startActivity(operationActivity);
 				} else {
@@ -395,6 +426,7 @@ public class MainActivity extends FragmentActivity {
 		super.onSaveInstanceState(outState);
 		Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
 		outState.putBoolean("isLogged", isLogged);
+		outState.putBoolean("splashShown", splashShown);
 	}
 
 	/*
@@ -421,13 +453,16 @@ public class MainActivity extends FragmentActivity {
 		unregisterReceiver(mReceiverGetToken);
 	}
 
-	/* (non-Javadoc)
-	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
+	 * android.view.KeyEvent)
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if ( keyCode == KeyEvent.KEYCODE_BACK) {
-			//return true;
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			// return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}

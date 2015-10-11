@@ -16,26 +16,31 @@ import android.util.Log;
 
 /**
  * @author Dmitriy Logachov
- *
+ * 
  */
 public class ProcessorService extends Service {
+
 	private Integer lastStarId;
 	private final Context mContext = this;
+	private final HashMap<String, AsyncServiceTask> mTasks = new HashMap<String, AsyncServiceTask>();
+
 	public static class Extras {
 		public static final String PROVIDER_EXTRA = "PROVIDER_EXTRA";
 		public static final String METHOD_EXTRA = "METHOD_EXTRA";
 		public static final String RESULT_ACTION_EXTRA = "RESULT_ACTION_EXTRA";
 		public static final String RESULT_EXTRA = "RESULT_EXTRA";
+		public static final String RESULT_BUNDLE = "RESULT_BUNDLE";
 	}
-	private final HashMap<String, AsyncServiceTask> mTasks = new  HashMap<String, AsyncServiceTask>();
+
 	public class Providers {
 		public static final int USERS_PROVIDER = 1;
 		public static final int TOKEN_PROVIDER = 2;
 		public static final int TASK_PROVIDER = 3;
 		public static final int REFERENCE_PROVIDER = 4;
 	}
-	
+
 	private IServiceProvider GetProvider(int provider) {
+
 		switch (provider) {
 		case Providers.USERS_PROVIDER:
 			return new UsersServiceProvider(this);
@@ -50,11 +55,12 @@ public class ProcessorService extends Service {
 	}
 
 	private String getTaskIdentifier(Bundle extras) {
+
 		// получаем список имён всех параметров запроса, для создания "хэша"
 		String[] keys = extras.keySet().toArray(new String[0]);
 		java.util.Arrays.sort(keys);
 		StringBuilder identifier = new StringBuilder();
-		
+
 		for (int keyIndex = 0; keyIndex < keys.length; keyIndex++) {
 			String key = keys[keyIndex];
 			/*
@@ -65,7 +71,7 @@ public class ProcessorService extends Service {
 			if (key.equals(Extras.RESULT_ACTION_EXTRA)) {
 				continue;
 			}
-			
+
 			identifier.append("{");
 			identifier.append(key);
 			identifier.append(":");
@@ -75,21 +81,22 @@ public class ProcessorService extends Service {
 		Log.d("test", identifier.toString());
 		return identifier.toString();
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+
 		synchronized (mTasks) {
 			lastStarId = startId;
 			Bundle extras = intent.getExtras();
 			String taskIdentifier = getTaskIdentifier(extras);
 			AsyncServiceTask task = mTasks.get(taskIdentifier);
-			
+
 			if (task == null) {
 				task = new AsyncServiceTask(taskIdentifier, extras);
 				mTasks.put(taskIdentifier, task);
 				task.execute((Void[]) null);
 			}
-			
+
 			// в данном случае это строка для фильтра broadcastreceiver
 			String resultAction = extras.getString(Extras.RESULT_ACTION_EXTRA);
 			if (resultAction != "") {
@@ -98,17 +105,18 @@ public class ProcessorService extends Service {
 		}
 		return START_STICKY;
 	}
-	
-	public class AsyncServiceTask extends AsyncTask<Void, Integer, Boolean> {
+
+	public class AsyncServiceTask extends AsyncTask<Void, Integer, Bundle> {
+
 		private final Bundle mExtras;
 		private final ArrayList<String> mResultAction = new ArrayList<String>();
 		private final String mTaskIdentifier;
-		
+
 		public AsyncServiceTask(String identifier, Bundle extras) {
 			mExtras = extras;
 			mTaskIdentifier = identifier;
 		}
-		
+
 		public void addResultAction(String resultAction) {
 			if (!mResultAction.contains(resultAction)) {
 				mResultAction.add(resultAction);
@@ -116,45 +124,53 @@ public class ProcessorService extends Service {
 		}
 
 		@Override
-		protected Boolean doInBackground(Void... params) {
-			Boolean result = false;
+		protected Bundle doInBackground(Void... params) {
+
+			Bundle result;
+
 			final int providerId = mExtras.getInt(Extras.PROVIDER_EXTRA);
 			final int methodId = mExtras.getInt(Extras.METHOD_EXTRA);
-			
+
 			if (providerId != 0 && methodId != 0) {
 				final IServiceProvider provider = GetProvider(providerId);
 				if (provider != null) {
 					try {
-						result = provider.RunTask(methodId, mExtras);
+						return provider.RunTask(methodId, mExtras);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 			}
+
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
 			return result;
 		}
 
 		@Override
-		protected void onPostExecute(Boolean result) {
+		protected void onPostExecute(Bundle result) {
 			synchronized (mTasks) {
-				// бежим по списку строк фильтров для broadcastreceiver`ов которым нужно отправить уведомление о завершении операции
+				// бежим по списку строк фильтров для broadcastreceiver`ов
+				// которым нужно отправить уведомление о завершении операции
 				for (int i = 0; i < mResultAction.size(); i++) {
 					Intent resultIntent = new Intent(mResultAction.get(i));
-					resultIntent.putExtra(Extras.RESULT_EXTRA, result.booleanValue());
+					boolean success = result
+							.getBoolean(IServiceProvider.RESULT);
+					resultIntent.putExtra(Extras.RESULT_EXTRA, success);
+					resultIntent.putExtra(Extras.RESULT_BUNDLE, result);
 					resultIntent.putExtras(mExtras);
 					resultIntent.setPackage(mContext.getPackageName());
 					mContext.sendBroadcast(resultIntent);
 				}
-				
+
 				mTasks.remove(mTaskIdentifier);
-				
+
 				if (mTasks.size() < 1) {
 					stopSelf(lastStarId);
 				}
 			}
 		}
-		
-		
+
 	}
 
 	@Override

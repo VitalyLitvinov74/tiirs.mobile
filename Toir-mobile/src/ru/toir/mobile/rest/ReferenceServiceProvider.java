@@ -36,7 +36,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 		public static final String GET_EQUIPMENT_PARAMETER_UUID = "equipmentUuid";
 		public static final String GET_DOCUMENTATION_FILE_PARAMETER_UUID = "documentationFileUuid";
 	}
-	
+
 	public static class Actions {
 		public static final String ACTION_GET_ALL = "action_get_all";
 		public static final String ACTION_GET_OPERATION_RESULT = "action_get_operation_result";
@@ -67,7 +67,8 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 * @see ru.toir.mobile.rest.IServiceProvider#RunTask(int, android.os.Bundle)
 	 */
 	@Override
-	public boolean RunTask(int method, Bundle extras) {
+	public Bundle RunTask(int method, Bundle extras) {
+
 		switch (method) {
 		case Methods.GET_OPERATION_RESULT:
 			return getOperationResult(extras);
@@ -98,174 +99,221 @@ public class ReferenceServiceProvider implements IServiceProvider {
 		case Methods.GET_DOCUMENTATION_FILE:
 			return getDocumentationFile(extras);
 		}
-		return false;
+
+		Bundle result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, false);
+		result.putString(MESSAGE, "Запуск не существующей задачи сервиса.");
+		return result;
+
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getOperationResult(Bundle extras) {
+	private Bundle getOperationResult(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getOperationResult(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getOperationPattern(Bundle extras) {
+	private Bundle getOperationPattern(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getOperationPattern(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getDocumentType(Bundle extras) {
+	private Bundle getDocumentType(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getDocumentType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getEquipmentStatus(Bundle extras) {
+	private Bundle getEquipmentStatus(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getEquipmentStatus(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getEquipmentType(Bundle extras) {
+	private Bundle getEquipmentType(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getEquipmentType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getMeasureType(Bundle extras) {
+	private Bundle getMeasureType(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getMeasureType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getOperationStatus(Bundle extras) {
+	private Bundle getOperationStatus(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getOperationStatus(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getOperationType(Bundle extras) {
+	private Bundle getOperationType(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getOperationType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getTaskStatus(Bundle extras) {
+	private Bundle getTaskStatus(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getTaskStatus(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getEquipment(Bundle extras) {
+	private Bundle getEquipment(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getEquipment(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	private boolean getCriticalType(Bundle extras) {
+	private Bundle getCriticalType(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getCriticalType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getDocumentation(Bundle extras) {
+	private Bundle getDocumentation(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getDocumentation(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getAll(Bundle extras) {
+	private Bundle getAll(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getAll(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private boolean getDocumentationFile(Bundle extras) {
+	private Bundle getDocumentationFile(Bundle extras) {
 		try {
 			return new ReferenceProcessor(mContext).getDocumentaionFile(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(MESSAGE, e.getMessage());
+			return result;
 		}
 	}
 

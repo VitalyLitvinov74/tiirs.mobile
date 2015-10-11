@@ -27,8 +27,7 @@ public class TaskServiceHelper extends ServiceHelperBase {
 	 */
 	public void GetTask() {
 
-		Bundle bundle = new Bundle();
-		RunMethod(TaskServiceProvider.Methods.GET_TASK, bundle);
+		RunMethod(TaskServiceProvider.Methods.GET_TASK);
 	}
 
 	/**

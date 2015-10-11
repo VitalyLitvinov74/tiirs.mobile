@@ -24,6 +24,7 @@ import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.db.tables.OperationType;
+import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
@@ -101,7 +102,10 @@ public class TaskFragment extends Fragment {
 				if (method == TaskServiceProvider.Methods.GET_TASK) {
 					boolean result = intent.getBooleanExtra(
 							ProcessorService.Extras.RESULT_EXTRA, false);
-					Log.d(TAG, "" + result);
+					Bundle bundle = intent
+							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
+					Log.d(TAG, "boolean result" + result);
+
 					if (result == true) {
 						/*
 						 * нужно видимо что-то дёрнуть чтоб уведомить о том что
@@ -110,13 +114,23 @@ public class TaskFragment extends Fragment {
 						 * (которые изменили свой статус на "В работе")
 						 */
 
-						Toast.makeText(getActivity(), "Наряды получены.",
-								Toast.LENGTH_SHORT).show();
+						// сообщаем количество полученных нарядов
+						int count = bundle
+								.getInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT);
+						if (count > 0) {
+							Toast.makeText(getActivity(),
+									"Количество новых нарядов " + count,
+									Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(getActivity(), "Новых нарядов нет.",
+									Toast.LENGTH_SHORT).show();
+						}
 					} else {
-						// если наряды по какой-то причине не удалось получить,
-						// видимо нужно вывести какое-то сообщение
+						// сообщаем описание неудачи
+						String message = bundle
+								.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getActivity(),
-								"Ошибка при получении нарядов.",
+								"Ошибка при получении нарядов.\r\n" + message,
 								Toast.LENGTH_LONG).show();
 					}
 
@@ -821,6 +835,13 @@ public class TaskFragment extends Fragment {
 						ArrayList<Task> tasks = adapter
 								.getTaskByUserAndUpdated(AuthorizedUser
 										.getInstance().getUuid());
+						if (tasks == null) {
+							Toast.makeText(getActivity(),
+									"Нет результатов для отправки.",
+									Toast.LENGTH_SHORT);
+							return true;
+						}
+
 						String[] sendTaskUuids = new String[tasks.size()];
 						int i = 0;
 						for (Task task : tasks) {
