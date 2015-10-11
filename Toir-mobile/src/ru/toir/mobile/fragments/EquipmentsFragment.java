@@ -7,12 +7,11 @@ import java.util.List;
 import ru.toir.mobile.R;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.TOiRDatabaseContext;
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+//import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentType;
-import ru.toir.mobile.utils.DataUtils;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -180,8 +179,8 @@ public class EquipmentsFragment extends Fragment {
 				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new TOiRDatabaseContext(getActivity().getApplicationContext()));
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+//		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
+//				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = equipmentDBAdapter.getAllItems(
 				type, "");
 		equipment_uuid.clear();

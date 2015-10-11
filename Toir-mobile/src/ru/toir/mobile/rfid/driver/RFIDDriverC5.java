@@ -1,7 +1,7 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.OperationActivity;
-import ru.toir.mobile.R;
+//import ru.toir.mobile.R;
 import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.EquipmentInfoActivity;
 import android.app.Activity;

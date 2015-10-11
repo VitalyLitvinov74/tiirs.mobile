@@ -67,7 +67,6 @@ public class EquipmentInfoActivity extends Activity {
 	    android:id="@+id/equipment_listView_main"
 	*/
 		
-		private TextView tv_equipment_id;
 		private TextView tv_equipment_name;
 		private TextView tv_equipment_type;
 		private TextView tv_equipment_position;
