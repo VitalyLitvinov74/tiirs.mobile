@@ -13,10 +13,13 @@ import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.*;
 import ru.toir.mobile.db.tables.*;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -40,6 +43,7 @@ public class EquipmentInfoActivity extends Activity {
 		public final static int WRITE_USER_LABLE = 2;
 
 		private String equipment_uuid;
+		private String equipment_documentation;
 		private Spinner Spinner_operation;
 		private	byte regim; 
 		private ListView lv;
@@ -75,6 +79,7 @@ public class EquipmentInfoActivity extends Activity {
 		private TextView tv_equipment_documentation;
 		private Button read_rfid_button;
 		private Button write_rfid_button;
+		private Button open_documentation_button;
 		
 		private	RFID rfid;
 		
@@ -87,11 +92,11 @@ public class EquipmentInfoActivity extends Activity {
 			Bundle b = getIntent().getExtras();
 	        equipment_uuid = b.getString("equipment_uuid"); 
 	        setContentView(R.layout.equipment_layout);
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	       
-			tv_equipment_id = (TextView) findViewById(R.id.equipment_text_name);
+			//tv_equipment_id = (TextView) findViewById(R.id.equipment_text_name);
 			tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
-			tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);		
+			tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);				
 			tv_equipment_position = (TextView) findViewById(R.id.equipment_position);
 			//tv_equipment_date = (TextView) findViewById(R.id.equipment_start_date);
 			tv_equipment_status = (TextView) findViewById(R.id.equipment_status);
@@ -132,6 +137,7 @@ public class EquipmentInfoActivity extends Activity {
 
 			read_rfid_button = (Button) findViewById(R.id.button_read);		
 			write_rfid_button = (Button) findViewById(R.id.button_write);
+			open_documentation_button = (Button) findViewById(R.id.ei_button_open_documentation);
 			
     		// инициализируем драйвер
     		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID)) {
@@ -180,12 +186,14 @@ public class EquipmentInfoActivity extends Activity {
 			CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			Equipment equipment = equipmentDBAdapter.getItem(equipment_uuid);
 			ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment.getUuid());		
-			tv_equipment_id.setText("TAGID: " + equipment.getTag_id());
+			//tv_equipment_id.setText("TAGID: " + equipment.getTag_id());
 			tv_equipment_name.setText("Название: " + equipment.getTitle());			
 			tv_equipment_type.setText("Тип: " + eqTypeDBAdapter.getNameByUUID(equipment.getEquipment_type_uuid()));
-			tv_equipment_position.setText("" + equipment.getLatitude() + " / " + equipment.getLongitude());
+			
+			tv_equipment_position.setText("" + String.valueOf(equipment.getLatitude()) + " / " + String.valueOf(equipment.getLongitude()));
 			//tv_equipment_date.setText(DataUtils.getDate(equipment.getStart_date(),"dd-MM-yyyy hh:mm"));
 			tv_equipment_critical.setText("Критичность: " + criticalTypeDBAdapter.getNameByUUID(equipment.getCritical_type_uuid()));
+			
 			if (equipmentOperationList != null && equipmentOperationList.size()>0)
 				tv_equipment_task_date.setText("" + taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
 			else tv_equipment_task_date.setText("еще не обслуживалось");
@@ -193,12 +201,33 @@ public class EquipmentInfoActivity extends Activity {
 				tv_equipment_tasks.setText("" + eqOperationResultDBAdapter.getOperationResultByUUID(equipmentOperationList.get(0).getOperation_status_uuid()));
 			else tv_equipment_tasks.setText("еще не обслуживалось");
 			//File imgFile = new File(getApplicationInfo().dataDir + equipment.getImg());
-			tv_equipment_documentation.setText("Tag UUID: " + equipment.getUuid());
+			tv_equipment_documentation.setText("UUID: " + equipment.getUuid());
 			File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ equipment.getImage());						
 			if(imgFile.exists() && imgFile.isFile()){
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 			    tv_equipment_image.setImageBitmap(myBitmap);			    			    
 			}			
+
+			open_documentation_button.setOnClickListener(
+		            new View.OnClickListener() {
+		                @Override
+		                public void onClick(View v) {
+		                	EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+		                	equipment_documentation = documentationAdapter.getDocumentByUuid(equipment_uuid).getPath();
+		                	File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "doc"+ File.separator + equipment_documentation);
+		                	Intent target = new Intent(Intent.ACTION_VIEW);
+		                	// пока только pdf
+		                	target.setDataAndType(Uri.fromFile(file),"application/pdf");
+		                	target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+		                	Intent intent = Intent.createChooser(target, "Open File");
+		                	try {
+		                	    startActivity(intent);
+		                	} catch (ActivityNotFoundException e) {
+		                	    // Instruct the user to install a PDF reader here, or something
+		                	}   
+		            	} 
+		            });    			
 
 			// заполняем структуру для записи в метку
 			equipmenttag.set_equipment_uuid(equipment.getUuid());

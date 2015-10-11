@@ -100,7 +100,7 @@ public class EquipmentInfoFragment extends Fragment {
 		Equipment equipment = equipmentDBAdapter.getItem(equipment_uuid);
 		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter.getItemsByTaskAndEquipment("", equipment.getUuid());		
 		tv_equipment_id.setText("TAGID: " + equipment.getTag_id());
-		tv_equipment_name.setText("Название: " + equipment.getTitle());			
+		tv_equipment_name.setText(" " + equipment.getTitle());			
 		tv_equipment_type.setText("Тип: " + eqTypeDBAdapter.getNameByUUID(equipment.getEquipment_type_uuid()));
 		tv_equipment_position.setText("" + equipment.getLatitude() + " / " + equipment.getLongitude());
 		tv_equipment_date.setText(DataUtils.getDate(equipment.getStart_date(),"dd-MM-yyyy hh:mm"));

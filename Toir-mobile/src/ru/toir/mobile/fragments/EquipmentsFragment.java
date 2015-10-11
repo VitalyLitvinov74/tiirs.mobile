@@ -195,9 +195,10 @@ public class EquipmentsFragment extends Fragment {
 					equipmentList.get(cnt).getTitle()
 							+ " | ИД: "
 							+ equipmentList.get(cnt).getInventoryNumber()
-							+ " | Дата: "
-							+ DataUtils.getDate(equipmentList.get(cnt)
-									.getStart_date(), "dd-MM-yyyy hh:mm"));
+							//+ " | Дата: "
+							//+ DataUtils.getDate(equipmentList.get(cnt)
+									//.getStart_date(), "dd-MM-yyyy hh:mm")
+							);
 			hm.put("descr",
 					"Тип: "
 							+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(
@@ -205,9 +206,10 @@ public class EquipmentsFragment extends Fragment {
 							+ " ["
 							+ equipmentList.get(cnt).getLocation()
 							+ "]"
-							+ " | Критичность: "
-							+ criticalTypeDBAdapter.getNameByUUID(equipmentList
-									.get(cnt).getCritical_type_uuid()));
+							//+ " | Критичность: "
+							//+ criticalTypeDBAdapter.getNameByUUID(equipmentList
+									//.get(cnt).getCritical_type_uuid())
+									);
 			// TODO: real image
 			// hm.put("img", getActivity().getApplicationInfo().dataDir +
 			// equipmentList.get(cnt).getImg());

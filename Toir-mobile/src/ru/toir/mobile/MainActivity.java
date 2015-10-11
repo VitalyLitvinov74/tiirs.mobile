@@ -311,7 +311,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	void setMainLayout() {
 		setContentView(R.layout.main_layout);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);		
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);		
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager

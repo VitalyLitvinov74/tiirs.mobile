@@ -6,6 +6,7 @@ package ru.toir.mobile.db.adapters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -157,6 +158,21 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Возвращает руководство по uuid
+	 * @param uuid
+	 * @return Если записи нет, возвращает null
+	 */
+	public EquipmentDocumentation getDocumentByUuid(String uuid) {
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_UUID + "=?", new String[] { uuid }, null, null, null);		
+		if (cursor.moveToFirst()) {
+				return getItem(cursor);
+		} else {
+			return null;
+		}
 	}
 
 	/**

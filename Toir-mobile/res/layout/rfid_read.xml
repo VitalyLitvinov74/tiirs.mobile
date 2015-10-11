@@ -18,7 +18,8 @@
         android:layout_above="@+id/progressBar1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:text="@string/pleasePutTag" />
+        android:text="@string/pleasePutTag"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/cancelButton"

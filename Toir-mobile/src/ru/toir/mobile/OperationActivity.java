@@ -16,6 +16,7 @@ import java.util.Locale;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
@@ -88,10 +89,14 @@ public class OperationActivity extends Activity {
 	private ArrayList<OperationResult> operationResults;
 	private String task_uuid, operation_uuid, equipment_uuid,operation_result_uuid,operation_type_uuid;
 	private String taskname = "";
+	private String taskstatus = "";
 	private String operationname = "";
+	private String operation="";
 	private LinearLayout layout;
 	private TextView stepTitle;
 	private TextView stepDescrition;
+	private TextView task_title,task_status,equipment_title,equipment_status,equipment_operation;
+
 	private Button numStepButton;
 	private NumberPicker numberPicker;
 	private Spinner spinnerSuffix;
@@ -146,45 +151,67 @@ public class OperationActivity extends Activity {
 		task_uuid = b.getString(TASK_UUID_EXTRA);
 		equipment_uuid = b.getString(EQUIPMENT_UUID_EXTRA);
 		setContentView(R.layout.taskwork_fragment);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		layout = (LinearLayout) findViewById(R.id.resultButtonLayout);
-		stepTitle = (TextView) findViewById(R.id.stepTitle);
-		stepDescrition = (TextView) findViewById(R.id.step_description);
-		numStepButton = (Button) findViewById(R.id.numStepButton);
-		step_image = (ImageView) findViewById(R.id.step_image);
+		layout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
+		stepTitle = (TextView) findViewById(R.id.twf_stepTitle);
+		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
+		numStepButton = (Button) findViewById(R.id.twf_numStepButton);
+		step_image = (ImageView) findViewById(R.id.twf_step_image);
 		
+		task_title = (TextView) findViewById(R.id.twf_task_title);
+		task_status = (TextView) findViewById(R.id.twf_task_status);
+		equipment_title = (TextView) findViewById(R.id.twf_equipment_title);
+		equipment_status = (TextView) findViewById(R.id.twf_equipment_status);
+		equipment_operation = (TextView) findViewById(R.id.twf_equipment_operation);
+
 		// получаем статус и время наряда
 		TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(
 				getApplicationContext()));
 		Task task = dbTask.getItem(task_uuid);
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
-		taskname = "Наряд: " + dbTask.getCreateTimeByUUID(task_uuid)
-				+ " / Статус: "
-				+ taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
-
+				new TOiRDatabaseContext(getApplicationContext()));		
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		EquipmentOperation equipmentOperation = operationDBAdapter
 				.getItem(operation_uuid);
-
+		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
+				new TOiRDatabaseContext(getApplicationContext()));
 		// получаем шаблон операции
 		OperationPatternDBAdapter patternDBAdapter = new OperationPatternDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		pattern = patternDBAdapter.getItem(equipmentOperation
 				.getOperation_pattern_uuid());
-		operationname = "Оборудование: "
-				+ eqDBAdapter.getEquipsNameByUUID(equipment_uuid)
-				+ " / Операция: " + pattern.getTitle();
 
+		//android:id="@+id/twf_task_title"
+		taskname = "Наряд: " 
+				+ dbTask.getItem(task_uuid).getTask_name();
+		task_title.setText(taskname);
+	    //android:id="@+id/twf_task_status"
+		taskstatus = "Статус: "
+				+ taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
+		task_status.setText(taskstatus);	    
+        //android:id="@+id/twf_equipment_title"
+		operationname = "Оборудование: " 
+				+ eqDBAdapter.getEquipsNameByUUID(equipment_uuid);
+	    equipment_title.setText(operationname);		
+   		//android:id="@+id/twf_equipment_status"
+		operation = "Состояние: " 
+				+ equipmentStatusDBAdapter.getNameByUUID(eqDBAdapter.getItem(equipment_uuid).getEquipment_status_uuid());
+	    equipment_status.setText(operation);	    	    
+	    //android:id="@+id/twf_equipment_operation"
+		operation = "Операция: " 
+				+ pattern.getTitle();
+	    equipment_operation.setText(operation);
+	    
 		// получаем шаги шаблона операции
 		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		patternSteps = patternStepDBAdapter.getItems(pattern.getUuid());
 
+		
 		// получаем варианты выполнения шагов
 		ArrayList<String> uuids = new ArrayList<String>();
 		for (OperationPatternStep step : patternSteps) {
@@ -199,11 +226,6 @@ public class OperationActivity extends Activity {
 				new TOiRDatabaseContext(getApplicationContext()));
 		operationResults = resultDBAdapter.getItems(equipmentOperation
 				.getOperation_type_uuid());
-
-		TextView taskName = (TextView) findViewById(R.id.twf_task_title);
-		taskName.setText(taskname);
-		TextView operationName = (TextView) findViewById(R.id.twf_equipment_title);
-		operationName.setText(operationname);
 
 		/*
 		 * cоздаём запись с результатом выполнения операции для фиксации времени
@@ -280,12 +302,12 @@ public class OperationActivity extends Activity {
 
 	private void showStepContent(OperationPatternStep step) {
 
-		//stepTitle.setText(step.getTitle());
-		stepTitle.setText(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ step.getImage());
+		stepTitle.setText("Шаг: " + step.getTitle());
+		//stepTitle.setText(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ step.getImage());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
-		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.photoContainer);
+		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 		photoContainer.removeAllViewsInLayout();
 		photoContainer.setVisibility(View.INVISIBLE);
 
@@ -438,7 +460,7 @@ public class OperationActivity extends Activity {
 			// инициализировать интерфейс для фотографии
 			View cameraView = View.inflate(getApplicationContext(),
 					R.layout.fragment_native_camera, null);
-			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.photoContainer);
+			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 			RelativeLayout cameraLayout = new RelativeLayout(
 					getApplicationContext());
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -545,7 +567,7 @@ public class OperationActivity extends Activity {
 				equipmentOperationResultDBAdapter.update(operationResult);
 
 				// обновление статуса операции по результату выполнения
-				Spinner operationStatusSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
+				Spinner operationStatusSpinner = (Spinner) findViewById(R.id.twf_altOperationStatusSpinner);
 				String operationStatusUuid = ((OperationStatus) operationStatusSpinner
 						.getSelectedItem()).getUuid();
 				EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
@@ -580,10 +602,10 @@ public class OperationActivity extends Activity {
 		layout.addView(resultButton);
 
 		// показ элементов отвечающих за статус выполнения операции
-		RelativeLayout alterOperationStatusLayout = (RelativeLayout) findViewById(R.id.alterOperationStatus);
+		RelativeLayout alterOperationStatusLayout = (RelativeLayout) findViewById(R.id.twf_alterOperationStatus);
 		alterOperationStatusLayout.setVisibility(View.VISIBLE);
 
-		Spinner alterSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
+		Spinner alterSpinner = (Spinner) findViewById(R.id.twf_altOperationStatusSpinner);
 		OperationStatusDBAdapter dbAdapter = new OperationStatusDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		ArrayList<OperationStatus> list = dbAdapter.getAllItems();
@@ -610,13 +632,13 @@ public class OperationActivity extends Activity {
 			}
 		}
 
-		CheckBox checkBox = (CheckBox) findViewById(R.id.showAltOperationStatusCheckbox);
+		CheckBox checkBox = (CheckBox) findViewById(R.id.twf_showAltOperationStatusCheckbox);
 		checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				Spinner alterSpinner = (Spinner) findViewById(R.id.altOperationStatusSpinner);
+				Spinner alterSpinner = (Spinner) findViewById(R.id.twf_altOperationStatusSpinner);
 				if (isChecked) {
 					alterSpinner.setVisibility(View.VISIBLE);
 				} else {

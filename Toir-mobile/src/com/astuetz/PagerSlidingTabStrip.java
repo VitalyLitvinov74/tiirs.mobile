@@ -85,7 +85,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 	private int tabPadding = 24;
 	private int dividerWidth = 1;
 
-	private int tabTextSize = 12;
+	private int tabTextSize = 14;
 	private int tabTextColor = 0xFF666666;
 	private Typeface tabTypeface = null;
 	private int tabTypefaceStyle = Typeface.BOLD;
@@ -175,8 +175,9 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 			throw new IllegalStateException("ViewPager does not have adapter instance.");
 		}
 
-		pager.setOnPageChangeListener(pageListener);
-
+		//pager.setOnPageChangeListener(pageListener);
+		pager.addOnPageChangeListener(pageListener);
+		
 		notifyDataSetChanged();
 	}
 
@@ -350,7 +351,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 	}
 
 	private class PageListener implements OnPageChangeListener {
-
+		
 		@Override
 		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

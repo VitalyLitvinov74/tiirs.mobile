@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/darker_gray">
+    android:background="@android:color/black">
 
     <TextView
         android:id="@+id/pleaseScanImage"
@@ -11,11 +11,11 @@
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal|center_vertical"
         android:layout_marginTop="5dp"
-        android:layout_weight="0.14"
+        android:layout_weight="0.03"
         android:ems="10"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/pleaseScanImg"
-        android:textColor="@color/black"
+        android:textColor="@color/gray"
         android:textSize="18sp" />
 
         <TextView
@@ -24,7 +24,7 @@
             android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:layout_weight="0.02"
+            android:layout_weight="0.01"
             android:background="@color/grey"
             android:ems="10" >
         </TextView>

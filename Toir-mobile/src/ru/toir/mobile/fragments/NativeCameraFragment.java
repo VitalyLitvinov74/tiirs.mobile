@@ -150,6 +150,7 @@ public class NativeCameraFragment extends Fragment {
 			mCamera = Camera.open();
 			try {
 				mCamera.setPreviewDisplay(holder);
+				mCamera.setDisplayOrientation(90);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

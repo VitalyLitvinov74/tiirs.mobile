@@ -268,10 +268,9 @@ public class TaskFragment extends Fragment {
 		String[] taskFrom = { TaskDBAdapter.Projection.TASK_STATUS_UUID,
 				TaskDBAdapter.Projection.TASK_NAME,
 				TaskDBAdapter.Projection.CREATED_AT,
-				TaskDBAdapter.Projection.CLOSE_DATE,
 				TaskStatusDBAdapter.Projection.TITLE };
 		int[] taskTo = { R.id.ti_ImageStatus, R.id.ti_Name, R.id.ti_Create,
-				R.id.ti_Close, R.id.ti_Status };
+				R.id.ti_Status };
 		taskAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.task_item, null, taskFrom, taskTo,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -297,7 +296,7 @@ public class TaskFragment extends Fragment {
 					((TextView) view).setText(sDate);
 					return true;
 				}
-
+/*
 				if (viewId == R.id.ti_Close) {
 					long lDate = cursor.getLong(columnIndex);
 					String sDate;
@@ -309,7 +308,7 @@ public class TaskFragment extends Fragment {
 					((TextView) view).setText(sDate);
 					return true;
 				}
-
+*/
 				if (viewId == R.id.ti_ImageStatus) {
 					int image_id = R.drawable.img_status_3;
 					String taskStatus = cursor.getString(columnIndex);
