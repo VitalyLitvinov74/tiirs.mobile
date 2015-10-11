@@ -160,6 +160,8 @@ public class RFIDDriverC5 implements RFIDDriver{
 	@Override
 	public void close() {
 		reader.StopLoop();
+		reader.m_handler=null;
+        android.hardware.uhf.magic.reader.Close();;
 	}
 
 	/** 

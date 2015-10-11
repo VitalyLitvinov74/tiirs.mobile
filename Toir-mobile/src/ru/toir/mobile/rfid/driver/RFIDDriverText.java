@@ -77,7 +77,7 @@ public class RFIDDriverText implements RFIDDriver{
 	 */
 	@Override
 	public void getMenu(Menu menu) {
-		String[] tags = {"01234567","00000001","00000002","00000003","00000004", "00000005"};
+		String[] tags = {"01234567","3400E2004000860902372580112F","3000E2004000860902332580112D","00000003","00000004", "00000005"};
 		MenuItem item;
 		int i = 0;
 		

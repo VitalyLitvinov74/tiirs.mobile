@@ -811,10 +811,11 @@ public class reader {
 				int nTemp = 0;
 				m_nCount = 0;
 				m_nread = 0;
-				while (m_handler != null) {
-
+				int m_nReRead=0;
+				while (m_handler != null && (m_nReRead < 100)) {
 					nTemp = Read(m_buf, m_nCount, 1024);
 					m_nCount += nTemp;
+					m_nReRead++;
 					if (nTemp == 0) {
 						m_nread++;
 						if (m_nread > 5)
@@ -857,14 +858,16 @@ public class reader {
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
 				int nTemp = 0, nIndex = 0;
+				int m_nReRead=0;
 				boolean tag_find = false;
 				m_nCount = 0;
 				m_nReSend = 0;
 				nIndex = 0;
-				while (m_handler != null) {
+				while (m_handler != null && (m_nReRead < 50)) {
 					// nIndex = m_nCount;
 					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
 					m_nCount += nTemp;
+					m_nReRead++;
 					// Log.e("777777777777777777", "count=" + m_nCount);
 					if (nTemp == 0) {
 
