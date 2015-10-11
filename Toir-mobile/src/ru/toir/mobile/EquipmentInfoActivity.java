@@ -26,6 +26,7 @@ import android.preference.PreferenceManager;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
+import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
 import ru.toir.mobile.rfid.driver.RFIDDriverC5;
 import android.view.View;
@@ -39,9 +40,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class EquipmentInfoActivity extends Activity {
-		public final static int READ_USER_LABLE = 1;
-		public final static int WRITE_USER_LABLE = 2;
-
+		public final static int READ_EQUIPMENT_LABLE = 1;
+		public final static int WRITE_EQUIPMENT_LABLE = 2;
+		public final static int WRITE_USER_LABLE = 4;
+		
 		private String equipment_uuid;
 		private String equipment_documentation;
 		private Spinner Spinner_operation;
@@ -58,6 +60,7 @@ public class EquipmentInfoActivity extends Activity {
 		TagRecordStructure tagrecord2 = new TagRecordStructure();
 		private ArrayList<TagRecordStructure> tagrecords = new ArrayList<TagRecordStructure>();
 		EquipmentTagStructure equipmenttag = new EquipmentTagStructure();
+		UserTagStructure usertag = new UserTagStructure();
 		
 	/*	
 	    android:id="@+id/equipment_image"
@@ -79,6 +82,7 @@ public class EquipmentInfoActivity extends Activity {
 		private TextView tv_equipment_documentation;
 		private Button read_rfid_button;
 		private Button write_rfid_button;
+		private Button write_button;
 		private Button open_documentation_button;
 		
 		private	RFID rfid;
@@ -138,7 +142,7 @@ public class EquipmentInfoActivity extends Activity {
 			read_rfid_button = (Button) findViewById(R.id.button_read);		
 			write_rfid_button = (Button) findViewById(R.id.button_write);
 			open_documentation_button = (Button) findViewById(R.id.ei_button_open_documentation);
-			
+			write_button = (Button) findViewById(R.id.button_write_user);
     		// инициализируем драйвер
     		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID)) {
     			read_rfid_button.setOnClickListener(
@@ -146,7 +150,7 @@ public class EquipmentInfoActivity extends Activity {
 		                @Override
 		                public void onClick(View v) {		            		
 		            			// запускаем процедуру считывания тега метки
-		                		regim = READ_USER_LABLE;
+		                		regim = READ_EQUIPMENT_LABLE;
 		            			rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID);		            			
 		            		} 
 		                });
@@ -154,10 +158,18 @@ public class EquipmentInfoActivity extends Activity {
     		            new View.OnClickListener() {
     		                @Override
     		                public void onClick(View v) {
-    		                	regim = WRITE_USER_LABLE;
+    		                	regim = WRITE_EQUIPMENT_LABLE;
     		                	rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID);    		                	
     		            	} 
     		            });
+    			write_button.setOnClickListener(
+    		            new View.OnClickListener() {
+    		                @Override
+    		                public void onClick(View v) {
+    		                	regim = WRITE_USER_LABLE;
+    		                	rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID);    		                	
+    		            	} 
+    		            });    			
     			}
     		else {
     			setResult(RFID.RESULT_RFID_INIT_ERROR);
@@ -295,7 +307,7 @@ public class EquipmentInfoActivity extends Activity {
 		public void CallbackOnReadLable(String result) {
 			if (result.length()>=20)
 				{
-				 if (regim == WRITE_USER_LABLE)
+				 if (regim == WRITE_EQUIPMENT_LABLE)
 					{			
 					 rfid.SetOperationType((byte)RFIDDriverC5.WRITE_EQUIPMENT_MEMORY);
 					 byte out_buffer[]={};
@@ -305,7 +317,23 @@ public class EquipmentInfoActivity extends Activity {
 						e.printStackTrace();	}
 					 rfid.write(out_buffer);	
 					}
-				 if (regim == READ_USER_LABLE)
+				 if (regim == WRITE_USER_LABLE)
+					{			
+					 rfid.SetOperationType((byte)RFIDDriverC5.WRITE_USER_MEMORY);
+					 byte out_buffer[]={};
+ 					 UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
+								getApplicationContext()));
+					 Users user = users.getUserByTagId(AuthorizedUser.getInstance().getTagId());
+					 usertag.set_user_uuid(user.getUuid());
+					 usertag.set_name(user.getName());
+					 usertag.set_whois(user.getWhois());
+					 try {
+						 	out_buffer = DataUtils.PackToSendUserData(usertag);
+					 	} catch (IOException e) {
+						e.printStackTrace();	}
+					 rfid.write(out_buffer);
+					}
+				 if (regim == READ_EQUIPMENT_LABLE)
 					{			
 					 rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);
 					 rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_MEMORY);	

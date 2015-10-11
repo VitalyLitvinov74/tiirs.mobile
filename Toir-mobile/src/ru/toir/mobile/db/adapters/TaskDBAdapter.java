@@ -92,6 +92,24 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
+	 * Возвращает список всех нарядов
+	 * Возможно временная функция
+	 * @param uuid
+	 * @return
+	 */
+	public ArrayList<Task> getOrders() {
+		ArrayList<Task> arrayList = new ArrayList<Task>();
+		Cursor cursor;
+		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				arrayList.add(getItem(cursor));
+			} while(cursor.moveToNext());
+		}
+		return arrayList;
+	}
+
+	/**
 	 * Возвращает список нарядов по пользователю и статусу наряда
 	 * 
 	 * @param user_uuid

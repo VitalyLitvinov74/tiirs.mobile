@@ -8,7 +8,7 @@ package ru.toir.mobile.rfid;
  * класс, описывающий структуру информации метки пользователя (бейджа)
  */
 public class UserTagStructure {	
-	protected String uuid;	// BDFF4E95-F0AB-4E07-9DFD-4CA314FFE05B [16]	
+	protected String uuid;	// BDFF4E95-F0AB-4E07-9DFD-4CA314FFE05B16	
 	protected String name;	// Логачев Дмитрий [20]
 	protected short type;	// 1- Администратор [2]
 	protected String whois;	// ведущий инженер [20]	

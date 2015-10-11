@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +10,17 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.*;
 import ru.toir.mobile.db.tables.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ru.toir.mobile.utils.DataUtils;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -28,6 +33,7 @@ public class UserInfoFragment extends Fragment {
 	private TextView tv_user_type;
 	private TextView tv_user_gps;
 	private TextView tv_user_status;
+	private ImageView user_image;
 	
 	/*
 	 * (non-Javadoc)
@@ -56,6 +62,7 @@ public class UserInfoFragment extends Fragment {
 		tv_user_type = (TextView) view.findViewById(R.id.user_text_type);
 		tv_user_gps = (TextView) view.findViewById(R.id.user_position);
 		tv_user_status = (TextView) view.findViewById(R.id.user_status);
+		user_image = (ImageView) view.findViewById(R.id.user_image);
 		
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
@@ -66,7 +73,9 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			tv_user_id.setText("ID: " + user.getTag_id());
+			if (user.getTag_id().length()>20)
+				tv_user_id.setText("ID: " + user.getTag_id().substring(0, 20));
+			else tv_user_id.setText("ID: " + user.getTag_id());
 			tv_user_name.setText("ФИО: " + user.getName());
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			tv_user_status.setText("Статус: задание");
@@ -79,6 +88,16 @@ public class UserInfoFragment extends Fragment {
 				tv_user_gps.setText(Float.parseFloat(gpstrack.getLatitude()) + " / "
 						+ Float.parseFloat(gpstrack.getLongitude()));
 			}
+			
+			if (AuthorizedUser.getInstance().getTagId().equals("3000E2004000860902332580112D")) {
+				// ваще хардкодед для демонстрашки
+				// TODO реальные фотки должны адресоваться из базы
+				File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getActivity().getApplicationContext().getPackageName() + File.separator + "img" + File.separator+ "m_kazantcev.jpg");						
+					 if(imgFile.exists() && imgFile.isFile()){
+						 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+						 user_image.setImageBitmap(myBitmap);			    			    
+					 }			
+				}
 		}
 	}
 
@@ -94,8 +113,8 @@ public class UserInfoFragment extends Fragment {
 		} else {
 			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
 					getActivity().getApplicationContext()));
-			ArrayList<Task> ordersList = dbOrder.getOrdersByUser(
-					user.getUuid(), "", "");
+			//ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(), "", "");
+			ArrayList<Task> ordersList = dbOrder.getOrders();
 			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 					new TOiRDatabaseContext(getActivity()
 							.getApplicationContext()));

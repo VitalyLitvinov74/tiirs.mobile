@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.TagRecordStructure;
+import ru.toir.mobile.rfid.UserTagStructure;
 import android.text.TextUtils;
 
 
@@ -255,7 +256,26 @@ public class DataUtils {
 		out_buffer = outputStream.toByteArray( );
 		return out_buffer;
 	}
-	
+
+	public static byte[] PackToSendUserData(UserTagStructure usertag) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		byte out_buffer[] = new byte[256];
+		byte temp_buffer[] = new byte[32];
+		String temp;
+		int cur=0;
+		temp = usertag.get_user_uuid().replace("-", "");
+		temp_buffer = hexStringToByteArray(temp);
+		outputStream.write(temp_buffer);		
+		temp_buffer = usertag.get_name().getBytes();
+		outputStream.write(temp_buffer);
+		temp_buffer = usertag.get_whois().getBytes();
+		outputStream.write(temp_buffer);
+		for (cur=outputStream.size(); cur<64; cur++)
+			 outputStream.write((byte)0);
+		out_buffer = outputStream.toByteArray( );
+		return out_buffer;
+	}
+
 	public static byte[] hexStringToByteArray(String s) {		
 	    int len = s.length();
 	    byte[] data = new byte[len / 2];

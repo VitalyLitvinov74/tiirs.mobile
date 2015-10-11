@@ -28,6 +28,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 	public final static int READ_EQUIPMENT_OPERATION_MEMORY = 5;
 	public final static int WRITE_EQUIPMENT_OPERATION_MEMORY = 6;
 	public final static int WRITE_EQUIPMENT_MEMORY = 7;
+	public final static int WRITE_USER_MEMORY = 8;
 	
 	public final static int USER_MEMORY_BANK = 3;
 
@@ -54,7 +55,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 		types=type;
 		if (type==READ_USER_LABLE)
 			{
-			 mActivity.setContentView(R.layout.bar2d_read);			 
+			 //mActivity.setContentView(R.layout.bar2d_read);			 
 			 mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 			}
 		reader.m_handler=mHandler;
@@ -96,8 +97,8 @@ public class RFIDDriverC5 implements RFIDDriver{
 			android.hardware.uhf.magic.reader.InventoryLables();
 		if (type == READ_EQUIPMENT_MEMORY || type == READ_EQUIPMENT_OPERATION_MEMORY)
 			{
-			reader.m_strPCEPC=mPCEPC;
-			byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
+			 reader.m_strPCEPC=mPCEPC;
+			 byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
 			 byte memoryBank = USER_MEMORY_BANK;	// user memory
 			 int address = 0;						// читаем всегда с начала
 			 int dataLength = 32;					// длина памяти данных
@@ -121,7 +122,7 @@ public class RFIDDriverC5 implements RFIDDriver{
 	 */
 	@Override
 	public boolean write(byte[] outBuffer){		
-		if (types==WRITE_EQUIPMENT_OPERATION_MEMORY || types==WRITE_EQUIPMENT_MEMORY)
+		if (types==WRITE_EQUIPMENT_OPERATION_MEMORY || types==WRITE_EQUIPMENT_MEMORY || types==WRITE_USER_MEMORY)
 			{
 			 //byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
 			 byte[] epc = reader.stringToBytes(mPCEPC);
@@ -180,9 +181,9 @@ public class RFIDDriverC5 implements RFIDDriver{
     				Toast.makeText(mActivity.getApplicationContext(),"Код: " + m_strresult,Toast.LENGTH_LONG).show();					
 					//m_strresult+="\r\n";
     				// возврат при чтении метки пользователя
-					if (types == READ_USER_LABLE)
-						{
-						 m_strresult = "01234567";					
+					if (types == READ_USER_LABLE || types==0)
+						{						 
+						 //m_strresult = "01234567";					
 						 reader.StopLoop();						 
 						 ((RFIDActivity)mActivity).Callback(m_strresult);
 						}
@@ -211,9 +212,9 @@ public class RFIDDriverC5 implements RFIDDriver{
 					if (types==WRITE_EQUIPMENT_OPERATION_MEMORY)				
 						 ((OperationActivity)mActivity).CallbackOnWrite(m_strresult);
 					// возврат при записи памяти оборудования
-					if (types==WRITE_EQUIPMENT_MEMORY)
+					if (types==WRITE_EQUIPMENT_MEMORY || types==WRITE_USER_MEMORY)
 						 ((EquipmentInfoActivity)mActivity).CallbackOnWrite(m_strresult);						
-					m_strresult="";
+					//m_strresult="";
     			}  
     			m_nCount++;
     			//Log.e("8888888888",m_nCount+"\r\n");
