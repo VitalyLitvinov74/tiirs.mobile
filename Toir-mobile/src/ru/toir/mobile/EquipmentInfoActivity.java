@@ -101,7 +101,6 @@ public class EquipmentInfoActivity extends Activity {
 			tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
 			tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);				
 			tv_equipment_position = (TextView) findViewById(R.id.equipment_position);
-			//tv_equipment_date = (TextView) findViewById(R.id.equipment_start_date);
 			tv_equipment_status = (TextView) findViewById(R.id.equipment_status);
 			tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);	
 			tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
@@ -142,6 +141,8 @@ public class EquipmentInfoActivity extends Activity {
 			write_rfid_button = (Button) findViewById(R.id.button_write);
 			open_documentation_button = (Button) findViewById(R.id.ei_button_open_documentation);
 			write_button = (Button) findViewById(R.id.button_write_user);
+			// временная кнопка записи в метку пользователей
+			write_button.setVisibility(View.GONE);
     		// инициализируем драйвер
     		if (rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_LABLE_ID)) {
     			read_rfid_button.setOnClickListener(
@@ -188,7 +189,7 @@ public class EquipmentInfoActivity extends Activity {
 			spinner_operation_adapter.add("Ремонт задвижки");
 	      	spinner_operation_adapter.add("Осмотр задвижки");
 	      	 
-			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
+			//TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
 			EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
@@ -202,17 +203,17 @@ public class EquipmentInfoActivity extends Activity {
 			tv_equipment_type.setText("Тип: " + eqTypeDBAdapter.getNameByUUID(equipment.getEquipment_type_uuid()));
 			
 			tv_equipment_position.setText("" + String.valueOf(equipment.getLatitude()) + " / " + String.valueOf(equipment.getLongitude()));
-			//tv_equipment_date.setText(DataUtils.getDate(equipment.getStart_date(),"dd-MM-yyyy hh:mm"));
+			tv_equipment_task_date.setText(DataUtils.getDate(equipment.getStart_date(),"dd-MM-yyyy hh:mm"));
 			tv_equipment_critical.setText("Критичность: " + criticalTypeDBAdapter.getNameByUUID(equipment.getCritical_type_uuid()));
 			
-			if (equipmentOperationList != null && equipmentOperationList.size()>0)
-				tv_equipment_task_date.setText("" + taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
-			else tv_equipment_task_date.setText("еще не обслуживалось");
+			//if (equipmentOperationList != null && equipmentOperationList.size()>0)
+			//	tv_equipment_task_date.setText("" + taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
+			//else tv_equipment_task_date.setText("еще не обслуживалось");
 			if (equipmentOperationList != null && equipmentOperationList.size()>0)
 				tv_equipment_tasks.setText("" + eqOperationResultDBAdapter.getOperationResultByUUID(equipmentOperationList.get(0).getOperation_status_uuid()));
 			else tv_equipment_tasks.setText("еще не обслуживалось");
 			//File imgFile = new File(getApplicationInfo().dataDir + equipment.getImg());
-			tv_equipment_documentation.setText("UUID: " + equipment.getUuid());
+			tv_equipment_documentation.setText("UUID: " + equipment.getUuid().substring(0, 13));
 			File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ equipment.getImage());						
 			if(imgFile.exists() && imgFile.isFile()){
 			    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -224,19 +225,25 @@ public class EquipmentInfoActivity extends Activity {
 		                @Override
 		                public void onClick(View v) {
 		                	EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(new TOiRDatabaseContext(getApplicationContext()));
-		                	equipment_documentation = documentationAdapter.getDocumentByUuid(equipment_uuid).getPath();
-		                	File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "doc"+ File.separator + equipment_documentation);
-		                	Intent target = new Intent(Intent.ACTION_VIEW);
-		                	// пока только pdf
-		                	target.setDataAndType(Uri.fromFile(file),"application/pdf");
-		                	target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		                	if (documentationAdapter.getDocumentByUuid(equipment_uuid)!=null)
+		                		{
+		                		 equipment_documentation = documentationAdapter.getDocumentByUuid(equipment_uuid).getPath();
+		                		 File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "doc"+ File.separator + equipment_documentation);
+		                		 if (file.exists())
+		                		 	{
+		                			 Intent target = new Intent(Intent.ACTION_VIEW);
+		                			 // пока только pdf		                	
+		                			 target.setDataAndType(Uri.fromFile(file),"application/pdf");
+		                			 target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-		                	Intent intent = Intent.createChooser(target, "Open File");
-		                	try {
-		                	    startActivity(intent);
-		                	} catch (ActivityNotFoundException e) {
-		                	    // Instruct the user to install a PDF reader here, or something
-		                	}   
+		                			 Intent intent = Intent.createChooser(target, "Open File");
+		                			 try {
+		                				 startActivity(intent);
+		                			 } catch (ActivityNotFoundException e) {
+		                				 // Instruct the user to install a PDF reader here, or something
+		                			 }
+		                		 	}
+		                		}
 		            	} 
 		            });    			
 

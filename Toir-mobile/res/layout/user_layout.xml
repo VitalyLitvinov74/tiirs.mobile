@@ -188,7 +188,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="2/1"
                             android:textSize="16sp" />
 
                     </TableRow>
@@ -209,7 +208,6 @@
                             android:id="@+id/user_text_boss"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="+79227000286"
                             android:textSize="16sp" />
 
                     </TableRow>

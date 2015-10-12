@@ -35,6 +35,9 @@ public class UserInfoFragment extends Fragment {
 	private TextView tv_user_status;
 	private ImageView user_image;
 	
+	private TextView tv_user_date;
+	private TextView tv_user_tasks;
+	private TextView tv_user_boss;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -63,7 +66,10 @@ public class UserInfoFragment extends Fragment {
 		tv_user_gps = (TextView) view.findViewById(R.id.user_position);
 		tv_user_status = (TextView) view.findViewById(R.id.user_status);
 		user_image = (ImageView) view.findViewById(R.id.user_image);
-		
+		tv_user_date = (TextView) view.findViewById(R.id.user_text_date);
+		tv_user_tasks = (TextView) view.findViewById(R.id.user_text_tasks);
+		tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
+
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
 		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
@@ -77,6 +83,10 @@ public class UserInfoFragment extends Fragment {
 				tv_user_id.setText("ID: " + user.getTag_id().substring(0, 20));
 			else tv_user_id.setText("ID: " + user.getTag_id());
 			tv_user_name.setText("ФИО: " + user.getName());
+			tv_user_date.setText("11.10.2015 10:54");
+			tv_user_tasks.setText("2/2");
+			tv_user_boss.setText("+79227000286");
+			
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			tv_user_status.setText("Статус: задание");
 			GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(

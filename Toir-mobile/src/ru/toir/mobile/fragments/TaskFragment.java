@@ -3,6 +3,7 @@ package ru.toir.mobile.fragments;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.OperationActivity;
@@ -41,6 +42,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -743,15 +745,12 @@ public class TaskFragment extends Fragment {
 	// init equipment operation information screen
 	private void initOperationPattern(String equipment_operation_uuid,
 			String task_uuid, String equipment_uuid) {
-		Toast.makeText(getActivity(),
-				"Проваливаемся на экран с информацией об обслуживании",
-				Toast.LENGTH_SHORT).show();
-
 		// запускаем считывание метки оборудования
 		// передаём в активити считывания метки все необходимые данные для
 		// запуска активити выполнения операции
 		// они будут возвращены в MainActivity.onActivityResult и переданны в
-		// новое активити
+		// новое активити		
+		
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(getActivity()));
 		String equipment_tag = equipmentDBAdapter.getItem(equipment_uuid)

@@ -812,7 +812,7 @@ public class reader {
 				m_nCount = 0;
 				m_nread = 0;
 				int m_nReRead=0;
-				while (m_handler != null && (m_nReRead < 100)) {
+				while (m_handler != null && (m_nReRead >= 0)) {
 					nTemp = Read(m_buf, m_nCount, 1024);
 					m_nCount += nTemp;
 					m_nReRead++;
@@ -863,7 +863,7 @@ public class reader {
 				m_nCount = 0;
 				m_nReSend = 0;
 				nIndex = 0;
-				while (m_handler != null && (m_nReRead < 50)) {
+				while (m_handler != null && (m_nReRead >= 0)) {
 					// nIndex = m_nCount;
 					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
 					m_nCount += nTemp;

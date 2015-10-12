@@ -98,7 +98,7 @@ public class RFIDActivity extends Activity {
 			} else {
 				setResult(RESULT_CANCELED);
 			}
-			rfid.close();
+			//rfid.close();
 			break;
 		case RESULT_CANCELED:
 			setResult(RESULT_CANCELED);
