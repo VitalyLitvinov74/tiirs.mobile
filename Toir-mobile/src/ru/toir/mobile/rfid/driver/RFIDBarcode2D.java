@@ -2,15 +2,12 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.pm.ActivityInfo;
 import android.hardware.barcode.Scanner;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -39,7 +36,8 @@ public class RFIDBarcode2D implements RFIDDriver {
 				scanText.setText((String) msg.obj);
 				// temporary
 				msg.obj = "01234567";
-				((RFIDActivity) mActivity).Callback((String) msg.obj);
+				// TODO разобраться как вернуть данные по новой схеме!!!
+				//((RFIDActivity) mActivity).Callback((String) msg.obj);
 				break;
 			}
 			case Scanner.BARCODE_NOREAD: {

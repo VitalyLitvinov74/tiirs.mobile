@@ -8,8 +8,6 @@ import net.sourceforge.zbar.SymbolSet;
 import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -18,7 +16,6 @@ import android.hardware.Camera.Size;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -173,7 +170,8 @@ public class RFIDQRcode implements RFIDDriver {
 								+ lastScannedCode);
 						// !!!! hardcoded
 						lastScannedCode = "01234567";
-						((RFIDActivity) mActivity).Callback(lastScannedCode);
+						// TODO разобраться как вернуть данные по новой схеме!!!
+						//((RFIDActivity) mActivity).Callback(lastScannedCode);
 						releaseCamera();
 					}
 				}

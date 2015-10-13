@@ -2,10 +2,8 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.EquipmentInfoActivity;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.pm.ActivityInfo;
 import android.hardware.uhf.magic.reader;
@@ -14,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -206,7 +203,8 @@ public class RFIDDriverC5 implements RFIDDriver {
 					if (types == READ_USER_LABLE || types == 0) {
 						// m_strresult = "01234567";
 						reader.StopLoop();
-						((RFIDActivity) mActivity).Callback(m_strresult);
+						// TODO разобраться как вернуть данные по новой схеме!!!
+						//((RFIDActivity) mActivity).Callback(m_strresult);
 					}
 					// возврат при чтении метки оборудования
 					if (types == READ_EQUIPMENT_LABLE_ID
