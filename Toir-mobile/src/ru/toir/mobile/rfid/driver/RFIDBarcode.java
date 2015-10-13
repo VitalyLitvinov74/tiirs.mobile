@@ -3,8 +3,10 @@
  */
 package ru.toir.mobile.rfid.driver;
 
+import ru.toir.mobile.R;
+
 import com.google.zxing.integration.android.IntentIntegrator;
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +18,7 @@ import android.view.ViewGroup;
  */
 public class RFIDBarcode implements RFIDDriver {
 
-	private Activity mActivity;
+	private DialogFragment mDialogFragment;
 
 	/*
 	 * (non-Javadoc)
@@ -25,8 +27,8 @@ public class RFIDBarcode implements RFIDDriver {
 	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
 	 */
 	@Override
-	public void setActivity(Activity activity) {
-		this.mActivity = activity;
+	public void setDialogFragment(DialogFragment fragment) {
+		this.mDialogFragment = fragment;
 	}
 
 	/*
@@ -46,7 +48,7 @@ public class RFIDBarcode implements RFIDDriver {
 	 */
 	@Override
 	public void read(byte type) {
-		IntentIntegrator integrator = new IntentIntegrator(mActivity);
+		IntentIntegrator integrator = new IntentIntegrator(mDialogFragment);
 		integrator.initiateScan();
 	}
 
@@ -92,7 +94,8 @@ public class RFIDBarcode implements RFIDDriver {
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
-		return null;
+		View view = inflater.inflate(R.layout.rfid_read, viewGroup);
+		return view;
 	}
 
 	/*

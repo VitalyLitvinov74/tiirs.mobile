@@ -1,17 +1,17 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
-import android.app.Activity;
-import android.content.pm.ActivityInfo;
+import ru.toir.mobile.rfid.RFID;
+import android.app.DialogFragment;
 import android.hardware.barcode.Scanner;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * @author olejek
@@ -23,21 +23,26 @@ import android.widget.Toast;
 public class RFIDBarcode2D implements RFIDDriver {
 
 	private Handler mHandler = new MainHandler();
-	private static Activity mActivity;
 	static private TextView scanText;
+	private static Handler newHandler;
 
 	static private class MainHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case Scanner.BARCODE_READ: {
-				Toast.makeText(mActivity.getApplicationContext(),
-						"Код: " + msg.obj, Toast.LENGTH_LONG).show();
+				// Toast.makeText(mActivity.getApplicationContext(),"Код: " + msg.obj, Toast.LENGTH_LONG).show();
 				scanText.setText((String) msg.obj);
 				// temporary
 				msg.obj = "01234567";
-				// TODO разобраться как вернуть данные по новой схеме!!!
-				//((RFIDActivity) mActivity).Callback((String) msg.obj);
+
+				// ((RFIDActivity) mActivity).Callback((String) msg.obj);
+				Message message = new Message();
+				message.arg1 = RFID.RESULT_RFID_SUCCESS;
+				Bundle bundle = new Bundle();
+				bundle.putString(RFID.RESULT_RFID_TAG_ID, (String) msg.obj);
+				message.setData(bundle);
+				newHandler.sendMessage(message);
 				break;
 			}
 			case Scanner.BARCODE_NOREAD: {
@@ -50,8 +55,8 @@ public class RFIDBarcode2D implements RFIDDriver {
 	};
 
 	@Override
-	public void setActivity(Activity activity) {
-		mActivity = activity;
+	public void setDialogFragment(DialogFragment fragment) {
+
 	}
 
 	/**
@@ -64,12 +69,6 @@ public class RFIDBarcode2D implements RFIDDriver {
 	@Override
 	public boolean init(byte type) {
 		Scanner.m_handler = mHandler;
-		// initialize the scanner
-		Scanner.InitSCA();
-		mActivity.setContentView(R.layout.bar2d_read);
-		mActivity
-				.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);
 		return true;
 	}
 
@@ -127,21 +126,32 @@ public class RFIDBarcode2D implements RFIDDriver {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#getView(android.view.LayoutInflater, android.view.ViewGroup)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.toir.mobile.rfid.driver.RFIDDriver#getView(android.view.LayoutInflater
+	 * , android.view.ViewGroup)
 	 */
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
-		return null;
+		// initialize the scanner
+		Scanner.InitSCA();
+		View view = inflater.inflate(R.layout.bar2d_read, viewGroup);
+		scanText = (TextView) view.findViewById(R.id.code_from_bar);
+
+		return view;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setHandler(android.os.Handler)
 	 */
 	@Override
 	public void setHandler(Handler handler) {
-
+		newHandler = handler;
 	}
 
 }

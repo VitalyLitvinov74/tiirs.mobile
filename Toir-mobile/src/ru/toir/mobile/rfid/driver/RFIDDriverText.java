@@ -2,7 +2,7 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.RFID;
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,7 +55,8 @@ public class RFIDDriverText implements RFIDDriver {
 				Message message = new Message();
 				message.arg1 = RFID.RESULT_RFID_SUCCESS;
 				Bundle bundle = new Bundle();
-				bundle.putString(RFID.RESULT_RFID_TAG_ID, (String) spinner.getSelectedItem());
+				bundle.putString(RFID.RESULT_RFID_TAG_ID,
+						(String) spinner.getSelectedItem());
 				message.setData(bundle);
 				mHandler.sendMessage(message);
 			}
@@ -168,10 +169,11 @@ public class RFIDDriverText implements RFIDDriver {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
+	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.DialogFragment
+	 * )
 	 */
 	@Override
-	public void setActivity(Activity activity) {
+	public void setDialogFragment(DialogFragment fragment) {
 
 	}
 

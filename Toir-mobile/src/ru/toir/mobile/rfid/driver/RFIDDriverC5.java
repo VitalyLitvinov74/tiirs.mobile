@@ -1,13 +1,10 @@
 package ru.toir.mobile.rfid.driver;
 
-import ru.toir.mobile.OperationActivity;
-import ru.toir.mobile.R;
-import ru.toir.mobile.EquipmentInfoActivity;
-import android.app.Activity;
+import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
-import android.content.pm.ActivityInfo;
 import android.hardware.uhf.magic.reader;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -16,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
 
 /**
  * @author koputo
@@ -26,6 +22,7 @@ import android.widget.Toast;
  *         </p>
  */
 public class RFIDDriverC5 implements RFIDDriver {
+
 	public final static int READ_USER_LABLE = 1;
 	public final static int READ_EQUIPMENT_LABLE_ID = 2;
 	public final static int READ_EQUIPMENT_OPERATION_LABLE_ID = 3;
@@ -37,8 +34,6 @@ public class RFIDDriverC5 implements RFIDDriver {
 
 	public final static int USER_MEMORY_BANK = 3;
 
-	static Activity mActivity;
-	private DialogFragment mDialog;
 	private Handler mHandler = new MainHandler();
 	static String m_strresult = "";
 	static int m_nCount = 0;
@@ -46,10 +41,11 @@ public class RFIDDriverC5 implements RFIDDriver {
 	EditText m_address;
 	static byte types = 0;
 	static String mPCEPC = "";
+	private static Handler newHandler;
 
 	@Override
-	public void setActivity(Activity activity) {
-		mActivity = activity;
+	public void setDialogFragment(DialogFragment fragment) {
+
 	}
 
 	/**
@@ -64,8 +60,7 @@ public class RFIDDriverC5 implements RFIDDriver {
 		types = type;
 		if (type == READ_USER_LABLE) {
 			// mActivity.setContentView(R.layout.bar2d_read);
-			mActivity
-					.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			// mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 		reader.m_handler = mHandler;
 		android.hardware.uhf.magic.reader.init("/dev/ttyMT1");
@@ -196,49 +191,54 @@ public class RFIDDriverC5 implements RFIDDriver {
 				if (m_strresult.indexOf((String) msg.obj) < 0) {
 					// Log.e("8888888888",(String)msg.obj+"\r\n");
 					m_strresult += (String) msg.obj;
-					Toast.makeText(mActivity.getApplicationContext(),
-							"Код: " + m_strresult, Toast.LENGTH_LONG).show();
+					//Toast.makeText(mActivity.getApplicationContext(), "Код: " + m_strresult, Toast.LENGTH_LONG).show();
 					// m_strresult+="\r\n";
 					// возврат при чтении метки пользователя
 					if (types == READ_USER_LABLE || types == 0) {
 						// m_strresult = "01234567";
 						reader.StopLoop();
-						// TODO разобраться как вернуть данные по новой схеме!!!
+
 						//((RFIDActivity) mActivity).Callback(m_strresult);
+						Message message = new Message();
+						message.arg1 = RFID.RESULT_RFID_SUCCESS;
+						Bundle bundle = new Bundle();
+						bundle.putString(RFID.RESULT_RFID_TAG_ID, m_strresult);
+						message.setData(bundle);
+						newHandler.sendMessage(message);
 					}
 					// возврат при чтении метки оборудования
 					if (types == READ_EQUIPMENT_LABLE_ID
 							|| types == READ_EQUIPMENT_OPERATION_LABLE_ID) {
 						reader.m_strPCEPC = m_strresult;
 						mPCEPC = m_strresult;
-						if (types == READ_EQUIPMENT_LABLE_ID)
-							((EquipmentInfoActivity) mActivity)
-									.CallbackOnReadLable(m_strresult);
-						if (types == READ_EQUIPMENT_OPERATION_LABLE_ID)
-							((OperationActivity) mActivity)
-									.CallbackOnReadLable(m_strresult);
+						if (types == READ_EQUIPMENT_LABLE_ID) {
+							//((EquipmentInfoActivity) mActivity).CallbackOnReadLable(m_strresult);
+						}
+						if (types == READ_EQUIPMENT_OPERATION_LABLE_ID) {
+							//((OperationActivity) mActivity).CallbackOnReadLable(m_strresult);
+						}
 					}
 					// возврат при чтении памяти оборудования
 					if (types == READ_EQUIPMENT_MEMORY
 							|| types == READ_EQUIPMENT_OPERATION_MEMORY) {
 						if (mPCEPC != null && !mPCEPC.equals("")) {
-							if (types == READ_EQUIPMENT_MEMORY)
-								((EquipmentInfoActivity) mActivity)
-										.Callback(m_strresult);
-							if (types == READ_EQUIPMENT_OPERATION_MEMORY)
-								((OperationActivity) mActivity)
-										.Callback(m_strresult);
+							if (types == READ_EQUIPMENT_MEMORY) {
+								//((EquipmentInfoActivity) mActivity).Callback(m_strresult);
+							}
+							if (types == READ_EQUIPMENT_OPERATION_MEMORY) {
+								//((OperationActivity) mActivity).Callback(m_strresult);
+							}
 						}
 					}
 					// возврат при записи памяти оборудования
-					if (types == WRITE_EQUIPMENT_OPERATION_MEMORY)
-						((OperationActivity) mActivity)
-								.CallbackOnWrite(m_strresult);
+					if (types == WRITE_EQUIPMENT_OPERATION_MEMORY) {
+						//((OperationActivity) mActivity).CallbackOnWrite(m_strresult);
+					}
 					// возврат при записи памяти оборудования
 					if (types == WRITE_EQUIPMENT_MEMORY
-							|| types == WRITE_USER_MEMORY)
-						((EquipmentInfoActivity) mActivity)
-								.CallbackOnWrite(m_strresult);
+							|| types == WRITE_USER_MEMORY) {
+						//((EquipmentInfoActivity) mActivity).CallbackOnWrite(m_strresult);
+					}
 					// m_strresult="";
 				}
 				m_nCount++;
@@ -251,25 +251,6 @@ public class RFIDDriverC5 implements RFIDDriver {
 
 		}
 	};
-
-	/**
-	 * @return the mDialog
-	 */
-	public DialogFragment getDialog() {
-		return mDialog;
-	}
-
-	/**
-	 * @param mDialog
-	 *            the mDialog to set
-	 */
-	public void setDialog(DialogFragment mDialog) {
-		this.mDialog = mDialog;
-	}
-
-	public int getLayout() {
-		return R.layout.rfid_dialog_text;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -285,7 +266,7 @@ public class RFIDDriverC5 implements RFIDDriver {
 	}
 
 	public void setHandler(Handler handler) {
-
+		newHandler = handler;
 	}
 
 }

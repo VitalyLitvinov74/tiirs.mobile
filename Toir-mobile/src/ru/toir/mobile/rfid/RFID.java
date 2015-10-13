@@ -3,7 +3,7 @@
  */
 package ru.toir.mobile.rfid;
 
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +34,8 @@ public class RFID {
 	 * 
 	 * @param activity
 	 */
-	public void setActivity(Activity activity) {
-		mDriver.setActivity(activity);
+	public void setDialogFragment(DialogFragment fragment) {
+		mDriver.setDialogFragment(fragment);
 	}
 
 	/**

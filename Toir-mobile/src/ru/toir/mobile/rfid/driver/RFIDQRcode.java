@@ -8,7 +8,7 @@ import net.sourceforge.zbar.SymbolSet;
 import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
 import ru.toir.mobile.rfid.RFID;
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
@@ -243,12 +243,10 @@ public class RFIDQRcode implements RFIDDriver {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
+	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.DialogFragment)
 	 */
 	@Override
-	public void setActivity(Activity activity) {
+	public void setDialogFragment(DialogFragment fragment) {
 
 	}
 

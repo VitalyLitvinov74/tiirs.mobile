@@ -1,6 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,11 +76,11 @@ public interface RFIDDriver {
 
 	/**
 	 * <p>
-	 * Передаём в драйвер текущую Activity
+	 * Передаём в драйвер текущий фрагмент
 	 * </p>
 	 * 
 	 * @return
 	 */
-	public void setActivity(Activity activity);
+	public void setDialogFragment(DialogFragment fragment);
 
 }

@@ -1,7 +1,7 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,7 +84,7 @@ public class RFIDDriverNull implements RFIDDriver {
 	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
 	 */
 	@Override
-	public void setActivity(Activity activity) {
+	public void setDialogFragment(DialogFragment fragment) {
 
 	}
 

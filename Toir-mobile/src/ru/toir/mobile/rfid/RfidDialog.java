@@ -3,10 +3,12 @@
  */
 package ru.toir.mobile.rfid;
 
+import com.google.zxing.integration.android.IntentIntegrator;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.driver.RFIDDriver;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -79,10 +81,6 @@ public class RfidDialog extends DialogFragment {
 
 		rfid = new RFID(driver);
 
-		// это нужно было для создания внутри драйвера элементов интерфейса
-		// специфических для каждого драйвера
-		// rfid.setActivity(this);
-
 		View view = rfid.getView(inflater, viewGroup);
 
 		// инициализируем драйвер
@@ -94,6 +92,8 @@ public class RfidDialog extends DialogFragment {
 		}
 
 		rfid.setHandler(mHandler);
+		rfid.setDialogFragment(this);
+		// TODO пересмотреть алгоритм, т.к. нужно еще и писать в метку, и в разные области, и читать из разных областей
 		rfid.read((byte) 0);
 		return view;
 	}
@@ -123,6 +123,36 @@ public class RfidDialog extends DialogFragment {
 	 */
 	public void setHandler(Handler handler) {
 		this.mHandler = handler;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onActivityResult(int, int, android.content.Intent)
+	 */
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//super.onActivityResult(requestCode, resultCode, data);
+		Message message = new Message();
+		switch (requestCode) {
+		case IntentIntegrator.REQUEST_CODE:
+			if (data != null) {
+				String result = data.getStringExtra("SCAN_RESULT");
+				if (result != null && !result.equals("")) {
+					message.arg1 = RFID.RESULT_RFID_SUCCESS;
+					Bundle bundle = new Bundle();
+					bundle.putString(RFID.RESULT_RFID_TAG_ID, result);
+					message.setData(bundle);
+				} else {
+					message.arg1 = RFID.RESULT_RFID_READ_ERROR;
+				}
+			} else {
+				message.arg1 = RFID.RESULT_RFID_CANCEL;
+			}
+			break;
+		default:
+			message.arg1 = RFID.RESULT_RFID_CANCEL;
+			break;
+		}
+		mHandler.sendMessage(message);
 	}
 
 }

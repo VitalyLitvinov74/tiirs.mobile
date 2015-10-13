@@ -135,7 +135,8 @@ public class EquipmentInfoActivity extends Activity {
 			}
 
 			rfid = new RFID(driver);
-    		rfid.setActivity(this);
+			// TODO разобраться, видимо для callback вызовов
+    		//rfid.setActivity(this);
 
 			read_rfid_button = (Button) findViewById(R.id.button_read);		
 			write_rfid_button = (Button) findViewById(R.id.button_write);
