@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,9 +56,10 @@ public class RfidDialog extends DialogFragment {
 					+ driverClassName);
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, e.toString());
-			// TODO нужен механиз возврата результата из диалога
-			// setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
-			// finish();
+			Message message = new Message();
+			message.arg1 = RFID.RESULT_RFID_CLASS_NOT_FOUND;
+			mHandler.sendMessage(message);
+
 		}
 
 		// пытаемся создать объект драйвера
@@ -65,29 +67,30 @@ public class RfidDialog extends DialogFragment {
 			driver = (RFIDDriver) driverClass.newInstance();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
-			// TODO нужен механиз возврата результата из диалога
-			// setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
-			// finish();
+			Message message = new Message();
+			message.arg1 = RFID.RESULT_RFID_CLASS_NOT_FOUND;
+			mHandler.sendMessage(message);
 		} catch (Exception e) {
-			// TODO нужен механиз возврата результата из диалога
 			e.printStackTrace();
-			// setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
-			// finish();
+			Message message = new Message();
+			message.arg1 = RFID.RESULT_RFID_CLASS_NOT_FOUND;
+			mHandler.sendMessage(message);
 		}
 
 		rfid = new RFID(driver);
+
 		// это нужно было для создания внутри драйвера элементов интерфейса
 		// специфических для каждого драйвера
 		// rfid.setActivity(this);
-		// rfid.setDialog(this);
 
 		View view = rfid.getView(inflater, viewGroup);
 
 		// инициализируем драйвер
 		if (!rfid.init((byte) 0)) {
-			// TODO нужен механиз возврата результата из диалога
-			// setResult(RFID.RESULT_RFID_INIT_ERROR);
-			// finish();
+			Message message = new Message();
+			message.arg1 = RFID.RESULT_RFID_INIT_ERROR;
+			mHandler.sendMessage(message);
+
 		}
 		
 		rfid.setHandler(mHandler);

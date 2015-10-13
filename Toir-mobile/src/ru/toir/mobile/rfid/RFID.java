@@ -18,10 +18,15 @@ import ru.toir.mobile.rfid.driver.RFIDDriver;
  */
 public class RFID {
 
-	public static final int RESULT_RFID_READ_ERROR = android.app.Activity.RESULT_FIRST_USER;
-	public static final int RESULT_RFID_INIT_ERROR = android.app.Activity.RESULT_FIRST_USER + 1;
-	public static final int RESULT_RFID_CLASS_NOT_FOUND = android.app.Activity.RESULT_FIRST_USER + 2;
-	public static final int RESULT_RFID_WRITE_ERROR = android.app.Activity.RESULT_FIRST_USER + 3;
+	public static final int RESULT_RFID_SUCCESS = 0;
+	public static final int RESULT_RFID_READ_ERROR = 1;
+	public static final int RESULT_RFID_INIT_ERROR = 2;
+	public static final int RESULT_RFID_CLASS_NOT_FOUND = 3;
+	public static final int RESULT_RFID_WRITE_ERROR = 4;
+	public static final int RESULT_RFID_CANCEL = 5;
+	
+	public static final String RESULT_RFID_TAG_ID = "tagId";
+	
 	RFIDDriver mDriver;
 
 	/**

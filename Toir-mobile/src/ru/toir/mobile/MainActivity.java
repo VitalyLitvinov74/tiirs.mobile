@@ -34,6 +34,7 @@ import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rest.UsersServiceProvider;
+import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.RfidDialog;
 
 public class MainActivity extends FragmentActivity {
@@ -258,14 +259,15 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				Log.d(TAG, "Получили сообщение из драйвра.");
-				if (msg.arg1 == 1) {
-					Bundle bundle = msg.getData();
-					String label = bundle.getString("label");
-					Log.d(TAG, label);
-					rfidDialog.dismiss();
 
-					AuthorizedUser.getInstance().setTagId(label);
+				Log.d(TAG, "Получили сообщение из драйвра.");
+
+				if (msg.arg1 == RFID.RESULT_RFID_SUCCESS) {
+					Bundle bundle = msg.getData();
+					String tagId = bundle.getString(RFID.RESULT_RFID_TAG_ID);
+					Log.d(TAG, tagId);
+
+					AuthorizedUser.getInstance().setTagId(tagId);
 
 					// показываем диалог входа
 					authorizationDialog = new ProgressDialog(MainActivity.this);
@@ -280,8 +282,16 @@ public class MainActivity extends FragmentActivity {
 					TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
 							getApplicationContext(),
 							TokenServiceProvider.Actions.ACTION_GET_TOKEN);
-					tokenServiceHelper.GetTokenByTag(label);
+					tokenServiceHelper.GetTokenByTag(tagId);
+				} else {
+					// по кодам из RFID можно показать более подробные сообщения
+					Toast.makeText(getApplicationContext(),
+							"Операция прервана", Toast.LENGTH_SHORT).show();
 				}
+
+				// закрываем диалог
+				rfidDialog.dismiss();
+
 				return true;
 			}
 		});

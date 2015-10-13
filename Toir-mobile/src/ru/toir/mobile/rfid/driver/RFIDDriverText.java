@@ -1,6 +1,7 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
+import ru.toir.mobile.rfid.RFID;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -46,13 +47,15 @@ public class RFIDDriverText implements RFIDDriver {
 
 			@Override
 			public void onClick(View v) {
+
 				Log.d(TAG, "pressed OK");
+
 				Spinner spinner = (Spinner) v.getRootView().findViewById(
 						R.id.rfid_dialog_text_spinner_lables);
 				Message message = new Message();
-				message.arg1 = 1;
+				message.arg1 = RFID.RESULT_RFID_SUCCESS;
 				Bundle bundle = new Bundle();
-				bundle.putString("label", (String) spinner.getSelectedItem());
+				bundle.putString(RFID.RESULT_RFID_TAG_ID, (String) spinner.getSelectedItem());
 				message.setData(bundle);
 				mHandler.sendMessage(message);
 			}
@@ -64,7 +67,12 @@ public class RFIDDriverText implements RFIDDriver {
 
 			@Override
 			public void onClick(View v) {
+
 				Log.d(TAG, "pressed CANCEL");
+
+				Message message = new Message();
+				message.arg1 = RFID.RESULT_RFID_CANCEL;
+				mHandler.sendMessage(message);
 			}
 		});
 

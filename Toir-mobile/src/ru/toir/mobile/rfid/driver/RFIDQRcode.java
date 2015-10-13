@@ -7,17 +7,20 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
+import ru.toir.mobile.rfid.RFID;
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -30,7 +33,7 @@ import android.widget.TextView;
  */
 public class RFIDQRcode implements RFIDDriver {
 
-	private Activity mActivity;
+	//private Activity mActivity;
 	private Camera mCamera;
 	private CameraPreview mPreview;
 	private Handler autoFocusHandler;
@@ -39,6 +42,8 @@ public class RFIDQRcode implements RFIDDriver {
 	private FrameLayout preview;
 	private Image codeImage;
 	private String lastScannedCode;
+	private Handler mHandler;
+	private View mView;
 
 	static {
 		System.loadLibrary("iconv");
@@ -53,9 +58,7 @@ public class RFIDQRcode implements RFIDDriver {
 	 */
 	@Override
 	public boolean init(byte type) {
-		mActivity.setContentView(R.layout.qr_read);
-		mActivity
-				.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 		return true;
 	}
 
@@ -73,8 +76,8 @@ public class RFIDQRcode implements RFIDDriver {
 	 */
 	@Override
 	public void read(byte type) {
-		preview = (FrameLayout) mActivity.findViewById(R.id.cameraPreview);
-		scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);
+		preview = (FrameLayout) mView.findViewById(R.id.cameraPreview);
+		scanText = (TextView) mView.findViewById(R.id.code_from_bar);
 		// запускаем отдельную задачу для считывания метки
 		releaseCamera();
 		resumeCamera();
@@ -135,7 +138,7 @@ public class RFIDQRcode implements RFIDDriver {
 		scanner.setConfig(0, Config.Y_DENSITY, 3);
 
 		mCamera = getCameraInstance();
-		mPreview = new CameraPreview(mActivity.getApplicationContext(),
+		mPreview = new CameraPreview(mView.getContext().getApplicationContext(),
 				mCamera, previewCb, autoFocusCB);
 		preview.removeAllViews();
 		preview.addView(mPreview);
@@ -170,8 +173,13 @@ public class RFIDQRcode implements RFIDDriver {
 								+ lastScannedCode);
 						// !!!! hardcoded
 						lastScannedCode = "01234567";
-						// TODO разобраться как вернуть данные по новой схеме!!!
-						//((RFIDActivity) mActivity).Callback(lastScannedCode);
+						
+						Message message = new Message();
+						message.arg1 = RFID.RESULT_RFID_SUCCESS;
+						Bundle bundle = new Bundle();
+						bundle.putString(RFID.RESULT_RFID_TAG_ID, lastScannedCode);
+						message.setData(bundle);
+						mHandler.sendMessage(message);
 						releaseCamera();
 					}
 				}
@@ -205,7 +213,20 @@ public class RFIDQRcode implements RFIDDriver {
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
-		return null;
+		mView = inflater.inflate(R.layout.qr_read, viewGroup);
+		Button button = (Button) mView.findViewById(R.id.cancelButton);
+		button.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+
+				Message message = new Message();
+				message.arg1 = RFID.RESULT_RFID_CANCEL;
+				mHandler.sendMessage(message);
+			}
+		});
+
+		return mView;
 	}
 
 	/*
@@ -215,7 +236,7 @@ public class RFIDQRcode implements RFIDDriver {
 	 */
 	@Override
 	public void setHandler(Handler handler) {
-
+		mHandler = handler;
 	}
 
 	/*
@@ -227,7 +248,7 @@ public class RFIDQRcode implements RFIDDriver {
 	@Override
 	public void setActivity(Activity activity) {
 
-		mActivity = activity;
+		//mActivity = activity;
 	}
 
 }

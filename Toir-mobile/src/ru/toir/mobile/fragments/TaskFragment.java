@@ -26,6 +26,7 @@ import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.TaskRes;
@@ -761,11 +762,11 @@ public class TaskFragment extends Fragment {
 			@Override
 			public boolean handleMessage(Message msg) {
 				Bundle data = msg.getData();
-				String label = data.getString("label");
-				Log.d(TAG, "нужна: " + equipment_tag + " считали:" + label);
+				String tagId = data.getString(RFID.RESULT_RFID_TAG_ID);
+				Log.d(TAG, "нужна: " + equipment_tag + " считали: " + tagId);
 				Intent operationActivity = new Intent(getActivity(),
 						OperationActivity.class);
-				if (equipment_tag.equals(label)) {
+				if (equipment_tag.equals(tagId)) {
 					operationActivity.putExtras(bundle);
 					startActivity(operationActivity);
 				} else {
