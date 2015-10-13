@@ -1,49 +1,86 @@
 package ru.toir.mobile.rfid.driver;
 
 import android.app.Activity;
-import android.view.Menu;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
- * @author koputo
- * <p>Интерфейс драйвера считывателя RFID</p>
+ * @author Dmitriy Logachov
+ *         <p>
+ *         Интерфейс драйвера считывателя RFID
+ *         </p>
  */
 public interface RFIDDriver {
-	static byte types=0;	
-	
-	public void setActivity(Activity activity);
-	
+
+	static byte types = 0;
+
 	/**
-	 * <p>Инициализация драйвера</p>
+	 * <p>
+	 * Инициализация драйвера
+	 * </p>
+	 * 
 	 * @return
 	 */
 	public boolean init(byte type);
 
 	/**
-	 * <p>Считывание метки</p>
+	 * <p>
+	 * Считывание метки
+	 * </p>
+	 * 
 	 * @return
 	 */
 	public void read(byte type);
 
 	/**
-	 * <p>Запись в метку</p>
+	 * <p>
+	 * Запись в метку
+	 * </p>
+	 * 
 	 * @param outBuffer
 	 * @return
 	 */
 	public boolean write(byte[] outBuffer);
 
 	/**
-	 * <p>Устанавливаем тип операции</p>
+	 * <p>
+	 * Устанавливаем тип операции
+	 * </p>
+	 * 
 	 * @return boolean
 	 */
 	public boolean SetOperationType(byte type);
 
 	/**
-	 * <p>Завершение работы драйвера</p>
+	 * <p>
+	 * Завершение работы драйвера
+	 * </p>
 	 */
 	public void close();
-	
+
 	/**
-	 * <p>Меню которое предоставляет драйвер</p>
+	 * <p>
+	 * Интерфейс который предоставляет драйвер
+	 * </p>
 	 */
-	public void getMenu(Menu menu);	
+	public View getView(LayoutInflater inflater, ViewGroup viewGroup);
+
+	/**
+	 * <p>
+	 * Handler который будет обрабатывать сообщение от драйвера
+	 * </p>
+	 */
+	public void setHandler(Handler handler);
+
+	/**
+	 * <p>
+	 * Передаём в драйвер текущую Activity
+	 * </p>
+	 * 
+	 * @return
+	 */
+	public void setActivity(Activity activity);
+
 }

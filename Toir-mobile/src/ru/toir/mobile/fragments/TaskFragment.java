@@ -3,12 +3,9 @@ package ru.toir.mobile.fragments;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
-
 import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.RFIDActivity;
 import ru.toir.mobile.TOiRDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
@@ -29,6 +26,7 @@ import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.TaskRes;
 import ru.toir.mobile.utils.DataUtils;
@@ -42,8 +40,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -745,31 +744,40 @@ public class TaskFragment extends Fragment {
 	// init equipment operation information screen
 	private void initOperationPattern(String equipment_operation_uuid,
 			String task_uuid, String equipment_uuid) {
-		// запускаем считывание метки оборудования
-		// передаём в активити считывания метки все необходимые данные для
-		// запуска активити выполнения операции
-		// они будут возвращены в MainActivity.onActivityResult и переданны в
-		// новое активити		
-		
+
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(getActivity()));
-		String equipment_tag = equipmentDBAdapter.getItem(equipment_uuid)
+		final String equipment_tag = equipmentDBAdapter.getItem(equipment_uuid)
 				.getTag_id();
-
-		Intent rfidRead = new Intent(getActivity(), RFIDActivity.class);
-		Bundle bundle = new Bundle();
-		// следующие параметры предаются в OperationActivity
+		final Bundle bundle = new Bundle();
 		bundle.putString(OperationActivity.OPERATION_UUID_EXTRA,
 				equipment_operation_uuid);
 		bundle.putString(OperationActivity.TASK_UUID_EXTRA, task_uuid);
 		bundle.putString(OperationActivity.EQUIPMENT_UUID_EXTRA, equipment_uuid);
-		// метка предаётся в MainActivity для проверки правильности оборудования
-		bundle.putString(OperationActivity.EQUIPMENT_TAG_EXTRA, equipment_tag);
-		bundle.putInt("action",
-				MainActivity.RFIDReadAction.READ_EQUIPMENT_TAG_BEFORE_OPERATION);
-		rfidRead.putExtras(bundle);
-		getActivity().startActivityForResult(rfidRead,
-				MainActivity.RETURN_CODE_READ_RFID);
+
+		final RfidDialog rfidDialog = new RfidDialog(getContext());
+		Handler handler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				Bundle data = msg.getData();
+				String label = data.getString("label");
+				Log.d(TAG, "нужна: " + equipment_tag + " считали:" + label);
+				Intent operationActivity = new Intent(getActivity(),
+						OperationActivity.class);
+				if (equipment_tag.equals(label)) {
+					operationActivity.putExtras(bundle);
+					startActivity(operationActivity);
+				} else {
+					Toast.makeText(getActivity(), "Не верное оборудование!!!",
+							Toast.LENGTH_SHORT).show();
+				}
+				rfidDialog.dismiss();
+				return true;
+			}
+		});
+		rfidDialog.setHandler(handler);
+		rfidDialog.show(getActivity().getFragmentManager(), "aaaa");
 	}
 
 	/*

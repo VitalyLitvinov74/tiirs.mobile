@@ -1,147 +1,170 @@
 package ru.toir.mobile.rfid.driver;
 
-
-import ru.toir.mobile.RFIDActivity;
+import ru.toir.mobile.R;
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 /**
- * @author koputo
- * <p>Драйвер считывателя RFID который "считывает" содержимое меток из текстового файла.</p>
+ * @author Dmitriy Logachov
+ *         <p>
+ *         Драйвер считывателя RFID который "считывает" содержимое меток из
+ *         текстового файла.
+ *         </p>
  */
-public class RFIDDriverText implements RFIDDriver{
-	
-	ReadTagAsyncTask mTask;
-	Activity mActivity;
+public class RFIDDriverText implements RFIDDriver {
 
-	static byte types=0;	
-	
-	@Override
-	public void setActivity(Activity activity) {
-		mActivity = activity;
-	}
-	
+	private View view;
+	private String TAG = "RFIDDriverText";
+	private Context mContext;
+	private Handler mHandler;
+
 	/**
-	 * <p>Инициализируем драйвер</p>
+	 * <p>
+	 * Инициализируем драйвер
+	 * </p>
+	 * 
 	 * @return boolean
 	 */
 	@Override
 	public boolean init(byte type) {
+
+		Button ok = (Button) view.findViewById(R.id.rfid_dialog_text_button_OK);
+		ok.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "pressed OK");
+				Spinner spinner = (Spinner) v.getRootView().findViewById(
+						R.id.rfid_dialog_text_spinner_lables);
+				Message message = new Message();
+				message.arg1 = 1;
+				Bundle bundle = new Bundle();
+				bundle.putString("label", (String) spinner.getSelectedItem());
+				message.setData(bundle);
+				mHandler.sendMessage(message);
+			}
+		});
+
+		Button cancel = (Button) view
+				.findViewById(R.id.rfid_dialog_text_button_CANCEL);
+		cancel.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "pressed CANCEL");
+			}
+		});
+
+		Spinner spinner = (Spinner) view
+				.findViewById(R.id.rfid_dialog_text_spinner_lables);
+		SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
+				mContext, R.array.list,
+				android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(spinnerAdapter);
+		spinner.setSelection(Adapter.NO_SELECTION, false);
+		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+
+				Log.d(TAG, (String) parent.getItemAtPosition(position));
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
+
 		return true;
 	}
-	
-	/**
-	 * <p>Считываем метку</p>
-	 * <p>Здесь нужно запустить отдельную задачу в которой пытаемся считать метку</p>
-	 * <p>Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в onPostExecute() и onCancelled() объекта {@link AsyncTask}</p>
-	 */
+
 	@Override
 	public void read(byte type) {
-		// запускаем отдельную задачу для считывания метки
-		mTask = (ReadTagAsyncTask)new ReadTagAsyncTask().execute();
 	}
-	
+
 	/**
-	 * <p>Записываем в метку</p>
+	 * <p>
+	 * Записываем в метку
+	 * </p>
+	 * 
 	 * @param outBuffer
 	 * @return
 	 */
 	@Override
-	public boolean write(byte[] outBuffer){
+	public boolean write(byte[] outBuffer) {
 		return false;
 	}
 
 	/**
-	 * <p>Завершаем работу драйвера</p>
+	 * <p>
+	 * Завершаем работу драйвера
+	 * </p>
 	 */
 	@Override
 	public void close() {
 	}
 
 	/**
-	 * <p>Устанавливаем тип операции</p>
+	 * <p>
+	 * Устанавливаем тип операции
+	 * </p>
+	 * 
 	 * @return boolean
 	 */
 	@Override
 	public boolean SetOperationType(byte type) {
-		types=type;
+
 		return true;
 	}
 
-	/** 
-	 * <p>Добавляем в переданное меню элементы которые будут отвечать за считывание меток</p>
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.toir.mobile.rfid.driver.RFIDDriver#getView(android.view.LayoutInflater
+	 * , android.view.ViewGroup)
 	 */
 	@Override
-	public void getMenu(Menu menu) {
-		String[] tags = {"01234567","3400E2004000860902372580112F","3000E2004000860902332580112D","00000003","00000004", "00000005"};
-		MenuItem item;
-		int i = 0;
-		
-		for (String tag: tags) {
-			item = menu.add(0, i, i + 1, tag);
-			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					String tag = String.valueOf(item.getTitle());
-					Log.d("test", tag);
-					// отменяем выполнение задачи
-					mTask.cancel(true);
-					//mCallback.Callback(tag);
-					((RFIDActivity)mActivity).Callback(tag);
-					return true;
-				}
-			});
-			i++;
-		}
+	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
+
+		mContext = inflater.getContext();
+		view = inflater.inflate(R.layout.rfid_dialog_text, viewGroup);
+		return view;
 	}
-	
-	public class ReadTagAsyncTask extends AsyncTask<String, Integer, String> {
 
-		/* (non-Javadoc)
-		 * @see android.os.AsyncTask#doInBackground(Params[])
-		 */
-		@Override
-		protected String doInBackground(String... params) {
-			// симулируем считывание метки
-			while (true) {
-				try {
-					if (isCancelled()) {
-						break;
-					}
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-		 */
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			// в данном случае мы не вызываем callback, так как реального считывания не происходит и данные мы вернём из обработчика меню
-			// но в реальных условиях этот метод вызывается как только происходит выход из doInBackground 
-			//callback.Callback(result);
-		}
-
-		/* (non-Javadoc)
-		 * @see android.os.AsyncTask#onCancelled()
-		 */
-		@Override
-		protected void onCancelled() {
-			super.onCancelled();
-			// чтение отменено, возвращаем null
-			// в данном случае мы не вызываем callback, так как нам необходимо обязательно остановить выполнение задачи,
-			// а данные мы вернём из обработчика меню
-			//callback.Callback(null);
-		}
-		
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setHandler(android.os.Handler)
+	 */
+	@Override
+	public void setHandler(Handler handler) {
+		this.mHandler = handler;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
+	 */
+	@Override
+	public void setActivity(Activity activity) {
+
+	}
+
 }

@@ -4,39 +4,55 @@
 package ru.toir.mobile.rfid.driver;
 
 import com.google.zxing.integration.android.IntentIntegrator;
-
 import android.app.Activity;
-import android.view.Menu;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
- * @author koputo
- *
+ * @author Dmitriy Logachov
+ * 
  */
 public class RFIDBarcode implements RFIDDriver {
-	
-	Activity mActivity;
-	static byte types=0;	
 
+	private Activity mActivity;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.Activity)
+	 */
 	@Override
 	public void setActivity(Activity activity) {
 		this.mActivity = activity;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#init(byte)
+	 */
 	@Override
 	public boolean init(byte type) {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#read()
 	 */
 	@Override
 	public void read(byte type) {
 		IntentIntegrator integrator = new IntentIntegrator(mActivity);
-		integrator.initiateScan();		
+		integrator.initiateScan();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#write(byte[])
 	 */
 	@Override
@@ -44,28 +60,49 @@ public class RFIDBarcode implements RFIDDriver {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#close()
 	 */
 	@Override
 	public void close() {
 	}
 
-	/* (non-Javadoc)
-	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#getMenu(android.view.Menu)
-	 */
-	@Override
-	public void getMenu(Menu menu) {
-	}
-
 	/**
-	 * <p>Устанавливаем тип операции</p>
+	 * <p>
+	 * Устанавливаем тип операции
+	 * </p>
+	 * 
 	 * @return boolean
 	 */
 	@Override
 	public boolean SetOperationType(byte type) {
-		types=type;
+
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.toir.mobile.rfid.driver.RFIDDriver#getView(android.view.LayoutInflater
+	 * , android.view.ViewGroup)
+	 */
+	@Override
+	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
+
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setHandler(android.os.Handler)
+	 */
+	@Override
+	public void setHandler(Handler handler) {
+
 	}
 
 }

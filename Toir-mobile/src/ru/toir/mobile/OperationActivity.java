@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
-
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
@@ -38,13 +37,11 @@ import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
-import ru.toir.mobile.rfid.driver.RFIDDriver;
 import ru.toir.mobile.rfid.driver.RFIDDriverC5;
 import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -53,7 +50,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -107,9 +103,6 @@ public class OperationActivity extends Activity {
 	private String lastPhotoFile;
 	Preview mPreview;
 
-	private String driverClassName;
-	private Class<?> driverClass;
-	private RFIDDriver driver;
 	private	RFID rfid;
 
 	TagRecordStructure tagrecord = new TagRecordStructure();
@@ -244,6 +237,7 @@ public class OperationActivity extends Activity {
 			equipmentOperationResultDBAdapter.replace(operationResult);
 		}
 
+		/*
 		// инициализируем драйвер для работы с метками
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -277,7 +271,8 @@ public class OperationActivity extends Activity {
 		if (!rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID)) {
 			setResult(RFID.RESULT_RFID_INIT_ERROR);
 			finish();
-		}	
+		}
+		*/	
 
 		showStep(getFirstStep().getUuid());
 	}
@@ -581,13 +576,14 @@ public class OperationActivity extends Activity {
 
 				// обновляем информацию об операции в метке устройства
 				// читаем > обновляем > записываем		
-				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null)
-					{
+				/*
+				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null) {
 					 setContentView(R.layout.rfid_read);
 					 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 					 rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
 					}				
-				//finish();
+				 */
+				finish();
 			}
 		});
 
@@ -790,11 +786,13 @@ public class OperationActivity extends Activity {
 
 	}
 
+	// TODO разобраться зачем это
 	public void CallbackOnReadLable(String result) {
 		rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
 		rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
 	}
 
+	// TODO разобраться зачем это
 	public void Callback(String result) {
 		if(result == null){
 			setResult(RFID.RESULT_RFID_READ_ERROR);	
