@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ import android.widget.TextView;
  */
 public class RFIDQRcode implements RFIDDriver {
 
-	//private Activity mActivity;
+	private String TAG = "RFIDQRcode";
 	private Camera mCamera;
 	private CameraPreview mPreview;
 	private Handler autoFocusHandler;
@@ -138,8 +139,9 @@ public class RFIDQRcode implements RFIDDriver {
 		scanner.setConfig(0, Config.Y_DENSITY, 3);
 
 		mCamera = getCameraInstance();
-		mPreview = new CameraPreview(mView.getContext().getApplicationContext(),
-				mCamera, previewCb, autoFocusCB);
+		mPreview = new CameraPreview(
+				mView.getContext().getApplicationContext(), mCamera, previewCb,
+				autoFocusCB);
 		preview.removeAllViews();
 		preview.addView(mPreview);
 		if (mCamera != null) {
@@ -169,15 +171,15 @@ public class RFIDQRcode implements RFIDDriver {
 				for (Symbol sym : syms) {
 					lastScannedCode = sym.getData();
 					if (lastScannedCode != null) {
+						Log.d(TAG, "прочитано: " + lastScannedCode);
 						scanText.setText("Результат сканирования: "
 								+ lastScannedCode);
-						// !!!! hardcoded
-						lastScannedCode = "01234567";
-						
+
 						Message message = new Message();
 						message.arg1 = RFID.RESULT_RFID_SUCCESS;
 						Bundle bundle = new Bundle();
-						bundle.putString(RFID.RESULT_RFID_TAG_ID, lastScannedCode);
+						bundle.putString(RFID.RESULT_RFID_TAG_ID,
+								lastScannedCode);
 						message.setData(bundle);
 						mHandler.sendMessage(message);
 						releaseCamera();
@@ -216,7 +218,7 @@ public class RFIDQRcode implements RFIDDriver {
 		mView = inflater.inflate(R.layout.qr_read, viewGroup);
 		Button button = (Button) mView.findViewById(R.id.cancelButton);
 		button.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 
@@ -248,7 +250,6 @@ public class RFIDQRcode implements RFIDDriver {
 	@Override
 	public void setActivity(Activity activity) {
 
-		//mActivity = activity;
 	}
 
 }

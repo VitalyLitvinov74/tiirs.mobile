@@ -92,9 +92,9 @@ public class RfidDialog extends DialogFragment {
 			mHandler.sendMessage(message);
 
 		}
-		
-		rfid.setHandler(mHandler);
 
+		rfid.setHandler(mHandler);
+		rfid.read((byte) 0);
 		return view;
 	}
 
@@ -107,7 +107,7 @@ public class RfidDialog extends DialogFragment {
 	public void onStart() {
 
 		super.onStart();
-		//rfid.read((byte) 0);
+		// rfid.read((byte) 0);
 	}
 
 	/**
@@ -118,7 +118,8 @@ public class RfidDialog extends DialogFragment {
 	}
 
 	/**
-	 * @param mhHandler the mhHandler to set
+	 * @param mhHandler
+	 *            the mhHandler to set
 	 */
 	public void setHandler(Handler handler) {
 		this.mHandler = handler;
