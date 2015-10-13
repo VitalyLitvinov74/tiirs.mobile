@@ -926,7 +926,7 @@ public class ReferenceProcessor {
 		db.endTransaction();
 
 		result = new Bundle();
-		result.putBoolean(IServiceProvider.RESULT, false);
+		result.putBoolean(IServiceProvider.RESULT, true);
 		return result;
 	}
 
