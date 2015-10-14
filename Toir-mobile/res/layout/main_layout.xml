@@ -9,13 +9,17 @@
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="48dip"
-        app:pstsTabBackground="@color/black"
-        android:background="@drawable/background_tabs" />
+        app:pstsIndicatorColor="#FF33B5E6"
+        app:pstsUnderlineColor="#FF33B5E6"
+        android:background="@drawable/background_tabs"
+        app:pstsTabBackground = "@drawable/textures_3pxtile_mini"/>
 
-    <android.support.v4.view.ViewPager 
+    <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tabs"
-        tools:context=".MainActivity" />    
+        android:scrollbars="vertical"
+        tools:context=".MainActivity" />
+    
 </RelativeLayout>
