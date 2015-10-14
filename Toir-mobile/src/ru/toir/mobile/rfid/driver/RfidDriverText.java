@@ -3,7 +3,6 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,22 +24,73 @@ import android.widget.SpinnerAdapter;
  *         текстового файла.
  *         </p>
  */
-public class RFIDDriverText implements RFIDDriver {
+public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
-	private View view;
-	private String TAG = "RFIDDriverText";
-	private Context mContext;
-	private Handler mHandler;
+	private String TAG = "RfidDriverText";
 
-	/**
-	 * <p>
-	 * Инициализируем драйвер
-	 * </p>
+	public RfidDriverText(DialogFragment dialog, Handler handler) {
+		super(dialog, handler);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return boolean
+	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#init(byte)
 	 */
 	@Override
 	public boolean init(byte type) {
+		/*
+		 * Для этого драйвера ни какой специальной инициализации не нужно.
+		 */
+
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#readTagId(byte)
+	 */
+	@Override
+	public void readTagId(byte type) {
+		/*
+		 * В данном драйвере реального считывания не происходит.
+		 */
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#write(byte[])
+	 */
+	@Override
+	public boolean write(byte[] outBuffer) {
+		/*
+		 * В данном драйвере реальной записи не происходит.
+		 */
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#close()
+	 */
+	@Override
+	public void close() {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.toir.mobile.rfid.driver.IRfidDriver#getView(android.view.LayoutInflater
+	 * , android.view.ViewGroup)
+	 */
+	@Override
+	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
+
+		View view = inflater.inflate(R.layout.rfid_dialog_text, viewGroup);
 
 		Button ok = (Button) view.findViewById(R.id.rfid_dialog_text_button_OK);
 		ok.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +130,7 @@ public class RFIDDriverText implements RFIDDriver {
 		Spinner spinner = (Spinner) view
 				.findViewById(R.id.rfid_dialog_text_spinner_lables);
 		SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
-				mContext, R.array.list,
+				inflater.getContext(), R.array.list,
 				android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(spinnerAdapter);
 		spinner.setSelection(Adapter.NO_SELECTION, false);
@@ -98,83 +148,7 @@ public class RFIDDriverText implements RFIDDriver {
 			}
 		});
 
-		return true;
-	}
-
-	@Override
-	public void read(byte type) {
-	}
-
-	/**
-	 * <p>
-	 * Записываем в метку
-	 * </p>
-	 * 
-	 * @param outBuffer
-	 * @return
-	 */
-	@Override
-	public boolean write(byte[] outBuffer) {
-		return false;
-	}
-
-	/**
-	 * <p>
-	 * Завершаем работу драйвера
-	 * </p>
-	 */
-	@Override
-	public void close() {
-	}
-
-	/**
-	 * <p>
-	 * Устанавливаем тип операции
-	 * </p>
-	 * 
-	 * @return boolean
-	 */
-	@Override
-	public boolean SetOperationType(byte type) {
-
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.toir.mobile.rfid.driver.RFIDDriver#getView(android.view.LayoutInflater
-	 * , android.view.ViewGroup)
-	 */
-	@Override
-	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-
-		mContext = inflater.getContext();
-		view = inflater.inflate(R.layout.rfid_dialog_text, viewGroup);
 		return view;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setHandler(android.os.Handler)
-	 */
-	@Override
-	public void setHandler(Handler handler) {
-		this.mHandler = handler;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.DialogFragment
-	 * )
-	 */
-	@Override
-	public void setDialogFragment(DialogFragment fragment) {
-
 	}
 
 }

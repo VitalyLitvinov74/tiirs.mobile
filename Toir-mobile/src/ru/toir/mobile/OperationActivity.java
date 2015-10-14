@@ -37,7 +37,8 @@ import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
-import ru.toir.mobile.rfid.driver.RFIDDriverC5;
+import ru.toir.mobile.rfid.driver.RfidDriverC5;
+import ru.toir.mobile.rfid.driver.RfidDriverBase;
 import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -83,15 +84,17 @@ public class OperationActivity extends Activity {
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
 	private ArrayList<OperationResult> operationResults;
-	private String task_uuid, operation_uuid, equipment_uuid,operation_result_uuid,operation_type_uuid;
+	private String task_uuid, operation_uuid, equipment_uuid,
+			operation_result_uuid, operation_type_uuid;
 	private String taskname = "";
 	private String taskstatus = "";
 	private String operationname = "";
-	private String operation="";
+	private String operation = "";
 	private LinearLayout layout;
 	private TextView stepTitle;
 	private TextView stepDescrition;
-	private TextView task_title,task_status,equipment_title,equipment_status,equipment_operation;
+	private TextView task_title, task_status, equipment_title,
+			equipment_status, equipment_operation;
 
 	private Button numStepButton;
 	private NumberPicker numberPicker;
@@ -103,7 +106,7 @@ public class OperationActivity extends Activity {
 	private String lastPhotoFile;
 	Preview mPreview;
 
-	private	RFID rfid;
+	private RfidDriverBase driver;
 
 	TagRecordStructure tagrecord = new TagRecordStructure();
 	TagRecordStructure tagrecord2 = new TagRecordStructure();
@@ -151,7 +154,7 @@ public class OperationActivity extends Activity {
 		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
 		numStepButton = (Button) findViewById(R.id.twf_numStepButton);
 		step_image = (ImageView) findViewById(R.id.twf_step_image);
-		
+
 		task_title = (TextView) findViewById(R.id.twf_task_title);
 		task_status = (TextView) findViewById(R.id.twf_task_status);
 		equipment_title = (TextView) findViewById(R.id.twf_equipment_title);
@@ -163,7 +166,7 @@ public class OperationActivity extends Activity {
 				getApplicationContext()));
 		Task task = dbTask.getItem(task_uuid);
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));		
+				new TOiRDatabaseContext(getApplicationContext()));
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
@@ -178,33 +181,31 @@ public class OperationActivity extends Activity {
 		pattern = patternDBAdapter.getItem(equipmentOperation
 				.getOperation_pattern_uuid());
 
-		//android:id="@+id/twf_task_title"
-		taskname = "Наряд: " 
-				+ dbTask.getItem(task_uuid).getTask_name();
+		// android:id="@+id/twf_task_title"
+		taskname = "Наряд: " + dbTask.getItem(task_uuid).getTask_name();
 		task_title.setText(taskname);
-	    //android:id="@+id/twf_task_status"
+		// android:id="@+id/twf_task_status"
 		taskstatus = "Статус: "
 				+ taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
-		task_status.setText(taskstatus);	    
-        //android:id="@+id/twf_equipment_title"
-		operationname = "Оборудование: " 
+		task_status.setText(taskstatus);
+		// android:id="@+id/twf_equipment_title"
+		operationname = "Оборудование: "
 				+ eqDBAdapter.getEquipsNameByUUID(equipment_uuid);
-	    equipment_title.setText(operationname);		
-   		//android:id="@+id/twf_equipment_status"
-		operation = "Состояние: " 
-				+ equipmentStatusDBAdapter.getNameByUUID(eqDBAdapter.getItem(equipment_uuid).getEquipment_status_uuid());
-	    equipment_status.setText(operation);	    	    
-	    //android:id="@+id/twf_equipment_operation"
-		operation = "Операция: " 
-				+ pattern.getTitle();
-	    equipment_operation.setText(operation);
-	    
+		equipment_title.setText(operationname);
+		// android:id="@+id/twf_equipment_status"
+		operation = "Состояние: "
+				+ equipmentStatusDBAdapter.getNameByUUID(eqDBAdapter.getItem(
+						equipment_uuid).getEquipment_status_uuid());
+		equipment_status.setText(operation);
+		// android:id="@+id/twf_equipment_operation"
+		operation = "Операция: " + pattern.getTitle();
+		equipment_operation.setText(operation);
+
 		// получаем шаги шаблона операции
 		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(
 				new TOiRDatabaseContext(getApplicationContext()));
 		patternSteps = patternStepDBAdapter.getItems(pattern.getUuid());
 
-		
 		// получаем варианты выполнения шагов
 		ArrayList<String> uuids = new ArrayList<String>();
 		for (OperationPatternStep step : patternSteps) {
@@ -238,46 +239,35 @@ public class OperationActivity extends Activity {
 		}
 
 		/*
-		// инициализируем драйвер для работы с метками
-		// получаем текущий драйвер считывателя
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		driverClassName = sp.getString(getString(R.string.RFIDDriver), "RFIDDriverNull");
-
-		// пытаемся получить класс драйвера
-		try {
-			driverClass = Class.forName("ru.toir.mobile.rfid.driver." + driverClassName);
-		}catch(ClassNotFoundException e){
-			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
-			finish();
-		}
-		
-		// пытаемся создать объект драйвера
-		try{
-			driver = (RFIDDriver)driverClass.newInstance();
-		}catch(InstantiationException e){
-			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
-			e.printStackTrace();
-			finish();
-		}catch(IllegalAccessException e){
-			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
-			e.printStackTrace();
-			finish();
-		}
-
-		rfid = new RFID(driver);
-		rfid.setActivity(this);
-
-		// инициализируем драйвер
-		if (!rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID)) {
-			setResult(RFID.RESULT_RFID_INIT_ERROR);
-			finish();
-		}
-		*/	
+		 * // инициализируем драйвер для работы с метками // получаем текущий
+		 * драйвер считывателя SharedPreferences sp =
+		 * PreferenceManager.getDefaultSharedPreferences
+		 * (getApplicationContext()); driverClassName =
+		 * sp.getString(getString(R.string.RFIDDriver), "RFIDDriverNull");
+		 * 
+		 * // пытаемся получить класс драйвера try { driverClass =
+		 * Class.forName("ru.toir.mobile.rfid.driver." + driverClassName);
+		 * }catch(ClassNotFoundException e){
+		 * setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND); finish(); }
+		 * 
+		 * // пытаемся создать объект драйвера try{ driver =
+		 * (RFIDDriver)driverClass.newInstance(); }catch(InstantiationException
+		 * e){ setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND); e.printStackTrace();
+		 * finish(); }catch(IllegalAccessException e){
+		 * setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND); e.printStackTrace();
+		 * finish(); }
+		 * 
+		 * rfid = new RFID(driver); rfid.setActivity(this);
+		 * 
+		 * // инициализируем драйвер if
+		 * (!rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID)) {
+		 * setResult(RFID.RESULT_RFID_INIT_ERROR); finish(); }
+		 */
 
 		showStep(getFirstStep().getUuid());
 	}
 
-	public void cancelOnClick(View view){
+	public void cancelOnClick(View view) {
 		setResult(RESULT_CANCELED);
 		finish();
 	}
@@ -298,7 +288,10 @@ public class OperationActivity extends Activity {
 	private void showStepContent(OperationPatternStep step) {
 
 		stepTitle.setText("Шаг: " + step.getTitle());
-		//stepTitle.setText(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ step.getImage());
+		// stepTitle.setText(Environment.getExternalStorageDirectory().getAbsolutePath()
+		// + File.separator + "Android" + File.separator + "data" +
+		// File.separator + getPackageName() + File.separator + "img" +
+		// File.separator+ step.getImage());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
@@ -306,11 +299,20 @@ public class OperationActivity extends Activity {
 		photoContainer.removeAllViewsInLayout();
 		photoContainer.setVisibility(View.INVISIBLE);
 
-		File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator+ step.getImage());						
-		if(imgFile.exists() && imgFile.isFile()){
-		    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-		    step_image.setImageBitmap(myBitmap);			    			    
-		}			
+		File imgFile = new File(Environment.getExternalStorageDirectory()
+				.getAbsolutePath()
+				+ File.separator
+				+ "Android"
+				+ File.separator
+				+ "data"
+				+ File.separator
+				+ getPackageName()
+				+ File.separator + "img" + File.separator + step.getImage());
+		if (imgFile.exists() && imgFile.isFile()) {
+			Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
+					.getAbsolutePath());
+			step_image.setImageBitmap(myBitmap);
+		}
 
 		// получаем список результатов шагов
 		ArrayList<OperationPatternStepResult> resultsList = getStepResult(step
@@ -327,7 +329,8 @@ public class OperationActivity extends Activity {
 			resultButton.setWidth(300);
 			resultButton.setTextSize(14);
 			if (result.getNext_operation_pattern_step_uuid().equals(
-					"00000000-0000-0000-0000-000000000000") || result.getNext_operation_pattern_step_uuid().equals("")) {
+					"00000000-0000-0000-0000-000000000000")
+					|| result.getNext_operation_pattern_step_uuid().equals("")) {
 				resultButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -575,13 +578,14 @@ public class OperationActivity extends Activity {
 				operationDBAdapter.update(operation);
 
 				// обновляем информацию об операции в метке устройства
-				// читаем > обновляем > записываем		
+				// читаем > обновляем > записываем
 				/*
-				if (EquipmentTagStructure.getInstance().get_equipment_uuid() == null) {
-					 setContentView(R.layout.rfid_read);
-					 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-					 rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
-					}				
+				 * if (EquipmentTagStructure.getInstance().get_equipment_uuid()
+				 * == null) { setContentView(R.layout.rfid_read);
+				 * setRequestedOrientation
+				 * (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+				 * rfid.read((byte)RFIDDriverC5
+				 * .READ_EQUIPMENT_OPERATION_LABLE_ID); }
 				 */
 				finish();
 			}
@@ -788,48 +792,64 @@ public class OperationActivity extends Activity {
 
 	// TODO разобраться зачем это
 	public void CallbackOnReadLable(String result) {
-		rfid.SetOperationType((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
-		rfid.read((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
+		driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
+		driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
 	}
 
 	// TODO разобраться зачем это
 	public void Callback(String result) {
-		if(result == null){
-			setResult(RFID.RESULT_RFID_READ_ERROR);	
+		if (result == null) {
+			setResult(RFID.RESULT_RFID_READ_ERROR);
 		} else {
-			if (result.length()<100)
-				{
-				 Toast.makeText(this, "Ответ слишком короткий",Toast.LENGTH_SHORT).show();					
-				 return;
-				}
+			if (result.length() < 100) {
+				Toast.makeText(this, "Ответ слишком короткий",
+						Toast.LENGTH_SHORT).show();
+				return;
+			}
 			byte out_buffer[];
-			
-			// парсим ответ
-			equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
-			equipmenttag.set_last(result.substring(36, 40));
-			equipmenttag.set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
-			tagrecord.operation_date=Long.parseLong(result.substring(40, 56),16);
-			tagrecord.operation_length = Short.parseShort(result.substring(56, 60),16);
-			tagrecord.operation_type = result.substring(60, 64).toLowerCase(Locale.ENGLISH);
-			tagrecord.operation_result = result.substring(64, 68).toLowerCase(Locale.ENGLISH);
-			tagrecord.user = result.substring(68, 72).toLowerCase(Locale.ENGLISH);
-			tagrecords.add(0,tagrecord);
-			tagrecord2.operation_date=Long.parseLong(result.substring(72, 88),16);
-			tagrecord2.operation_length = Short.parseShort(result.substring(88, 92),16);
-			tagrecord2.operation_type = result.substring(92, 96).toLowerCase(Locale.ENGLISH);
-			tagrecord2.operation_result = result.substring(96, 100).toLowerCase(Locale.ENGLISH);
-			tagrecord2.user = result.substring(100, 104).toLowerCase(Locale.ENGLISH);
-			tagrecords.add(1,tagrecord2);
 
-			// вариант 2 с хранением данных в глобальной структуре 
-			EquipmentTagStructure.getInstance().set_equipment_uuid(DataUtils.StringToUUID(result.substring(0, 32)));
-			EquipmentTagStructure.getInstance().set_status(result.substring(32, 36).toLowerCase(Locale.ENGLISH));
-			EquipmentTagStructure.getInstance().set_last(result.substring(36, 40));
-			
-			// заполоняем структуру результата обследования 
-			if (equipmenttag.get_last()=="1")
+			// парсим ответ
+			equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result
+					.substring(0, 32)));
+			equipmenttag.set_last(result.substring(36, 40));
+			equipmenttag.set_status(result.substring(32, 36).toLowerCase(
+					Locale.ENGLISH));
+			tagrecord.operation_date = Long.parseLong(result.substring(40, 56),
+					16);
+			tagrecord.operation_length = Short.parseShort(
+					result.substring(56, 60), 16);
+			tagrecord.operation_type = result.substring(60, 64).toLowerCase(
+					Locale.ENGLISH);
+			tagrecord.operation_result = result.substring(64, 68).toLowerCase(
+					Locale.ENGLISH);
+			tagrecord.user = result.substring(68, 72).toLowerCase(
+					Locale.ENGLISH);
+			tagrecords.add(0, tagrecord);
+			tagrecord2.operation_date = Long.parseLong(
+					result.substring(72, 88), 16);
+			tagrecord2.operation_length = Short.parseShort(
+					result.substring(88, 92), 16);
+			tagrecord2.operation_type = result.substring(92, 96).toLowerCase(
+					Locale.ENGLISH);
+			tagrecord2.operation_result = result.substring(96, 100)
+					.toLowerCase(Locale.ENGLISH);
+			tagrecord2.user = result.substring(100, 104).toLowerCase(
+					Locale.ENGLISH);
+			tagrecords.add(1, tagrecord2);
+
+			// вариант 2 с хранением данных в глобальной структуре
+			EquipmentTagStructure.getInstance().set_equipment_uuid(
+					DataUtils.StringToUUID(result.substring(0, 32)));
+			EquipmentTagStructure.getInstance().set_status(
+					result.substring(32, 36).toLowerCase(Locale.ENGLISH));
+			EquipmentTagStructure.getInstance().set_last(
+					result.substring(36, 40));
+
+			// заполоняем структуру результата обследования
+			if (equipmenttag.get_last() == "1")
 				equipmenttag.set_last("2");
-			else equipmenttag.set_last("1");
+			else
+				equipmenttag.set_last("1");
 			// TODO добавить статус оборудования после обслуживания
 			// equipmenttag.set_status("?");
 			Time now = new Time();
@@ -838,7 +858,7 @@ public class OperationActivity extends Activity {
 			// TODO решить как считать время выполнения операции
 			tagrecord.operation_length = 0;
 			tagrecord.operation_result = operation_result_uuid;
-			
+
 			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 					new TOiRDatabaseContext(getApplicationContext()));
 			EquipmentOperation operation = operationDBAdapter
@@ -848,24 +868,28 @@ public class OperationActivity extends Activity {
 			tagrecord.operation_type = operation_type_uuid;
 			tagrecord.user = AuthorizedUser.getInstance().getUuid();
 
-			if (equipmenttag.get_last()=="1")
-				tagrecords.set(0,tagrecord);
-			else tagrecords.set(1, tagrecord);
-			
-			//for (int pointer=0; pointer<equipmenttag.toString().length()+2*tagrecord.toString().length())
-			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2.toString()).getBytes();
-			rfid.SetOperationType((byte)RFIDDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
-			rfid.write(out_buffer);
+			if (equipmenttag.get_last() == "1")
+				tagrecords.set(0, tagrecord);
+			else
+				tagrecords.set(1, tagrecord);
+
+			// for (int pointer=0;
+			// pointer<equipmenttag.toString().length()+2*tagrecord.toString().length())
+			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2
+					.toString()).getBytes();
+			driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
+			driver.write(out_buffer);
 		}
 	}
 
 	public void CallbackOnWrite(String result) {
-		if(result == null){
-			setResult(RFID.RESULT_RFID_WRITE_ERROR);	
+		if (result == null) {
+			setResult(RFID.RESULT_RFID_WRITE_ERROR);
 		} else {
 			finish();
 		}
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -756,7 +756,7 @@ public class TaskFragment extends Fragment {
 		bundle.putString(OperationActivity.TASK_UUID_EXTRA, task_uuid);
 		bundle.putString(OperationActivity.EQUIPMENT_UUID_EXTRA, equipment_uuid);
 
-		final RfidDialog rfidDialog = new RfidDialog(getContext());
+		final RfidDialog rfidDialog = new RfidDialog(getActivity().getApplicationContext());
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override

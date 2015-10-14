@@ -3,7 +3,7 @@
  */
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.rfid.driver.RFIDDriverText;
+import ru.toir.mobile.rfid.driver.RfidDriverText;
 import android.test.AndroidTestCase;
 
 /**
@@ -11,7 +11,7 @@ import android.test.AndroidTestCase;
  *
  */
 public class RFIDDriverTextTest extends AndroidTestCase {
-	private RFIDDriverText driver;
+	private RfidDriverText driver;
 	
 	/**
 	 * 
@@ -41,7 +41,7 @@ public class RFIDDriverTextTest extends AndroidTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		driver = new RFIDDriverText();
+		//driver = new RfidDriverText();
 	}
 
 	/* (non-Javadoc)

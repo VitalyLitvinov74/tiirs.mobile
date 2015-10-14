@@ -297,8 +297,9 @@ public class MainActivity extends FragmentActivity {
 		});
 
 		rfidDialog.setHandler(handler);
-
 		rfidDialog.show(getFragmentManager(), "test1");
+		//rfidDialog.readTagId();
+		
 	}
 
 	/**

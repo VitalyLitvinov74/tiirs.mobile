@@ -9,11 +9,11 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
 import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,7 +32,7 @@ import android.widget.TextView;
  *         текстового файла.
  *         </p>
  */
-public class RFIDQRcode implements RFIDDriver {
+public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
 	private String TAG = "RFIDQRcode";
 	private Camera mCamera;
@@ -43,79 +43,33 @@ public class RFIDQRcode implements RFIDDriver {
 	private FrameLayout preview;
 	private Image codeImage;
 	private String lastScannedCode;
-	private Handler mHandler;
-	private View mView;
+	private Context mContext;
 
 	static {
 		System.loadLibrary("iconv");
 	};
 
-	/**
-	 * <p>
-	 * Инициализируем драйвер
-	 * </p>
-	 * 
-	 * @return boolean
-	 */
+	public RfidDriverQRcode(DialogFragment dialog, Handler handler) {
+		super(dialog, handler);
+	}
+
 	@Override
 	public boolean init(byte type) {
 
 		return true;
 	}
 
-	/**
-	 * <p>
-	 * Считываем метку
-	 * </p>
-	 * <p>
-	 * Здесь нужно запустить отдельную задачу в которой пытаемся считать метку
-	 * </p>
-	 * <p>
-	 * Расчитано на вызов метода Callback() объекта {@link TOIRCallback} в
-	 * onPostExecute() и onCancelled() объекта {@link AsyncTask}
-	 * </p>
-	 */
 	@Override
-	public void read(byte type) {
-		preview = (FrameLayout) mView.findViewById(R.id.cameraPreview);
-		scanText = (TextView) mView.findViewById(R.id.code_from_bar);
-		// запускаем отдельную задачу для считывания метки
+	public void readTagId(byte type) {
 		releaseCamera();
 		resumeCamera();
-		// mTask = (ReadTagAsyncTask)new ReadTagAsyncTask().execute();
 	}
 
-	/**
-	 * <p>
-	 * Устанавливаем тип операции
-	 * </p>
-	 * 
-	 * @return boolean
-	 */
-	@Override
-	public boolean SetOperationType(byte type) {
-
-		return true;
-	}
-
-	/**
-	 * <p>
-	 * Записываем в метку
-	 * </p>
-	 * 
-	 * @param outBuffer
-	 * @return
-	 */
 	@Override
 	public boolean write(byte[] outBuffer) {
 		return false;
 	}
 
-	/**
-	 * <p>
-	 * Завершаем работу драйвера
-	 * </p>
-	 */
 	@Override
 	public void close() {
 
@@ -140,7 +94,7 @@ public class RFIDQRcode implements RFIDDriver {
 
 		mCamera = getCameraInstance();
 		mPreview = new CameraPreview(
-				mView.getContext().getApplicationContext(), mCamera, previewCb,
+				mContext, mCamera, previewCb,
 				autoFocusCB);
 		preview.removeAllViews();
 		preview.addView(mPreview);
@@ -205,18 +159,14 @@ public class RFIDQRcode implements RFIDDriver {
 		}
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.toir.mobile.rfid.driver.RFIDDriver#getView(android.view.LayoutInflater
-	 * , android.view.ViewGroup)
-	 */
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
-		mView = inflater.inflate(R.layout.qr_read, viewGroup);
-		Button button = (Button) mView.findViewById(R.id.cancelButton);
+		mContext = inflater.getContext();
+		
+		View view = inflater.inflate(R.layout.qr_read, viewGroup);
+
+		Button button = (Button) view.findViewById(R.id.cancelButton);
 		button.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -227,27 +177,11 @@ public class RFIDQRcode implements RFIDDriver {
 				mHandler.sendMessage(message);
 			}
 		});
+		
+		preview = (FrameLayout) view.findViewById(R.id.cameraPreview);
+		scanText = (TextView) view.findViewById(R.id.code_from_bar);
 
-		return mView;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setHandler(android.os.Handler)
-	 */
-	@Override
-	public void setHandler(Handler handler) {
-		mHandler = handler;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see ru.toir.mobile.rfid.driver.RFIDDriver#setActivity(android.app.DialogFragment)
-	 */
-	@Override
-	public void setDialogFragment(DialogFragment fragment) {
-
+		return view;
 	}
 
 }

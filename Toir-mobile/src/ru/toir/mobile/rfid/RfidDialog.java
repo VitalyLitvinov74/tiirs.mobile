@@ -5,7 +5,7 @@ package ru.toir.mobile.rfid;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import ru.toir.mobile.R;
-import ru.toir.mobile.rfid.driver.RFIDDriver;
+import ru.toir.mobile.rfid.driver.RfidDriverBase;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -25,11 +25,17 @@ import android.view.ViewGroup;
  */
 public class RfidDialog extends DialogFragment {
 
+	public static final int READER_COMMAND_READ_ID = 1;
+	public static final int READER_COMMAND_READ_DATA = 2;
+	public static final int READER_COMMAND_READ_DATA_ID = 3;
+	public static final int READER_COMMAND_WRITE_DATA = 4;
+	public static final int READER_COMMAND_WRITE_DATA_ID = 5;
+
 	private String TAG = "RfidDialog";
 	private String driverClassName;
 	private Class<?> driverClass;
-	private RFIDDriver driver;
-	private RFID rfid;
+	private RfidDriverBase driver;
+	// private RFID rfid;
 	private Context mContext;
 	private Handler mHandler;
 
@@ -44,7 +50,7 @@ public class RfidDialog extends DialogFragment {
 
 		super.onCreate(savedInstanceState);
 
-		getDialog().setTitle("Текстовый драйвер: считывание метки");
+		getDialog().setTitle("Cчитывание метки");
 
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager
@@ -65,13 +71,9 @@ public class RfidDialog extends DialogFragment {
 		}
 
 		// пытаемся создать объект драйвера
+		// TODO реализовать создание через вызов конструктора с параметрами
 		try {
-			driver = (RFIDDriver) driverClass.newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-			Message message = new Message();
-			message.arg1 = RFID.RESULT_RFID_CLASS_NOT_FOUND;
-			mHandler.sendMessage(message);
+			driver = (RfidDriverBase) driverClass.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Message message = new Message();
@@ -79,23 +81,29 @@ public class RfidDialog extends DialogFragment {
 			mHandler.sendMessage(message);
 		}
 
-		rfid = new RFID(driver);
-
-		View view = rfid.getView(inflater, viewGroup);
-
 		// инициализируем драйвер
-		if (!rfid.init((byte) 0)) {
+		if (!driver.init((byte) 0)) {
 			Message message = new Message();
 			message.arg1 = RFID.RESULT_RFID_INIT_ERROR;
 			mHandler.sendMessage(message);
 
 		}
 
-		rfid.setHandler(mHandler);
-		rfid.setDialogFragment(this);
-		// TODO пересмотреть алгоритм, т.к. нужно еще и писать в метку, и в разные области, и читать из разных областей
-		rfid.read((byte) 0);
+		View view = driver.getView(inflater, viewGroup);
+
+		// TODO пересмотреть алгоритм, т.к. нужно еще и писать в метку, и в
+		// разные области, и читать из разных областей
+		driver.readTagId((byte) 0);
+
 		return view;
+	}
+
+	public void readTagId() {
+
+		// while(rfid != null) {
+		// Log.d(TAG, "ждём считыватель...");
+		// }
+		// rfid.read((byte) 0);
 	}
 
 	/*
@@ -125,12 +133,15 @@ public class RfidDialog extends DialogFragment {
 		this.mHandler = handler;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onActivityResult(int, int, android.content.Intent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Fragment#onActivityResult(int, int,
+	 * android.content.Intent)
 	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//super.onActivityResult(requestCode, resultCode, data);
+		// super.onActivityResult(requestCode, resultCode, data);
 		Message message = new Message();
 		switch (requestCode) {
 		case IntentIntegrator.REQUEST_CODE:

@@ -1,7 +1,5 @@
 package ru.toir.mobile.rfid.driver;
 
-import android.app.DialogFragment;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +10,7 @@ import android.view.ViewGroup;
  *         Интерфейс драйвера считывателя RFID
  *         </p>
  */
-public interface RFIDDriver {
-
-	static byte types = 0;
+public interface IRfidDriver {
 
 	/**
 	 * <p>
@@ -27,12 +23,12 @@ public interface RFIDDriver {
 
 	/**
 	 * <p>
-	 * Считывание метки
+	 * Считывание id метки
 	 * </p>
 	 * 
 	 * @return
 	 */
-	public void read(byte type);
+	public void readTagId(byte type);
 
 	/**
 	 * <p>
@@ -42,16 +38,8 @@ public interface RFIDDriver {
 	 * @param outBuffer
 	 * @return
 	 */
+	// TODO нужно пересмотреть параметры
 	public boolean write(byte[] outBuffer);
-
-	/**
-	 * <p>
-	 * Устанавливаем тип операции
-	 * </p>
-	 * 
-	 * @return boolean
-	 */
-	public boolean SetOperationType(byte type);
 
 	/**
 	 * <p>
@@ -62,25 +50,11 @@ public interface RFIDDriver {
 
 	/**
 	 * <p>
-	 * Интерфейс который предоставляет драйвер
+	 * Интерфейс пользователя который предоставляет драйвер
 	 * </p>
+	 * Здесь создаётся весь необходимый интерфейс для взаимодействия с
+	 * пользователем необходимый драйверу.
 	 */
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup);
-
-	/**
-	 * <p>
-	 * Handler который будет обрабатывать сообщение от драйвера
-	 * </p>
-	 */
-	public void setHandler(Handler handler);
-
-	/**
-	 * <p>
-	 * Передаём в драйвер текущий фрагмент
-	 * </p>
-	 * 
-	 * @return
-	 */
-	public void setDialogFragment(DialogFragment fragment);
 
 }
