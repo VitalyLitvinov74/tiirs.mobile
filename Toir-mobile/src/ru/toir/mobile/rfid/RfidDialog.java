@@ -3,9 +3,9 @@
  */
 package ru.toir.mobile.rfid;
 
+import java.lang.reflect.Constructor;
 import com.google.zxing.integration.android.IntentIntegrator;
 import ru.toir.mobile.R;
-import ru.toir.mobile.rfid.driver.RfidDriverBase;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -35,22 +35,19 @@ public class RfidDialog extends DialogFragment {
 	private String driverClassName;
 	private Class<?> driverClass;
 	private RfidDriverBase driver;
-	// private RFID rfid;
+
 	private Context mContext;
+
+	/*
+	 * обработчик передаётся в драйвер, в том числе используется для отправки
+	 * сообщений об ошибках если драйвер не удаётся запустить
+	 */
 	private Handler mHandler;
 
-	public RfidDialog(Context context) {
+	public RfidDialog(Context context, Handler handler) {
 
 		mContext = context;
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
-			Bundle savedInstanceState) {
-
-		super.onCreate(savedInstanceState);
-
-		getDialog().setTitle("Cчитывание метки");
+		mHandler = handler;
 
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager
@@ -71,9 +68,10 @@ public class RfidDialog extends DialogFragment {
 		}
 
 		// пытаемся создать объект драйвера
-		// TODO реализовать создание через вызов конструктора с параметрами
 		try {
-			driver = (RfidDriverBase) driverClass.newInstance();
+			Constructor<?> c = driverClass.getConstructor(DialogFragment.class,
+					Handler.class);
+			driver = (RfidDriverBase) c.newInstance(this, handler);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Message message = new Message();
@@ -88,6 +86,16 @@ public class RfidDialog extends DialogFragment {
 			mHandler.sendMessage(message);
 
 		}
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
+			Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+
+		getDialog().setTitle("Поднесите метку");
 
 		View view = driver.getView(inflater, viewGroup);
 
@@ -116,21 +124,6 @@ public class RfidDialog extends DialogFragment {
 
 		super.onStart();
 		// rfid.read((byte) 0);
-	}
-
-	/**
-	 * @return the mhHandler
-	 */
-	public Handler getHandler() {
-		return mHandler;
-	}
-
-	/**
-	 * @param mhHandler
-	 *            the mhHandler to set
-	 */
-	public void setHandler(Handler handler) {
-		this.mHandler = handler;
 	}
 
 	/*

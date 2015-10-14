@@ -1,4 +1,4 @@
-package ru.toir.mobile.rfid.driver;
+package ru.toir.mobile.rfid;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -7,7 +7,7 @@ import java.util.List;
 
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.*;
 import ru.toir.mobile.db.tables.*;
 import android.graphics.Bitmap;
@@ -72,7 +72,7 @@ public class UserInfoFragment extends Fragment {
 
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
-		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
+		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
 		if (user == null) {
@@ -89,7 +89,7 @@ public class UserInfoFragment extends Fragment {
 			
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			tv_user_status.setText("Статус: задание");
-			GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(
+			GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
 					getActivity().getApplicationContext()));
 			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
 			// Toast.makeText(getActivity(), user.getUuid(),
@@ -113,7 +113,7 @@ public class UserInfoFragment extends Fragment {
 
 	private void FillListViewTasks(View view) {
 		String tagId = AuthorizedUser.getInstance().getTagId();
-		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
+		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
 
@@ -121,12 +121,12 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
+			TaskDBAdapter dbOrder = new TaskDBAdapter(new ToirDatabaseContext(
 					getActivity().getApplicationContext()));
 			//ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(), "", "");
 			ArrayList<Task> ordersList = dbOrder.getOrders();
 			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-					new TOiRDatabaseContext(getActivity()
+					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 
 			Integer cnt = 0;

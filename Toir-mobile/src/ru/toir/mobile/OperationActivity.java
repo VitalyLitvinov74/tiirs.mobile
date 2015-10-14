@@ -35,9 +35,9 @@ import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.driver.RfidDriverC5;
-import ru.toir.mobile.rfid.driver.RfidDriverBase;
 import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -161,22 +161,22 @@ public class OperationActivity extends Activity {
 		equipment_operation = (TextView) findViewById(R.id.twf_equipment_operation);
 
 		// получаем статус и время наряда
-		TaskDBAdapter dbTask = new TaskDBAdapter(new TOiRDatabaseContext(
+		TaskDBAdapter dbTask = new TaskDBAdapter(new ToirDatabaseContext(
 				getApplicationContext()));
 		Task task = dbTask.getItem(task_uuid);
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperation equipmentOperation = operationDBAdapter
 				.getItem(operation_uuid);
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		// получаем шаблон операции
 		OperationPatternDBAdapter patternDBAdapter = new OperationPatternDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		pattern = patternDBAdapter.getItem(equipmentOperation
 				.getOperation_pattern_uuid());
 
@@ -202,7 +202,7 @@ public class OperationActivity extends Activity {
 
 		// получаем шаги шаблона операции
 		OperationPatternStepDBAdapter patternStepDBAdapter = new OperationPatternStepDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		patternSteps = patternStepDBAdapter.getItems(pattern.getUuid());
 
 		// получаем варианты выполнения шагов
@@ -211,12 +211,12 @@ public class OperationActivity extends Activity {
 			uuids.add(step.getUuid());
 		}
 		OperationPatternStepResultDBAdapter stepResultDBAdapter = new OperationPatternStepResultDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		stepsResults = stepResultDBAdapter.getItems(uuids);
 
 		// получаем список вариантов завершения операции
 		OperationResultDBAdapter resultDBAdapter = new OperationResultDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		operationResults = resultDBAdapter.getItems(equipmentOperation
 				.getOperation_type_uuid());
 
@@ -226,7 +226,7 @@ public class OperationActivity extends Activity {
 		 * кучи записей для одной операции)
 		 */
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationResult operationResult;
 		operationResult = equipmentOperationResultDBAdapter
 				.getItemByOperation(operation_uuid);
@@ -497,7 +497,7 @@ public class OperationActivity extends Activity {
 		boolean valueExists = true;
 		MeasureValue value;
 		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 
 		// проверка на существование записи измерения
 		value = adapter.getItem(operation_uuid, resultUuid);
@@ -553,7 +553,7 @@ public class OperationActivity extends Activity {
 				Log.d("test", result.getTitle());
 				EquipmentOperationResult operationResult = null;
 				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-						new TOiRDatabaseContext(getApplicationContext()));
+						new ToirDatabaseContext(getApplicationContext()));
 				// к этому моменту запись с установленной датой начала
 				// выполнения уже должна существовать
 				operationResult = equipmentOperationResultDBAdapter
@@ -568,7 +568,7 @@ public class OperationActivity extends Activity {
 				String operationStatusUuid = ((OperationStatus) operationStatusSpinner
 						.getSelectedItem()).getUuid();
 				EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-						new TOiRDatabaseContext(getApplicationContext()));
+						new ToirDatabaseContext(getApplicationContext()));
 				EquipmentOperation operation = operationDBAdapter
 						.getItem(operation_uuid);
 				operation_type_uuid = operation.getOperation_type_uuid();
@@ -606,7 +606,7 @@ public class OperationActivity extends Activity {
 
 		Spinner alterSpinner = (Spinner) findViewById(R.id.twf_altOperationStatusSpinner);
 		OperationStatusDBAdapter dbAdapter = new OperationStatusDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		ArrayList<OperationStatus> list = dbAdapter.getAllItems();
 		Iterator<OperationStatus> iterator = list.iterator();
 		// удаляем из списка статус "Новая", "Отменена"
@@ -859,7 +859,7 @@ public class OperationActivity extends Activity {
 			tagrecord.operation_result = operation_result_uuid;
 
 			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+					new ToirDatabaseContext(getApplicationContext()));
 			EquipmentOperation operation = operationDBAdapter
 					.getItem(operation_uuid);
 			operation.getOperation_type_uuid();

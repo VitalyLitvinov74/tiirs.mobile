@@ -6,7 +6,7 @@ import java.util.Iterator;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
@@ -27,7 +27,7 @@ import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.driver.RfidDriverBase;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.TaskRes;
 import ru.toir.mobile.utils.DataUtils;
@@ -87,6 +87,7 @@ public class TaskFragment extends Fragment {
 	private SimpleCursorAdapter taskAdapter;
 
 	private ProgressDialog processDialog;
+	private RfidDialog rfidDialog;
 
 	// фильтр для получения сообщений при получении нарядов с сервера
 	private IntentFilter mFilterGetTask = new IntentFilter(
@@ -401,7 +402,7 @@ public class TaskFragment extends Fragment {
 
 	private void fillSpinnersTasks() {
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
 				.getAllItems();
 
@@ -430,7 +431,7 @@ public class TaskFragment extends Fragment {
 	private void FillListViewTasks(String taskStatus, String orderByField) {
 
 		String tagId = AuthorizedUser.getInstance().getTagId();
-		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
+		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
 		Users user = users.getUserByTagId(tagId);
 
@@ -439,7 +440,7 @@ public class TaskFragment extends Fragment {
 					Toast.LENGTH_SHORT).show();
 		} else {
 			TaskDBAdapter taskDbAdapter = new TaskDBAdapter(
-					new TOiRDatabaseContext(getActivity()
+					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 
 			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
@@ -479,9 +480,9 @@ public class TaskFragment extends Fragment {
 	private void fillSpinnersEquipment() {
 
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<OperationType> operationTypeList = operationTypeDBAdapter
 				.getAllItems();
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
@@ -548,7 +549,7 @@ public class TaskFragment extends Fragment {
 								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
 
 				EquipmentOperationDBAdapter operationDbAdapter = new EquipmentOperationDBAdapter(
-						new TOiRDatabaseContext(getActivity()));
+						new ToirDatabaseContext(getActivity()));
 				EquipmentOperation operation = operationDbAdapter
 						.getItem(operation_uuid);
 				String operationStatus = operation.getOperation_status_uuid();
@@ -578,7 +579,7 @@ public class TaskFragment extends Fragment {
 								.getSelectedItem();
 						// выставляем выбранный статус
 						EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
-								new TOiRDatabaseContext(getActivity()));
+								new ToirDatabaseContext(getActivity()));
 						dbAdapter.setOperationStatus(operation_uuid,
 								status.getUuid());
 
@@ -606,7 +607,7 @@ public class TaskFragment extends Fragment {
 
 				// список статусов операций в выпадающем списке для выбора
 				OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
-						new TOiRDatabaseContext(getActivity()));
+						new ToirDatabaseContext(getActivity()));
 				ArrayList<OperationStatus> operationStatusList = statusDBAdapter
 						.getItems();
 				Iterator<OperationStatus> iterator = operationStatusList
@@ -648,7 +649,7 @@ public class TaskFragment extends Fragment {
 								// статус наряда
 								boolean complete = true;
 								TaskRes task = TaskRes.load(
-										new TOiRDatabaseContext(getActivity()),
+										new ToirDatabaseContext(getActivity()),
 										taskUuid);
 								ArrayList<EquipmentOperationRes> operations = task
 										.getEquipmentOperations();
@@ -667,7 +668,7 @@ public class TaskFragment extends Fragment {
 									task.setTask_status_uuid(Task.Extras.STATUS_UUID_NOT_COMPLETE);
 								}
 								TaskDBAdapter adapter = new TaskDBAdapter(
-										new TOiRDatabaseContext(getActivity()));
+										new ToirDatabaseContext(getActivity()));
 								task.setClose_date(Calendar.getInstance()
 										.getTimeInMillis());
 								task.setUpdated(true);
@@ -747,7 +748,7 @@ public class TaskFragment extends Fragment {
 			String task_uuid, String equipment_uuid) {
 
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity()));
+				new ToirDatabaseContext(getActivity()));
 		final String equipment_tag = equipmentDBAdapter.getItem(equipment_uuid)
 				.getTag_id();
 		final Bundle bundle = new Bundle();
@@ -755,8 +756,7 @@ public class TaskFragment extends Fragment {
 				equipment_operation_uuid);
 		bundle.putString(OperationActivity.TASK_UUID_EXTRA, task_uuid);
 		bundle.putString(OperationActivity.EQUIPMENT_UUID_EXTRA, equipment_uuid);
-
-		final RfidDialog rfidDialog = new RfidDialog(getActivity().getApplicationContext());
+		
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -777,7 +777,9 @@ public class TaskFragment extends Fragment {
 				return true;
 			}
 		});
-		rfidDialog.setHandler(handler);
+
+		rfidDialog = new RfidDialog(getActivity().getApplicationContext(), handler);
+		
 		rfidDialog.show(getActivity().getFragmentManager(), "aaaa");
 	}
 
@@ -839,7 +841,7 @@ public class TaskFragment extends Fragment {
 					public boolean onMenuItemClick(MenuItem item) {
 
 						TaskDBAdapter adapter = new TaskDBAdapter(
-								new TOiRDatabaseContext(getActivity()));
+								new ToirDatabaseContext(getActivity()));
 						ArrayList<Task> tasks = adapter
 								.getTaskByUserAndUpdated(AuthorizedUser
 										.getInstance().getUuid());
@@ -959,7 +961,7 @@ public class TaskFragment extends Fragment {
 	private void changeCursorOperations(String taskUuid,
 			String operationTypeUuid, String criticalTypeUuid) {
 		EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getActivity()));
+				new ToirDatabaseContext(getActivity()));
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(dbAdapter.getOperationWithInfo(taskUuid,
 				operationTypeUuid, criticalTypeUuid));

@@ -1,6 +1,8 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
+import ru.toir.mobile.rfid.IRfidDriver;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
 import android.hardware.barcode.Scanner;
 import android.os.Bundle;

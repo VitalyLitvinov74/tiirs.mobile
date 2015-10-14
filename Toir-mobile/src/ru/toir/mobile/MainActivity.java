@@ -33,7 +33,7 @@ import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rest.UsersServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.driver.RfidDriverBase;
+import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class MainActivity extends FragmentActivity {
 
@@ -41,6 +41,7 @@ public class MainActivity extends FragmentActivity {
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
+	private RfidDialog rfidDialog;
 
 	public static class RFIDReadAction {
 		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
@@ -69,7 +70,7 @@ public class MainActivity extends FragmentActivity {
 							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					if (result == true) {
 						UsersDBAdapter users = new UsersDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()));
+								new ToirDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser
 								.getInstance().getTagId());
 						// в зависимости от результата либо дать работать, либо
@@ -131,7 +132,7 @@ public class MainActivity extends FragmentActivity {
 						// токен не получен, сервер не ответил...
 						// проверяем наличие пользователя в локальной базе
 						UsersDBAdapter users = new UsersDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()));
+								new ToirDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser
 								.getInstance().getTagId());
 
@@ -220,7 +221,7 @@ public class MainActivity extends FragmentActivity {
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
-			helper = DatabaseHelper.getInstance(new TOiRDatabaseContext(
+			helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
 					getApplicationContext()));
 			Log.d(TAG, "db.version=" + helper.getVersion());
 			if (!helper.isDBActual()) {
@@ -252,7 +253,6 @@ public class MainActivity extends FragmentActivity {
 	public void startAuthorise() {
 
 		isLogged = false;
-		final RfidDialog rfidDialog = new RfidDialog(getApplicationContext());
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -294,8 +294,9 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 
-		rfidDialog.setHandler(handler);
+		rfidDialog = new RfidDialog(getApplicationContext(), handler);
 		rfidDialog.show(getFragmentManager(), "test1");
+
 		//rfidDialog.readTagId();
 		
 	}
@@ -354,7 +355,7 @@ public class MainActivity extends FragmentActivity {
 
 	public void onActionSettings(MenuItem menuItem) {
 		Log.d(TAG, "onActionSettings");
-		Intent i = new Intent(MainActivity.this, TOiRPreferences.class);
+		Intent i = new Intent(MainActivity.this, ToirPreferences.class);
 		startActivity(i);
 	}
 

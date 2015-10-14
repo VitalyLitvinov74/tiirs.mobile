@@ -1,5 +1,7 @@
 package ru.toir.mobile.rfid.driver;
 
+import ru.toir.mobile.rfid.IRfidDriver;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
 import android.os.Handler;
 import android.view.LayoutInflater;

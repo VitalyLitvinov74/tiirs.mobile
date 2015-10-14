@@ -7,6 +7,8 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
+import ru.toir.mobile.rfid.IRfidDriver;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.hardware.Camera;

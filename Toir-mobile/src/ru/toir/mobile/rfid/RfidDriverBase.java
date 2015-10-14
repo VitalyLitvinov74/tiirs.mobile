@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ru.toir.mobile.rfid.driver;
+package ru.toir.mobile.rfid;
 
 import android.app.DialogFragment;
 import android.os.Handler;
@@ -12,6 +12,8 @@ import android.os.Handler;
  */
 public abstract class RfidDriverBase implements IRfidDriver {
 
+	protected static final String TAG = "RfidDriverBase";
+	
 	public static final int RESULT_RFID_SUCCESS = 0;
 	public static final int RESULT_RFID_READ_ERROR = 1;
 	public static final int RESULT_RFID_INIT_ERROR = 2;
@@ -30,11 +32,13 @@ public abstract class RfidDriverBase implements IRfidDriver {
 
 	// тип команды, костыль, нужно пересмотреть код
 	// TODO нужно удалить
-	static byte types = 0;
+	protected static byte types = 0;
 
 	public RfidDriverBase(DialogFragment dialog, Handler handler) {
+
 		mDialogFragment = dialog;
 		mHandler = handler;
+		
 	}
 
 	/**

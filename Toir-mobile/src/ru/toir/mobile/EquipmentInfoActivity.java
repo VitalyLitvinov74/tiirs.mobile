@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.*;
 import ru.toir.mobile.db.tables.*;
 import android.app.Activity;
@@ -23,10 +23,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RfidDriverC5;
-import ru.toir.mobile.rfid.driver.RfidDriverBase;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -199,16 +199,16 @@ public class EquipmentInfoActivity extends Activity {
 		// TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new
 		// TOiRDatabaseContext(getApplicationContext()));
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationResultDBAdapter eqOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		Equipment equipment = equipmentDBAdapter.getItem(equipment_uuid);
 		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter
 				.getItemsByTaskAndEquipment("", equipment.getUuid());
@@ -266,7 +266,7 @@ public class EquipmentInfoActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()));
+								new ToirDatabaseContext(getApplicationContext()));
 						if (documentationAdapter
 								.getDocumentByUuid(equipment_uuid) != null) {
 							equipment_documentation = documentationAdapter
@@ -313,15 +313,15 @@ public class EquipmentInfoActivity extends Activity {
 
 	private void FillListViewOperations() {
 		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getApplicationContext()));
+				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationResult equipmentOperationResult;
 		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter
 				.getItemsByTaskAndEquipment("", equipment_uuid);
@@ -429,7 +429,7 @@ public class EquipmentInfoActivity extends Activity {
 				driver.SetOperationType((byte) RfidDriverC5.WRITE_USER_MEMORY);
 				byte out_buffer[] = {};
 				UsersDBAdapter users = new UsersDBAdapter(
-						new TOiRDatabaseContext(getApplicationContext()));
+						new ToirDatabaseContext(getApplicationContext()));
 				Users user = users.getUserByTagId(AuthorizedUser.getInstance()
 						.getTagId());
 				usertag.set_user_uuid(user.getUuid());
@@ -510,15 +510,15 @@ public class EquipmentInfoActivity extends Activity {
 					result.substring(36, 40));
 
 			EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+					new ToirDatabaseContext(getApplicationContext()));
 			EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+					new ToirDatabaseContext(getApplicationContext()));
 			OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+					new ToirDatabaseContext(getApplicationContext()));
 			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+					new ToirDatabaseContext(getApplicationContext()));
 			EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
-					new TOiRDatabaseContext(getApplicationContext()));
+					new ToirDatabaseContext(getApplicationContext()));
 
 			tv_equipment_name.setText("Название: "
 					+ eqDBAdapter.getEquipsNameByUUID(equipmenttag
