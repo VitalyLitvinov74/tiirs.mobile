@@ -10,9 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="48dip"
         app:pstsIndicatorColor="#FF33B5E6"
-        app:pstsUnderlineColor="#FF33B5E6"
-        android:background="@drawable/background_tabs"
-        app:pstsTabBackground = "@drawable/textures_3pxtile_mini"/>
+        app:pstsUnderlineColor="@color/black"
+        android:background="@color/black" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
