@@ -7,7 +7,6 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
-import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.hardware.Camera;
@@ -130,9 +129,9 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 								+ lastScannedCode);
 
 						Message message = new Message();
-						message.arg1 = RFID.RESULT_RFID_SUCCESS;
+						message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
 						Bundle bundle = new Bundle();
-						bundle.putString(RFID.RESULT_RFID_TAG_ID,
+						bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
 								lastScannedCode);
 						message.setData(bundle);
 						mHandler.sendMessage(message);
@@ -173,7 +172,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			public void onClick(View v) {
 
 				Message message = new Message();
-				message.arg1 = RFID.RESULT_RFID_CANCEL;
+				message.arg1 = RfidDriverBase.RESULT_RFID_CANCEL;
 				mHandler.sendMessage(message);
 			}
 		});

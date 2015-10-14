@@ -35,7 +35,6 @@ import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
-import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.driver.RfidDriverC5;
 import ru.toir.mobile.rfid.driver.RfidDriverBase;
@@ -799,7 +798,7 @@ public class OperationActivity extends Activity {
 	// TODO разобраться зачем это
 	public void Callback(String result) {
 		if (result == null) {
-			setResult(RFID.RESULT_RFID_READ_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_READ_ERROR);
 		} else {
 			if (result.length() < 100) {
 				Toast.makeText(this, "Ответ слишком короткий",
@@ -884,7 +883,7 @@ public class OperationActivity extends Activity {
 
 	public void CallbackOnWrite(String result) {
 		if (result == null) {
-			setResult(RFID.RESULT_RFID_WRITE_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
 		} else {
 			finish();
 		}

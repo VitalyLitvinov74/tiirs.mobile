@@ -1,6 +1,5 @@
 package ru.toir.mobile.rfid.driver;
 
-import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
 import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
@@ -171,9 +170,9 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 						// ((RFIDActivity) mActivity).Callback(m_strresult);
 						Message message = new Message();
-						message.arg1 = RFID.RESULT_RFID_SUCCESS;
+						message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
 						Bundle bundle = new Bundle();
-						bundle.putString(RFID.RESULT_RFID_TAG_ID, m_strresult);
+						bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID, m_strresult);
 						message.setData(bundle);
 						mHandler.sendMessage(message);
 					}

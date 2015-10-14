@@ -1,7 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
-import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
 import android.hardware.barcode.Scanner;
 import android.os.Bundle;
@@ -41,9 +40,9 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
 				// ((RFIDActivity) mActivity).Callback((String) msg.obj);
 				Message message = new Message();
-				message.arg1 = RFID.RESULT_RFID_SUCCESS;
+				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
 				Bundle bundle = new Bundle();
-				bundle.putString(RFID.RESULT_RFID_TAG_ID, (String) msg.obj);
+				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID, (String) msg.obj);
 				message.setData(bundle);
 				mHandler.sendMessage(message);
 				break;

@@ -1,7 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.R;
-import ru.toir.mobile.rfid.RFID;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.os.Handler;
@@ -103,9 +102,9 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Spinner spinner = (Spinner) v.getRootView().findViewById(
 						R.id.rfid_dialog_text_spinner_lables);
 				Message message = new Message();
-				message.arg1 = RFID.RESULT_RFID_SUCCESS;
+				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
 				Bundle bundle = new Bundle();
-				bundle.putString(RFID.RESULT_RFID_TAG_ID,
+				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
 						(String) spinner.getSelectedItem());
 				message.setData(bundle);
 				mHandler.sendMessage(message);
@@ -122,7 +121,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Log.d(TAG, "pressed CANCEL");
 
 				Message message = new Message();
-				message.arg1 = RFID.RESULT_RFID_CANCEL;
+				message.arg1 = RfidDriverBase.RESULT_RFID_CANCEL;
 				mHandler.sendMessage(message);
 			}
 		});

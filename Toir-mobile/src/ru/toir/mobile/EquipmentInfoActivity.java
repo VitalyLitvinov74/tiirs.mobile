@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
-import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.UserTagStructure;
 import ru.toir.mobile.rfid.driver.RfidDriverC5;
@@ -121,7 +120,7 @@ public class EquipmentInfoActivity extends Activity {
 			driverClass = Class.forName("ru.toir.mobile.rfid.driver."
 					+ driverClassName);
 		} catch (ClassNotFoundException e) {
-			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
+			setResult(RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND);
 			finish();
 		}
 
@@ -129,11 +128,11 @@ public class EquipmentInfoActivity extends Activity {
 		try {
 			driver = (RfidDriverBase) driverClass.newInstance();
 		} catch (InstantiationException e) {
-			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
+			setResult(RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND);
 			e.printStackTrace();
 			finish();
 		} catch (IllegalAccessException e) {
-			setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND);
+			setResult(RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND);
 			e.printStackTrace();
 			finish();
 		}
@@ -178,7 +177,7 @@ public class EquipmentInfoActivity extends Activity {
 				}
 			});
 		} else {
-			setResult(RFID.RESULT_RFID_INIT_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_INIT_ERROR);
 			finish();
 		}
 		initView();
@@ -455,7 +454,7 @@ public class EquipmentInfoActivity extends Activity {
 
 	public void CallbackOnWrite(String result) {
 		if (result == null) {
-			setResult(RFID.RESULT_RFID_WRITE_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
 		} else {
 			Toast.makeText(this, "Запись успешно завершена", Toast.LENGTH_SHORT)
 					.show();
@@ -466,7 +465,7 @@ public class EquipmentInfoActivity extends Activity {
 	public void Callback(String result) {
 		// Intent data = null;
 		if (result == null) {
-			setResult(RFID.RESULT_RFID_READ_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_READ_ERROR);
 		} else {
 			if (result.length() < 100) {
 				Toast.makeText(this, "Ответ слишком короткий",

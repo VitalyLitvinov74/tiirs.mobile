@@ -1,9 +1,7 @@
 package ru.toir.mobile;
 
 import java.io.File;
-
 import com.astuetz.PagerSlidingTabStrip;
-
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,8 +32,8 @@ import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rest.UsersServiceProvider;
-import ru.toir.mobile.rfid.RFID;
 import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.driver.RfidDriverBase;
 
 public class MainActivity extends FragmentActivity {
 
@@ -262,9 +260,9 @@ public class MainActivity extends FragmentActivity {
 
 				Log.d(TAG, "Получили сообщение из драйвра.");
 
-				if (msg.arg1 == RFID.RESULT_RFID_SUCCESS) {
+				if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
 					Bundle bundle = msg.getData();
-					String tagId = bundle.getString(RFID.RESULT_RFID_TAG_ID);
+					String tagId = bundle.getString(RfidDriverBase.RESULT_RFID_TAG_ID);
 					Log.d(TAG, tagId);
 
 					AuthorizedUser.getInstance().setTagId(tagId);
