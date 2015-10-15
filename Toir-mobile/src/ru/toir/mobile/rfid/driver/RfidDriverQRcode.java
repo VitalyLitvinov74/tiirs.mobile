@@ -67,11 +67,6 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public boolean write(byte[] outBuffer) {
-		return false;
-	}
-
-	@Override
 	public void close() {
 
 	}
@@ -94,9 +89,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 		scanner.setConfig(0, Config.Y_DENSITY, 3);
 
 		mCamera = getCameraInstance();
-		mPreview = new CameraPreview(
-				mContext, mCamera, previewCb,
-				autoFocusCB);
+		mPreview = new CameraPreview(mContext, mCamera, previewCb, autoFocusCB);
 		preview.removeAllViews();
 		preview.addView(mPreview);
 		if (mCamera != null) {
@@ -164,7 +157,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
 		mContext = inflater.getContext();
-		
+
 		View view = inflater.inflate(R.layout.qr_read, viewGroup);
 
 		Button button = (Button) view.findViewById(R.id.cancelButton);
@@ -178,11 +171,35 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 				mHandler.sendMessage(message);
 			}
 		});
-		
+
 		preview = (FrameLayout) view.findViewById(R.id.cameraPreview);
 		scanText = (TextView) view.findViewById(R.id.code_from_bar);
 
 		return view;
+	}
+
+	@Override
+	public void readTagData(String password, int memoryBank, int address,
+			int count) {
+
+	}
+
+	@Override
+	public void readTagData(String password, String tagId, int memoryBank,
+			int address, int count) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, int memoryBank, int address,
+			byte[] data) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, byte[] data) {
+
 	}
 
 }

@@ -423,7 +423,8 @@ public class EquipmentInfoActivity extends Activity {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				driver.write(out_buffer);
+				// TODO исправить на новый вариант записи в метку
+				//driver.write(out_buffer);
 			}
 			if (regim == WRITE_USER_LABLE) {
 				driver.SetOperationType((byte) RfidDriverC5.WRITE_USER_MEMORY);
@@ -440,7 +441,8 @@ public class EquipmentInfoActivity extends Activity {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				driver.write(out_buffer);
+				// TODO исправить на новый вариант записи в метку
+				//driver.write(out_buffer);
 			}
 			if (regim == READ_EQUIPMENT_LABLE) {
 				driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);

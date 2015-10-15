@@ -877,7 +877,8 @@ public class OperationActivity extends Activity {
 			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2
 					.toString()).getBytes();
 			driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
-			driver.write(out_buffer);
+			// TODO исправить на новый вариант записи в метку
+			//driver.write(out_buffer);
 		}
 	}
 

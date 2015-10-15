@@ -24,24 +24,22 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 	public RfidDriverBarcode(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
 	}
-	
+
 	@Override
 	public boolean init(byte type) {
+
 		return true;
 	}
 
 	@Override
 	public void readTagId(byte type) {
+
 		integrator.initiateScan();
 	}
 
 	@Override
-	public boolean write(byte[] outBuffer) {
-		return false;
-	}
-
-	@Override
 	public void close() {
+
 	}
 
 	@Override
@@ -50,6 +48,30 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 		integrator = new IntentIntegrator(mDialogFragment);
 
 		return null;
+	}
+
+	@Override
+	public void readTagData(String password, int memoryBank, int address,
+			int count) {
+
+	}
+
+	@Override
+	public void readTagData(String password, String tagId, int memoryBank,
+			int address, int count) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, int memoryBank, int address,
+			byte[] data) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, byte[] data) {
+
 	}
 
 }

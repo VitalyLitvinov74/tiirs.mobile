@@ -45,13 +45,9 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		super(dialog, handler);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#init(byte)
-	 */
 	@Override
 	public boolean init(byte type) {
+
 		types = type;
 		if (type == READ_USER_LABLE) {
 			// mActivity.setContentView(R.layout.bar2d_read);
@@ -69,13 +65,9 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#readTagId(byte)
-	 */
 	@Override
 	public void readTagId(byte type) {
+
 		types = type;
 		// scanText = (TextView) mActivity.findViewById(R.id.code_from_bar);
 		if (type <= READ_USER_LABLE)
@@ -104,52 +96,9 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		// reader.m_strPCEPC = "";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#write(byte[])
-	 */
-	@Override
-	public boolean write(byte[] outBuffer) {
-		if (types == WRITE_EQUIPMENT_OPERATION_MEMORY
-				|| types == WRITE_EQUIPMENT_MEMORY
-				|| types == WRITE_USER_MEMORY) {
-			// byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
-			byte[] epc = reader.stringToBytes(mPCEPC);
-			byte memoryBank = USER_MEMORY_BANK; // user memory
-			int address = 0; // пишем буфер с начала
-			// int dataLength = 32; // длина памяти данных
-			byte[] dataForWrite = new byte[50];
-			// int dataLength = Integer.valueOf(outBuffer.length) * 2;
-			String passwordString = "00000000"; // пароль
-			byte[] password = reader.stringToBytes(passwordString);
-
-			int rc = reader.Writelables(password, epc.length, epc, memoryBank,
-					(byte) address, (byte) 24, outBuffer);
-			System.arraycopy(outBuffer, 24, dataForWrite, 0, 24);
-
-			rc = reader.Writelables(password, epc.length, epc, memoryBank,
-					(byte) address + 48, (byte) 12, dataForWrite);
-			/*
-			 * int rc = reader.Writelables(password, epc.length, epc,
-			 * memoryBank, (byte) address, (byte) realDataLength, dataForWrite);
-			 */
-			if (rc >= 0)
-				return true;
-			else
-				return false;
-
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#close()
-	 */
 	@Override
 	public void close() {
+
 		reader.StopLoop();
 		reader.m_handler = null;
 		android.hardware.uhf.magic.reader.Close();
@@ -174,7 +123,8 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 						Message message = new Message();
 						message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
 						Bundle bundle = new Bundle();
-						bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID, m_strresult);
+						bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
+								m_strresult);
 						message.setData(bundle);
 						mHandler.sendMessage(message);
 					}
@@ -230,17 +180,70 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		}
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.toir.mobile.rfid.driver.IRfidDriver#getView(android.view.LayoutInflater
-	 * , android.view.ViewGroup)
-	 */
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
 		return null;
+	}
+
+	@Override
+	public void readTagData(String password, int memoryBank, int address,
+			int count) {
+
+	}
+
+	@Override
+	public void readTagData(String password, String tagId, int memoryBank,
+			int address, int count) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, int memoryBank, int address,
+			byte[] data) {
+
+		if (types == WRITE_EQUIPMENT_OPERATION_MEMORY
+				|| types == WRITE_EQUIPMENT_MEMORY
+				|| types == WRITE_USER_MEMORY) {
+			// byte[] epc = reader.stringToBytes(reader.m_strPCEPC);
+			byte[] epc = reader.stringToBytes(mPCEPC);
+			// TODO старый вариант
+			// byte memoryBank = USER_MEMORY_BANK; // user memory
+			// TODO старый вариант
+			// int address = 0; // пишем буфер с начала
+			// int dataLength = 32; // длина памяти данных
+			byte[] dataForWrite = new byte[50];
+			// int dataLength = Integer.valueOf(outBuffer.length) * 2;
+			// TODO старый вариант
+			// String passwordString = "00000000"; // пароль
+			// TODO старый вариант
+			// byte[] password = reader.stringToBytes(passwordString);
+
+			int rc = reader.Writelables(password.getBytes(), epc.length, epc,
+					(byte) memoryBank, (byte) address, (byte) 24, data);
+			System.arraycopy(data, 24, dataForWrite, 0, 24);
+
+			rc = reader.Writelables(password.getBytes(), epc.length, epc,
+					(byte) memoryBank, (byte) address + 48, (byte) 12,
+					dataForWrite);
+			/*
+			 * int rc = reader.Writelables(password, epc.length, epc,
+			 * memoryBank, (byte) address, (byte) realDataLength, dataForWrite);
+			 */
+			Message message = new Message();
+			if (rc >= 0) {
+				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
+			} else {
+				message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+			}
+			mHandler.sendMessage(message);
+		}
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, byte[] data) {
+
 	}
 
 }

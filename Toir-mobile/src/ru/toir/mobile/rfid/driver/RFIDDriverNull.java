@@ -27,20 +27,41 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId(byte type) {
-	}
 
-	@Override
-	public boolean write(byte[] outBuffer) {
-		return false;
 	}
 
 	@Override
 	public void close() {
+
 	}
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 		return null;
+	}
+
+	@Override
+	public void readTagData(String password, int memoryBank, int address,
+			int count) {
+
+	}
+
+	@Override
+	public void readTagData(String password, String tagId, int memoryBank,
+			int address, int count) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, int memoryBank, int address,
+			byte[] data) {
+
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, byte[] data) {
+
 	}
 
 }

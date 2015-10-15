@@ -33,11 +33,6 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		super(dialog, handler);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#init(byte)
-	 */
 	@Override
 	public boolean init(byte type) {
 		/*
@@ -47,11 +42,6 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#readTagId(byte)
-	 */
 	@Override
 	public void readTagId(byte type) {
 		/*
@@ -59,35 +49,18 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 */
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#write(byte[])
-	 */
 	@Override
-	public boolean write(byte[] outBuffer) {
+	public void writeTagData(String password, int memoryBank, int address,
+			byte[] data) {
 		/*
 		 * В данном драйвере реальной записи не происходит.
 		 */
-		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ru.toir.mobile.rfid.driver.IRfidDriver#close()
-	 */
 	@Override
 	public void close() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.toir.mobile.rfid.driver.IRfidDriver#getView(android.view.LayoutInflater
-	 * , android.view.ViewGroup)
-	 */
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
@@ -150,6 +123,30 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		});
 
 		return view;
+	}
+
+	@Override
+	public void readTagData(String password, int memoryBank, int address,
+			int count) {
+		/*
+		 * В данном драйвере реального считывания не происходит.
+		 */
+	}
+
+	@Override
+	public void readTagData(String password, String tagId, int memoryBank,
+			int address, int count) {
+		/*
+		 * В данном драйвере реального считывания не происходит.
+		 */
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, byte[] data) {
+		/*
+		 * В данном драйвере реальной записи не происходит.
+		 */
 	}
 
 }
