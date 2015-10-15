@@ -17,29 +17,23 @@ public class reader {
 	// флаг того что находимся в процессе чтения/записи данных из считывателя
 	static Boolean m_bASYC = false;
 
-	// буфер для операций чтения из считывателя
-	static byte[] m_buf = new byte[10240];
-
-	// позиция в буфере m_buf
-	static int m_nCount = 0;
-
 	// "поиск" меток до первой метки или в бесконечном цикле
 	static Boolean m_bLoop = false;
 
 	// флаг успешности операций чтения/записи в метку
 	static Boolean m_bOK = false;
 
-	// счетчик повторных попыток чтения/записи в метку
-	static int m_nReSend = 0;
-
-	// мутный счётчик чтения "полных" "пакетов" данных из считывателя
-	static int m_nread = 0;
-
 	// идентификатор звукового файла
 	static int msound = 0;
 
 	// набор звуков
 	static SoundPool mSoundPool = new SoundPool(1, AudioManager.STREAM_RING, 0);
+
+	static {
+		System.loadLibrary("uhf-tools");
+		msound = mSoundPool.load(
+				"/system/media/audio/notifications/Altair.ogg", 1);
+	}
 
 	/**
 	 * Поиск метки
@@ -96,12 +90,17 @@ public class reader {
 		m_bASYC = true;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
 				int nTemp = 0, nIndex = 0;
 				int m_nReRead = 0;
 				boolean tag_find = false;
-				m_nCount = 0;
-				m_nReSend = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// счетчик повторных попыток поиска метки
+				int m_nReSend = 0;
 				nIndex = 0;
+
 				while (m_handler != null && (m_nReRead >= 0)) {
 					// nIndex = m_nCount;
 					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
@@ -135,10 +134,11 @@ public class reader {
 								}
 							}
 						}
-						if (tag_find) {
 
+						if (tag_find) {
 							// mSoundPool.play(msound, 1.0f, 1.0f, 0, 0, 1.0f);
 						}
+
 						if (m_bLoop) {
 							m_nCount = 0;
 							inventoryLabelsLoop();
@@ -154,8 +154,9 @@ public class reader {
 							// Log.e("efsfsd", "m_nReSend=" + m_nReSend);
 						}
 
-						if (m_nCount >= 1024)
+						if (m_nCount >= 1024) {
 							m_nCount = 0;
+						}
 					}
 				}
 				// Log.e("end", "quit");
@@ -190,7 +191,8 @@ public class reader {
 			Clean();
 			nret = ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
 			m_bOK = false;
-			m_nReSend = 0;
+			// счетчик повторных попыток чтения метки
+			int m_nReSend = 0;
 			StartASYCReadlables();
 			while ((!m_bOK) && (m_nReSend < 20)) {
 				m_nReSend++;
@@ -201,157 +203,6 @@ public class reader {
 					e.printStackTrace();
 				}
 			}
-		}
-		return nret;
-	}
-
-	static public int getLockPayLoadNew(byte memoryBank, byte accessMask) {
-		int mask = 0x000000;
-		switch (memoryBank) {
-		// kill password
-		case 0:
-			switch (accessMask) {
-			// unlock
-			case 0:
-				mask = 0x0c0000;
-				break;
-			// lock
-			case 1:
-				mask = 0x0c0200;
-				break;
-			// permanent unlock
-			case 2:
-				mask = 0x0c0100;
-				break;
-			// permanent lock
-			case 3:
-				mask = 0x0C0300;
-				break;
-			}
-			break;
-		// access password
-		case 1:
-			switch (accessMask) {
-			// open
-			case 0:
-				mask = 0x080000;
-				break;
-			// pwd r/w
-			case 1:
-				mask = 0x080200;
-				break;
-			// permanent open
-			case 2:
-				mask = 0x080100;
-				break;
-			// permanent close
-			case 3:
-				mask = 0x080300;
-				break;
-			}
-			break;
-		// EPC
-		case 2:
-			break;
-		// TID
-		case 3:
-			break;
-		// USER
-		case 4:
-			break;
-		default:
-			break;
-		}
-
-		return mask;
-	}
-
-	static public int GetLockPayLoad(byte membank, byte Mask) {
-		int nret = 0;
-		/*
-		 * switch (Mask) { case 0: switch (membank) {
-		 */
-		switch (membank) {
-		case 0:
-			switch (Mask) {
-			case 0:
-				nret = 0x080000;
-				break;
-			case 1:
-				nret = 0x080200;
-				break;
-			case 2:
-				nret = 0x0c0100;
-				break;
-			case 3:
-				nret = 0x0c0300;
-				break;
-			}
-			break;
-		case 1:
-			switch (Mask) {
-			case 0:
-				nret = 0x020000;
-				break;
-			case 1:
-				nret = 0x020080;
-				break;
-			case 2:
-				nret = 0x030040;
-				break;
-			case 3:
-				nret = 0x0300c0;
-				break;
-			}
-			break;
-		case 2:
-			switch (Mask) {
-			case 0:
-				nret = 0x008000;
-				break;
-			case 1:
-				nret = 0x008020;
-				break;
-			case 2:
-				nret = 0x00c010;
-				break;
-			case 3:
-				nret = 0x00c030;
-				break;
-			}
-			break;
-		case 3:
-			switch (Mask) {
-			case 0:
-				nret = 0x002000;
-				break;
-			case 1:
-				nret = 0x002008;
-				break;
-			case 2:
-				nret = 0x003004;
-				break;
-			case 3:
-				nret = 0x00300c;
-				break;
-			}
-			break;
-		case 4:
-			switch (Mask) {
-			case 0:
-				nret = 0x000800;
-				break;
-			case 1:
-				nret = 0x000802;
-				break;
-			case 2:
-				nret = 0x000c01;
-				break;
-			case 3:
-				nret = 0x000c03;
-				break;
-			}
-			break;
 		}
 		return nret;
 	}
@@ -382,9 +233,15 @@ public class reader {
 		m_bASYC = true;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+
 				while (m_handler != null) {
 
 					nTemp = Read(m_buf, m_nCount, 1024);
@@ -456,11 +313,16 @@ public class reader {
 		m_bASYC = true;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
-				while (m_handler != null) {
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
 
+				while (m_handler != null) {
 					nTemp = Read(m_buf, m_nCount, 1024);
 					m_nCount += nTemp;
 					if (nTemp == 0) {
@@ -524,7 +386,8 @@ public class reader {
 		int nret = WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
 		if (!m_bASYC) {
 			m_bOK = false;
-			m_nReSend = 0;
+			// счетчик повторных попыток записи в метку
+			int m_nReSend = 0;
 			StartASYCWritelables();
 			while ((!m_bOK) && (m_nReSend < 20)) {
 				m_nReSend++;
@@ -547,11 +410,16 @@ public class reader {
 		m_bASYC = true;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
-				while (m_handler != null) {
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
 
+				while (m_handler != null) {
 					nTemp = Read(m_buf, m_nCount, 1024);
 					m_nCount += nTemp;
 					if (nTemp == 0) {
@@ -593,9 +461,14 @@ public class reader {
 		m_bASYC = true;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
 				int m_nReRead = 0;
 				while (m_handler != null && (m_nReRead >= 0)) {
 					nTemp = Read(m_buf, m_nCount, 1024);
@@ -638,10 +511,171 @@ public class reader {
 		thread.start();
 	}
 
-	static {
-		System.loadLibrary("uhf-tools");
-		msound = mSoundPool.load(
-				"/system/media/audio/notifications/Altair.ogg", 1);
+	/**
+	 * Возвращает маску доступа к областям памяти метки (попытка разобраться как
+	 * работает механизм доступа к областям памяти метки)
+	 * 
+	 * @param membank
+	 * @param mask
+	 * @return
+	 */
+	static public int getLockPayLoadNew(byte memoryBank, byte accessMask) {
+		int mask = 0x000000;
+		switch (memoryBank) {
+		// kill password
+		case 0:
+			switch (accessMask) {
+			// unlock
+			case 0:
+				mask = 0x0c0000;
+				break;
+			// lock
+			case 1:
+				mask = 0x0c0200;
+				break;
+			// permanent unlock
+			case 2:
+				mask = 0x0c0100;
+				break;
+			// permanent lock
+			case 3:
+				mask = 0x0C0300;
+				break;
+			}
+			break;
+		// access password
+		case 1:
+			switch (accessMask) {
+			// open
+			case 0:
+				mask = 0x080000;
+				break;
+			// pwd r/w
+			case 1:
+				mask = 0x080200;
+				break;
+			// permanent open
+			case 2:
+				mask = 0x080100;
+				break;
+			// permanent close
+			case 3:
+				mask = 0x080300;
+				break;
+			}
+			break;
+		// EPC
+		case 2:
+			break;
+		// TID
+		case 3:
+			break;
+		// USER
+		case 4:
+			break;
+		default:
+			break;
+		}
+
+		return mask;
+	}
+
+	/**
+	 * Возвращает маску доступа к областям памяти метки (почти оригинальный
+	 * вариант)
+	 * 
+	 * @param membank
+	 * @param mask
+	 * @return
+	 */
+	static public int getLockPayLoad(byte membank, byte mask) {
+		int nret = 0;
+		/*
+		 * switch (Mask) { case 0: switch (membank) {
+		 */
+		switch (membank) {
+		case 0:
+			switch (mask) {
+			case 0:
+				nret = 0x080000;
+				break;
+			case 1:
+				nret = 0x080200;
+				break;
+			case 2:
+				nret = 0x0c0100;
+				break;
+			case 3:
+				nret = 0x0c0300;
+				break;
+			}
+			break;
+		case 1:
+			switch (mask) {
+			case 0:
+				nret = 0x020000;
+				break;
+			case 1:
+				nret = 0x020080;
+				break;
+			case 2:
+				nret = 0x030040;
+				break;
+			case 3:
+				nret = 0x0300c0;
+				break;
+			}
+			break;
+		case 2:
+			switch (mask) {
+			case 0:
+				nret = 0x008000;
+				break;
+			case 1:
+				nret = 0x008020;
+				break;
+			case 2:
+				nret = 0x00c010;
+				break;
+			case 3:
+				nret = 0x00c030;
+				break;
+			}
+			break;
+		case 3:
+			switch (mask) {
+			case 0:
+				nret = 0x002000;
+				break;
+			case 1:
+				nret = 0x002008;
+				break;
+			case 2:
+				nret = 0x003004;
+				break;
+			case 3:
+				nret = 0x00300c;
+				break;
+			}
+			break;
+		case 4:
+			switch (mask) {
+			case 0:
+				nret = 0x000800;
+				break;
+			case 1:
+				nret = 0x000802;
+				break;
+			case 2:
+				nret = 0x000c01;
+				break;
+			case 3:
+				nret = 0x000c03;
+				break;
+			}
+			break;
+		}
+		return nret;
 	}
 
 	/**
@@ -667,6 +701,7 @@ public class reader {
 
 	/**
 	 * Перевод символа в byte
+	 * 
 	 * @param c
 	 * @return
 	 */
@@ -676,6 +711,7 @@ public class reader {
 
 	/**
 	 * Перевод массив byte в строку шестнадцатиричных значений
+	 * 
 	 * @param b
 	 * @param nS
 	 * @param ncount
@@ -696,11 +732,11 @@ public class reader {
 
 	/**
 	 * Перевод массива byte[4] в int
+	 * 
 	 * @param b
 	 * @return
 	 */
-	public static int byteToInt(byte[] b)
-	{
+	public static int byteToInt(byte[] b) {
 		int t2 = 0, temp = 0;
 		for (int i = 3; i >= 0; i--) {
 			t2 = t2 << 8;
@@ -717,13 +753,13 @@ public class reader {
 
 	/**
 	 * Перевод из массива byte в int
+	 * 
 	 * @param b
 	 * @param nIndex
 	 * @param ncount
 	 * @return
 	 */
-	public static int byteToInt(byte[] b, int nIndex, int ncount)
-	{
+	public static int byteToInt(byte[] b, int nIndex, int ncount) {
 		int t2 = 0, temp = 0;
 		for (int i = 0; i < ncount; i++) {
 			t2 = t2 << 8;
@@ -740,6 +776,7 @@ public class reader {
 
 	/**
 	 * Перевод int в массив byte[16]
+	 * 
 	 * @param content
 	 * @param offset
 	 * @return
