@@ -54,7 +54,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void readTagId() {
 
 		reader.m_handler = new ReadTagIdHandler();
-		android.hardware.uhf.magic.reader.InventoryLablesLoop();
+		android.hardware.uhf.magic.reader.inventoryLabelsLoop();
 	}
 
 	@Override
