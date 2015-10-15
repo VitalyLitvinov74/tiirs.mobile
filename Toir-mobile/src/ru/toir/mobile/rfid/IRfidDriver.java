@@ -19,7 +19,7 @@ public interface IRfidDriver {
 	 * 
 	 * @return
 	 */
-	public boolean init(byte type);
+	public boolean init();
 
 	/**
 	 * <p>
@@ -28,7 +28,7 @@ public interface IRfidDriver {
 	 * 
 	 * @return
 	 */
-	public void readTagId(byte type);
+	public void readTagId();
 
 	/**
 	 * Читаем данные с метки в два этапа, сначала находим метку(получаем Id),
@@ -81,7 +81,8 @@ public interface IRfidDriver {
 	 * @param data
 	 *            Данные для записи
 	 */
-	public void writeTagData(String password, int memoryBank, int address, byte[] data);
+	public void writeTagData(String password, int memoryBank, int address,
+			byte[] data);
 
 	/**
 	 * Пишем в метку в один этап.
@@ -98,8 +99,8 @@ public interface IRfidDriver {
 	 * @param data
 	 *            Данные для записи
 	 */
-	public void writeTagData(String password, String tagId, int memoryBank, int address,
-			byte[] data);
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, byte[] data);
 
 	/**
 	 * <p>

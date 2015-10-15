@@ -26,7 +26,6 @@ import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.UserTagStructure;
-import ru.toir.mobile.rfid.driver.RfidDriverC5;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -147,7 +146,9 @@ public class EquipmentInfoActivity extends Activity {
 		// временная кнопка записи в метку пользователей
 		write_button.setVisibility(View.GONE);
 		// инициализируем драйвер
-		if (driver.init((byte) RfidDriverC5.READ_EQUIPMENT_LABLE_ID)) {
+		// TODO разобраться
+		//if (driver.init((byte) RfidDriverC5.READ_EQUIPMENT_LABLE_ID)) {
+		if (driver.init()) {
 			read_rfid_button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -155,7 +156,9 @@ public class EquipmentInfoActivity extends Activity {
 					regim = READ_EQUIPMENT_LABLE;
 					// TODO реально здесь нужно разобраться что именно
 					// считывается
-					driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+					// driver.readTagId((byte)
+					// RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+					driver.readTagId();
 				}
 			});
 			write_rfid_button.setOnClickListener(new View.OnClickListener() {
@@ -164,7 +167,9 @@ public class EquipmentInfoActivity extends Activity {
 					regim = WRITE_EQUIPMENT_LABLE;
 					// TODO реально здесь нужно разобраться что именно
 					// считывается
-					driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+					// driver.readTagId((byte)
+					// RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+					driver.readTagId();
 				}
 			});
 			write_button.setOnClickListener(new View.OnClickListener() {
@@ -173,7 +178,9 @@ public class EquipmentInfoActivity extends Activity {
 					regim = WRITE_USER_LABLE;
 					// TODO реально здесь нужно разобраться что именно
 					// считывается
-					driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+					// driver.readTagId((byte)
+					// RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+					driver.readTagId();
 				}
 			});
 		} else {
@@ -416,7 +423,7 @@ public class EquipmentInfoActivity extends Activity {
 	public void CallbackOnReadLable(String result) {
 		if (result.length() >= 20) {
 			if (regim == WRITE_EQUIPMENT_LABLE) {
-				driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_MEMORY);
+				//driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_MEMORY);
 				byte out_buffer[] = {};
 				try {
 					out_buffer = DataUtils.PackToSend(equipmenttag, tagrecords);
@@ -424,10 +431,10 @@ public class EquipmentInfoActivity extends Activity {
 					e.printStackTrace();
 				}
 				// TODO исправить на новый вариант записи в метку
-				//driver.write(out_buffer);
+				// driver.write(out_buffer);
 			}
 			if (regim == WRITE_USER_LABLE) {
-				driver.SetOperationType((byte) RfidDriverC5.WRITE_USER_MEMORY);
+				//driver.SetOperationType((byte) RfidDriverC5.WRITE_USER_MEMORY);
 				byte out_buffer[] = {};
 				UsersDBAdapter users = new UsersDBAdapter(
 						new ToirDatabaseContext(getApplicationContext()));
@@ -442,12 +449,13 @@ public class EquipmentInfoActivity extends Activity {
 					e.printStackTrace();
 				}
 				// TODO исправить на новый вариант записи в метку
-				//driver.write(out_buffer);
+				// driver.write(out_buffer);
 			}
 			if (regim == READ_EQUIPMENT_LABLE) {
-				driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);
+				//driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);
 				// TODO реально здесь нужно разобраться что именно считывается
-				driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);
+				// driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);
+				driver.readTagId();
 			}
 		} else
 			Toast.makeText(this, "Ответ некорректен: " + result,

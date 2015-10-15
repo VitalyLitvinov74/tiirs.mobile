@@ -31,12 +31,29 @@ public class RfidDialog extends DialogFragment {
 	public static final int READER_COMMAND_WRITE_DATA = 4;
 	public static final int READER_COMMAND_WRITE_DATA_ID = 5;
 
-	private String TAG = "RfidDialog";
+	public static final String TAG = "RfidDialog";
 	private String driverClassName;
 	private Class<?> driverClass;
 	private RfidDriverBase driver;
 
 	private Context mContext;
+
+	// команда драйвера которая должна быть выполнена при старте диалога
+	private int command;
+	
+	// параметры передаваемые в драйвер
+	private String tagPassword;
+	private String tagId;
+	private int tagMemoryBank;
+	private int tagAddress;
+	private byte[] tagWriteData;
+	private int tagReadCount;
+
+	/*
+	 * проверка для защиты от повтороного выполнения комманды драйвера при
+	 * старте фрагмента диалога после запуска стронней activity
+	 */
+	private boolean isStarted = false;
 
 	/*
 	 * обработчик передаётся в драйвер, в том числе используется для отправки
@@ -80,7 +97,7 @@ public class RfidDialog extends DialogFragment {
 		}
 
 		// инициализируем драйвер
-		if (!driver.init((byte) 0)) {
+		if (!driver.init()) {
 			Message message = new Message();
 			message.arg1 = RfidDriverBase.RESULT_RFID_INIT_ERROR;
 			mHandler.sendMessage(message);
@@ -99,42 +116,50 @@ public class RfidDialog extends DialogFragment {
 
 		View view = driver.getView(inflater, viewGroup);
 
-		// TODO пересмотреть алгоритм, т.к. нужно еще и писать в метку, и в
-		// разные области, и читать из разных областей
-		driver.readTagId((byte) 0);
-
 		return view;
 	}
 
-	public void readTagId() {
-
-		// while(rfid != null) {
-		// Log.d(TAG, "ждём считыватель...");
-		// }
-		// rfid.read((byte) 0);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.DialogFragment#onStart()
-	 */
 	@Override
 	public void onStart() {
 
 		super.onStart();
-		// rfid.read((byte) 0);
+
+		if (isStarted) {
+			return;
+		}
+
+		isStarted = true;
+
+		switch (command) {
+		case READER_COMMAND_READ_ID:
+			driver.readTagId();
+			break;
+		case READER_COMMAND_READ_DATA:
+			driver.readTagData(tagPassword, tagMemoryBank, tagAddress, tagReadCount);
+			break;
+		case READER_COMMAND_READ_DATA_ID:
+			driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagReadCount);
+			break;
+		case READER_COMMAND_WRITE_DATA:
+			driver.writeTagData(tagPassword, tagMemoryBank, tagAddress, tagWriteData);
+			break;
+		case READER_COMMAND_WRITE_DATA_ID:
+			driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagWriteData);
+			break;
+		default:
+			driver.readTagId();
+			break;
+		}
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Fragment#onActivityResult(int, int,
-	 * android.content.Intent)
+	/**
+	 * Необходимо потому что один из драйверов стартует отдельную activity для
+	 * своих нужд.
 	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// super.onActivityResult(requestCode, resultCode, data);
+
 		Message message = new Message();
 		switch (requestCode) {
 		case IntentIntegrator.REQUEST_CODE:
@@ -157,6 +182,22 @@ public class RfidDialog extends DialogFragment {
 			break;
 		}
 		mHandler.sendMessage(message);
+	}
+
+	/**
+	 * Запускаем чтение(поиск первой попавшейся метки) Id метки
+	 */
+	public void readTagId() {
+
+		command = READER_COMMAND_READ_ID;
+	}
+
+	@Override
+	public void onDestroyView() {
+
+		super.onDestroyView();
+		driver.close();
+		driver = null;
 	}
 
 }

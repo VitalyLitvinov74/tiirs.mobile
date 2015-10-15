@@ -60,7 +60,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	};
 
 	@Override
-	public boolean init(byte type) {
+	public boolean init() {
 
 		Scanner.m_handler = c5Handler;
 
@@ -68,7 +68,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public void readTagId(byte type) {
+	public void readTagId() {
 
 		Scanner.Read();
 	}

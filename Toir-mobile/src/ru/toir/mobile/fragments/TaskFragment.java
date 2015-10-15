@@ -779,7 +779,7 @@ public class TaskFragment extends Fragment {
 		});
 
 		rfidDialog = new RfidDialog(getActivity().getApplicationContext(), handler);
-		
+		rfidDialog.readTagId();
 		rfidDialog.show(getActivity().getFragmentManager(), "aaaa");
 	}
 

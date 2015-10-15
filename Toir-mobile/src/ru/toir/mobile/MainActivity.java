@@ -295,9 +295,8 @@ public class MainActivity extends FragmentActivity {
 		});
 
 		rfidDialog = new RfidDialog(getApplicationContext(), handler);
-		rfidDialog.show(getFragmentManager(), "test1");
-
-		//rfidDialog.readTagId();
+		rfidDialog.readTagId();
+		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 		
 	}
 

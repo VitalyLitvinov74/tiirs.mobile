@@ -37,7 +37,6 @@ import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
-import ru.toir.mobile.rfid.driver.RfidDriverC5;
 import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -791,8 +790,9 @@ public class OperationActivity extends Activity {
 
 	// TODO разобраться зачем это
 	public void CallbackOnReadLable(String result) {
-		driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
-		driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
+		//driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
+		//driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
+		driver.readTagId();
 	}
 
 	// TODO разобраться зачем это
@@ -876,7 +876,7 @@ public class OperationActivity extends Activity {
 			// pointer<equipmenttag.toString().length()+2*tagrecord.toString().length())
 			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2
 					.toString()).getBytes();
-			driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
+			//driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
 			// TODO исправить на новый вариант записи в метку
 			//driver.write(out_buffer);
 		}

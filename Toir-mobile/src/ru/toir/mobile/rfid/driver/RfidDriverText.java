@@ -34,7 +34,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public boolean init(byte type) {
+	public boolean init() {
 		/*
 		 * Для этого драйвера ни какой специальной инициализации не нужно.
 		 */
@@ -43,7 +43,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public void readTagId(byte type) {
+	public void readTagId() {
 		/*
 		 * В данном драйвере реального считывания не происходит.
 		 */

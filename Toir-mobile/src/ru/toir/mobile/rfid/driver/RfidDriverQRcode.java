@@ -55,13 +55,14 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public boolean init(byte type) {
+	public boolean init() {
 
 		return true;
 	}
 
 	@Override
-	public void readTagId(byte type) {
+	public void readTagId() {
+
 		releaseCamera();
 		resumeCamera();
 	}
