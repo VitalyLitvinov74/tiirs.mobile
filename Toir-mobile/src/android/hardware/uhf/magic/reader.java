@@ -11,6 +11,8 @@ import android.util.Log;
 
 public class reader {
 
+	private static final String TAG = "C5Reader";
+
 	// обработчик через который класс общается с внешним миром
 	static public Handler m_handler = null;
 
@@ -87,43 +89,73 @@ public class reader {
 	 * доступных меток
 	 */
 	static void startASYClabels() {
+
+		// TODO нужно пересмотреть алгоритм обработки данных
+		// текущий алгоритм следующий, данные из считывателя читаются пока
+		// читаются, как закончились, началась обработка полученных данных.
+		// если в поле считывателя метка одна, всё отлично, отправится одно
+		// сообщение в драйвер, если меток несколько, на каждую метку отправится
+		// по сообщению. что в нашем случае не верно. так как если мы входим в
+		// программу вероятно отправится два запроса на токен на сервер.
+		// в остальных частях программы вероятно будут выполненны два действия с
+		// разными метками.
+		// если мы ищем метки непрерывно, то остановится поиск только когда
+		// будет закрыт диалог, и вместе с ним буде "убит" обработчик ждущий
+		// сообщения.
+		// вероятно нужно для "одиночного" режима прекращать искать метки сразу
+		// как будет найдена первая. если ни одна метка не была найдена,
+		// отправлять сообщение о "ошибке".
+		// для поиска меток в цикле пока даже не могу придумать применения, от
+		// задачи соответственно будет и решение по этому режиму.
 		m_bASYC = true;
+
 		Thread thread = new Thread(new Runnable() {
+
 			public void run() {
+
+				Log.d(TAG, "enter");
 				// буфер для операций чтения из считывателя
 				byte[] m_buf = new byte[10240];
-				int nTemp = 0, nIndex = 0;
+				int nTemp = 0;
+				int nIndex = 0;
 				int m_nReRead = 0;
 				boolean tag_find = false;
 				// позиция в буфере m_buf
 				int m_nCount = 0;
 				// счетчик повторных попыток поиска метки
 				int m_nReSend = 0;
-				nIndex = 0;
 
 				while (m_handler != null && (m_nReRead >= 0)) {
-					// nIndex = m_nCount;
+
 					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
 					m_nCount += nTemp;
 					m_nReRead++;
-					// Log.e("777777777777777777", "count=" + m_nCount);
-					if (nTemp == 0) {
 
+					if (nTemp == 0) {
+						// далее идёт очень мутный алгоритм "распознования"
+						// желаемых данных
 						String str = reader.BytesToString(m_buf, nIndex,
 								m_nCount - nIndex);
-						Log.e("test", str);
+						Log.e(TAG, "Прочитанные данные: " + str);
 						String[] substr = Pattern.compile("BB0222").split(str);
-						Log.e("test", "len=" + substr.length);
+						Log.e(TAG, "Количество совпадений с шаблоном: "
+								+ substr.length);
 						for (int i = 0; i < substr.length; i++) {
-							Log.e("test", substr[i]);
+							Log.e(TAG, "Совпадение №" + i + " : " + substr[i]);
 							if (substr[i].length() > 16) {
 								if (!substr[i].substring(0, 2).equals("BB")) {
 									int nlen = Integer.valueOf(
 											substr[i].substring(0, 4), 16);
-									Log.e("test", substr[i].substring(0, 4));
+									Log.e(TAG, "количество байт данных: 0x"
+											+ substr[i].substring(0, 4));
 									if ((nlen > 3)
 											&& (nlen < (substr[i].length() - 6) / 2)) {
 										Message msg = new Message();
+										// что это за значение понять не
+										// возможно, видимо размер передаваемых
+										// данных в байтах, но тогда он должен
+										// быть substr[i].length() - 14,
+										// либо равен nlen
 										msg.what = (substr[i].length() - 12) / 2;
 										msg.obj = substr[i].substring(6,
 												nlen * 2);
@@ -159,7 +191,7 @@ public class reader {
 						}
 					}
 				}
-				// Log.e("end", "quit");
+				Log.e(TAG, "quit");
 				m_bASYC = false;
 			}
 		});

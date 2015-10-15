@@ -29,8 +29,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public final static int MEMORY_BANK_TID = 2;
 	public final static int MEMORY_BANK_USER = 3;
 
-	private static String m_strresult = "";
-
 	public RfidDriverC5(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
 	}
@@ -68,20 +66,17 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	static private class ReadTagIdHandler extends Handler {
 		@Override
 		public void handleMessage(Message message) {
-			if (message.what != 0) {
-				if (m_strresult.indexOf((String) message.obj) < 0) {
-					Log.d(TAG, (String) message.obj);
-					m_strresult += (String) message.obj;
-					reader.StopLoop();
-					Message result = new Message();
-					result.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-					Bundle bundle = new Bundle();
-					bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-							m_strresult);
-					result.setData(bundle);
-					mHandler.sendMessage(result);
 
-				}
+			if (message.what != 0) {
+				Log.d(TAG, (String) message.obj);
+				reader.StopLoop();
+				Message result = new Message();
+				result.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
+				Bundle bundle = new Bundle();
+				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
+						(String) message.obj);
+				result.setData(bundle);
+				mHandler.sendMessage(result);
 			}
 		}
 	};
@@ -90,19 +85,19 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		@Override
 		public void handleMessage(Message message) {
 			if (message.what != 0) {
-				if (m_strresult.indexOf((String) message.obj) < 0) {
-					Log.d(TAG, (String) message.obj);
-					m_strresult += (String) message.obj;
-					reader.StopLoop();
-					Message result = new Message();
-					result.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-					Bundle bundle = new Bundle();
-					bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-							m_strresult);
-					result.setData(bundle);
-					mHandler.sendMessage(result);
-
-				}
+				// if (m_strresult.indexOf((String) message.obj) < 0) {
+				// Log.d(TAG, (String) message.obj);
+				// m_strresult += (String) message.obj;
+				// reader.StopLoop();
+				// Message result = new Message();
+				// result.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
+				// Bundle bundle = new Bundle();
+				// bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
+				// m_strresult);
+				// result.setData(bundle);
+				// mHandler.sendMessage(result);
+				//
+				// }
 			}
 		}
 	};
@@ -114,12 +109,10 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			// TODO реализовать обработку сообщений считывателя во время записи
 			// в метку
 			if (message.what != 0) {
-				if (m_strresult.indexOf((String) message.obj) < 0) {
-					Log.d(TAG, (String) message.obj);
-					m_strresult += (String) message.obj;
-					// возврат при записи памяти оборудования
-					// ((???) mActivity).CallbackOnWrite(m_strresult);
-				}
+				// if (m_strresult.indexOf((String) message.obj) < 0) {
+				// Log.d(TAG, (String) message.obj);
+				// m_strresult += (String) message.obj;
+				// }
 			}
 		}
 	};
@@ -143,7 +136,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
 
-		m_strresult = "";
 		reader.m_handler = new ReadTagDataHandler();
 		reader.ReadLables(password.getBytes(), tagId.getBytes().length,
 				tagId.getBytes(), (byte) memoryBank, (byte) address, count);
