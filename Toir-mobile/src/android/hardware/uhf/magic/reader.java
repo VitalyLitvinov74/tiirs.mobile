@@ -138,10 +138,9 @@ public class reader {
 								m_nCount - nIndex);
 						Log.e(TAG, "Прочитанные данные: " + str);
 						String[] substr = Pattern.compile("BB0222").split(str);
-						Log.e(TAG, "Количество совпадений с шаблоном: "
-								+ substr.length);
+						Log.e(TAG, "Количество подстрок: " + substr.length);
 						for (int i = 0; i < substr.length; i++) {
-							Log.e(TAG, "Совпадение №" + i + " : " + substr[i]);
+							Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
 							if (substr[i].length() > 16) {
 								if (!substr[i].substring(0, 2).equals("BB")) {
 									int nlen = Integer.valueOf(
@@ -237,6 +236,65 @@ public class reader {
 			}
 		}
 		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду чтения
+	 * данных из метки
+	 */
+	static void StartASYCReadlables() {
+		m_bASYC = true;
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+				int m_nReRead = 0;
+				while (m_handler != null && (m_nReRead >= 0)) {
+					nTemp = Read(m_buf, m_nCount, 1024);
+					m_nCount += nTemp;
+					m_nReRead++;
+					if (nTemp == 0) {
+						m_nread++;
+						if (m_nread > 5)
+							break;
+					}
+					String str = reader.BytesToString(m_buf, 0, m_nCount);
+					Log.e(TAG, "Прочитанные данные: " + str);
+					// Log.e("test", "m_bOK=" + m_bOK);
+					String[] substr = Pattern.compile("BB0139").split(str);
+					Log.e(TAG, "Количество подстрок: " + substr.length);
+					for (int i = 0; i < substr.length; i++) {
+						Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
+						if (substr[i].length() > 10) {
+							if (!substr[i].substring(0, 2).equals("BB")) {
+								Log.e(TAG, "read ok");
+								m_bOK = true;
+								Message msg = new Message();
+								msg.what = (substr[i].length() - 8) / 2;
+								msg.obj = substr[i].substring(4,
+										substr[i].length() - 4);
+								/*
+								 * msg.obj = decodeString(
+								 * substr[i].substring(4, substr[i].length() -
+								 * 4), "GBK");
+								 */
+								m_handler.sendMessage(msg);
+							}
+						}
+					}
+
+				}
+
+				m_bASYC = false;
+			}
+		});
+		thread.start();
 	}
 
 	/**
@@ -475,64 +533,6 @@ public class reader {
 							}
 						}
 
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду чтения
-	 * данных из метки
-	 */
-	static void StartASYCReadlables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// мутный счётчик чтения "полных" "пакетов" данных из
-				// считывателя
-				int m_nread = 0;
-				int m_nReRead = 0;
-				while (m_handler != null && (m_nReRead >= 0)) {
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					m_nReRead++;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					Log.e("test", str);
-					// Log.e("test", "m_bOK=" + m_bOK);
-					String[] substr = Pattern.compile("BB0139").split(str);
-					for (int i = 0; i < substr.length; i++) {
-						Log.e("test", substr[i]);
-						if (substr[i].length() > 10) {
-							if (!substr[i].substring(0, 2).equals("BB")) {
-								Log.e("test", "read ok");
-								m_bOK = true;
-								Message msg = new Message();
-								msg.what = (substr[i].length() - 8) / 2;
-								msg.obj = substr[i].substring(4,
-										substr[i].length() - 4);
-								/*
-								 * msg.obj = decodeString(
-								 * substr[i].substring(4, substr[i].length() -
-								 * 4), "GBK");
-								 */
-								m_handler.sendMessage(msg);
-							}
-						}
 					}
 
 				}

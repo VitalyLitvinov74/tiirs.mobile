@@ -14,18 +14,17 @@ import ru.toir.mobile.db.tables.*;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.UserTagStructure;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -37,6 +36,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class EquipmentInfoActivity extends Activity {
+
+	private final static String TAG = "EquipmentInfoActivity";
+
 	public final static int READ_EQUIPMENT_LABLE = 1;
 	public final static int WRITE_EQUIPMENT_LABLE = 2;
 	public final static int WRITE_USER_LABLE = 4;
@@ -77,10 +79,6 @@ public class EquipmentInfoActivity extends Activity {
 	private Button write_button;
 	private Button open_documentation_button;
 
-	private String driverClassName;
-	private Class<?> driverClass;
-	private RfidDriverBase driver;
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -108,36 +106,6 @@ public class EquipmentInfoActivity extends Activity {
 		tv_equipment_documentation = (TextView) findViewById(R.id.equipment_text_documentation);
 		lv = (ListView) findViewById(R.id.equipment_listView_main);
 		FillListViewOperations();
-		// получаем текущий драйвер считывателя
-		SharedPreferences sp = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-		driverClassName = sp.getString(getString(R.string.RFIDDriver),
-				"RFIDDriverNull");
-
-		// пытаемся получить класс драйвера
-		try {
-			driverClass = Class.forName("ru.toir.mobile.rfid.driver."
-					+ driverClassName);
-		} catch (ClassNotFoundException e) {
-			setResult(RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND);
-			finish();
-		}
-
-		// пытаемся создать объект драйвера
-		try {
-			driver = (RfidDriverBase) driverClass.newInstance();
-		} catch (InstantiationException e) {
-			setResult(RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND);
-			e.printStackTrace();
-			finish();
-		} catch (IllegalAccessException e) {
-			setResult(RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND);
-			e.printStackTrace();
-			finish();
-		}
-
-		// TODO разобраться, видимо для callback вызовов
-		// rfid.setActivity(this);
 
 		read_rfid_button = (Button) findViewById(R.id.button_read);
 		write_rfid_button = (Button) findViewById(R.id.button_write);
@@ -145,48 +113,43 @@ public class EquipmentInfoActivity extends Activity {
 		write_button = (Button) findViewById(R.id.button_write_user);
 		// временная кнопка записи в метку пользователей
 		write_button.setVisibility(View.GONE);
-		// инициализируем драйвер
-		// TODO разобраться
-		//if (driver.init((byte) RfidDriverC5.READ_EQUIPMENT_LABLE_ID)) {
-		if (driver.init()) {
-			read_rfid_button.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					// запускаем процедуру считывания тега метки
-					regim = READ_EQUIPMENT_LABLE;
-					// TODO реально здесь нужно разобраться что именно
-					// считывается
-					// driver.readTagId((byte)
-					// RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
-					driver.readTagId();
-				}
-			});
-			write_rfid_button.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					regim = WRITE_EQUIPMENT_LABLE;
-					// TODO реально здесь нужно разобраться что именно
-					// считывается
-					// driver.readTagId((byte)
-					// RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
-					driver.readTagId();
-				}
-			});
-			write_button.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					regim = WRITE_USER_LABLE;
-					// TODO реально здесь нужно разобраться что именно
-					// считывается
-					// driver.readTagId((byte)
-					// RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
-					driver.readTagId();
-				}
-			});
-		} else {
-			setResult(RfidDriverBase.RESULT_RFID_INIT_ERROR);
-			finish();
-		}
+
+		read_rfid_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "Считываем память метки.");
+				// запускаем процедуру считывания тега метки
+				// regim = READ_EQUIPMENT_LABLE;
+				// TODO реализовать чтение памяти метки a=0 l=32
+				// TODO читать метку с определённым id, или любую?
+			}
+		});
+		write_rfid_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "Пишем в метку оборудования.");
+				// regim = WRITE_EQUIPMENT_LABLE;
+				// TODO реализовать запись в метку a=0 l=24
+				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+				// содержимое для записи см в CallbackReadLable
+				// out_buffer = DataUtils.PackToSend(equipmenttag, tagrecords);
+				// driver.write(out_buffer);
+			}
+		});
+		write_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "Пишем в метку пользователя.");
+				//regim = WRITE_USER_LABLE;
+				// TODO реализовать запись в метку a=0 l=24
+				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
+				// содержимое для записи см в CallbackReadLable
+				// out_buffer = DataUtils.PackToSendUserData(usertag);
+				// driver.write(out_buffer);
+
+			}
+		});
+
 		initView();
 	}
 
@@ -420,21 +383,21 @@ public class EquipmentInfoActivity extends Activity {
 		lv.setAdapter(adapter);
 	}
 
+	// TODO Избавится от этого
 	public void CallbackOnReadLable(String result) {
 		if (result.length() >= 20) {
 			if (regim == WRITE_EQUIPMENT_LABLE) {
-				//driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_MEMORY);
+				// driver.SetOperationType(RfidDriverC5.WRITE_EQUIPMENT_MEMORY);
 				byte out_buffer[] = {};
 				try {
 					out_buffer = DataUtils.PackToSend(equipmenttag, tagrecords);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				// TODO исправить на новый вариант записи в метку
 				// driver.write(out_buffer);
 			}
 			if (regim == WRITE_USER_LABLE) {
-				//driver.SetOperationType((byte) RfidDriverC5.WRITE_USER_MEMORY);
+				// driver.SetOperationType(RfidDriverC5.WRITE_USER_MEMORY);
 				byte out_buffer[] = {};
 				UsersDBAdapter users = new UsersDBAdapter(
 						new ToirDatabaseContext(getApplicationContext()));
@@ -452,16 +415,15 @@ public class EquipmentInfoActivity extends Activity {
 				// driver.write(out_buffer);
 			}
 			if (regim == READ_EQUIPMENT_LABLE) {
-				//driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);
 				// TODO реально здесь нужно разобраться что именно считывается
-				// driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_MEMORY);
-				driver.readTagId();
+				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_MEMORY);
 			}
 		} else
 			Toast.makeText(this, "Ответ некорректен: " + result,
 					Toast.LENGTH_SHORT).show();
 	}
 
+	// TODO Избавиться от этого
 	public void CallbackOnWrite(String result) {
 		if (result == null) {
 			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
@@ -472,6 +434,7 @@ public class EquipmentInfoActivity extends Activity {
 		}
 	}
 
+	// TODO избавится от этого
 	public void Callback(String result) {
 		// Intent data = null;
 		if (result == null) {
