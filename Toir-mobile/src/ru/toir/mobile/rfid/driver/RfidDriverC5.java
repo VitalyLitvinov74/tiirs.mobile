@@ -76,21 +76,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		android.hardware.uhf.magic.reader.Close();
 	}
 
-	static private class writeTagDataHandler extends Handler {
-		@Override
-		public void handleMessage(Message message) {
-
-			// TODO реализовать обработку сообщений считывателя во время записи
-			// в метку
-			if (message.what != 0) {
-				// if (m_strresult.indexOf((String) message.obj) < 0) {
-				// Log.d(TAG, (String) message.obj);
-				// m_strresult += (String) message.obj;
-				// }
-			}
-		}
-	};
-
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
@@ -147,11 +132,12 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, byte[] data) {
 
-		reader.m_handler = new writeTagDataHandler();
+		reader.m_handler = new WriteTagDataHandler();
 
-		int rc = reader.Writelables(password.getBytes(),
-				tagId.getBytes().length, tagId.getBytes(), (byte) memoryBank,
-				(byte) address, data.length, data);
+		int rc = reader.Writelables(reader.stringToBytes(password),
+				reader.stringToBytes(tagId).length,
+				reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
+				data.length, data);
 
 		Message message = new Message();
 		if (rc >= 0) {
@@ -161,5 +147,17 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		}
 		mHandler.sendMessage(message);
 	}
+
+	static private class WriteTagDataHandler extends Handler {
+		@Override
+		public void handleMessage(Message message) {
+
+			if (message.what != 0) {
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_SUCCESS;
+				mHandler.sendMessage(result);
+			}
+		}
+	};
 
 }

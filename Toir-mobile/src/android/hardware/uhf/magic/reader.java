@@ -304,6 +304,109 @@ public class reader {
 	}
 
 	/**
+	 * write tag (results through the Handle asynchronous send a card, a
+	 * message)
+	 * 
+	 * @param password
+	 *            password 4 bytes
+	 * @param nUL
+	 *            PC+EPC length
+	 * @param PCandEPC
+	 *            PC+EPC data
+	 * @param membank
+	 *            tag data storage area
+	 * @param nSA
+	 *            write the tag data address offset
+	 * @param nDL
+	 *            write tag data area data length
+	 * @param data
+	 *            write data
+	 * @return
+	 */
+	static public int Writelables(byte[] password, int nUL, byte[] PCandEPC,
+			byte membank, int nSA, int nDL, byte[] data) {
+		Clean();
+		int nret = WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
+		if (!m_bASYC) {
+			m_bOK = false;
+			// счетчик повторных попыток записи в метку
+			int m_nReSend = 0;
+			StartASYCWritelables();
+			while ((!m_bOK) && (m_nReSend < 20)) {
+				m_nReSend++;
+				WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
+				try {
+					Thread.sleep(60);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду записи
+	 * данных в метку
+	 */
+	static void StartASYCWritelables() {
+
+		m_bASYC = true;
+		Thread thread = new Thread(new Runnable() {
+
+			public void run() {
+
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+
+				while (m_handler != null) {
+
+					nTemp = Read(m_buf, m_nCount, 1024);
+					m_nCount += nTemp;
+					if (nTemp == 0) {
+						m_nread++;
+						if (m_nread > 5)
+							break;
+					}
+
+					String str = reader.BytesToString(m_buf, 0, m_nCount);
+					Log.e(TAG, "Прочитанные данные: " + str);
+					String[] substr = Pattern.compile("BB0149").split(str);
+					Log.e(TAG, "Количество подстрок: " + substr.length);
+
+					for (int i = 0; i < substr.length; i++) {
+						if (substr[i].length() >= 10) {
+							Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
+							if (substr[i].substring(0, 10).equals("0001004B7E")) {
+								m_bOK = true;
+								Log.e(TAG, "Write OK");
+								Message msg = new Message();
+								msg.what = 2;
+								msg.obj = "OK";
+								m_handler.sendMessage(msg);
+								// принудительно выходим
+								m_handler = null;
+								break;
+							}
+						}
+
+					}
+
+				}
+
+				m_bASYC = false;
+			}
+		});
+		thread.start();
+	}
+
+	/**
 	 * inactivated label (results through the Handle asynchronous transmission)
 	 * 
 	 * @param btReadId
@@ -443,99 +546,6 @@ public class reader {
 								msg.obj = substr[i];
 								m_handler.sendMessage(msg);
 								Log.d("test", "Lock=FAIL");
-							}
-						}
-
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	/**
-	 * write tag (results through the Handle asynchronous send a card, a
-	 * message)
-	 * 
-	 * @param password
-	 *            password 4 bytes
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param membank
-	 *            tag data storage area
-	 * @param nSA
-	 *            write the tag data address offset
-	 * @param nDL
-	 *            write tag data area data length
-	 * @param data
-	 *            write data
-	 * @return
-	 */
-	static public int Writelables(byte[] password, int nUL, byte[] PCandEPC,
-			byte membank, int nSA, int nDL, byte[] data) {
-		Clean();
-		int nret = WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
-		if (!m_bASYC) {
-			m_bOK = false;
-			// счетчик повторных попыток записи в метку
-			int m_nReSend = 0;
-			StartASYCWritelables();
-			while ((!m_bOK) && (m_nReSend < 20)) {
-				m_nReSend++;
-				WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
-				try {
-					Thread.sleep(60);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return nret;
-	}
-
-	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду записи
-	 * данных в метку
-	 */
-	static void StartASYCWritelables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// мутный счётчик чтения "полных" "пакетов" данных из
-				// считывателя
-				int m_nread = 0;
-
-				while (m_handler != null) {
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					// Log.e("test", str);
-					String[] substr = Pattern.compile("BB0149").split(str);
-					// Log.e("test", "strlen="+substr.length);
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							if (substr[i].substring(0, 10).equals("0001004B7E")) {
-								m_bOK = true;
-								// Log.e("test", "ok");
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = "OK";
-								m_handler.sendMessage(msg);
 							}
 						}
 

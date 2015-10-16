@@ -125,7 +125,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Считываем память метки.");
-				EquipmentDBAdapter adapter = new EquipmentDBAdapter(new ToirDatabaseContext(getApplicationContext()));
+				EquipmentDBAdapter adapter = new EquipmentDBAdapter(
+						new ToirDatabaseContext(getApplicationContext()));
 				Equipment equipment = adapter.getItem(equipment_uuid);
 				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
 				Handler handler = new Handler(new Handler.Callback() {
@@ -149,7 +150,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 				rfidDialog.readTagData("0000000000", equipment.getTag_id(),
-						RfidDriverBase.MEMORY_BANK_USER, 0, 4);
+						RfidDriverBase.MEMORY_BANK_USER, 0, 8);
 				rfidDialog.show(getFragmentManager(), TAG);
 			}
 		});
@@ -157,27 +158,44 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		write_rfid_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
 				Log.d(TAG, "Пишем в метку оборудования.");
-				// regim = WRITE_EQUIPMENT_LABLE;
-				// TODO реализовать запись в метку a=0 l=24
-				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
-				// содержимое для записи см в CallbackReadLable
-				// out_buffer = DataUtils.PackToSend(equipmenttag, tagrecords);
-				// driver.write(out_buffer);
+				EquipmentDBAdapter adapter = new EquipmentDBAdapter(
+						new ToirDatabaseContext(getApplicationContext()));
+				Equipment equipment = adapter.getItem(equipment_uuid);
+				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+				Handler handler = new Handler(new Handler.Callback() {
+
+					@Override
+					public boolean handleMessage(Message msg) {
+
+						Log.d(TAG, "Получили сообщение из драйвра.");
+
+						if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+							Log.d(TAG, "Запись успешна.");
+						}
+
+						// закрываем диалог
+						rfidDialog.dismiss();
+						return true;
+					}
+				});
+				rfidDialog = new RfidDialog(getApplicationContext(), handler);
+				// тестовые данные для примера
+				byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+				rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+						RfidDriverBase.MEMORY_BANK_USER, 0, data);
+				rfidDialog.show(getFragmentManager(), TAG);
 			}
 		});
 
 		write_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.d(TAG, "Пишем в метку пользователя.");
-				// regim = WRITE_USER_LABLE;
-				// TODO реализовать запись в метку a=0 l=24
-				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
-				// содержимое для записи см в CallbackReadLable
-				// out_buffer = DataUtils.PackToSendUserData(usertag);
-				// driver.write(out_buffer);
 
+				Log.d(TAG, "Пишем в метку пользователя.");
+				// сюда нужно перенести код который отвечает за сохранение
+				// структуры данных в пользовательскую метку
 			}
 		});
 
@@ -414,7 +432,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		lv.setAdapter(adapter);
 	}
 
-	// TODO Избавится от этого
+	// TODO наследие старой архетектуры драйверов rfid
 	public void CallbackOnReadLable(String result) {
 		if (result.length() >= 20) {
 			if (regim == WRITE_EQUIPMENT_LABLE) {
@@ -442,11 +460,9 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				// TODO исправить на новый вариант записи в метку
 				// driver.write(out_buffer);
 			}
 			if (regim == READ_EQUIPMENT_LABLE) {
-				// TODO реально здесь нужно разобраться что именно считывается
 				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_MEMORY);
 			}
 		} else
@@ -454,7 +470,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 					Toast.LENGTH_SHORT).show();
 	}
 
-	// TODO Избавиться от этого
+	// TODO наследие старой архетектуры драйверов rfid
 	public void CallbackOnWrite(String result) {
 		if (result == null) {
 			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
@@ -465,7 +481,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		}
 	}
 
-	// TODO избавится от этого
+	// TODO наследие старой архетектуры драйверов rfid
 	public void Callback(String result) {
 		// Intent data = null;
 		if (result == null) {

@@ -189,7 +189,10 @@ public class RfidDialog extends DialogFragment {
 	}
 
 	/**
-	 * Запускаем чтение(поиск первой попавшейся метки) Id метки
+	 * <p>
+	 * Чтение(поиск первой попавшейся метки) Id метки.
+	 * </p>
+	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 */
 	public void readTagId() {
 
@@ -197,7 +200,10 @@ public class RfidDialog extends DialogFragment {
 	}
 
 	/**
-	 * Запускаем чтение памяти метки
+	 * <p>
+	 * Чтение данных из памяти конкретной метки.
+	 * </p>
+	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
 	 * @param password
 	 * @param tagId
@@ -213,8 +219,32 @@ public class RfidDialog extends DialogFragment {
 		tagMemoryBank = memoryBank;
 		tagAddress = address;
 		tagReadCount = count;
-		
+
 		command = READER_COMMAND_READ_DATA_ID;
+	}
+
+	/**
+	 * <p>
+	 * Пишем в память конкретной метки.
+	 * </p>
+	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+	 * 
+	 * @param password
+	 * @param tagId
+	 * @param memoryBank
+	 * @param address
+	 * @param data
+	 */
+	public void writeTagData(String password, String id, int memoryBank,
+			int address, byte[] data) {
+
+		tagPassword = password;
+		tagId = id;
+		tagMemoryBank = memoryBank;
+		tagAddress = address;
+		tagWriteData = data;
+
+		command = READER_COMMAND_WRITE_DATA_ID;
 	}
 
 	@Override
