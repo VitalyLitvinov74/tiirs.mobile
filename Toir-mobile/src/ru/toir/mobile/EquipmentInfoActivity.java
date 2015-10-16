@@ -20,10 +20,14 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
+import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.UserTagStructure;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -35,7 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EquipmentInfoActivity extends Activity {
+public class EquipmentInfoActivity extends FragmentActivity {
 
 	private final static String TAG = "EquipmentInfoActivity";
 
@@ -79,6 +83,8 @@ public class EquipmentInfoActivity extends Activity {
 	private Button write_button;
 	private Button open_documentation_button;
 
+	RfidDialog rfidDialog;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -117,13 +123,37 @@ public class EquipmentInfoActivity extends Activity {
 		read_rfid_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
 				Log.d(TAG, "Считываем память метки.");
-				// запускаем процедуру считывания тега метки
-				// regim = READ_EQUIPMENT_LABLE;
-				// TODO реализовать чтение памяти метки a=0 l=32
-				// TODO читать метку с определённым id, или любую?
+				EquipmentDBAdapter adapter = new EquipmentDBAdapter(new ToirDatabaseContext(getApplicationContext()));
+				Equipment equipment = adapter.getItem(equipment_uuid);
+				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+				Handler handler = new Handler(new Handler.Callback() {
+
+					@Override
+					public boolean handleMessage(Message msg) {
+
+						Log.d(TAG, "Получили сообщение из драйвра.");
+
+						if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+							Bundle bundle = msg.getData();
+							String tagData = bundle
+									.getString(RfidDriverBase.RESULT_RFID_TAG_DATA);
+							Log.d(TAG, tagData);
+						}
+
+						// закрываем диалог
+						rfidDialog.dismiss();
+						return true;
+					}
+				});
+				rfidDialog = new RfidDialog(getApplicationContext(), handler);
+				rfidDialog.readTagData("0000000000", equipment.getTag_id(),
+						RfidDriverBase.MEMORY_BANK_USER, 0, 4);
+				rfidDialog.show(getFragmentManager(), TAG);
 			}
 		});
+
 		write_rfid_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -136,11 +166,12 @@ public class EquipmentInfoActivity extends Activity {
 				// driver.write(out_buffer);
 			}
 		});
+
 		write_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.d(TAG, "Пишем в метку пользователя.");
-				//regim = WRITE_USER_LABLE;
+				// regim = WRITE_USER_LABLE;
 				// TODO реализовать запись в метку a=0 l=24
 				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_LABLE_ID);
 				// содержимое для записи см в CallbackReadLable

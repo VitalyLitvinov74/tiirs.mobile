@@ -161,6 +161,9 @@ public class reader {
 										m_handler.sendMessage(msg);
 										tag_find = true;
 										m_bOK = true;
+										// принудительно выходим
+										m_nReRead = -1;
+										break;
 									}
 								}
 							}
@@ -285,6 +288,9 @@ public class reader {
 								 * 4), "GBK");
 								 */
 								m_handler.sendMessage(msg);
+								// принудительно выходим
+								m_nReRead = -1;
+								break;
 							}
 						}
 					}

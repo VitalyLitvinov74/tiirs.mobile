@@ -40,7 +40,7 @@ public class RfidDialog extends DialogFragment {
 
 	// команда драйвера которая должна быть выполнена при старте диалога
 	private int command;
-	
+
 	// параметры передаваемые в драйвер
 	private String tagPassword;
 	private String tagId;
@@ -135,16 +135,20 @@ public class RfidDialog extends DialogFragment {
 			driver.readTagId();
 			break;
 		case READER_COMMAND_READ_DATA:
-			driver.readTagData(tagPassword, tagMemoryBank, tagAddress, tagReadCount);
+			driver.readTagData(tagPassword, tagMemoryBank, tagAddress,
+					tagReadCount);
 			break;
 		case READER_COMMAND_READ_DATA_ID:
-			driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagReadCount);
+			driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress,
+					tagReadCount);
 			break;
 		case READER_COMMAND_WRITE_DATA:
-			driver.writeTagData(tagPassword, tagMemoryBank, tagAddress, tagWriteData);
+			driver.writeTagData(tagPassword, tagMemoryBank, tagAddress,
+					tagWriteData);
 			break;
 		case READER_COMMAND_WRITE_DATA_ID:
-			driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagWriteData);
+			driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress,
+					tagWriteData);
 			break;
 		default:
 			driver.readTagId();
@@ -190,6 +194,27 @@ public class RfidDialog extends DialogFragment {
 	public void readTagId() {
 
 		command = READER_COMMAND_READ_ID;
+	}
+
+	/**
+	 * Запускаем чтение памяти метки
+	 * 
+	 * @param password
+	 * @param tagId
+	 * @param memoryBank
+	 * @param address
+	 * @param count
+	 */
+	public void readTagData(String password, String id, int memoryBank,
+			int address, int count) {
+
+		tagPassword = password;
+		tagId = id;
+		tagMemoryBank = memoryBank;
+		tagAddress = address;
+		tagReadCount = count;
+		
+		command = READER_COMMAND_READ_DATA_ID;
 	}
 
 	@Override

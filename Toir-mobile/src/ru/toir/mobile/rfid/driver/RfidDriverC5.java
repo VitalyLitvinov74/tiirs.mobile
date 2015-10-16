@@ -24,11 +24,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	private static final String TAG = "RfidDriverC5";
 
-	public final static int MEMORY_BANK_RESERVED = 0;
-	public final static int MEMORY_BANK_EPC = 1;
-	public final static int MEMORY_BANK_TID = 2;
-	public final static int MEMORY_BANK_USER = 3;
-
 	public RfidDriverC5(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
 	}
@@ -55,6 +50,24 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		android.hardware.uhf.magic.reader.inventoryLabelsLoop();
 	}
 
+	static private class ReadTagIdHandler extends Handler {
+		@Override
+		public void handleMessage(Message message) {
+
+			if (message.what != 0) {
+				String data = (String) message.obj;
+				Log.d(TAG, data);
+				reader.StopLoop();
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_SUCCESS;
+				Bundle bundle = new Bundle();
+				bundle.putString(RESULT_RFID_TAG_ID, data);
+				result.setData(bundle);
+				mHandler.sendMessage(result);
+			}
+		}
+	};
+
 	@Override
 	public void close() {
 
@@ -62,45 +75,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		reader.m_handler = null;
 		android.hardware.uhf.magic.reader.Close();
 	}
-
-	static private class ReadTagIdHandler extends Handler {
-		@Override
-		public void handleMessage(Message message) {
-
-			if (message.what != 0) {
-				Log.d(TAG, (String) message.obj);
-				reader.StopLoop();
-				Message result = new Message();
-				result.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-				Bundle bundle = new Bundle();
-				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-						(String) message.obj);
-				result.setData(bundle);
-				mHandler.sendMessage(result);
-			}
-		}
-	};
-
-	static private class ReadTagDataHandler extends Handler {
-		@Override
-		public void handleMessage(Message message) {
-			if (message.what != 0) {
-				// if (m_strresult.indexOf((String) message.obj) < 0) {
-				// Log.d(TAG, (String) message.obj);
-				// m_strresult += (String) message.obj;
-				// reader.StopLoop();
-				// Message result = new Message();
-				// result.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-				// Bundle bundle = new Bundle();
-				// bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-				// m_strresult);
-				// result.setData(bundle);
-				// mHandler.sendMessage(result);
-				//
-				// }
-			}
-		}
-	};
 
 	static private class writeTagDataHandler extends Handler {
 		@Override
@@ -137,9 +111,29 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			int address, int count) {
 
 		reader.m_handler = new ReadTagDataHandler();
-		reader.ReadLables(password.getBytes(), tagId.getBytes().length,
-				tagId.getBytes(), (byte) memoryBank, (byte) address, count);
+		reader.ReadLables(reader.stringToBytes(password),
+				reader.stringToBytes(tagId).length,
+				reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
+				count);
 	}
+
+	static private class ReadTagDataHandler extends Handler {
+		@Override
+		public void handleMessage(Message message) {
+			if (message.what != 0) {
+				String data = (String) message.obj;
+				Log.d(TAG, data);
+				// TODO нужно ли это?
+				reader.StopLoop();
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_SUCCESS;
+				Bundle bundle = new Bundle();
+				bundle.putString(RESULT_RFID_TAG_DATA, data);
+				result.setData(bundle);
+				mHandler.sendMessage(result);
+			}
+		}
+	};
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
