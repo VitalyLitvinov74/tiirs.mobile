@@ -47,7 +47,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void readTagId() {
 
 		reader.m_handler = new ReadTagIdHandler();
-		android.hardware.uhf.magic.reader.inventoryLabelsLoop();
+		reader.inventoryLabelsLoop();
 	}
 
 	static private class ReadTagIdHandler extends Handler {
@@ -66,7 +66,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				mHandler.sendMessage(result);
 			}
 		}
-	};
+	}
 
 	@Override
 	public void close() {
@@ -87,8 +87,42 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
 
-		// TODO реализовать получение Id метки
-		// TODO реализовать чтение метки по полученому Id
+		reader.m_handler = new ReadTagDataWOIdHandler(password, memoryBank,
+				address, count);
+		reader.inventoryLabelsLoop();
+	}
+
+	static private class ReadTagDataWOIdHandler extends Handler {
+
+		private String password;
+		private int memoryBank;
+		private int address;
+		private int count;
+
+		public ReadTagDataWOIdHandler(String password, int memoryBank,
+				int address, int count) {
+
+			this.password = password;
+			this.memoryBank = memoryBank;
+			this.address = address;
+			this.count = count;
+		}
+
+		@Override
+		public void handleMessage(Message message) {
+			if (message.what != 0) {
+				String tagId = (String) message.obj;
+				Log.d(TAG, tagId);
+				// TODO нужно ли это?
+				reader.StopLoop();
+				// запускаем чтение метки
+				reader.m_handler = new ReadTagDataHandler();
+				reader.ReadLables(reader.stringToBytes(password),
+						reader.stringToBytes(tagId).length,
+						reader.stringToBytes(tagId), (byte) memoryBank,
+						(byte) address, count);
+			}
+		}
 	}
 
 	@Override
@@ -118,14 +152,49 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				mHandler.sendMessage(result);
 			}
 		}
-	};
+	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			byte[] data) {
 
-		// TODO реализовать получение Id метки
-		// TODO реализовать запись метки по полученому Id
+		reader.m_handler = new WriteTagDataWOIdHandler(password, memoryBank,
+				address, data);
+		reader.inventoryLabelsLoop();
+	}
+
+	static private class WriteTagDataWOIdHandler extends Handler {
+
+		private String password;
+		private int memoryBank;
+		private int address;
+		private byte[] data;
+
+		public WriteTagDataWOIdHandler(String password, int memoryBank,
+				int address, byte[] data) {
+
+			this.password = password;
+			this.memoryBank = memoryBank;
+			this.address = address;
+			this.data = data;
+		}
+
+		@Override
+		public void handleMessage(Message message) {
+
+			if (message.what != 0) {
+				String tagId = (String) message.obj;
+				Log.d(TAG, tagId);
+				// TODO нужно ли это?
+				reader.StopLoop();
+				// запускаем запись в метку
+				reader.m_handler = new WriteTagDataHandler();
+				reader.Writelables(reader.stringToBytes(password),
+						reader.stringToBytes(tagId).length,
+						reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
+						data.length, data);
+			}
+		}
 	}
 
 	@Override
@@ -139,6 +208,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
 				data.length, data);
 
+		// TODO всё до конца метода - лишнее?
 		Message message = new Message();
 		if (rc >= 0) {
 			message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
@@ -158,6 +228,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				mHandler.sendMessage(result);
 			}
 		}
-	};
+	}
 
 }

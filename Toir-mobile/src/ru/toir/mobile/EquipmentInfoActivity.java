@@ -149,8 +149,15 @@ public class EquipmentInfoActivity extends FragmentActivity {
 					}
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
-				rfidDialog.readTagData("0000000000", equipment.getTag_id(),
+
+				// читаем метку с id привязанным к оборудованию
+				// rfidDialog.readTagData("0000000000", equipment.getTag_id(),
+				// RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+
+				// читаем "произовольную" метку, ту которую найдём первой
+				rfidDialog.readTagData("0000000000",
 						RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+
 				rfidDialog.show(getFragmentManager(), TAG);
 			}
 		});
@@ -182,10 +189,18 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 				// тестовые данные для примера
-				byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
-				rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+				byte[] data = new byte[] { 14, 0, 2, 0, 4, 0, 6, 15 };
+
+				// пишем в метку с id привязанным к оборудованию
+				// rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+				// RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+				// пишем в "произовольную" метку, ту которую найдём первой
+				rfidDialog.writeTagData("0000000000",
 						RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
 				rfidDialog.show(getFragmentManager(), TAG);
+
 			}
 		});
 
