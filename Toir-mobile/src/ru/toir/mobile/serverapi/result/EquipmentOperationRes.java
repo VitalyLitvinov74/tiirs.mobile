@@ -5,7 +5,7 @@ package ru.toir.mobile.serverapi.result;
 
 import java.util.ArrayList;
 
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import android.content.Context;
 
@@ -26,7 +26,7 @@ public class EquipmentOperationRes extends ru.toir.mobile.db.tables.EquipmentOpe
 
 	public static ArrayList<EquipmentOperationRes> load(Context context, String taskUuid) {
 
-		EquipmentOperationDBAdapter adapter = new EquipmentOperationDBAdapter(new TOiRDatabaseContext(context));
+		EquipmentOperationDBAdapter adapter = new EquipmentOperationDBAdapter(new ToirDatabaseContext(context));
 		
 		ArrayList<ru.toir.mobile.db.tables.EquipmentOperation> operationList = adapter.getItems(taskUuid);
 		if (operationList != null) {

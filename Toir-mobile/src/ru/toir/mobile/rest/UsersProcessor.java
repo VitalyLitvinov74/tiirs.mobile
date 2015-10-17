@@ -7,7 +7,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.RestClient.Method;
@@ -84,7 +84,7 @@ public class UsersProcessor {
 						UserSrv.class);
 				if (serverUser != null) {
 					UsersDBAdapter adapter = new UsersDBAdapter(
-							new TOiRDatabaseContext(mContext));
+							new ToirDatabaseContext(mContext));
 					Users user = adapter.getItem(AuthorizedUser.getInstance()
 							.getTagId());
 					if (user == null) {

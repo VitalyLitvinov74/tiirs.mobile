@@ -10,7 +10,7 @@ import android.location.GpsStatus;
 import android.location.GpsSatellite;
 import android.os.Bundle;
 import android.widget.TextView;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
 //import ru.toir.mobile.db.tables.Users;
 import android.content.Context;
@@ -83,7 +83,7 @@ public class TestGPSListener implements LocationListener,GpsStatus.Listener{
     public void RecordGPSData(Double Latitude, Double Longitude) {
 		gpsLog.append("Latitude:"+String.valueOf(Latitude)+"\n");
 		gpsLog.append("Longitude:"+String.valueOf(Longitude)+"\n");
-		GPSDBAdapter gps = new GPSDBAdapter(new TOiRDatabaseContext(context));		
+		GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(context));		
 		String gpsuuid = UUID.randomUUID().toString();
 		//String user_uuid = UUID.randomUUID().toString();
 		//GpsTrack gpstracker = gps.getGPSByUuid(user_uuid);

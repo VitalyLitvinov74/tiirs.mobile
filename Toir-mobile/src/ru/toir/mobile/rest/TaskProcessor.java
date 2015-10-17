@@ -14,7 +14,7 @@ import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -280,7 +280,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!taskDBAdapter.saveItems(localTasks)) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
@@ -290,7 +290,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!taskStatusDBAdapter.saveItems(TaskSrv.getTaskStatuses(tasks))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
@@ -300,7 +300,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!operationDBAdapter
 				.saveItems(TaskSrv.getEquipmentOperations(tasks))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -314,7 +314,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!equipmentDBAdapter.saveItems(EquipmentOperationSrv
 				.getEquipments(operations))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -325,7 +325,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!operationTypeDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationTypes(operations))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -336,7 +336,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!operationStatusDBAdapter.saveItems(EquipmentOperationSrv
 				.getOperationStatuses(operations))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -361,7 +361,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!equipmentTypeDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentTypes(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -372,7 +372,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!criticalTypeDBAdapter.saveItems(EquipmentSrv
 				.getCriticalTypes(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -383,7 +383,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!equipmentStatusDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentStatuses(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -394,7 +394,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!documentationDBAdapter.saveItems(EquipmentSrv
 				.getEquipmentDocumentations(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -405,7 +405,7 @@ public class TaskProcessor {
 
 		// сохраняем
 		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!documentationTypeDBAdapter.saveItems(EquipmentSrv
 				.getDocumentationTypes(equipments))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -560,14 +560,14 @@ public class TaskProcessor {
 	 * @param resultsList
 	 */
 	private void riseUpdated(ArrayList<TaskRes> resultsList) {
-		TaskDBAdapter taskAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
+		TaskDBAdapter taskAdapter = new TaskDBAdapter(new ToirDatabaseContext(
 				mContext));
 		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		EquipmentOperationResultDBAdapter operationResultAdapter = new EquipmentOperationResultDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		MeasureValueDBAdapter valueAdapter = new MeasureValueDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 				.getWritableDatabase();
@@ -606,14 +606,14 @@ public class TaskProcessor {
 	 */
 	private void clearUpdated(ArrayList<TaskRes> resultsList) {
 
-		TaskDBAdapter taskAdapter = new TaskDBAdapter(new TOiRDatabaseContext(
+		TaskDBAdapter taskAdapter = new TaskDBAdapter(new ToirDatabaseContext(
 				mContext));
 		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		EquipmentOperationResultDBAdapter operationResultAdapter = new EquipmentOperationResultDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		MeasureValueDBAdapter valueAdapter = new MeasureValueDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 				.getWritableDatabase();

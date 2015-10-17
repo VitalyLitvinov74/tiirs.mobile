@@ -3,7 +3,7 @@
  */
 package ru.toir.mobile.serverapi.result;
 
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
 import android.content.Context;
 
@@ -20,7 +20,7 @@ public class EquipmentOperationResultRes extends ru.toir.mobile.db.tables.Equipm
 	}
 	
 	public static EquipmentOperationResultRes load(Context context, String uuid) {
-		EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new TOiRDatabaseContext(context));
+		EquipmentOperationResultDBAdapter adapter = new EquipmentOperationResultDBAdapter(new ToirDatabaseContext(context));
 		
 		ru.toir.mobile.db.tables.EquipmentOperationResult result = new ru.toir.mobile.db.tables.EquipmentOperationResult();
 		result = adapter.getItemByOperation(uuid);

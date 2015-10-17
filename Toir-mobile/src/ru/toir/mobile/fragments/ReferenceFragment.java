@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
@@ -220,13 +220,13 @@ public class ReferenceFragment extends Fragment {
 			// String reference=Spinner_references.getSelectedItem().toString();
 			long current_ref = Spinner_references.getSelectedItemId();
 			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-					new TOiRDatabaseContext(getActivity()
+					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 			CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-					new TOiRDatabaseContext(getActivity()
+					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 			DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-					new TOiRDatabaseContext(getActivity()
+					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 			String type = "";
 			String critical_type = "";
@@ -256,7 +256,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillReferencesEquipment() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
 				.getAllItems();
 		spinner_type_adapter.clear();
@@ -269,7 +269,7 @@ public class ReferenceFragment extends Fragment {
 		}
 
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 		spinner_addict_adapter.clear();
@@ -285,13 +285,13 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewEquipment(String type, String critical_type) {
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = eqDBAdapter.getAllItems(type,
 				critical_type);
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		Integer cnt = 0;
@@ -324,7 +324,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewEquipmentType() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
 				.getAllItems();
 
@@ -347,7 +347,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillReferencesDocumentation() {
 		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<DocumentationType> documentationTypeList = DocumentationTypeDBAdapter
 				.getAllItems();
 		spinner_type_adapter.clear();
@@ -364,9 +364,9 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewDocumentation(String type) {
 		EquipmentDocumentationDBAdapter EquipmentDocumentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentDocumentation> equipmentDocumentationList = EquipmentDocumentationDBAdapter
 				.getAllItems(type);
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -395,7 +395,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewCriticalType() {
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
 
@@ -421,7 +421,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewMeasurementType() {
 		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<MeasureType> measureTypeList = measureTypeDBAdapter
 				.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -443,9 +443,9 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewOperationResult() {
 		OperationResultDBAdapter opResultTypeDBAdapter = new OperationResultDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		OperationTypeDBAdapter OperationTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 
 		ArrayList<OperationResult> opResultList = opResultTypeDBAdapter
 				.getAllItems();
@@ -473,7 +473,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewOperationType() {
 		OperationTypeDBAdapter opTypeDBAdapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<OperationType> opTypeList = opTypeDBAdapter.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		Integer cnt = 0;
@@ -494,7 +494,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewTaskStatus() {
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
 				.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
@@ -516,7 +516,7 @@ public class ReferenceFragment extends Fragment {
 
 	private void FillListViewEquipmentStatus() {
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentStatus> equipmentStatusList = equipmentStatusDBAdapter
 				.getAllItems();
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();

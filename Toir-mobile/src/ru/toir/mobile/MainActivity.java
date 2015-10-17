@@ -1,9 +1,7 @@
 package ru.toir.mobile;
 
 import java.io.File;
-
 import com.astuetz.PagerSlidingTabStrip;
-
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,10 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -34,7 +32,8 @@ import ru.toir.mobile.rest.TokenServiceHelper;
 import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rest.UsersServiceProvider;
-import ru.toir.mobile.rfid.RFID;
+import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class MainActivity extends FragmentActivity {
 
@@ -42,6 +41,7 @@ public class MainActivity extends FragmentActivity {
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
+	private RfidDialog rfidDialog;
 
 	public static class RFIDReadAction {
 		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
@@ -49,7 +49,6 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private ProgressDialog authorizationDialog;
-	private boolean processLogin = false;
 
 	private boolean splashShown = false;
 
@@ -71,7 +70,7 @@ public class MainActivity extends FragmentActivity {
 							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					if (result == true) {
 						UsersDBAdapter users = new UsersDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()));
+								new ToirDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser
 								.getInstance().getTagId());
 						// в зависимости от результата либо дать работать, либо
@@ -94,7 +93,6 @@ public class MainActivity extends FragmentActivity {
 								Toast.LENGTH_LONG).show();
 					}
 					authorizationDialog.dismiss();
-					processLogin = false;
 				}
 			}
 		}
@@ -134,7 +132,7 @@ public class MainActivity extends FragmentActivity {
 						// токен не получен, сервер не ответил...
 						// проверяем наличие пользователя в локальной базе
 						UsersDBAdapter users = new UsersDBAdapter(
-								new TOiRDatabaseContext(getApplicationContext()));
+								new ToirDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser
 								.getInstance().getTagId());
 
@@ -150,11 +148,11 @@ public class MainActivity extends FragmentActivity {
 									"Нет доступа.", Toast.LENGTH_LONG).show();
 						}
 
-						String message = bundle.getString(IServiceProvider.MESSAGE);
-						Toast.makeText(getApplicationContext(),
-								message, Toast.LENGTH_LONG).show();
+						String message = bundle
+								.getString(IServiceProvider.MESSAGE);
+						Toast.makeText(getApplicationContext(), message,
+								Toast.LENGTH_LONG).show();
 						authorizationDialog.dismiss();
-						processLogin = false;
 					}
 				}
 			}
@@ -223,7 +221,7 @@ public class MainActivity extends FragmentActivity {
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
-			helper = DatabaseHelper.getInstance(new TOiRDatabaseContext(
+			helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
 					getApplicationContext()));
 			Log.d(TAG, "db.version=" + helper.getVersion());
 			if (!helper.isDBActual()) {
@@ -253,88 +251,53 @@ public class MainActivity extends FragmentActivity {
 	 * 
 	 */
 	public void startAuthorise() {
+
 		isLogged = false;
-		Intent rfidRead = new Intent(this, RFIDActivity.class);
-		rfidRead.putExtra("action", RFIDReadAction.READ_USER_TAG_BEFORE_LOGIN);
-		startActivityForResult(rfidRead, RETURN_CODE_READ_RFID);
-	}
+		Handler handler = new Handler(new Handler.Callback() {
 
-	/**
-	 * 
-	 */
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+			@Override
+			public boolean handleMessage(Message msg) {
 
-		String msg = null;
-		Uri tagData = null;
-		String tagId = null;
+				Log.d(TAG, "Получили сообщение из драйвра.");
 
-		switch (requestCode) {
-		case RETURN_CODE_READ_RFID:
-			if (resultCode == RESULT_OK) {
-				tagData = data.getData();
-				if (tagData == null) {
-					msg = "Данные не получены!";
+				if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					Bundle bundle = msg.getData();
+					String tagId = bundle.getString(RfidDriverBase.RESULT_RFID_TAG_ID);
+					Log.d(TAG, tagId);
+
+					AuthorizedUser.getInstance().setTagId(tagId);
+
+					// показываем диалог входа
+					authorizationDialog = new ProgressDialog(MainActivity.this);
+					authorizationDialog.setMessage("Вход в систему");
+					authorizationDialog.setIndeterminate(true);
+					authorizationDialog
+							.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					authorizationDialog.setCancelable(false);
+					authorizationDialog.show();
+
+					// запрашиваем токен
+					TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
+							getApplicationContext(),
+							TokenServiceProvider.Actions.ACTION_GET_TOKEN);
+					tokenServiceHelper.GetTokenByTag(tagId);
 				} else {
-					tagId = tagData.toString();
-					Log.d(TAG, "Прочитаны данные из метки: " + tagId);
-				}
-			} else if (resultCode == RESULT_CANCELED) {
-				msg = "Чтение метки отменено пользователем!";
-			} else if (resultCode == RFID.RESULT_RFID_READ_ERROR) {
-				msg = "Не удалось прочитать содержимое метки!";
-			} else if (resultCode == RFID.RESULT_RFID_INIT_ERROR) {
-				msg = "Не удалось инициализировать драйвер считывателя!";
-			} else if (resultCode == RFID.RESULT_RFID_CLASS_NOT_FOUND) {
-				msg = "Не найден драйвер считывателя!";
-			}
-			break;
-
-		default:
-			msg = "Не известный код возврата.";
-			break;
-		}
-
-		// что-то пошло не так при считывании метки
-		if (msg != null) {
-			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT)
-					.show();
-		} else {
-			int action = data.getIntExtra("action", 0);
-			switch (action) {
-			case RFIDReadAction.READ_USER_TAG_BEFORE_LOGIN:
-				// сохраняем ид метки для дальнейшего использования
-				AuthorizedUser.getInstance().setTagId(tagId);
-
-				processLogin = true;
-
-				// запрашиваем токен
-				TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
-						getApplicationContext(),
-						TokenServiceProvider.Actions.ACTION_GET_TOKEN);
-				tokenServiceHelper.GetTokenByTag(tagId);
-
-				break;
-			case RFIDReadAction.READ_EQUIPMENT_TAG_BEFORE_OPERATION:
-				Intent operationActivity = new Intent(this,
-						OperationActivity.class);
-				Bundle bundle = data.getExtras();
-				if (!bundle.getString(OperationActivity.EQUIPMENT_TAG_EXTRA)
-						.equals(tagId)) {
-					operationActivity.putExtras(bundle);
-					startActivity(operationActivity);
-				} else {
+					// по кодам из RFID можно показать более подробные сообщения
 					Toast.makeText(getApplicationContext(),
-							"Не верное оборудование!!!", Toast.LENGTH_SHORT)
-							.show();
+							"Операция прервана", Toast.LENGTH_SHORT).show();
 				}
-				break;
-			default:
-				break;
-			}
 
-		}
+				// закрываем диалог
+				rfidDialog.dismiss();
+
+				return true;
+			}
+		});
+
+		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog.readTagId();
+		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
+		
 	}
 
 	/**
@@ -342,7 +305,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	void setMainLayout() {
 		setContentView(R.layout.main_layout);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);		
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager
@@ -391,7 +354,7 @@ public class MainActivity extends FragmentActivity {
 
 	public void onActionSettings(MenuItem menuItem) {
 		Log.d(TAG, "onActionSettings");
-		Intent i = new Intent(MainActivity.this, TOiRPreferences.class);
+		Intent i = new Intent(MainActivity.this, ToirPreferences.class);
 		startActivity(i);
 	}
 
@@ -465,21 +428,6 @@ public class MainActivity extends FragmentActivity {
 			// return true;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (processLogin) {
-			// показываем диалог входа
-			authorizationDialog = new ProgressDialog(MainActivity.this);
-			authorizationDialog.setMessage("Вход в систему");
-			authorizationDialog.setIndeterminate(true);
-			authorizationDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			authorizationDialog.setCancelable(false);
-			authorizationDialog.show();
-		}
-
 	}
 
 }

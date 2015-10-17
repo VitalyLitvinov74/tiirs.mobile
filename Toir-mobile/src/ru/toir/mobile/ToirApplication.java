@@ -20,7 +20,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.HandlerThread;
 //import android.util.Log;
 
-public class TOiRApplication extends Application {
+public class ToirApplication extends Application {
 	private String rootPath;	
 	private final Logger logger = LoggerFactory.getLogger();
 

@@ -17,7 +17,7 @@ import android.util.Log;
  * @author koputo
  * <p>Класс переопределяет контекст для создания и работы базы данных</p>
  */
-public class TOiRDatabaseContext extends ContextWrapper {
+public class ToirDatabaseContext extends ContextWrapper {
 	
 	private static final String TAG = "TOiRDatabaseContext";
 	// в тестах используется префикс для создания файлов
@@ -30,7 +30,7 @@ public class TOiRDatabaseContext extends ContextWrapper {
 	 * <p>Это частный случай, так как пока в планах нет необходимости использовать класс RenamingDelegatingContext для работы.
 	 * Используется только в тестах, для переименования базы, чтоб не затирать рабочую.</p>
 	 */
-	public TOiRDatabaseContext(Context base) {
+	public ToirDatabaseContext(Context base) {
 		super(base);
 		
 		Class<?> testClass = base.getClass();

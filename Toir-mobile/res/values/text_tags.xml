@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list">
+        <item >01234567</item>
+        <item >00000001</item>
+        <item >00000002</item>
+        <item >00000003</item>
+        <item >00000004</item>
+        <item >00000005</item>
+        <item >3400E2004000860902372580112F</item>
+        <item >3000E2004000860902332580112D</item>
+    </string-array>
+    
+</resources>

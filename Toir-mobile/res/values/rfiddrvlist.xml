@@ -3,20 +3,18 @@
     <string-array name="drvNameList">
         <item >Null driver</item>
         <item >Text driver</item>
-        <item >Reader 666</item>
         <item >Barcode</item>
         <item >QRcode</item>        
         <item >Barcode2D</item>
         <item >Driver C5</item>
     </string-array>
     <string-array name="drvClassNameList">
-        <item >RFIDDriverNull</item>
-        <item >RFIDDriverText</item>
-        <item >RFIDDriver666</item>
-        <item >RFIDBarcode</item>
-        <item >RFIDQRcode</item>
-        <item >RFIDBarcode2D</item>
-        <item >RFIDDriverC5</item>
+        <item >RfidDriverNull</item>
+        <item >RfidDriverText</item>
+        <item >RfidDriverBarcode</item>
+        <item >RfidDriverQRcode</item>
+        <item >RfidDriverBarcode2D</item>
+        <item >RfidDriverC5</item>
     </string-array>
     
 </resources>

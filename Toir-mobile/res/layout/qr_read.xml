@@ -46,7 +46,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_marginTop="54dp"
-            android:onClick="cancelOnClick"
             android:text="@string/cancel" />
 
 </LinearLayout>

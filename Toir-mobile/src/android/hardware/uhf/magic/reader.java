@@ -10,17 +10,869 @@ import android.os.Message;
 import android.util.Log;
 
 public class reader {
+
+	private static final String TAG = "C5Reader";
+
+	// обработчик через который класс общается с внешним миром
 	static public Handler m_handler = null;
+
+	// флаг того что находимся в процессе чтения/записи данных из считывателя
 	static Boolean m_bASYC = false;
-	static byte[] m_buf = new byte[10240];
-	static int m_nCount = 0;
+
+	// "поиск" меток до первой метки или в бесконечном цикле
 	static Boolean m_bLoop = false;
+
+	// флаг успешности операций чтения/записи в метку
 	static Boolean m_bOK = false;
-	static int m_nReSend = 0;
-	static int m_nread = 0;
+
+	// идентификатор звукового файла
 	static int msound = 0;
+
+	// набор звуков
 	static SoundPool mSoundPool = new SoundPool(1, AudioManager.STREAM_RING, 0);
-	static public String m_strPCEPC = "";
+
+	static {
+		System.loadLibrary("uhf-tools");
+		msound = mSoundPool.load(
+				"/system/media/audio/notifications/Altair.ogg", 1);
+	}
+
+	/**
+	 * Поиск метки
+	 * 
+	 * @return
+	 */
+	static public int inventoryLabels() {
+		int nret = Inventory();
+		if (!m_bASYC) {
+			startASYClabels();
+		}
+		return nret;
+	}
+
+	/**
+	 * Поиск меток
+	 * 
+	 * @return
+	 */
+	static public int inventoryLabelsLoop() {
+		int nret = Inventory();
+		m_bLoop = true;
+		if (!m_bASYC) {
+			startASYClabels();
+		}
+		return nret;
+	}
+
+	/**
+	 * "останавливает" бесконечный цикл поиска меток
+	 */
+	static public void StopLoop() {
+		m_bLoop = false;
+	}
+
+	/**
+	 * Пока не ясно зачем это
+	 * 
+	 * @return
+	 */
+	static public int multInventoryLabels() {
+		int nret = MultiInventory(65535);
+		if (!m_bASYC) {
+			startASYClabels();
+		}
+		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду поиска
+	 * доступных меток
+	 */
+	static void startASYClabels() {
+
+		// TODO нужно пересмотреть алгоритм обработки данных
+		// текущий алгоритм следующий, данные из считывателя читаются пока
+		// читаются, как закончились, началась обработка полученных данных.
+		// если в поле считывателя метка одна, всё отлично, отправится одно
+		// сообщение в драйвер, если меток несколько, на каждую метку отправится
+		// по сообщению. что в нашем случае не верно. так как если мы входим в
+		// программу вероятно отправится два запроса на токен на сервер.
+		// в остальных частях программы вероятно будут выполненны два действия с
+		// разными метками.
+		// если мы ищем метки непрерывно, то остановится поиск только когда
+		// будет закрыт диалог, и вместе с ним буде "убит" обработчик ждущий
+		// сообщения.
+		// вероятно нужно для "одиночного" режима прекращать искать метки сразу
+		// как будет найдена первая. если ни одна метка не была найдена,
+		// отправлять сообщение о "ошибке".
+		// для поиска меток в цикле пока даже не могу придумать применения, от
+		// задачи соответственно будет и решение по этому режиму.
+		m_bASYC = true;
+
+		Thread thread = new Thread(new Runnable() {
+
+			public void run() {
+
+				Log.d(TAG, "enter");
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				int nIndex = 0;
+				int m_nReRead = 0;
+				boolean tag_find = false;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// счетчик повторных попыток поиска метки
+				int m_nReSend = 0;
+
+				while (m_handler != null && (m_nReRead >= 0)) {
+
+					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
+					m_nCount += nTemp;
+					m_nReRead++;
+
+					if (nTemp == 0) {
+						// далее идёт очень мутный алгоритм "распознования"
+						// желаемых данных
+						String str = reader.BytesToString(m_buf, nIndex,
+								m_nCount - nIndex);
+						Log.e(TAG, "Прочитанные данные: " + str);
+						String[] substr = Pattern.compile("BB0222").split(str);
+						Log.e(TAG, "Количество подстрок: " + substr.length);
+						for (int i = 0; i < substr.length; i++) {
+							Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
+							if (substr[i].length() > 16) {
+								if (!substr[i].substring(0, 2).equals("BB")) {
+									int nlen = Integer.valueOf(
+											substr[i].substring(0, 4), 16);
+									Log.e(TAG, "количество байт данных: 0x"
+											+ substr[i].substring(0, 4));
+									if ((nlen > 3)
+											&& (nlen < (substr[i].length() - 6) / 2)) {
+										Message msg = new Message();
+										// что это за значение понять не
+										// возможно, видимо размер передаваемых
+										// данных в байтах, но тогда он должен
+										// быть substr[i].length() - 14,
+										// либо равен nlen
+										msg.what = (substr[i].length() - 12) / 2;
+										msg.obj = substr[i].substring(6,
+												nlen * 2);
+										m_handler.sendMessage(msg);
+										tag_find = true;
+										m_bOK = true;
+										// принудительно выходим
+										m_nReRead = -1;
+										break;
+									}
+								}
+							}
+						}
+
+						if (tag_find) {
+							// mSoundPool.play(msound, 1.0f, 1.0f, 0, 0, 1.0f);
+						}
+
+						if (m_bLoop) {
+							m_nCount = 0;
+							inventoryLabelsLoop();
+							tag_find = false;
+						} else {
+							if ((m_nReSend < 20) && (!tag_find)) {
+								Inventory();
+								m_nReSend++;
+							} else {
+								break;
+							}
+							tag_find = false;
+							// Log.e("efsfsd", "m_nReSend=" + m_nReSend);
+						}
+
+						if (m_nCount >= 1024) {
+							m_nCount = 0;
+						}
+					}
+				}
+				Log.e(TAG, "quit");
+				m_bASYC = false;
+			}
+		});
+		thread.start();
+	}
+
+	/***
+	 * read the label (results through the Handle asynchronous send a card, a
+	 * message)
+	 * 
+	 * @param password
+	 *            read the password, 4 bytes
+	 * @param nUL
+	 *            PC+EPC length
+	 * @param PCandEPC
+	 *            PC+EPC data
+	 * @param membank
+	 *            tag data storage area
+	 * @param nSA
+	 *            read tag data address offset
+	 * @param nDL
+	 *            read tag data address length
+	 * @return
+	 */
+	static public int ReadLables(byte[] password, int nUL, byte[] PCandEPC,
+			byte membank, int nSA, int nDL) {
+		int nret = 0;
+		if (!m_bASYC) {
+			Clean();
+			nret = ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
+			m_bOK = false;
+			// счетчик повторных попыток чтения метки
+			int m_nReSend = 0;
+			StartASYCReadlables();
+			while ((!m_bOK) && (m_nReSend < 20)) {
+				m_nReSend++;
+				ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
+				try {
+					Thread.sleep(60);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду чтения
+	 * данных из метки
+	 */
+	static void StartASYCReadlables() {
+		m_bASYC = true;
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+				int m_nReRead = 0;
+				while (m_handler != null && (m_nReRead >= 0)) {
+					nTemp = Read(m_buf, m_nCount, 1024);
+					m_nCount += nTemp;
+					m_nReRead++;
+					if (nTemp == 0) {
+						m_nread++;
+						if (m_nread > 5)
+							break;
+					}
+					String str = reader.BytesToString(m_buf, 0, m_nCount);
+					Log.e(TAG, "Прочитанные данные: " + str);
+					// Log.e("test", "m_bOK=" + m_bOK);
+					String[] substr = Pattern.compile("BB0139").split(str);
+					Log.e(TAG, "Количество подстрок: " + substr.length);
+					for (int i = 0; i < substr.length; i++) {
+						Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
+						if (substr[i].length() > 10) {
+							if (!substr[i].substring(0, 2).equals("BB")) {
+								Log.e(TAG, "read ok");
+								m_bOK = true;
+								Message msg = new Message();
+								msg.what = (substr[i].length() - 8) / 2;
+								msg.obj = substr[i].substring(4,
+										substr[i].length() - 4);
+								/*
+								 * msg.obj = decodeString(
+								 * substr[i].substring(4, substr[i].length() -
+								 * 4), "GBK");
+								 */
+								m_handler.sendMessage(msg);
+								// принудительно выходим
+								m_nReRead = -1;
+								break;
+							}
+						}
+					}
+
+				}
+
+				m_bASYC = false;
+			}
+		});
+		thread.start();
+	}
+
+	/**
+	 * write tag (results through the Handle asynchronous send a card, a
+	 * message)
+	 * 
+	 * @param password
+	 *            password 4 bytes
+	 * @param nUL
+	 *            PC+EPC length
+	 * @param PCandEPC
+	 *            PC+EPC data
+	 * @param membank
+	 *            tag data storage area
+	 * @param nSA
+	 *            write the tag data address offset
+	 * @param nDL
+	 *            write tag data area data length
+	 * @param data
+	 *            write data
+	 * @return
+	 */
+	static public int Writelables(byte[] password, int nUL, byte[] PCandEPC,
+			byte membank, int nSA, int nDL, byte[] data) {
+		Clean();
+		int nret = WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
+		if (!m_bASYC) {
+			m_bOK = false;
+			// счетчик повторных попыток записи в метку
+			int m_nReSend = 0;
+			StartASYCWritelables();
+			while ((!m_bOK) && (m_nReSend < 20)) {
+				m_nReSend++;
+				WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
+				try {
+					Thread.sleep(60);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду записи
+	 * данных в метку
+	 */
+	static void StartASYCWritelables() {
+
+		m_bASYC = true;
+		Thread thread = new Thread(new Runnable() {
+
+			public void run() {
+
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+
+				while (m_handler != null) {
+
+					nTemp = Read(m_buf, m_nCount, 1024);
+					m_nCount += nTemp;
+					if (nTemp == 0) {
+						m_nread++;
+						if (m_nread > 5)
+							break;
+					}
+
+					String str = reader.BytesToString(m_buf, 0, m_nCount);
+					Log.e(TAG, "Прочитанные данные: " + str);
+					String[] substr = Pattern.compile("BB0149").split(str);
+					Log.e(TAG, "Количество подстрок: " + substr.length);
+
+					for (int i = 0; i < substr.length; i++) {
+						if (substr[i].length() >= 10) {
+							Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
+							if (substr[i].substring(0, 10).equals("0001004B7E")) {
+								m_bOK = true;
+								Log.e(TAG, "Write OK");
+								Message msg = new Message();
+								msg.what = 2;
+								msg.obj = "OK";
+								m_handler.sendMessage(msg);
+								// принудительно выходим
+								m_handler = null;
+								break;
+							}
+						}
+
+					}
+
+				}
+
+				m_bASYC = false;
+			}
+		});
+		thread.start();
+	}
+
+	/**
+	 * inactivated label (results through the Handle asynchronous transmission)
+	 * 
+	 * @param btReadId
+	 *            reader.
+	 * @param pbtAryPassWord
+	 *            destroy the password (4 bytes)
+	 * @return
+	 */
+	static public int KillLables(byte[] password, int nUL, byte[] EPC) {
+		Clean();
+		int nret = Kill(password, nUL, EPC);
+		if (!m_bASYC) {
+			StartASYCKilllables();
+		}
+		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду по
+	 * отключению метки
+	 */
+	static void StartASYCKilllables() {
+		m_bASYC = true;
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+
+				while (m_handler != null) {
+
+					nTemp = Read(m_buf, m_nCount, 1024);
+					m_nCount += nTemp;
+					if (nTemp == 0) {
+						m_nread++;
+						if (m_nread > 5) {
+							break;
+						}
+					}
+					// Log.e("test",""+m_nCount+"="+m_nread);
+					String str = reader.BytesToString(m_buf, 0, m_nCount);
+					// Log.e("test",str);
+					String[] substr = Pattern.compile("BB0165").split(str);
+					// Log.e("test","sub="+substr.length);
+					for (int i = 0; i < substr.length; i++) {
+						if (substr[i].length() >= 10) {
+							if (substr[i].substring(0, 10).equals("000100677E")) {
+								Message msg = new Message();
+								msg.what = 2;
+								msg.obj = "OK".getBytes();
+								m_handler.sendMessage(msg);
+							} else {
+								Message msg = new Message();
+								msg.what = 2;
+								msg.obj = substr[i];
+								m_handler.sendMessage(msg);
+							}
+						}
+
+					}
+
+				}
+
+				m_bASYC = false;
+			}
+		});
+		thread.start();
+	}
+
+	/**
+	 * for a single label, data store Lock lock or unlock Unlock the label
+	 * 
+	 * @param password
+	 *            lock password
+	 * @param nUL
+	 *            PC+EPC length
+	 * @param PCandEPC
+	 *            PC+EPC data
+	 * @param nLD
+	 *            lock or unlock command
+	 * @return
+	 */
+	static public int LockLables(byte[] password, int nUL, byte[] PCandEPC,
+			int nLD) {
+		Clean();
+		int nret = Lock(password, nUL, PCandEPC, nLD);
+		if (!m_bASYC) {
+			StartASYCLocklables();
+		}
+		return nret;
+	}
+
+	/**
+	 * Запуск процесса чтения данных из считывателя в ответ на команду изменения
+	 * статусов доступа к областям данных метки
+	 */
+	static void StartASYCLocklables() {
+		m_bASYC = true;
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				// буфер для операций чтения из считывателя
+				byte[] m_buf = new byte[10240];
+				int nTemp = 0;
+				// позиция в буфере m_buf
+				int m_nCount = 0;
+				// мутный счётчик чтения "полных" "пакетов" данных из
+				// считывателя
+				int m_nread = 0;
+
+				while (m_handler != null) {
+					nTemp = Read(m_buf, m_nCount, 1024);
+					m_nCount += nTemp;
+					if (nTemp == 0) {
+						m_nread++;
+						if (m_nread > 5)
+							break;
+
+					}
+					String str = reader.BytesToString(m_buf, 0, m_nCount);
+					String[] substr = Pattern.compile("BB0182").split(str);
+					for (int i = 0; i < substr.length; i++) {
+						if (substr[i].length() >= 10) {
+							if (substr[i].substring(0, 10).equals("000100847E")) {
+								Message msg = new Message();
+								msg.what = 2;
+								msg.obj = "OK";
+								m_handler.sendMessage(msg);
+								Log.d("test", "Lock=OK");
+							} else {
+								Message msg = new Message();
+								msg.what = 2;
+								msg.obj = substr[i];
+								m_handler.sendMessage(msg);
+								Log.d("test", "Lock=FAIL");
+							}
+						}
+
+					}
+
+				}
+
+				m_bASYC = false;
+			}
+		});
+		thread.start();
+	}
+
+	/**
+	 * Возвращает маску доступа к областям памяти метки (попытка разобраться как
+	 * работает механизм доступа к областям памяти метки)
+	 * 
+	 * @param membank
+	 * @param mask
+	 * @return
+	 */
+	static public int getLockPayLoadNew(byte memoryBank, byte accessMask) {
+		int mask = 0x000000;
+		switch (memoryBank) {
+		// kill password
+		case 0:
+			switch (accessMask) {
+			// unlock
+			case 0:
+				mask = 0x0c0000;
+				break;
+			// lock
+			case 1:
+				mask = 0x0c0200;
+				break;
+			// permanent unlock
+			case 2:
+				mask = 0x0c0100;
+				break;
+			// permanent lock
+			case 3:
+				mask = 0x0C0300;
+				break;
+			}
+			break;
+		// access password
+		case 1:
+			switch (accessMask) {
+			// open
+			case 0:
+				mask = 0x080000;
+				break;
+			// pwd r/w
+			case 1:
+				mask = 0x080200;
+				break;
+			// permanent open
+			case 2:
+				mask = 0x080100;
+				break;
+			// permanent close
+			case 3:
+				mask = 0x080300;
+				break;
+			}
+			break;
+		// EPC
+		case 2:
+			break;
+		// TID
+		case 3:
+			break;
+		// USER
+		case 4:
+			break;
+		default:
+			break;
+		}
+
+		return mask;
+	}
+
+	/**
+	 * Возвращает маску доступа к областям памяти метки (почти оригинальный
+	 * вариант)
+	 * 
+	 * @param membank
+	 * @param mask
+	 * @return
+	 */
+	static public int getLockPayLoad(byte membank, byte mask) {
+		int nret = 0;
+		/*
+		 * switch (Mask) { case 0: switch (membank) {
+		 */
+		switch (membank) {
+		case 0:
+			switch (mask) {
+			case 0:
+				nret = 0x080000;
+				break;
+			case 1:
+				nret = 0x080200;
+				break;
+			case 2:
+				nret = 0x0c0100;
+				break;
+			case 3:
+				nret = 0x0c0300;
+				break;
+			}
+			break;
+		case 1:
+			switch (mask) {
+			case 0:
+				nret = 0x020000;
+				break;
+			case 1:
+				nret = 0x020080;
+				break;
+			case 2:
+				nret = 0x030040;
+				break;
+			case 3:
+				nret = 0x0300c0;
+				break;
+			}
+			break;
+		case 2:
+			switch (mask) {
+			case 0:
+				nret = 0x008000;
+				break;
+			case 1:
+				nret = 0x008020;
+				break;
+			case 2:
+				nret = 0x00c010;
+				break;
+			case 3:
+				nret = 0x00c030;
+				break;
+			}
+			break;
+		case 3:
+			switch (mask) {
+			case 0:
+				nret = 0x002000;
+				break;
+			case 1:
+				nret = 0x002008;
+				break;
+			case 2:
+				nret = 0x003004;
+				break;
+			case 3:
+				nret = 0x00300c;
+				break;
+			}
+			break;
+		case 4:
+			switch (mask) {
+			case 0:
+				nret = 0x000800;
+				break;
+			case 1:
+				nret = 0x000802;
+				break;
+			case 2:
+				nret = 0x000c01;
+				break;
+			case 3:
+				nret = 0x000c03;
+				break;
+			}
+			break;
+		}
+		return nret;
+	}
+
+	/**
+	 * Перевод строки шестнадцатиричных значений в массив byte
+	 * 
+	 * @param hexString
+	 * @return
+	 */
+	public static byte[] stringToBytes(String hexString) {
+		if (hexString == null || hexString.equals("")) {
+			return null;
+		}
+		hexString = hexString.toUpperCase(Locale.ENGLISH);
+		int length = hexString.length() / 2;
+		char[] hexChars = hexString.toCharArray();
+		byte[] d = new byte[length];
+		for (int i = 0; i < length; i++) {
+			int pos = i * 2;
+			d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+		}
+		return d;
+	}
+
+	/**
+	 * Перевод символа в byte
+	 * 
+	 * @param c
+	 * @return
+	 */
+	private static byte charToByte(char c) {
+		return (byte) "0123456789ABCDEF".indexOf(c);
+	}
+
+	/**
+	 * Перевод массив byte в строку шестнадцатиричных значений
+	 * 
+	 * @param b
+	 * @param nS
+	 * @param ncount
+	 * @return
+	 */
+	public static String BytesToString(byte[] b, int nS, int ncount) {
+		String ret = "";
+		int nMax = ncount > (b.length - nS) ? b.length - nS : ncount;
+		for (int i = 0; i < nMax; i++) {
+			String hex = Integer.toHexString(b[i + nS] & 0xFF);
+			if (hex.length() == 1) {
+				hex = '0' + hex;
+			}
+			ret += hex.toUpperCase(Locale.ENGLISH);
+		}
+		return ret;
+	}
+
+	/**
+	 * Перевод массива byte[4] в int
+	 * 
+	 * @param b
+	 * @return
+	 */
+	public static int byteToInt(byte[] b) {
+		int t2 = 0, temp = 0;
+		for (int i = 3; i >= 0; i--) {
+			t2 = t2 << 8;
+			temp = b[i];
+			if (temp < 0) {
+				temp += 256;
+			}
+			t2 = t2 + temp;
+
+		}
+		return t2;
+
+	}
+
+	/**
+	 * Перевод из массива byte в int
+	 * 
+	 * @param b
+	 * @param nIndex
+	 * @param ncount
+	 * @return
+	 */
+	public static int byteToInt(byte[] b, int nIndex, int ncount) {
+		int t2 = 0, temp = 0;
+		for (int i = 0; i < ncount; i++) {
+			t2 = t2 << 8;
+			temp = b[i + nIndex];
+			if (temp < 0) {
+				temp += 256;
+			}
+			t2 = t2 + temp;
+
+		}
+		return t2;
+
+	}
+
+	/**
+	 * Перевод int в массив byte[16]
+	 * 
+	 * @param content
+	 * @param offset
+	 * @return
+	 */
+	public static byte[] intToByte(int content, int offset) {
+
+		byte result[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		for (int j = offset; j < result.length; j += 4) {
+			result[j + 3] = (byte) (content & 0xff);
+			result[j + 2] = (byte) ((content >> 8) & 0xff);
+			result[j + 1] = (byte) ((content >> 16) & 0xff);
+			result[j] = (byte) ((content >> 24) & 0xff);
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param string
+	 * @return
+	 */
+	private static byte[] string2Bytes(String string) {
+		int blen = string.length() / 2;
+		byte[] data = new byte[blen];
+		for (int i = 0; i < blen; i++) {
+			String bStr = string.substring(2 * i, 2 * (i + 1));
+			data[i] = (byte) Integer.parseInt(bStr, 16);
+		}
+		return data;
+	}
+
+	/**
+	 * 
+	 * @param string
+	 * @param encoding
+	 * @return
+	 */
+	private static String decodeString(String string, String encoding) {
+		try {
+			byte[] data = string2Bytes(string);
+			return new String(data, encoding);
+		} catch (UnsupportedEncodingException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+
+	// далее идут native медоты из сопутствующей библиотеки
 
 	/**
 	 * Initialization device
@@ -103,11 +955,12 @@ public class reader {
 	static public native int Select(byte selPa, int nPTR, byte nMaskLen,
 			byte turncate, byte[] mask);
 
-	/* *
+	/**
 	 * set to send Select commands
 	 * 
-	 * @param data (0x01 is to cancel the Select instruction, 0x00 is the Select
-	 * instruction)
+	 * @param data
+	 *            (0x01 is to cancel the Select instruction, 0x00 is the Select
+	 *            instruction)
 	 * 
 	 * @return return 0x00, error is returned not 0
 	 */
@@ -184,24 +1037,6 @@ public class reader {
 	 * @return
 	 */
 	static public native int Kill(byte[] password, int nUL, byte[] EPC);
-
-	/**
-	 * inactivated label (results through the Handle asynchronous transmission)
-	 * 
-	 * @param btReadId
-	 *            reader.
-	 * @param pbtAryPassWord
-	 *            destroy the password (4 bytes)
-	 * @return
-	 */
-	static public int KillLables(byte[] password, int nUL, byte[] EPC) {
-		Clean();
-		int nret = Kill(password, nUL, EPC);
-		if (!m_bASYC) {
-			StartASYCKilllables();
-		}
-		return nret;
-	}
 
 	/**
 	 * To obtain the parameters
@@ -382,650 +1217,5 @@ public class reader {
 	 */
 	static public native int SetIOParameter(byte p1, byte p2, byte p3,
 			byte[] bufout);
-
-	static public int InventoryLables() {
-		int nret = Inventory();
-		if (!m_bASYC) {
-			StartASYClables();
-		}
-		return nret;
-	}
-
-	static public int InventoryLablesLoop() {
-		int nret = Inventory();
-		m_bLoop = true;
-		if (!m_bASYC) {
-			StartASYClables();
-		}
-		return nret;
-	}
-
-	static public void StopLoop() {
-		m_bLoop = false;
-	}
-
-	static public int MultInventoryLables() {
-		int nret = MultiInventory(65535);
-		if (!m_bASYC) {
-			StartASYClables();
-		}
-		return nret;
-	}
-
-	/***
-	 * read the label (results through the Handle asynchronous send a card, a
-	 * message)
-	 * 
-	 * @param password
-	 *            read the password, 4 bytes
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param membank
-	 *            tag data storage area
-	 * @param nSA
-	 *            read tag data address offset
-	 * @param nDL
-	 *            read tag data address length
-	 * @return
-	 */
-	static public int ReadLables(byte[] password, int nUL, byte[] PCandEPC,
-			byte membank, int nSA, int nDL) {
-		int nret = 0;
-		if (!m_bASYC) {
-			Clean();
-			nret = ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
-			m_bOK = false;
-			m_nReSend = 0;
-			StartASYCReadlables();
-			while ((!m_bOK) && (m_nReSend < 20)) {
-				m_nReSend++;
-				ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
-				try {
-					Thread.sleep(60);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return nret;
-	}
-
-	/**
-	 * for a single label, data store Lock lock or unlock Unlock the label
-	 * 
-	 * @param password
-	 *            lock password
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param nLD
-	 *            lock or unlock command
-	 * @return
-	 */
-	static public int LockLables(byte[] password, int nUL, byte[] PCandEPC,
-			int nLD) {
-		Clean();
-		int nret = Lock(password, nUL, PCandEPC, nLD);
-		if (!m_bASYC) {
-			StartASYCLocklables();
-		}
-		return nret;
-	}
-
-	/**
-	 * write tag (results through the Handle asynchronous send a card, a
-	 * message)
-	 * 
-	 * @param password
-	 *            password 4 bytes
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param membank
-	 *            tag data storage area
-	 * @param nSA
-	 *            write the tag data address offset
-	 * @param nDL
-	 *            write tag data area data length
-	 * @param data
-	 *            write data
-	 * @return
-	 */
-	static public int Writelables(byte[] password, int nUL, byte[] PCandEPC,
-			byte membank, int nSA, int nDL, byte[] data) {
-		Clean();
-		int nret = WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
-		if (!m_bASYC) {
-			m_bOK = false;
-			m_nReSend = 0;
-			StartASYCWritelables();
-			while ((!m_bOK) && (m_nReSend < 20)) {
-				m_nReSend++;
-				WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
-				try {
-					Thread.sleep(60);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return nret;
-	}
-	
-	static public int getLockPayLoadNew(byte memoryBank, byte accessMask) {
-		int mask = 0x000000;
-		switch (memoryBank) {
-		// kill password
-		case 0:
-			switch (accessMask) {
-			// unlock
-			case 0:
-				mask = 0x0c0000;
-				break;
-			// lock
-			case 1:
-				mask = 0x0c0200;
-				break;
-			// permanent unlock
-			case 2:
-				mask = 0x0c0100;
-				break;
-			// permanent lock
-			case 3:
-				mask = 0x0C0300;
-				break;
-			}
-			break;
-		// access password
-		case 1:
-			switch (accessMask) {
-			// open
-			case 0:
-				mask = 0x080000;
-				break;
-			// pwd r/w
-			case 1:
-				mask = 0x080200;
-				break;
-			// permanent open
-			case 2:
-				mask = 0x080100;
-				break;
-			// permanent close
-			case 3:
-				mask = 0x080300;
-				break;
-			}
-			break;
-		// EPC
-		case 2:
-			break;
-		// TID
-		case 3:
-			break;
-		// USER
-		case 4:
-			break;
-		default:
-			break;
-		}
-		
-		return mask;
-	}
-
-	static public int GetLockPayLoad(byte membank, byte Mask) {
-		int nret = 0;
-		/*
-		switch (Mask) {
-		case 0:
-			switch (membank) {
-		*/
-		switch (membank) {
-		case 0:
-			switch (Mask) {
-			case 0:
-				nret = 0x080000;
-				break;
-			case 1:
-				nret = 0x080200;
-				break;
-			case 2:
-				nret = 0x0c0100;
-				break;
-			case 3:
-				nret = 0x0c0300;
-				break;
-			}
-			break;
-		case 1:
-			switch (Mask) {
-			case 0:
-				nret = 0x020000;
-				break;
-			case 1:
-				nret = 0x020080;
-				break;
-			case 2:
-				nret = 0x030040;
-				break;
-			case 3:
-				nret = 0x0300c0;
-				break;
-			}
-			break;
-		case 2:
-			switch (Mask) {
-			case 0:
-				nret = 0x008000;
-				break;
-			case 1:
-				nret = 0x008020;
-				break;
-			case 2:
-				nret = 0x00c010;
-				break;
-			case 3:
-				nret = 0x00c030;
-				break;
-			}
-			break;
-		case 3:
-			switch (Mask) {
-			case 0:
-				nret = 0x002000;
-				break;
-			case 1:
-				nret = 0x002008;
-				break;
-			case 2:
-				nret = 0x003004;
-				break;
-			case 3:
-				nret = 0x00300c;
-				break;
-			}
-			break;
-		case 4:
-			switch (Mask) {
-			case 0:
-				nret = 0x000800;
-				break;
-			case 1:
-				nret = 0x000802;
-				break;
-			case 2:
-				nret = 0x000c01;
-				break;
-			case 3:
-				nret = 0x000c03;
-				break;
-			}
-			break;
-		}
-		return nret;
-	}
-
-	static void StartASYCKilllables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
-				while (m_handler != null) {
-
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-
-					}
-					// Log.e("test",""+m_nCount+"="+m_nread);
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					// Log.e("test",str);
-					String[] substr = Pattern.compile("BB0165").split(str);
-					// Log.e("test","sub="+substr.length);
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							if (substr[i].substring(0, 10).equals("000100677E")) {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = "OK".getBytes();
-								m_handler.sendMessage(msg);
-							} else {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = substr[i];
-								m_handler.sendMessage(msg);
-							}
-						}
-
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	static void StartASYCLocklables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
-				while (m_handler != null) {
-
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					String[] substr = Pattern.compile("BB0182").split(str);
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							if (substr[i].substring(0, 10).equals("000100847E")) {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = "OK";
-								m_handler.sendMessage(msg);
-								Log.d("test", "Lock=OK");
-							} else {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = substr[i];
-								m_handler.sendMessage(msg);
-								Log.d("test", "Lock=FAIL");
-							}
-						}
-
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	static void StartASYCWritelables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
-				while (m_handler != null) {
-
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					// Log.e("test", str);
-					String[] substr = Pattern.compile("BB0149").split(str);
-					// Log.e("test", "strlen="+substr.length);
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							if (substr[i].substring(0, 10).equals("0001004B7E")) {
-								m_bOK = true;
-								// Log.e("test", "ok");
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = "OK";
-								m_handler.sendMessage(msg);
-							}
-						}
-
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	static void StartASYCReadlables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				int nTemp = 0;
-				m_nCount = 0;
-				m_nread = 0;
-				int m_nReRead=0;
-				while (m_handler != null && (m_nReRead >= 0)) {
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					m_nReRead++;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					Log.e("test", str);
-					Log.e("test","m_bOK="+m_bOK);
-					String[] substr = Pattern.compile("BB0139").split(str);
-					for (int i = 0; i < substr.length; i++) {
-						Log.e("test",substr[i]);
-						if (substr[i].length() > 10) {
-							if (!substr[i].substring(0, 2).equals("BB")) {
-								Log.e("test","read ok");
-								m_bOK = true;
-								Message msg = new Message();
-								msg.what = (substr[i].length() - 8) / 2;
-								msg.obj = substr[i].substring(4,
-										substr[i].length() - 4);
-								/*
-								msg.obj = decodeString(
-										substr[i].substring(4,
-												substr[i].length() - 4), "GBK");
-								*/
-								m_handler.sendMessage(msg);
-							}
-						}
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	static void StartASYClables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				int nTemp = 0, nIndex = 0;
-				int m_nReRead=0;
-				boolean tag_find = false;
-				m_nCount = 0;
-				m_nReSend = 0;
-				nIndex = 0;
-				while (m_handler != null && (m_nReRead >= 0)) {
-					// nIndex = m_nCount;
-					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
-					m_nCount += nTemp;
-					m_nReRead++;
-					// Log.e("777777777777777777", "count=" + m_nCount);
-					if (nTemp == 0) {
-
-						String str = reader.BytesToString(m_buf, nIndex,
-								m_nCount - nIndex);
-						Log.e("test", str);
-						String[] substr = Pattern.compile("BB0222").split(str);
-						Log.e("test", "len=" + substr.length);
-						for (int i = 0; i < substr.length; i++) {
-							Log.e("test", substr[i]);
-							if (substr[i].length() > 16) {
-								if (!substr[i].substring(0, 2).equals("BB")) {
-									int nlen = Integer.valueOf(
-											substr[i].substring(0, 4), 16);
-									Log.e("test",substr[i].substring(0,4));
-									if ((nlen > 3)
-											&& (nlen < (substr[i].length() - 6) / 2)) {
-										Message msg = new Message();
-										msg.what = (substr[i].length() - 12) / 2;
-										msg.obj = substr[i].substring(6,
-												nlen * 2);
-										m_handler.sendMessage(msg);
-										tag_find = true;
-										m_bOK = true;
-									}
-								}
-							}
-						}
-						if (tag_find) {
-
-							//mSoundPool.play(msound, 1.0f, 1.0f, 0, 0, 1.0f);
-						}
-						if (m_bLoop) {
-							m_nCount = 0;
-							InventoryLablesLoop();
-							tag_find = false;
-						} else {
-							if ((m_nReSend < 20) && (!tag_find)) {
-								Inventory();
-								m_nReSend++;
-							} else
-								break;
-							tag_find = false;
-							// Log.e("efsfsd", "m_nReSend=" + m_nReSend);
-						}
-
-						if (m_nCount >= 1024)
-							m_nCount = 0;
-					}
-				}
-				// Log.e("end", "quit");
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	static {
-		System.loadLibrary("uhf-tools");
-		msound = mSoundPool.load("/system/media/audio/notifications/Altair.ogg",
-				1);
-	}
-
-	public static byte[] stringToBytes(String hexString) {
-		if (hexString == null || hexString.equals("")) {
-			return null;
-		}
-		hexString = hexString.toUpperCase(Locale.ENGLISH);
-		int length = hexString.length() / 2;
-		char[] hexChars = hexString.toCharArray();
-		byte[] d = new byte[length];
-		for (int i = 0; i < length; i++) {
-			int pos = i * 2;
-			d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
-		}
-		return d;
-	}
-
-	private static byte charToByte(char c) {
-		return (byte) "0123456789ABCDEF".indexOf(c);
-	}
-
-	public static String BytesToString(byte[] b, int nS, int ncount) {
-		String ret = "";
-		int nMax = ncount > (b.length - nS) ? b.length - nS : ncount;
-		for (int i = 0; i < nMax; i++) {
-			String hex = Integer.toHexString(b[i + nS] & 0xFF);
-			if (hex.length() == 1) {
-				hex = '0' + hex;
-			}
-			ret += hex.toUpperCase(Locale.ENGLISH);
-		}
-		return ret;
-	}
-
-	public static int byteToInt(byte[] b) // byteToInt
-	{
-		int t2 = 0, temp = 0;
-		for (int i = 3; i >= 0; i--) {
-			t2 = t2 << 8;
-			temp = b[i];
-			if (temp < 0) {
-				temp += 256;
-			}
-			t2 = t2 + temp;
-
-		}
-		return t2;
-
-	}
-
-	public static int byteToInt(byte[] b, int nIndex, int ncount) // byteToInt
-	{
-		int t2 = 0, temp = 0;
-		for (int i = 0; i < ncount; i++) {
-			t2 = t2 << 8;
-			temp = b[i + nIndex];
-			if (temp < 0) {
-				temp += 256;
-			}
-			t2 = t2 + temp;
-
-		}
-		return t2;
-
-	}
-
-	/**** int to byte ******/
-	public static byte[] intToByte(int content, int offset) {
-
-		byte result[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		for (int j = offset; j < result.length; j += 4) {
-			result[j + 3] = (byte) (content & 0xff);
-			result[j + 2] = (byte) ((content >> 8) & 0xff);
-			result[j + 1] = (byte) ((content >> 16) & 0xff);
-			result[j] = (byte) ((content >> 24) & 0xff);
-		}
-		return result;
-	}
-
-	private static byte[] string2Bytes(String string) {
-		int blen = string.length() / 2;
-		byte[] data = new byte[blen];
-		for (int i = 0; i < blen; i++) {
-			String bStr = string.substring(2 * i, 2 * (i + 1));
-			data[i] = (byte) Integer.parseInt(bStr, 16);
-		}
-		return data;
-	}
-
-	private static String decodeString(String string, String encoding) {
-		try {
-			byte[] data = string2Bytes(string);
-			return new String(data, encoding);
-		} catch (UnsupportedEncodingException ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
 
 }

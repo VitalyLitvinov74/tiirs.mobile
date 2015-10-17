@@ -6,7 +6,7 @@ import java.util.List;
 
 import ru.toir.mobile.R;
 import ru.toir.mobile.EquipmentInfoActivity;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 //import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -81,7 +81,7 @@ public class EquipmentsFragment extends Fragment {
 
 	private void FillSpinnersEquipments() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
 				.getAllItems();
 		spinner_type_adapter.clear();
@@ -176,9 +176,9 @@ public class EquipmentsFragment extends Fragment {
 
 	private void FillListViewEquipments(String type, String sort) {
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 //		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 //				new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = equipmentDBAdapter.getAllItems(

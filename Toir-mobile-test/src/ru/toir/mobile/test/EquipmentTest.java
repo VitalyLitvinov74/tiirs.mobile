@@ -4,7 +4,7 @@
 package ru.toir.mobile.test;
 
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import android.content.Context;
 import android.test.AndroidTestCase;
@@ -60,7 +60,7 @@ public class EquipmentTest extends AndroidTestCase {
 		Log.d(TAG, "setUp");
 		
 		// создаём тестовый контекст (в котором используются правильные пути к базе с префиксом к создаваемым файлам)
-		context = new TOiRDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
+		context = new ToirDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
 		
 		// удаляем базу
 		context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName());

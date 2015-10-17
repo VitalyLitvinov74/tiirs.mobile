@@ -10,11 +10,11 @@ import android.content.pm.PackageManager.NameNotFoundException;
  * @author koputo
  *
  */
-public class TOiRServerAPI {
+public class ToirServerAPI {
 	private Context context;
 	private String SERVER_API = "serverApiVersion";
 	
-	public TOiRServerAPI(Context _context){
+	public ToirServerAPI(Context _context){
 		context = _context;
 	}
 

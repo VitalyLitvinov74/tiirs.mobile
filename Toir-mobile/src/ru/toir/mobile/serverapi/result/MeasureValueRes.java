@@ -5,7 +5,7 @@ package ru.toir.mobile.serverapi.result;
 
 import java.util.ArrayList;
 
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import android.content.Context;
 
@@ -22,7 +22,7 @@ public class MeasureValueRes extends ru.toir.mobile.db.tables.MeasureValue {
 	}
 	
 	public static ArrayList<MeasureValueRes> load(Context context, String uuid) {
-		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(new TOiRDatabaseContext(context));
+		MeasureValueDBAdapter adapter = new MeasureValueDBAdapter(new ToirDatabaseContext(context));
 		ArrayList<ru.toir.mobile.db.tables.MeasureValue> valuesList = adapter.getItems(uuid);
 		if (valuesList != null) {
 			ArrayList<MeasureValueRes> returnList = new ArrayList<MeasureValueRes>();

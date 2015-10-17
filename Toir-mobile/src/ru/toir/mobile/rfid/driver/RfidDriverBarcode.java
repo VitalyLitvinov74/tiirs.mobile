@@ -1,7 +1,12 @@
+/**
+ * 
+ */
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+
+import com.google.zxing.integration.android.IntentIntegrator;
 import android.app.DialogFragment;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -10,24 +15,26 @@ import android.view.ViewGroup;
 
 /**
  * @author Dmitriy Logachov
- *         <p>
- *         Драйвер считывателя RFID который ни чего не делает.
- *         </p>
+ * 
  */
-public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
+public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
-	public RFIDDriverNull(DialogFragment dialog, Handler handler) {
+	private IntentIntegrator integrator;
+
+	public RfidDriverBarcode(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
 	}
 
 	@Override
 	public boolean init() {
+
 		return true;
 	}
 
 	@Override
 	public void readTagId() {
 
+		integrator.initiateScan();
 	}
 
 	@Override
@@ -37,6 +44,9 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
+
+		integrator = new IntentIntegrator(mDialogFragment);
+
 		return null;
 	}
 

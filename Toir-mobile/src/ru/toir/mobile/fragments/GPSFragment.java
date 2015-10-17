@@ -2,7 +2,7 @@ package ru.toir.mobile.fragments;
 
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -84,7 +84,7 @@ public class GPSFragment extends Fragment {
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		String equipmentUUID = "";
 		Float	equipment_latitude=0f, equipment_longitude=0f;
-		UsersDBAdapter users = new UsersDBAdapter(new TOiRDatabaseContext(
+		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
 		// (если он будет храниться глобально, то запрашивать постоянно уже не
@@ -131,7 +131,7 @@ public class GPSFragment extends Fragment {
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
 		mapView.getOverlays().add(aItemizedIconOverlay);		
 
-		TaskDBAdapter dbOrder = new TaskDBAdapter(new TOiRDatabaseContext(
+		TaskDBAdapter dbOrder = new TaskDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
 		ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(),
 				TaskStatusDBAdapter.STATUS_UUID_RECIEVED, "");
@@ -144,7 +144,7 @@ public class GPSFragment extends Fragment {
 		Integer cnt = 0, cnt2 = 0;
 		while (cnt < ordersList.size()) {
 			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-					new TOiRDatabaseContext(getActivity()
+					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 			ArrayList<EquipmentOperation> equipOperationList = operationDBAdapter
 					.getItems(ordersList.get(cnt).getUuid());
@@ -154,7 +154,7 @@ public class GPSFragment extends Fragment {
 			while (cnt2 < equipOperationList.size()) {
 				// equipOpList.get(cnt2).getUuid();
 				EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-						new TOiRDatabaseContext(getActivity()
+						new ToirDatabaseContext(getActivity()
 								.getApplicationContext()));
 				equipmentUUID = equipOperationList.get(cnt2).getEquipment_uuid();
 				if (equipmentUUID != null) {

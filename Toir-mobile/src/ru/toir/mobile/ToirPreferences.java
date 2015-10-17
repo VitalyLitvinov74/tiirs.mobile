@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
-public class TOiRPreferences extends Activity {
+public class ToirPreferences extends Activity {
 
 	/* (non-Javadoc)
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
@@ -12,10 +12,10 @@ public class TOiRPreferences extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getFragmentManager().beginTransaction().replace(android.R.id.content, new TOiRPreferenceFragment()).commit();
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new ToirPreferenceFragment()).commit();
 	}
 	
-	public class TOiRPreferenceFragment extends PreferenceFragment {
+	public class ToirPreferenceFragment extends PreferenceFragment {
 
 		/* (non-Javadoc)
 		 * @see android.preference.PreferenceFragment#onCreate(android.os.Bundle)

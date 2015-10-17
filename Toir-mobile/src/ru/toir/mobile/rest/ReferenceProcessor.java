@@ -17,7 +17,7 @@ import com.google.gson.GsonBuilder;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -328,7 +328,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -384,9 +384,9 @@ public class ReferenceProcessor {
 		String fileUuids[] = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID);
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		for (String fileUuid : fileUuids) {
 			EquipmentDocumentation document = documentationDBAdapter
@@ -473,7 +473,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -543,7 +543,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -614,7 +614,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -686,7 +686,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -757,7 +757,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -828,7 +828,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -965,7 +965,7 @@ public class ReferenceProcessor {
 
 		// получаем дату последней модификации содержимого таблицы
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		lastChangedAt = adapter.getLastChangedAt();
 		if (lastChangedAt != null) {
 			url.append('?')
@@ -1121,7 +1121,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentOperationDBAdapter operationAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		ArrayList<EquipmentOperation> operations = operationAdapter
 				.getItems(null);
 		if (operations != null) {
@@ -1158,7 +1158,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		ArrayList<Equipment> equipments = equipmentAdapter.getAllItems("", "");
 		if (equipments != null) {
 			Set<String> uuids = new HashSet<String>();
@@ -1227,14 +1227,14 @@ public class ReferenceProcessor {
 		Bundle result = new Bundle();
 
 		OperationPatternDBAdapter adapter0 = new OperationPatternDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (adapter0.replace(pattern.getLocal()) == -1) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			return result;
 		}
 
 		OperationPatternStepDBAdapter adapter1 = new OperationPatternStepDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!adapter1.saveItems(OperationPatternSrv
 				.getOperationPatternSteps(pattern))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1242,7 +1242,7 @@ public class ReferenceProcessor {
 		}
 
 		OperationPatternStepResultDBAdapter adapter2 = new OperationPatternStepResultDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!adapter2.saveItems(OperationPatternSrv
 				.getOperationPatternStepResults(pattern))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1250,7 +1250,7 @@ public class ReferenceProcessor {
 		}
 
 		MeasureTypeDBAdapter adapter3 = new MeasureTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!adapter3.saveItems(OperationPatternStepSrv.getMeasureTypes(pattern
 				.getSteps()))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1272,7 +1272,7 @@ public class ReferenceProcessor {
 		Bundle result = new Bundle();
 
 		OperationResultDBAdapter adapter0 = new OperationResultDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!adapter0
 				.saveItems(OperationResultSrv.getOperationResults(results))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1280,7 +1280,7 @@ public class ReferenceProcessor {
 		}
 
 		OperationTypeDBAdapter adapter1 = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (!adapter1.saveItems(OperationResultSrv.getOperationTypes(results))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1309,7 +1309,7 @@ public class ReferenceProcessor {
 		}
 
 		DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter
 				.saveItems(DocumentationTypeSrv.getDocumentationTypes(array))) {
@@ -1341,7 +1341,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(EquipmentStatusSrv.getEquipmentStatuses(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
@@ -1372,7 +1372,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(EquipmentTypeSrv.getEquipmentTypes(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
@@ -1403,7 +1403,7 @@ public class ReferenceProcessor {
 		}
 
 		MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(MeasureTypeSrv.getMeasureTypes(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
@@ -1434,7 +1434,7 @@ public class ReferenceProcessor {
 		}
 
 		TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(TaskStatusSrv.getTaskStatuses(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
@@ -1465,7 +1465,7 @@ public class ReferenceProcessor {
 		}
 
 		OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(OperationStatusSrv.getOperationStatuses(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
@@ -1496,7 +1496,7 @@ public class ReferenceProcessor {
 		}
 
 		OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(OperationTypeSrv.getOperationTypes(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
@@ -1527,7 +1527,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentDBAdapter equipmentAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (equipmentAdapter.replace(element.getLocal()) == -1) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1537,7 +1537,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentTypeDBAdapter equipmentTypeAdapter = new EquipmentTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (equipmentTypeAdapter.replace(element.getEquipmentType().getLocal()) == -1) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
@@ -1546,7 +1546,7 @@ public class ReferenceProcessor {
 		}
 
 		CriticalTypeDBAdapter criticalTypeAdapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (criticalTypeAdapter
 				.replace(element.getCriticalityType().getLocal()) == -1) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1556,7 +1556,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentStatusDBAdapter equipmentStatusAdapter = new EquipmentStatusDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (equipmentStatusAdapter.replace(element.getEquipmentStatus()
 				.getLocal()) == -1) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1566,7 +1566,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentDocumentationDBAdapter documentationAdapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		ArrayList<EquipmentSrv> elements = new ArrayList<EquipmentSrv>();
 		elements.add(element);
 		if (!documentationAdapter.saveItems(EquipmentSrv
@@ -1578,7 +1578,7 @@ public class ReferenceProcessor {
 		}
 
 		DocumentationTypeDBAdapter documentationTypeAdapter = new DocumentationTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 		if (!documentationTypeAdapter.saveItems(EquipmentSrv
 				.getDocumentationTypes(elements))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -1614,7 +1614,7 @@ public class ReferenceProcessor {
 		}
 
 		EquipmentDocumentationDBAdapter adapter = new EquipmentDocumentationDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (!adapter.saveItems(EquipmentDocumentationSrv
 				.getEquipmentDocumentations(array, equipmentUuid))) {
@@ -1649,7 +1649,7 @@ public class ReferenceProcessor {
 		}
 
 		CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
-				new TOiRDatabaseContext(mContext));
+				new ToirDatabaseContext(mContext));
 
 		if (adapter.saveItems(CriticalTypeSrv.getCriticalTypes(array))) {
 			result.putBoolean(IServiceProvider.RESULT, true);
