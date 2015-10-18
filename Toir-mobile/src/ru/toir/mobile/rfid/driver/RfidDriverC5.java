@@ -106,7 +106,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			this.password = password;
 			this.memoryBank = memoryBank;
 			this.address = address;
-			this.count = count;
+			this.count = count / 2;
 		}
 
 		@Override

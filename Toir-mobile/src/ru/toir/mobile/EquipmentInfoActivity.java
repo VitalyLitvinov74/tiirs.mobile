@@ -128,6 +128,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						new ToirDatabaseContext(getApplicationContext()));
 				Equipment equipment = adapter.getItem(equipment_uuid);
 				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+				final int readCount = 8;
 				Handler handler = new Handler(new Handler.Callback() {
 
 					@Override
@@ -138,13 +139,17 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
 							String tagData = (String) msg.obj;
 							Log.d(TAG, tagData);
-							Toast.makeText(getApplicationContext(),
-									"Считывание метки успешно.",
+							Toast.makeText(
+									getApplicationContext(),
+									"Считывание метки успешно. Запрошено: "
+											+ readCount + ", получено: "
+											+ tagData.length() / 2,
 									Toast.LENGTH_SHORT).show();
 						} else {
 							Log.d(TAG, "Ошибка чтения метки!");
 							Toast.makeText(getApplicationContext(),
-									"Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+									"Ошибка чтения метки.", Toast.LENGTH_SHORT)
+									.show();
 						}
 
 						// закрываем диалог
@@ -160,7 +165,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 				// читаем "произовольную" метку, ту которую найдём первой
 				rfidDialog.readTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, 4);
+						RfidDriverBase.MEMORY_BANK_USER, 0, readCount);
 
 				rfidDialog.show(getFragmentManager(), TAG);
 			}
@@ -193,7 +198,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 				// тестовые данные для примера
-				byte[] data = new byte[] { 14, 0, 2, 0, 4, 0, 6, 15 };
+				byte[] data = new byte[] { 10, 11, 12, 13, 14, 15, 10, 11 };
 
 				// пишем в метку с id привязанным к оборудованию
 				// rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
