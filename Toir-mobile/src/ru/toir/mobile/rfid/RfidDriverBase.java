@@ -30,7 +30,7 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	public static final String RESULT_RFID_TAG_DATA = "tagData";
 
 	// диалог в котором драйвер реализует интерфейс пользователя
-	protected DialogFragment mDialogFragment;
+	protected static DialogFragment mDialogFragment;
 
 	// Handler который будет обрабатывать сообщение от драйвера
 	// TODO нужно избавиться от static

@@ -4,13 +4,13 @@ import java.io.IOException;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Scanner {
+
+	private final static String TAG = "Scanner";
 	static public final int BARCODE_READ = 10;
 	static public final int BARCODE_NOREAD = 12;
 	static Boolean m_bASYC = false;
-	static int m_nCommand = 0;
 	static public Handler m_handler = null;
 
 	/**
@@ -88,31 +88,33 @@ public class Scanner {
 		if (m_bASYC) {
 			return;
 		} else {
-			// m_nCommand=nCode;
 			StartASYC();
 		}
 	}
 
 	/**
-	 * The Thread of the scan
+	 * Метод заглушка. Ни какие команды чтения в считыватель не отправляются.
+	 * Считывание происходит по нажатию железной кнопки "scan", то есть ввод в
+	 * поле ввода на котором установлен фокус ввода.
+	 */
+	static public void ReadHW() {
+	}
+
+	/**
+	 * The Thread of the scan. Автоматическое чтение штрихкода.
 	 */
 	static void StartASYC() {
 		m_bASYC = true;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
-
 				if (m_handler != null) {
 
 					String str = ReadSCAAuto();
-					
 					Message msg = new Message();
 					msg.what = str.length() > 0 ? BARCODE_READ : BARCODE_NOREAD;
 					msg.obj = str;
-					if (!str.equals(""))
-						m_handler.sendMessage(msg);
-
+					m_handler.sendMessage(msg);
 				}
-
 				m_bASYC = false;
 			}
 		});
@@ -136,10 +138,6 @@ public class Scanner {
 			e.printStackTrace();
 			Log.i("run", e.toString());
 		}
-	}
-
-	static private void showToast(String str) {
-		Toast.makeText(null, str, Toast.LENGTH_SHORT).show();
 	}
 
 	static {

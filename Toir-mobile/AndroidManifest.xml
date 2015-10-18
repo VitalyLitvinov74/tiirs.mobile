@@ -32,19 +32,13 @@
             </intent-filter>
         </activity>
         <meta-data android:value="1" android:name="serverApiVersion"/>
-        <activity android:name=".RFIDActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
         <activity android:name=".EquipmentInfoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".TOiRPreferences">
+        <activity android:name=".ToirPreferences">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
         </activity>

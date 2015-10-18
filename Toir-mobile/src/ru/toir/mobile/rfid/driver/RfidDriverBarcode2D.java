@@ -8,10 +8,13 @@ import android.hardware.barcode.Scanner;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.EditText;
 
 /**
  * @author olejek
@@ -22,8 +25,8 @@ import android.widget.TextView;
  */
 public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
+	private final static String TAG = "RfidDriverBarcode2D";
 	private Handler c5Handler = new MainHandler();
-	static private TextView scanText;
 
 	public RfidDriverBarcode2D(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
@@ -34,23 +37,27 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case Scanner.BARCODE_READ: {
-				// Toast.makeText(mActivity.getApplicationContext(),"Код: " +
-				// msg.obj, Toast.LENGTH_LONG).show();
-				scanText.setText((String) msg.obj);
-				// temporary
-				msg.obj = "01234567";
-
-				// ((RFIDActivity) mActivity).Callback((String) msg.obj);
+				String tagId;
+				if (!((String) msg.obj).equals("")) {
+					tagId = (String) msg.obj;
+				} else {
+					EditText ed = (EditText) mDialogFragment.getView()
+							.findViewById(R.id.catch2bbarcode);
+					tagId = ed.getText().toString();
+				}
+				Log.d(TAG, tagId);
 				Message message = new Message();
 				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
 				Bundle bundle = new Bundle();
-				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-						(String) msg.obj);
+				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID, tagId);
 				message.setData(bundle);
 				mHandler.sendMessage(message);
 				break;
 			}
 			case Scanner.BARCODE_NOREAD: {
+				Message message = new Message();
+				message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+				mHandler.sendMessage(message);
 				break;
 			}
 			default:
@@ -62,6 +69,9 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public boolean init() {
 
+		// initialize the scanner
+		Scanner.InitSCA();
+
 		Scanner.m_handler = c5Handler;
 
 		return true;
@@ -70,7 +80,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagId() {
 
-		Scanner.Read();
+		Scanner.ReadHW();
 	}
 
 	@Override
@@ -81,10 +91,37 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
-		// initialize the scanner
-		Scanner.InitSCA();
 		View view = inflater.inflate(R.layout.bar2d_read, viewGroup);
-		scanText = (TextView) view.findViewById(R.id.code_from_bar);
+		// инициализируем текстовое поле ввода в которое по нажатии железной
+		// кнопки будет введено считанное значение
+		EditText ed = (EditText) view.findViewById(R.id.catch2bbarcode);
+		ed.requestFocus();
+		ed.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+
+				Message message = new Message();
+				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
+				Bundle bundle = new Bundle();
+				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
+						s.toString());
+				message.setData(bundle);
+				mHandler.sendMessage(message);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+
+			}
+		});
 
 		return view;
 	}
@@ -92,25 +129,36 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			byte[] data) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, byte[] data) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 }

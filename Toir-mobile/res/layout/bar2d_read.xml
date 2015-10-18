@@ -18,16 +18,14 @@
         android:textColor="@color/gray"
         android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/code_from_bar"
-            android:layout_width="250dp"
-            android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_weight="0.01"
-            android:background="@color/grey"
-            android:ems="10" >
-        </TextView>
+    <EditText
+        android:id="@+id/catch2bbarcode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
 
         <Button
             android:id="@+id/cancelButton"
@@ -35,6 +33,5 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_marginTop="54dp"
-            android:onClick="cancelOnClick"
             android:text="@string/cancel" />
 </LinearLayout>
