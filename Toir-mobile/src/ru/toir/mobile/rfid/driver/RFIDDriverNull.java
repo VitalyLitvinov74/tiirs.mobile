@@ -4,6 +4,7 @@ import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
 import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,9 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagId() {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
@@ -44,24 +48,36 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			byte[] data) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, byte[] data) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 }

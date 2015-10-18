@@ -55,6 +55,9 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		/*
 		 * В данном драйвере реальной записи не происходит.
 		 */
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
@@ -131,6 +134,9 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		/*
 		 * В данном драйвере реального считывания не происходит.
 		 */
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
@@ -139,6 +145,9 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		/*
 		 * В данном драйвере реального считывания не происходит.
 		 */
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
@@ -147,6 +156,9 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		/*
 		 * В данном драйвере реальной записи не происходит.
 		 */
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 }

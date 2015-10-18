@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class reader {
 
-	private static final String TAG = "C5Reader";
+	private static final String TAG = "reader";
 
 	// обработчик через который класс общается с внешним миром
 	static public Handler m_handler = null;

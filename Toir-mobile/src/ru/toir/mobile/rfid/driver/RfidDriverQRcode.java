@@ -183,24 +183,36 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			byte[] data) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, byte[] data) {
 
+		Message message = new Message();
+		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		mHandler.sendMessage(message);
 	}
 
 }
