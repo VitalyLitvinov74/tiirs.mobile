@@ -313,19 +313,19 @@ public class TaskFragment extends Fragment {
 					((TextView) view).setText(sDate);
 					return true;
 				}
-/*
-				if (viewId == R.id.ti_Close) {
-					long lDate = cursor.getLong(columnIndex);
-					String sDate;
-					if (lDate != 0) {
-						sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
-					} else {
-						sDate = "нет";
-					}
-					((TextView) view).setText(sDate);
-					return true;
-				}
-*/
+
+				// if (viewId == R.id.ti_Close) {
+				// long lDate = cursor.getLong(columnIndex);
+				// String sDate;
+				// if (lDate != 0) {
+				// sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
+				// } else {
+				// sDate = "нет";
+				// }
+				// ((TextView) view).setText(sDate);
+				// return true;
+				// }
+
 				if (viewId == R.id.ti_ImageStatus) {
 					int image_id = R.drawable.img_status_3;
 					String taskStatus = cursor.getString(columnIndex);
@@ -756,21 +756,26 @@ public class TaskFragment extends Fragment {
 				equipment_operation_uuid);
 		bundle.putString(OperationActivity.TASK_UUID_EXTRA, task_uuid);
 		bundle.putString(OperationActivity.EQUIPMENT_UUID_EXTRA, equipment_uuid);
-		
+
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				Bundle data = msg.getData();
-				String tagId = data.getString(RfidDriverBase.RESULT_RFID_TAG_ID);
-				Log.d(TAG, "нужна: " + equipment_tag + " считали: " + tagId);
-				Intent operationActivity = new Intent(getActivity(),
-						OperationActivity.class);
-				if (equipment_tag.equals(tagId)) {
-					operationActivity.putExtras(bundle);
-					startActivity(operationActivity);
+				if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					String tagId = (String) msg.obj;
+					Log.d(TAG, "нужна: " + equipment_tag + " считали: " + tagId);
+					Intent operationActivity = new Intent(getActivity(),
+							OperationActivity.class);
+					if (equipment_tag.equals(tagId)) {
+						operationActivity.putExtras(bundle);
+						startActivity(operationActivity);
+					} else {
+						Toast.makeText(getActivity(),
+								"Не верное оборудование!!!", Toast.LENGTH_SHORT)
+								.show();
+					}
 				} else {
-					Toast.makeText(getActivity(), "Не верное оборудование!!!",
+					Toast.makeText(getActivity(), "Ошибка чтения метки.",
 							Toast.LENGTH_SHORT).show();
 				}
 				rfidDialog.dismiss();
@@ -778,7 +783,8 @@ public class TaskFragment extends Fragment {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getActivity().getApplicationContext(), handler);
+		rfidDialog = new RfidDialog(getActivity().getApplicationContext(),
+				handler);
 		rfidDialog.readTagId();
 		rfidDialog.show(getActivity().getFragmentManager(), "aaaa");
 	}

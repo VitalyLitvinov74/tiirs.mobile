@@ -5,7 +5,6 @@ import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
 import android.hardware.uhf.magic.reader;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -33,8 +32,8 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 		Log.d(TAG, "init");
 
-		android.hardware.uhf.magic.reader.init("/dev/ttyMT1");
-		android.hardware.uhf.magic.reader.Open("/dev/ttyMT1");
+		reader.init("/dev/ttyMT1");
+		reader.Open("/dev/ttyMT1");
 		if (reader.SetTransmissionPower(1950) != 0x11) {
 			if (reader.SetTransmissionPower(1950) != 0x11) {
 				reader.SetTransmissionPower(1950);
@@ -54,15 +53,17 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		@Override
 		public void handleMessage(Message message) {
 
-			if (message.what != 0) {
+			if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 				String data = (String) message.obj;
 				Log.d(TAG, data);
 				reader.StopLoop();
 				Message result = new Message();
 				result.arg1 = RESULT_RFID_SUCCESS;
-				Bundle bundle = new Bundle();
-				bundle.putString(RESULT_RFID_TAG_ID, data);
-				result.setData(bundle);
+				result.obj = data;
+				mHandler.sendMessage(result);
+			} else {
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_READ_ERROR;
 				mHandler.sendMessage(result);
 			}
 		}
@@ -110,10 +111,10 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 		@Override
 		public void handleMessage(Message message) {
-			if (message.what != 0) {
+
+			if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 				String tagId = (String) message.obj;
 				Log.d(TAG, tagId);
-				// TODO нужно ли это?
 				reader.StopLoop();
 				// запускаем чтение метки
 				reader.m_handler = new ReadTagDataHandler();
@@ -121,6 +122,10 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 						reader.stringToBytes(tagId).length,
 						reader.stringToBytes(tagId), (byte) memoryBank,
 						(byte) address, count);
+			} else {
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_READ_ERROR;
+				mHandler.sendMessage(result);
 			}
 		}
 	}
@@ -139,16 +144,18 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	static private class ReadTagDataHandler extends Handler {
 		@Override
 		public void handleMessage(Message message) {
-			if (message.what != 0) {
+
+			if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 				String data = (String) message.obj;
 				Log.d(TAG, data);
-				// TODO нужно ли это?
 				reader.StopLoop();
 				Message result = new Message();
 				result.arg1 = RESULT_RFID_SUCCESS;
-				Bundle bundle = new Bundle();
-				bundle.putString(RESULT_RFID_TAG_DATA, data);
-				result.setData(bundle);
+				result.obj = data;
+				mHandler.sendMessage(result);
+			} else {
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_READ_ERROR;
 				mHandler.sendMessage(result);
 			}
 		}
@@ -182,17 +189,20 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		@Override
 		public void handleMessage(Message message) {
 
-			if (message.what != 0) {
+			if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 				String tagId = (String) message.obj;
 				Log.d(TAG, tagId);
-				// TODO нужно ли это?
 				reader.StopLoop();
 				// запускаем запись в метку
 				reader.m_handler = new WriteTagDataHandler();
 				reader.Writelables(reader.stringToBytes(password),
 						reader.stringToBytes(tagId).length,
-						reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
-						data.length, data);
+						reader.stringToBytes(tagId), (byte) memoryBank,
+						(byte) address, data.length, data);
+			} else {
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_READ_ERROR;
+				mHandler.sendMessage(result);
 			}
 		}
 	}
@@ -203,28 +213,23 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 		reader.m_handler = new WriteTagDataHandler();
 
-		int rc = reader.Writelables(reader.stringToBytes(password),
+		reader.Writelables(reader.stringToBytes(password),
 				reader.stringToBytes(tagId).length,
 				reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
 				data.length, data);
-
-		// TODO всё до конца метода - лишнее?
-		Message message = new Message();
-		if (rc >= 0) {
-			message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-		} else {
-			message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
-		}
-		mHandler.sendMessage(message);
 	}
 
 	static private class WriteTagDataHandler extends Handler {
 		@Override
 		public void handleMessage(Message message) {
 
-			if (message.what != 0) {
+			if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 				Message result = new Message();
 				result.arg1 = RESULT_RFID_SUCCESS;
+				mHandler.sendMessage(result);
+			} else {
+				Message result = new Message();
+				result.arg1 = RESULT_RFID_WRITE_ERROR;
 				mHandler.sendMessage(result);
 			}
 		}

@@ -136,10 +136,15 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						Log.d(TAG, "Получили сообщение из драйвра.");
 
 						if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
-							Bundle bundle = msg.getData();
-							String tagData = bundle
-									.getString(RfidDriverBase.RESULT_RFID_TAG_DATA);
+							String tagData = (String) msg.obj;
 							Log.d(TAG, tagData);
+							Toast.makeText(getApplicationContext(),
+									"Считывание метки успешно.",
+									Toast.LENGTH_SHORT).show();
+						} else {
+							Log.d(TAG, "Ошибка чтения метки!");
+							Toast.makeText(getApplicationContext(),
+									"Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
 						}
 
 						// закрываем диалог
@@ -155,7 +160,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 				// читаем "произовольную" метку, ту которую найдём первой
 				rfidDialog.readTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+						RfidDriverBase.MEMORY_BANK_USER, 0, 4);
 
 				rfidDialog.show(getFragmentManager(), TAG);
 			}

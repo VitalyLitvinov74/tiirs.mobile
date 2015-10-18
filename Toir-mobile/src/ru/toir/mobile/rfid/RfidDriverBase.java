@@ -27,7 +27,6 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	public static final int RESULT_RFID_CANCEL = 5;
 
 	public static final String RESULT_RFID_TAG_ID = "tagId";
-	public static final String RESULT_RFID_TAG_DATA = "tagData";
 
 	// диалог в котором драйвер реализует интерфейс пользователя
 	protected static DialogFragment mDialogFragment;

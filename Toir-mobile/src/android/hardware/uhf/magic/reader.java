@@ -3,6 +3,8 @@ package android.hardware.uhf.magic;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import ru.toir.mobile.rfid.RfidDriverBase;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
@@ -108,12 +110,13 @@ public class reader {
 		// для поиска меток в цикле пока даже не могу придумать применения, от
 		// задачи соответственно будет и решение по этому режиму.
 		m_bASYC = true;
+		m_bOK = false;
 
 		Thread thread = new Thread(new Runnable() {
 
 			public void run() {
 
-				Log.d(TAG, "enter");
+				Log.d(TAG, "Search tag: start");
 				// буфер для операций чтения из считывателя
 				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
@@ -136,26 +139,21 @@ public class reader {
 						// желаемых данных
 						String str = reader.BytesToString(m_buf, nIndex,
 								m_nCount - nIndex);
-						Log.e(TAG, "Прочитанные данные: " + str);
+						Log.d(TAG, "Прочитанные данные: " + str);
 						String[] substr = Pattern.compile("BB0222").split(str);
-						Log.e(TAG, "Количество подстрок: " + substr.length);
+						Log.d(TAG, "Количество подстрок: " + substr.length);
 						for (int i = 0; i < substr.length; i++) {
-							Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
+							Log.d(TAG, "Подстрока №" + i + " : " + substr[i]);
 							if (substr[i].length() > 16) {
 								if (!substr[i].substring(0, 2).equals("BB")) {
 									int nlen = Integer.valueOf(
 											substr[i].substring(0, 4), 16);
-									Log.e(TAG, "количество байт данных: 0x"
+									Log.d(TAG, "количество байт данных: 0x"
 											+ substr[i].substring(0, 4));
 									if ((nlen > 3)
 											&& (nlen < (substr[i].length() - 6) / 2)) {
 										Message msg = new Message();
-										// что это за значение понять не
-										// возможно, видимо размер передаваемых
-										// данных в байтах, но тогда он должен
-										// быть substr[i].length() - 14,
-										// либо равен nlen
-										msg.what = (substr[i].length() - 12) / 2;
+										msg.what = RfidDriverBase.RESULT_RFID_SUCCESS;
 										msg.obj = substr[i].substring(6,
 												nlen * 2);
 										m_handler.sendMessage(msg);
@@ -188,13 +186,23 @@ public class reader {
 							// Log.e("efsfsd", "m_nReSend=" + m_nReSend);
 						}
 
-						if (m_nCount >= 1024) {
+						if (m_nCount >= 10240) {
 							m_nCount = 0;
 						}
 					}
 				}
+
 				Log.e(TAG, "quit");
+
 				m_bASYC = false;
+
+				if (!m_bOK) {
+					Message msg = new Message();
+					msg.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
+					m_handler.sendMessage(msg);
+				}
+
+				Log.d(TAG, "Search tag: quit");
 			}
 		});
 		thread.start();
@@ -246,9 +254,13 @@ public class reader {
 	 * данных из метки
 	 */
 	static void StartASYCReadlables() {
+
 		m_bASYC = true;
+		m_bOK = false;
+
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
+				Log.d(TAG, "Read data: start");
 				// буфер для операций чтения из считывателя
 				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
@@ -269,7 +281,6 @@ public class reader {
 					}
 					String str = reader.BytesToString(m_buf, 0, m_nCount);
 					Log.e(TAG, "Прочитанные данные: " + str);
-					// Log.e("test", "m_bOK=" + m_bOK);
 					String[] substr = Pattern.compile("BB0139").split(str);
 					Log.e(TAG, "Количество подстрок: " + substr.length);
 					for (int i = 0; i < substr.length; i++) {
@@ -279,14 +290,9 @@ public class reader {
 								Log.e(TAG, "read ok");
 								m_bOK = true;
 								Message msg = new Message();
-								msg.what = (substr[i].length() - 8) / 2;
+								msg.what = RfidDriverBase.RESULT_RFID_SUCCESS;
 								msg.obj = substr[i].substring(4,
 										substr[i].length() - 4);
-								/*
-								 * msg.obj = decodeString(
-								 * substr[i].substring(4, substr[i].length() -
-								 * 4), "GBK");
-								 */
 								m_handler.sendMessage(msg);
 								// принудительно выходим
 								m_nReRead = -1;
@@ -298,6 +304,14 @@ public class reader {
 				}
 
 				m_bASYC = false;
+
+				if (!m_bOK) {
+					Message msg = new Message();
+					msg.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
+					m_handler.sendMessage(msg);
+				}
+
+				Log.d(TAG, "Read data: quit");
 			}
 		});
 		thread.start();
@@ -352,10 +366,13 @@ public class reader {
 	static void StartASYCWritelables() {
 
 		m_bASYC = true;
+		m_bOK = false;
+
 		Thread thread = new Thread(new Runnable() {
 
 			public void run() {
 
+				Log.d(TAG, "Write data: start");
 				// буфер для операций чтения из считывателя
 				byte[] m_buf = new byte[10240];
 				int nTemp = 0;
@@ -387,7 +404,7 @@ public class reader {
 								m_bOK = true;
 								Log.e(TAG, "Write OK");
 								Message msg = new Message();
-								msg.what = 2;
+								msg.what = RfidDriverBase.RESULT_RFID_SUCCESS;
 								msg.obj = "OK";
 								m_handler.sendMessage(msg);
 								// принудительно выходим
@@ -401,6 +418,14 @@ public class reader {
 				}
 
 				m_bASYC = false;
+
+				if (!m_bOK) {
+					Message msg = new Message();
+					msg.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+					m_handler.sendMessage(msg);
+				}
+
+				Log.d("TAG", "Write data: quit");
 			}
 		});
 		thread.start();

@@ -261,8 +261,7 @@ public class MainActivity extends FragmentActivity {
 				Log.d(TAG, "Получили сообщение из драйвра.");
 
 				if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
-					Bundle bundle = msg.getData();
-					String tagId = bundle.getString(RfidDriverBase.RESULT_RFID_TAG_ID);
+					String tagId = (String) msg.obj;
 					Log.d(TAG, tagId);
 
 					AuthorizedUser.getInstance().setTagId(tagId);
@@ -297,7 +296,7 @@ public class MainActivity extends FragmentActivity {
 		rfidDialog = new RfidDialog(getApplicationContext(), handler);
 		rfidDialog.readTagId();
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
-		
+
 	}
 
 	/**
