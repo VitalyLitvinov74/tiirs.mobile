@@ -106,7 +106,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			this.password = password;
 			this.memoryBank = memoryBank;
 			this.address = address;
-			this.count = count / 2;
+			this.count = count;
 		}
 
 		@Override
@@ -121,7 +121,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				reader.ReadLables(reader.stringToBytes(password),
 						reader.stringToBytes(tagId).length,
 						reader.stringToBytes(tagId), (byte) memoryBank,
-						(byte) address, count);
+						(byte) address, count / 2);
 			} else {
 				Message result = new Message();
 				result.arg1 = RESULT_RFID_READ_ERROR;
@@ -138,7 +138,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		reader.ReadLables(reader.stringToBytes(password),
 				reader.stringToBytes(tagId).length,
 				reader.stringToBytes(tagId), (byte) memoryBank, (byte) address,
-				count);
+				count / 2);
 	}
 
 	static private class ReadTagDataHandler extends Handler {

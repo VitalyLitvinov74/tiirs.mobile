@@ -199,6 +199,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 				// тестовые данные для примера
 				byte[] data = new byte[] { 10, 11, 12, 13, 14, 15, 10, 11 };
+				data = new byte[] { 10, 10, 10, 10 };
 
 				// пишем в метку с id привязанным к оборудованию
 				// rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
