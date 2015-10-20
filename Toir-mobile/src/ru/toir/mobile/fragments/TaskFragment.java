@@ -122,10 +122,10 @@ public class TaskFragment extends Fragment {
 								.getInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT);
 						if (count > 0) {
 							Toast.makeText(getActivity(),
-									"Количество новых нарядов " + count,
+									"Количество нарядов " + count,
 									Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(getActivity(), "Новых нарядов нет.",
+							Toast.makeText(getActivity(), "Нарядов нет.",
 									Toast.LENGTH_SHORT).show();
 						}
 					} else {
@@ -133,7 +133,7 @@ public class TaskFragment extends Fragment {
 						String message = bundle
 								.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getActivity(),
-								"Ошибка при получении нарядов.\r\n" + message,
+								"Ошибка при получении нарядов." + message,
 								Toast.LENGTH_LONG).show();
 					}
 
@@ -799,44 +799,89 @@ public class TaskFragment extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		// добавляем элемент меню для получения наряда
-		MenuItem getTask = menu.add("Получить наряды");
-		getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+		// добавляем элемент меню для получения новых нарядов
+		MenuItem getTaskNew = menu.add("Получить новые наряды");
+		getTaskNew
+				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				Log.d("test", "Получаем наряд.");
-				TaskServiceHelper tsh = new TaskServiceHelper(getActivity()
-						.getApplicationContext(),
-						TaskServiceProvider.Actions.ACTION_GET_TASK);
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						Log.d(TAG, "Получаем новые наряды.");
+						TaskServiceHelper tsh = new TaskServiceHelper(
+								getActivity().getApplicationContext(),
+								TaskServiceProvider.Actions.ACTION_GET_TASK);
 
-				getActivity()
-						.registerReceiver(mReceiverGetTask, mFilterGetTask);
+						getActivity().registerReceiver(mReceiverGetTask,
+								mFilterGetTask);
 
-				tsh.GetTask();
+						tsh.GetTaskNew();
 
-				// показываем диалог получения наряда
-				processDialog = new ProgressDialog(getActivity());
-				processDialog.setMessage("Получаем наряд");
-				processDialog.setIndeterminate(true);
-				processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				processDialog.setCancelable(false);
-				processDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-						"Отмена", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								getActivity().unregisterReceiver(
-										mReceiverGetTask);
-								Toast.makeText(getActivity(),
-										"Получение нарядов отменено",
-										Toast.LENGTH_SHORT).show();
-							}
-						});
-				processDialog.show();
-				return true;
-			}
-		});
+						// показываем диалог получения наряда
+						processDialog = new ProgressDialog(getActivity());
+						processDialog.setMessage("Получаем наряды");
+						processDialog.setIndeterminate(true);
+						processDialog
+								.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+						processDialog.setCancelable(false);
+						processDialog.setButton(
+								DialogInterface.BUTTON_NEGATIVE, "Отмена",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										getActivity().unregisterReceiver(
+												mReceiverGetTask);
+										Toast.makeText(getActivity(),
+												"Получение нарядов отменено",
+												Toast.LENGTH_SHORT).show();
+									}
+								});
+						processDialog.show();
+						return true;
+					}
+				});
+
+		// добавляем элемент меню для получения "архивных" нарядов
+		MenuItem getTaskDone = menu.add("Получить сделанные наряды");
+		getTaskDone
+				.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						Log.d("test", "Получаем сделанные наряды.");
+						TaskServiceHelper tsh = new TaskServiceHelper(
+								getActivity().getApplicationContext(),
+								TaskServiceProvider.Actions.ACTION_GET_TASK);
+
+						getActivity().registerReceiver(mReceiverGetTask,
+								mFilterGetTask);
+
+						tsh.GetTaskDone();
+
+						// показываем диалог получения наряда
+						processDialog = new ProgressDialog(getActivity());
+						processDialog.setMessage("Получаем наряды");
+						processDialog.setIndeterminate(true);
+						processDialog
+								.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+						processDialog.setCancelable(false);
+						processDialog.setButton(
+								DialogInterface.BUTTON_NEGATIVE, "Отмена",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										getActivity().unregisterReceiver(
+												mReceiverGetTask);
+										Toast.makeText(getActivity(),
+												"Получение нарядов отменено",
+												Toast.LENGTH_SHORT).show();
+									}
+								});
+						processDialog.show();
+						return true;
+					}
+				});
 
 		// добавляем элемент меню для отправки результатов выполнения нарядов
 		MenuItem sendTaskResultMenu = menu.add("Отправить результаты");

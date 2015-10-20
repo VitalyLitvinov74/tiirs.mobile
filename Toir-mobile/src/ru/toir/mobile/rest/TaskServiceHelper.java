@@ -14,7 +14,6 @@ public class TaskServiceHelper extends ServiceHelperBase {
 
 	/**
 	 * @param context
-	 * @param providerId
 	 * @param resultAction
 	 */
 	public TaskServiceHelper(Context context, String resultAction) {
@@ -22,19 +21,32 @@ public class TaskServiceHelper extends ServiceHelperBase {
 	}
 
 	/**
+	 * Получаем новые наряды
 	 * 
-	 * @param token
 	 */
-	public void GetTask() {
+	public void GetTaskNew() {
 
-		RunMethod(TaskServiceProvider.Methods.GET_TASK);
+		Bundle bundle = new Bundle();
+		bundle.putString(TaskServiceProvider.Methods.PARAMETER_GET_TASK_STATUS, "new");
+		RunMethod(TaskServiceProvider.Methods.GET_TASK, bundle);
+	}
+
+	/**
+	 * Получаем "архивные" наряды, те у которых статус не "Новый"
+	 * 
+	 */
+	public void GetTaskDone() {
+
+		Bundle bundle = new Bundle();
+		bundle.putString(TaskServiceProvider.Methods.PARAMETER_GET_TASK_STATUS, "done");
+		RunMethod(TaskServiceProvider.Methods.GET_TASK, bundle);
 	}
 
 	/**
 	 * Отправляет результат выполнения наряда
 	 * 
-	 * @param token
-	 * @param taskUuids набор uuid нарядов для отправки их результатов
+	 * @param taskUuids
+	 *            набор uuid нарядов для отправки их результатов
 	 */
 	public void SendTaskResult(String[] taskUuids) {
 

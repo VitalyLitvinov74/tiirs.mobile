@@ -14,8 +14,6 @@ public class TaskServiceProvider implements IServiceProvider {
 
 	private final Context mContext;
 
-	// TODO реализовать получение нарядов по новым урл api/orders/new и
-	// api/order/done
 	public static class Methods {
 		// список методов
 		public static final int GET_TASK = 1;
@@ -23,6 +21,7 @@ public class TaskServiceProvider implements IServiceProvider {
 
 		// список параметров к методам
 		public static final String PARAMETER_TASK_UUID = "taskUuid";
+		public static final String PARAMETER_GET_TASK_STATUS = "status";
 
 		// список возвращаемых значений
 		public static final String RESULT_GET_TASK_COUNT = "taskCount";
@@ -77,7 +76,7 @@ public class TaskServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * Получение нарядов с сервера
+	 * Получение новых нарядов с сервера
 	 * 
 	 * @param extras
 	 * @return

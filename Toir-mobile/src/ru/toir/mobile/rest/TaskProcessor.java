@@ -56,6 +56,7 @@ import android.util.Log;
 public class TaskProcessor {
 
 	private Context mContext;
+
 	private static final String TASK_GET_URL = "/api/orders/";
 	private static final String TASK_SEND_RESULT_URL = "/api/orders/";
 	private String mServerUrl;
@@ -78,7 +79,7 @@ public class TaskProcessor {
 	}
 
 	/**
-	 * Получение нарядов со статусом "Новый"
+	 * Получение нарядов
 	 * 
 	 * @param bundle
 	 * @return
@@ -94,14 +95,18 @@ public class TaskProcessor {
 			return result;
 		}
 
+		String status = bundle
+				.getString(TaskServiceProvider.Methods.PARAMETER_GET_TASK_STATUS);
+
 		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
 				.getWritableDatabase();
 		db.beginTransaction();
 
 		boolean success;
 
-		// получаем наряды
-		Bundle taskResult = getTasks();
+		// получаем новые наряды
+		String url = mServerUrl + TASK_GET_URL + status;
+		Bundle taskResult = getTasks(url);
 		success = taskResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
 			db.endTransaction();
@@ -136,6 +141,17 @@ public class TaskProcessor {
 			result.putAll(operationResultsResult);
 		}
 
+		// получаем статусы операций
+		Bundle operationStatusesResult = getOperationStatuses();
+		success = operationStatusesResult.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			db.endTransaction();
+			return operationStatusesResult;
+		} else {
+			// добавляем в результат все элементы ответа
+			result.putAll(operationStatusesResult);
+		}
+
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
@@ -148,7 +164,7 @@ public class TaskProcessor {
 	 * 
 	 * @return
 	 */
-	private Bundle getTasks() {
+	private Bundle getTasks(String url) {
 
 		URI requestUri = null;
 		String token = AuthorizedUser.getInstance().getToken();
@@ -156,7 +172,7 @@ public class TaskProcessor {
 		Bundle result = new Bundle();
 
 		try {
-			requestUri = new URI(mServerUrl + TASK_GET_URL);
+			requestUri = new URI(url);
 			Log.d("test", "requestUri = " + requestUri.toString());
 
 			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
@@ -245,6 +261,26 @@ public class TaskProcessor {
 					uuids);
 
 			return processor.getOperationResult(bundle);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
+		}
+	}
+
+	/**
+	 * Получаем все возможные статусы операций
+	 * 
+	 * @return
+	 */
+	private Bundle getOperationStatuses() {
+
+		try {
+			ReferenceProcessor processor = new ReferenceProcessor(mContext);
+			Bundle bundle = new Bundle();
+			return processor.getOperationStatus(bundle);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
