@@ -14,6 +14,8 @@ public class TaskServiceProvider implements IServiceProvider {
 
 	private final Context mContext;
 
+	// TODO реализовать получение нарядов по новым урл api/orders/new и
+	// api/order/done
 	public static class Methods {
 		// список методов
 		public static final int GET_TASK = 1;

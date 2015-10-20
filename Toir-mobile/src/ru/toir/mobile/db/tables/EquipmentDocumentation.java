@@ -10,6 +10,7 @@ public class EquipmentDocumentation extends BaseTable {
 	private String documentation_type_uuid;
 	private String title;
 	private String path;
+	private boolean required;
 
 	/**
 	 * 
@@ -75,6 +76,20 @@ public class EquipmentDocumentation extends BaseTable {
 	 */
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	/**
+	 * @return the required
+	 */
+	public boolean isRequired() {
+		return required;
+	}
+
+	/**
+	 * @param required the required to set
+	 */
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 
 }

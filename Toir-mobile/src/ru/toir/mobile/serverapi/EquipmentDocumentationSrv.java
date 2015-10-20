@@ -18,6 +18,10 @@ public class EquipmentDocumentationSrv extends BaseObjectSrv {
 	private String Path;
 	@Expose
 	private DocumentationTypeSrv DocumentType;
+	@Expose
+	private ArrayList<String> Links;
+	@Expose
+	private boolean Required; 
 
 	/**
 	 * 
@@ -87,6 +91,7 @@ public class EquipmentDocumentationSrv extends BaseObjectSrv {
 		item.setDocumentation_type_uuid(DocumentType.getId());
 		item.setTitle(Title);
 		item.setPath(Path);
+		item.setRequired(Required);
 		item.setCreatedAt(getCreatedAtTime());
 		item.setChangedAt(getChangedAtTime());
 
@@ -111,6 +116,34 @@ public class EquipmentDocumentationSrv extends BaseObjectSrv {
 			list.add(documentation.getDocumentType());
 		}
 		return list;
+	}
+
+	/**
+	 * @return the required
+	 */
+	public boolean getRequired() {
+		return Required;
+	}
+
+	/**
+	 * @param required the required to set
+	 */
+	public void setRequired(boolean required) {
+		Required = required;
+	}
+
+	/**
+	 * @return the links
+	 */
+	public ArrayList<String> getLinks() {
+		return Links;
+	}
+
+	/**
+	 * @param links the links to set
+	 */
+	public void setLinks(ArrayList<String> links) {
+		Links = links;
 	}
 
 }

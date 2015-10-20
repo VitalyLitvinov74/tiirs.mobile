@@ -34,6 +34,12 @@ public class EquipmentSrv extends BaseObjectSrv {
 	private Date StartupDate;
 	@Expose
 	private EquipmentStatusSrv EquipmentStatus;
+	@Expose
+	private String InventoryNumber;
+	@Expose
+	private String Location;
+	@Expose
+	private ArrayList<String> ImageLinks;
 
 	/**
 	 * @return
@@ -190,13 +196,21 @@ public class EquipmentSrv extends BaseObjectSrv {
 		item.setLatitude(GeoCoordinates.getLatitude());
 		item.setLongitude(GeoCoordinates.getLongitude());
 		item.setTag_id(Tag);
-		// TODO когда на сервере появится - добавить
-		item.setImage("");
+		// TODO на сервере это просто куча файлов, решить что с этим делать!
+		// видимо нужно отдельно запрашивать инфо по получаемому оборудованию, и
+		// складировать так же в папку, для начала...
+		// проблема в том что сейчас нет ни каких механизмов для проверки того
+		// что изображение уже загружено на устройство, что изображение не нужно
+		// тянуть по новой и т.д.
+		// пока тупо ставим первый файл из списка
+		if (ImageLinks.size() > 0) {
+			item.setImage(ImageLinks.get(0));
+		} else {
+			item.setImage("");
+		}
 		item.setEquipmentStatus_uuid(EquipmentStatus.getId());
-		// TODO когда на сервере появится - добавить
-		item.setInventoryNumber("");
-		// TODO когда на сервере появится - добавить
-		item.setLocation("");
+		item.setInventoryNumber(InventoryNumber);
+		item.setLocation(Location);
 		item.setCreatedAt(getCreatedAtTime());
 		item.setChangedAt(getChangedAtTime());
 
@@ -204,9 +218,11 @@ public class EquipmentSrv extends BaseObjectSrv {
 	}
 
 	/**
-	 * Возвращает список типов документов связанных с оборудованием в локальном представлении
+	 * Возвращает список типов документов связанных с оборудованием в локальном
+	 * представлении
 	 * 
-	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @param equipments
+	 *            {@link ArrayList}<{@link EquipmentSrv}>
 	 * @return {@link ArrayList}<{@link DocumentationType}>
 	 */
 	public static ArrayList<DocumentationType> getDocumentationTypes(
@@ -226,7 +242,8 @@ public class EquipmentSrv extends BaseObjectSrv {
 	/**
 	 * Возвращает список оборудования в локальном представлении
 	 * 
-	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @param equipments
+	 *            {@link ArrayList}<{@link EquipmentSrv}>
 	 * @return {@link ArrayList}<{@link Equipment}>
 	 */
 	public static ArrayList<Equipment> getEquipments(
@@ -242,7 +259,8 @@ public class EquipmentSrv extends BaseObjectSrv {
 	/**
 	 * Возвращает список статусов оборудования в локальном представлении
 	 * 
-	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @param equipments
+	 *            {@link ArrayList}<{@link EquipmentSrv}>
 	 * @return {@link ArrayList}<{@link EquipmentStatus}>
 	 */
 	public static ArrayList<EquipmentStatus> getEquipmentStatuses(
@@ -258,7 +276,8 @@ public class EquipmentSrv extends BaseObjectSrv {
 	/**
 	 * Возвращает список типов оборудования в локальном представлении
 	 * 
-	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @param equipments
+	 *            {@link ArrayList}<{@link EquipmentSrv}>
 	 * @return {@link ArrayList}<{@link EquipmentType}>
 	 */
 	public static ArrayList<EquipmentType> getEquipmentTypes(
@@ -272,9 +291,11 @@ public class EquipmentSrv extends BaseObjectSrv {
 	}
 
 	/**
-	 * Возвращает список типов критичности оборудования в локальном представлении
+	 * Возвращает список типов критичности оборудования в локальном
+	 * представлении
 	 * 
-	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @param equipments
+	 *            {@link ArrayList}<{@link EquipmentSrv}>
 	 * @return {@link ArrayList}<{@link CriticalType}>
 	 */
 	public static ArrayList<CriticalType> getCriticalTypes(
@@ -290,7 +311,8 @@ public class EquipmentSrv extends BaseObjectSrv {
 	/**
 	 * Возвращает список документации оборудования в локальном представлении
 	 * 
-	 * @param equipments {@link ArrayList}<{@link EquipmentSrv}>
+	 * @param equipments
+	 *            {@link ArrayList}<{@link EquipmentSrv}>
 	 * @return {@link ArrayList}<{@link EquipmentDocumentation}>
 	 */
 	public static ArrayList<EquipmentDocumentation> getEquipmentDocumentations(
@@ -305,6 +327,50 @@ public class EquipmentSrv extends BaseObjectSrv {
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * @return the inventoryNumber
+	 */
+	public String getInventoryNumber() {
+		return InventoryNumber;
+	}
+
+	/**
+	 * @param inventoryNumber
+	 *            the inventoryNumber to set
+	 */
+	public void setInventoryNumber(String inventoryNumber) {
+		InventoryNumber = inventoryNumber;
+	}
+
+	/**
+	 * @return the location
+	 */
+	public String getLocation() {
+		return Location;
+	}
+
+	/**
+	 * @param location
+	 *            the location to set
+	 */
+	public void setLocation(String location) {
+		Location = location;
+	}
+
+	/**
+	 * @return the imageLinks
+	 */
+	public ArrayList<String> getImageLinks() {
+		return ImageLinks;
+	}
+
+	/**
+	 * @param imageLinks the imageLinks to set
+	 */
+	public void setImageLinks(ArrayList<String> imageLinks) {
+		ImageLinks = imageLinks;
 	}
 
 }

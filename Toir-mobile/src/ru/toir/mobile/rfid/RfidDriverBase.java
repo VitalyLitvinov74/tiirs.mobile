@@ -32,7 +32,6 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	protected static DialogFragment mDialogFragment;
 
 	// Handler который будет обрабатывать сообщение от драйвера
-	// TODO нужно избавиться от static
 	protected static Handler mHandler;
 
 	public RfidDriverBase(DialogFragment dialog, Handler handler) {

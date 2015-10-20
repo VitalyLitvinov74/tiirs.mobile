@@ -24,30 +24,52 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 	public static final String FIELD_DOCUMENTATION_TYPE_UUID = "documentation_type_uuid";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_PATH = "path";
-	
+	public static final String FIELD_REQUIRED = "required";
+
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
 		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
-		
-		public static final String EQUIPMENT_UUID = TABLE_NAME + '_' + FIELD_EQUIPMENT_UUID;
-		public static final String DOCUMENTATION_TYPE_UUID = TABLE_NAME + '_' + FIELD_DOCUMENTATION_TYPE_UUID;
-		public static final String TITLE = TABLE_NAME + '_' + TABLE_NAME + '_' + FIELD_TITLE;
+		public static final String CREATED_AT = TABLE_NAME + '_'
+				+ FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_'
+				+ FIELD_CHANGED_AT;
+
+		public static final String EQUIPMENT_UUID = TABLE_NAME + '_'
+				+ FIELD_EQUIPMENT_UUID;
+		public static final String DOCUMENTATION_TYPE_UUID = TABLE_NAME + '_'
+				+ FIELD_DOCUMENTATION_TYPE_UUID;
+		public static final String TITLE = TABLE_NAME + '_' + TABLE_NAME + '_'
+				+ FIELD_TITLE;
 		public static final String PATH = TABLE_NAME + '_' + FIELD_PATH;
+		public static final String REQUIRED = TABLE_NAME + '_' + FIELD_REQUIRED;
 	}
-	
+
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID)
+				+ " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID)
+				+ " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT,
+				getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS "
+						+ Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT,
+				getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS "
+						+ Projection.CHANGED_AT);
 
-		mProjection.put(Projection.EQUIPMENT_UUID, getFullName(TABLE_NAME, FIELD_EQUIPMENT_UUID) + " AS " + Projection.EQUIPMENT_UUID);
-		mProjection.put(Projection.DOCUMENTATION_TYPE_UUID, getFullName(TABLE_NAME, FIELD_DOCUMENTATION_TYPE_UUID) + " AS " + Projection.DOCUMENTATION_TYPE_UUID);
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
-		mProjection.put(Projection.PATH, getFullName(TABLE_NAME, FIELD_PATH) + " AS " + Projection.PATH);
+		mProjection.put(Projection.EQUIPMENT_UUID,
+				getFullName(TABLE_NAME, FIELD_EQUIPMENT_UUID) + " AS "
+						+ Projection.EQUIPMENT_UUID);
+		mProjection.put(Projection.DOCUMENTATION_TYPE_UUID,
+				getFullName(TABLE_NAME, FIELD_DOCUMENTATION_TYPE_UUID) + " AS "
+						+ Projection.DOCUMENTATION_TYPE_UUID);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE)
+				+ " AS " + Projection.TITLE);
+		mProjection.put(Projection.PATH, getFullName(TABLE_NAME, FIELD_PATH)
+				+ " AS " + Projection.PATH);
+		mProjection.put(Projection.REQUIRED,
+				getFullName(TABLE_NAME, FIELD_REQUIRED) + " AS "
+						+ Projection.REQUIRED);
 	}
 
 	/**
@@ -92,15 +114,17 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 				.getColumnIndex(FIELD_EQUIPMENT_UUID)));
 		item.setDocumentation_type_uuid(cursor.getString(cursor
 				.getColumnIndex(FIELD_DOCUMENTATION_TYPE_UUID)));
-		item.setTitle(cursor.getString(cursor
-				.getColumnIndex(FIELD_TITLE)));
-		item.setPath(cursor.getString(cursor
-				.getColumnIndex(FIELD_PATH)));
+		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
+		item.setPath(cursor.getString(cursor.getColumnIndex(FIELD_PATH)));
+		item.setRequired(cursor.getInt(cursor.getColumnIndex(FIELD_REQUIRED)) == 0 ? false
+				: true);
 		return item;
 	}
 
 	/**
-	 * <p>Добавляет/заменяет запись в таблице</p>
+	 * <p>
+	 * Добавляет/заменяет запись в таблице
+	 * </p>
 	 * 
 	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
@@ -110,9 +134,11 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 		ContentValues values = putCommonFields(item);
 
 		values.put(FIELD_EQUIPMENT_UUID, item.getEquipment_uuid());
-		values.put(FIELD_DOCUMENTATION_TYPE_UUID, item.getDocumentation_type_uuid());
+		values.put(FIELD_DOCUMENTATION_TYPE_UUID,
+				item.getDocumentation_type_uuid());
 		values.put(FIELD_TITLE, item.getTitle());
 		values.put(FIELD_PATH, item.getPath());
+		values.put(FIELD_REQUIRED, item.isRequired() == true ? 1 : 0);
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
 	}
@@ -162,14 +188,16 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 
 	/**
 	 * Возвращает руководство по uuid
+	 * 
 	 * @param uuid
 	 * @return Если записи нет, возвращает null
 	 */
 	public EquipmentDocumentation getDocumentByUuid(String uuid) {
 		Cursor cursor;
-		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_UUID + "=?", new String[] { uuid }, null, null, null);		
+		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_EQUIPMENT_UUID + "=?",
+				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
-				return getItem(cursor);
+			return getItem(cursor);
 		} else {
 			return null;
 		}

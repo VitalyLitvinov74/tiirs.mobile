@@ -4,7 +4,6 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -81,10 +80,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 						R.id.rfid_dialog_text_spinner_lables);
 				Message message = new Message();
 				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-				Bundle bundle = new Bundle();
-				bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-						(String) spinner.getSelectedItem());
-				message.setData(bundle);
+				message.obj = spinner.getSelectedItem();
 				mHandler.sendMessage(message);
 			}
 		});
