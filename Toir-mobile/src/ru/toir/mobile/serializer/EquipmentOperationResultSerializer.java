@@ -38,8 +38,7 @@ public class EquipmentOperationResultSerializer implements
 				DataUtils.getDate(item.getEnd_date(), dateFormat));
 		result.addProperty("OperationResultId", item.getOperation_result_uuid());
 		result.addProperty("Type", item.getType());
-		result.addProperty("CreatedAt",
-				DataUtils.getDate(item.getCreatedAt(), dateFormat));
+		// result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), dateFormat));
 		result.addProperty("ChangedAt",
 				DataUtils.getDate(item.getChangedAt(), dateFormat));
 

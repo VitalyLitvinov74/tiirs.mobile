@@ -104,7 +104,7 @@ public class TaskProcessor {
 
 		boolean success;
 
-		// получаем новые наряды
+		// получаем наряды
 		String url = mServerUrl + TASK_GET_URL + status;
 		Bundle taskResult = getTasks(url);
 		success = taskResult.getBoolean(IServiceProvider.RESULT);
@@ -541,7 +541,7 @@ public class TaskProcessor {
 						postData.toString().getBytes());
 				Response response = new RestClient().execute(request);
 				// если ответ 204 значит всё сохранилось на сервере
-				if (response.mStatus == 204) {
+				if (response.mStatus == 204 || response.mStatus == 200) {
 					clearUpdated(results);
 				} else {
 					throw new Exception(

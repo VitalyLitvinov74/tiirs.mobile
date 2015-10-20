@@ -30,13 +30,12 @@ public class TaskSerializer implements JsonSerializer<TaskRes> {
 			JsonSerializationContext serializeContext) {
 		JsonObject result = new JsonObject();
 		result.addProperty("Id", item.getUuid());
-		result.addProperty("EmployeeId", item.getUsers_uuid());
+		// result.addProperty("EmployeeId", item.getUsers_uuid());
 		result.addProperty("CloseDate",
 				DataUtils.getDate(item.getClose_date(), dateFormat));
 		result.addProperty("TaskStatusId", item.getTask_status_uuid());
-		result.addProperty("TaskName", item.getTask_name());
-		result.addProperty("CreatedAt",
-				DataUtils.getDate(item.getCreatedAt(), dateFormat));
+		// result.addProperty("TaskName", item.getTask_name());
+		// result.addProperty("CreatedAt", DataUtils.getDate(item.getCreatedAt(), dateFormat));
 		result.addProperty("ChangedAt",
 				DataUtils.getDate(item.getChangedAt(), dateFormat));
 		result.add("EquipmentOperations",
