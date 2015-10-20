@@ -6,6 +6,8 @@ import java.util.Set;
 
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import com.google.gson.annotations.Expose;
+
+import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.OperationStatus;
@@ -28,6 +30,8 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 	private OperationTypeSrv OperationType;
 	@Expose
 	private String OperationPatternId;
+	@Expose
+	private ArrayList<MeasureValueSrv> MeasuredValues;
 
 	/**
 	 * 
@@ -137,8 +141,9 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 
 		return item;
 	}
-	
-	public static ArrayList<OperationType> getOperationTypes(ArrayList<EquipmentOperationSrv> operations) {
+
+	public static ArrayList<OperationType> getOperationTypes(
+			ArrayList<EquipmentOperationSrv> operations) {
 
 		ArrayList<OperationType> list = new ArrayList<OperationType>();
 		for (EquipmentOperationSrv operation : operations) {
@@ -197,4 +202,43 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 		return list;
 	}
 
+	/**
+	 * @return the measuredValues
+	 */
+	public ArrayList<MeasureValueSrv> getMeasuredValues() {
+		return MeasuredValues;
+	}
+
+	/**
+	 * @param measuredValues
+	 *            the measuredValues to set
+	 */
+	public void setMeasuredValues(ArrayList<MeasureValueSrv> measuredValues) {
+		MeasuredValues = measuredValues;
+	}
+
+	public static ArrayList<MeasureValue> getMeasureValues(
+			ArrayList<TaskSrv> tasks) {
+
+		ArrayList<MeasureValue> list = new ArrayList<MeasureValue>();
+
+		if (tasks != null) {
+			for (TaskSrv task : tasks) {
+				ArrayList<EquipmentOperationSrv> operations = task.getItems();
+				if (operations != null) {
+					for (EquipmentOperationSrv operation : operations) {
+						ArrayList<MeasureValueSrv> measureValues = operation
+								.getMeasuredValues();
+						if (measureValues != null) {
+							for (MeasureValueSrv measureValue : measureValues) {
+								list.add(measureValue.getLocal());
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return list;
+	}
 }

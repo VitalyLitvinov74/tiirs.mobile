@@ -449,6 +449,15 @@ public class TaskProcessor {
 					"Ошибка при сохранении типов документации.");
 			return result;
 		}
+		
+		// сохраняем
+		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(new ToirDatabaseContext(mContext));
+		if (!measureValueDBAdapter.saveItems(EquipmentOperationSrv.getMeasureValues(tasks))) {
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE,
+					"Ошибка при сохранении результатов измерений.");
+			return result;
+		}
 
 		// если добрались сюда, значит всё в порядке
 		result.putBoolean(IServiceProvider.RESULT, true);

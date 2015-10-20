@@ -139,11 +139,15 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 		return projection;
 	}
 
-	public void saveItems(ArrayList<MeasureValue> list) {
+	public boolean saveItems(ArrayList<MeasureValue> list) {
 
 		for (MeasureValue item : list) {
-			replace(item);
+			if (replace(item) == -1) {
+				return false;
+			}
 		}
+		
+		return true;
 	}
 
 	/**
