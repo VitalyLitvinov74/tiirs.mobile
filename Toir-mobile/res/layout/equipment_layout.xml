@@ -116,8 +116,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/equipment_layout1"
-        android:baselineAligned="false"
-        android:visibility="gone" >
+        android:baselineAligned="false" >
 
         <ListView
             android:id="@+id/equipment_listView_main"

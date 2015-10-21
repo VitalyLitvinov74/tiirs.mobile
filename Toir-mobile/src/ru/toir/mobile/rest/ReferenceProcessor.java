@@ -440,6 +440,9 @@ public class ReferenceProcessor {
 
 		result = new Bundle();
 		result.putBoolean(IServiceProvider.RESULT, true);
+		result.putStringArray(
+				ReferenceServiceProvider.Methods.RESULT_GET_DOCUMENTATION_FILE_UUID,
+				fileUuids);
 		return result;
 	}
 

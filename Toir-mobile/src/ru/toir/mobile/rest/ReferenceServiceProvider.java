@@ -36,6 +36,8 @@ public class ReferenceServiceProvider implements IServiceProvider {
 		public static final String GET_EQUIPMENT_PARAMETER_UUID = "equipmentUuid";
 		public static final String GET_DOCUMENTATION_FILE_PARAMETER_UUID = "documentationFileUuid";
 		public static final String GET_IMAGE_FILE_PARAMETER_UUID = "imageFileUuid";
+		
+		public static final String RESULT_GET_DOCUMENTATION_FILE_UUID = "loadedUuid";
 	}
 
 	public static class Actions {
