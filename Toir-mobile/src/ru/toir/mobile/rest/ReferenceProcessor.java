@@ -370,7 +370,7 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public Bundle getDocumentaionFile(Bundle bundle) {
-		// TODO придумать механизм формирования пути для хранения файлов
+
 		Bundle result;
 
 		if (!checkToken()) {
@@ -395,7 +395,9 @@ public class ReferenceProcessor {
 					.getEquipment_uuid());
 
 			url.setLength(0);
-			url.append(mServerUrl).append("/").append(document.getPath());
+			url.append(mServerUrl).append("/api/Equipment/")
+					.append(equipment.getUuid()).append("/Documents/")
+					.append(document.getUuid()).append("/file");
 
 			try {
 				URI requestUri = new URI(url.toString());
@@ -413,7 +415,6 @@ public class ReferenceProcessor {
 				if (response.mStatus == 200) {
 					File file = new File(
 							mContext.getExternalFilesDir("documentation") + "/"
-									+ equipment.getEquipment_type_uuid() + "/"
 									+ equipment.getUuid(), document.getPath());
 					if (!file.getParentFile().exists()) {
 						file.getParentFile().mkdirs();
