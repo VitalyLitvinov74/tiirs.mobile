@@ -370,7 +370,7 @@ public class ReferenceProcessor {
 	 * @return
 	 */
 	public Bundle getDocumentaionFile(Bundle bundle) {
-
+		// TODO придумать механизм формирования пути для хранения файлов
 		Bundle result;
 
 		if (!checkToken()) {
@@ -395,7 +395,7 @@ public class ReferenceProcessor {
 					.getEquipment_uuid());
 
 			url.setLength(0);
-			url.append(mServerUrl).append(document.getPath());
+			url.append(mServerUrl).append("/").append(document.getPath());
 
 			try {
 				URI requestUri = new URI(url.toString());

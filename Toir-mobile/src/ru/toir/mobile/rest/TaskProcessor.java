@@ -5,6 +5,7 @@ package ru.toir.mobile.rest;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,7 @@ import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
@@ -63,6 +65,7 @@ public class TaskProcessor {
 
 	private Set<String> patternUuids;
 	private Set<String> operationTypeUuids;
+	private Set<String> requiredDocuments;
 
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
@@ -152,11 +155,42 @@ public class TaskProcessor {
 			result.putAll(operationStatusesResult);
 		}
 
+		// получаем обязательную документацию
+		Bundle documentFileResult = getDocumentFiles();
+		success = documentFileResult.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			db.endTransaction();
+			return documentFileResult;
+		} else {
+			// добавляем в результат все элементы ответа
+			result.putAll(documentFileResult);
+		}
+
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
 		result.putBoolean(IServiceProvider.RESULT, true);
 		return result;
+	}
+
+	private Bundle getDocumentFiles() {
+
+		try {
+			ReferenceProcessor referenceProcessor = new ReferenceProcessor(
+					mContext);
+			Bundle extra = new Bundle();
+			extra.putStringArray(
+					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
+					 requiredDocuments.toArray(new String[]{}));
+
+			return referenceProcessor.getDocumentaionFile(extra);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
+		}
 	}
 
 	/**
@@ -314,7 +348,7 @@ public class TaskProcessor {
 			}
 		}
 
-		// сохраняем
+		// сохраняем наряды
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!taskDBAdapter.saveItems(localTasks)) {
@@ -324,7 +358,7 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем статусы нарядов
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!taskStatusDBAdapter.saveItems(TaskSrv.getTaskStatuses(tasks))) {
@@ -334,7 +368,7 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем операции
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!operationDBAdapter
@@ -348,7 +382,7 @@ public class TaskProcessor {
 		ArrayList<EquipmentOperationSrv> operations = TaskSrv
 				.getEquipmentOperationSrvs(tasks);
 
-		// сохраняем
+		// сохраняем оборудование
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!equipmentDBAdapter.saveItems(EquipmentOperationSrv
@@ -359,7 +393,7 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем типы операций
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!operationTypeDBAdapter.saveItems(EquipmentOperationSrv
@@ -370,7 +404,7 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем статусы операций
 		OperationStatusDBAdapter operationStatusDBAdapter = new OperationStatusDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!operationStatusDBAdapter.saveItems(EquipmentOperationSrv
@@ -395,7 +429,7 @@ public class TaskProcessor {
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
 
-		// сохраняем
+		// сохраняем типы оборудования
 		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!equipmentTypeDBAdapter.saveItems(EquipmentSrv
@@ -406,7 +440,7 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем типы критичности оборудования
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!criticalTypeDBAdapter.saveItems(EquipmentSrv
@@ -417,7 +451,7 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем статусы оборудования
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!equipmentStatusDBAdapter.saveItems(EquipmentSrv
@@ -428,18 +462,28 @@ public class TaskProcessor {
 			return result;
 		}
 
-		// сохраняем
+		// получаем список документов для обязательной загрузки, позже загрузить
+		ArrayList<EquipmentDocumentation> doclist = EquipmentSrv
+				.getEquipmentDocumentations(equipments);
+		requiredDocuments = new HashSet<String>();
+		for (EquipmentDocumentation doc : doclist) {
+			if (doc.isRequired()) {
+
+				requiredDocuments.add(doc.getUuid());
+			}
+		}
+
+		// сохраняем записи о документации на оборудование
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
 				new ToirDatabaseContext(mContext));
-		if (!documentationDBAdapter.saveItems(EquipmentSrv
-				.getEquipmentDocumentations(equipments))) {
+		if (!documentationDBAdapter.saveItems(doclist)) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
 					"Ошибка при сохранении документации.");
 			return result;
 		}
 
-		// сохраняем
+		// сохраняем типы документации
 		DocumentationTypeDBAdapter documentationTypeDBAdapter = new DocumentationTypeDBAdapter(
 				new ToirDatabaseContext(mContext));
 		if (!documentationTypeDBAdapter.saveItems(EquipmentSrv
@@ -449,10 +493,12 @@ public class TaskProcessor {
 					"Ошибка при сохранении типов документации.");
 			return result;
 		}
-		
-		// сохраняем
-		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(new ToirDatabaseContext(mContext));
-		if (!measureValueDBAdapter.saveItems(EquipmentOperationSrv.getMeasureValues(tasks))) {
+
+		// сохраняем результаты измерений
+		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(
+				new ToirDatabaseContext(mContext));
+		if (!measureValueDBAdapter.saveItems(EquipmentOperationSrv
+				.getMeasureValues(tasks))) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
 					"Ошибка при сохранении результатов измерений.");

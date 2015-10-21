@@ -90,7 +90,8 @@ public class EquipmentDocumentationSrv extends BaseObjectSrv {
 		item.setEquipment_uuid(uuid);
 		item.setDocumentation_type_uuid(DocumentType.getId());
 		item.setTitle(Title);
-		item.setPath(Path);
+		//item.setPath(Path);
+		item.setPath(Links.get(0));
 		item.setRequired(Required);
 		item.setCreatedAt(getCreatedAtTime());
 		item.setChangedAt(getChangedAtTime());
