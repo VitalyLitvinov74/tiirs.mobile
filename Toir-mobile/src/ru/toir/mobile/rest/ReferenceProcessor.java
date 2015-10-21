@@ -6,6 +6,8 @@ package ru.toir.mobile.rest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -422,6 +424,100 @@ public class ReferenceProcessor {
 					FileOutputStream fos = new FileOutputStream(file);
 					fos.write(response.mBody);
 					fos.close();
+					// TODO обновить запись с документацией для указания
+					// локального пути до файла
+				} else {
+					throw new Exception("Не удалось получить файл. URL: " + url);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE, e.getMessage());
+				return result;
+			}
+		}
+
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
+	}
+
+	/**
+	 * Получаем файл изображения
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public Bundle getEquipmentFile(Bundle bundle) {
+
+		Bundle result;
+
+		if (!checkToken()) {
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
+		}
+
+		StringBuilder url = new StringBuilder(new String(new byte[] {},
+				Charset.forName("cp1251")));
+		String equipmentsUuids[] = bundle
+				.getStringArray(ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
+
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+				new ToirDatabaseContext(mContext));
+
+		for (String equipmentsUuid : equipmentsUuids) {
+			Equipment equipment = equipmentDBAdapter.getItem(equipmentsUuid);
+
+			File imgFile = new File(equipment.getImage());
+			String fileName = imgFile.getName();
+			String filePath = imgFile.getParent();
+
+			// костыль пока сервер не начнёт принимать запросы в UTF-8
+			String serverCharset = "CP1251";
+			String fileNameWin;
+			if (Charset.isSupported(serverCharset)) {
+				try {
+					fileNameWin = URLEncoder.encode(fileName, serverCharset);
+				} catch (Exception e) {
+					e.printStackTrace();
+					fileNameWin = fileName;
+				}
+			} else {
+				fileNameWin = fileName;
+			}
+
+			url.setLength(0);
+			url.append(mServerUrl).append("/").append(filePath).append("/")
+					.append(fileNameWin);
+
+			try {
+				URI requestUri = new URI(url.toString());
+				Log.d("test", "requestUri = " + requestUri.toString());
+
+				Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+				List<String> tList = new ArrayList<String>();
+				tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+				headers.put("Authorization", tList);
+
+				Request request = new Request(Method.GET, requestUri, headers,
+						null);
+				Response response = new RestClient().execute(request);
+
+				if (response.mStatus == 200) {
+					File file = new File(
+							mContext.getExternalFilesDir("documentation") + "/"
+									+ equipment.getUuid(), fileName);
+					if (!file.getParentFile().exists()) {
+						file.getParentFile().mkdirs();
+					}
+					FileOutputStream fos = new FileOutputStream(file);
+					fos.write(response.mBody);
+					fos.close();
+					// TODO обновить запись с оборудованием для указания
+					// локального пути до файла
 				} else {
 					throw new Exception("Не удалось получить файл. URL: " + url);
 				}

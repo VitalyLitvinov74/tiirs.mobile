@@ -66,6 +66,7 @@ public class TaskProcessor {
 	private Set<String> patternUuids;
 	private Set<String> operationTypeUuids;
 	private Set<String> requiredDocuments;
+	private Set<String> equipmentImages;
 
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
@@ -166,6 +167,17 @@ public class TaskProcessor {
 			result.putAll(documentFileResult);
 		}
 
+		// получаем изображение оборудования
+		Bundle imageFileResult = getEquipmentFiles();
+		success = imageFileResult.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			db.endTransaction();
+			return imageFileResult;
+		} else {
+			// добавляем в результат все элементы ответа
+			result.putAll(imageFileResult);
+		}
+
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
@@ -181,9 +193,29 @@ public class TaskProcessor {
 			Bundle extra = new Bundle();
 			extra.putStringArray(
 					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
-					 requiredDocuments.toArray(new String[]{}));
+					requiredDocuments.toArray(new String[] {}));
 
 			return referenceProcessor.getDocumentaionFile(extra);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
+		}
+	}
+
+	private Bundle getEquipmentFiles() {
+
+		try {
+			ReferenceProcessor referenceProcessor = new ReferenceProcessor(
+					mContext);
+			Bundle extra = new Bundle();
+			extra.putStringArray(
+					ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID,
+					equipmentImages.toArray(new String[] {}));
+
+			return referenceProcessor.getEquipmentFile(extra);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
@@ -429,6 +461,12 @@ public class TaskProcessor {
 		ArrayList<EquipmentSrv> equipments = EquipmentOperationSrv
 				.getEquipmentSrvs(operations);
 
+		// список полученного оборудования для загрузки позже изображений
+		equipmentImages = new HashSet<String>();
+		for (EquipmentSrv equipment : equipments) {
+			equipmentImages.add(equipment.getId());
+		}
+		
 		// сохраняем типы оборудования
 		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(mContext));
