@@ -26,6 +26,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 
 public class EquipmentsFragment extends Fragment {
+
 	private Spinner Spinner_sort;
 	private Spinner Spinner_type;
 	private ListView lv;
@@ -179,8 +180,9 @@ public class EquipmentsFragment extends Fragment {
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
-//		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-//				new TOiRDatabaseContext(getActivity().getApplicationContext()));
+		// CriticalTypeDBAdapter criticalTypeDBAdapter = new
+		// CriticalTypeDBAdapter(
+		// new TOiRDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = equipmentDBAdapter.getAllItems(
 				type, "");
 		equipment_uuid.clear();
@@ -190,25 +192,21 @@ public class EquipmentsFragment extends Fragment {
 		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
 		while (cnt < equipmentList.size()) {
 			HashMap<String, String> hm = new HashMap<String, String>();
-			hm.put("name",
-					equipmentList.get(cnt).getTitle()
-							+ " | ИД: "
-							+ equipmentList.get(cnt).getInventoryNumber()
-							//+ " | Дата: "
-							//+ DataUtils.getDate(equipmentList.get(cnt)
-									//.getStart_date(), "dd-MM-yyyy hh:mm")
-							);
+			hm.put("name", equipmentList.get(cnt).getTitle() + " | ИД: "
+					+ equipmentList.get(cnt).getInventoryNumber()
+			// + " | Дата: "
+			// + DataUtils.getDate(equipmentList.get(cnt)
+			// .getStart_date(), "dd-MM-yyyy hh:mm")
+			);
 			hm.put("descr",
 					"Тип: "
 							+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(
-							cnt).getEquipment_type_uuid())
-							+ " ["
-							+ equipmentList.get(cnt).getLocation()
-							+ "]"
-							//+ " | Критичность: "
-							//+ criticalTypeDBAdapter.getNameByUUID(equipmentList
-									//.get(cnt).getCritical_type_uuid())
-									);
+									cnt).getEquipment_type_uuid()) + " ["
+							+ equipmentList.get(cnt).getLocation() + "]"
+			// + " | Критичность: "
+			// + criticalTypeDBAdapter.getNameByUUID(equipmentList
+			// .get(cnt).getCritical_type_uuid())
+			);
 			// TODO: real image
 			// hm.put("img", getActivity().getApplicationInfo().dataDir +
 			// equipmentList.get(cnt).getImg());

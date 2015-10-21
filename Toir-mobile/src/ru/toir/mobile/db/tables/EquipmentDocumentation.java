@@ -92,4 +92,10 @@ public class EquipmentDocumentation extends BaseTable {
 		this.required = required;
 	}
 
+	@Override
+	public String toString() {
+
+		return title;
+	}
+
 }

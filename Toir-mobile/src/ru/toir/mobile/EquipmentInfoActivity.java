@@ -29,6 +29,7 @@ import ru.toir.mobile.rfid.UserTagStructure;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -82,7 +83,9 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	private Button write_button;
 	private Button open_documentation_button;
 
-	RfidDialog rfidDialog;
+	// диалог для работы с rfid считывателем
+	private RfidDialog rfidDialog;
+	private ArrayAdapter<EquipmentDocumentation> documentationArrayAdapter;
 
 	/*
 	 * (non-Javadoc)
@@ -227,6 +230,37 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		initView();
 	}
 
+	private class ListViewClickListener implements
+			AdapterView.OnItemClickListener {
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+
+			EquipmentDocumentation item = documentationArrayAdapter
+					.getItem(position);
+
+			File file = new File(item.getPath());
+			if (file.exists()) {
+				Intent target = new Intent(Intent.ACTION_VIEW);
+				String[] patternList = file.getName().split("\\.");
+				target.setDataAndType(Uri.fromFile(file), "application/"
+						+ patternList[patternList.length - 1]);
+				target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+				Intent intent = Intent.createChooser(target, "Open File");
+				try {
+					startActivity(intent);
+				} catch (ActivityNotFoundException e) {
+					// сообщить пользователю установить подходящее приложение
+				}
+			} else {
+				// либо сказать что файла нет, либо предложить скачать с сервера
+			}
+		}
+
+	}
+
 	private void initView() {
 
 		spinner_operation_adapter = new ArrayAdapter<String>(
@@ -276,29 +310,16 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		// tv_equipment_task_date.setText("" +
 		// taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
 		// else tv_equipment_task_date.setText("еще не обслуживалось");
-		if (equipmentOperationList != null && equipmentOperationList.size() > 0)
+		if (equipmentOperationList != null && equipmentOperationList.size() > 0) {
 			tv_equipment_tasks.setText(""
 					+ eqOperationResultDBAdapter
 							.getOperationResultByUUID(equipmentOperationList
 									.get(0).getOperation_status_uuid()));
-		else
+		} else {
 			tv_equipment_tasks.setText("еще не обслуживалось");
-		// File imgFile = new File(getApplicationInfo().dataDir +
-		// equipment.getImg());
-		tv_equipment_documentation.setText("UUID: "
-				+ equipment.getUuid().substring(0, 13));
-		File imgFile = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath()
-				+ File.separator
-				+ "Android"
-				+ File.separator
-				+ "data"
-				+ File.separator
-				+ getPackageName()
-				+ File.separator
-				+ "img"
-				+ File.separator
-				+ equipment.getImage());
+		}
+
+		File imgFile = new File(equipment.getImage());
 		if (imgFile.exists() && imgFile.isFile()) {
 			Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
 					.getAbsolutePath());
@@ -353,6 +374,18 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		equipmenttag.set_status(equipment.getEquipment_status_uuid().substring(
 				9, 13));
 		equipmenttag.set_last("0001");
+
+		// адаптер для listview с документацией
+		ListView documentationListView = (ListView) findViewById(R.id.e_l_documentation_listView);
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
+				new ToirDatabaseContext(getApplicationContext()));
+		documentationArrayAdapter = new ArrayAdapter<EquipmentDocumentation>(
+				getApplicationContext(), R.layout.equipment_documentation_item,
+				R.id.documentation_item_title,
+				documentationDBAdapter.getItems(equipment_uuid));
+		documentationListView.setAdapter(documentationArrayAdapter);
+		documentationListView
+				.setOnItemClickListener(new ListViewClickListener());
 	}
 
 	private void FillListViewOperations() {
