@@ -424,8 +424,8 @@ public class ReferenceProcessor {
 					FileOutputStream fos = new FileOutputStream(file);
 					fos.write(response.mBody);
 					fos.close();
-					// TODO обновить запись с документацией для указания
-					// локального пути до файла
+					document.setPath(file.getPath());
+					documentationDBAdapter.replace(document);
 				} else {
 					throw new Exception("Не удалось получить файл. URL: " + url);
 				}
@@ -516,8 +516,8 @@ public class ReferenceProcessor {
 					FileOutputStream fos = new FileOutputStream(file);
 					fos.write(response.mBody);
 					fos.close();
-					// TODO обновить запись с оборудованием для указания
-					// локального пути до файла
+					equipment.setImage(file.getPath());
+					equipmentDBAdapter.replace(equipment);
 				} else {
 					throw new Exception("Не удалось получить файл. URL: " + url);
 				}
