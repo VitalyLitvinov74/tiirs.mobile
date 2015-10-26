@@ -13,5 +13,9 @@
         android:orderInCategory="101"
         android:title="@string/action_update"
         android:onClick="onActionUpdate" />
-
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="102"
+        android:title="@string/action_about"
+        android:onClick="onActionAbout" />    
 </menu>

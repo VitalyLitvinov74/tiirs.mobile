@@ -3,7 +3,8 @@
 
     <string name="app_name">Toir-mobile</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Натройки приложения</string>
+    <string name="action_about">О программе</string>  
     <string name="pleasePutTag">Поднесите метку</string>
     <string name="readTag">Считать</string>
     <string name="cancel">Отмена</string>

@@ -357,6 +357,13 @@ public class MainActivity extends FragmentActivity {
 		startActivity(i);
 	}
 
+	public void onActionAbout(MenuItem menuItem) {
+		Log.d(TAG, "onActionAbout");
+		AboutDialog about = new AboutDialog(this);
+		about.setTitle("О программе");
+		about.show();
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -373,6 +380,9 @@ public class MainActivity extends FragmentActivity {
 		if (id == R.id.action_settings) {
 			return true;
 		} else if (id == R.id.action_update) {
+			return true;
+		}
+		else if (id == R.id.action_about) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
