@@ -219,7 +219,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 					@Override
 					public boolean handleMessage(Message msg) {
 
-						Log.d(TAG, "Получили сообщение из драйвра.");
+						Log.d(TAG, "Получили сообщение из драйвера.");
 
 						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 							String tagData = (String) msg.obj;
@@ -267,12 +267,13 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						new ToirDatabaseContext(getApplicationContext()));
 				Equipment equipment = adapter.getItem(equipment_uuid);
 				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+
 				Handler handler = new Handler(new Handler.Callback() {
 
 					@Override
 					public boolean handleMessage(Message msg) {
 
-						Log.d(TAG, "Получили сообщение из драйвра.");
+						Log.d(TAG, "Получили сообщение из драйвера.");
 
 						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 							Toast.makeText(getApplicationContext(),
@@ -295,6 +296,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 				data = "00000000000000000000000000000000";
 				//data = "FFFFFFFFFFFFFFFF";
+				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 
 				// пишем в метку с id привязанным к оборудованию
 				// rfidDialog.writeTagData("0000000000", equipment.getTag_id(),

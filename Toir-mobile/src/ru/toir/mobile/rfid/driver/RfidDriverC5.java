@@ -229,11 +229,8 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 						public boolean handleMessage(Message msg) {
 
 							if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-								String data = (String) msg.obj;
-								Log.d(TAG, data);
 								Message message = new Message();
 								message.what = RESULT_RFID_SUCCESS;
-								message.obj = data;
 								mHandler.sendMessage(message);
 							} else if (msg.what == RfidDriverBase.RESULT_RFID_TIMEOUT) {
 								Message message = new Message();
@@ -285,7 +282,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 					// данные успешно записаны
 					Message message = new Message();
 					message.what = RESULT_RFID_SUCCESS;
-					message.obj = msg.obj;
 					mHandler.sendMessage(message);
 				} else if (msg.what == RESULT_RFID_TIMEOUT) {
 					Log.d("TAG", "вышел таймаут.");
