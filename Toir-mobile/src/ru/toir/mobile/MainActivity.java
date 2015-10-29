@@ -260,7 +260,7 @@ public class MainActivity extends FragmentActivity {
 
 				Log.d(TAG, "Получили сообщение из драйвра.");
 
-				if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 					String tagId = (String) msg.obj;
 					Log.d(TAG, tagId);
 

@@ -145,7 +145,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
-			byte[] data) {
+			String data) {
 
 		Message message = new Message();
 		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
@@ -154,7 +154,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, byte[] data) {
+			int address, String data) {
 
 		Message message = new Message();
 		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;

@@ -5,8 +5,6 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import ru.toir.mobile.rfid.RfidDriverBase;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -21,419 +19,164 @@ public class reader {
 	// флаг того что находимся в процессе чтения/записи данных из считывателя
 	static Boolean m_bASYC = false;
 
-	// "поиск" меток до первой метки или в бесконечном цикле
-	static Boolean m_bLoop = false;
-
-	// флаг успешности операций чтения/записи в метку
-	static Boolean m_bOK = false;
-
-	// идентификатор звукового файла
-	static int msound = 0;
-
-	// набор звуков
-	static SoundPool mSoundPool = new SoundPool(1, AudioManager.STREAM_RING, 0);
+	private static ParseThread readThread;
 
 	static {
 		System.loadLibrary("uhf-tools");
-		msound = mSoundPool.load(
-				"/system/media/audio/notifications/Altair.ogg", 1);
 	}
 
 	/**
-	 * Поиск метки
-	 * 
-	 * @return
-	 */
-	static public int inventoryLabels() {
-		int nret = Inventory();
-		if (!m_bASYC) {
-			startASYClabels();
-		}
-		return nret;
-	}
-
-	/**
-	 * Поиск меток
-	 * 
-	 * @return
-	 */
-	static public int inventoryLabelsLoop() {
-		int nret = Inventory();
-		m_bLoop = true;
-		if (!m_bASYC) {
-			startASYClabels();
-		}
-		return nret;
-	}
-
-	/**
-	 * "останавливает" бесконечный цикл поиска меток
-	 */
-	static public void StopLoop() {
-		m_bLoop = false;
-	}
-
-	/**
-	 * Пока не ясно зачем это
-	 * 
-	 * @return
-	 */
-	static public int multInventoryLabels() {
-		int nret = MultiInventory(65535);
-		if (!m_bASYC) {
-			startASYClabels();
-		}
-		return nret;
-	}
-
-	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду поиска
-	 * доступных меток
-	 */
-	static void startASYClabels() {
-
-		// TODO нужно пересмотреть алгоритм обработки данных
-		// текущий алгоритм следующий, данные из считывателя читаются пока
-		// читаются, как закончились, началась обработка полученных данных.
-		// если в поле считывателя метка одна, всё отлично, отправится одно
-		// сообщение в драйвер, если меток несколько, на каждую метку отправится
-		// по сообщению. что в нашем случае не верно. так как если мы входим в
-		// программу вероятно отправится два запроса на токен на сервер.
-		// в остальных частях программы вероятно будут выполненны два действия с
-		// разными метками.
-		// если мы ищем метки непрерывно, то остановится поиск только когда
-		// будет закрыт диалог, и вместе с ним буде "убит" обработчик ждущий
-		// сообщения.
-		// вероятно нужно для "одиночного" режима прекращать искать метки сразу
-		// как будет найдена первая. если ни одна метка не была найдена,
-		// отправлять сообщение о "ошибке".
-		// для поиска меток в цикле пока даже не могу придумать применения, от
-		// задачи соответственно будет и решение по этому режиму.
-		m_bASYC = true;
-		m_bOK = false;
-
-		Thread thread = new Thread(new Runnable() {
-
-			public void run() {
-
-				Log.d(TAG, "Search tag: start");
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				int nIndex = 0;
-				int m_nReRead = 0;
-				boolean tag_find = false;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// счетчик повторных попыток поиска метки
-				int m_nReSend = 0;
-
-				while (m_handler != null && (m_nReRead >= 0)) {
-
-					nTemp = Read(m_buf, m_nCount, 10240 - m_nCount);
-					m_nCount += nTemp;
-					m_nReRead++;
-
-					if (nTemp == 0) {
-						// далее идёт очень мутный алгоритм "распознования"
-						// желаемых данных
-						String str = reader.BytesToString(m_buf, nIndex,
-								m_nCount - nIndex);
-						Log.d(TAG, "Прочитанные данные: " + str);
-						String[] substr = Pattern.compile("BB0222").split(str);
-						Log.d(TAG, "Количество подстрок: " + substr.length);
-						for (int i = 0; i < substr.length; i++) {
-							Log.d(TAG, "Подстрока №" + i + " : " + substr[i]);
-							if (substr[i].length() > 16) {
-								if (!substr[i].substring(0, 2).equals("BB")) {
-									int nlen = Integer.valueOf(
-											substr[i].substring(0, 4), 16);
-									Log.d(TAG, "количество байт данных: 0x"
-											+ substr[i].substring(0, 4));
-									if ((nlen > 3)
-											&& (nlen < (substr[i].length() - 6) / 2)) {
-										Message msg = new Message();
-										msg.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-										msg.obj = substr[i].substring(6,
-												nlen * 2);
-										m_handler.sendMessage(msg);
-										tag_find = true;
-										m_bOK = true;
-										// принудительно выходим
-										m_nReRead = -1;
-										break;
-									}
-								}
-							}
-						}
-
-						if (tag_find) {
-							// mSoundPool.play(msound, 1.0f, 1.0f, 0, 0, 1.0f);
-						}
-
-						if (m_bLoop) {
-							m_nCount = 0;
-							inventoryLabelsLoop();
-							tag_find = false;
-						} else {
-							if ((m_nReSend < 20) && (!tag_find)) {
-								Inventory();
-								m_nReSend++;
-							} else {
-								break;
-							}
-							tag_find = false;
-							// Log.e("efsfsd", "m_nReSend=" + m_nReSend);
-						}
-
-						if (m_nCount >= 1024) {
-							Log.d("test", "m_nCount = 0");
-							m_nCount = 0;
-						}
-					}
-				}
-
-				Log.e(TAG, "quit");
-
-				m_bASYC = false;
-
-				if (!m_bOK) {
-					Message msg = new Message();
-					msg.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
-					m_handler.sendMessage(msg);
-				}
-
-				Log.d(TAG, "Search tag: quit");
-			}
-		});
-		thread.start();
-	}
-
-	/***
-	 * read the label (results through the Handle asynchronous send a card, a
-	 * message)
+	 * Запуск процесса записи данных в метку. Новый вариант, с правильным
+	 * разбором данных поступающих из считывателя.
 	 * 
 	 * @param password
-	 *            read the password, 4 bytes
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param membank
-	 *            tag data storage area
-	 * @param nSA
-	 *            read tag data address offset
-	 * @param nDL
-	 *            read tag data address length
-	 * @return
-	 */
-	static public int ReadLables(byte[] password, int nUL, byte[] PCandEPC,
-			byte membank, int nSA, int nDL) {
-		int nret = 0;
-		if (!m_bASYC) {
-			Log.d(TAG, "start read tag");
-			Clean();
-			nret = ReadTag(password, nUL, PCandEPC, membank, nSA, nDL);
-			m_bOK = false;
-			// счетчик повторных попыток чтения метки
-			int m_nReSend = 0;
-			StartASYCReadlables();
-			while ((!m_bOK) && (m_nReSend < 20)) {
-				m_nReSend++;
-				Log.d(TAG, "попытка чтения метки №" + m_nReSend);
-				ReadTag(password, nUL, PCandEPC, membank, nSA, nDL);
-				try {
-					Thread.sleep(60);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			Log.d(TAG, "end read tag");
-		}
-		return nret;
-	}
-
-	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду чтения
-	 * данных из метки
-	 */
-	static void StartASYCReadlables() {
-
-		m_bASYC = true;
-		m_bOK = false;
-
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				Log.d(TAG, "Read data: start");
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// мутный счётчик чтения "полных" "пакетов" данных из
-				// считывателя
-				int m_nread = 0;
-				int m_nReRead = 0;
-				while (m_handler != null && (m_nReRead >= 0)) {
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					m_nReRead++;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5) {
-							break;							
-						}
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					Log.e(TAG, "Прочитанные данные: " + str);
-					String[] substr = Pattern.compile("BB0139").split(str);
-					Log.e(TAG, "Количество подстрок: " + substr.length);
-					for (int i = 0; i < substr.length; i++) {
-						Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
-						if (substr[i].length() > 10) {
-							if (!substr[i].substring(0, 2).equals("BB")) {
-								Log.e(TAG, "read ok");
-								m_bOK = true;
-								Message msg = new Message();
-								msg.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-								msg.obj = substr[i].substring(4,
-										substr[i].length() - 4);
-								m_handler.sendMessage(msg);
-								// принудительно выходим
-								m_nReRead = -1;
-								break;
-							}
-						}
-					}
-
-				}
-
-				m_bASYC = false;
-
-				if (!m_bOK) {
-					Message msg = new Message();
-					msg.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
-					m_handler.sendMessage(msg);
-				}
-
-				Log.d(TAG, "Read data: quit");
-			}
-		});
-		thread.start();
-	}
-
-	/**
-	 * write tag (results through the Handle asynchronous send a card, a
-	 * message)
-	 * 
-	 * @param password
-	 *            password 4 bytes
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param membank
-	 *            tag data storage area
-	 * @param nSA
-	 *            write the tag data address offset
-	 * @param nDL
-	 *            write tag data area data length
+	 * @param pcEpc
+	 * @param memoryBank
+	 * @param offset
 	 * @param data
-	 *            write data
-	 * @return
+	 * @param timeOut
 	 */
-	static public int Writelables(byte[] password, int nUL, byte[] PCandEPC,
-			byte membank, int nSA, int nDL, byte[] data) {
-		Clean();
-		int nret = WriteTag(password, nUL, PCandEPC, membank, nSA, nDL, data);
-		if (!m_bASYC) {
-			m_bOK = false;
-			// счетчик повторных попыток записи в метку
-			int m_nReSend = 0;
-			StartASYCWritelables();
-			while ((!m_bOK) && (m_nReSend < 20)) {
-				m_nReSend++;
-				WriteTag(password, nUL, PCandEPC, membank, nSA, nDL, data);
-				try {
-					Thread.sleep(60);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+	static public void writeTagData(String password, String pcEpc,
+			int memoryBank, int offset, String data, int timeOut) {
+
+		final byte[] fPassword = string2Bytes(password);
+		final byte[] fPcEpc = string2Bytes(pcEpc);
+		final byte fMemoryBank = (byte) memoryBank;
+		final int fOffset = offset / 2;
+		final byte[] fData = string2Bytes(data);
+
+		// обработчик для повторной отправки команды в считыватель или отправки
+		// сообщения о успешном выполнении
+		Handler handler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					// отправляем сообщение о успешном чтении данных
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+					m_handler.sendMessage(message);
+				} else if (msg.what == RfidDriverBase.RESULT_RFID_TIMEOUT) {
+					// отправляем сообщение о таймауте
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_TIMEOUT;
+					m_handler.sendMessage(message);
+				} else {
+					// запись не удалась
+					// отправляем повторно команду записи
+					WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank,
+							fOffset, fData.length, fData);
 				}
+				return true;
 			}
-		}
-		return nret;
+		});
+
+		readThread = new ParseThread(ParseThread.WRITE_TAG_DATA_COMMAND,
+				timeOut);
+		readThread.setResendCommandHandler(handler);
+		readThread.start();
+
+		// отправляем команду записи
+		WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset,
+				fData.length, fData);
+
 	}
 
 	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду записи
-	 * данных в метку
+	 * Запуск процесса чтения Id доступных меток. Новый вариант, с правильным
+	 * разбором данных поступающих из считывателя.
+	 * 
+	 * @param timeOut
 	 */
-	static void StartASYCWritelables() {
+	static public void readTagId(int timeOut) {
 
-		m_bASYC = true;
-		m_bOK = false;
+		// обработчик для повторной отправки команды в считыватель или отправки
+		// сообщения о успешном выполнении
+		Handler handler = new Handler(new Handler.Callback() {
 
-		Thread thread = new Thread(new Runnable() {
-
-			public void run() {
-
-				Log.d(TAG, "Write data: start");
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// мутный счётчик чтения "полных" "пакетов" данных из
-				// считывателя
-				int m_nread = 0;
-
-				while (m_handler != null) {
-
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-					}
-
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					Log.e(TAG, "Прочитанные данные: " + str);
-					String[] substr = Pattern.compile("BB0149").split(str);
-					Log.e(TAG, "Количество подстрок: " + substr.length);
-
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							Log.e(TAG, "Подстрока №" + i + " : " + substr[i]);
-							if (substr[i].substring(0, 10).equals("0001004B7E")) {
-								m_bOK = true;
-								Log.e(TAG, "Write OK");
-								Message msg = new Message();
-								msg.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-								msg.obj = "OK";
-								m_handler.sendMessage(msg);
-								// принудительно выходим
-								m_handler = null;
-								break;
-							}
-						}
-
-					}
-
+			@Override
+			public boolean handleMessage(Message msg) {
+				Log.d(TAG, "readTagId: msg.what=" + msg.what);
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					// отправляем сообщение о успешном чтении данных
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+					message.obj = msg.obj;
+					m_handler.sendMessage(message);
+				} else if (msg.what == RfidDriverBase.RESULT_RFID_TIMEOUT) {
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_TIMEOUT;
+					m_handler.sendMessage(message);
+				} else {
+					// чтение не удалось, отправляем повторно команду
+					// чтения Id
+					Inventory();
 				}
-
-				m_bASYC = false;
-
-				if (!m_bOK) {
-					Message msg = new Message();
-					msg.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
-					m_handler.sendMessage(msg);
-				}
-
-				Log.d("TAG", "Write data: quit");
+				return true;
 			}
 		});
-		thread.start();
+
+		readThread = new ParseThread(ParseThread.READ_TAG_ID_COMMAND, timeOut);
+		readThread.setResendCommandHandler(handler);
+		readThread.start();
+
+		// отправляем команду чтения Id метки
+		Inventory();
+
+	}
+
+	/**
+	 * Запуск процесса чтения области памяти метки. Новый вариант, с правильным
+	 * разбором данных поступающих из считывателя.
+	 * 
+	 * @param password
+	 * @param pcEpc
+	 * @param memoryBank
+	 * @param offset
+	 * @param count
+	 */
+	static public void readTagData(String password, String pcEpc,
+			int memoryBank, int offset, int count, int timeOut) {
+
+		final byte[] fPassword = string2Bytes(password);
+		final byte[] fPcEpc = string2Bytes(pcEpc);
+		final byte fMemoryBank = (byte) memoryBank;
+		final int fOffset = offset / 2;
+		final int fCount = count / 2;
+
+		// обработчик для повторной отправки команды в считыватель или отправки
+		// сообщения о успешном выполнении
+		Handler handler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					// отправляем сообщение о успешном чтении данных
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+					message.obj = msg.obj;
+					m_handler.sendMessage(message);
+				} else if (msg.what == RfidDriverBase.RESULT_RFID_TIMEOUT) {
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_TIMEOUT;
+					m_handler.sendMessage(message);
+				} else {
+					// чтение данных не удалось, отправляем повторно команду
+					// чтения данных
+					ReadTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank,
+							fOffset, fCount);
+				}
+				return true;
+			}
+		});
+
+		readThread = new ParseThread(ParseThread.READ_TAG_DATA_COMMAND, timeOut);
+		readThread.setResendCommandHandler(handler);
+		readThread.start();
+
+		// отправляем команду чтения памяти метки
+		ReadTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fCount);
+
 	}
 
 	/**
@@ -1013,8 +756,8 @@ public class reader {
 	 *            read tag data address length
 	 * @return
 	 */
-	static public native int ReadTag(byte[] password, int nUL,
-			byte[] PCandEPC, byte membank, int nSA, int nDL);
+	static public native int ReadTag(byte[] password, int nUL, byte[] PCandEPC,
+			byte membank, int nSA, int nDL);
 
 	/**
 	 * write tag data storage area
