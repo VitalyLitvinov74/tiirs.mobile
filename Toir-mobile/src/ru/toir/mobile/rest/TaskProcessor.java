@@ -466,7 +466,7 @@ public class TaskProcessor {
 		for (EquipmentSrv equipment : equipments) {
 			equipmentImages.add(equipment.getId());
 		}
-		
+
 		// сохраняем типы оборудования
 		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(mContext));
@@ -531,6 +531,18 @@ public class TaskProcessor {
 					"Ошибка при сохранении типов документации.");
 			return result;
 		}
+
+		// сохраняем записи о результатах выполненых работ
+		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
+				new ToirDatabaseContext(mContext));
+		// TODO реализовать сбор разрозненных данных чтобы сделать необходимые
+		// записи
+		// if (!equipmentOperationResultDBAdapter.saveItems(null)) {
+		// result.putBoolean(IServiceProvider.RESULT, false);
+		// result.putString(IServiceProvider.MESSAGE,
+		// "Ошибка при сохранении результатов выполнения операций.");
+		// return result;
+		// }
 
 		// сохраняем результаты измерений
 		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(

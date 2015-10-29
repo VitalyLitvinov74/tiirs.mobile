@@ -21,7 +21,9 @@ public class EquipmentDocumentationSrv extends BaseObjectSrv {
 	@Expose
 	private ArrayList<String> Links;
 	@Expose
-	private boolean Required; 
+	private boolean Required;
+	@Expose
+	private String FileName; 
 
 	/**
 	 * 
@@ -144,6 +146,20 @@ public class EquipmentDocumentationSrv extends BaseObjectSrv {
 	 */
 	public void setLinks(ArrayList<String> links) {
 		Links = links;
+	}
+
+	/**
+	 * @return the fileName
+	 */
+	public String getFileName() {
+		return FileName;
+	}
+
+	/**
+	 * @param fileName the fileName to set
+	 */
+	public void setFileName(String fileName) {
+		FileName = fileName;
 	}
 
 }

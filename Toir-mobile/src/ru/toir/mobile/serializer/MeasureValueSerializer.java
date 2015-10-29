@@ -40,6 +40,8 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 		result.addProperty("Value", value);
 		// пока тупо считаем что если значение начинается с '/' то это файл
 		if (value.startsWith("/")) {
+			File fname = new File(value);
+			result.addProperty("Value", fname.getName());
 			File file = new File(value);
 			int bufferSize = 1024;
 			int count;
@@ -53,7 +55,9 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 				}
 				// TODO решить каким образом будут передаваться на сервер
 				// бинарные данные
-				// result.addProperty("BinaryValue", valueBase64.toString());
+				result.addProperty("BinaryValue", valueBase64.toString());
+				result.addProperty("Encoding", "base64");
+				
 				fis.close();
 			} catch (Exception e) {
 				e.printStackTrace();

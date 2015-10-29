@@ -32,6 +32,8 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 	private String OperationPatternId;
 	@Expose
 	private ArrayList<MeasureValueSrv> MeasuredValues;
+	@Expose
+	private String EquipmentOperationResultId;
 
 	/**
 	 * 
@@ -240,5 +242,19 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 		}
 
 		return list;
+	}
+
+	/**
+	 * @return the equipmentOperationResultId
+	 */
+	public String getEquipmentOperationResultId() {
+		return EquipmentOperationResultId;
+	}
+
+	/**
+	 * @param equipmentOperationResultId the equipmentOperationResultId to set
+	 */
+	public void setEquipmentOperationResultId(String equipmentOperationResultId) {
+		EquipmentOperationResultId = equipmentOperationResultId;
 	}
 }

@@ -318,12 +318,16 @@ public class EquipmentSrv extends BaseObjectSrv {
 	public static ArrayList<EquipmentDocumentation> getEquipmentDocumentations(
 			ArrayList<EquipmentSrv> equipments) {
 
+		EquipmentDocumentation item;
 		ArrayList<EquipmentDocumentation> list = new ArrayList<EquipmentDocumentation>();
 		for (EquipmentSrv equipment : equipments) {
 			ArrayList<EquipmentDocumentationSrv> documentations = equipment
 					.getDocuments();
 			for (EquipmentDocumentationSrv documentation : documentations) {
-				list.add(documentation.getLocal(equipment.getId()));
+				item = documentation.getLocal(equipment.getId());
+				// TODO есть рассогласованость в полях с именами и путями
+				item.setPath(documentation.getFileName());
+				list.add(item);
 			}
 		}
 		return list;
