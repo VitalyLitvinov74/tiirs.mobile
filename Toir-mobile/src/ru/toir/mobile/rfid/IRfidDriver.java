@@ -82,7 +82,7 @@ public interface IRfidDriver {
 	 *            Данные для записи
 	 */
 	public void writeTagData(String password, int memoryBank, int address,
-			byte[] data);
+			String data);
 
 	/**
 	 * Пишем в метку в один этап.
@@ -100,7 +100,7 @@ public interface IRfidDriver {
 	 *            Данные для записи
 	 */
 	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, byte[] data);
+			int address, String data);
 
 	/**
 	 * <p>

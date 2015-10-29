@@ -50,7 +50,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
-			byte[] data) {
+			String data) {
 		/*
 		 * В данном драйвере реальной записи не происходит.
 		 */
@@ -148,7 +148,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, byte[] data) {
+			int address, String data) {
 		/*
 		 * В данном драйвере реальной записи не происходит.
 		 */

@@ -64,13 +64,13 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
-			byte[] data) {
+			String data) {
 
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, byte[] data) {
+			int address, String data) {
 
 	}
 

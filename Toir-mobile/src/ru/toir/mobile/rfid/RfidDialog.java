@@ -46,7 +46,7 @@ public class RfidDialog extends DialogFragment {
 	private String tagId;
 	private int tagMemoryBank;
 	private int tagAddress;
-	private byte[] tagWriteData;
+	private String tagWriteData;
 	private int tagReadCount;
 
 	/*
@@ -258,7 +258,7 @@ public class RfidDialog extends DialogFragment {
 	 * @param data
 	 */
 	public void writeTagData(String password, String id, int memoryBank,
-			int address, byte[] data) {
+			int address, String data) {
 
 		tagPassword = password;
 		tagId = id;
@@ -281,7 +281,7 @@ public class RfidDialog extends DialogFragment {
 	 * @param data
 	 */
 	public void writeTagData(String password, int memoryBank, int address,
-			byte[] data) {
+			String data) {
 
 		tagPassword = password;
 		tagMemoryBank = memoryBank;

@@ -213,22 +213,19 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						new ToirDatabaseContext(getApplicationContext()));
 				Equipment equipment = adapter.getItem(equipment_uuid);
 				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
-				final int readCount = 8;
+
 				Handler handler = new Handler(new Handler.Callback() {
 
 					@Override
 					public boolean handleMessage(Message msg) {
 
-						Log.d(TAG, "Получили сообщение из драйвра.");
+						Log.d(TAG, "Получили сообщение из драйвера.");
 
-						if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 							String tagData = (String) msg.obj;
 							Log.d(TAG, tagData);
-							Toast.makeText(
-									getApplicationContext(),
-									"Считывание метки успешно. Запрошено: "
-											+ readCount + ", получено: "
-											+ tagData.length() / 2,
+							Toast.makeText(getApplicationContext(),
+									"Считывание метки успешно.\r\n" + tagData,
 									Toast.LENGTH_SHORT).show();
 						} else {
 							Log.d(TAG, "Ошибка чтения метки!");
@@ -244,13 +241,18 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 
+				// читаем метку с конкретным id для теста
+				// rfidDialog.readTagData("0000000000",
+				// "3000E2004000860902332580112D",
+				// RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+
 				// читаем метку с id привязанным к оборудованию
 				// rfidDialog.readTagData("0000000000", equipment.getTag_id(),
 				// RfidDriverBase.MEMORY_BANK_USER, 0, 8);
 
 				// читаем "произовольную" метку, ту которую найдём первой
 				rfidDialog.readTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, readCount);
+						RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
 				rfidDialog.show(getFragmentManager(), TAG);
 			}
@@ -265,15 +267,22 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						new ToirDatabaseContext(getApplicationContext()));
 				Equipment equipment = adapter.getItem(equipment_uuid);
 				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+
 				Handler handler = new Handler(new Handler.Callback() {
 
 					@Override
 					public boolean handleMessage(Message msg) {
 
-						Log.d(TAG, "Получили сообщение из драйвра.");
+						Log.d(TAG, "Получили сообщение из драйвера.");
 
-						if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
-							Log.d(TAG, "Запись успешна.");
+						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+							Toast.makeText(getApplicationContext(),
+									"Запись метки удалась.", Toast.LENGTH_SHORT)
+									.show();
+						} else {
+							Toast.makeText(getApplicationContext(),
+									"Не удалось записать данные.",
+									Toast.LENGTH_SHORT).show();
 						}
 
 						// закрываем диалог
@@ -283,11 +292,19 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 				// тестовые данные для примера
-				byte[] data = new byte[] { 10, 11, 12, 13, 14, 15, 10, 11 };
-				data = new byte[] { 10, 10, 10, 10 };
+				String data = "0a0a0a0a";
+				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+				data = "00000000000000000000000000000000";
+				//data = "FFFFFFFFFFFFFFFF";
+				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 
 				// пишем в метку с id привязанным к оборудованию
 				// rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+				// RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+				// пишем в "известную" метку
+				// rfidDialog.writeTagData("0000000000",
+				// "3000E2004000860902332580112D",
 				// RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
 				// пишем в "произовольную" метку, ту которую найдём первой

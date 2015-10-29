@@ -60,8 +60,8 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 			}
 		}
 		
-		result.addProperty("Date",
-				DataUtils.getDate(item.getChangedAt(), dateFormat));
+		// result.addProperty("Date",
+		// DataUtils.getDate(item.getChangedAt(), dateFormat));
 		
 		result.addProperty("CreatedAt",
 				DataUtils.getDate(item.getCreatedAt(), dateFormat));
