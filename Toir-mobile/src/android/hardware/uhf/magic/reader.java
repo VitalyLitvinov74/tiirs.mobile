@@ -186,7 +186,8 @@ public class reader {
 							// Log.e("efsfsd", "m_nReSend=" + m_nReSend);
 						}
 
-						if (m_nCount >= 10240) {
+						if (m_nCount >= 1024) {
+							Log.d("test", "m_nCount = 0");
 							m_nCount = 0;
 						}
 					}
@@ -230,21 +231,24 @@ public class reader {
 			byte membank, int nSA, int nDL) {
 		int nret = 0;
 		if (!m_bASYC) {
+			Log.d(TAG, "start read tag");
 			Clean();
-			nret = ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
+			nret = ReadTag(password, nUL, PCandEPC, membank, nSA, nDL);
 			m_bOK = false;
 			// счетчик повторных попыток чтения метки
 			int m_nReSend = 0;
 			StartASYCReadlables();
 			while ((!m_bOK) && (m_nReSend < 20)) {
 				m_nReSend++;
-				ReadLable(password, nUL, PCandEPC, membank, nSA, nDL);
+				Log.d(TAG, "попытка чтения метки №" + m_nReSend);
+				ReadTag(password, nUL, PCandEPC, membank, nSA, nDL);
 				try {
 					Thread.sleep(60);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
+			Log.d(TAG, "end read tag");
 		}
 		return nret;
 	}
@@ -276,8 +280,9 @@ public class reader {
 					m_nReRead++;
 					if (nTemp == 0) {
 						m_nread++;
-						if (m_nread > 5)
-							break;
+						if (m_nread > 5) {
+							break;							
+						}
 					}
 					String str = reader.BytesToString(m_buf, 0, m_nCount);
 					Log.e(TAG, "Прочитанные данные: " + str);
@@ -340,7 +345,7 @@ public class reader {
 	static public int Writelables(byte[] password, int nUL, byte[] PCandEPC,
 			byte membank, int nSA, int nDL, byte[] data) {
 		Clean();
-		int nret = WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
+		int nret = WriteTag(password, nUL, PCandEPC, membank, nSA, nDL, data);
 		if (!m_bASYC) {
 			m_bOK = false;
 			// счетчик повторных попыток записи в метку
@@ -348,7 +353,7 @@ public class reader {
 			StartASYCWritelables();
 			while ((!m_bOK) && (m_nReSend < 20)) {
 				m_nReSend++;
-				WriteLable(password, nUL, PCandEPC, membank, nSA, nDL, data);
+				WriteTag(password, nUL, PCandEPC, membank, nSA, nDL, data);
 				try {
 					Thread.sleep(60);
 				} catch (InterruptedException e) {
@@ -904,7 +909,7 @@ public class reader {
 	 * 
 	 * @param strpath
 	 */
-	static public native void init(String strpath);
+	static public native void Init(String strpath);
 
 	/**
 	 * open device
@@ -1008,7 +1013,7 @@ public class reader {
 	 *            read tag data address length
 	 * @return
 	 */
-	static public native int ReadLable(byte[] password, int nUL,
+	static public native int ReadTag(byte[] password, int nUL,
 			byte[] PCandEPC, byte membank, int nSA, int nDL);
 
 	/**
@@ -1030,7 +1035,7 @@ public class reader {
 	 *            write data
 	 * @return
 	 */
-	static public native int WriteLable(byte[] password, int nUL,
+	static public native int WriteTag(byte[] password, int nUL,
 			byte[] PCandEPC, byte membank, int nSA, int nDL, byte[] data);
 
 	/**

@@ -244,13 +244,17 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				});
 				rfidDialog = new RfidDialog(getApplicationContext(), handler);
 
+				// читаем метку с конкретным id для теста
+				rfidDialog.readTagData("0000000000", "3400E2004000860902332580112D",
+						RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+
 				// читаем метку с id привязанным к оборудованию
 				// rfidDialog.readTagData("0000000000", equipment.getTag_id(),
 				// RfidDriverBase.MEMORY_BANK_USER, 0, 8);
 
 				// читаем "произовольную" метку, ту которую найдём первой
-				rfidDialog.readTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, readCount);
+				// rfidDialog.readTagData("0000000000",
+				// RfidDriverBase.MEMORY_BANK_USER, 0, readCount);
 
 				rfidDialog.show(getFragmentManager(), TAG);
 			}

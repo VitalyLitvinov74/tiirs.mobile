@@ -32,8 +32,8 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 		Log.d(TAG, "init");
 
-		reader.init("/dev/ttyMT1");
-		reader.Open("/dev/ttyMT1");
+		reader.Init("");
+		reader.Open("");
 		if (reader.SetTransmissionPower(1950) != 0x11) {
 			if (reader.SetTransmissionPower(1950) != 0x11) {
 				reader.SetTransmissionPower(1950);
