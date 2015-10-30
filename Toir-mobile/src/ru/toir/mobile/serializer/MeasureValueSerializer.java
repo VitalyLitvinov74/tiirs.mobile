@@ -3,12 +3,14 @@
  */
 package ru.toir.mobile.serializer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Type;
 import ru.toir.mobile.serverapi.result.MeasureValueRes;
 import ru.toir.mobile.utils.DataUtils;
 import android.util.Base64;
+import android.util.Base64OutputStream;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -46,27 +48,29 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 			int bufferSize = 1024;
 			int count;
 			byte buffer[] = new byte[bufferSize];
-			StringBuilder valueBase64 = new StringBuilder();
 			try {
 				FileInputStream fis = new FileInputStream(file);
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				Base64OutputStream b64os = new Base64OutputStream(baos,
+						Base64.NO_WRAP);
+
 				while ((count = fis.read(buffer)) > 0) {
-					valueBase64.append(Base64.encodeToString(buffer, 0, count,
-							Base64.NO_CLOSE));
+					b64os.write(buffer, 0, count);
 				}
-				// TODO решить каким образом будут передаваться на сервер
-				// бинарные данные
-				result.addProperty("BinaryValue", valueBase64.toString());
-				result.addProperty("Encoding", "base64");
-				
+
+				b64os.close();
+				baos.close();
 				fis.close();
+
+				result.addProperty("BinaryValue", baos.toString());
+				result.addProperty("Encoding", "base64");
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
-		// result.addProperty("Date",
-		// DataUtils.getDate(item.getChangedAt(), dateFormat));
-		
+
 		result.addProperty("CreatedAt",
 				DataUtils.getDate(item.getCreatedAt(), dateFormat));
 		result.addProperty("ChangedAt",
@@ -74,5 +78,4 @@ public class MeasureValueSerializer implements JsonSerializer<MeasureValueRes> {
 
 		return result;
 	}
-
 }
