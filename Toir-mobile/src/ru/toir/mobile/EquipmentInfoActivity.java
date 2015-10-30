@@ -37,6 +37,7 @@ import ru.toir.mobile.rfid.UserTagStructure;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -134,23 +135,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						if (uuids != null) {
 							EquipmentDocumentation item = documentationDBAdapter
 									.getItem(uuids[0]);
-							File file = new File(item.getPath());
-							Intent target = new Intent(Intent.ACTION_VIEW);
-							String[] patternList = file.getName().split("\\.");
-							target.setDataAndType(
-									Uri.fromFile(file),
-									"application/"
-											+ patternList[patternList.length - 1]);
-							target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-							Intent viewFileIntent = Intent.createChooser(
-									target, "Open File");
-							try {
-								startActivity(viewFileIntent);
-							} catch (ActivityNotFoundException e) {
-								// сообщить пользователю установить подходящее
-								// приложение
-							}
+							showDocument(uuids[0]);
 						}
 					} else {
 						// сообщаем описание неудачи
@@ -169,6 +154,43 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 		}
 	};
+
+	/**
+	 * Показываем документ из базы во внешнем приложении.
+	 * 
+	 * @param uuid
+	 */
+	private void showDocument(String uuid) {
+
+		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
+				new ToirDatabaseContext(getApplicationContext()));
+
+		if (uuid != null) {
+			EquipmentDocumentation item = documentationDBAdapter.getItem(uuid);
+			MimeTypeMap mt = MimeTypeMap.getSingleton();
+			File file = new File(item.getPath());
+			String[] patternList = file.getName().split("\\.");
+			String extension = patternList[patternList.length - 1];
+
+			if (mt.hasExtension(extension)) {
+				String mimeType = mt.getMimeTypeFromExtension(extension);
+				Intent target = new Intent(Intent.ACTION_VIEW);
+				target.setDataAndType(Uri.fromFile(new File(item.getPath())),
+						mimeType);
+				target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+				Intent viewFileIntent = Intent.createChooser(target,
+						"Open File");
+				try {
+					startActivity(viewFileIntent);
+				} catch (ActivityNotFoundException e) {
+					// сообщить пользователю установить подходящее
+					// приложение
+				}
+			}
+
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -295,7 +317,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				String data = "0a0a0a0a";
 				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 				data = "00000000000000000000000000000000";
-				//data = "FFFFFFFFFFFFFFFF";
+				// data = "FFFFFFFFFFFFFFFF";
 				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 
 				// пишем в метку с id привязанным к оборудованию
@@ -341,18 +363,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 			File file = new File(item.getPath());
 			if (file.exists()) {
-				Intent target = new Intent(Intent.ACTION_VIEW);
-				String[] patternList = file.getName().split("\\.");
-				target.setDataAndType(Uri.fromFile(file), "application/"
-						+ patternList[patternList.length - 1]);
-				target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-				Intent intent = Intent.createChooser(target, "Open File");
-				try {
-					startActivity(intent);
-				} catch (ActivityNotFoundException e) {
-					// сообщить пользователю установить подходящее приложение
-				}
+				showDocument(item.getUuid());
 			} else {
 				// либо сказать что файла нет, либо предложить скачать с сервера
 				Log.d(TAG, "Получаем файл документации.");
