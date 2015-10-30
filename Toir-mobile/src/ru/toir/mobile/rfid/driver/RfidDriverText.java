@@ -95,7 +95,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Log.d(TAG, "pressed CANCEL");
 
 				Message message = new Message();
-				message.arg1 = RfidDriverBase.RESULT_RFID_CANCEL;
+				message.what = RfidDriverBase.RESULT_RFID_CANCEL;
 				mHandler.sendMessage(message);
 			}
 		});
