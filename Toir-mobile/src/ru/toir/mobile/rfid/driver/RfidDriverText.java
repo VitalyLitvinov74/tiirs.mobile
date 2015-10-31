@@ -55,7 +55,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реальной записи не происходит.
 		 */
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -79,7 +79,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Spinner spinner = (Spinner) v.getRootView().findViewById(
 						R.id.rfid_dialog_text_spinner_lables);
 				Message message = new Message();
-				message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
+				message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
 				message.obj = spinner.getSelectedItem();
 				mHandler.sendMessage(message);
 			}
@@ -131,7 +131,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реального считывания не происходит.
 		 */
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -142,7 +142,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реального считывания не происходит.
 		 */
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -153,7 +153,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реальной записи не происходит.
 		 */
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 

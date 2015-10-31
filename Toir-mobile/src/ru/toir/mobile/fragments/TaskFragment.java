@@ -761,7 +761,7 @@ public class TaskFragment extends Fragment {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				if (msg.arg1 == RfidDriverBase.RESULT_RFID_SUCCESS) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 					String tagId = (String) msg.obj;
 					Log.d(TAG, "нужна: " + equipment_tag + " считали: " + tagId);
 					Intent operationActivity = new Intent(getActivity(),

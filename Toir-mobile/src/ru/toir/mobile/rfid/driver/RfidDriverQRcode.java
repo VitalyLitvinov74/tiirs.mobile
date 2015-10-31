@@ -15,7 +15,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -125,11 +124,8 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 								+ lastScannedCode);
 
 						Message message = new Message();
-						message.arg1 = RfidDriverBase.RESULT_RFID_SUCCESS;
-						Bundle bundle = new Bundle();
-						bundle.putString(RfidDriverBase.RESULT_RFID_TAG_ID,
-								lastScannedCode);
-						message.setData(bundle);
+						message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+						message.obj = lastScannedCode;
 						mHandler.sendMessage(message);
 						releaseCamera();
 					}
@@ -168,7 +164,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			public void onClick(View v) {
 
 				Message message = new Message();
-				message.arg1 = RfidDriverBase.RESULT_RFID_CANCEL;
+				message.what = RfidDriverBase.RESULT_RFID_CANCEL;
 				mHandler.sendMessage(message);
 			}
 		});
@@ -184,7 +180,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int count) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -193,7 +189,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int address, int count) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -202,7 +198,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			String data) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -211,7 +207,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 

@@ -30,7 +30,7 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 	public void readTagId() {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -49,7 +49,7 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 			int count) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -58,7 +58,7 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 			int address, int count) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_READ_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -67,7 +67,7 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 			String data) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -76,7 +76,7 @@ public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 
 		Message message = new Message();
-		message.arg1 = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+		message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
