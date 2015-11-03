@@ -16,6 +16,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.adapters.BaseDBAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -30,6 +31,7 @@ import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
+import ru.toir.mobile.db.tables.EquipmentOperationResult;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
@@ -535,14 +537,35 @@ public class TaskProcessor {
 		// сохраняем записи о результатах выполненых работ
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 				new ToirDatabaseContext(mContext));
-		// TODO реализовать сбор разрозненных данных чтобы сделать необходимые
-		// записи
-		// if (!equipmentOperationResultDBAdapter.saveItems(null)) {
-		// result.putBoolean(IServiceProvider.RESULT, false);
-		// result.putString(IServiceProvider.MESSAGE,
-		// "Ошибка при сохранении результатов выполнения операций.");
-		// return result;
-		// }
+		// TODO исправить сохранение как будут данные с сервера
+		for (TaskSrv taskSrv : tasks) {
+			ArrayList<EquipmentOperationSrv> operationsSrv = taskSrv.getItems();
+			for (EquipmentOperationSrv operationSrv : operationsSrv) {
+				// если uuid "нулевой" то результатов нет, ни чего не пишем в
+				// базу
+				if (!operationSrv.getEquipmentOperationResultId().equals(
+						BaseDBAdapter.uuidNull)) {
+					EquipmentOperationResult operationResult = new EquipmentOperationResult();
+					operationResult.setUuid(operationSrv
+							.getEquipmentOperationResultId());
+					operationResult.setEquipment_operation_uuid(operationSrv
+							.getId());
+					// TODO не передаётся с сервера
+					operationResult.setStart_date(0);
+					// TODO не передаётся с сервера
+					operationResult.setEnd_date(0);
+					// TODO не передаётся с сервера
+					operationResult.setOperation_result_uuid("null");
+					// TODO не передаётся с сервера
+					operationResult.setType(-1);
+					operationResult.setCreatedAt(operationSrv
+							.getCreatedAtTime());
+					operationResult.setChangedAt(operationSrv
+							.getChangedAtTime());
+					equipmentOperationResultDBAdapter.replace(operationResult);
+				}
+			}
+		}
 
 		// сохраняем результаты измерений
 		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(
