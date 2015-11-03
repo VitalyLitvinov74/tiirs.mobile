@@ -286,10 +286,6 @@ public class OperationActivity extends Activity {
 	private void showStepContent(OperationPatternStep step) {
 
 		stepTitle.setText("Шаг: " + step.getTitle());
-		// stepTitle.setText(Environment.getExternalStorageDirectory().getAbsolutePath()
-		// + File.separator + "Android" + File.separator + "data" +
-		// File.separator + getPackageName() + File.separator + "img" +
-		// File.separator+ step.getImage());
 		stepDescrition.setText(step.getDescription());
 		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
@@ -297,19 +293,13 @@ public class OperationActivity extends Activity {
 		photoContainer.removeAllViewsInLayout();
 		photoContainer.setVisibility(View.INVISIBLE);
 
-		File imgFile = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath()
-				+ File.separator
-				+ "Android"
-				+ File.separator
-				+ "data"
-				+ File.separator
-				+ getPackageName()
-				+ File.separator + "img" + File.separator + step.getImage());
+		File imgFile = new File(step.getImage());
 		if (imgFile.exists() && imgFile.isFile()) {
 			Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
 					.getAbsolutePath());
 			step_image.setImageBitmap(myBitmap);
+		} else {
+			step_image.setImageResource(R.drawable.workman);
 		}
 
 		// получаем список результатов шагов

@@ -38,6 +38,7 @@ import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
 import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
@@ -202,6 +203,60 @@ public class ReferenceProcessor {
 				result = new Bundle();
 				result.putBoolean(IServiceProvider.RESULT, false);
 				return result;
+			}
+		}
+
+		// получаем изображения к шагам шаблона операции
+		OperationPatternStepDBAdapter stepDBAdapter = new OperationPatternStepDBAdapter(
+				new ToirDatabaseContext(mContext));
+		for (String patternUuid : patternUuids) {
+			ArrayList<OperationPatternStep> steps = stepDBAdapter
+					.getItems(patternUuid);
+
+			for (OperationPatternStep step : steps) {
+				url.setLength(0);
+				url.append(mServerUrl).append("/api/operationpatterns/")
+						.append(patternUuid).append("/steps/")
+						.append(step.getUuid()).append("/images/")
+						.append(step.getUuid()).append(".jpg");
+
+				try {
+					URI requestUri = new URI(url.toString());
+					Log.d("test", "requestUri = " + requestUri.toString());
+
+					Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+					List<String> tList = new ArrayList<String>();
+					tList.add("bearer "
+							+ AuthorizedUser.getInstance().getToken());
+					headers.put("Authorization", tList);
+
+					Request request = new Request(Method.GET, requestUri,
+							headers, null);
+					Response response = new RestClient().execute(request);
+
+					if (response.mStatus == 200) {
+						File file = new File(
+								mContext.getExternalFilesDir("patterns") + "/"
+										+ patternUuid, step.getUuid() + ".jpg");
+						if (!file.getParentFile().exists()) {
+							file.getParentFile().mkdirs();
+						}
+						FileOutputStream fos = new FileOutputStream(file);
+						fos.write(response.mBody);
+						fos.close();
+						step.setImage(file.getPath());
+						stepDBAdapter.replace(step);
+					} else {
+						throw new Exception("Не удалось получить файл. URL: "
+								+ url);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					result = new Bundle();
+					result.putBoolean(IServiceProvider.RESULT, false);
+					result.putString(IServiceProvider.MESSAGE, e.getMessage());
+					return result;
+				}
 			}
 		}
 
@@ -447,7 +502,7 @@ public class ReferenceProcessor {
 	}
 
 	/**
-	 * Получаем файл изображения
+	 * Получаем файл изображения оборудования
 	 * 
 	 * @param bundle
 	 * @return
