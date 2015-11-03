@@ -102,6 +102,9 @@ public class OperationActivity extends Activity {
 	private ImageView step_image;
 
 	private String lastPhotoFile;
+	// костыль для того чтобы передать uuid в класс работы с камерой для
+	// сохранения файла изображения с именем шага операции
+	private String currentStepUuid;
 	Preview mPreview;
 
 	private RfidDriverBase driver;
@@ -272,6 +275,7 @@ public class OperationActivity extends Activity {
 
 	private void showStep(String uuid) {
 
+		currentStepUuid = uuid;
 		OperationPatternStep step = null;
 
 		step = getStep(uuid);
@@ -725,9 +729,13 @@ public class OperationActivity extends Activity {
 
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
 				Locale.ENGLISH).format(new Date());
+		String fileName;
+		// оригинальное имя файла
+		//fileName = "IMG_" + timeStamp + ".jpg";
+		fileName = currentStepUuid + ".jpg";
 		File mediaFile;
 		mediaFile = new File(mediaStorageDir.getPath() + File.separator
-				+ "IMG_" + timeStamp + ".jpg");
+				+ fileName);
 		return mediaFile;
 	}
 
@@ -780,8 +788,10 @@ public class OperationActivity extends Activity {
 
 	// TODO разобраться зачем это
 	public void CallbackOnReadLable(String result) {
-		//driver.SetOperationType((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
-		//driver.readTagId((byte) RfidDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
+		// driver.SetOperationType((byte)
+		// RfidDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
+		// driver.readTagId((byte)
+		// RfidDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
 		driver.readTagId();
 	}
 
@@ -866,9 +876,10 @@ public class OperationActivity extends Activity {
 			// pointer<equipmenttag.toString().length()+2*tagrecord.toString().length())
 			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2
 					.toString()).getBytes();
-			//driver.SetOperationType((byte) RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
+			// driver.SetOperationType((byte)
+			// RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
 			// TODO исправить на новый вариант записи в метку
-			//driver.write(out_buffer);
+			// driver.write(out_buffer);
 		}
 	}
 
