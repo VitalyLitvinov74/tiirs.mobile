@@ -518,8 +518,7 @@ public class ReferenceProcessor {
 			return result;
 		}
 
-		StringBuilder url = new StringBuilder(new String(new byte[] {},
-				Charset.forName("cp1251")));
+		StringBuilder url = new StringBuilder();
 		String equipmentsUuids[] = bundle
 				.getStringArray(ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
 
@@ -530,26 +529,24 @@ public class ReferenceProcessor {
 			Equipment equipment = equipmentDBAdapter.getItem(equipmentsUuid);
 
 			File imgFile = new File(equipment.getImage());
-			String fileName = imgFile.getName();
+			String fileName;
 			String filePath = imgFile.getParent();
 
-			// костыль пока сервер не начнёт принимать запросы в UTF-8
-			String serverCharset = "CP1251";
-			String fileNameWin;
-			if (Charset.isSupported(serverCharset)) {
+			String charset = "UTF-8";
+			if (Charset.isSupported(charset)) {
 				try {
-					fileNameWin = URLEncoder.encode(fileName, serverCharset);
+					fileName = URLEncoder.encode(imgFile.getName(), charset);
 				} catch (Exception e) {
 					e.printStackTrace();
-					fileNameWin = fileName;
+					fileName = imgFile.getName();
 				}
 			} else {
-				fileNameWin = fileName;
+				fileName = imgFile.getName();
 			}
 
 			url.setLength(0);
 			url.append(mServerUrl).append("/").append(filePath).append("/")
-					.append(fileNameWin);
+					.append(fileName);
 
 			try {
 				URI requestUri = new URI(url.toString());
