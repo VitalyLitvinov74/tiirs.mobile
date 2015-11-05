@@ -535,7 +535,8 @@ public class ReferenceProcessor {
 			String charset = "UTF-8";
 			if (Charset.isSupported(charset)) {
 				try {
-					fileName = URLEncoder.encode(imgFile.getName(), charset);
+					fileName = URLEncoder.encode(imgFile.getName(), charset)
+							.replace("+", "%20");
 				} catch (Exception e) {
 					e.printStackTrace();
 					fileName = imgFile.getName();

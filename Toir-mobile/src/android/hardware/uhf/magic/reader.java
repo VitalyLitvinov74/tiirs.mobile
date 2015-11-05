@@ -679,6 +679,19 @@ public class reader {
 	static public native int Read(byte[] pout, int nStart, int nCount);
 
 	/**
+	 * write data
+	 * 
+	 * @param jpout
+	 *            store write data
+	 * @param nStart
+	 *            write data in the starting position of jpout
+	 * @param nwrite
+	 *            to write data length
+	 * @return
+	 */
+	public static native int Write(byte[] jpout, int nStart, int nwrite);
+
+	/**
 	 * Closing device
 	 */
 	static public native void Close();
