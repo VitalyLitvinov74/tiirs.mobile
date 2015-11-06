@@ -1,6 +1,7 @@
 package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +35,12 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 	private ArrayList<MeasureValueSrv> MeasuredValues;
 	@Expose
 	private String EquipmentOperationResultId;
+	@Expose
+	private Date InspectionStartTime;
+	@Expose
+	private Date InspectionEndTime;
+	@Expose
+	private String OperationResultId;
 
 	/**
 	 * 
@@ -252,9 +259,55 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 	}
 
 	/**
-	 * @param equipmentOperationResultId the equipmentOperationResultId to set
+	 * @param equipmentOperationResultId
+	 *            the equipmentOperationResultId to set
 	 */
 	public void setEquipmentOperationResultId(String equipmentOperationResultId) {
 		EquipmentOperationResultId = equipmentOperationResultId;
+	}
+
+	/**
+	 * @return the inspectionStartTime
+	 */
+	public Date getInspectionStartTime() {
+		return InspectionStartTime;
+	}
+
+	/**
+	 * @param inspectionStartTime
+	 *            the inspectionStartTime to set
+	 */
+	public void setInspectionStartTime(Date inspectionStartTime) {
+		InspectionStartTime = inspectionStartTime;
+	}
+
+	/**
+	 * @return the inspectionEndTime
+	 */
+	public Date getInspectionEndTime() {
+		return InspectionEndTime;
+	}
+
+	/**
+	 * @param inspectionEndTime
+	 *            the inspectionEndTime to set
+	 */
+	public void setInspectionEndTime(Date inspectionEndTime) {
+		InspectionEndTime = inspectionEndTime;
+	}
+
+	/**
+	 * @return the operationResultId
+	 */
+	public String getOperationResultId() {
+		return OperationResultId;
+	}
+
+	/**
+	 * @param operationResultId
+	 *            the operationResultId to set
+	 */
+	public void setOperationResultId(String operationResultId) {
+		OperationResultId = operationResultId;
 	}
 }

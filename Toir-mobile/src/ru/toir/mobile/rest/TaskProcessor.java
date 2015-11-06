@@ -32,6 +32,7 @@ import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperationResult;
+import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serializer.EquipmentOperationResultSerializer;
@@ -69,6 +70,7 @@ public class TaskProcessor {
 	private Set<String> operationTypeUuids;
 	private Set<String> requiredDocuments;
 	private Set<String> equipmentImages;
+	private Set<String> measureValuesImages;
 
 	public TaskProcessor(Context context) throws Exception {
 		mContext = context;
@@ -180,6 +182,18 @@ public class TaskProcessor {
 			result.putAll(imageFileResult);
 		}
 
+		// получаем изображение результата измерения
+		Bundle measureImageFileResult = getMeasureValueImages(measureValuesImages
+				.toArray(new String[] {}));
+		success = measureImageFileResult.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			db.endTransaction();
+			return measureImageFileResult;
+		} else {
+			// добавляем в результат все элементы ответа
+			result.putAll(measureImageFileResult);
+		}
+
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
@@ -197,7 +211,7 @@ public class TaskProcessor {
 					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
 					requiredDocuments.toArray(new String[] {}));
 
-			return referenceProcessor.getDocumentaionFile(extra);
+			return referenceProcessor.getDocumentationFile(extra);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
@@ -349,6 +363,29 @@ public class TaskProcessor {
 			ReferenceProcessor processor = new ReferenceProcessor(mContext);
 			Bundle bundle = new Bundle();
 			return processor.getOperationStatus(bundle);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
+		}
+	}
+
+	/**
+	 * Получаем изображения к результатам измерений
+	 * 
+	 * @return
+	 */
+	private Bundle getMeasureValueImages(String[] uuids) {
+
+		try {
+			ReferenceProcessor processor = new ReferenceProcessor(mContext);
+			Bundle bundle = new Bundle();
+			bundle.putStringArray(
+					ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID,
+					uuids);
+			return processor.getMeasureValueFile(bundle);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
@@ -537,7 +574,6 @@ public class TaskProcessor {
 		// сохраняем записи о результатах выполненых работ
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 				new ToirDatabaseContext(mContext));
-		// TODO исправить сохранение как будут данные с сервера
 		for (TaskSrv taskSrv : tasks) {
 			ArrayList<EquipmentOperationSrv> operationsSrv = taskSrv.getItems();
 			for (EquipmentOperationSrv operationSrv : operationsSrv) {
@@ -550,12 +586,12 @@ public class TaskProcessor {
 							.getEquipmentOperationResultId());
 					operationResult.setEquipment_operation_uuid(operationSrv
 							.getId());
-					// TODO не передаётся с сервера
-					operationResult.setStart_date(0);
-					// TODO не передаётся с сервера
-					operationResult.setEnd_date(0);
-					// TODO не передаётся с сервера
-					operationResult.setOperation_result_uuid("null");
+					operationResult.setStart_date(operationSrv
+							.getInspectionStartTime().getTime());
+					operationResult.setEnd_date(operationSrv
+							.getInspectionEndTime().getTime());
+					operationResult.setOperation_result_uuid(operationSrv
+							.getOperationResultId());
 					// TODO не передаётся с сервера
 					operationResult.setType(-1);
 					operationResult.setCreatedAt(operationSrv
@@ -570,12 +606,21 @@ public class TaskProcessor {
 		// сохраняем результаты измерений
 		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(
 				new ToirDatabaseContext(mContext));
-		if (!measureValueDBAdapter.saveItems(EquipmentOperationSrv
-				.getMeasureValues(tasks))) {
+		ArrayList<MeasureValue> measureValues = EquipmentOperationSrv
+				.getMeasureValues(tasks);
+		if (!measureValueDBAdapter.saveItems(measureValues)) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
 					"Ошибка при сохранении результатов измерений.");
 			return result;
+		}
+
+		// строим список изображений результатов измерений
+		measureValuesImages = new HashSet<String>();
+		for (MeasureValue measureValue : measureValues) {
+			if (measureValue.getValue().startsWith("api/")) {
+				measureValuesImages.add(measureValue.getUuid());
+			}
 		}
 
 		// если добрались сюда, значит всё в порядке

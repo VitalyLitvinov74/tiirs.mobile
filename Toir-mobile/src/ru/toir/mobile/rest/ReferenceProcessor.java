@@ -28,6 +28,7 @@ import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
@@ -38,6 +39,7 @@ import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.CriticalTypeSrv;
@@ -59,6 +61,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
@@ -426,7 +429,7 @@ public class ReferenceProcessor {
 	 * @param bundle
 	 * @return
 	 */
-	public Bundle getDocumentaionFile(Bundle bundle) {
+	public Bundle getDocumentationFile(Bundle bundle) {
 
 		Bundle result;
 
@@ -529,25 +532,26 @@ public class ReferenceProcessor {
 			Equipment equipment = equipmentDBAdapter.getItem(equipmentsUuid);
 
 			File imgFile = new File(equipment.getImage());
-			String fileName;
+			String fileName = imgFile.getName();
+			String fileNameEncoded;
 			String filePath = imgFile.getParent();
 
 			String charset = "UTF-8";
 			if (Charset.isSupported(charset)) {
 				try {
-					fileName = URLEncoder.encode(imgFile.getName(), charset)
+					fileNameEncoded = URLEncoder.encode(fileName, charset)
 							.replace("+", "%20");
 				} catch (Exception e) {
 					e.printStackTrace();
-					fileName = imgFile.getName();
+					fileNameEncoded = fileName;
 				}
 			} else {
-				fileName = imgFile.getName();
+				fileNameEncoded = fileName;
 			}
 
 			url.setLength(0);
 			url.append(mServerUrl).append("/").append(filePath).append("/")
-					.append(fileName);
+					.append(fileNameEncoded);
 
 			try {
 				URI requestUri = new URI(url.toString());
@@ -574,6 +578,98 @@ public class ReferenceProcessor {
 					fos.close();
 					equipment.setImage(file.getPath());
 					equipmentDBAdapter.replace(equipment);
+				} else {
+					throw new Exception("Не удалось получить файл. URL: " + url);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				result = new Bundle();
+				result.putBoolean(IServiceProvider.RESULT, false);
+				result.putString(IServiceProvider.MESSAGE, e.getMessage());
+				return result;
+			}
+		}
+
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
+	}
+
+	/**
+	 * Получаем файл изображения результата измерения
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public Bundle getMeasureValueFile(Bundle bundle) {
+
+		Bundle result;
+
+		if (!checkToken()) {
+			result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, "Нет связи с сервером.");
+			return result;
+		}
+
+		StringBuilder url = new StringBuilder();
+		String measureValueUuids[] = bundle
+				.getStringArray(ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
+
+		MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(
+				new ToirDatabaseContext(mContext));
+
+		for (String measureValueUuid : measureValueUuids) {
+			MeasureValue measureValue = measureValueDBAdapter
+					.getItem(measureValueUuid);
+
+			File imgFile = new File(measureValue.getValue());
+			String fileName = imgFile.getName();
+			String fileNameEncoded;
+			String filePath = imgFile.getParent();
+
+			String charset = "UTF-8";
+			if (Charset.isSupported(charset)) {
+				try {
+					fileNameEncoded = URLEncoder.encode(fileName, charset)
+							.replace("+", "%20");
+				} catch (Exception e) {
+					e.printStackTrace();
+					fileNameEncoded = fileName;
+				}
+			} else {
+				fileNameEncoded = fileName;
+			}
+
+			url.setLength(0);
+			url.append(mServerUrl).append("/").append(filePath).append("/")
+					.append(fileNameEncoded);
+
+			try {
+				URI requestUri = new URI(url.toString());
+				Log.d("test", "requestUri = " + requestUri.toString());
+
+				Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
+				List<String> tList = new ArrayList<String>();
+				tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+				headers.put("Authorization", tList);
+
+				Request request = new Request(Method.GET, requestUri, headers,
+						null);
+				Response response = new RestClient().execute(request);
+
+				if (response.mStatus == 200) {
+					File file = new File(mContext.getExternalFilesDir(
+							Environment.DIRECTORY_PICTURES).getAbsolutePath(),
+							fileName);
+					if (!file.getParentFile().exists()) {
+						file.getParentFile().mkdirs();
+					}
+					FileOutputStream fos = new FileOutputStream(file);
+					fos.write(response.mBody);
+					fos.close();
+					measureValue.setValue(file.getPath());
+					measureValueDBAdapter.replace(measureValue);
 				} else {
 					throw new Exception("Не удалось получить файл. URL: " + url);
 				}
