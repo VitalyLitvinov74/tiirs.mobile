@@ -25,6 +25,8 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 	protected String Title;
 	@Expose
 	protected ArrayList<OperationPatternStepResultSrv> Results = new ArrayList<OperationPatternStepResultSrv>();
+	@Expose
+	protected ArrayList<String> ImageLinks;
 
 	/**
 	 * 
@@ -141,7 +143,11 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 		item.setUuid(Id);
 		item.setOperation_pattern_uuid(uuid);
 		item.setDescription(Description);
-		item.setImage(ImagePath);
+		if (ImageLinks.size() > 0) {
+			item.setImage(ImageLinks.get(0));
+		} else {
+			item.setImage(null);
+		}
 		item.setFirst_step(getIsFirstStep() == 1 ? true : false);
 		item.setLast_step(getIsLastStep() == 1 ? true : false);
 		item.setTitle(Title);
@@ -161,6 +167,20 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * @return the imageLinks
+	 */
+	public ArrayList<String> getImageLinks() {
+		return ImageLinks;
+	}
+
+	/**
+	 * @param imageLinks the imageLinks to set
+	 */
+	public void setImageLinks(ArrayList<String> imageLinks) {
+		ImageLinks = imageLinks;
 	}
 
 }

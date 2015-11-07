@@ -217,6 +217,9 @@ public class ReferenceProcessor {
 					.getItems(patternUuid);
 
 			for (OperationPatternStep step : steps) {
+				if (step.getImage() == null) {
+					continue;
+				}
 				url.setLength(0);
 				url.append(mServerUrl).append("/api/operationpatterns/")
 						.append(patternUuid).append("/steps/")

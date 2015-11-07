@@ -174,6 +174,7 @@ public class GPSFragment extends Fragment {
 					curLatitude = curLatitude - 0.0001 * cnt2;
 					curLongitude = curLongitude - 0.0001 * cnt2;
 
+					// TODO это нужно переписать!
 					Equipment equipment = equipmentDBAdapter
 							.getItem(equipOperationList.get(cnt2)
 									.getEquipment_uuid());
