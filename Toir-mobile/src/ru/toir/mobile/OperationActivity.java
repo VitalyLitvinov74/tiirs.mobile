@@ -47,7 +47,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.format.Time;
@@ -732,7 +731,7 @@ public class OperationActivity extends Activity {
 				Locale.ENGLISH).format(new Date());
 		String fileName;
 		// оригинальное имя файла
-		//fileName = "IMG_" + timeStamp + ".jpg";
+		// fileName = "IMG_" + timeStamp + ".jpg";
 		fileName = currentStepUuid + ".jpg";
 		File mediaFile;
 		mediaFile = new File(mediaStorageDir.getPath() + File.separator
@@ -799,7 +798,7 @@ public class OperationActivity extends Activity {
 	// TODO разобраться зачем это
 	public void Callback(String result) {
 		if (result == null) {
-			setResult(reader.RESULT_RFID_READ_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_READ_ERROR);
 		} else {
 			if (result.length() < 100) {
 				Toast.makeText(this, "Ответ слишком короткий",
@@ -886,7 +885,7 @@ public class OperationActivity extends Activity {
 
 	public void CallbackOnWrite(String result) {
 		if (result == null) {
-			setResult(reader.RESULT_RFID_WRITE_ERROR);
+			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
 		} else {
 			finish();
 		}

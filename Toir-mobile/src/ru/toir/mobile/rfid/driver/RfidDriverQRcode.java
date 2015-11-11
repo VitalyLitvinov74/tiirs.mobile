@@ -15,7 +15,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
-import android.hardware.uhf.magic.reader;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -125,7 +124,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 								+ lastScannedCode);
 
 						Message message = new Message();
-						message.what = reader.RESULT_RFID_SUCCESS;
+						message.what = RESULT_RFID_SUCCESS;
 						message.obj = lastScannedCode;
 						mHandler.sendMessage(message);
 						releaseCamera();
@@ -165,7 +164,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			public void onClick(View v) {
 
 				Message message = new Message();
-				message.what = reader.RESULT_RFID_CANCEL;
+				message.what = RESULT_RFID_CANCEL;
 				mHandler.sendMessage(message);
 			}
 		});
@@ -181,7 +180,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int count) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_READ_ERROR;
+		message.what = RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -190,7 +189,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int address, int count) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_READ_ERROR;
+		message.what = RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -199,7 +198,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			String data) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_WRITE_ERROR;
+		message.what = RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -208,7 +207,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_WRITE_ERROR;
+		message.what = RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 

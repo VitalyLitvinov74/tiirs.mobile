@@ -5,7 +5,6 @@ import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
 import android.hardware.barcode.Scanner;
-import android.hardware.uhf.magic.reader;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -47,14 +46,14 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 				}
 				Log.d(TAG, tagId);
 				Message message = new Message();
-				message.what = reader.RESULT_RFID_SUCCESS;
+				message.what = RESULT_RFID_SUCCESS;
 				message.obj = tagId;
 				mHandler.sendMessage(message);
 				break;
 			}
 			case Scanner.BARCODE_NOREAD: {
 				Message message = new Message();
-				message.what = reader.RESULT_RFID_READ_ERROR;
+				message.what = RESULT_RFID_READ_ERROR;
 				mHandler.sendMessage(message);
 				break;
 			}
@@ -101,7 +100,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 					int count) {
 
 				Message message = new Message();
-				message.what = reader.RESULT_RFID_SUCCESS;
+				message.what = RESULT_RFID_SUCCESS;
 				message.obj = s.toString();
 				mHandler.sendMessage(message);
 			}
@@ -125,7 +124,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_READ_ERROR;
+		message.what = RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -134,7 +133,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 			int address, int count) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_READ_ERROR;
+		message.what = RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -143,7 +142,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 			String data) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_WRITE_ERROR;
+		message.what = RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -152,7 +151,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_WRITE_ERROR;
+		message.what = RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 

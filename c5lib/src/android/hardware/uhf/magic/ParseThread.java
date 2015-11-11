@@ -60,7 +60,7 @@ public class ParseThread extends Thread {
 						interrupt();
 						if (resendCommandHandler != null) {
 							Message message = new Message();
-							message.what = reader.RESULT_RFID_TIMEOUT;
+							message.what = reader.RESULT_TIMEOUT;
 							resendCommandHandler.sendMessage(message);
 						}
 					}
@@ -93,7 +93,7 @@ public class ParseThread extends Thread {
 		byte[] payloadLenBuff = new byte[2];
 		int payloadLenBuffIndex = 0;
 		boolean packetEnd = false;
-		
+
 		int rc;
 
 		while (true) {
@@ -143,7 +143,7 @@ public class ParseThread extends Thread {
 												// драйверу что нужно послать
 												// комманду снова
 												Message message = new Message();
-												message.what = reader.RESULT_RFID_READ_ERROR;
+												message.what = reader.RESULT_READ_ERROR;
 												resendCommandHandler
 														.sendMessage(message);
 											} else {
@@ -161,7 +161,7 @@ public class ParseThread extends Thread {
 												case READ_TAG_ID_COMMAND:
 													Log.d(TAG,
 															"Id карты прочитан успешно!");
-													message.what = reader.RESULT_RFID_SUCCESS;
+													message.what = reader.RESULT_SUCCESS;
 													message.obj = reader
 															.BytesToString(
 																	data,
@@ -171,58 +171,58 @@ public class ParseThread extends Thread {
 												case READ_TAG_DATA_COMMAND:
 													Log.d(TAG,
 															"Данные карты прочитаны успешно!");
-													message.what = reader.RESULT_RFID_SUCCESS;
+													message.what = reader.RESULT_SUCCESS;
 													message.obj = reader
 															.BytesToString(
 																	data, 0,
 																	payloadLength);
 													break;
 												case WRITE_TAG_DATA_COMMAND:
-													rc = reader.byteToInt(
-															data, 0, 1);
+													rc = reader.byteToInt(data,
+															0, 1);
 													Log.d(TAG,
 															"код возврата после записи = "
 																	+ rc);
 													if (rc == 0) {
 														Log.d(TAG,
 																"Данные записаны успешно!");
-														message.what = reader.RESULT_RFID_SUCCESS;
+														message.what = reader.RESULT_SUCCESS;
 													} else {
 														Log.d(TAG,
 																"Не удалось записать данные!");
-														message.what = reader.RESULT_RFID_WRITE_ERROR;
+														message.what = reader.RESULT_WRITE_ERROR;
 													}
 													break;
 												case LOCK_TAG_COMMAND:
-													rc = reader.byteToInt(
-															data, 0, 1);
+													rc = reader.byteToInt(data,
+															0, 1);
 													Log.d(TAG,
 															"код возврата после блокировки = "
 																	+ rc);
 													if (rc == 0) {
 														Log.d(TAG,
 																"Блокировка выполненна успешно!");
-														message.what = reader.RESULT_RFID_SUCCESS;
+														message.what = reader.RESULT_SUCCESS;
 													} else {
 														Log.d(TAG,
 																"Не удалось выполнить блокировку!");
-														message.what = reader.RESULT_RFID_WRITE_ERROR;
+														message.what = reader.RESULT_WRITE_ERROR;
 													}
 													break;
 												case KILL_TAG_COMMAND:
-													rc = reader.byteToInt(
-															data, 0, 1);
+													rc = reader.byteToInt(data,
+															0, 1);
 													Log.d(TAG,
 															"код возврата после деактивации = "
 																	+ rc);
 													if (rc == 0) {
 														Log.d(TAG,
 																"Деактивация выполненна успешно!");
-														message.what = reader.RESULT_RFID_SUCCESS;
+														message.what = reader.RESULT_SUCCESS;
 													} else {
 														Log.d(TAG,
 																"Не удалось выполнить деактивацию!");
-														message.what = reader.RESULT_RFID_WRITE_ERROR;
+														message.what = reader.RESULT_WRITE_ERROR;
 													}
 													break;
 												}

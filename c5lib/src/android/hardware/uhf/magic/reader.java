@@ -21,25 +21,23 @@ public class reader {
 	public static final int PERMANENT_LOCK = 3;
 
 	// области памяти метки для блокировки
-	public static final int MEMBLOCK_KILL_PWD = 0;
-	public static final int MEMBLOCK_ACCESS_PWD = 1;
-	public static final int MEMBLOCK_TID = 2;
-	public static final int MEMBLOCK_EPC = 3;
-	public static final int MEMBLOCK_USER = 4;
-	
+	public static final int LOCK_KILL_PWD = 0;
+	public static final int LOCK_ACCESS_PWD = 1;
+	public static final int LOCK_TID = 2;
+	public static final int LOCK_EPC = 3;
+	public static final int LOCK_USER = 4;
+
+	// области памяти метки для чтения/записи
 	public final static int MEMORY_BANK_RESERVED = 0;
 	public final static int MEMORY_BANK_EPC = 1;
 	public final static int MEMORY_BANK_TID = 2;
 	public final static int MEMORY_BANK_USER = 3;
 
-	public static final int RESULT_RFID_SUCCESS = 0;
-	public static final int RESULT_RFID_READ_ERROR = 1;
-	public static final int RESULT_RFID_INIT_ERROR = 2;
-	public static final int RESULT_RFID_CLASS_NOT_FOUND = 3;
-	public static final int RESULT_RFID_WRITE_ERROR = 4;
-	public static final int RESULT_RFID_CANCEL = 5;
-	public static final int RESULT_RFID_TIMEOUT = 6;
-
+	// значения возвращаемые считывателем
+	public static final int RESULT_SUCCESS = 0;
+	public static final int RESULT_READ_ERROR = 1;
+	public static final int RESULT_WRITE_ERROR = 2;
+	public static final int RESULT_TIMEOUT = 3;
 
 	private static ParseThread readThread;
 
@@ -69,15 +67,15 @@ public class reader {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				if (msg.what == RESULT_RFID_SUCCESS) {
+				if (msg.what == RESULT_SUCCESS) {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
+					message.what = RESULT_SUCCESS;
 					m_handler.sendMessage(message);
-				} else if (msg.what == RESULT_RFID_TIMEOUT) {
+				} else if (msg.what == RESULT_TIMEOUT) {
 					// отправляем сообщение о таймауте
 					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
+					message.what = RESULT_TIMEOUT;
 					m_handler.sendMessage(message);
 				} else {
 					// деактивация не удалась
@@ -121,15 +119,15 @@ public class reader {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				if (msg.what == RESULT_RFID_SUCCESS) {
+				if (msg.what == RESULT_SUCCESS) {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
+					message.what = RESULT_SUCCESS;
 					m_handler.sendMessage(message);
-				} else if (msg.what == RESULT_RFID_TIMEOUT) {
+				} else if (msg.what == RESULT_TIMEOUT) {
 					// отправляем сообщение о таймауте
 					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
+					message.what = RESULT_TIMEOUT;
 					m_handler.sendMessage(message);
 				} else {
 					// блокировка не удалась
@@ -175,15 +173,15 @@ public class reader {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				if (msg.what == RESULT_RFID_SUCCESS) {
+				if (msg.what == RESULT_SUCCESS) {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
+					message.what = RESULT_SUCCESS;
 					m_handler.sendMessage(message);
-				} else if (msg.what == RESULT_RFID_TIMEOUT) {
+				} else if (msg.what == RESULT_TIMEOUT) {
 					// отправляем сообщение о таймауте
 					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
+					message.what = RESULT_TIMEOUT;
 					m_handler.sendMessage(message);
 				} else {
 					// запись не удалась
@@ -221,15 +219,15 @@ public class reader {
 			@Override
 			public boolean handleMessage(Message msg) {
 				Log.d(TAG, "readTagId: msg.what=" + msg.what);
-				if (msg.what == RESULT_RFID_SUCCESS) {
+				if (msg.what == RESULT_SUCCESS) {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
+					message.what = RESULT_SUCCESS;
 					message.obj = msg.obj;
 					m_handler.sendMessage(message);
-				} else if (msg.what == RESULT_RFID_TIMEOUT) {
+				} else if (msg.what == RESULT_TIMEOUT) {
 					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
+					message.what = RESULT_TIMEOUT;
 					m_handler.sendMessage(message);
 				} else {
 					// чтение не удалось, отправляем повторно команду
@@ -274,15 +272,15 @@ public class reader {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				if (msg.what == RESULT_RFID_SUCCESS) {
+				if (msg.what == RESULT_SUCCESS) {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
+					message.what = RESULT_SUCCESS;
 					message.obj = msg.obj;
 					m_handler.sendMessage(message);
-				} else if (msg.what == RESULT_RFID_TIMEOUT) {
+				} else if (msg.what == RESULT_TIMEOUT) {
 					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
+					message.what = RESULT_TIMEOUT;
 					m_handler.sendMessage(message);
 				} else {
 					// чтение данных не удалось, отправляем повторно команду

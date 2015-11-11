@@ -27,6 +27,7 @@ import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.TaskRes;
 import ru.toir.mobile.utils.DataUtils;
@@ -40,7 +41,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -761,7 +761,7 @@ public class TaskFragment extends Fragment {
 
 			@Override
 			public boolean handleMessage(Message msg) {
-				if (msg.what == reader.RESULT_RFID_SUCCESS) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 					String tagId = (String) msg.obj;
 					Log.d(TAG, "нужна: " + equipment_tag + " считали: " + tagId);
 					Intent operationActivity = new Intent(getActivity(),

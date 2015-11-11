@@ -4,7 +4,6 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.DialogFragment;
-import android.hardware.uhf.magic.reader;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -56,7 +55,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реальной записи не происходит.
 		 */
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_WRITE_ERROR;
+		message.what = RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -80,7 +79,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Spinner spinner = (Spinner) v.getRootView().findViewById(
 						R.id.rfid_dialog_text_spinner_lables);
 				Message message = new Message();
-				message.what = reader.RESULT_RFID_SUCCESS;
+				message.what = RESULT_RFID_SUCCESS;
 				message.obj = spinner.getSelectedItem();
 				mHandler.sendMessage(message);
 			}
@@ -96,7 +95,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Log.d(TAG, "pressed CANCEL");
 
 				Message message = new Message();
-				message.what = reader.RESULT_RFID_CANCEL;
+				message.what = RESULT_RFID_CANCEL;
 				mHandler.sendMessage(message);
 			}
 		});
@@ -132,7 +131,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реального считывания не происходит.
 		 */
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_READ_ERROR;
+		message.what = RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -143,7 +142,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реального считывания не происходит.
 		 */
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_READ_ERROR;
+		message.what = RESULT_RFID_READ_ERROR;
 		mHandler.sendMessage(message);
 	}
 
@@ -154,7 +153,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 		 * В данном драйвере реальной записи не происходит.
 		 */
 		Message message = new Message();
-		message.what = reader.RESULT_RFID_WRITE_ERROR;
+		message.what = RESULT_RFID_WRITE_ERROR;
 		mHandler.sendMessage(message);
 	}
 
