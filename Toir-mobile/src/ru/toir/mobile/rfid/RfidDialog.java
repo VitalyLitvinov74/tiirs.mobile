@@ -10,6 +10,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -79,7 +80,7 @@ public class RfidDialog extends DialogFragment {
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, e.toString());
 			Message message = new Message();
-			message.what = RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND;
+			message.what = reader.RESULT_RFID_CLASS_NOT_FOUND;
 			mHandler.sendMessage(message);
 
 		}
@@ -92,14 +93,14 @@ public class RfidDialog extends DialogFragment {
 		} catch (Exception e) {
 			e.printStackTrace();
 			Message message = new Message();
-			message.what = RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND;
+			message.what = reader.RESULT_RFID_CLASS_NOT_FOUND;
 			mHandler.sendMessage(message);
 		}
 
 		// инициализируем драйвер
 		if (!driver.init()) {
 			Message message = new Message();
-			message.what = RfidDriverBase.RESULT_RFID_INIT_ERROR;
+			message.what = reader.RESULT_RFID_INIT_ERROR;
 			mHandler.sendMessage(message);
 
 		}
@@ -170,17 +171,17 @@ public class RfidDialog extends DialogFragment {
 			if (data != null) {
 				String result = data.getStringExtra("SCAN_RESULT");
 				if (result != null && !result.equals("")) {
-					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+					message.what = reader.RESULT_RFID_SUCCESS;
 					message.obj = result;
 				} else {
-					message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
+					message.what = reader.RESULT_RFID_READ_ERROR;
 				}
 			} else {
-				message.what = RfidDriverBase.RESULT_RFID_CANCEL;
+				message.what = reader.RESULT_RFID_CANCEL;
 			}
 			break;
 		default:
-			message.what = RfidDriverBase.RESULT_RFID_CANCEL;
+			message.what = reader.RESULT_RFID_CANCEL;
 			break;
 		}
 		mHandler.sendMessage(message);

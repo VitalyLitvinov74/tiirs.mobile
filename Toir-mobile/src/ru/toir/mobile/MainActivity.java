@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -33,7 +34,6 @@ import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rest.UsersServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class MainActivity extends FragmentActivity {
 
@@ -260,7 +260,7 @@ public class MainActivity extends FragmentActivity {
 
 				Log.d(TAG, "Получили сообщение из драйвра.");
 
-				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+				if (msg.what == reader.RESULT_RFID_SUCCESS) {
 					String tagId = (String) msg.obj;
 					Log.d(TAG, tagId);
 
@@ -381,8 +381,7 @@ public class MainActivity extends FragmentActivity {
 			return true;
 		} else if (id == R.id.action_update) {
 			return true;
-		}
-		else if (id == R.id.action_about) {
+		} else if (id == R.id.action_about) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

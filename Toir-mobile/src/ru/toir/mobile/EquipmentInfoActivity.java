@@ -21,6 +21,7 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.uhf.magic.reader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,7 +32,6 @@ import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagRecordStructure;
 import ru.toir.mobile.rfid.UserTagStructure;
 import android.support.v4.app.FragmentActivity;
@@ -243,7 +243,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 						Log.d(TAG, "Получили сообщение из драйвера.");
 
-						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+						if (msg.what == reader.RESULT_RFID_SUCCESS) {
 							String tagData = (String) msg.obj;
 							Log.d(TAG, tagData);
 							Toast.makeText(getApplicationContext(),
@@ -274,7 +274,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 				// читаем "произовольную" метку, ту которую найдём первой
 				rfidDialog.readTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+						reader.MEMORY_BANK_USER, 0, 64);
 
 				rfidDialog.show(getFragmentManager(), TAG);
 			}
@@ -297,7 +297,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 						Log.d(TAG, "Получили сообщение из драйвера.");
 
-						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+						if (msg.what == reader.RESULT_RFID_SUCCESS) {
 							Toast.makeText(getApplicationContext(),
 									"Запись метки удалась.", Toast.LENGTH_SHORT)
 									.show();
@@ -331,7 +331,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 				// пишем в "произовольную" метку, ту которую найдём первой
 				rfidDialog.writeTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, data);
+						reader.MEMORY_BANK_USER, 0, data);
 
 				rfidDialog.show(getFragmentManager(), TAG);
 
@@ -631,7 +631,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	// TODO наследие старой архитектуры драйверов rfid
 	public void CallbackOnWrite(String result) {
 		if (result == null) {
-			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
+			setResult(reader.RESULT_RFID_WRITE_ERROR);
 		} else {
 			Toast.makeText(this, "Запись успешно завершена", Toast.LENGTH_SHORT)
 					.show();
@@ -643,7 +643,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	public void Callback(String result) {
 		// Intent data = null;
 		if (result == null) {
-			setResult(RfidDriverBase.RESULT_RFID_READ_ERROR);
+			setResult(reader.RESULT_RFID_READ_ERROR);
 		} else {
 			if (result.length() < 100) {
 				Toast.makeText(this, "Ответ слишком короткий",
