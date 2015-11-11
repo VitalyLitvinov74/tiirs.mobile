@@ -25,6 +25,8 @@ public class ParseThread extends Thread {
 	public static final byte READ_TAG_ID_COMMAND = (byte) 0x22;
 	public static final byte READ_TAG_DATA_COMMAND = (byte) 0x39;
 	public static final byte WRITE_TAG_DATA_COMMAND = (byte) 0x49;
+	public static final byte LOCK_TAG_COMMAND = (byte) 0x82;
+	public static final byte KILL_TAG_COMMAND = (byte) 0x65;
 
 	// флаг успешности выполнения команды
 	private boolean tagOperationSuccess;
@@ -91,6 +93,8 @@ public class ParseThread extends Thread {
 		byte[] payloadLenBuff = new byte[2];
 		int payloadLenBuffIndex = 0;
 		boolean packetEnd = false;
+		
+		int rc;
 
 		while (true) {
 
@@ -174,9 +178,9 @@ public class ParseThread extends Thread {
 																	payloadLength);
 													break;
 												case WRITE_TAG_DATA_COMMAND:
-													int rc = reader.byteToInt(
+													rc = reader.byteToInt(
 															data, 0, 1);
-													Log.d("TAG",
+													Log.d(TAG,
 															"код возврата после записи = "
 																	+ rc);
 													if (rc == 0) {
@@ -186,6 +190,38 @@ public class ParseThread extends Thread {
 													} else {
 														Log.d(TAG,
 																"Не удалось записать данные!");
+														message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+													}
+													break;
+												case LOCK_TAG_COMMAND:
+													rc = reader.byteToInt(
+															data, 0, 1);
+													Log.d(TAG,
+															"код возврата после блокировки = "
+																	+ rc);
+													if (rc == 0) {
+														Log.d(TAG,
+																"Блокировка выполненна успешно!");
+														message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+													} else {
+														Log.d(TAG,
+																"Не удалось выполнить блокировку!");
+														message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
+													}
+													break;
+												case KILL_TAG_COMMAND:
+													rc = reader.byteToInt(
+															data, 0, 1);
+													Log.d(TAG,
+															"код возврата после деактивации = "
+																	+ rc);
+													if (rc == 0) {
+														Log.d(TAG,
+																"Деактивация выполненна успешно!");
+														message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+													} else {
+														Log.d(TAG,
+																"Не удалось выполнить деактивацию!");
 														message.what = RfidDriverBase.RESULT_RFID_WRITE_ERROR;
 													}
 													break;

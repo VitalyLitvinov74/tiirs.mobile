@@ -2,8 +2,6 @@ package android.hardware.uhf.magic;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-import java.util.regex.Pattern;
-
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.os.Handler;
 import android.os.Message;
@@ -16,13 +14,125 @@ public class reader {
 	// обработчик через который класс общается с внешним миром
 	static public Handler m_handler = null;
 
-	// флаг того что находимся в процессе чтения/записи данных из считывателя
-	static Boolean m_bASYC = false;
+	// маски доступа к областям памяти
+	public static final int UNLOCK = 0;
+	public static final int PERMANENT_UNLOCK = 1;
+	public static final int LOCK = 2;
+	public static final int PERMANENT_LOCK = 3;
+
+	// области памяти метки для блокировки
+	public static final int MEMBLOCK_KILL_PWD = 0;
+	public static final int MEMBLOCK_ACCESS_PWD = 1;
+	public static final int MEMBLOCK_TID = 2;
+	public static final int MEMBLOCK_EPC = 3;
+	public static final int MEMBLOCK_USER = 4;
 
 	private static ParseThread readThread;
 
 	static {
 		System.loadLibrary("uhf-tools");
+	}
+
+	/**
+	 * Запуск процесса деактивации метки. Новый вариант, с правильным разбором
+	 * данных поступающих из считывателя.
+	 * 
+	 * @param password
+	 * @param pcEpc
+	 * @param memoryBank
+	 * @param offset
+	 * @param data
+	 * @param timeOut
+	 */
+	static public void killTag(String password, String pcEpc, int timeOut) {
+
+		final byte[] fPassword = string2Bytes(password);
+		final byte[] fPcEpc = string2Bytes(pcEpc);
+
+		// обработчик для повторной отправки команды в считыватель или отправки
+		// сообщения о успешном выполнении
+		Handler handler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					// отправляем сообщение о успешном чтении данных
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+					m_handler.sendMessage(message);
+				} else if (msg.what == RfidDriverBase.RESULT_RFID_TIMEOUT) {
+					// отправляем сообщение о таймауте
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_TIMEOUT;
+					m_handler.sendMessage(message);
+				} else {
+					// деактивация не удалась
+					// отправляем повторно команду деактивации
+					Kill(fPassword, fPcEpc.length, fPcEpc);
+				}
+				return true;
+			}
+		});
+
+		readThread = new ParseThread(ParseThread.KILL_TAG_COMMAND, timeOut);
+		readThread.setResendCommandHandler(handler);
+		readThread.start();
+
+		// отправляем команду деактивации
+		Kill(fPassword, fPcEpc.length, fPcEpc);
+
+	}
+
+	/**
+	 * Запуск процесса блокировки метки. Новый вариант, с правильным разбором
+	 * данных поступающих из считывателя.
+	 * 
+	 * @param password
+	 * @param pcEpc
+	 * @param memoryBank
+	 * @param offset
+	 * @param data
+	 * @param timeOut
+	 */
+	static public void lockTag(String password, String pcEpc, int mask,
+			int timeOut) {
+
+		final byte[] fPassword = string2Bytes(password);
+		final byte[] fPcEpc = string2Bytes(pcEpc);
+		final int fMask = mask;
+
+		// обработчик для повторной отправки команды в считыватель или отправки
+		// сообщения о успешном выполнении
+		Handler handler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+					// отправляем сообщение о успешном чтении данных
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+					m_handler.sendMessage(message);
+				} else if (msg.what == RfidDriverBase.RESULT_RFID_TIMEOUT) {
+					// отправляем сообщение о таймауте
+					Message message = new Message();
+					message.what = RfidDriverBase.RESULT_RFID_TIMEOUT;
+					m_handler.sendMessage(message);
+				} else {
+					// блокировка не удалась
+					// отправляем повторно команду блокировки
+					Lock(fPassword, fPcEpc.length, fPcEpc, fMask);
+				}
+				return true;
+			}
+		});
+
+		readThread = new ParseThread(ParseThread.LOCK_TAG_COMMAND, timeOut);
+		readThread.setResendCommandHandler(handler);
+		readThread.start();
+
+		// отправляем команду блокировки
+		Lock(fPassword, fPcEpc.length, fPcEpc, fMask);
+
 	}
 
 	/**
@@ -180,323 +290,57 @@ public class reader {
 	}
 
 	/**
-	 * inactivated label (results through the Handle asynchronous transmission)
+	 * Возвращает маску доступа к областям памяти метки
 	 * 
-	 * @param btReadId
-	 *            reader.
-	 * @param pbtAryPassWord
-	 *            destroy the password (4 bytes)
+	 * @param memoryBlock
+	 * @param lockType
 	 * @return
 	 */
-	static public int KillLables(byte[] password, int nUL, byte[] EPC) {
-		Clean();
-		int nret = Kill(password, nUL, EPC);
-		if (!m_bASYC) {
-			StartASYCKilllables();
-		}
-		return nret;
-	}
+	static public int getLockPayload(int memoryBlock, int lockType) {
 
-	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду по
-	 * отключению метки
-	 */
-	static void StartASYCKilllables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// мутный счётчик чтения "полных" "пакетов" данных из
-				// считывателя
-				int m_nread = 0;
+		int result = 0;
+		int shiftBits;
+		int tmpMask;
 
-				while (m_handler != null) {
-
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5) {
-							break;
-						}
-					}
-					// Log.e("test",""+m_nCount+"="+m_nread);
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					// Log.e("test",str);
-					String[] substr = Pattern.compile("BB0165").split(str);
-					// Log.e("test","sub="+substr.length);
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							if (substr[i].substring(0, 10).equals("000100677E")) {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = "OK".getBytes();
-								m_handler.sendMessage(msg);
-							} else {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = substr[i];
-								m_handler.sendMessage(msg);
-							}
-						}
-
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	/**
-	 * for a single label, data store Lock lock or unlock Unlock the label
-	 * 
-	 * @param password
-	 *            lock password
-	 * @param nUL
-	 *            PC+EPC length
-	 * @param PCandEPC
-	 *            PC+EPC data
-	 * @param nLD
-	 *            lock or unlock command
-	 * @return
-	 */
-	static public int LockLables(byte[] password, int nUL, byte[] PCandEPC,
-			int nLD) {
-		Clean();
-		int nret = Lock(password, nUL, PCandEPC, nLD);
-		if (!m_bASYC) {
-			StartASYCLocklables();
-		}
-		return nret;
-	}
-
-	/**
-	 * Запуск процесса чтения данных из считывателя в ответ на команду изменения
-	 * статусов доступа к областям данных метки
-	 */
-	static void StartASYCLocklables() {
-		m_bASYC = true;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				// буфер для операций чтения из считывателя
-				byte[] m_buf = new byte[10240];
-				int nTemp = 0;
-				// позиция в буфере m_buf
-				int m_nCount = 0;
-				// мутный счётчик чтения "полных" "пакетов" данных из
-				// считывателя
-				int m_nread = 0;
-
-				while (m_handler != null) {
-					nTemp = Read(m_buf, m_nCount, 1024);
-					m_nCount += nTemp;
-					if (nTemp == 0) {
-						m_nread++;
-						if (m_nread > 5)
-							break;
-
-					}
-					String str = reader.BytesToString(m_buf, 0, m_nCount);
-					String[] substr = Pattern.compile("BB0182").split(str);
-					for (int i = 0; i < substr.length; i++) {
-						if (substr[i].length() >= 10) {
-							if (substr[i].substring(0, 10).equals("000100847E")) {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = "OK";
-								m_handler.sendMessage(msg);
-								Log.d("test", "Lock=OK");
-							} else {
-								Message msg = new Message();
-								msg.what = 2;
-								msg.obj = substr[i];
-								m_handler.sendMessage(msg);
-								Log.d("test", "Lock=FAIL");
-							}
-						}
-
-					}
-
-				}
-
-				m_bASYC = false;
-			}
-		});
-		thread.start();
-	}
-
-	/**
-	 * Возвращает маску доступа к областям памяти метки (попытка разобраться как
-	 * работает механизм доступа к областям памяти метки)
-	 * 
-	 * @param membank
-	 * @param mask
-	 * @return
-	 */
-	static public int getLockPayLoadNew(byte memoryBank, byte accessMask) {
-		int mask = 0x000000;
-		switch (memoryBank) {
-		// kill password
+		switch (memoryBlock) {
 		case 0:
-			switch (accessMask) {
-			// unlock
-			case 0:
-				mask = 0x0c0000;
-				break;
-			// lock
-			case 1:
-				mask = 0x0c0200;
-				break;
-			// permanent unlock
-			case 2:
-				mask = 0x0c0100;
-				break;
-			// permanent lock
-			case 3:
-				mask = 0x0C0300;
-				break;
-			}
+			shiftBits = 8;
 			break;
-		// access password
 		case 1:
-			switch (accessMask) {
-			// open
-			case 0:
-				mask = 0x080000;
-				break;
-			// pwd r/w
-			case 1:
-				mask = 0x080200;
-				break;
-			// permanent open
-			case 2:
-				mask = 0x080100;
-				break;
-			// permanent close
-			case 3:
-				mask = 0x080300;
-				break;
-			}
+			shiftBits = 6;
 			break;
-		// EPC
 		case 2:
+			shiftBits = 4;
 			break;
-		// TID
 		case 3:
+			shiftBits = 2;
 			break;
-		// USER
 		case 4:
+			shiftBits = 0;
 			break;
 		default:
-			break;
+			return 0;
 		}
 
-		return mask;
-	}
-
-	/**
-	 * Возвращает маску доступа к областям памяти метки (почти оригинальный
-	 * вариант)
-	 * 
-	 * @param membank
-	 * @param mask
-	 * @return
-	 */
-	static public int getLockPayLoad(byte membank, byte mask) {
-		int nret = 0;
-		/*
-		 * switch (Mask) { case 0: switch (membank) {
-		 */
-		switch (membank) {
-		case 0:
-			switch (mask) {
-			case 0:
-				nret = 0x080000;
-				break;
-			case 1:
-				nret = 0x080200;
-				break;
-			case 2:
-				nret = 0x0c0100;
-				break;
-			case 3:
-				nret = 0x0c0300;
-				break;
-			}
+		switch (lockType) {
+		case UNLOCK:
+		case LOCK:
+			// 10 binary
+			tmpMask = 2;
 			break;
-		case 1:
-			switch (mask) {
-			case 0:
-				nret = 0x020000;
-				break;
-			case 1:
-				nret = 0x020080;
-				break;
-			case 2:
-				nret = 0x030040;
-				break;
-			case 3:
-				nret = 0x0300c0;
-				break;
-			}
+		case PERMANENT_UNLOCK:
+		case PERMANENT_LOCK:
+			// 11 binary
+			tmpMask = 3;
 			break;
-		case 2:
-			switch (mask) {
-			case 0:
-				nret = 0x008000;
-				break;
-			case 1:
-				nret = 0x008020;
-				break;
-			case 2:
-				nret = 0x00c010;
-				break;
-			case 3:
-				nret = 0x00c030;
-				break;
-			}
-			break;
-		case 3:
-			switch (mask) {
-			case 0:
-				nret = 0x002000;
-				break;
-			case 1:
-				nret = 0x002008;
-				break;
-			case 2:
-				nret = 0x003004;
-				break;
-			case 3:
-				nret = 0x00300c;
-				break;
-			}
-			break;
-		case 4:
-			switch (mask) {
-			case 0:
-				nret = 0x000800;
-				break;
-			case 1:
-				nret = 0x000802;
-				break;
-			case 2:
-				nret = 0x000c01;
-				break;
-			case 3:
-				nret = 0x000c03;
-				break;
-			}
-			break;
+		default:
+			return 0;
 		}
-		return nret;
+
+		result |= (tmpMask << (shiftBits + 10));
+		result |= (lockType << shiftBits);
+
+		return result;
 	}
 
 	/**
