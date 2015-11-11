@@ -195,7 +195,7 @@ void Java_android_hardware_uhf_magic_reader_init(JNIEnv *env, jclass jc,
 const unsigned char name980_3812[12] = "/dev/ttyMT2"; // idb
 const unsigned char name719q_3813[11] = "/dev/ttyS4"; // idb
 const unsigned char name980m2_3814[12] = "/dev/ttyMT4"; // idb
-const unsigned char *aDevMsm_io_cm7 = "хз что за устройство";
+const unsigned char *aDevMsm_io_cm7 = "/dev/msm_io_cm7";
 const unsigned char * const device_pwr = (const unsigned char *) &aDevMsm_io_cm7; // idb
 const unsigned char *aDevScan = "хз что за устройство";
 const unsigned char * const device_pwr_388 = (const unsigned char *) &aDevScan; // idb
@@ -924,7 +924,8 @@ int openportserial(unsigned char *ppath, int baud) {
 				//cfg.c_lflag &= 0xFFFF7FB4;
 				// 0xFFFF0000 | (XCASE | ECHOE | ECHOK | NOFLSH | TOSTOP | ECHOCTL | ECHOPRT | ECHOKE | FLUSHO | PENDIN | 0020000)
 				//cfg.c_lflag &= 0xFFFF0000 | (XCASE | ECHOE | ECHOK | NOFLSH | TOSTOP | ECHOCTL | ECHOPRT | ECHOKE | FLUSHO | PENDIN | 0020000);
-				cfg.c_lflag = XCASE | ECHOE | ECHOK | NOFLSH | TOSTOP | ECHOCTL | ECHOPRT | ECHOKE | FLUSHO | PENDIN | 0020000;
+				cfg.c_lflag = XCASE | ECHOE | ECHOK | NOFLSH | TOSTOP | ECHOCTL
+						| ECHOPRT | ECHOKE | FLUSHO | PENDIN | 0020000;
 				cfg.c_cc[VMIN] = 0; // минимальное количество байтов для приёма
 				//cfg.c_cflag = baud & 0x100F | ((cfg.c_cflag & 0xFFFFFECF | 0x30) & 0xFFFFEFF0 | baud & 0x100F) & 0xFFFFEFF0;
 				//cfg.c_cflag = baud & CBAUD | ((cfg.c_cflag & (~CSIZE | CS8)) & ~CBAUD | baud & CBAUD) & ~CBAUD; // установка скорости и длины данных
@@ -1712,130 +1713,120 @@ int MagicSelect(int nPL, unsigned char selPa, int nPTR, unsigned char nMaskLen,
 // 27B4: using guessed type int __fastcall _stack_chk_fail(int);
 
 int rf_fw_download_tmp(unsigned char *path) {
-	 char *v1; // r4@1
-	  int v2; // r5@1
-	  int v3; // r5@1
-	  int v4; // r5@1
-	  int v5; // r5@1
-	  int v6; // r5@1
-	  int v7; // r5@1
-	  int v8; // r5@1
-	  int v9; // r5@1
-	  signed int v10; // r11@3
-	  signed int v11; // r6@3
-	  int result; // r0@10
-	  int v13; // r5@12
-	  int v14; // r4@15
-	  int v15; // r0@15
-	  int v16; // [sp+4h] [bp-1Ch]@1
-	  char v17[] = {0xD3,0xD3,0xD3,0xD3,0xD3,0xD3}; // [sp+18h] [bp-8h]@1
-	  char v19; // [sp+20h] [bp+0h]@1
-	  unsigned int v20; // [sp+24h] [bp+4h]@1
+	char *v1; // r4@1
+	int v2; // r5@1
+	int v3; // r5@1
+	int v4; // r5@1
+	int v5; // r5@1
+	int v6; // r5@1
+	int v7; // r5@1
+	int v8; // r5@1
+	int v9; // r5@1
+	signed int v10; // r11@3
+	signed int v11; // r6@3
+	int result; // r0@10
+	int v13; // r5@12
+	int v14; // r4@15
+	int v15; // r0@15
+	int v16; // [sp+4h] [bp-1Ch]@1
+	char v17[] = { 0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3 }; // [sp+18h] [bp-8h]@1
+	char v19; // [sp+20h] [bp+0h]@1
+	unsigned int v20; // [sp+24h] [bp+4h]@1
 
-	  v1 = (char *)&v20;
-	  v19 = -2;
-	  poweron();
-	  poweron();
-	  openportserial(v16, 4098);
-	  MagicGetParameter();
-	  v2 = readportserial(&v20, 8u);
-	  v3 = readportserial(&v20, 8u) + v2;
-	  v4 = v3 + readportserial(&v20, 8u);
-	  v5 = v4 + readportserial(&v20, 8u);
-	  v6 = v5 + readportserial(&v20, 8u);
-	  v7 = v6 + readportserial(&v20, 8u);
-	  v8 = v7 + readportserial(&v20, 8u);
-	  v9 = v8 + readportserial(&v20, 8u);
-	  closeserial();
-	  if ( v9 <= 4 )
-	  {
-	    Reset();
-	    openportserial(v16, 13);
-	    v10 = 0;
-	    v11 = 0;
-	    while ( 1 )
-	    {
-	      writeport(&v19, 1u);
-	      usleep(0x1388u);
-	      readportserial(v1, 1u);
-	      v1 = (char *)&v20;
-	      _android_log_print(6, 25224, "recv=%02x\r\n", v20);
-	      if ( v20 == 255 )
-	        break;
-	      ++v10;
-	      usleep(0xBB8u);
-	      if ( v10 > 10 )
-	      {
-	        closeserial();
-	        openportserial(v16, 4098);
-	        if ( v11 > 10 )
-	          goto LABEL_9;
-	        while ( 1 )
-	        {
-	          writeport(&v19, 1u);
-	          usleep(0x1388u);
-	          readportserial(v1, 1u);
-	          _android_log_print(6, "ScannerJNI", "recv=%02x\r\n", v20);
-	          v1 = (char *)&v20;
-	          if ( v20 == 255 )
-	            break;
-	          ++v11;
-	          usleep(0xBB8u);
-	          if ( v11 == 11 )
-	            goto LABEL_9;
-	        }
-	      }
-	    }
-	    v19 = -75;
-	    writeport(&v19, 1u);
-	    usleep(0x1388u);
-	    closeserial();
-	    openportserial(v16, 4098);
-	    usleep(0x2710u);
-	    v19 = -37;
-	    v13 = 0;
-	    while ( 1 )
-	    {
-	      writeport(&v19, 1u);
-	      usleep(0x1388u);
-	      readportserial(v1, 1u);
-	      v1 = (char *)&v20;
-	      if ( v20 == 191 )
-	        break;
-	      ++v13;
-	      usleep(0xBB8u);
-	      if ( v13 == 101 )
-	        goto LABEL_10;
-	    }
-	    _android_log_print(4, "ScannerJNI", "[rf_fw_download] -- trycnts1111 : 0x%X ", v13);
-	    usleep(0x1388u);
-	    v19 = -3;
-	    writeport(&v19, 1u);
-	    usleep(0x1388u);
-	    printf(" read : 0x%X", 14388);
-	    v14 = 0;
-	    v15 = 0;
-	    do
-	    {
-	      ++v14;
-	      writeport(&firmware[v15], 1u);
-	      v15 = v14;
-	    }
-	    while ( v14 != 14388 );
-	    _android_log_print(6, "ScannerJNI", " read : 0x%X", 14388);
-	    usleep(0x2710u);
-	    writeport(&v17, 6u);
-	    _android_log_print(6, "ScannerJNI", "[rf_fw_download]  ok-- ");
-	LABEL_9:
-	    closeserial();
-	  }
-	  else
-	  {
-	    _android_log_print(6, "ScannerJNI", "return  -- %x", v9);
-	  }
-	LABEL_10:
-	  result = 0;
-	  return result;
+	v1 = (char *) &v20;
+	v19 = -2;
+	poweron();
+	poweron();
+	openportserial(v16, 4098);
+	MagicGetParameter();
+	v2 = readportserial(&v20, 8u);
+	v3 = readportserial(&v20, 8u) + v2;
+	v4 = v3 + readportserial(&v20, 8u);
+	v5 = v4 + readportserial(&v20, 8u);
+	v6 = v5 + readportserial(&v20, 8u);
+	v7 = v6 + readportserial(&v20, 8u);
+	v8 = v7 + readportserial(&v20, 8u);
+	v9 = v8 + readportserial(&v20, 8u);
+	closeserial();
+	if (v9 <= 4) {
+		Reset();
+		openportserial(v16, 13);
+		v10 = 0;
+		v11 = 0;
+		while (1) {
+			writeport(&v19, 1u);
+			usleep(0x1388u);
+			readportserial(v1, 1u);
+			v1 = (char *) &v20;
+			_android_log_print(6, 25224, "recv=%02x\r\n", v20);
+			if (v20 == 255)
+				break;
+			++v10;
+			usleep(0xBB8u);
+			if (v10 > 10) {
+				closeserial();
+				openportserial(v16, 4098);
+				if (v11 > 10)
+					goto LABEL_9;
+				while (1) {
+					writeport(&v19, 1u);
+					usleep(0x1388u);
+					readportserial(v1, 1u);
+					_android_log_print(6, "ScannerJNI", "recv=%02x\r\n", v20);
+					v1 = (char *) &v20;
+					if (v20 == 255)
+						break;
+					++v11;
+					usleep(0xBB8u);
+					if (v11 == 11)
+						goto LABEL_9;
+				}
+			}
+		}
+		v19 = -75;
+		writeport(&v19, 1u);
+		usleep(0x1388u);
+		closeserial();
+		openportserial(v16, 4098);
+		usleep(0x2710u);
+		v19 = -37;
+		v13 = 0;
+		while (1) {
+			writeport(&v19, 1u);
+			usleep(0x1388u);
+			readportserial(v1, 1u);
+			v1 = (char *) &v20;
+			if (v20 == 191)
+				break;
+			++v13;
+			usleep(0xBB8u);
+			if (v13 == 101)
+				goto LABEL_10;
+		}
+		_android_log_print(4, "ScannerJNI",
+				"[rf_fw_download] -- trycnts1111 : 0x%X ", v13);
+		usleep(0x1388u);
+		v19 = -3;
+		writeport(&v19, 1u);
+		usleep(0x1388u);
+		printf(" read : 0x%X", 14388);
+		v14 = 0;
+		v15 = 0;
+		do {
+			++v14;
+			writeport(&firmware[v15], 1u);
+			v15 = v14;
+		} while (v14 != 14388);
+		_android_log_print(6, "ScannerJNI", " read : 0x%X", 14388);
+		usleep(0x2710u);
+		writeport(&v17, 6u);
+		_android_log_print(6, "ScannerJNI", "[rf_fw_download]  ok-- ");
+		LABEL_9: closeserial();
+	} else {
+		_android_log_print(6, "ScannerJNI", "return  -- %x", v9);
+	}
+	LABEL_10: result = 0;
+	return result;
 }
 
 int rf_fw_download(unsigned char *path) {
