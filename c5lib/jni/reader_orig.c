@@ -1062,8 +1062,8 @@ int openport(unsigned char *ppath) {
 	cfg.c_cc[6] = 0;
 	cfg.c_cc[5] = 1;
 	cfg.c_lflag &= 0xFFFF7FB4;
-	cfg.c_cflag = ((cfg.c_cflag & 0xFFFFFECF | 0x30) & 0xFFFFEFF0 | 0x1002)
-			& 0xFFFFEFF0 | 0x1002;
+	cfg.c_cflag = (((cfg.c_cflag & 0xFFFFFECF) | 0x30) & (0xFFFFEFF0 | 0x1002))
+			(& 0xFFFFEFF0 | 0x1002);
 	if (ioctl(g_port, 0x5402u, &cfg)) {
 		close(g_port);
 		result = -2;
