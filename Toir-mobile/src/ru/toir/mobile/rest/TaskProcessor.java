@@ -5,6 +5,7 @@ package ru.toir.mobile.rest;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +69,12 @@ public class TaskProcessor {
 
 	private Set<String> patternUuids;
 	private Set<String> operationTypeUuids;
-	private Set<String> requiredDocuments;
+	private Map<String, String> requiredDocuments;
 	private Set<String> equipmentImages;
 	private Set<String> measureValuesImages;
 
 	public TaskProcessor(Context context) throws Exception {
+
 		mContext = context;
 
 		SharedPreferences sp = PreferenceManager
@@ -209,7 +211,7 @@ public class TaskProcessor {
 			Bundle extra = new Bundle();
 			extra.putStringArray(
 					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
-					requiredDocuments.toArray(new String[] {}));
+					requiredDocuments.keySet().toArray(new String[] {}));
 
 			return referenceProcessor.getDocumentationFile(extra);
 		} catch (Exception e) {
@@ -542,11 +544,11 @@ public class TaskProcessor {
 		// получаем список документов для обязательной загрузки, позже загрузить
 		ArrayList<EquipmentDocumentation> doclist = EquipmentSrv
 				.getEquipmentDocumentations(equipments);
-		requiredDocuments = new HashSet<String>();
+		requiredDocuments = new HashMap<String, String>();
 		for (EquipmentDocumentation doc : doclist) {
 			if (doc.isRequired()) {
 
-				requiredDocuments.add(doc.getUuid());
+				requiredDocuments.put(doc.getUuid(), null);
 			}
 		}
 
