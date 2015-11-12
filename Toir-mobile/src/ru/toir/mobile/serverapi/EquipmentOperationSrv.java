@@ -2,7 +2,8 @@ package ru.toir.mobile.serverapi;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import ru.toir.mobile.db.tables.EquipmentOperation;
@@ -184,11 +185,11 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 	public static Set<String> getOperationPatternUuids(
 			ArrayList<EquipmentOperationSrv> operations) {
 
-		Set<String> list = new HashSet<String>();
+		Map<String, String> list = new HashMap<String, String>();
 		for (EquipmentOperationSrv operation : operations) {
-			list.add(operation.getOperationPatternId());
+			list.put(operation.getOperationPatternId(), null);
 		}
-		return list;
+		return list.keySet();
 	}
 
 	public static ArrayList<EquipmentSrv> getEquipmentSrvs(
@@ -204,11 +205,11 @@ public class EquipmentOperationSrv extends BaseObjectSrv {
 	public static Set<String> getOperationTypeUuids(
 			ArrayList<EquipmentOperationSrv> operations) {
 
-		Set<String> list = new HashSet<String>();
+		Map<String, String> list = new HashMap<String, String>();
 		for (EquipmentOperationSrv operation : operations) {
-			list.add(operation.getOperationType().getId());
+			list.put(operation.getOperationType().getId(), null);
 		}
-		return list;
+		return list.keySet();
 	}
 
 	/**

@@ -6,7 +6,6 @@ package ru.toir.mobile.rest;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +68,7 @@ public class TaskProcessor {
 
 	private Set<String> patternUuids;
 	private Set<String> operationTypeUuids;
-	private Map<String, String> requiredDocuments;
+	private Set<String> requiredDocuments;
 	private Set<String> equipmentImages;
 	private Set<String> measureValuesImages;
 
@@ -211,7 +210,7 @@ public class TaskProcessor {
 			Bundle extra = new Bundle();
 			extra.putStringArray(
 					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
-					requiredDocuments.keySet().toArray(new String[] {}));
+					requiredDocuments.toArray(new String[] {}));
 
 			return referenceProcessor.getDocumentationFile(extra);
 		} catch (Exception e) {
@@ -503,10 +502,12 @@ public class TaskProcessor {
 				.getEquipmentSrvs(operations);
 
 		// список полученного оборудования для загрузки позже изображений
-		equipmentImages = new HashSet<String>();
+		Map<String, String> tmpEquipmentImages = new HashMap<String, String>();
 		for (EquipmentSrv equipment : equipments) {
-			equipmentImages.add(equipment.getId());
+			tmpEquipmentImages.put(equipment.getId(), null);
 		}
+
+		equipmentImages = tmpEquipmentImages.keySet();
 
 		// сохраняем типы оборудования
 		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
@@ -544,13 +545,16 @@ public class TaskProcessor {
 		// получаем список документов для обязательной загрузки, позже загрузить
 		ArrayList<EquipmentDocumentation> doclist = EquipmentSrv
 				.getEquipmentDocumentations(equipments);
-		requiredDocuments = new HashMap<String, String>();
+		Map<String, String> tmpRequiredDocuments = new HashMap<String, String>();
+
 		for (EquipmentDocumentation doc : doclist) {
 			if (doc.isRequired()) {
 
-				requiredDocuments.put(doc.getUuid(), null);
+				tmpRequiredDocuments.put(doc.getUuid(), null);
 			}
 		}
+
+		requiredDocuments = tmpRequiredDocuments.keySet();
 
 		// сохраняем записи о документации на оборудование
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
@@ -618,12 +622,14 @@ public class TaskProcessor {
 		}
 
 		// строим список изображений результатов измерений
-		measureValuesImages = new HashSet<String>();
+		Map<String, String> tmpMeasureValuesImages = new HashMap<String, String>();
 		for (MeasureValue measureValue : measureValues) {
 			if (measureValue.getValue().startsWith("api/")) {
-				measureValuesImages.add(measureValue.getUuid());
+				tmpMeasureValuesImages.put(measureValue.getUuid(), null);
 			}
 		}
+
+		measureValuesImages = tmpMeasureValuesImages.keySet();
 
 		// если добрались сюда, значит всё в порядке
 		result.putBoolean(IServiceProvider.RESULT, true);
