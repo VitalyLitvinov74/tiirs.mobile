@@ -71,12 +71,16 @@ public class reader {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
 					message.what = RESULT_SUCCESS;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else if (msg.what == RESULT_TIMEOUT) {
 					// отправляем сообщение о таймауте
 					Message message = new Message();
 					message.what = RESULT_TIMEOUT;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else {
 					// деактивация не удалась
 					// отправляем повторно команду деактивации
@@ -123,12 +127,16 @@ public class reader {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
 					message.what = RESULT_SUCCESS;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else if (msg.what == RESULT_TIMEOUT) {
 					// отправляем сообщение о таймауте
 					Message message = new Message();
 					message.what = RESULT_TIMEOUT;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else {
 					// блокировка не удалась
 					// отправляем повторно команду блокировки
@@ -177,12 +185,16 @@ public class reader {
 					// отправляем сообщение о успешном чтении данных
 					Message message = new Message();
 					message.what = RESULT_SUCCESS;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else if (msg.what == RESULT_TIMEOUT) {
 					// отправляем сообщение о таймауте
 					Message message = new Message();
 					message.what = RESULT_TIMEOUT;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else {
 					// запись не удалась
 					// отправляем повторно команду записи
@@ -224,11 +236,15 @@ public class reader {
 					Message message = new Message();
 					message.what = RESULT_SUCCESS;
 					message.obj = msg.obj;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else if (msg.what == RESULT_TIMEOUT) {
 					Message message = new Message();
 					message.what = RESULT_TIMEOUT;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else {
 					// чтение не удалось, отправляем повторно команду
 					// чтения Id
@@ -277,11 +293,15 @@ public class reader {
 					Message message = new Message();
 					message.what = RESULT_SUCCESS;
 					message.obj = msg.obj;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else if (msg.what == RESULT_TIMEOUT) {
 					Message message = new Message();
 					message.what = RESULT_TIMEOUT;
-					m_handler.sendMessage(message);
+					if (m_handler != null) {
+						m_handler.sendMessage(message);
+					}
 				} else {
 					// чтение данных не удалось, отправляем повторно команду
 					// чтения данных
@@ -348,6 +368,9 @@ public class reader {
 		default:
 			return 0;
 		}
+		
+		// TODO нужно проверить такой вариант
+		tmpMask = 3;
 
 		result |= (tmpMask << (shiftBits + 10));
 		result |= (lockType << shiftBits);

@@ -172,8 +172,12 @@ public class MainActivity extends FragmentActivity {
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
 		if (savedInstanceState != null) {
 			isLogged = savedInstanceState.getBoolean("isLogged");
-			splashShown = savedInstanceState.getBoolean("splashShown");
 			Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
+			splashShown = savedInstanceState.getBoolean("splashShown");
+			AuthorizedUser aUser = AuthorizedUser.getInstance();
+			aUser.setTagId(savedInstanceState.getString("tagId"));
+			aUser.setToken(savedInstanceState.getString("token"));
+			aUser.setUuid(savedInstanceState.getString("userUuid"));
 		}
 
 		Log.d(TAG, "onCreate");
@@ -398,6 +402,9 @@ public class MainActivity extends FragmentActivity {
 		Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
 		outState.putBoolean("isLogged", isLogged);
 		outState.putBoolean("splashShown", splashShown);
+		outState.putString("tagId", AuthorizedUser.getInstance().getTagId());
+		outState.putString("token", AuthorizedUser.getInstance().getToken());
+		outState.putString("userUuid", AuthorizedUser.getInstance().getUuid());
 	}
 
 	/*

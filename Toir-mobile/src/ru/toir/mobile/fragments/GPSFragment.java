@@ -48,14 +48,14 @@ public class GPSFragment extends Fragment {
 	private IMapController mapController;
 	private MapView mapView;
 	private double curLatitude, curLongitude;
-	private ListView lv_equipment;	
+	private ListView lv_equipment;
 	Location location;
 	TextView gpsLog;
 	ArrayList<OverlayItem> aOverlayItemArray;
 	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
-	//private SimpleCursorAdapter equipmentAdapter;
-	private	int LastItemPosition = -1;
-	
+	// private SimpleCursorAdapter equipmentAdapter;
+	private int LastItemPosition = -1;
+
 	/**
 	 * Класс объекта оборудования для отображения на крате
 	 * 
@@ -83,7 +83,7 @@ public class GPSFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		String equipmentUUID = "";
-		Float	equipment_latitude=0f, equipment_longitude=0f;
+		Float equipment_latitude = 0f, equipment_longitude = 0f;
 		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
@@ -122,14 +122,14 @@ public class GPSFragment extends Fragment {
 		mapController.setCenter(point2);
 
 		// добавляем тестовый маркер
-		//aOverlayItemArray = new ArrayList<OverlayItem>();
+		// aOverlayItemArray = new ArrayList<OverlayItem>();
 		OverlayItem overlayItem = new OverlayItem("We are here", "WAH",
 				new GeoPoint(curLatitude, curLongitude));
 		aOverlayItemArray = new ArrayList<OverlayItem>();
 		aOverlayItemArray.add(overlayItem);
 		ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
-		mapView.getOverlays().add(aItemizedIconOverlay);		
+		mapView.getOverlays().add(aItemizedIconOverlay);
 
 		TaskDBAdapter dbOrder = new TaskDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
@@ -138,8 +138,8 @@ public class GPSFragment extends Fragment {
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		String[] equipmentFrom = { "name", "location" };
-		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine};
-		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);		
+		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine };
+		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);
 
 		Integer cnt = 0, cnt2 = 0;
 		while (cnt < ordersList.size()) {
@@ -150,49 +150,55 @@ public class GPSFragment extends Fragment {
 					.getItems(ordersList.get(cnt).getUuid());
 			// запрашиваем перечень оборудования
 			cnt2 = 0;
-			if (equipOperationList!=null)
-			while (cnt2 < equipOperationList.size()) {
-				// equipOpList.get(cnt2).getUuid();
-				EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-						new ToirDatabaseContext(getActivity()
-								.getApplicationContext()));
-				equipmentUUID = equipOperationList.get(cnt2).getEquipment_uuid();
-				if (equipmentUUID != null) {
-					//location = eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
-					HashMap<String, String> hm = new HashMap<String, String>();
-					hm.put("name", equipmentDBAdapter.getEquipsNameByUUID(equipmentUUID)
-							//+ " ["
-							//+ eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
-							//+ "]"
-							);
-					// default
-					hm.put("location", equipmentDBAdapter.getLocationByUUID(equipmentUUID));
-					aList.add(hm);					
-					// String coordinates[] = location.split("[NSWE]");
-					//equipment_latitude=equipmentDBAdapter.getLatitudeByUUID(equipmentUUID);
-					//equipment_longitude=equipmentDBAdapter.getLongitudeByUUID(equipmentUUID);
-					curLatitude = curLatitude - 0.0001 * cnt2;
-					curLongitude = curLongitude - 0.0001 * cnt2;
+			if (equipOperationList != null)
+				while (cnt2 < equipOperationList.size()) {
+					// equipOpList.get(cnt2).getUuid();
+					EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+							new ToirDatabaseContext(getActivity()
+									.getApplicationContext()));
+					equipmentUUID = equipOperationList.get(cnt2)
+							.getEquipment_uuid();
+					if (equipmentUUID != null) {
+						// location =
+						// eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
+						HashMap<String, String> hm = new HashMap<String, String>();
+						hm.put("name", equipmentDBAdapter
+								.getEquipsNameByUUID(equipmentUUID)
+						// + " ["
+						// + eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
+						// + "]"
+						);
+						// default
+						hm.put("location", equipmentDBAdapter
+								.getLocationByUUID(equipmentUUID));
+						aList.add(hm);
+						// String coordinates[] = location.split("[NSWE]");
+						// equipment_latitude=equipmentDBAdapter.getLatitudeByUUID(equipmentUUID);
+						// equipment_longitude=equipmentDBAdapter.getLongitudeByUUID(equipmentUUID);
+						curLatitude = curLatitude - 0.0001 * cnt2;
+						curLongitude = curLongitude - 0.0001 * cnt2;
 
-					// TODO это нужно переписать!
-					Equipment equipment = equipmentDBAdapter
-							.getItem(equipOperationList.get(cnt2)
-									.getEquipment_uuid());
-					//EquipmentOverlayItem olItem = new EquipmentOverlayItem(
-					//		equipment.getTitle(), "Device", new GeoPoint(
-					//				curLatitude, curLongitude));
-					EquipmentOverlayItem olItem = new EquipmentOverlayItem(
-							equipment.getTitle(), "Device", new GeoPoint(
-									equipment_latitude, equipment_longitude));
-					olItem.equipment = equipment;
-					Drawable newMarker = this.getResources().getDrawable(
-							R.drawable.marker_equip);
-					olItem.setMarker(newMarker);
-					overlayItemArray.add(olItem);
-					// aOverlayItemArray.add(olItem);
+						// TODO это нужно переписать!
+						Equipment equipment = equipmentDBAdapter
+								.getItem(equipOperationList.get(cnt2)
+										.getEquipment_uuid());
+						// EquipmentOverlayItem olItem = new
+						// EquipmentOverlayItem(
+						// equipment.getTitle(), "Device", new GeoPoint(
+						// curLatitude, curLongitude));
+						EquipmentOverlayItem olItem = new EquipmentOverlayItem(
+								equipment.getTitle(), "Device",
+								new GeoPoint(equipment_latitude,
+										equipment_longitude));
+						olItem.equipment = equipment;
+						Drawable newMarker = this.getResources().getDrawable(
+								R.drawable.marker_equip);
+						olItem.setMarker(newMarker);
+						overlayItemArray.add(olItem);
+						// aOverlayItemArray.add(olItem);
+					}
+					cnt2 = cnt2 + 1;
 				}
-				cnt2 = cnt2 + 1;
-			}
 			cnt = cnt + 1;
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
@@ -200,26 +206,27 @@ public class GPSFragment extends Fragment {
 				equipmentFrom, equipmentTo);
 		// Setting the adapter to the listView
 		lv_equipment.setAdapter(adapter);
-		//lv_equipment.setOnItemClickListener(clickListener);
+		// lv_equipment.setOnItemClickListener(clickListener);
 		lv_equipment.setOnItemClickListener(new OnItemClickListener() {
-		      public void onItemClick(AdapterView<?> parent, View view,
-		          int position, long id) {
-		    	  // TODO связать нажатие в списке с картой: изменить цвет маркера
-		  			OverlayItem item = overlayItemArray.get(position);
-		  		  // Get the new Drawable
-		  			Drawable marker =view.getResources().getDrawable(R.drawable.marker_equip_selected);
-		  		  // Set the new marker
-		  			item.setMarker(marker);		
-		  			if (LastItemPosition>=0)
-		  				{
-			  			 OverlayItem item2 = overlayItemArray.get(LastItemPosition);
-			  			 marker =view.getResources().getDrawable(R.drawable.marker_equip);
-				  		 item2.setMarker(marker);				  				
-		  				}
-		  			LastItemPosition = position;
-		      	}
-		    });
-		
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO связать нажатие в списке с картой: изменить цвет маркера
+				OverlayItem item = overlayItemArray.get(position);
+				// Get the new Drawable
+				Drawable marker = view.getResources().getDrawable(
+						R.drawable.marker_equip_selected);
+				// Set the new marker
+				item.setMarker(marker);
+				if (LastItemPosition >= 0) {
+					OverlayItem item2 = overlayItemArray.get(LastItemPosition);
+					marker = view.getResources().getDrawable(
+							R.drawable.marker_equip);
+					item2.setMarker(marker);
+				}
+				LastItemPosition = position;
+			}
+		});
+
 		TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
 			@Override
@@ -240,27 +247,28 @@ public class GPSFragment extends Fragment {
 			}
 		};
 		mapView.getOverlays().add(overlay);
-/*
-		String[] equipmentFrom = { "", "equipment_uuid" };
-		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine};
-		EquipmentOperationDBAdapter equipmentOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new TOiRDatabaseContext(getActivity()
-						.getApplicationContext()));
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new TOiRDatabaseContext(getActivity()
-						.getApplicationContext()));
 
-		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);		
-		equipmentAdapter = new SimpleCursorAdapter(getActivity(),
-				R.layout.listview, null, equipmentFrom, equipmentTo,
-				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-		// Setting the adapter to the listView
-		lv_equipment.setAdapter(equipmentAdapter);
-		lv_equipment.setOnItemClickListener(clickListener);		
-		equipmentAdapter.changeCursor(equipmentOperationDBAdapter.getOperationWithInfo());
-		*/				
+		// String[] equipmentFrom = { "", "equipment_uuid" };
+		// int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine};
+		// EquipmentOperationDBAdapter equipmentOperationDBAdapter = new
+		// EquipmentOperationDBAdapter(
+		// new TOiRDatabaseContext(getActivity()
+		// .getApplicationContext()));
+		// EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+		// new TOiRDatabaseContext(getActivity()
+		// .getApplicationContext()));
+		//
+		// lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);
+		// equipmentAdapter = new SimpleCursorAdapter(getActivity(),
+		// R.layout.listview, null, equipmentFrom, equipmentTo,
+		// CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		// // Setting the adapter to the listView
+		// lv_equipment.setAdapter(equipmentAdapter);
+		// lv_equipment.setOnItemClickListener(clickListener);
+		// equipmentAdapter.changeCursor(equipmentOperationDBAdapter.getOperationWithInfo());
+				
 		onInit(rootView);
-		
+
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
 
