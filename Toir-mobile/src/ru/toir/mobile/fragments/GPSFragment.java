@@ -3,15 +3,12 @@ package ru.toir.mobile.fragments;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
-
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -25,13 +22,10 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Bundle;
-
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
-
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.*;
@@ -41,10 +35,10 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.location.Location;
-
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 
 public class GPSFragment extends Fragment {
+
 	private IMapController mapController;
 	private MapView mapView;
 	private double curLatitude, curLongitude;
@@ -80,9 +74,10 @@ public class GPSFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
 		String tagId = AuthorizedUser.getInstance().getTagId();
-		String equipmentUUID = "";
+		// String equipmentUUID = "";
 		Float equipment_latitude = 0f, equipment_longitude = 0f;
 		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
@@ -111,6 +106,7 @@ public class GPSFragment extends Fragment {
 						+ String.valueOf(location.getLongitude()) + "\n");
 			}
 		}
+
 		mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
 		// mapView.setTileSource(TileSourceFactory.MAPNIK);
 		mapView.setUseDataConnection(false);
@@ -131,76 +127,70 @@ public class GPSFragment extends Fragment {
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
 		mapView.getOverlays().add(aItemizedIconOverlay);
 
-		TaskDBAdapter dbOrder = new TaskDBAdapter(new ToirDatabaseContext(
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
-		ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(),
-				TaskStatusDBAdapter.STATUS_UUID_RECIEVED, "");
+		ArrayList<Task> taskList = taskDBAdapter.getOrdersByUser(user.getUuid(),
+				Task.Extras.STATUS_UUID_IN_PROCESS, "");
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		String[] equipmentFrom = { "name", "location" };
 		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine };
 		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);
 
-		Integer cnt = 0, cnt2 = 0;
-		while (cnt < ordersList.size()) {
-			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
-			ArrayList<EquipmentOperation> equipOperationList = operationDBAdapter
-					.getItems(ordersList.get(cnt).getUuid());
-			// запрашиваем перечень оборудования
-			cnt2 = 0;
-			if (equipOperationList != null)
-				while (cnt2 < equipOperationList.size()) {
-					// equipOpList.get(cnt2).getUuid();
-					EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-							new ToirDatabaseContext(getActivity()
-									.getApplicationContext()));
-					equipmentUUID = equipOperationList.get(cnt2)
-							.getEquipment_uuid();
-					if (equipmentUUID != null) {
-						// location =
-						// eqDBAdapter.getLocationCoordinatesByUUID(equipmentUUID);
-						HashMap<String, String> hm = new HashMap<String, String>();
-						hm.put("name", equipmentDBAdapter
-								.getEquipsNameByUUID(equipmentUUID)
-						// + " ["
-						// + eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
-						// + "]"
-						);
-						// default
-						hm.put("location", equipmentDBAdapter
-								.getLocationByUUID(equipmentUUID));
-						aList.add(hm);
-						// String coordinates[] = location.split("[NSWE]");
-						// equipment_latitude=equipmentDBAdapter.getLatitudeByUUID(equipmentUUID);
-						// equipment_longitude=equipmentDBAdapter.getLongitudeByUUID(equipmentUUID);
-						curLatitude = curLatitude - 0.0001 * cnt2;
-						curLongitude = curLongitude - 0.0001 * cnt2;
+		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
 
-						// TODO это нужно переписать!
+		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
+
+		for (Task task : taskList) {
+			ArrayList<EquipmentOperation> operationList = operationDBAdapter
+					.getItems(task.getUuid());
+			// запрашиваем перечень оборудования
+			if (operationList != null) {
+				for (EquipmentOperation operation : operationList) {
+
+					if (operation.getEquipment_uuid() != null) {
+						HashMap<String, String> hm = new HashMap<String, String>();
 						Equipment equipment = equipmentDBAdapter
-								.getItem(equipOperationList.get(cnt2)
-										.getEquipment_uuid());
-						// EquipmentOverlayItem olItem = new
-						// EquipmentOverlayItem(
-						// equipment.getTitle(), "Device", new GeoPoint(
-						// curLatitude, curLongitude));
-						EquipmentOverlayItem olItem = new EquipmentOverlayItem(
-								equipment.getTitle(), "Device",
-								new GeoPoint(equipment_latitude,
-										equipment_longitude));
-						olItem.equipment = equipment;
-						Drawable newMarker = this.getResources().getDrawable(
-								R.drawable.marker_equip);
-						olItem.setMarker(newMarker);
-						overlayItemArray.add(olItem);
-						// aOverlayItemArray.add(olItem);
+								.getItem(operation.getEquipment_uuid());
+						if (equipment != null) {
+
+							hm.put("name", equipment.getTitle()
+							// + " ["
+							// +
+							// eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
+							// + "]"
+							);
+							// default
+							hm.put("location", equipment.getLocation());
+							aList.add(hm);
+							// String coordinates[] = location.split("[NSWE]");
+							// equipment_latitude=equipmentDBAdapter.getLatitudeByUUID(equipmentUUID);
+							// equipment_longitude=equipmentDBAdapter.getLongitudeByUUID(equipmentUUID);
+							curLatitude = curLatitude - 0.0001;
+							curLongitude = curLongitude - 0.0001;
+
+							// EquipmentOverlayItem olItem = new
+							// EquipmentOverlayItem(
+							// equipment.getTitle(), "Device", new GeoPoint(
+							// curLatitude, curLongitude));
+							EquipmentOverlayItem olItem = new EquipmentOverlayItem(
+									equipment.getTitle(), "Device",
+									new GeoPoint(equipment_latitude,
+											equipment_longitude));
+							olItem.equipment = equipment;
+							Drawable newMarker = this.getResources()
+									.getDrawable(R.drawable.marker_equip);
+							olItem.setMarker(newMarker);
+							overlayItemArray.add(olItem);
+							// aOverlayItemArray.add(olItem);
+						}
 					}
-					cnt2 = cnt2 + 1;
 				}
-			cnt = cnt + 1;
+			}
 		}
+
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview,
 				equipmentFrom, equipmentTo);
@@ -266,7 +256,7 @@ public class GPSFragment extends Fragment {
 		// lv_equipment.setAdapter(equipmentAdapter);
 		// lv_equipment.setOnItemClickListener(clickListener);
 		// equipmentAdapter.changeCursor(equipmentOperationDBAdapter.getOperationWithInfo());
-				
+
 		onInit(rootView);
 
 		rootView.setFocusableInTouchMode(true);
