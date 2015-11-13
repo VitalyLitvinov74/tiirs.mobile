@@ -46,12 +46,12 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 	 * @param uuid
 	 * @return
 	 */
-	public Cursor getItem(String uuid) {
+	public OperationType getItem(String uuid) {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + "=?",
 				new String[] { uuid }, null, null, null);
 		if (cursor.moveToFirst()) {
-			return cursor;
+			return getItem(cursor);
 		}
 		return null;
 	}

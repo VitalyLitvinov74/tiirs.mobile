@@ -44,7 +44,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,22 +56,14 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	public final static int WRITE_USER_LABLE = 4;
 
 	private String equipment_uuid;
-	private Spinner Spinner_operation;
 	private byte regim;
 	private ListView lv;
-	private ArrayAdapter<String> spinner_operation_adapter;
-	private ArrayList<String> list = new ArrayList<String>();
 
 	TagRecordStructure tagrecord = new TagRecordStructure();
 	TagRecordStructure tagrecord2 = new TagRecordStructure();
 	private ArrayList<TagRecordStructure> tagrecords = new ArrayList<TagRecordStructure>();
 	EquipmentTagStructure equipmenttag = new EquipmentTagStructure();
 	UserTagStructure usertag = new UserTagStructure();
-
-	/*
-	 * android:id="@+id/equipment_image"
-	 * android:id="@+id/equipment_listView_main"
-	 */
 
 	private TextView tv_equipment_name;
 	private TextView tv_equipment_type;
@@ -133,8 +124,6 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						String[] uuids = bundle
 								.getStringArray(ReferenceServiceProvider.Methods.RESULT_GET_DOCUMENTATION_FILE_UUID);
 						if (uuids != null) {
-							EquipmentDocumentation item = documentationDBAdapter
-									.getItem(uuids[0]);
 							showDocument(uuids[0]);
 						}
 					} else {
@@ -217,14 +206,13 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_tasks);
 		tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
 		tv_equipment_documentation = (TextView) findViewById(R.id.equipment_text_documentation);
-		lv = (ListView) findViewById(R.id.equipment_listView_main);
+		lv = (ListView) findViewById(R.id.equipment_info_operation_list);
 		FillListViewOperations();
 
 		read_rfid_button = (Button) findViewById(R.id.button_read);
 		write_rfid_button = (Button) findViewById(R.id.button_write);
-		write_button = (Button) findViewById(R.id.button_write_user);
 		// временная кнопка записи в метку пользователей
-		write_button.setVisibility(View.GONE);
+		write_button = (Button) findViewById(R.id.button_write_user);
 
 		read_rfid_button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -405,17 +393,6 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 	private void initView() {
 
-		spinner_operation_adapter = new ArrayAdapter<String>(
-				getApplicationContext(), android.R.layout.simple_spinner_item,
-				list);
-		Spinner_operation = (Spinner) findViewById(R.id.equipment_spinner_operations);
-		Spinner_operation.setAdapter(spinner_operation_adapter);
-
-		// TODO: настоящие операции над оборудованием (возможные)
-		spinner_operation_adapter.clear();
-		spinner_operation_adapter.add("Ремонт задвижки");
-		spinner_operation_adapter.add("Осмотр задвижки");
-
 		// TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new
 		// TOiRDatabaseContext(getApplicationContext()));
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
@@ -489,6 +466,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	}
 
 	private void FillListViewOperations() {
+
 		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
 				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
@@ -499,44 +477,63 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				new ToirDatabaseContext(getApplicationContext()));
 		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
 				new ToirDatabaseContext(getApplicationContext()));
-		EquipmentOperationResult equipmentOperationResult;
-		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter
+		OperationResultDBAdapter operationResultDBAdapter = new OperationResultDBAdapter(
+				new ToirDatabaseContext(getApplicationContext()));
+
+		ArrayList<EquipmentOperation> operationList = eqOperationDBAdapter
 				.getItemsByTaskAndEquipment("", equipment_uuid);
+		EquipmentOperationResult equipmentOperationResult;
+		OperationResult operationResult;
 		int operation_type;
-		String temp;
-		int cnt = 0;
+
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		String[] from = { "name", "descr", "img" };
 		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
-		if (equipmentOperationList != null)
-			while (cnt < equipmentOperationList.size()) {
+
+		if (operationList != null)
+			for (EquipmentOperation operation : operationList) {
+
 				HashMap<String, String> hm = new HashMap<String, String>();
+				equipmentOperationResult = equipmentOperationResultDBAdapter
+						.getItemByOperation(operation.getUuid());
+				String resultTitle;
+				String startDate;
+
+				if (equipmentOperationResult != null) {
+					startDate = DataUtils.getDate(
+							equipmentOperationResult.getStart_date(),
+							"dd-MM-yyyy hh:mm");
+				} else {
+					startDate = "не проводилась";
+				}
+
 				hm.put("name",
 						"Операция: "
-								+ operationTypeDBAdapter
-										.getOperationTypeByUUID(equipmentOperationList
-												.get(cnt)
-												.getOperation_type_uuid())
-								+ " ["
-								+ DataUtils.getDate(
-										equipmentOperationResultDBAdapter
-												.getStartDateByUUID(equipmentOperationList
-														.get(cnt)
-														.getEquipment_uuid()),
-										"dd-MM-yyyy hh:mm") + "]");
+								+ operationTypeDBAdapter.getItem(
+										operation.getOperation_type_uuid())
+										.getTitle() + " [" + startDate + "]");
+
+				if (equipmentOperationResult != null) {
+					operationResult = operationResultDBAdapter
+							.getItem(equipmentOperationResult
+									.getOperation_result_uuid());
+					resultTitle = operationResult.getTitle();
+				} else {
+					resultTitle = "---";
+				}
+
 				hm.put("descr",
 						"Критичность: "
-								+ criticalTypeDBAdapter.getNameByUUID(eqDBAdapter
-										.getCriticalByUUID(equipmentOperationList
-												.get(cnt).getEquipment_uuid()))
-								+ " Результат: ["
-								+ equipmentOperationResultDBAdapter
-										.getOperationResultByUUID(equipmentOperationList
-												.get(cnt).getUuid()) + "]");
+								+ criticalTypeDBAdapter.getItem(
+										eqDBAdapter.getItem(
+												operation.getEquipment_uuid())
+												.getCritical_type_uuid())
+										.getType() + " Результат: ["
+								+ resultTitle + "]");
 				// Creation row
 				operation_type = equipmentOperationResultDBAdapter
-						.getOperationResultTypeByUUID(equipmentOperationList
-								.get(cnt).getOperation_status_uuid());
+						.getOperationResultTypeByUUID(operation
+								.getOperation_status_uuid());
 				switch (operation_type) {
 				case 1:
 					hm.put("img", Integer.toString(R.drawable.img_status_4));
@@ -554,35 +551,36 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 				// заполняем структуру для записи в метку
 				// TODO должны записываться последние две записи об обслуживании
-				tagrecord.operation_date = Long.parseLong(
-						equipmentOperationResultDBAdapter.getStartDateByUUID(
-								equipmentOperationList.get(cnt)
-										.getEquipment_uuid()).toString(), 16);
-				tagrecord.operation_length = Short.parseShort("2050", 16);
-				tagrecord.operation_type = equipmentOperationList.get(cnt)
-						.getOperation_type_uuid().substring(9, 13)
-						.toLowerCase(Locale.ENGLISH);
-				temp = equipmentOperationList.get(cnt).getUuid();
-				if (!temp.equals("") && temp != null) {
-					equipmentOperationResult = equipmentOperationResultDBAdapter
-							.getItemByOperation(temp);
-					if (equipmentOperationResult != null)
-						tagrecord.operation_result = equipmentOperationResultDBAdapter
-								.getItemByOperation(
-										equipmentOperationList.get(cnt)
-												.getUuid())
-								.getOperation_result_uuid().substring(9, 13)
-								.toLowerCase(Locale.ENGLISH);
-					else
-						tagrecord.operation_result = "8888";
-				}
-				// tagrecord.user =
-				// AuthorizedUser.getInstance().getUuid().substring(9,
-				// 13).toLowerCase(Locale.ENGLISH);
-				tagrecord.user = "9bf0";
-				if (cnt < 2)
-					tagrecords.add(cnt, tagrecord);
-				cnt++;
+				// tagrecord.operation_date = Long.parseLong(
+				// equipmentOperationResultDBAdapter.getStartDateByUUID(
+				// equipmentOperationList.get(cnt)
+				// .getEquipment_uuid()).toString(), 16);
+				// tagrecord.operation_length = Short.parseShort("2050", 16);
+				// tagrecord.operation_type = equipmentOperationList.get(cnt)
+				// .getOperation_type_uuid().substring(9, 13)
+				// .toLowerCase(Locale.ENGLISH);
+				// temp = equipmentOperationList.get(cnt).getUuid();
+				// if (!temp.equals("") && temp != null) {
+				// equipmentOperationResult = equipmentOperationResultDBAdapter
+				// .getItemByOperation(temp);
+				// if (equipmentOperationResult != null)
+				// tagrecord.operation_result =
+				// equipmentOperationResultDBAdapter
+				// .getItemByOperation(
+				// equipmentOperationList.get(cnt)
+				// .getUuid())
+				// .getOperation_result_uuid().substring(9, 13)
+				// .toLowerCase(Locale.ENGLISH);
+				// else
+				// tagrecord.operation_result = "8888";
+				// }
+				// // tagrecord.user =
+				// // AuthorizedUser.getInstance().getUuid().substring(9,
+				// // 13).toLowerCase(Locale.ENGLISH);
+				// tagrecord.user = "9bf0";
+				// if (cnt < 2)
+				// tagrecords.add(cnt, tagrecord);
+				// cnt++;
 			}
 		SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(),
 				aList, R.layout.listview, from, to);

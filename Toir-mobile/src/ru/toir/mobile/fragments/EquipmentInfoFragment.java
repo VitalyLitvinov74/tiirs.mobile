@@ -31,11 +31,6 @@ public class EquipmentInfoFragment extends Fragment {
 	ArrayAdapter<String> spinner_operation_adapter;
 	ArrayList<String> list = new ArrayList<String>();
 	
-/*	
-    android:id="@+id/equipment_image"
-    android:id="@+id/equipment_listView_main"
-*/
-	
 	private TextView tv_equipment_id;
 	private TextView tv_equipment_name;
 	private TextView tv_equipment_type;
@@ -73,7 +68,7 @@ public class EquipmentInfoFragment extends Fragment {
 		tv_equipment_task_date = (TextView) rootView.findViewById(R.id.equipment_text_date);
 		tv_equipment_tasks = (TextView) rootView.findViewById(R.id.equipment_text_tasks);	
 		tv_equipment_image = (ImageView) rootView.findViewById(R.id.equipment_image);
-	 	lv = (ListView) rootView.findViewById(R.id.equipment_listView_main);	 	
+	 	lv = (ListView) rootView.findViewById(R.id.equipment_info_operation_list);	 	
 	 	FillListViewOperations(rootView);
 	 	initView(rootView);
 		return rootView;
@@ -82,7 +77,6 @@ public class EquipmentInfoFragment extends Fragment {
 	private void initView(View view) {		
 		
 		spinner_operation_adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, list);
-		Spinner_operation = (Spinner) view.findViewById(R.id.equipment_spinner_operations);
 		Spinner_operation.setAdapter(spinner_operation_adapter);
 		
 		// TODO: настоящие операции над оборудованием (возможные)

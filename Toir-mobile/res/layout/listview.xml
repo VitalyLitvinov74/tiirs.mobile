@@ -14,22 +14,9 @@
         android:contentDescription="@string/image_description" />
 
     <TextView
-        android:id="@+id/lv_secondLine"
-        android:layout_width="fill_parent"
-        android:layout_height="26dip"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/lv_icon"
-        android:ellipsize="marquee"
-        android:singleLine="true"
-        android:text="@string/description"
-        android:textSize="12sp" />
-
-    <TextView
         android:id="@+id/lv_firstLine"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/lv_secondLine"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
@@ -37,5 +24,17 @@
         android:gravity="center_vertical"
         android:text="@string/description"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/lv_secondLine"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/lv_icon"
+        android:layout_below="@+id/lv_firstLine"
+        android:ellipsize="marquee"
+        android:text="@string/description"
+        android:textSize="12sp" />
 
 </RelativeLayout> 
