@@ -517,7 +517,11 @@ public class EquipmentInfoActivity extends FragmentActivity {
 					operationResult = operationResultDBAdapter
 							.getItem(equipmentOperationResult
 									.getOperation_result_uuid());
+					if (operationResult != null) {
 					resultTitle = operationResult.getTitle();
+					} else {
+						resultTitle = "---";
+					}
 				} else {
 					resultTitle = "---";
 				}

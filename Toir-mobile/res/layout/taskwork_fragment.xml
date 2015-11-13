@@ -83,25 +83,27 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="200dp"
-                android:layout_gravity="left" >
-
-                <ImageView
-                    android:id="@+id/twf_step_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/step_image_descr"
-                    android:padding="5dp"
-                    android:src="@drawable/workman" />
+                android:layout_gravity="left"
+                android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/twf_step_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:drawablePadding="5dp"
                     android:fitsSystemWindows="true"
                     android:padding="5dp"
                     android:text="@string/operation_step_descr_title"
                     android:textSize="16sp" />
+                
+                <ImageView
+                    android:id="@+id/twf_step_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/step_image_descr"
+                    android:padding="5dp"
+                    android:src="@drawable/workman" />
+
             </LinearLayout>
         </LinearLayout>
 
