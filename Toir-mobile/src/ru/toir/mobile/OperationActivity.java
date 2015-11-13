@@ -453,8 +453,9 @@ public class OperationActivity extends Activity {
 			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 			RelativeLayout cameraLayout = new RelativeLayout(
 					getApplicationContext());
+			
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-					320, 240);
+					photoContainer.getWidth(), (int)(photoContainer.getWidth() * 0.75));
 			cameraLayout.setLayoutParams(params);
 			cameraLayout.addView(cameraView);
 			photoContainer.addView(cameraLayout);

@@ -1,154 +1,154 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <LinearLayout
-        android:id="@+id/topLayout"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical"
-        android:paddingLeft="5dp" >
+        android:orientation="vertical" >
 
         <LinearLayout
+            android:id="@+id/topLayout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal|left" >
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="5dp" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal|left" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:orientation="vertical"
+                    android:padding="3dp" >
+
+                    <TextView
+                        android:id="@+id/twf_task_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/almostblack"
+                        android:text="@string/task_title"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/twf_task_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/almostblack"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/twf_equipment_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/equipment_title"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/twf_equipment_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/twf_equipment_operation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/twf_stepTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/operation_step_title"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/twf_numStepButton"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_weight="1"
+                    android:clickable="false"
+                    android:gravity="center_vertical|center_horizontal" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:orientation="vertical"
-                android:padding="3dp" >
+                android:layout_height="200dp"
+                android:layout_gravity="left" >
+
+                <ImageView
+                    android:id="@+id/twf_step_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/step_image_descr"
+                    android:padding="5dp"
+                    android:src="@drawable/workman" />
 
                 <TextView
-                    android:id="@+id/twf_task_title"
+                    android:id="@+id/twf_step_description"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/almostblack"
-                    android:text="@string/task_title"
+                    android:layout_height="match_parent"
+                    android:drawablePadding="5dp"
+                    android:fitsSystemWindows="true"
+                    android:padding="5dp"
+                    android:text="@string/operation_step_descr_title"
                     android:textSize="16sp" />
-               
-                <TextView
-                    android:id="@+id/twf_task_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/almostblack"
-                    android:textSize="16sp" />
-               
-                <TextView
-                    android:id="@+id/twf_equipment_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/equipment_title"
-                    android:textSize="16sp" />
-                
-                <TextView
-                    android:id="@+id/twf_equipment_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/twf_equipment_operation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp" />
-                
-                <TextView
-                    android:id="@+id/twf_stepTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/operation_step_title"
-                    android:textSize="16sp" />
-
             </LinearLayout>
-
-            <Button
-                android:id="@+id/twf_numStepButton"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_weight="1"
-                android:clickable="false"
-                android:gravity="center_vertical|center_horizontal" />
-
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/twf_resultsLayout"
             android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:layout_gravity="left" >
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/topLayout"
+            android:baselineAligned="false" >
 
-            <ImageView
-                android:id="@+id/twf_step_image"
-                android:padding="5dp"
+            <LinearLayout
+                android:id="@+id/twf_resultButtonLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="20.46"
+                android:orientation="horizontal" >
+            </LinearLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/twf_photoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/twf_resultsLayout" >
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/twf_alterOperationStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/twf_resultsLayout"
+            android:visibility="invisible" >
+
+            <CheckBox
+                android:id="@+id/twf_showAltOperationStatusCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/step_image_descr"
-                android:src="@drawable/workman" />
+                android:text="@string/operation_status_change_title" />
 
-            <TextView
-                android:id="@+id/twf_step_description"
+            <Spinner
+                android:id="@+id/twf_altOperationStatusSpinner"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:drawablePadding="5dp"
-                android:fitsSystemWindows="true"
-                android:padding="5dp"
-                android:text="@string/operation_step_descr_title"
-                android:textSize="16sp" />
-
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/twf_showAltOperationStatusCheckbox"
+                android:visibility="invisible" />
+        </RelativeLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/twf_resultsLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/topLayout"
-        android:baselineAligned="false" >
-
-        <LinearLayout
-            android:id="@+id/twf_resultButtonLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="20.46"
-            android:orientation="horizontal" >
-        </LinearLayout>
-        
-    </LinearLayout>
-
-    <RelativeLayout
-       	android:id="@+id/twf_photoContainer"
-       	android:layout_width="wrap_content"
-       	android:layout_height="wrap_content"
-       	android:layout_below="@+id/twf_resultsLayout" >
-
-    </RelativeLayout>
-
-    <RelativeLayout
-       	android:id="@+id/twf_alterOperationStatus"
-       	android:layout_width="wrap_content"
-       	android:layout_height="wrap_content"
-       	android:layout_below="@+id/twf_resultsLayout"
-       	android:visibility="invisible" >
-
-        <CheckBox
-            android:id="@+id/twf_showAltOperationStatusCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/operation_status_change_title" />
-
-        <Spinner
-            android:id="@+id/twf_altOperationStatusSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/twf_showAltOperationStatusCheckbox"
-            android:visibility="invisible" />
-
-    </RelativeLayout>
-
-</RelativeLayout>
+</ScrollView>
