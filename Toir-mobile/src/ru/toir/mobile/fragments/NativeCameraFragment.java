@@ -106,6 +106,13 @@ public class NativeCameraFragment extends Fragment {
 				});
 			}
 			fragmentShowed = true;
+		} else {
+			if (mPreview != null) {
+				// для принудительного вызова surfaceDestroyed чтоб освободить
+				// камеру при переходе на соседний фрагмент
+				mPreview.setVisibility(View.GONE);
+			}
+			fragmentShowed = false;
 		}
 	}
 
@@ -165,9 +172,11 @@ public class NativeCameraFragment extends Fragment {
 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
-			mCamera.stopPreview();
-			mCamera.release();
-			mCamera = null;
+			if (mCamera != null) {
+				mCamera.stopPreview();
+				mCamera.release();
+				mCamera = null;
+			}
 		}
 
 	}
