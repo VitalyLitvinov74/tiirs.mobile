@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.HashMap;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
@@ -53,14 +54,19 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 public class ReferenceFragment extends Fragment {
-	private Spinner Spinner_references;
-	private Spinner Spinner_type;
-	private Spinner Spinner_addict;
-	private ListView lv;
+
+	private Spinner referenceSpinner;
+	private Spinner typeSpinner;
+	private Spinner extendSpinner;
+
+	private ListView contentListView;
+
 	ArrayList<String> list = new ArrayList<String>();
 	ArrayList<String> list2 = new ArrayList<String>();
+
 	ArrayAdapter<String> spinner_type_adapter;
 	ArrayAdapter<String> spinner_addict_adapter;
+
 	private ProgressDialog getReferencesDialog;
 
 	private IntentFilter mFilterGetReference = new IntentFilter(
@@ -81,8 +87,7 @@ public class ReferenceFragment extends Fragment {
 			} else {
 				// сообщаем описание неудачи
 				String message = bundle.getString(IServiceProvider.MESSAGE);
-				Toast.makeText(context, message,
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 			}
 		}
 	};
@@ -99,10 +104,10 @@ public class ReferenceFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.reference_layout, container,
 				false);
-		Spinner_references = (Spinner) rootView.findViewById(R.id.spinner1);
-		Spinner_type = (Spinner) rootView.findViewById(R.id.spinner2);
-		Spinner_addict = (Spinner) rootView.findViewById(R.id.spinner3);
-		lv = (ListView) rootView.findViewById(R.id.listView1);
+		referenceSpinner = (Spinner) rootView.findViewById(R.id.spinner1);
+		typeSpinner = (Spinner) rootView.findViewById(R.id.spinner2);
+		extendSpinner = (Spinner) rootView.findViewById(R.id.spinner3);
+		contentListView = (ListView) rootView.findViewById(R.id.listView1);
 		initView();
 
 		setHasOptionsMenu(true);
@@ -118,91 +123,87 @@ public class ReferenceFragment extends Fragment {
 	}
 
 	private void FillSpinners() {
-		ArrayAdapter<CharSequence> spinner_adapter = ArrayAdapter
-				.createFromResource(getActivity().getApplicationContext(),
-						R.array.references_array,
-						android.R.layout.simple_spinner_item);
+
 		spinner_type_adapter = new ArrayAdapter<String>(getActivity()
-				.getApplicationContext(), android.R.layout.simple_spinner_item,
+				.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,
 				list);
+		typeSpinner.setAdapter(spinner_type_adapter);
+
 		spinner_addict_adapter = new ArrayAdapter<String>(getActivity()
-				.getApplicationContext(), android.R.layout.simple_spinner_item,
+				.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,
 				list2);
+		extendSpinner.setAdapter(spinner_addict_adapter);
 
-		spinner_adapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		Spinner_references.setAdapter(spinner_adapter);
+		extendSpinner.setOnItemSelectedListener(new SpinnerListener());
+		typeSpinner.setOnItemSelectedListener(new SpinnerListener());
 
-		Spinner_addict.setOnItemSelectedListener(new SpinnerListener());
-		Spinner_type.setOnItemSelectedListener(new SpinnerListener());
+		// получаем списко справочников, разбиваем его на ключ:значение
+		String[] referenceArray = getResources().getStringArray(
+				R.array.references_array);
+		List<SortField> referenceList = new ArrayList<SortField>();
+		String[] tmpValue;
+		SortField item;
+		for (String value : referenceArray) {
+			tmpValue = value.split(":");
+			item = new SortField(tmpValue[0], tmpValue[1]);
+			referenceList.add(item);
+		}
 
-		Spinner_references
+		ArrayAdapter<SortField> spinner_adapter = new ArrayAdapter<SortField>(
+				getActivity(), android.R.layout.simple_spinner_dropdown_item,
+				referenceList);
+
+		referenceSpinner.setAdapter(spinner_adapter);
+		referenceSpinner
 				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 					@Override
 					public void onItemSelected(AdapterView<?> parentView,
 							View selectedItemView, int position, long id) {
-						// String selected =
-						// parentView.getItemAtPosition(position).toString();
-						spinner_type_adapter
-								.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-						Spinner_type.setAdapter(spinner_type_adapter);
-						spinner_addict_adapter
-								.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-						Spinner_addict.setAdapter(spinner_addict_adapter);
 
-						switch (position) {
-						// устройства
-						case 0:
+						SortField selectedItem = (SortField) parentView
+								.getItemAtPosition(position);
+						String selected = selectedItem.getField();
+
+						if (selected.equals(EquipmentDBAdapter.TABLE_NAME)) {
 							FillReferencesEquipment();
 							FillListViewEquipment("", "");
-							break;
-						// Документация
-						case 1:
+						} else if (selected
+								.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
 							FillListViewDocumentation("");
 							FillReferencesDocumentation();
-							break;
-						// Типы оборудования
-						case 2:
+						} else if (selected
+								.equals(EquipmentTypeDBAdapter.TABLE_NAME)) {
 							FillListViewEquipmentType();
-							break;
-						// Степени важности
-						case 3:
+						} else if (selected
+								.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
 							FillListViewCriticalType();
 							ClearReferences();
-							break;
-						// Типы измерений
-						case 4:
+						} else if (selected
+								.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
 							FillListViewMeasurementType();
 							ClearReferences();
-							break;
-						// Результаты операций
-						case 5:
+						} else if (selected
+								.equals(OperationResultDBAdapter.TABLE_NAME)) {
 							FillListViewOperationResult();
 							ClearReferences();
-							break;
-						// Типы операций
-						case 6:
+						} else if (selected
+								.equals(OperationTypeDBAdapter.TABLE_NAME)) {
 							FillListViewOperationType();
 							ClearReferences();
-							break;
-						// Статусы нарядов
-						case 7:
+						} else if (selected
+								.equals(TaskStatusDBAdapter.TABLE_NAME)) {
 							FillListViewTaskStatus();
 							ClearReferences();
-							break;
-						// Статусы состояния оборудования
-						case 8:
+						} else if (selected
+								.equals(EquipmentStatusDBAdapter.TABLE_NAME)) {
 							FillListViewEquipmentStatus();
 							ClearReferences();
-							break;
-						default:
-							break;
 						}
 					}
 
 					@Override
 					public void onNothingSelected(AdapterView<?> parentView) {
-						//
+
 					}
 				});
 	}
@@ -218,7 +219,7 @@ public class ReferenceFragment extends Fragment {
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
 			// String reference=Spinner_references.getSelectedItem().toString();
-			long current_ref = Spinner_references.getSelectedItemId();
+			long current_ref = referenceSpinner.getSelectedItemId();
 			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
@@ -231,22 +232,21 @@ public class ReferenceFragment extends Fragment {
 			String type = "";
 			String critical_type = "";
 			if (current_ref == 0) {
-				if (Spinner_type.getSelectedItemId() > 0)
-					type = eqTypeDBAdapter.getUUIDByName(Spinner_type
+				if (typeSpinner.getSelectedItemId() > 0)
+					type = eqTypeDBAdapter.getUUIDByName(typeSpinner
 							.getSelectedItem().toString());
-				if (Spinner_addict.getSelectedItemId() > 0) {
+				if (extendSpinner.getSelectedItemId() > 0) {
 					critical_type = criticalTypeDBAdapter
-							.getUUIDByName(Spinner_addict.getSelectedItem()
+							.getUUIDByName(extendSpinner.getSelectedItem()
 									.toString().charAt(13)
 									+ "");
 				}
 				FillListViewEquipment(type, critical_type);
 			}
 			if (current_ref == 1) {
-				if (Spinner_type.getSelectedItemId() > 0)
-					type = DocumentationTypeDBAdapter
-							.getUUIDByName(Spinner_type.getSelectedItem()
-									.toString());
+				if (typeSpinner.getSelectedItemId() > 0)
+					type = DocumentationTypeDBAdapter.getUUIDByName(typeSpinner
+							.getSelectedItem().toString());
 				FillListViewDocumentation(type);
 			}
 			// TODO add this
@@ -255,10 +255,10 @@ public class ReferenceFragment extends Fragment {
 	}
 
 	private void FillReferencesEquipment() {
+
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
-				.getItems();
+		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter.getItems();
 		spinner_type_adapter.clear();
 		Integer cnt = 0;
 		spinner_type_adapter.add("Все");
@@ -319,14 +319,13 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		// Setting the adapter to the listView
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewEquipmentType() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
-				.getItems();
+		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter.getItems();
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		Integer cnt = 0;
@@ -342,7 +341,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillReferencesDocumentation() {
@@ -390,7 +389,7 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		// Setting the adapter to the listView
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewCriticalType() {
@@ -416,7 +415,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewMeasurementType() {
@@ -438,7 +437,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewOperationResult() {
@@ -468,7 +467,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewOperationType() {
@@ -489,7 +488,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewTaskStatus() {
@@ -511,7 +510,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void FillListViewEquipmentStatus() {
@@ -533,7 +532,7 @@ public class ReferenceFragment extends Fragment {
 		}
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
-		lv.setAdapter(adapter);
+		contentListView.setAdapter(adapter);
 	}
 
 	private void ClearReferences() {

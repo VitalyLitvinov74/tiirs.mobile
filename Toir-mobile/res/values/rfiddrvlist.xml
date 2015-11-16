@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="drvNameList">
-        <item >Null driver</item>
-        <item >Text driver</item>
-        <item >Barcode</item>
-        <item >QRcode</item>        
-        <item >Barcode2D</item>
-        <item >Driver C5</item>
+        <item>Null driver</item>
+        <item>Text driver</item>
+        <item>Barcode</item>
+        <item>QRcode</item>
+        <item>Barcode2D</item>
+        <item>Driver C5</item>
     </string-array>
     <string-array name="drvClassNameList">
-        <item >RfidDriverNull</item>
-        <item >RfidDriverText</item>
-        <item >RfidDriverBarcode</item>
-        <item >RfidDriverQRcode</item>
-        <item >RfidDriverBarcode2D</item>
-        <item >RfidDriverC5</item>
+        <item>RfidDriverNull</item>
+        <item>RfidDriverText</item>
+        <item>RfidDriverBarcode</item>
+        <item>RfidDriverQRcode</item>
+        <item>RfidDriverBarcode2D</item>
+        <item>RfidDriverC5</item>
     </string-array>
-    
+
 </resources>

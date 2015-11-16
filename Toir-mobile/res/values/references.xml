@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="references_array">
-        <item>Устройства</item>
-        <item>Документация</item>
-        <item>Типы оборудования</item>
-        <item>Степени важности</item>
-        <item>Типы измерений</item>
-        <item>Результаты операций</item>
-        <item>Типы операций</item>
-        <item>Статусы нарядов</item>
-        <item>Состояния оборудования</item>        
-    </string-array>    
+        <item>Устройства:equipment</item>
+        <item>Документация:equipment_documentation</item>
+        <item>Типы оборудования:equipment_type</item>
+        <item>Степени важности:critical_type</item>
+        <item>Типы измерений:measure_type</item>
+        <item>Результаты операций:operation_result</item>
+        <item>Типы операций:operation_type</item>
+        <item>Статусы нарядов:task_status</item>
+        <item>Состояния оборудования:equipment_status</item>
+    </string-array>
+
 </resources>
