@@ -7,6 +7,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
@@ -948,31 +949,6 @@ public class TaskFragment extends Fragment {
 						return true;
 					}
 				});
-	}
-
-	/**
-	 * 
-	 * @author Dmitriy Logachov
-	 * 
-	 *         Класс для представления элемента выпадающего списка сортировки по
-	 *         полю в базе
-	 */
-	private class SortField {
-		private String title;
-		private String field;
-
-		public SortField(String title, String field) {
-			this.title = title;
-			this.field = field;
-		}
-
-		public String getField() {
-			return field;
-		}
-
-		public String toString() {
-			return title;
-		}
 	}
 
 	/*
