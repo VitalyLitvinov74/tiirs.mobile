@@ -258,7 +258,7 @@ public class ReferenceFragment extends Fragment {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
-				.getAllItems();
+				.getItems();
 		spinner_type_adapter.clear();
 		Integer cnt = 0;
 		spinner_type_adapter.add("Все");
@@ -326,7 +326,7 @@ public class ReferenceFragment extends Fragment {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter
-				.getAllItems();
+				.getItems();
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		Integer cnt = 0;

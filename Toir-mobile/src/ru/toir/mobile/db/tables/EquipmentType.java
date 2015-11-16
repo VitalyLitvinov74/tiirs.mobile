@@ -31,4 +31,7 @@ public class EquipmentType extends BaseTable {
 		this.title = title;
 	}
 
+	public String toString() {
+		return title;
+	}
 }

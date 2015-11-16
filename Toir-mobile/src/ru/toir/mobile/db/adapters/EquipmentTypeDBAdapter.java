@@ -13,24 +13,33 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 	public static final String TABLE_NAME = "equipment_type";
 
 	public static final String FIELD_TITLE = "title";
-	
+
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
 		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
-		
+		public static final String CREATED_AT = TABLE_NAME + '_'
+				+ FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_'
+				+ FIELD_CHANGED_AT;
+
 		public static final String TITLE = TABLE_NAME + '_' + FIELD_TITLE;
 	}
-	
+
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID)
+				+ " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID)
+				+ " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT,
+				getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS "
+						+ Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT,
+				getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS "
+						+ Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE)
+				+ " AS " + Projection.TITLE);
 	}
 
 	/**
@@ -58,7 +67,7 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 
 	public EquipmentType getItem(Cursor cursor) {
 		EquipmentType item = new EquipmentType();
-		
+
 		getItem(cursor, item);
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		return item;
@@ -78,7 +87,9 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * <p>
+	 * Добавляет/изменяет запись в таблице
+	 * </p>
 	 * 
 	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
@@ -99,22 +110,20 @@ public class EquipmentTypeDBAdapter extends BaseDBAdapter {
 	 * 
 	 * @return list
 	 */
-	public ArrayList<EquipmentType> getAllItems() {
-		ArrayList<EquipmentType> arrayList = new ArrayList<EquipmentType>();
+	public ArrayList<EquipmentType> getItems() {
+
+		ArrayList<EquipmentType> list = new ArrayList<EquipmentType>();
 		Cursor cursor;
+
 		cursor = mDb.query(TABLE_NAME, mColumns, null, null, null, null, null);
 
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
-			while (true) {
-				EquipmentType equip = getItem(cursor);
-				arrayList.add(equip);
-				if (cursor.isLast())
-					break;
-				cursor.moveToNext();
-			}
+		if (cursor.moveToFirst()) {
+			do {
+				list.add(getItem(cursor));
+			} while (cursor.moveToNext());
 		}
-		return arrayList;
+
+		return list;
 	}
 
 	public String getNameByUUID(String uuid) {

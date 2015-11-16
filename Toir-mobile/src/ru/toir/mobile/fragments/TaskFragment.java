@@ -957,33 +957,21 @@ public class TaskFragment extends Fragment {
 	 *         Класс для представления элемента выпадающего списка сортировки по
 	 *         полю в базе
 	 */
-	class SortField {
-		private String Title;
-		private String Field;
+	private class SortField {
+		private String title;
+		private String field;
 
 		public SortField(String title, String field) {
-			Title = title;
-			Field = field;
-		}
-
-		public String getTitle() {
-			return Title;
-		}
-
-		public void setTitle(String title) {
-			Title = title;
+			this.title = title;
+			this.field = field;
 		}
 
 		public String getField() {
-			return Field;
-		}
-
-		public void setField(String field) {
-			Field = field;
+			return field;
 		}
 
 		public String toString() {
-			return Title;
+			return title;
 		}
 	}
 

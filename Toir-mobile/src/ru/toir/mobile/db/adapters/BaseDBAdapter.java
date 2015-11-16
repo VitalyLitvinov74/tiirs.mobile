@@ -28,7 +28,7 @@ public class BaseDBAdapter {
 	public static final String FIELD_CHANGED_AT = "ChangedAt";
 
 	String[] mColumns = { "*" };
-	
+
 	public static final String uuidNull = "00000000-0000-0000-0000-000000000000";
 
 	/**
@@ -67,10 +67,9 @@ public class BaseDBAdapter {
 	 * @return
 	 */
 	protected static String getLeftJoinTables(String firstTable,
-			String secondTable, String firstField, String secondField,
-			boolean first) {
+			String secondTable, String firstField, String secondField) {
 		return getJoinTables("LEFT JOIN", firstTable, secondTable, firstField,
-				secondField, first);
+				secondField);
 	}
 
 	/**
@@ -84,17 +83,14 @@ public class BaseDBAdapter {
 	 * @return
 	 */
 	protected static String getJoinTables(String join, String firstTable,
-			String secondTable, String firstField, String secondField,
-			boolean first) {
-		StringBuilder result = new StringBuilder();
+			String secondTable, String firstField, String secondField) {
 
-		if (first) {
-			result.append(firstTable).append(' ');
-		}
+		StringBuilder result = new StringBuilder();
 
 		result.append(join).append(' ').append(secondTable).append(" ON ")
 				.append(firstTable).append('.').append(firstField).append('=')
 				.append(secondTable).append('.').append(secondField);
+
 		return result.toString();
 
 	}

@@ -310,18 +310,21 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 
 		String table;
 		StringBuilder tables = new StringBuilder();
+
+		tables.append(TABLE_NAME);
+		
 		// операции с типами операций
 		table = getLeftJoinTables(TABLE_NAME,
 				OperationTypeDBAdapter.TABLE_NAME,
 				FIELD_OPERATION_TYPE_UUID,
-				OperationTypeDBAdapter.FIELD_UUID, true);
-		tables.append(table);
+				OperationTypeDBAdapter.FIELD_UUID);
+		tables.append(' ').append(table);
 		projection.putAll(OperationTypeDBAdapter.getProjection());
 		
 		// оборудование 
 		table = getLeftJoinTables(TABLE_NAME,
 				EquipmentDBAdapter.TABLE_NAME, FIELD_EQUIPMENT_UUID,
-				EquipmentDBAdapter.FIELD_UUID, false);
+				EquipmentDBAdapter.FIELD_UUID);
 		tables.append(' ').append(table);
 		projection.putAll(EquipmentDBAdapter.getProjection());
 
@@ -329,28 +332,28 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		table = getLeftJoinTables(EquipmentDBAdapter.TABLE_NAME,
 				CriticalTypeDBAdapter.TABLE_NAME,
 				EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID,
-				CriticalTypeDBAdapter.FIELD_UUID, false);
+				CriticalTypeDBAdapter.FIELD_UUID);
 		tables.append(' ').append(table);
 		projection.putAll(CriticalTypeDBAdapter.getProjection());
 		
 		// статусы операций
 		table = getLeftJoinTables(TABLE_NAME,
 				OperationStatusDBAdapter.TABLE_NAME, FIELD_OPERATION_STATUS_UUID,
-				OperationStatusDBAdapter.FIELD_UUID, false);
+				OperationStatusDBAdapter.FIELD_UUID);
 		tables.append(' ').append(table);
 		projection.putAll(OperationStatusDBAdapter.getProjection());
 		
 		// результаты выполнения операций
 		table = getLeftJoinTables(TABLE_NAME,
 				EquipmentOperationResultDBAdapter.TABLE_NAME, FIELD_UUID,
-				EquipmentOperationResultDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID, false);
+				EquipmentOperationResultDBAdapter.FIELD_EQUIPMENT_OPERATION_UUID);
 		tables.append(' ').append(table);
 		projection.putAll(EquipmentOperationResultDBAdapter.getProjection());
 		
 		// справочник вариантов результатов выполнения операции
 		table = getLeftJoinTables(EquipmentOperationResultDBAdapter.TABLE_NAME,
 				OperationResultDBAdapter.TABLE_NAME, EquipmentOperationResultDBAdapter.FIELD_OPERATION_RESULT_UUID,
-				OperationResultDBAdapter.FIELD_UUID, false);
+				OperationResultDBAdapter.FIELD_UUID);
 		tables.append(' ').append(table);
 		projection.putAll(OperationResultDBAdapter.getProjection());
 		
@@ -383,6 +386,16 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @return the mProjection
+	 */
+	public static Map<String, String> getProjection() {
+		Map<String, String> projection = new HashMap<String, String>();
+		projection.putAll(mProjection);
+		projection.remove(Projection._ID);
+		return projection;
 	}
 
 }
