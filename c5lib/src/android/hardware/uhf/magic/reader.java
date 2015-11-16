@@ -368,7 +368,7 @@ public class reader {
 		default:
 			return 0;
 		}
-		
+
 		// TODO нужно проверить такой вариант
 		tmpMask = 3;
 
@@ -524,7 +524,7 @@ public class reader {
 		}
 	}
 
-	// далее идут native медоты из сопутствующей библиотеки
+	// далее идут native методы из сопутствующей библиотеки
 
 	/**
 	 * Initialization device
@@ -592,14 +592,14 @@ public class reader {
 	 * 
 	 * @return return 0x10, error return 0X11
 	 */
-	static public native int MultiInventory(int ntimes);
+	// static public native int MultiInventory(int ntimes);
 
 	/**
 	 * stop repeatedly polling
 	 * 
 	 * @return return 0x10, error return 0X11
 	 */
-	static public native int StopMultiInventory();
+	// static public native int StopMultiInventory();
 
 	/**
 	 * set the Select parameter, and set before a single polling or multiple
@@ -617,8 +617,8 @@ public class reader {
 	 * @param mask
 	 * @return return 0x00, error is returned not 0
 	 */
-	static public native int Select(byte selPa, int nPTR, byte nMaskLen,
-			byte turncate, byte[] mask);
+	// static public native int Select(byte selPa, int nPTR, byte nMaskLen, byte
+	// turncate, byte[] mask);
 
 	/**
 	 * set to send Select commands
@@ -629,7 +629,7 @@ public class reader {
 	 * 
 	 * @return return 0x00, error is returned not 0
 	 */
-	static public native int SetSelect(byte data);
+	// static public native int SetSelect(byte data);
 
 	/**
 	 * read tag data storage area
@@ -708,7 +708,7 @@ public class reader {
 	 * 
 	 * @return
 	 */
-	static public native int Query();
+	// static public native int Query();
 
 	/**
 	 * set the relevant parameters in the Query command
@@ -725,7 +725,7 @@ public class reader {
 	 *            4b0000-4b1111
 	 * @return
 	 */
-	static public native int SetQuery(int nParam);
+	// static public native int SetQuery(int nParam);
 
 	/**
 	 * set working area band
@@ -735,7 +735,7 @@ public class reader {
 	 *            03 Europe 06 of South Korea
 	 * @return
 	 */
-	static public native int SetFrequency(byte region);
+	// static public native int SetFrequency(byte region);
 
 	/**
 	 * set working channel
@@ -757,7 +757,7 @@ public class reader {
 	 *            frequency: CH_Index = (Freq_CH-917.1M) /0.2M
 	 * @return
 	 */
-	static public native int SetChannel(byte channel);
+	// static public native int SetChannel(byte channel);
 
 	/**
 	 * get working channel
@@ -774,7 +774,7 @@ public class reader {
 	 * formula of European channel parameters, Freq_CH channel frequency:
 	 * Freq_CH = CH_Index * 0.2M + 865.1M
 	 */
-	static public native int GetChannel();
+	// static public native int GetChannel();
 
 	/**
 	 * set to automatic frequency hopping pattern or cancel automatic frequency
@@ -785,7 +785,7 @@ public class reader {
 	 *            automatic frequency hopping
 	 * @return
 	 */
-	static public native int SetAutoFrequencyHopping(byte auto);
+	// static public native int SetAutoFrequencyHopping(byte auto);
 
 	/**
 	 * access transmission power
@@ -810,7 +810,7 @@ public class reader {
 	 *            0xFF continuous wave 0x00 is open, closed continuous wave
 	 * @return
 	 */
-	static public native int SetContinuousCarrier(byte bOn);
+	// static public native int SetContinuousCarrier(byte bOn);
 
 	/**
 	 * get the current reader receiving demodulator parameters
@@ -823,7 +823,7 @@ public class reader {
 	 *            0x03 24 0x04 27 0x05 30 0x06 36 0x07 40
 	 * @return
 	 */
-	static public native int GetParameter(byte[] bufout);
+	// static public native int GetParameter(byte[] bufout);
 
 	/**
 	 * set the current reader receiving demodulator parameters
@@ -841,7 +841,7 @@ public class reader {
 	 *            the more stable. 0x01B0 is the minimum recommended
 	 * @return
 	 */
-	static public native int SetParameter(byte bMixer, byte bIF, int nThrd);
+	// static public native int SetParameter(byte bMixer, byte bIF, int nThrd);
 
 	/**
 	 * Test RF input blocking signal
@@ -849,7 +849,7 @@ public class reader {
 	 * @param bufout
 	 * @return
 	 */
-	static public native int ScanJammer(byte[] bufout);
+	// static public native int ScanJammer(byte[] bufout);
 
 	/**
 	 * Test RF input RSSI signal size, used to detect the current environment
@@ -858,7 +858,7 @@ public class reader {
 	 * @param bufout
 	 * @return
 	 */
-	static public native int TestRssi(byte[] bufout);
+	// static public native int TestRssi(byte[] bufout);
 
 	/**
 	 * Set the IO port direction, read the IO level and IO level setting
@@ -880,7 +880,7 @@ public class reader {
 	 * @param bufout
 	 * @return
 	 */
-	static public native int SetIOParameter(byte p1, byte p2, byte p3,
-			byte[] bufout);
+	// static public native int SetIOParameter(byte p1, byte p2, byte p3,
+	// byte[] bufout);
 
 }
