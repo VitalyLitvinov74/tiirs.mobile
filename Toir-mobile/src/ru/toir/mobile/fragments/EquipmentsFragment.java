@@ -124,8 +124,6 @@ public class EquipmentsFragment extends Fragment {
 
 		equipmentListView.setOnItemClickListener(new ListviewClickListener());
 
-		initView();
-
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
 
@@ -228,6 +226,15 @@ public class EquipmentsFragment extends Fragment {
 
 		equipmentAdapter.changeCursor(adapter.getItemsWithInfo(type, sort));
 
+	}
+
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser) {
+
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isVisibleToUser) {
+			initView();
+		}
 	}
 
 }
