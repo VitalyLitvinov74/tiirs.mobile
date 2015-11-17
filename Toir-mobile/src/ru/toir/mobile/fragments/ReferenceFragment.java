@@ -57,15 +57,20 @@ public class ReferenceFragment extends Fragment {
 
 	private Spinner referenceSpinner;
 	private Spinner typeSpinner;
-	private Spinner extendSpinner;
+	private Spinner extraSpinner;
 
 	private ListView contentListView;
 
-	ArrayList<String> list = new ArrayList<String>();
-	ArrayList<String> list2 = new ArrayList<String>();
+	private ArrayList<SortField> referenceList;
+	private ArrayList<SortField> typeList;
+	private ArrayList<SortField> extraList;
 
-	ArrayAdapter<String> spinner_type_adapter;
-	ArrayAdapter<String> spinner_addict_adapter;
+	private ArrayAdapter<SortField> referenceSpinnerAdapter;
+	private ArrayAdapter<SortField> typeSpinnerAdapter;
+	private ArrayAdapter<SortField> extraSpinnerAdapter;
+
+	private TypeExtraSpinnerListener typeExtraSpinnerListener;
+	private ReferenceSpinnerListener referenceSpinnerListener;
 
 	private ProgressDialog getReferencesDialog;
 
@@ -102,13 +107,49 @@ public class ReferenceFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
 		View rootView = inflater.inflate(R.layout.reference_layout, container,
 				false);
+
 		referenceSpinner = (Spinner) rootView.findViewById(R.id.spinner1);
 		typeSpinner = (Spinner) rootView.findViewById(R.id.spinner2);
-		extendSpinner = (Spinner) rootView.findViewById(R.id.spinner3);
+		extraSpinner = (Spinner) rootView.findViewById(R.id.spinner3);
 		contentListView = (ListView) rootView.findViewById(R.id.listView1);
-		initView();
+
+		typeList = new ArrayList<SortField>();
+		typeSpinnerAdapter = new ArrayAdapter<SortField>(getActivity()
+				.getApplicationContext(),
+				android.R.layout.simple_spinner_dropdown_item, typeList);
+		typeSpinner.setAdapter(typeSpinnerAdapter);
+
+		extraList = new ArrayList<SortField>();
+		extraSpinnerAdapter = new ArrayAdapter<SortField>(getActivity()
+				.getApplicationContext(),
+				android.R.layout.simple_spinner_dropdown_item, extraList);
+		extraSpinner.setAdapter(extraSpinnerAdapter);
+
+		typeExtraSpinnerListener = new TypeExtraSpinnerListener();
+		extraSpinner.setOnItemSelectedListener(typeExtraSpinnerListener);
+		typeSpinner.setOnItemSelectedListener(typeExtraSpinnerListener);
+
+		// получаем список справочников, разбиваем его на ключ:значение
+		String[] referenceArray = getResources().getStringArray(
+				R.array.references_array);
+		String[] tmpValue;
+		SortField item;
+		referenceList = new ArrayList<SortField>();
+		for (String value : referenceArray) {
+			tmpValue = value.split(":");
+			item = new SortField(tmpValue[0], tmpValue[1]);
+			referenceList.add(item);
+		}
+
+		referenceSpinnerAdapter = new ArrayAdapter<SortField>(getActivity(),
+				android.R.layout.simple_spinner_dropdown_item, referenceList);
+
+		referenceSpinner.setAdapter(referenceSpinnerAdapter);
+		referenceSpinnerListener = new ReferenceSpinnerListener();
+		referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
 
 		setHasOptionsMenu(true);
 		rootView.setFocusableInTouchMode(true);
@@ -117,99 +158,92 @@ public class ReferenceFragment extends Fragment {
 		return rootView;
 	}
 
-	private void initView() {
-		FillSpinners();
-		FillListViewEquipment("", "");
-	}
+	/**
+	 * 
+	 * @author Dmitriy Logachov
+	 *         <p>
+	 *         Класс реализует обработку выбора элемента выпадающего списка
+	 *         справочников.
+	 *         </p>
+	 * 
+	 */
+	private class ReferenceSpinnerListener implements
+			AdapterView.OnItemSelectedListener {
 
-	private void FillSpinners() {
+		@Override
+		public void onItemSelected(AdapterView<?> parentView,
+				View selectedItemView, int position, long id) {
 
-		spinner_type_adapter = new ArrayAdapter<String>(getActivity()
-				.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,
-				list);
-		typeSpinner.setAdapter(spinner_type_adapter);
+			SortField selectedItem = (SortField) parentView
+					.getItemAtPosition(position);
+			String selected = selectedItem.getField();
 
-		spinner_addict_adapter = new ArrayAdapter<String>(getActivity()
-				.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,
-				list2);
-		extendSpinner.setAdapter(spinner_addict_adapter);
+			if (selected.equals(EquipmentDBAdapter.TABLE_NAME)) {
 
-		extendSpinner.setOnItemSelectedListener(new SpinnerListener());
-		typeSpinner.setOnItemSelectedListener(new SpinnerListener());
+				fillTypeExtraEquipment();
+				fillListViewEquipment("", "");
 
-		// получаем списко справочников, разбиваем его на ключ:значение
-		String[] referenceArray = getResources().getStringArray(
-				R.array.references_array);
-		List<SortField> referenceList = new ArrayList<SortField>();
-		String[] tmpValue;
-		SortField item;
-		for (String value : referenceArray) {
-			tmpValue = value.split(":");
-			item = new SortField(tmpValue[0], tmpValue[1]);
-			referenceList.add(item);
+			} else if (selected
+					.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraDocumentation();
+				fillListViewDocumentation("");
+
+			} else if (selected.equals(EquipmentTypeDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraEquipmentType();
+				fillListViewEquipmentType();
+
+			} else if (selected.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraCriticalType();
+				fillListViewCriticalType();
+
+			} else if (selected.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraMeasurementType();
+				fillListViewMeasurementType();
+
+			} else if (selected.equals(OperationResultDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraOperationResult();
+				fillListViewOperationResult();
+
+			} else if (selected.equals(OperationTypeDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraOperationType();
+				fillListViewOperationType();
+
+			} else if (selected.equals(TaskStatusDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraTaskStatus();
+				fillListViewTaskStatus();
+
+			} else if (selected.equals(EquipmentStatusDBAdapter.TABLE_NAME)) {
+
+				fillTypeExtraEquipmentStatus();
+				fillListViewEquipmentStatus();
+
+			}
 		}
 
-		ArrayAdapter<SortField> spinner_adapter = new ArrayAdapter<SortField>(
-				getActivity(), android.R.layout.simple_spinner_dropdown_item,
-				referenceList);
+		@Override
+		public void onNothingSelected(AdapterView<?> parentView) {
 
-		referenceSpinner.setAdapter(spinner_adapter);
-		referenceSpinner
-				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-					@Override
-					public void onItemSelected(AdapterView<?> parentView,
-							View selectedItemView, int position, long id) {
-
-						SortField selectedItem = (SortField) parentView
-								.getItemAtPosition(position);
-						String selected = selectedItem.getField();
-
-						if (selected.equals(EquipmentDBAdapter.TABLE_NAME)) {
-							FillReferencesEquipment();
-							FillListViewEquipment("", "");
-						} else if (selected
-								.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
-							FillListViewDocumentation("");
-							FillReferencesDocumentation();
-						} else if (selected
-								.equals(EquipmentTypeDBAdapter.TABLE_NAME)) {
-							FillListViewEquipmentType();
-						} else if (selected
-								.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
-							FillListViewCriticalType();
-							ClearReferences();
-						} else if (selected
-								.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
-							FillListViewMeasurementType();
-							ClearReferences();
-						} else if (selected
-								.equals(OperationResultDBAdapter.TABLE_NAME)) {
-							FillListViewOperationResult();
-							ClearReferences();
-						} else if (selected
-								.equals(OperationTypeDBAdapter.TABLE_NAME)) {
-							FillListViewOperationType();
-							ClearReferences();
-						} else if (selected
-								.equals(TaskStatusDBAdapter.TABLE_NAME)) {
-							FillListViewTaskStatus();
-							ClearReferences();
-						} else if (selected
-								.equals(EquipmentStatusDBAdapter.TABLE_NAME)) {
-							FillListViewEquipmentStatus();
-							ClearReferences();
-						}
-					}
-
-					@Override
-					public void onNothingSelected(AdapterView<?> parentView) {
-
-					}
-				});
+		}
 	}
 
-	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
-		boolean userSelect = false;
+	/**
+	 * 
+	 * @author olejek
+	 *         <p>
+	 *         Класс реализует обработку выбора элементов выпадающих списков для
+	 *         {@code typeSpinner} и {@code extraSpinner}
+	 *         </p>
+	 * 
+	 */
+	private class TypeExtraSpinnerListener implements
+			AdapterView.OnItemSelectedListener {
 
 		@Override
 		public void onNothingSelected(AdapterView<?> parentView) {
@@ -218,72 +252,94 @@ public class ReferenceFragment extends Fragment {
 		@Override
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
-			// String reference=Spinner_references.getSelectedItem().toString();
-			long current_ref = referenceSpinner.getSelectedItemId();
-			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
-			CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
-			DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
-			String type = "";
-			String critical_type = "";
-			if (current_ref == 0) {
-				if (typeSpinner.getSelectedItemId() > 0)
-					type = eqTypeDBAdapter.getUUIDByName(typeSpinner
-							.getSelectedItem().toString());
-				if (extendSpinner.getSelectedItemId() > 0) {
-					critical_type = criticalTypeDBAdapter
-							.getUUIDByName(extendSpinner.getSelectedItem()
-									.toString().charAt(13)
-									+ "");
-				}
-				FillListViewEquipment(type, critical_type);
+
+			String referenceSelected = EquipmentDBAdapter.TABLE_NAME;
+			SortField referenceItem = (SortField) referenceSpinner
+					.getSelectedItem();
+			if (referenceItem != null) {
+				referenceSelected = referenceItem.getField();
 			}
-			if (current_ref == 1) {
-				if (typeSpinner.getSelectedItemId() > 0)
-					type = DocumentationTypeDBAdapter.getUUIDByName(typeSpinner
-							.getSelectedItem().toString());
-				FillListViewDocumentation(type);
+
+			String typeSelected = null;
+			SortField typeItem = (SortField) typeSpinner.getSelectedItem();
+			if (typeItem != null) {
+				typeSelected = typeItem.getField();
+			}
+
+			String extraSelected = null;
+			SortField extraItem = (SortField) extraSpinner.getSelectedItem();
+			if (extraItem != null) {
+				extraSelected = extraItem.getField();
+			}
+
+			if (referenceSelected.equals(EquipmentDBAdapter.TABLE_NAME)) {
+
+				// в данном случае тип оборудования
+				if (typeSelected == null) {
+					typeSelected = "";
+				}
+
+				// в данном случае тип критичности
+				if (extraSelected == null) {
+					extraSelected = "";
+				}
+
+				fillListViewEquipment(typeSelected, extraSelected);
+
+			} else if (referenceSelected
+					.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
+
+				// в данном случае тип документации
+				if (typeSelected == null) {
+					typeSelected = "";
+				}
+
+				fillListViewDocumentation(typeSelected);
+
 			}
 			// TODO add this
 			// <item>Результаты операций</item>
 		}
 	}
 
-	private void FillReferencesEquipment() {
+	private void fillTypeExtraEquipment() {
 
-		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
+		EquipmentTypeDBAdapter equipmentTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter.getItems();
-		spinner_type_adapter.clear();
-		Integer cnt = 0;
-		spinner_type_adapter.add("Все");
-		cnt++;
-		while (cnt <= equipmentTypeList.size()) {
-			spinner_type_adapter.add(equipmentTypeList.get(cnt - 1).getTitle());
-			cnt++;
+		ArrayList<EquipmentType> equipmentTypeList = equipmentTypeDBAdapter
+				.getItems();
+
+		typeSpinner.setVisibility(View.VISIBLE);
+		extraSpinner.setVisibility(View.VISIBLE);
+
+		SortField item;
+		item = new SortField("Все", null);
+		typeSpinnerAdapter.clear();
+		typeSpinnerAdapter.add(item);
+
+		for (EquipmentType type : equipmentTypeList) {
+			item = new SortField(type.getTitle(), type.getUuid());
+			typeSpinnerAdapter.add(item);
 		}
 
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
 				.getAllItems();
-		spinner_addict_adapter.clear();
-		cnt = 0;
-		spinner_addict_adapter.add("Все");
-		cnt++;
-		while (cnt <= criticalTypeList.size()) {
-			spinner_addict_adapter.add("Критичность: "
-					+ criticalTypeList.get(cnt - 1).getType());
-			cnt++;
+
+		item = new SortField("Все", null);
+		extraSpinnerAdapter.clear();
+		extraSpinnerAdapter.add(item);
+
+		for (CriticalType type : criticalTypeList) {
+			item = new SortField("Критичность: " + type.getType(),
+					type.getUuid());
+			extraSpinnerAdapter.add(item);
 		}
 	}
 
-	private void FillListViewEquipment(String type, String critical_type) {
+	private void fillListViewEquipment(String type, String critical_type) {
+
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<Equipment> equipmentList = eqDBAdapter.getAllItems(type,
@@ -293,36 +349,96 @@ public class ReferenceFragment extends Fragment {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 
-		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-		Integer cnt = 0;
-		// keys used in Hashmap
+		List<HashMap<String, String>> elementList = new ArrayList<HashMap<String, String>>();
 		String[] from = { "name", "descr", "img" };
-		// id of views in listview_layout
 		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
-		while (cnt < equipmentList.size()) {
-			HashMap<String, String> hm = new HashMap<String, String>();
-			hm.put("name", equipmentList.get(cnt).getTitle());
-			hm.put("descr",
+		HashMap<String, String> element;
+
+		for (Equipment item : equipmentList) {
+			element = new HashMap<String, String>();
+			element.put("name", item.getTitle());
+			element.put(
+					"descr",
 					"Критичность: "
-							+ criticalTypeDBAdapter.getNameByUUID(equipmentList
-									.get(cnt).getCritical_type_uuid())
+							+ criticalTypeDBAdapter.getNameByUUID(item
+									.getCritical_type_uuid())
 							+ " | Тип: "
-							+ eqTypeDBAdapter.getNameByUUID(equipmentList.get(
-									cnt).getEquipment_type_uuid()) + " ["
-							+ equipmentList.get(cnt).getLatitude() + " "
-							+ equipmentList.get(cnt).getLongitude() + "]");
-			hm.put("img", Integer.toString(R.drawable.img_1));
-			aList.add(hm);
-			cnt++;
+							+ eqTypeDBAdapter.getNameByUUID(item
+									.getEquipment_type_uuid()) + " ["
+							+ item.getLatitude() + " " + item.getLongitude()
+							+ "]");
+			element.put("img", Integer.toString(R.drawable.img_1));
+			elementList.add(element);
 		}
 
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
-				.getApplicationContext(), aList, R.layout.listview, from, to);
-		// Setting the adapter to the listView
+				.getApplicationContext(), elementList, R.layout.listview, from,
+				to);
+
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillListViewEquipmentType() {
+	private void fillTypeExtraDocumentation() {
+
+		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
+		ArrayList<DocumentationType> documentationTypeList = DocumentationTypeDBAdapter
+				.getAllItems();
+
+		typeSpinner.setVisibility(View.VISIBLE);
+		extraSpinner.setVisibility(View.GONE);
+
+		SortField item;
+		item = new SortField("Все", null);
+		typeSpinnerAdapter.clear();
+		typeSpinnerAdapter.add(item);
+
+		for (DocumentationType type : documentationTypeList) {
+			item = new SortField(type.getTitle(), type.getUuid());
+			typeSpinnerAdapter.add(item);
+		}
+	}
+
+	private void fillListViewDocumentation(String type) {
+
+		EquipmentDocumentationDBAdapter EquipmentDocumentationDBAdapter = new EquipmentDocumentationDBAdapter(
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
+		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
+		List<EquipmentDocumentation> equipmentDocumentationList = EquipmentDocumentationDBAdapter
+				.getAllItems(type);
+		List<HashMap<String, String>> elementList = new ArrayList<HashMap<String, String>>();
+		String[] from = { "name", "descr", "img" };
+		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
+		HashMap<String, String> element;
+
+		for (EquipmentDocumentation item : equipmentDocumentationList) {
+			element = new HashMap<String, String>();
+			element.put("name", item.getTitle());
+			element.put(
+					"descr",
+					DocumentationTypeDBAdapter.getNameByUUID(item
+							.getDocumentation_type_uuid())
+							+ " ["
+							+ item.getPath() + "]");
+			element.put("img", Integer.toString(R.drawable.img_4));
+			elementList.add(element);
+		}
+
+		SimpleAdapter adapter = new SimpleAdapter(getActivity()
+				.getApplicationContext(), elementList, R.layout.listview, from,
+				to);
+
+		contentListView.setAdapter(adapter);
+	}
+
+	private void fillTypeExtraEquipmentType() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
+	}
+
+	private void fillListViewEquipmentType() {
 		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentType> equipmentTypeList = eqTypeDBAdapter.getItems();
@@ -344,55 +460,13 @@ public class ReferenceFragment extends Fragment {
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillReferencesDocumentation() {
-		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<DocumentationType> documentationTypeList = DocumentationTypeDBAdapter
-				.getAllItems();
-		spinner_type_adapter.clear();
-		spinner_addict_adapter.clear();
-		Integer cnt = 0;
-		spinner_type_adapter.add("Все");
-		cnt++;
-		while (cnt <= documentationTypeList.size()) {
-			spinner_type_adapter.add(documentationTypeList.get(cnt - 1)
-					.getTitle());
-			cnt++;
-		}
+	private void fillTypeExtraCriticalType() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
 	}
 
-	private void FillListViewDocumentation(String type) {
-		EquipmentDocumentationDBAdapter EquipmentDocumentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		DocumentationTypeDBAdapter DocumentationTypeDBAdapter = new DocumentationTypeDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<EquipmentDocumentation> equipmentDocumentationList = EquipmentDocumentationDBAdapter
-				.getAllItems(type);
-		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-		Integer cnt = 0;
-		String[] from = { "name", "descr", "img" };
-		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
-		while (cnt < equipmentDocumentationList.size()) {
-			HashMap<String, String> hm = new HashMap<String, String>();
-			hm.put("name", equipmentDocumentationList.get(cnt).getTitle());
-			hm.put("descr",
-					DocumentationTypeDBAdapter
-							.getNameByUUID(equipmentDocumentationList.get(cnt)
-									.getDocumentation_type_uuid())
-							+ " ["
-							+ equipmentDocumentationList.get(cnt).getPath()
-							+ "]");
-			hm.put("img", Integer.toString(R.drawable.img_4));
-			aList.add(hm);
-			cnt++;
-		}
-		SimpleAdapter adapter = new SimpleAdapter(getActivity()
-				.getApplicationContext(), aList, R.layout.listview, from, to);
-		// Setting the adapter to the listView
-		contentListView.setAdapter(adapter);
-	}
-
-	private void FillListViewCriticalType() {
+	private void fillListViewCriticalType() {
 		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
@@ -418,7 +492,13 @@ public class ReferenceFragment extends Fragment {
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillListViewMeasurementType() {
+	private void fillTypeExtraMeasurementType() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
+	}
+
+	private void fillListViewMeasurementType() {
 		MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<MeasureType> measureTypeList = measureTypeDBAdapter
@@ -440,7 +520,13 @@ public class ReferenceFragment extends Fragment {
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillListViewOperationResult() {
+	private void fillTypeExtraOperationResult() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
+	}
+
+	private void fillListViewOperationResult() {
 		OperationResultDBAdapter opResultTypeDBAdapter = new OperationResultDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		OperationTypeDBAdapter OperationTypeDBAdapter = new OperationTypeDBAdapter(
@@ -470,7 +556,13 @@ public class ReferenceFragment extends Fragment {
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillListViewOperationType() {
+	private void fillTypeExtraOperationType() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
+	}
+
+	private void fillListViewOperationType() {
 		OperationTypeDBAdapter opTypeDBAdapter = new OperationTypeDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<OperationType> opTypeList = opTypeDBAdapter.getAllItems();
@@ -491,7 +583,13 @@ public class ReferenceFragment extends Fragment {
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillListViewTaskStatus() {
+	private void fillTypeExtraTaskStatus() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
+	}
+
+	private void fillListViewTaskStatus() {
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
@@ -513,7 +611,13 @@ public class ReferenceFragment extends Fragment {
 		contentListView.setAdapter(adapter);
 	}
 
-	private void FillListViewEquipmentStatus() {
+	private void fillTypeExtraEquipmentStatus() {
+
+		typeSpinner.setVisibility(View.GONE);
+		extraSpinner.setVisibility(View.GONE);
+	}
+
+	private void fillListViewEquipmentStatus() {
 		EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 		ArrayList<EquipmentStatus> equipmentStatusList = equipmentStatusDBAdapter
@@ -533,11 +637,6 @@ public class ReferenceFragment extends Fragment {
 		SimpleAdapter adapter = new SimpleAdapter(getActivity()
 				.getApplicationContext(), aList, R.layout.listview, from, to);
 		contentListView.setAdapter(adapter);
-	}
-
-	private void ClearReferences() {
-		spinner_type_adapter.clear();
-		spinner_addict_adapter.clear();
 	}
 
 	/*
