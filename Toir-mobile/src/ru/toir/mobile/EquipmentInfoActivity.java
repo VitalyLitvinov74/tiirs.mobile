@@ -68,13 +68,10 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	private TextView tv_equipment_name;
 	private TextView tv_equipment_type;
 	private TextView tv_equipment_position;
-	// private TextView tv_equipment_date;
 	private TextView tv_equipment_tasks;
 	private TextView tv_equipment_critical;
 	private ImageView tv_equipment_image;
 	private TextView tv_equipment_status;
-	// private TextView tv_equipment_text_date;
-	// private TextView tv_equipment_text_tasks;
 	private TextView tv_equipment_task_date;
 	private TextView tv_equipment_documentation;
 	private Button read_rfid_button;
@@ -419,7 +416,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				+ String.valueOf(equipment.getLatitude()) + " / "
 				+ String.valueOf(equipment.getLongitude()));
 		tv_equipment_task_date.setText(DataUtils.getDate(
-				equipment.getStart_date(), "dd-MM-yyyy hh:mm"));
+				equipment.getStart_date(), "dd.MM.yyyy HH:mm"));
 		tv_equipment_critical.setText("Критичность: "
 				+ criticalTypeDBAdapter.getNameByUUID(equipment
 						.getCritical_type_uuid()));
@@ -502,7 +499,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 				if (equipmentOperationResult != null) {
 					startDate = DataUtils.getDate(
 							equipmentOperationResult.getStart_date(),
-							"dd-MM-yyyy hh:mm");
+							"dd.MM.yyyy HH:mm");
 				} else {
 					startDate = "не проводилась";
 				}
@@ -518,7 +515,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 							.getItem(equipmentOperationResult
 									.getOperation_result_uuid());
 					if (operationResult != null) {
-					resultTitle = operationResult.getTitle();
+						resultTitle = operationResult.getTitle();
 					} else {
 						resultTitle = "---";
 					}
@@ -731,7 +728,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 								+ " ["
 								+ DataUtils.getDate(
 										tagrecords.get(cnt).operation_date,
-										"dd-MM-yyyy hh:mm") + "]");
+										"dd.MM.yyyy HH:mm") + "]");
 				hm.put("descr",
 						"Результат: ["
 								+ equipmentOperationResultDBAdapter
@@ -766,7 +763,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 			// equipmenttag.get_equipment_uuid());
 			if (tagrecords.get(0).operation_date > 0) {
 				tv_equipment_task_date.setText(DataUtils.getDate(
-						tagrecords.get(0).operation_date, "dd-MM-yyyy hh:mm"));
+						tagrecords.get(0).operation_date, "dd.MM.yyyy HH:mm"));
 				tv_equipment_tasks
 						.setText(equipmentOperationResultDBAdapter
 								.getOperationResultByPartOfUUID(tagrecords

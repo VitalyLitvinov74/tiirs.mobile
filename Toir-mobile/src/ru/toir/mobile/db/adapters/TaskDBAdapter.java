@@ -3,6 +3,7 @@ package ru.toir.mobile.db.adapters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.utils.DataUtils;
@@ -215,7 +216,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 				new String[] { uuid }, null, null, null);
 		if (cur.getCount() > 0) {
 			cur.moveToFirst();
-			return DataUtils.getDate(cur.getLong(5), "dd-MM-yyyy hh:mm:ss");
+			return DataUtils.getDate(cur.getLong(5), "dd.MM.yyyy HH:mm:ss");
 		} else
 			return "";
 	}
@@ -234,7 +235,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 				new String[] { uuid }, null, null, null);
 		if (cur.getCount() > 0) {
 			cur.moveToFirst();
-			return DataUtils.getDate(cur.getLong(5), "dd-MM-yyyy hh:mm:ss");
+			return DataUtils.getDate(cur.getLong(5), "dd.MM.yyyy HH:mm:ss");
 		} else
 			return "";
 	}
@@ -340,7 +341,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 
 		Cursor cursor;
 		String sortOrder = null;
-		String paramArray[] = null;
+		List<String> paramList = new ArrayList<String>();
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		Map<String, String> projection = new HashMap<String, String>();
 
@@ -357,14 +358,22 @@ public class TaskDBAdapter extends BaseDBAdapter {
 		projection.putAll(TaskStatusDBAdapter.getProjection());
 		queryBuilder.setProjectionMap(projection);
 
+		queryBuilder.appendWhere(getFullName(TABLE_NAME, FIELD_USER_UUID)
+				+ "=?");
+		paramList.add(userUuid);
+
 		if (statusUuid != null) {
-			queryBuilder.appendWhere(FIELD_TASK_STATUS_UUID + "=?");
-			paramArray = new String[] { statusUuid };
+			queryBuilder.appendWhere(" AND "
+					+ getFullName(TABLE_NAME, FIELD_TASK_STATUS_UUID) + "=?");
+			paramList.add(statusUuid);
 		}
 
 		if (orderByField != null) {
 			sortOrder = orderByField;
 		}
+
+		String paramArray[] = new String[paramList.size()];
+		paramArray = paramList.toArray(paramArray);
 
 		cursor = queryBuilder.query(mDb, null, null, paramArray, null, null,
 				sortOrder);

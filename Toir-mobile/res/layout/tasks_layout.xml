@@ -12,26 +12,13 @@
             android:id="@+id/tasks_spinner10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2" />
+            android:layout_weight="1" />
 
         <Spinner
             android:id="@+id/tasks_spinner11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2" />
-
-        <Button
-            android:id="@+id/tasks_button_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/back"
-            android:textSize="14sp"
-            android:visibility="invisible" />               
-        
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout
@@ -46,7 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>
-
     </LinearLayout>
 
 </RelativeLayout>

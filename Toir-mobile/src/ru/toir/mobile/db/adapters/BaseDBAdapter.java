@@ -102,7 +102,7 @@ public class BaseDBAdapter {
 	 * @param field
 	 * @return
 	 */
-	protected static String getFullName(String table, String field) {
+	public static String getFullName(String table, String field) {
 		return new StringBuilder().append(table).append('.').append(field)
 				.toString();
 	}

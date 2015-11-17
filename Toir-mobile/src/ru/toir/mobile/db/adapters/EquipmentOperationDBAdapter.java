@@ -391,15 +391,11 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 			String operationTypeUuid, String criticalTypeUuid) {
 
 		Cursor cursor;
-		String sortOrder = null;
-		List<String> paramArray = new ArrayList<String>();
+		List<String> paramList = new ArrayList<String>();
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		Map<String, String> projection = new HashMap<String, String>();
 
 		projection.putAll(mProjection);
-
-		queryBuilder.appendWhere(FIELD_TASK_UUID + "=?");
-		paramArray.add(taskUuid);
 
 		String table;
 		StringBuilder tables = new StringBuilder();
@@ -455,18 +451,33 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		queryBuilder.setTables(tables.toString());
 		queryBuilder.setProjectionMap(projection);
 
+		queryBuilder.appendWhere(getFullName(TABLE_NAME, FIELD_TASK_UUID)
+				+ "=?");
+		paramList.add(taskUuid);
+
 		if (operationTypeUuid != null) {
-			queryBuilder.appendWhere(FIELD_OPERATION_TYPE_UUID + "=?");
-			paramArray.add(operationTypeUuid);
+			queryBuilder
+					.appendWhere(" AND "
+							+ getFullName(TABLE_NAME, FIELD_OPERATION_TYPE_UUID)
+							+ "=?");
+			paramList.add(operationTypeUuid);
 		}
 
 		if (criticalTypeUuid != null) {
-			sortOrder = criticalTypeUuid;
+			queryBuilder
+					.appendWhere(" AND "
+							+ getFullName(EquipmentDBAdapter.TABLE_NAME,
+									EquipmentDBAdapter.FIELD_CRITICAL_TYPE_UUID)
+							+ "=?");
+			paramList.add(criticalTypeUuid);
 		}
 
-		String[] pa = new String[paramArray.size()];
-		pa = paramArray.toArray(pa);
-		cursor = queryBuilder.query(mDb, null, null, pa, null, null, sortOrder);
+		String[] paramArray = new String[paramList.size()];
+		paramArray = paramList.toArray(paramArray);
+
+		cursor = queryBuilder.query(mDb, null, null, paramArray, null, null,
+				null);
+
 		return cursor;
 	}
 

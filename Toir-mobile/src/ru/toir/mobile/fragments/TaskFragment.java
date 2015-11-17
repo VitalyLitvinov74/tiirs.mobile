@@ -8,6 +8,7 @@ import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.SortField;
+import ru.toir.mobile.db.adapters.BaseDBAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
@@ -70,12 +71,13 @@ import android.widget.Button;
 public class TaskFragment extends Fragment {
 
 	private String TAG = "TaskFragment";
+
 	private int Level = 0;
 	private String currentTaskUuid = "";
-	private Spinner Spinner_references;
-	private Spinner Spinner_type;
-	private ListView lv;
-	private Button button;
+
+	private Spinner referenceSpinner;
+	private Spinner typeSpinner;
+	private ListView mainListView;
 
 	private SimpleCursorAdapter operationAdapter;
 	private ListviewClickListener clickListener = new ListviewClickListener();
@@ -194,24 +196,18 @@ public class TaskFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
 		View rootView = inflater.inflate(R.layout.tasks_layout, container,
 				false);
 
-		lv = (ListView) rootView.findViewById(R.id.tasks_listView);
+		mainListView = (ListView) rootView.findViewById(R.id.tasks_listView);
 
-		button = (Button) rootView.findViewById(R.id.tasks_button_back);
-		button.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				initView();
-			}
-		});
-
-		Spinner_references = (Spinner) rootView
+		referenceSpinner = (Spinner) rootView
 				.findViewById(R.id.tasks_spinner10);
-		Spinner_references.setOnItemSelectedListener(referenceSpinnerListener);
+		referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
 
-		Spinner_type = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
-		Spinner_type.setOnItemSelectedListener(referenceSpinnerListener);
+		typeSpinner = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
+		typeSpinner.setOnItemSelectedListener(referenceSpinnerListener);
 
 		setHasOptionsMenu(true);
 		rootView.setFocusableInTouchMode(true);
@@ -375,10 +371,10 @@ public class TaskFragment extends Fragment {
 				new ArrayList<SortField>());
 
 		// так как обработчики пока одни на всё, ставим их один раз
-		lv.setOnItemClickListener(clickListener);
-		lv.setOnItemLongClickListener(longClickListener);
+		mainListView.setOnItemClickListener(clickListener);
+		mainListView.setOnItemLongClickListener(longClickListener);
 
-		lv.setLongClickable(true);
+		mainListView.setLongClickable(true);
 
 		initView();
 
@@ -405,19 +401,23 @@ public class TaskFragment extends Fragment {
 		taskStatusList.add(0, allStatus);
 		taskStatusAdapter.clear();
 		taskStatusAdapter.addAll(taskStatusList);
-		Spinner_references.setAdapter(taskStatusAdapter);
+		referenceSpinner.setAdapter(taskStatusAdapter);
 
 		sortFieldAdapter.clear();
 		sortFieldAdapter.add(new SortField("Сортировка", null));
-		sortFieldAdapter.add(new SortField("По дате создания",
-				TaskDBAdapter.FIELD_CREATED_AT));
-		sortFieldAdapter.add(new SortField("По дате получения",
-				TaskDBAdapter.FIELD_CLOSE_DATE));
-		sortFieldAdapter.add(new SortField("По дате изменения",
-				TaskDBAdapter.FIELD_CHANGED_AT));
-		sortFieldAdapter.add(new SortField("По статусу отправки",
-				TaskDBAdapter.FIELD_UPDATED));
-		Spinner_type.setAdapter(sortFieldAdapter);
+		sortFieldAdapter.add(new SortField("По дате создания", BaseDBAdapter
+				.getFullName(TaskDBAdapter.TABLE_NAME,
+						TaskDBAdapter.FIELD_CREATED_AT)));
+		sortFieldAdapter.add(new SortField("По дате получения", BaseDBAdapter
+				.getFullName(TaskDBAdapter.TABLE_NAME,
+						TaskDBAdapter.FIELD_CLOSE_DATE)));
+		sortFieldAdapter.add(new SortField("По дате изменения", BaseDBAdapter
+				.getFullName(TaskDBAdapter.TABLE_NAME,
+						TaskDBAdapter.FIELD_CHANGED_AT)));
+		sortFieldAdapter.add(new SortField("По статусу отправки", BaseDBAdapter
+				.getFullName(TaskDBAdapter.TABLE_NAME,
+						TaskDBAdapter.FIELD_UPDATED)));
+		typeSpinner.setAdapter(sortFieldAdapter);
 
 	}
 
@@ -439,34 +439,7 @@ public class TaskFragment extends Fragment {
 			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
 					user.getUuid(), taskStatus, orderByField));
 
-			// Integer cnt = 0;
-			// List<HashMap<String, String>> aList = new
-			// ArrayList<HashMap<String, String>>();
-			// while (cnt < ordersList.size()) {
-			// HashMap<String, String> hm = new HashMap<String, String>();
-			// hm.put("name",
-			// "Создан: "
-			// + DataUtils.getDate(ordersList.get(cnt)
-			// .getCreate_date(), "dd-MM-yyyy hh:mm")
-			// + " | Изменен: "
-			// + DataUtils.getDate(ordersList.get(cnt)
-			// .getModify_date(), "dd-MM-yyyy hh:mm"));
-			// hm.put("descr",
-			// "Статус: "
-			// + taskStatusDBAdapter.getNameByUUID(ordersList
-			// .get(cnt).getTask_status_uuid())
-			// + " | Отправлялся: "
-			// + DataUtils.getDate(ordersList.get(cnt)
-			// .getAttempt_send_date(),
-			// "dd-MM-yyyy hh:mm") + " [Count="
-			// + ordersList.get(cnt).getAttempt_count() + "]");
-			// aList.add(hm);
-			// cnt++;
-			// }
-
-			// Setting the adapter to the listView
-			lv.setAdapter(taskAdapter);
-			button.setVisibility(View.INVISIBLE);
+			mainListView.setAdapter(taskAdapter);
 		}
 	}
 
@@ -487,14 +460,14 @@ public class TaskFragment extends Fragment {
 		operationTypeList.add(0, allOperation);
 		operationTypeAdapter.clear();
 		operationTypeAdapter.addAll(operationTypeList);
-		Spinner_references.setAdapter(operationTypeAdapter);
+		referenceSpinner.setAdapter(operationTypeAdapter);
 
 		CriticalType allCriticalType = new CriticalType();
 		allCriticalType.setUuid(null);
 		criticalTypeList.add(0, allCriticalType);
 		criticalTypeAdapter.clear();
 		criticalTypeAdapter.addAll(criticalTypeList);
-		Spinner_type.setAdapter(criticalTypeAdapter);
+		typeSpinner.setAdapter(criticalTypeAdapter);
 
 	}
 
@@ -577,9 +550,9 @@ public class TaskFragment extends Fragment {
 								status.getUuid());
 
 						// текущие значения фильтров
-						OperationType operationType = (OperationType) Spinner_references
+						OperationType operationType = (OperationType) referenceSpinner
 								.getSelectedItem();
-						CriticalType criticalType = (CriticalType) Spinner_type
+						CriticalType criticalType = (CriticalType) typeSpinner
 								.getSelectedItem();
 						// обновляем содержимое курсора
 						changeCursorOperations(taskUuid,
@@ -700,20 +673,20 @@ public class TaskFragment extends Fragment {
 
 			Log.d("test", "reference spinner onItemSelected");
 			if (Level == 0) {
-				String taskStatusUuid = ((TaskStatus) Spinner_references
+				String taskStatusUuid = ((TaskStatus) referenceSpinner
 						.getSelectedItem()).getUuid();
 
-				String orderByField = ((SortField) Spinner_type
+				String orderByField = ((SortField) typeSpinner
 						.getSelectedItem()).getField();
 
 				FillListViewTasks(taskStatusUuid, orderByField);
 			}
 
 			if (Level == 1) {
-				String operationTypeUuid = ((OperationType) Spinner_references
+				String operationTypeUuid = ((OperationType) referenceSpinner
 						.getSelectedItem()).getUuid();
 
-				String criticalTypeUuid = ((CriticalType) Spinner_type
+				String criticalTypeUuid = ((CriticalType) typeSpinner
 						.getSelectedItem()).getUuid();
 
 				FillListViewEquipment(currentTaskUuid, operationTypeUuid,
@@ -729,10 +702,7 @@ public class TaskFragment extends Fragment {
 		changeCursorOperations(task_uuid, operation_type_uuid,
 				critical_type_uuid);
 
-		// Setting the adapter to the listView
-		lv.setAdapter(operationAdapter);
-
-		button.setVisibility(View.VISIBLE);
+		mainListView.setAdapter(operationAdapter);
 
 	}
 
@@ -955,9 +925,9 @@ public class TaskFragment extends Fragment {
 		// операции, обновить отображение обновившехся данных
 		// текущие значения фильтров
 		if (Level == 1) {
-			OperationType operationType = (OperationType) Spinner_references
+			OperationType operationType = (OperationType) referenceSpinner
 					.getSelectedItem();
-			CriticalType criticalType = (CriticalType) Spinner_type
+			CriticalType criticalType = (CriticalType) typeSpinner
 					.getSelectedItem();
 			changeCursorOperations(currentTaskUuid, operationType.getUuid(),
 					criticalType.getUuid());
@@ -967,8 +937,10 @@ public class TaskFragment extends Fragment {
 
 	private void changeCursorOperations(String taskUuid,
 			String operationTypeUuid, String criticalTypeUuid) {
+
 		EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
 				new ToirDatabaseContext(getActivity()));
+
 		// обновляем содержимое курсора
 		operationAdapter.changeCursor(dbAdapter.getOperationWithInfo(taskUuid,
 				operationTypeUuid, criticalTypeUuid));
