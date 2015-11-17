@@ -17,22 +17,31 @@ public class MeasureTypeDBAdapter extends BaseDBAdapter {
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
 		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
-		
+		public static final String CREATED_AT = TABLE_NAME + '_'
+				+ FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_'
+				+ FIELD_CHANGED_AT;
+
 		public static final String TITLE = TABLE_NAME + '_' + FIELD_TITLE;
 	}
-	
+
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID)
+				+ " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID)
+				+ " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT,
+				getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS "
+						+ Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT,
+				getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS "
+						+ Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE)
+				+ " AS " + Projection.TITLE);
 	}
-	
+
 	public class Type {
 		public static final String NONE = "e9ade49a-3c31-42f8-a751-aaeb890c2190";
 		public static final String FREQUENCY = "481c2e40-421e-41ab-8bc1-5fb0d01a4cc3";
@@ -66,7 +75,7 @@ public class MeasureTypeDBAdapter extends BaseDBAdapter {
 
 	public MeasureType getItem(Cursor cursor) {
 		MeasureType item = new MeasureType();
-		
+
 		getItem(cursor, item);
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		return item;
@@ -86,7 +95,9 @@ public class MeasureTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * <p>
+	 * Добавляет/изменяет запись в таблице
+	 * </p>
 	 * 
 	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись

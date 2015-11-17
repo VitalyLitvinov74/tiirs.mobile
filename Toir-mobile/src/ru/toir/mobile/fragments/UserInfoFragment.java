@@ -34,10 +34,11 @@ public class UserInfoFragment extends Fragment {
 	private TextView tv_user_gps;
 	private TextView tv_user_status;
 	private ImageView user_image;
-	
+
 	private TextView tv_user_date;
 	private TextView tv_user_tasks;
 	private TextView tv_user_boss;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -79,14 +80,15 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			if (user.getTag_id().length()>20)
+			if (user.getTag_id().length() > 20)
 				tv_user_id.setText("ID: " + user.getTag_id().substring(0, 20));
-			else tv_user_id.setText("ID: " + user.getTag_id());
+			else
+				tv_user_id.setText("ID: " + user.getTag_id());
 			tv_user_name.setText("ФИО: " + user.getName());
 			tv_user_date.setText("11.10.2015 10:54");
 			tv_user_tasks.setText("2/2");
 			tv_user_boss.setText("+79227000286");
-			
+
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			tv_user_status.setText("Статус: задание");
 			GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
@@ -95,23 +97,37 @@ public class UserInfoFragment extends Fragment {
 			// Toast.makeText(getActivity(), user.getUuid(),
 			// Toast.LENGTH_SHORT).show();
 			if (gpstrack != null) {
-				tv_user_gps.setText(Float.parseFloat(gpstrack.getLatitude()) + " / "
-						+ Float.parseFloat(gpstrack.getLongitude()));
+				tv_user_gps.setText(Float.parseFloat(gpstrack.getLatitude())
+						+ " / " + Float.parseFloat(gpstrack.getLongitude()));
 			}
-			
-			if (AuthorizedUser.getInstance().getTagId().equals("3000E2004000860902332580112D")) {
+
+			if (AuthorizedUser.getInstance().getTagId()
+					.equals("3000E2004000860902332580112D")) {
 				// ваще хардкодед для демонстрашки
 				// TODO реальные фотки должны адресоваться из базы
-				File imgFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getActivity().getApplicationContext().getPackageName() + File.separator + "img" + File.separator+ "m_kazantcev.jpg");						
-					 if(imgFile.exists() && imgFile.isFile()){
-						 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-						 user_image.setImageBitmap(myBitmap);			    			    
-					 }			
+				File imgFile = new File(Environment
+						.getExternalStorageDirectory().getAbsolutePath()
+						+ File.separator
+						+ "Android"
+						+ File.separator
+						+ "data"
+						+ File.separator
+						+ getActivity().getApplicationContext()
+								.getPackageName()
+						+ File.separator
+						+ "img"
+						+ File.separator + "m_kazantcev.jpg");
+				if (imgFile.exists() && imgFile.isFile()) {
+					Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
+							.getAbsolutePath());
+					user_image.setImageBitmap(myBitmap);
 				}
+			}
 		}
 	}
 
 	private void FillListViewTasks(View view) {
+
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 				getActivity().getApplicationContext()));
@@ -121,52 +137,57 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			TaskDBAdapter dbOrder = new TaskDBAdapter(new ToirDatabaseContext(
+			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new ToirDatabaseContext(
 					getActivity().getApplicationContext()));
-			//ArrayList<Task> ordersList = dbOrder.getOrdersByUser(user.getUuid(), "", "");
-			ArrayList<Task> ordersList = dbOrder.getOrders();
+			ArrayList<Task> taskList = taskDBAdapter.getOrders();
 			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 					new ToirDatabaseContext(getActivity()
 							.getApplicationContext()));
 
-			Integer cnt = 0;
-			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+			List<HashMap<String, String>> elementList = new ArrayList<HashMap<String, String>>();
 			String[] from = { "name", "img" };
 			int[] to = { R.id.lv1_firstLine, R.id.lv1_icon };
-			while (cnt < ordersList.size()) {
-				HashMap<String, String> hm = new HashMap<String, String>();
-				hm.put("name",
-						"["
-								+ DataUtils.getDate(ordersList.get(cnt)
-										.getCreatedAt(), "dd-MM-yyyy hh:mm")
-								+ "] Статус: "
-								+ taskStatusDBAdapter.getNameByUUID(ordersList
-										.get(cnt).getTask_status_uuid()));
-				// default
+			String taskStatusUuid;
+			HashMap<String, String> element;
 
-				hm.put("img", Integer.toString(R.drawable.checkmark_32));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED))
-					hm.put("img", Integer.toString(R.drawable.forbidden_32));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED))
-					hm.put("img", Integer.toString(R.drawable.checkmark_32));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED))
-					hm.put("img", Integer.toString(R.drawable.information_32));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED))
-					hm.put("img", Integer.toString(R.drawable.help_32));
-				if (ordersList.get(cnt).getTask_status_uuid()
-						.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED))
-					hm.put("img", Integer.toString(R.drawable.help_32));
-				aList.add(hm);
-				cnt++;
+			for (Task item : taskList) {
+				element = new HashMap<String, String>();
+				element.put("name",
+						"["
+								+ DataUtils.getDate(item.getCreatedAt(),
+										"dd-MM-yyyy HH:mm")
+								+ "] Статус: "
+								+ taskStatusDBAdapter.getNameByUUID(item
+										.getTask_status_uuid()));
+				// default
+				element.put("img", Integer.toString(R.drawable.checkmark_32));
+
+				taskStatusUuid = item.getTask_status_uuid();
+
+				if (taskStatusUuid
+						.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
+					element.put("img", Integer.toString(R.drawable.forbidden_32));
+				}
+
+				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.COMPLETE)) {
+					element.put("img", Integer.toString(R.drawable.checkmark_32));
+				}
+
+				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.IN_WORK)) {
+					element.put("img", Integer.toString(R.drawable.information_32));
+				}
+
+				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.NEW)) {
+					element.put("img", Integer.toString(R.drawable.help_32));
+				}
+
+				elementList.add(element);
 			}
+
 			SimpleAdapter adapter = new SimpleAdapter(getActivity()
-					.getApplicationContext(), aList, R.layout.listview1row,
+					.getApplicationContext(), elementList, R.layout.listview1row,
 					from, to);
-			// Setting the adapter to the listView
+
 			ListView lv;
 			lv = (ListView) view.findViewById(R.id.user_listView_main);
 			lv.setAdapter(adapter);

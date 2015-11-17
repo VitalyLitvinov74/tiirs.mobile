@@ -13,35 +13,46 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	public static final String TABLE_NAME = "operation_status";
 
 	public static final String FIELD_TITLE = "title";
-	
+
 	public static final class Projection {
 		public static final String _ID = "_id";
 		public static final String UUID = TABLE_NAME + '_' + "uuid";
 		public static final String CREATED_AT = TABLE_NAME + '_' + "CreatedAt";
 		public static final String CHANGED_AT = TABLE_NAME + '_' + "ChangedAt";
-		
+
 		public static final String TITLE = TABLE_NAME + '_' + "title";
 	}
-	
+
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID)
+				+ " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID)
+				+ " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT,
+				getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS "
+						+ Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT,
+				getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS "
+						+ Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE)
+				+ " AS " + Projection.TITLE);
 	}
-	
+
 	/**
 	 * Класс констант статуса операции
+	 * 
 	 * @author Dmitriy Logachov
-	 *
+	 * 
 	 */
 	public class Status {
 		public static final String NEW = "18d3d5d4-336f-4b25-ba2b-00a6c7d5eb6c";
 		public static final String COMPLETE = "626fc9e9-9f1f-4de7-937d-74dad54ed751";
-		public static final String NOTCOMPLETE = "0f733a22-b65a-4d96-af86-34f7e6a62b0b";
+		public static final String UNCOMPLETE = "0f733a22-b65a-4d96-af86-34f7e6a62b0b";
+		public static final String IN_WORK = "78063cca-4463-45ad-9124-88cea2b51017";
+		public static final String EQUIPMENT_NOT_EXIST = "1a277eb1-1a22-400f-9e03-f094e19feede";
+		public static final String NO_ACCESS_TO_EQUIPMENT = "fd97214c-867f-44d1-99aa-25108d045b0b";
 	}
 
 	/**
@@ -74,7 +85,7 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	 */
 	public OperationStatus getItem(Cursor cursor) {
 		OperationStatus item = new OperationStatus();
-		
+
 		getItem(cursor, item);
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		return item;
@@ -121,14 +132,16 @@ public class OperationStatusDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * <p>
+	 * Добавляет/изменяет запись в таблице
+	 * </p>
 	 * 
 	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
 	 */
 	public long replace(OperationStatus item) {
 		long id;
-		
+
 		ContentValues values = putCommonFields(item);
 		values.put(FIELD_TITLE, item.getTitle());
 		id = mDb.replace(TABLE_NAME, null, values);

@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -73,6 +72,9 @@ import android.widget.Toast;
  * 
  */
 public class OperationActivity extends Activity {
+
+	private static final String TAG = "OperationActivity";
+
 	public static final String OPERATION_UUID_EXTRA = "operation_uuid";
 	public static final String TASK_UUID_EXTRA = "task_uuid";
 	public static final String EQUIPMENT_UUID_EXTRA = "equipment_uuid";
@@ -238,32 +240,6 @@ public class OperationActivity extends Activity {
 			operationResult.setStart_date(new Date().getTime());
 			equipmentOperationResultDBAdapter.replace(operationResult);
 		}
-
-		/*
-		 * // инициализируем драйвер для работы с метками // получаем текущий
-		 * драйвер считывателя SharedPreferences sp =
-		 * PreferenceManager.getDefaultSharedPreferences
-		 * (getApplicationContext()); driverClassName =
-		 * sp.getString(getString(R.string.RFIDDriver), "RFIDDriverNull");
-		 * 
-		 * // пытаемся получить класс драйвера try { driverClass =
-		 * Class.forName("ru.toir.mobile.rfid.driver." + driverClassName);
-		 * }catch(ClassNotFoundException e){
-		 * setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND); finish(); }
-		 * 
-		 * // пытаемся создать объект драйвера try{ driver =
-		 * (RFIDDriver)driverClass.newInstance(); }catch(InstantiationException
-		 * e){ setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND); e.printStackTrace();
-		 * finish(); }catch(IllegalAccessException e){
-		 * setResult(RFID.RESULT_RFID_CLASS_NOT_FOUND); e.printStackTrace();
-		 * finish(); }
-		 * 
-		 * rfid = new RFID(driver); rfid.setActivity(this);
-		 * 
-		 * // инициализируем драйвер if
-		 * (!rfid.init((byte)RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID)) {
-		 * setResult(RFID.RESULT_RFID_INIT_ERROR); finish(); }
-		 */
 
 		showStep(getFirstStep().getUuid());
 	}
@@ -453,9 +429,10 @@ public class OperationActivity extends Activity {
 			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 			RelativeLayout cameraLayout = new RelativeLayout(
 					getApplicationContext());
-			
+
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-					photoContainer.getWidth(), (int)(photoContainer.getWidth() * 0.75));
+					photoContainer.getWidth(),
+					(int) (photoContainer.getWidth() * 0.75));
 			cameraLayout.setLayoutParams(params);
 			cameraLayout.addView(cameraView);
 			photoContainer.addView(cameraLayout);
@@ -544,7 +521,7 @@ public class OperationActivity extends Activity {
 						.findViewWithTag("result");
 				OperationResult result = (OperationResult) spinner
 						.getSelectedItem();
-				Log.d("test", result.getTitle());
+				Log.d(TAG, result.getTitle());
 				EquipmentOperationResult operationResult = null;
 				EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
 						new ToirDatabaseContext(getApplicationContext()));
@@ -572,14 +549,16 @@ public class OperationActivity extends Activity {
 
 				// обновляем информацию об операции в метке устройства
 				// читаем > обновляем > записываем
-				/*
-				 * if (EquipmentTagStructure.getInstance().get_equipment_uuid()
-				 * == null) { setContentView(R.layout.rfid_read);
-				 * setRequestedOrientation
-				 * (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-				 * rfid.read((byte)RFIDDriverC5
-				 * .READ_EQUIPMENT_OPERATION_LABLE_ID); }
-				 */
+				// if (EquipmentTagStructure.getInstance().get_equipment_uuid()
+				// == null) {
+				// setContentView(R.layout.rfid_read);
+				// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+				// rfid.read((byte)
+				// RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
+				// }
+				
+				// проверяем всё ли операции выполненны в наряде, если да, закрываем наряд
+
 				finish();
 			}
 		});
@@ -728,8 +707,8 @@ public class OperationActivity extends Activity {
 			}
 		}
 
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-				Locale.ENGLISH).format(new Date());
+		// String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+		// Locale.ENGLISH).format(new Date());
 		String fileName;
 		// оригинальное имя файла
 		// fileName = "IMG_" + timeStamp + ".jpg";

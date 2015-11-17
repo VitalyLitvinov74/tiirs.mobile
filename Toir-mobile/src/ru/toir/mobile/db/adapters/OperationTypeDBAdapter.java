@@ -13,24 +13,33 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 	public static final String TABLE_NAME = "operation_type";
 
 	public static final String FIELD_TITLE = "title";
-	
+
 	public static final class Projection {
 		public static final String _ID = FIELD__ID;
 		public static final String UUID = TABLE_NAME + '_' + FIELD_UUID;
-		public static final String CREATED_AT = TABLE_NAME + '_' + FIELD_CREATED_AT;
-		public static final String CHANGED_AT = TABLE_NAME + '_' + FIELD_CHANGED_AT;
-		
+		public static final String CREATED_AT = TABLE_NAME + '_'
+				+ FIELD_CREATED_AT;
+		public static final String CHANGED_AT = TABLE_NAME + '_'
+				+ FIELD_CHANGED_AT;
+
 		public static final String TITLE = TABLE_NAME + '_' + "title";
 	}
-	
+
 	private static final Map<String, String> mProjection = new HashMap<String, String>();
 	static {
-		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID) + " AS " + Projection._ID);
-		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID) + " AS " + Projection.UUID);
-		mProjection.put(Projection.CREATED_AT, getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS " + Projection.CREATED_AT);
-		mProjection.put(Projection.CHANGED_AT, getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS " + Projection.CHANGED_AT);
+		mProjection.put(Projection._ID, getFullName(TABLE_NAME, FIELD__ID)
+				+ " AS " + Projection._ID);
+		mProjection.put(Projection.UUID, getFullName(TABLE_NAME, FIELD_UUID)
+				+ " AS " + Projection.UUID);
+		mProjection.put(Projection.CREATED_AT,
+				getFullName(TABLE_NAME, FIELD_CREATED_AT) + " AS "
+						+ Projection.CREATED_AT);
+		mProjection.put(Projection.CHANGED_AT,
+				getFullName(TABLE_NAME, FIELD_CHANGED_AT) + " AS "
+						+ Projection.CHANGED_AT);
 
-		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE) + " AS " + Projection.TITLE);
+		mProjection.put(Projection.TITLE, getFullName(TABLE_NAME, FIELD_TITLE)
+				+ " AS " + Projection.TITLE);
 	}
 
 	/**
@@ -58,7 +67,7 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 
 	public OperationType getItem(Cursor cursor) {
 		OperationType item = new OperationType();
-		
+
 		getItem(cursor, item);
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		return item;
@@ -102,7 +111,9 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 	}
 
 	/**
-	 * <p>Добавляет/изменяет запись в таблице</p>
+	 * <p>
+	 * Добавляет/изменяет запись в таблице
+	 * </p>
 	 * 
 	 * @param item
 	 * @return long id столбца или -1 если не удалось добавить запись
@@ -110,7 +121,7 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 	public long replace(OperationType item) {
 		long id;
 		ContentValues values = putCommonFields(item);
-		
+
 		values.put(FIELD_TITLE, item.getTitle());
 		id = mDb.replace(TABLE_NAME, null, values);
 		return id;
@@ -136,8 +147,7 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 
 	/**
 	 * <p>
-	 * Временная функция
-	 * Возвращает название типа обслуживания по части uuid
+	 * Временная функция Возвращает название типа обслуживания по части uuid
 	 * </p>
 	 * 
 	 * @param uuid
@@ -145,7 +155,7 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 	public String getOperationTypeByPartOfUUID(String uuid) {
 		Cursor cursor;
 		cursor = mDb.query(TABLE_NAME, mColumns, FIELD_UUID + " LIKE ?",
-				new String[] { "%"+uuid+"%"}, null, null, null);
+				new String[] { "%" + uuid + "%" }, null, null, null);
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex(FIELD_TITLE));
@@ -163,7 +173,7 @@ public class OperationTypeDBAdapter extends BaseDBAdapter {
 
 		return true;
 	}
-	
+
 	/**
 	 * @return the mProjection
 	 */

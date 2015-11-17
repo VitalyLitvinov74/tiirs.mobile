@@ -332,28 +332,23 @@ public class TaskFragment extends Fragment {
 					String taskStatus = cursor.getString(columnIndex);
 
 					if (taskStatus
-							.equals(TaskStatusDBAdapter.STATUS_UUID_UNCOMPLETED)) {
+							.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
 						image_id = R.drawable.img_status_3;
 					}
 
 					if (taskStatus
-							.equals(TaskStatusDBAdapter.STATUS_UUID_COMPLETED)) {
+							.equals(TaskStatusDBAdapter.Status.COMPLETE)) {
 						image_id = R.drawable.img_status_1;
 					}
 
 					if (taskStatus
-							.equals(TaskStatusDBAdapter.STATUS_UUID_RECIEVED)) {
+							.equals(TaskStatusDBAdapter.Status.IN_WORK)) {
 						image_id = R.drawable.img_status_5;
 					}
 
 					if (taskStatus
-							.equals(TaskStatusDBAdapter.STATUS_UUID_CREATED)) {
+							.equals(TaskStatusDBAdapter.Status.NEW)) {
 						image_id = R.drawable.img_status_4;
-					}
-
-					if (taskStatus
-							.equals(TaskStatusDBAdapter.STATUS_UUID_ARCHIVED)) {
-						image_id = R.drawable.img_status_2;
 					}
 
 					((ImageView) view).setImageResource(image_id);
