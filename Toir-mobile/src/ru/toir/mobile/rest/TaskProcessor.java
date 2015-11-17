@@ -125,6 +125,17 @@ public class TaskProcessor {
 			result.putAll(taskResult);
 		}
 
+		// получаем статусы нарядов
+		Bundle taskStatusResult = getTaskStatuses();
+		success = taskStatusResult.getBoolean(IServiceProvider.RESULT);
+		if (!success) {
+			db.endTransaction();
+			return taskStatusResult;
+		} else {
+			// добавляем в результат все элементы ответа
+			result.putAll(taskStatusResult);
+		}
+
 		// получаем шаблоны
 		ArrayList<String> operationPatternUuids = new ArrayList<String>(
 				patternUuids);
@@ -387,6 +398,26 @@ public class TaskProcessor {
 					ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID,
 					uuids);
 			return processor.getMeasureValueFile(bundle);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Bundle result = new Bundle();
+			result.putBoolean(IServiceProvider.RESULT, false);
+			result.putString(IServiceProvider.MESSAGE, e.getMessage());
+			return result;
+		}
+	}
+
+	/**
+	 * Получаем статусы нарядов
+	 * 
+	 * @return
+	 */
+	private Bundle getTaskStatuses() {
+
+		try {
+			ReferenceProcessor processor = new ReferenceProcessor(mContext);
+			Bundle bundle = new Bundle();
+			return processor.getTaskStatus(bundle);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();

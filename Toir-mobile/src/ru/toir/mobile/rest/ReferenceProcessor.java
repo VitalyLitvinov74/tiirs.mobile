@@ -1088,13 +1088,20 @@ public class ReferenceProcessor {
 					.append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
 		}
 
+		SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
+				.getWritableDatabase();
+		boolean inParrentTransaction;
+		inParrentTransaction = db.inTransaction();
+
+		// если транзакция не открыта раньше, открываем её
+		if (!inParrentTransaction) {
+			db.beginTransaction();
+		}
+		
 		jsonString = getReferenceData(url.toString());
 		if (jsonString != null) {
 			Gson gson = new GsonBuilder().setDateFormat(dateFormat).create();
 			// разбираем и сохраняем полученные данные
-			SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-					.getWritableDatabase();
-			db.beginTransaction();
 			ArrayList<TaskStatusSrv> list = gson.fromJson(jsonString,
 					new TypeToken<ArrayList<TaskStatusSrv>>() {
 						private static final long serialVersionUID = 1l;
@@ -1102,18 +1109,31 @@ public class ReferenceProcessor {
 
 			result = saveTaskStatus(list);
 			boolean success = result.getBoolean(IServiceProvider.RESULT);
-			if (success) {
-				db.setTransactionSuccessful();
+			if (!success) {
+				if (!inParrentTransaction) {
+					db.endTransaction();
+				}
+				return result;
 			}
-			db.endTransaction();
-			return result;
 		} else {
+			if (!inParrentTransaction) {
+				db.endTransaction();
+			}
 			result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
 					"Ошибка получения данных справочника.");
 			return result;
 		}
+		
+		if (!inParrentTransaction) {
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		}
+
+		result = new Bundle();
+		result.putBoolean(IServiceProvider.RESULT, true);
+		return result;
 	}
 
 	/**
