@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -580,6 +581,7 @@ public class OperationActivity extends Activity {
 					Task task = taskDBAdapter.getItem(taskUuid);
 					task.setTask_status_uuid(TaskStatusDBAdapter.Status.COMPLETE);
 					task.setUpdated(true);
+					task.setClose_date(Calendar.getInstance().getTimeInMillis());
 					taskDBAdapter.update(task);
 				}
 
