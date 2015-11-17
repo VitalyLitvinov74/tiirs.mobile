@@ -30,6 +30,8 @@ import android.widget.TextView;
 
 public class EquipmentsFragment extends Fragment {
 
+	private boolean isInit;
+
 	private Spinner sortSpinner;
 	private Spinner typeSpinner;
 	private ListView equipmentListView;
@@ -124,8 +126,12 @@ public class EquipmentsFragment extends Fragment {
 
 		equipmentListView.setOnItemClickListener(new ListviewClickListener());
 
+		initView();
+
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
+
+		isInit = true;
 
 		return rootView;
 	}
@@ -232,7 +238,7 @@ public class EquipmentsFragment extends Fragment {
 	public void setUserVisibleHint(boolean isVisibleToUser) {
 
 		super.setUserVisibleHint(isVisibleToUser);
-		if (isVisibleToUser) {
+		if (isVisibleToUser && isInit) {
 			initView();
 		}
 	}
