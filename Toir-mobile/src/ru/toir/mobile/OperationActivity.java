@@ -609,10 +609,10 @@ public class OperationActivity extends Activity {
 		// удаляем из списка статус "Новая", "Отменена"
 		while (iterator.hasNext()) {
 			OperationStatus item = iterator.next();
-			if (item.getUuid().equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+			if (item.getUuid().equals(OperationStatusDBAdapter.Status.NEW)) {
 				iterator.remove();
 			} else if (item.getUuid().equals(
-					OperationStatus.Extras.STATUS_UUID_CANCELED)) {
+					OperationStatusDBAdapter.Status.UNCOMPLETE)) {
 				iterator.remove();
 			}
 		}

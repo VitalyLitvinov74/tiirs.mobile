@@ -336,18 +336,15 @@ public class TaskFragment extends Fragment {
 						image_id = R.drawable.img_status_3;
 					}
 
-					if (taskStatus
-							.equals(TaskStatusDBAdapter.Status.COMPLETE)) {
+					if (taskStatus.equals(TaskStatusDBAdapter.Status.COMPLETE)) {
 						image_id = R.drawable.img_status_1;
 					}
 
-					if (taskStatus
-							.equals(TaskStatusDBAdapter.Status.IN_WORK)) {
+					if (taskStatus.equals(TaskStatusDBAdapter.Status.IN_WORK)) {
 						image_id = R.drawable.img_status_5;
 					}
 
-					if (taskStatus
-							.equals(TaskStatusDBAdapter.Status.NEW)) {
+					if (taskStatus.equals(TaskStatusDBAdapter.Status.NEW)) {
 						image_id = R.drawable.img_status_4;
 					}
 
@@ -552,7 +549,7 @@ public class TaskFragment extends Fragment {
 				// менять произвольно статус операции позволяем только если
 				// статус операции "Новая"
 				if (!operationStatus
-						.equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+						.equals(OperationStatusDBAdapter.Status.NEW)) {
 					Toast.makeText(getActivity(),
 							"Изменить статус операции нельзя!",
 							Toast.LENGTH_SHORT).show();
@@ -612,10 +609,10 @@ public class TaskFragment extends Fragment {
 				while (iterator.hasNext()) {
 					OperationStatus item = iterator.next();
 					if (item.getUuid().equals(
-							OperationStatus.Extras.STATUS_UUID_NEW)) {
+							OperationStatusDBAdapter.Status.NEW)) {
 						iterator.remove();
 					} else if (item.getUuid().equals(
-							OperationStatus.Extras.STATUS_UUID_COMPLETE)) {
+							OperationStatusDBAdapter.Status.COMPLETE)) {
 						iterator.remove();
 					}
 				}
@@ -652,16 +649,16 @@ public class TaskFragment extends Fragment {
 								for (EquipmentOperationRes operation : operations) {
 									if (operation
 											.getOperation_status_uuid()
-											.equals(OperationStatus.Extras.STATUS_UUID_NEW)) {
+											.equals(OperationStatusDBAdapter.Status.NEW)) {
 										complete = false;
 										break;
 									}
 								}
 
 								if (complete) {
-									task.setTask_status_uuid(Task.Extras.STATUS_UUID_COMPLETE);
+									task.setTask_status_uuid(TaskStatusDBAdapter.Status.COMPLETE);
 								} else {
-									task.setTask_status_uuid(Task.Extras.STATUS_UUID_NOT_COMPLETE);
+									task.setTask_status_uuid(TaskStatusDBAdapter.Status.UNCOMPLETE);
 								}
 								TaskDBAdapter adapter = new TaskDBAdapter(
 										new ToirDatabaseContext(getActivity()));

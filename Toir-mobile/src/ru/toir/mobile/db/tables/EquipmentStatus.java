@@ -12,10 +12,6 @@ public class EquipmentStatus extends BaseTable {
 	private String title;
 	private int type;
 
-	public static class Extras {
-		//public static final String STATUS_UUID_UNCERTAINED = "PROVIDER_E";
-	}
-
 	public EquipmentStatus() {
 	}
 	

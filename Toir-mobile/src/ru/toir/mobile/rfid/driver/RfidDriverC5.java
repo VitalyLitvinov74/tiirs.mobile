@@ -22,9 +22,12 @@ import android.view.ViewGroup;
 public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	private static final String TAG = "RfidDriverC5";
+	private int timeOut;
 
 	public RfidDriverC5(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
+		// по умолчанию таймаут на операцию 5 секунд
+		timeOut = 5000;
 	}
 
 	@Override
@@ -44,9 +47,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-
-		// TODO timeOut ????
-		int timeOut = 5000;
 
 		reader.m_handler = new Handler(new Handler.Callback() {
 
@@ -98,9 +98,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-
-		// TODO таймаут нужно задать константой или вынести повыше
-		final int timeOut = 5000; // 5 секунд на всё
 
 		final String lPassword = password;
 		final int lMemoryBank = memoryBank;
@@ -170,9 +167,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
 
-		// TODO таймаут нужно задать константой или вынести повыше
-		final int timeOut = 5000; // 5 секунд на всё
-
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -207,9 +201,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-
-		// TODO timeOut ????
-		final int timeOut = 5000;
 
 		final String lPassword = password;
 		final int lMemoryBank = memoryBank;
@@ -270,9 +261,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-
-		// TODO timeOut ????
-		final int timeOut = 5000; // 5 секунд на всё
 
 		Handler handler = new Handler(new Handler.Callback() {
 

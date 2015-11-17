@@ -26,6 +26,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.api.IMapController;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.tables.*;
@@ -127,10 +128,10 @@ public class GPSFragment extends Fragment {
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
 		mapView.getOverlays().add(aItemizedIconOverlay);
 
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new ToirDatabaseContext(
-				getActivity().getApplicationContext()));
-		ArrayList<Task> taskList = taskDBAdapter.getOrdersByUser(user.getUuid(),
-				Task.Extras.STATUS_UUID_IN_PROCESS, "");
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+				new ToirDatabaseContext(getActivity().getApplicationContext()));
+		ArrayList<Task> taskList = taskDBAdapter.getOrdersByUser(
+				user.getUuid(), TaskStatusDBAdapter.Status.IN_WORK, "");
 
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		String[] equipmentFrom = { "name", "location" };

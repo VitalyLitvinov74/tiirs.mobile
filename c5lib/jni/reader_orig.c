@@ -197,7 +197,7 @@ const unsigned char name719q_3813[11] = "/dev/ttyS4"; // idb
 const unsigned char name980m2_3814[12] = "/dev/ttyMT4"; // idb
 const unsigned char *aDevMsm_io_cm7 = "/dev/msm_io_cm7";
 const unsigned char * const device_pwr = (const unsigned char *) &aDevMsm_io_cm7; // idb
-const unsigned char *aDevScan = "хз что за устройство";
+const unsigned char *aDevScan = "/dev/scan";
 const unsigned char * const device_pwr_388 = (const unsigned char *) &aDevScan; // idb
 int g_port = -1; // дескриптор порта считывателя
 unsigned char messagebuf[50]; // idb
@@ -965,13 +965,11 @@ void Reset() {
 	__android_log_print(ANDROID_LOG_INFO, "ScannerJNI", "reset");
 
 	data = 48;
-	// TODO что за устройство здесь открывается???
-	fd = open(device_pwr, O_RDWR);
+		fd = open(aDevMsm_io_cm7, O_RDWR);
 	fd1 = fd;
 	if (fd1 < 0) {
 		data = 48;
-		// TODO что за устройство здесь открывается???
-		fd2 = open(device_pwr_388, O_RDWR);
+		fd2 = open(aDevScan, O_RDWR);
 		write(fd2, &data, 1);
 		usleep(300000);
 		data = 49;

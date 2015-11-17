@@ -446,8 +446,8 @@ public class TaskProcessor {
 
 		// для новых нарядов выставляем статус "В работе"
 		for (Task item : localTasks) {
-			if (item.getTask_status_uuid().equals(Task.Extras.STATUS_UUID_NEW)) {
-				item.setTask_status_uuid(Task.Extras.STATUS_UUID_IN_PROCESS);
+			if (item.getTask_status_uuid().equals(TaskStatusDBAdapter.Status.NEW)) {
+				item.setTask_status_uuid(TaskStatusDBAdapter.Status.IN_WORK);
 			}
 		}
 
