@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
@@ -84,7 +85,7 @@ public class OperationActivity extends Activity {
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
 	private ArrayList<OperationResult> operationResults;
-	private String task_uuid, operation_uuid, equipment_uuid,
+	private String taskUuid, operation_uuid, equipment_uuid,
 			operation_result_uuid, operation_type_uuid;
 	private String taskname = "";
 	private String taskstatus = "";
@@ -147,7 +148,7 @@ public class OperationActivity extends Activity {
 
 		Bundle b = getIntent().getExtras();
 		operation_uuid = b.getString(OPERATION_UUID_EXTRA);
-		task_uuid = b.getString(TASK_UUID_EXTRA);
+		taskUuid = b.getString(TASK_UUID_EXTRA);
 		equipment_uuid = b.getString(EQUIPMENT_UUID_EXTRA);
 		setContentView(R.layout.taskwork_fragment);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -167,7 +168,7 @@ public class OperationActivity extends Activity {
 		// получаем статус и время наряда
 		TaskDBAdapter dbTask = new TaskDBAdapter(new ToirDatabaseContext(
 				getApplicationContext()));
-		Task task = dbTask.getItem(task_uuid);
+		Task task = dbTask.getItem(taskUuid);
 		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 				new ToirDatabaseContext(getApplicationContext()));
 		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
@@ -185,7 +186,7 @@ public class OperationActivity extends Activity {
 				.getOperation_pattern_uuid());
 
 		// android:id="@+id/twf_task_title"
-		taskname = "Наряд: " + dbTask.getItem(task_uuid).getTask_name();
+		taskname = "Наряд: " + dbTask.getItem(taskUuid).getTask_name();
 		task_title.setText(taskname);
 		// android:id="@+id/twf_task_status"
 		taskstatus = "Статус: "
@@ -556,8 +557,31 @@ public class OperationActivity extends Activity {
 				// rfid.read((byte)
 				// RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
 				// }
-				
-				// проверяем всё ли операции выполненны в наряде, если да, закрываем наряд
+
+				// всё ли операции выполненны?
+				List<EquipmentOperation> operations = operationDBAdapter
+						.getItems(taskUuid);
+				String operationStatus;
+				boolean operationsIsDone = true;
+				for (EquipmentOperation item : operations) {
+					operationStatus = item.getOperation_status_uuid();
+					if (operationStatus
+							.equals(OperationStatusDBAdapter.Status.NEW)
+							|| operationStatus
+									.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
+						operationsIsDone = false;
+					}
+				}
+
+				// все операции выполненны, меняем статус наряда на "Закончен"
+				if (operationsIsDone) {
+					TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+							new ToirDatabaseContext(getApplicationContext()));
+					Task task = taskDBAdapter.getItem(taskUuid);
+					task.setTask_status_uuid(TaskStatusDBAdapter.Status.COMPLETE);
+					task.setUpdated(true);
+					taskDBAdapter.update(task);
+				}
 
 				finish();
 			}
