@@ -80,9 +80,9 @@ public class TaskFragment extends Fragment {
 	private ListView mainListView;
 
 	private SimpleCursorAdapter operationAdapter;
-	private ListviewClickListener clickListener = new ListviewClickListener();
-	private ListViewLongClickListener longClickListener = new ListViewLongClickListener();
-	private ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
+	private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
+	private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
+	private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
 	private ArrayAdapter<OperationType> operationTypeAdapter;
 	private ArrayAdapter<CriticalType> criticalTypeAdapter;
 	private ArrayAdapter<TaskStatus> taskStatusAdapter;
@@ -200,14 +200,14 @@ public class TaskFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.tasks_layout, container,
 				false);
 
-		mainListView = (ListView) rootView.findViewById(R.id.tasks_listView);
+		mainListView = (ListView) rootView.findViewById(R.id.tl_tasks_list_view);
 
 		referenceSpinner = (Spinner) rootView
-				.findViewById(R.id.tasks_spinner10);
-		referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
+				.findViewById(R.id.tl_reference_spinner);
+		referenceSpinner.setOnItemSelectedListener(filterSpinnerListener);
 
-		typeSpinner = (Spinner) rootView.findViewById(R.id.tasks_spinner11);
-		typeSpinner.setOnItemSelectedListener(referenceSpinnerListener);
+		typeSpinner = (Spinner) rootView.findViewById(R.id.tl_type_spinner);
+		typeSpinner.setOnItemSelectedListener(filterSpinnerListener);
 
 		setHasOptionsMenu(true);
 		rootView.setFocusableInTouchMode(true);
@@ -371,8 +371,8 @@ public class TaskFragment extends Fragment {
 				new ArrayList<SortField>());
 
 		// так как обработчики пока одни на всё, ставим их один раз
-		mainListView.setOnItemClickListener(clickListener);
-		mainListView.setOnItemLongClickListener(longClickListener);
+		mainListView.setOnItemClickListener(mainListViewClickListener);
+		mainListView.setOnItemLongClickListener(mainListViewLongClickListener);
 
 		mainListView.setLongClickable(true);
 
@@ -384,7 +384,7 @@ public class TaskFragment extends Fragment {
 	private void initView() {
 
 		Level = 0;
-		FillListViewTasks(null, null);
+		fillListViewTask(null, null);
 		fillSpinnersTasks();
 
 	}
@@ -421,7 +421,7 @@ public class TaskFragment extends Fragment {
 
 	}
 
-	private void FillListViewTasks(String taskStatus, String orderByField) {
+	private void fillListViewTask(String taskStatus, String orderByField) {
 
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
@@ -471,7 +471,7 @@ public class TaskFragment extends Fragment {
 
 	}
 
-	public class ListviewClickListener implements
+	public class ListViewClickListener implements
 			AdapterView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View selectedItemView,
@@ -492,7 +492,7 @@ public class TaskFragment extends Fragment {
 			if (Level == 0) {
 				currentTaskUuid = cursor.getString(cursor
 						.getColumnIndex(TaskDBAdapter.Projection.UUID));
-				FillListViewEquipment(currentTaskUuid, null, null);
+				fillListViewOperation(currentTaskUuid, null, null);
 				fillSpinnersEquipment();
 				Level = 1;
 			}
@@ -639,7 +639,7 @@ public class TaskFragment extends Fragment {
 										.getTimeInMillis());
 								task.setUpdated(true);
 								adapter.update(task);
-								FillListViewTasks(null, null);
+								fillListViewTask(null, null);
 								dialog.dismiss();
 							}
 						});
@@ -679,7 +679,7 @@ public class TaskFragment extends Fragment {
 				String orderByField = ((SortField) typeSpinner
 						.getSelectedItem()).getField();
 
-				FillListViewTasks(taskStatusUuid, orderByField);
+				fillListViewTask(taskStatusUuid, orderByField);
 			}
 
 			if (Level == 1) {
@@ -689,13 +689,13 @@ public class TaskFragment extends Fragment {
 				String criticalTypeUuid = ((CriticalType) typeSpinner
 						.getSelectedItem()).getUuid();
 
-				FillListViewEquipment(currentTaskUuid, operationTypeUuid,
+				fillListViewOperation(currentTaskUuid, operationTypeUuid,
 						criticalTypeUuid);
 			}
 		}
 	}
 
-	private void FillListViewEquipment(String task_uuid,
+	private void fillListViewOperation(String task_uuid,
 			String operation_type_uuid, String critical_type_uuid) {
 
 		// обновляем содержимое курсора
@@ -853,6 +853,12 @@ public class TaskFragment extends Fragment {
 
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
+
+						// TODO реализовать проверку на то какие из доступных
+						// нарядов можно перевести в статус Закончен
+
+						// TODO реализовать механизм уведомления пользователя о
+						// не выполненных нарядах
 
 						TaskDBAdapter adapter = new TaskDBAdapter(
 								new ToirDatabaseContext(getActivity()));
