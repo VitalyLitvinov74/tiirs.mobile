@@ -86,19 +86,27 @@ public class OperationActivity extends Activity {
 	private ArrayList<OperationPatternStep> patternSteps;
 	private ArrayList<OperationPatternStepResult> stepsResults;
 	private ArrayList<OperationResult> operationResults;
-	private String taskUuid, operation_uuid, equipment_uuid,
-			operation_result_uuid, operation_type_uuid;
+
+	private String taskUuid;
+	private String operation_uuid;
+	private String equipment_uuid;
+	private String operation_result_uuid;
+	private String operation_type_uuid;
+
 	private String taskname = "";
 	private String taskstatus = "";
 	private String operationname = "";
 	private String operation = "";
+
 	private LinearLayout layout;
 	private TextView stepTitle;
 	private TextView stepDescrition;
-	private TextView task_title, task_status, equipment_title,
-			equipment_status, equipment_operation;
+	private TextView task_title;
+	private TextView task_status;
+	private TextView equipment_title;
+	private TextView equipment_status;
+	private TextView equipment_operation;
 
-	private Button numStepButton;
 	private NumberPicker numberPicker;
 	private Spinner spinnerSuffix;
 	private ArrayAdapter<Suffixes> spinnerSuffixAdapter;
@@ -157,7 +165,6 @@ public class OperationActivity extends Activity {
 		layout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
 		stepTitle = (TextView) findViewById(R.id.twf_stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
-		numStepButton = (Button) findViewById(R.id.twf_numStepButton);
 		step_image = (ImageView) findViewById(R.id.twf_step_image);
 
 		task_title = (TextView) findViewById(R.id.twf_task_title);
@@ -187,23 +194,20 @@ public class OperationActivity extends Activity {
 				.getOperation_pattern_uuid());
 
 		// android:id="@+id/twf_task_title"
-		taskname = "Наряд: " + dbTask.getItem(taskUuid).getTask_name();
+		taskname = dbTask.getItem(taskUuid).getTask_name();
 		task_title.setText(taskname);
 		// android:id="@+id/twf_task_status"
-		taskstatus = "Статус: "
-				+ taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
+		taskstatus = taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
 		task_status.setText(taskstatus);
 		// android:id="@+id/twf_equipment_title"
-		operationname = "Оборудование: "
-				+ eqDBAdapter.getEquipsNameByUUID(equipment_uuid);
+		operationname = eqDBAdapter.getEquipsNameByUUID(equipment_uuid);
 		equipment_title.setText(operationname);
 		// android:id="@+id/twf_equipment_status"
-		operation = "Состояние: "
-				+ equipmentStatusDBAdapter.getNameByUUID(eqDBAdapter.getItem(
+		operation = equipmentStatusDBAdapter.getNameByUUID(eqDBAdapter.getItem(
 						equipment_uuid).getEquipment_status_uuid());
 		equipment_status.setText(operation);
 		// android:id="@+id/twf_equipment_operation"
-		operation = "Операция: " + pattern.getTitle();
+		operation = pattern.getTitle();
 		equipment_operation.setText(operation);
 
 		// получаем шаги шаблона операции
@@ -267,9 +271,8 @@ public class OperationActivity extends Activity {
 
 	private void showStepContent(OperationPatternStep step) {
 
-		stepTitle.setText("Шаг: " + step.getTitle());
+		stepTitle.setText(step.getTitle());
 		stepDescrition.setText(step.getDescription());
-		numStepButton.setText(step.get_id() + "");
 		layout.removeAllViewsInLayout();
 		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 		photoContainer.removeAllViewsInLayout();

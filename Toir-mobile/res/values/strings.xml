@@ -63,7 +63,7 @@
     <string name="result_title">Результат: </string>
     <string name="step_image_descr">Изображение шага операции</string>
     <string name="task_title">Наряд: </string>
-    <string name="operation_step_title">Название шага обслуживания</string>
+    <string name="operation_step_title">Шаг:</string>
     <string name="operation_step_descr_title">Описание шага обслуживания</string>
     <string name="operation_status_change_title">Изменить статус операции</string>
     <string name="divider"> | </string>
