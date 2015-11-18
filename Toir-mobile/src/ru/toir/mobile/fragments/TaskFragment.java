@@ -479,13 +479,45 @@ public class TaskFragment extends Fragment {
 			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 
 			if (Level == 1) {
-				initOperationPattern(
-						cursor.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID)),
-						cursor.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID)),
-						cursor.getString(cursor
-								.getColumnIndex(EquipmentDBAdapter.Projection.UUID)));
+				String operationUuid = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
+				String taskUuid = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
+				String equipmentUuid = cursor.getString(cursor
+						.getColumnIndex(EquipmentDBAdapter.Projection.UUID));
+				String operationStatus = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.OPERATION_STATUS_UUID));
+
+				if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)
+						|| operationStatus
+								.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
+
+					initOperationPattern(operationUuid, taskUuid, equipmentUuid);
+
+				} else {
+
+					// операция уже выполнена
+					// сообщаем об этом
+					AlertDialog.Builder dialog = new AlertDialog.Builder(
+							getContext());
+					dialog.setTitle("Внимание!");
+					dialog.setMessage("Операция уже выполнена. Повторное выполнение невозможно!");
+					dialog.setPositiveButton(android.R.string.ok,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									dialog.dismiss();
+								}
+							});
+					dialog.show();
+				}
+
 			}
 
 			if (Level == 0) {
