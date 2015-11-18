@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.tables.Task;
 
 /**
  * @author Dmitriy Logachov
@@ -25,7 +26,7 @@ public class TaskRes extends ru.toir.mobile.db.tables.Task {
 	public static TaskRes load(Context context, String uuid) {
 
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new ToirDatabaseContext(context));
-		ru.toir.mobile.db.tables.Task task = taskDBAdapter.getItem(uuid);
+		Task task = taskDBAdapter.getItem(uuid);
 		if (task != null) {
 			TaskRes item = new TaskRes();
 			item._id = task.get_id();

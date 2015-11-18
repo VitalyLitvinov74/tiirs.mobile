@@ -3,6 +3,8 @@ package ru.toir.mobile.fragments;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.List;
+
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
@@ -200,7 +202,8 @@ public class TaskFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.tasks_layout, container,
 				false);
 
-		mainListView = (ListView) rootView.findViewById(R.id.tl_tasks_list_view);
+		mainListView = (ListView) rootView
+				.findViewById(R.id.tl_tasks_list_view);
 
 		referenceSpinner = (Spinner) rootView
 				.findViewById(R.id.tl_reference_spinner);
@@ -506,7 +509,9 @@ public class TaskFragment extends Fragment {
 				int position, long id) {
 
 			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+
 			if (Level == 1) {
+				// находимся на "экране" с операциями
 				final String operation_uuid = cursor
 						.getString(cursor
 								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
@@ -597,6 +602,7 @@ public class TaskFragment extends Fragment {
 						.findViewById(R.id.statusSpinner);
 				statusSpinner.setAdapter(adapter);
 			} else if (Level == 0) {
+				// находимся на экране с нарядами
 				final String taskUuid = cursor.getString(cursor
 						.getColumnIndex(TaskDBAdapter.Projection.UUID));
 
@@ -609,21 +615,32 @@ public class TaskFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// закрываем наряд
-								// в зависимости от результата выполнения
-								// операций выставляем
-								// статус наряда
+								/*
+								 * закрываем наряд, в зависимости от статуса
+								 * выполнения операции выставляем статус наряда
+								 */
 								boolean complete = true;
-								TaskRes task = TaskRes.load(
-										new ToirDatabaseContext(getActivity()),
+								TaskRes task = TaskRes.load(getContext(),
 										taskUuid);
-								ArrayList<EquipmentOperationRes> operations = task
+								List<EquipmentOperationRes> operations = task
 										.getEquipmentOperations();
+								EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
+										new ToirDatabaseContext(getContext()));
+
+								String operationStatusUuid;
 								for (EquipmentOperationRes operation : operations) {
-									if (operation
-											.getOperation_status_uuid()
-											.equals(OperationStatusDBAdapter.Status.NEW)) {
+									operationStatusUuid = operation
+											.getOperation_status_uuid();
+									if (operationStatusUuid
+											.equals(OperationStatusDBAdapter.Status.NEW)
+											|| operationStatusUuid
+													.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
 										complete = false;
+										// выставляем статус операции
+										// "Не выполнена"
+										operation
+												.setOperation_status_uuid(OperationStatusDBAdapter.Status.UNCOMPLETE);
+										operationDBAdapter.update(operation);
 										break;
 									}
 								}
@@ -633,6 +650,7 @@ public class TaskFragment extends Fragment {
 								} else {
 									task.setTask_status_uuid(TaskStatusDBAdapter.Status.UNCOMPLETE);
 								}
+
 								TaskDBAdapter adapter = new TaskDBAdapter(
 										new ToirDatabaseContext(getActivity()));
 								task.setClose_date(Calendar.getInstance()
@@ -643,6 +661,7 @@ public class TaskFragment extends Fragment {
 								dialog.dismiss();
 							}
 						});
+
 				dialog.setNegativeButton("Отмена",
 						new DialogInterface.OnClickListener() {
 
