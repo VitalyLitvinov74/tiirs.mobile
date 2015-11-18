@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
@@ -37,7 +36,6 @@ import ru.toir.mobile.serverapi.result.TaskRes;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.db.tables.TaskStatus;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -57,7 +55,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -68,7 +65,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
 
 public class TaskFragment extends Fragment {
 
@@ -513,98 +509,48 @@ public class TaskFragment extends Fragment {
 
 			if (Level == 1) {
 				// находимся на "экране" с операциями
-				final String operation_uuid = cursor
+				String operationUuid = cursor
 						.getString(cursor
 								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
-				final String taskUuid = cursor
+				String taskUuid = cursor
 						.getString(cursor
 								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
 
 				EquipmentOperationDBAdapter operationDbAdapter = new EquipmentOperationDBAdapter(
 						new ToirDatabaseContext(getActivity()));
 				EquipmentOperation operation = operationDbAdapter
-						.getItem(operation_uuid);
+						.getItem(operationUuid);
 				String operationStatus = operation.getOperation_status_uuid();
+
 				// менять произвольно статус операции позволяем только если
-				// статус операции "Новая"
-				if (!operationStatus
-						.equals(OperationStatusDBAdapter.Status.NEW)) {
-					Toast.makeText(getActivity(),
-							"Изменить статус операции нельзя!",
-							Toast.LENGTH_SHORT).show();
-					return true;
+				// статус операции "Новая" или "В работе"
+				if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)
+						|| operationStatus
+								.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
+
+					// показываем диалог изменения статуса
+					closeOperationManual(operationUuid, taskUuid);
+				} else {
+
+					// операция уже выполнена, изменить статус нельзя
+					// сообщаем об этом
+					AlertDialog.Builder dialog = new AlertDialog.Builder(
+							getContext());
+					dialog.setTitle("Внимание!");
+					dialog.setMessage("Изменить статус операции нельзя!");
+					dialog.setPositiveButton(android.R.string.ok,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									dialog.dismiss();
+								}
+							});
+					dialog.show();
+
 				}
-
-				// диалог для отмены операции
-				// TODO заменить на alertdialog
-				final Dialog dialog = new Dialog(getActivity());
-				dialog.setContentView(R.layout.operation_cancel_dialog);
-				dialog.setTitle("Отмена операции");
-				dialog.show();
-				Button cancelOK = (Button) dialog.findViewById(R.id.cancelOK);
-				cancelOK.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-
-						View parent = (View) v.getParent();
-						Spinner spinner = (Spinner) parent
-								.findViewById(R.id.statusSpinner);
-						OperationStatus status = (OperationStatus) spinner
-								.getSelectedItem();
-						// выставляем выбранный статус
-						EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
-								new ToirDatabaseContext(getActivity()));
-						dbAdapter.setOperationStatus(operation_uuid,
-								status.getUuid());
-
-						// текущие значения фильтров
-						OperationType operationType = (OperationType) referenceSpinner
-								.getSelectedItem();
-						CriticalType criticalType = (CriticalType) typeSpinner
-								.getSelectedItem();
-						// обновляем содержимое курсора
-						changeCursorOperations(taskUuid,
-								operationType.getUuid(), criticalType.getUuid());
-
-						// закрываем диалог
-						dialog.dismiss();
-					}
-				});
-
-				Button cancelCancel = (Button) dialog
-						.findViewById(R.id.cancelCancel);
-				cancelCancel.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				});
-
-				// список статусов операций в выпадающем списке для выбора
-				OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
-						new ToirDatabaseContext(getActivity()));
-				ArrayList<OperationStatus> operationStatusList = statusDBAdapter
-						.getItems();
-				Iterator<OperationStatus> iterator = operationStatusList
-						.iterator();
-				// удаляем из списка статус "Новая", "Выполнена"
-				while (iterator.hasNext()) {
-					OperationStatus item = iterator.next();
-					if (item.getUuid().equals(
-							OperationStatusDBAdapter.Status.NEW)) {
-						iterator.remove();
-					} else if (item.getUuid().equals(
-							OperationStatusDBAdapter.Status.COMPLETE)) {
-						iterator.remove();
-					}
-				}
-
-				ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
-						getActivity(), android.R.layout.simple_spinner_item,
-						operationStatusList);
-				Spinner statusSpinner = (Spinner) dialog
-						.findViewById(R.id.statusSpinner);
-				statusSpinner.setAdapter(adapter);
 
 			} else if (Level == 0) {
 
@@ -651,6 +597,92 @@ public class TaskFragment extends Fragment {
 			return true;
 		}
 
+	}
+
+	/**
+	 * Диалог изменения статуса операции
+	 * 
+	 * @param operationUuid
+	 * @param taskUuid
+	 */
+	private void closeOperationManual(final String operationUuid,
+			final String taskUuid) {
+
+		// диалог для отмены операции
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		View myView = inflater.inflate(R.layout.operation_cancel_dialog, null);
+
+		dialog.setView(myView);
+
+		dialog.setTitle("Отмена операции");
+
+		DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+				Spinner spinner = (Spinner) ((AlertDialog) dialog)
+						.findViewById(R.id.statusSpinner);
+				OperationStatus status = (OperationStatus) spinner
+						.getSelectedItem();
+
+				// выставляем выбранный статус
+				EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
+						new ToirDatabaseContext(getActivity()));
+				dbAdapter.setOperationStatus(operationUuid, status.getUuid());
+
+				// текущие значения фильтров
+				OperationType operationType = (OperationType) referenceSpinner
+						.getSelectedItem();
+				CriticalType criticalType = (CriticalType) typeSpinner
+						.getSelectedItem();
+
+				// обновляем содержимое курсора
+				changeCursorOperations(taskUuid, operationType.getUuid(),
+						criticalType.getUuid());
+
+				// закрываем диалог
+				dialog.dismiss();
+			}
+		};
+
+		dialog.setPositiveButton(android.R.string.ok, okListener);
+
+		dialog.setNegativeButton(android.R.string.cancel,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						dialog.dismiss();
+					}
+				});
+
+		// список статусов операций в выпадающем списке для выбора
+		OperationStatusDBAdapter statusDBAdapter = new OperationStatusDBAdapter(
+				new ToirDatabaseContext(getActivity()));
+		List<OperationStatus> operationStatusList = statusDBAdapter.getItems();
+		Iterator<OperationStatus> iterator = operationStatusList.iterator();
+		// удаляем из списка статус "Новая", "Выполнена"
+		while (iterator.hasNext()) {
+			OperationStatus item = iterator.next();
+			if (item.getUuid().equals(OperationStatusDBAdapter.Status.NEW)) {
+				iterator.remove();
+			} else if (item.getUuid().equals(
+					OperationStatusDBAdapter.Status.COMPLETE)) {
+				iterator.remove();
+			}
+		}
+
+		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
+				getActivity(), android.R.layout.simple_spinner_dropdown_item,
+				operationStatusList);
+		Spinner statusSpinner = (Spinner) myView
+				.findViewById(R.id.statusSpinner);
+		statusSpinner.setAdapter(adapter);
+
+		dialog.show();
 	}
 
 	/**
