@@ -6,7 +6,9 @@ package ru.toir.mobile.rest;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import com.google.common.reflect.TypeToken;
@@ -438,6 +440,30 @@ public class TaskProcessor {
 
 		Bundle result = new Bundle();
 
+		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+				new ToirDatabaseContext(mContext));
+
+		// проверяем наряды со статусом Новый на наличие в локальной базе, если
+		// такой наряд есть, удаляем его из списка полученных нарядов.
+		// то есть, если наряд на сервере всё еще новый, а у нас он уже есть,
+		// значит он в работе.
+		// наряд со статусом В работе с сервера приехать не может.
+		// соответственно наряды со статусом Закончен и Не закончен,
+		// загружаются и обновляют содержимое локального наряда
+		Iterator<TaskSrv> taskIterator = tasks.iterator();
+		while (taskIterator.hasNext()) {
+			TaskSrv item = taskIterator.next();
+			if (item.getOrderStatus()
+					.getId()
+					.toUpperCase(Locale.ENGLISH)
+					.equals(TaskStatusDBAdapter.Status.NEW
+							.toUpperCase(Locale.ENGLISH))) {
+				if (taskDBAdapter.getItem(item.getId()) != null) {
+					taskIterator.remove();
+				}
+			}
+		}
+
 		ArrayList<Task> localTasks = TaskSrv.getTasks(tasks);
 
 		// добавляем в результат колличество полученных нарядов
@@ -446,14 +472,13 @@ public class TaskProcessor {
 
 		// для новых нарядов выставляем статус "В работе"
 		for (Task item : localTasks) {
-			if (item.getTask_status_uuid().equals(TaskStatusDBAdapter.Status.NEW)) {
+			if (item.getTask_status_uuid().equals(
+					TaskStatusDBAdapter.Status.NEW)) {
 				item.setTask_status_uuid(TaskStatusDBAdapter.Status.IN_WORK);
 			}
 		}
 
 		// сохраняем наряды
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
-				new ToirDatabaseContext(mContext));
 		if (!taskDBAdapter.saveItems(localTasks)) {
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(IServiceProvider.MESSAGE,
