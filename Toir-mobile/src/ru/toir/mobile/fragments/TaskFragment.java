@@ -873,69 +873,108 @@ public class TaskFragment extends Fragment {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 
-						// TODO реализовать проверку на то какие из доступных
-						// нарядов можно перевести в статус Закончен
-
-						// TODO реализовать механизм уведомления пользователя о
-						// не выполненных нарядах
-
 						TaskDBAdapter adapter = new TaskDBAdapter(
 								new ToirDatabaseContext(getActivity()));
-						ArrayList<Task> tasks = adapter
-								.getTaskByUserAndUpdated(AuthorizedUser
-										.getInstance().getUuid());
-						if (tasks == null) {
-							Toast.makeText(getActivity(),
-									"Нет результатов для отправки.",
-									Toast.LENGTH_SHORT);
-							return true;
+						List<Task> tasks;
+						String currentUserUuid = AuthorizedUser.getInstance()
+								.getUuid();
+
+						// проверяем наличие не законченных нарядов
+						tasks = adapter.getOrdersByUser(currentUserUuid,
+								TaskStatusDBAdapter.Status.IN_WORK, "");
+						if (tasks.size() > 0) {
+							AlertDialog.Builder dialog = new AlertDialog.Builder(
+									getContext());
+
+							dialog.setTitle("Внимание!");
+							dialog.setMessage("Есть " + tasks.size()
+									+ " наряда в процессе выполнения.\n"
+									+ "Отправить выполненные наряды?");
+							dialog.setPositiveButton(android.R.string.ok,
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+
+											sendCompleteTask();
+											dialog.dismiss();
+										}
+									});
+							dialog.setNegativeButton(android.R.string.cancel,
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+
+											dialog.dismiss();
+										}
+									});
+							dialog.show();
 						}
 
-						String[] sendTaskUuids = new String[tasks.size()];
-						int i = 0;
-						for (Task task : tasks) {
-							sendTaskUuids[i] = task.getUuid();
-							// устанавливаем дату попытки отправки
-							// (пока только для наряда)
-							task.setAttempt_send_date(Calendar.getInstance()
-									.getTime().getTime());
-							adapter.replace(task);
-							i++;
-						}
-
-						getActivity().registerReceiver(mReceiverSendTaskResult,
-								mFilterSendTask);
-
-						TaskServiceHelper tsh = new TaskServiceHelper(
-								getActivity(),
-								TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
-						tsh.SendTaskResult(sendTaskUuids);
-
-						// показываем диалог отправки результатов
-						processDialog = new ProgressDialog(getActivity());
-						processDialog.setMessage("Отправляем результаты");
-						processDialog.setIndeterminate(true);
-						processDialog
-								.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-						processDialog.setCancelable(false);
-						processDialog.setButton(
-								DialogInterface.BUTTON_NEGATIVE, "Отмена",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										getActivity().unregisterReceiver(
-												mReceiverGetTask);
-										Toast.makeText(
-												getActivity(),
-												"Отправка результатов отменена",
-												Toast.LENGTH_SHORT).show();
-									}
-								});
-						processDialog.show();
 						return true;
 					}
 				});
+	}
+
+	/**
+	 * Отправка всех выполненных нарядов на сервер
+	 */
+	private void sendCompleteTask() {
+
+		TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext(
+				getActivity()));
+		List<Task> tasks;
+		String currentUserUuid = AuthorizedUser.getInstance().getUuid();
+
+		tasks = adapter.getTaskByUserAndUpdated(currentUserUuid);
+
+		if (tasks == null) {
+			Toast.makeText(getActivity(), "Нет результатов для отправки.",
+					Toast.LENGTH_SHORT);
+			return;
+		}
+
+		String[] sendTaskUuids = new String[tasks.size()];
+		int i = 0;
+		for (Task task : tasks) {
+			sendTaskUuids[i] = task.getUuid();
+			// устанавливаем дату попытки отправки
+			// (пока только для наряда)
+			task.setAttempt_send_date(Calendar.getInstance().getTime()
+					.getTime());
+			adapter.replace(task);
+			i++;
+		}
+
+		getActivity()
+				.registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
+
+		TaskServiceHelper tsh = new TaskServiceHelper(getActivity(),
+				TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+		tsh.SendTaskResult(sendTaskUuids);
+
+		// показываем диалог отправки результатов
+		processDialog = new ProgressDialog(getActivity());
+		processDialog.setMessage("Отправляем результаты");
+		processDialog.setIndeterminate(true);
+		processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		processDialog.setCancelable(false);
+		processDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getActivity().unregisterReceiver(mReceiverGetTask);
+						Toast.makeText(getActivity(),
+								"Отправка результатов отменена",
+								Toast.LENGTH_SHORT).show();
+					}
+				});
+		processDialog.show();
 	}
 
 	/*

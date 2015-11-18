@@ -100,19 +100,20 @@ public class TaskDBAdapter extends BaseDBAdapter {
 	 * @param uuid
 	 * @return
 	 */
-	public ArrayList<Task> getOrdersByUser(String uuid, String type, String sort) {
+	public ArrayList<Task> getOrdersByUser(String uuid, String statusUuid,
+			String sortField) {
 		ArrayList<Task> arrayList = new ArrayList<Task>();
 		Cursor cursor;
 
-		if (sort == null || sort.equals(""))
-			sort = null;
-		if (type == null || type.equals("")) {
+		if (sortField == null || sortField.equals(""))
+			sortField = null;
+		if (statusUuid == null || statusUuid.equals("")) {
 			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID + "=?",
-					new String[] { uuid }, null, null, sort);
+					new String[] { uuid }, null, null, sortField);
 		} else {
 			cursor = mDb.query(TABLE_NAME, mColumns, FIELD_USER_UUID
 					+ "=? AND " + FIELD_TASK_STATUS_UUID + "=?", new String[] {
-					uuid, type }, null, null, sort);
+					uuid, statusUuid }, null, null, sortField);
 		}
 
 		if (cursor.moveToFirst()) {
