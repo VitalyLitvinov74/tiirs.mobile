@@ -479,8 +479,8 @@ public class TaskFragment extends Fragment {
 			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 
 			if (Level == 1) {
-				// TODO реализовать проверку на то что операцию нельзя выполнить
-				// повторно
+
+				// находимся на "экране" операций
 				String operationUuid = cursor
 						.getString(cursor
 								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
@@ -496,9 +496,9 @@ public class TaskFragment extends Fragment {
 				if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)
 						|| operationStatus
 								.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
-					
+
 					initOperationPattern(operationUuid, taskUuid, equipmentUuid);
-					
+
 				} else {
 
 					// операция уже выполнена
@@ -520,9 +520,9 @@ public class TaskFragment extends Fragment {
 					dialog.show();
 				}
 
-			}
+			} else if (Level == 0) {
 
-			if (Level == 0) {
+				// находимся на "экране" нарядов
 				currentTaskUuid = cursor.getString(cursor
 						.getColumnIndex(TaskDBAdapter.Projection.UUID));
 				fillListViewOperation(currentTaskUuid, null, null);
