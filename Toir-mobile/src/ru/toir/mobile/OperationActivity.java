@@ -99,6 +99,7 @@ public class OperationActivity extends Activity {
 	private String operation = "";
 
 	private LinearLayout layout;
+	private LinearLayout stepInfoLayout;
 	private TextView stepTitle;
 	private TextView stepDescrition;
 	private TextView task_title;
@@ -163,6 +164,7 @@ public class OperationActivity extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		layout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
+		stepInfoLayout = (LinearLayout) findViewById(R.id.twf_step_info_layout);
 		stepTitle = (TextView) findViewById(R.id.twf_stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
 		step_image = (ImageView) findViewById(R.id.twf_step_image);
@@ -197,14 +199,15 @@ public class OperationActivity extends Activity {
 		taskname = dbTask.getItem(taskUuid).getTask_name();
 		task_title.setText(taskname);
 		// android:id="@+id/twf_task_status"
-		taskstatus = taskStatusDBAdapter.getNameByUUID(task.getTask_status_uuid());
+		taskstatus = taskStatusDBAdapter.getNameByUUID(task
+				.getTask_status_uuid());
 		task_status.setText(taskstatus);
 		// android:id="@+id/twf_equipment_title"
 		operationname = eqDBAdapter.getEquipsNameByUUID(equipment_uuid);
 		equipment_title.setText(operationname);
 		// android:id="@+id/twf_equipment_status"
 		operation = equipmentStatusDBAdapter.getNameByUUID(eqDBAdapter.getItem(
-						equipment_uuid).getEquipment_status_uuid());
+				equipment_uuid).getEquipment_status_uuid());
 		equipment_status.setText(operation);
 		// android:id="@+id/twf_equipment_operation"
 		operation = pattern.getTitle();
@@ -284,7 +287,8 @@ public class OperationActivity extends Activity {
 					.getAbsolutePath());
 			step_image.setImageBitmap(myBitmap);
 		} else {
-			step_image.setImageResource(R.drawable.workman);
+			//step_image.setImageResource(R.drawable.workman);
+			step_image.setVisibility(View.GONE);
 		}
 
 		// получаем список результатов шагов
@@ -316,7 +320,7 @@ public class OperationActivity extends Activity {
 						}
 
 						// показываем финальный шаг
-						ShowFinalStep();
+						showFinalStep();
 					}
 				});
 			} else {
@@ -344,6 +348,9 @@ public class OperationActivity extends Activity {
 				measureUI(measureType);
 			}
 		}
+		
+		layout.refreshDrawableState();
+		stepInfoLayout.refreshDrawableState();
 	}
 
 	/**
@@ -512,7 +519,13 @@ public class OperationActivity extends Activity {
 	 * Показываем экран с выбором результата(вердикта) выполнения операции и
 	 * возможностью изменить статус операции (вместо "Выполнена" по умолчанию)
 	 */
-	private void ShowFinalStep() {
+	private void showFinalStep() {
+
+		step_image.setVisibility(View.GONE);
+		stepTitle.setText("Завершение операции");
+		stepDescrition.setText("Вынесите вредикт по итогу выполнения операции.");
+
+		
 		Button resultButton = new Button(getApplicationContext());
 		resultButton.setText("Завершить операцию");
 		resultButton.setOnClickListener(new View.OnClickListener() {
@@ -913,21 +926,22 @@ public class OperationActivity extends Activity {
 			// операции
 			final AlertDialog.Builder dialog = new AlertDialog.Builder(
 					OperationActivity.this);
-			dialog.setTitle("Отмена выполнения операции");
-			dialog.setPositiveButton("Продолжить",
+			dialog.setTitle("Отменить выполнение операции?");
+			dialog.setPositiveButton(android.R.string.ok,
 					new DialogInterface.OnClickListener() {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
+							finish();
 						}
 					});
-			dialog.setNegativeButton("Выйти",
+			dialog.setNegativeButton(android.R.string.cancel,
 					new DialogInterface.OnClickListener() {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							finish();
+							dialog.dismiss();
 						}
 					});
 			dialog.show();
