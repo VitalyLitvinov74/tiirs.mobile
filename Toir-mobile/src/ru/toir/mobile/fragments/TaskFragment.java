@@ -221,7 +221,7 @@ public class TaskFragment extends Fragment {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK
 						&& event.getAction() == KeyEvent.ACTION_UP) {
-					Log.d("test", "TaskFragment !!! back pressed!!!");
+					Log.d(TAG, "TaskFragment !!! back pressed!!!");
 					if (Level == 1) {
 						initView();
 					}
@@ -504,6 +504,7 @@ public class TaskFragment extends Fragment {
 
 	public class ListViewLongClickListener implements
 			AdapterView.OnItemLongClickListener {
+
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {
@@ -533,7 +534,9 @@ public class TaskFragment extends Fragment {
 							Toast.LENGTH_SHORT).show();
 					return true;
 				}
+
 				// диалог для отмены операции
+				// TODO заменить на alertdialog
 				final Dialog dialog = new Dialog(getActivity());
 				dialog.setContentView(R.layout.operation_cancel_dialog);
 				dialog.setTitle("Отмена операции");
@@ -567,6 +570,7 @@ public class TaskFragment extends Fragment {
 						dialog.dismiss();
 					}
 				});
+
 				Button cancelCancel = (Button) dialog
 						.findViewById(R.id.cancelCancel);
 				cancelCancel.setOnClickListener(new OnClickListener() {
@@ -601,86 +605,133 @@ public class TaskFragment extends Fragment {
 				Spinner statusSpinner = (Spinner) dialog
 						.findViewById(R.id.statusSpinner);
 				statusSpinner.setAdapter(adapter);
+
 			} else if (Level == 0) {
+
 				// находимся на экране с нарядами
-				final String taskUuid = cursor.getString(cursor
+				String taskUuid = cursor.getString(cursor
 						.getColumnIndex(TaskDBAdapter.Projection.UUID));
 
-				final AlertDialog.Builder dialog = new AlertDialog.Builder(
-						TaskFragment.this.getActivity());
-				dialog.setTitle("Закрытие наряда");
-				dialog.setPositiveButton("Закрыть наряд",
-						new DialogInterface.OnClickListener() {
+				TaskDBAdapter adapter = new TaskDBAdapter(
+						new ToirDatabaseContext(getContext()));
+				Task task = adapter.getItem(taskUuid);
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								/*
-								 * закрываем наряд, в зависимости от статуса
-								 * выполнения операции выставляем статус наряда
-								 */
-								boolean complete = true;
-								TaskRes task = TaskRes.load(getContext(),
-										taskUuid);
-								List<EquipmentOperationRes> operations = task
-										.getEquipmentOperations();
-								EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-										new ToirDatabaseContext(getContext()));
+				// проверяем статус наряда
+				String taskStatusUuid = task.getTask_status_uuid();
+				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.COMPLETE)
+						|| taskStatusUuid
+								.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
 
-								String operationStatusUuid;
-								for (EquipmentOperationRes operation : operations) {
-									operationStatusUuid = operation
-											.getOperation_status_uuid();
-									if (operationStatusUuid
-											.equals(OperationStatusDBAdapter.Status.NEW)
-											|| operationStatusUuid
-													.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
-										complete = false;
-										// выставляем статус операции
-										// "Не выполнена"
-										operation
-												.setOperation_status_uuid(OperationStatusDBAdapter.Status.UNCOMPLETE);
-										operationDBAdapter.update(operation);
-										break;
-									}
+					// наряд уже закрыт, изменить статус нельзя
+					// сообщаем об этом
+					AlertDialog.Builder dialog = new AlertDialog.Builder(
+							getContext());
+					dialog.setTitle("Внимание!");
+					dialog.setMessage("Изменить статус наряда уже нельзя!");
+					dialog.setPositiveButton(android.R.string.ok,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									dialog.dismiss();
 								}
+							});
+					dialog.show();
 
-								if (complete) {
-									task.setTask_status_uuid(TaskStatusDBAdapter.Status.COMPLETE);
-								} else {
-									task.setTask_status_uuid(TaskStatusDBAdapter.Status.UNCOMPLETE);
-								}
+				} else {
 
-								TaskDBAdapter adapter = new TaskDBAdapter(
-										new ToirDatabaseContext(getActivity()));
-								task.setClose_date(Calendar.getInstance()
-										.getTimeInMillis());
-								task.setUpdated(true);
-								adapter.update(task);
-								fillListViewTask(null, null);
-								dialog.dismiss();
-							}
-						});
+					// наряд можно закрыть принудительно
+					closeTaskManual(taskUuid);
+				}
 
-				dialog.setNegativeButton("Отмена",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-							}
-						});
-
-				dialog.show();
 			}
+
 			return true;
 		}
 
 	}
 
-	public class ReferenceSpinnerListener implements
+	/**
+	 * Диалог ручного закрытия наряда
+	 * 
+	 * @param taskUuid
+	 */
+	private void closeTaskManual(final String taskUuid) {
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(
+				TaskFragment.this.getActivity());
+		dialog.setTitle("Закрытие наряда");
+		dialog.setMessage("Всем не законченным операциям будет установлен статус \"Не выполнена\""
+				+ "\n" + "Закрыть наряд?");
+		dialog.setPositiveButton(android.R.string.yes,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						/*
+						 * закрываем наряд, в зависимости от статуса выполнения
+						 * операции выставляем статус наряда
+						 */
+						boolean complete = true;
+						TaskRes task = TaskRes.load(getContext(), taskUuid);
+						List<EquipmentOperationRes> operations = task
+								.getEquipmentOperations();
+						EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
+								new ToirDatabaseContext(getContext()));
+
+						String operationStatusUuid;
+						for (EquipmentOperationRes operation : operations) {
+							operationStatusUuid = operation
+									.getOperation_status_uuid();
+							if (operationStatusUuid
+									.equals(OperationStatusDBAdapter.Status.NEW)
+									|| operationStatusUuid
+											.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
+								complete = false;
+								// выставляем статус операции
+								// "Не выполнена"
+								operation
+										.setOperation_status_uuid(OperationStatusDBAdapter.Status.UNCOMPLETE);
+								operationDBAdapter.update(operation);
+								break;
+							}
+						}
+
+						if (complete) {
+							task.setTask_status_uuid(TaskStatusDBAdapter.Status.COMPLETE);
+						} else {
+							task.setTask_status_uuid(TaskStatusDBAdapter.Status.UNCOMPLETE);
+						}
+
+						TaskDBAdapter adapter = new TaskDBAdapter(
+								new ToirDatabaseContext(getActivity()));
+						task.setClose_date(Calendar.getInstance()
+								.getTimeInMillis());
+						task.setUpdated(true);
+						adapter.update(task);
+						fillListViewTask(null, null);
+						dialog.dismiss();
+					}
+				});
+
+		dialog.setNegativeButton(android.R.string.cancel,
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						dialog.dismiss();
+					}
+				});
+
+		dialog.show();
+
+	}
+
+	private class ReferenceSpinnerListener implements
 			AdapterView.OnItemSelectedListener {
-		boolean userSelect = false;
 
 		@Override
 		public void onNothingSelected(AdapterView<?> parentView) {
@@ -690,7 +741,7 @@ public class TaskFragment extends Fragment {
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
 
-			Log.d("test", "reference spinner onItemSelected");
+			Log.d(TAG, "reference spinner onItemSelected");
 			if (Level == 0) {
 				String taskStatusUuid = ((TaskStatus) referenceSpinner
 						.getSelectedItem()).getUuid();
@@ -830,7 +881,7 @@ public class TaskFragment extends Fragment {
 
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
-						Log.d("test", "Получаем сделанные наряды.");
+						Log.d(TAG, "Получаем сделанные наряды.");
 						TaskServiceHelper tsh = new TaskServiceHelper(
 								getActivity().getApplicationContext(),
 								TaskServiceProvider.Actions.ACTION_GET_TASK);
