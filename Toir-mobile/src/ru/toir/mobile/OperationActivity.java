@@ -56,6 +56,7 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -99,7 +100,7 @@ public class OperationActivity extends Activity {
 	private String operation = "";
 
 	private LinearLayout resultButtonLayout;
-	private LinearLayout stepInfoLayout;
+	private RelativeLayout photoContainer;
 	private TextView stepTitle;
 	private TextView stepDescrition;
 	private TextView task_title;
@@ -164,7 +165,8 @@ public class OperationActivity extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		resultButtonLayout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
-		stepInfoLayout = (LinearLayout) findViewById(R.id.twf_step_info_layout);
+		photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
+
 		stepTitle = (TextView) findViewById(R.id.twf_stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
 		step_image = (ImageView) findViewById(R.id.twf_step_image);
@@ -277,9 +279,8 @@ public class OperationActivity extends Activity {
 		stepTitle.setText(step.getTitle());
 		stepDescrition.setText(step.getDescription());
 		resultButtonLayout.removeAllViewsInLayout();
-		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
-		photoContainer.removeAllViewsInLayout();
-		// photoContainer.setVisibility(View.INVISIBLE);
+
+		clearPhotoContainer();
 
 		File imgFile = new File(step.getImage());
 		if (imgFile.exists() && imgFile.isFile()) {
@@ -357,6 +358,7 @@ public class OperationActivity extends Activity {
 	 * @param measureType
 	 */
 	private void measureUI(String measureType) {
+
 		// выбор значения
 		if (numberPicker == null) {
 			numberPicker = new NumberPicker(getApplicationContext());
@@ -436,20 +438,13 @@ public class OperationActivity extends Activity {
 
 			// инициализировать интерфейс для фотографии
 			View cameraView = View.inflate(getApplicationContext(),
-					R.layout.fragment_native_camera, null);
-			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
+					R.layout.fragment_native_camera, photoContainer);
 
-			// промежуточный layout
-			RelativeLayout cameraLayout = new RelativeLayout(
-					getApplicationContext());
+			ViewGroup.LayoutParams photoParams = cameraView.getLayoutParams();
+			// пропорции предпросмотра с камеры 4:3
+			photoParams.height = (int) (cameraView.getWidth() * 0.75);
 
-			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-					photoContainer.getWidth(),
-					(int) (photoContainer.getWidth() * 0.75));
-			cameraLayout.setLayoutParams(params);
-			cameraLayout.addView(cameraView);
-			photoContainer.addView(cameraLayout);
-			photoContainer.setVisibility(View.VISIBLE);
+			cameraView.setLayoutParams(photoParams);
 
 			lastPhotoFile = null;
 
@@ -526,9 +521,8 @@ public class OperationActivity extends Activity {
 		stepTitle.setText("Завершение операции");
 		stepDescrition
 				.setText("Вынесите вердикт по итогу выполнения операции.");
-		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
-		photoContainer.removeAllViewsInLayout();
-		photoContainer.setVisibility(View.INVISIBLE);
+
+		clearPhotoContainer();
 
 		Button resultButton = new Button(getApplicationContext());
 		resultButton.setText("Завершить операцию");
@@ -675,6 +669,18 @@ public class OperationActivity extends Activity {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Очищаем от содержимого layout с предпросмотром
+	 */
+	private void clearPhotoContainer() {
+
+		photoContainer.removeAllViewsInLayout();
+		ViewGroup.LayoutParams photoParams = photoContainer.getLayoutParams();
+		photoParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		photoContainer.setLayoutParams(photoParams);
+
 	}
 
 	/**

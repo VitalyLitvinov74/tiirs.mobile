@@ -188,9 +188,7 @@
         <RelativeLayout
             android:id="@+id/twf_photoContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/orange"
-            android:padding="5dp" >
+            android:layout_height="wrap_content" >
         </RelativeLayout>
 
         <RelativeLayout
