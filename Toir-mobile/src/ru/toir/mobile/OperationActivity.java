@@ -66,6 +66,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,6 +102,8 @@ public class OperationActivity extends Activity {
 
 	private LinearLayout resultButtonLayout;
 	private RelativeLayout photoContainer;
+	private ScrollView rootView;
+
 	private TextView stepTitle;
 	private TextView stepDescrition;
 	private TextView task_title;
@@ -166,6 +169,7 @@ public class OperationActivity extends Activity {
 
 		resultButtonLayout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
 		photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
+		rootView = (ScrollView) findViewById(R.id.twf_rootView);
 
 		stepTitle = (TextView) findViewById(R.id.twf_stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
@@ -349,6 +353,14 @@ public class OperationActivity extends Activity {
 				measureUI(measureType);
 			}
 		}
+
+		rootView.post(new Runnable() {
+
+			@Override
+			public void run() {
+				rootView.fullScroll(ScrollView.FOCUS_DOWN);
+			}
+		});
 
 	}
 
