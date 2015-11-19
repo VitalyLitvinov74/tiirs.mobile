@@ -98,7 +98,7 @@ public class OperationActivity extends Activity {
 	private String operationname = "";
 	private String operation = "";
 
-	private LinearLayout layout;
+	private LinearLayout resultButtonLayout;
 	private LinearLayout stepInfoLayout;
 	private TextView stepTitle;
 	private TextView stepDescrition;
@@ -163,7 +163,7 @@ public class OperationActivity extends Activity {
 		setContentView(R.layout.taskwork_fragment);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		layout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
+		resultButtonLayout = (LinearLayout) findViewById(R.id.twf_resultButtonLayout);
 		stepInfoLayout = (LinearLayout) findViewById(R.id.twf_step_info_layout);
 		stepTitle = (TextView) findViewById(R.id.twf_stepTitle);
 		stepDescrition = (TextView) findViewById(R.id.twf_step_description);
@@ -276,7 +276,7 @@ public class OperationActivity extends Activity {
 
 		stepTitle.setText(step.getTitle());
 		stepDescrition.setText(step.getDescription());
-		layout.removeAllViewsInLayout();
+		resultButtonLayout.removeAllViewsInLayout();
 		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 		photoContainer.removeAllViewsInLayout();
 		photoContainer.setVisibility(View.INVISIBLE);
@@ -341,7 +341,7 @@ public class OperationActivity extends Activity {
 				});
 			}
 
-			layout.addView(resultButton);
+			resultButtonLayout.addView(resultButton);
 
 			// выводим элементы интерфейса для ввода значения измеренний
 			if (!measureType.equals(MeasureTypeDBAdapter.Type.NONE)) {
@@ -349,8 +349,6 @@ public class OperationActivity extends Activity {
 			}
 		}
 		
-		layout.refreshDrawableState();
-		stepInfoLayout.refreshDrawableState();
 	}
 
 	/**
@@ -375,7 +373,7 @@ public class OperationActivity extends Activity {
 		}
 
 		if (measureType.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
-			layout.addView(numberPicker);
+			resultButtonLayout.addView(numberPicker);
 
 			suffixList.add(new Suffixes("Гц", 1));
 			suffixList.add(new Suffixes("кГц", 1000));
@@ -393,9 +391,9 @@ public class OperationActivity extends Activity {
 			}
 			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
-			layout.addView(spinnerSuffix);
+			resultButtonLayout.addView(spinnerSuffix);
 		} else if (measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
-			layout.addView(numberPicker);
+			resultButtonLayout.addView(numberPicker);
 
 			suffixList.add(new Suffixes("В", 1));
 			suffixList.add(new Suffixes("кВ", 1000));
@@ -413,9 +411,9 @@ public class OperationActivity extends Activity {
 			}
 			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
-			layout.addView(spinnerSuffix);
+			resultButtonLayout.addView(spinnerSuffix);
 		} else if (measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
-			layout.addView(numberPicker);
+			resultButtonLayout.addView(numberPicker);
 
 			suffixList.add(new Suffixes("Па", 1));
 			suffixList.add(new Suffixes("кПа", 1000));
@@ -433,7 +431,7 @@ public class OperationActivity extends Activity {
 			}
 			spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
-			layout.addView(spinnerSuffix);
+			resultButtonLayout.addView(spinnerSuffix);
 		} else if (measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
 			// инициализировать интерфейс для фотографии
 			View cameraView = View.inflate(getApplicationContext(),
@@ -523,7 +521,10 @@ public class OperationActivity extends Activity {
 
 		step_image.setVisibility(View.GONE);
 		stepTitle.setText("Завершение операции");
-		stepDescrition.setText("Вынесите вредикт по итогу выполнения операции.");
+		stepDescrition.setText("Вынесите вердикт по итогу выполнения операции.");
+		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
+		photoContainer.removeAllViewsInLayout();
+		photoContainer.setVisibility(View.INVISIBLE);
 
 		
 		Button resultButton = new Button(getApplicationContext());
@@ -611,9 +612,9 @@ public class OperationActivity extends Activity {
 		spinner.setAdapter(resultsAdapter);
 		spinner.setTag("result");
 
-		layout.removeAllViewsInLayout();
-		layout.addView(spinner);
-		layout.addView(resultButton);
+		resultButtonLayout.removeAllViewsInLayout();
+		resultButtonLayout.addView(spinner);
+		resultButtonLayout.addView(resultButton);
 
 		// показ элементов отвечающих за статус выполнения операции
 		RelativeLayout alterOperationStatusLayout = (RelativeLayout) findViewById(R.id.twf_alterOperationStatus);
