@@ -253,10 +253,10 @@ public class OperationActivity extends Activity {
 		showStep(getFirstStep().getUuid());
 	}
 
-	public void cancelOnClick(View view) {
-		setResult(RESULT_CANCELED);
-		finish();
-	}
+	// public void cancelOnClick(View view) {
+	// setResult(RESULT_CANCELED);
+	// finish();
+	// }
 
 	private void showStep(String uuid) {
 
@@ -279,7 +279,7 @@ public class OperationActivity extends Activity {
 		resultButtonLayout.removeAllViewsInLayout();
 		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 		photoContainer.removeAllViewsInLayout();
-		photoContainer.setVisibility(View.INVISIBLE);
+		// photoContainer.setVisibility(View.INVISIBLE);
 
 		File imgFile = new File(step.getImage());
 		if (imgFile.exists() && imgFile.isFile()) {
@@ -287,7 +287,7 @@ public class OperationActivity extends Activity {
 					.getAbsolutePath());
 			step_image.setImageBitmap(myBitmap);
 		} else {
-			//step_image.setImageResource(R.drawable.workman);
+			// step_image.setImageResource(R.drawable.workman);
 			step_image.setVisibility(View.GONE);
 		}
 
@@ -348,7 +348,7 @@ public class OperationActivity extends Activity {
 				measureUI(measureType);
 			}
 		}
-		
+
 	}
 
 	/**
@@ -433,10 +433,13 @@ public class OperationActivity extends Activity {
 
 			resultButtonLayout.addView(spinnerSuffix);
 		} else if (measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+
 			// инициализировать интерфейс для фотографии
 			View cameraView = View.inflate(getApplicationContext(),
 					R.layout.fragment_native_camera, null);
 			RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
+
+			// промежуточный layout
 			RelativeLayout cameraLayout = new RelativeLayout(
 					getApplicationContext());
 
@@ -521,12 +524,12 @@ public class OperationActivity extends Activity {
 
 		step_image.setVisibility(View.GONE);
 		stepTitle.setText("Завершение операции");
-		stepDescrition.setText("Вынесите вердикт по итогу выполнения операции.");
+		stepDescrition
+				.setText("Вынесите вердикт по итогу выполнения операции.");
 		RelativeLayout photoContainer = (RelativeLayout) findViewById(R.id.twf_photoContainer);
 		photoContainer.removeAllViewsInLayout();
 		photoContainer.setVisibility(View.INVISIBLE);
 
-		
 		Button resultButton = new Button(getApplicationContext());
 		resultButton.setText("Завершить операцию");
 		resultButton.setOnClickListener(new View.OnClickListener() {
@@ -607,7 +610,8 @@ public class OperationActivity extends Activity {
 		});
 
 		ArrayAdapter<OperationResult> resultsAdapter = new ArrayAdapter<OperationResult>(
-				this, android.R.layout.simple_spinner_item, operationResults);
+				this, android.R.layout.simple_spinner_dropdown_item,
+				operationResults);
 		Spinner spinner = new Spinner(getApplicationContext());
 		spinner.setAdapter(resultsAdapter);
 		spinner.setTag("result");
@@ -615,6 +619,16 @@ public class OperationActivity extends Activity {
 		resultButtonLayout.removeAllViewsInLayout();
 		resultButtonLayout.addView(spinner);
 		resultButtonLayout.addView(resultButton);
+
+		// после добавления элементов в LinearLayout устанавливаем
+		// вес элементов для корректного отображения
+		LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) spinner
+				.getLayoutParams();
+		param.weight = 1;
+		spinner.setLayoutParams(param);
+		param = (LinearLayout.LayoutParams) resultButton.getLayoutParams();
+		param.weight = 1;
+		resultButton.setLayoutParams(param);
 
 		// показ элементов отвечающих за статус выполнения операции
 		RelativeLayout alterOperationStatusLayout = (RelativeLayout) findViewById(R.id.twf_alterOperationStatus);
@@ -657,7 +671,7 @@ public class OperationActivity extends Activity {
 				if (isChecked) {
 					alterSpinner.setVisibility(View.VISIBLE);
 				} else {
-					alterSpinner.setVisibility(View.INVISIBLE);
+					alterSpinner.setVisibility(View.GONE);
 				}
 			}
 		});
