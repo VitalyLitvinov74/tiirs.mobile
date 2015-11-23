@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_ImageStatus"
         android:text="@string/equipment_title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_EquipmentLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -35,8 +35,8 @@
         android:id="@+id/eoi_OperationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/eoi_ImageStatus"
-        android:layout_marginLeft="15dp"
+        android:layout_below="@+id/eoi_EquipmentLabel"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_ImageStatus"
         android:text="@string/operation_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -45,9 +45,8 @@
         android:id="@+id/eoi_Operation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/eoi_OperationLabel"
-        android:layout_alignBottom="@+id/eoi_OperationLabel"
-        android:layout_marginLeft="15dp"
+        android:layout_below="@+id/eoi_EquipmentLabel"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_OperationLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -56,8 +55,8 @@
         android:id="@+id/eoi_StatusLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/eoi_ImageStatus"
-        android:layout_marginLeft="15dp"
+        android:layout_below="@+id/eoi_EquipmentLabel"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_Operation"
         android:text="@string/status_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -66,8 +65,8 @@
         android:id="@+id/eoi_Status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/eoi_ImageStatus"
-        android:layout_marginLeft="15dp"
+        android:layout_below="@+id/eoi_EquipmentLabel"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_StatusLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -76,9 +75,9 @@
         android:id="@+id/eoi_ResultStatusLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/eoi_ImageStatus"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/eoi_Status"
+        android:layout_below="@+id/eoi_OperationLabel"
+        android:layout_marginLeft="05dp"
+        android:layout_toRightOf="@+id/eoi_ImageStatus"
         android:text="@string/result_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />
     
@@ -86,8 +85,8 @@
         android:id="@+id/eoi_ResultStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/eoi_ImageStatus"
-        android:layout_marginLeft="15dp"
+        android:layout_below="@+id/eoi_OperationLabel"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_ResultStatusLabel"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
