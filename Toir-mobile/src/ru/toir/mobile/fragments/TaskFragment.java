@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
@@ -246,27 +248,27 @@ public class TaskFragment extends Fragment {
 					int columnIndex) {
 				int viewId = view.getId();
 				if (viewId == R.id.eoi_ImageStatus) {
-					// TODO добавить установку картинки в зависимости от...
-					// я так и не понял от чего зависит картинка операции
-					// берём значения в диапазоне от 0 до 3
-					long row_id = cursor.getLong(cursor.getColumnIndex("_id"));
-					int criteria = (int) (row_id % 4);
+
+					String statusUuid = cursor
+							.getString(
+									cursor.getColumnIndex(EquipmentOperationDBAdapter.Projection.OPERATION_STATUS_UUID))
+							.toUpperCase(Locale.US);
+
 					int image_id;
-					switch (criteria) {
-					case 0:
-						image_id = R.drawable.img_status_1;
-						break;
-					case 1:
-						image_id = R.drawable.img_status_2;
-						break;
-					case 2:
-						image_id = R.drawable.img_status_3;
-						break;
-					case 3:
+
+					if (statusUuid.equals(OperationStatusDBAdapter.Status.NEW
+							.toUpperCase(Locale.US))) {
+						image_id = R.drawable.img_status_5;
+					} else if (statusUuid
+							.equals(OperationStatusDBAdapter.Status.IN_WORK
+									.toUpperCase(Locale.US))) {
 						image_id = R.drawable.img_status_4;
-						break;
-					default:
+					} else if (statusUuid
+							.equals(OperationStatusDBAdapter.Status.COMPLETE
+									.toUpperCase(Locale.US))) {
 						image_id = R.drawable.img_status_1;
+					} else {
+						image_id = R.drawable.img_status_3;
 					}
 
 					((ImageView) view).setImageResource(image_id);
