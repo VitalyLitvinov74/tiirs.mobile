@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
 import ru.toir.mobile.R;
-
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -178,7 +176,5 @@ public class NativeCameraFragment extends Fragment {
 				mCamera = null;
 			}
 		}
-
 	}
-
 }

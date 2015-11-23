@@ -821,6 +821,7 @@ public class OperationActivity extends Activity {
 			mCamera = Camera.open();
 			try {
 				mCamera.setPreviewDisplay(holder);
+				mCamera.setDisplayOrientation(90);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
