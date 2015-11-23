@@ -286,13 +286,16 @@ public class OperationActivity extends Activity {
 
 		clearPhotoContainer();
 
-		File imgFile = new File(step.getImage());
-		if (imgFile.exists() && imgFile.isFile()) {
-			Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
-					.getAbsolutePath());
-			step_image.setImageBitmap(myBitmap);
+		if (step.getImage() != null) {
+			File imgFile = new File(step.getImage());
+			if (imgFile.exists() && imgFile.isFile()) {
+				Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
+						.getAbsolutePath());
+				step_image.setImageBitmap(myBitmap);
+			} else {
+				step_image.setVisibility(View.GONE);
+			}
 		} else {
-			// step_image.setImageResource(R.drawable.workman);
 			step_image.setVisibility(View.GONE);
 		}
 
