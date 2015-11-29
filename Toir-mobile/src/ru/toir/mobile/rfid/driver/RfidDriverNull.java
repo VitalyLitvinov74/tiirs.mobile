@@ -15,9 +15,9 @@ import android.view.ViewGroup;
  *         Драйвер считывателя RFID который ни чего не делает.
  *         </p>
  */
-public class RFIDDriverNull extends RfidDriverBase implements IRfidDriver {
+public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
 
-	public RFIDDriverNull(DialogFragment dialog, Handler handler) {
+	public RfidDriverNull(DialogFragment dialog, Handler handler) {
 		super(dialog, handler);
 	}
 

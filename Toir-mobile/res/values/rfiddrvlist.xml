@@ -11,12 +11,12 @@
         <item>Bluetooth driver</item>
     </string-array>
     <string-array name="drvClassNameList">
-        <item>RfidDriverNull</item>
-        <item>RfidDriverText</item>
-        <item>RfidDriverBarcode</item>
-        <item>RfidDriverQRcode</item>
-        <item>RfidDriverBarcode2D</item>
-        <item>RfidDriverC5</item>
+        <item>@string/rfidDriverNullClass</item>
+        <item>@string/rfidDriverTextClass</item>
+        <item>@string/rfidDriverBarcodeClass</item>
+        <item>@string/rfidDriverQRcodeClass</item>
+        <item>@string/rfidDriverBarcode2DClass</item>
+        <item>@string/rfidDriverC5Class</item>
         <item>@string/rfidDriverBluetoothClass</item>
     </string-array>
 

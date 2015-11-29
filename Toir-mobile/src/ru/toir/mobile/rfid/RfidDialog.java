@@ -69,8 +69,9 @@ public class RfidDialog extends DialogFragment {
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(mContext);
-		driverClassName = sp.getString(mContext.getString(R.string.rfidDriverListPrefKey),
-				"RFIDDriverNull");
+		driverClassName = sp.getString(
+				mContext.getString(R.string.rfidDriverListPrefKey),
+				mContext.getString(R.string.rfidDriverNullClass));
 
 		// пытаемся получить класс драйвера
 		try {

@@ -262,7 +262,7 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public boolean handleMessage(Message msg) {
 
-				Log.d(TAG, "Получили сообщение из драйвра.");
+				Log.d(TAG, "Получили сообщение из драйвера.");
 
 				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 					String tagId = (String) msg.obj;

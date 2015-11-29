@@ -62,7 +62,7 @@ public class ToirPreferences extends PreferenceActivity {
 
 					// принудительно перерисовываем элемент
 					View view = drvSettingScr.getView(null, null);
-					view.requestLayout();
+					view.invalidate();
 					view = null;
 					return true;
 				}
