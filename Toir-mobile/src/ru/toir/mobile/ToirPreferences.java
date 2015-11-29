@@ -55,35 +55,7 @@ public class ToirPreferences extends PreferenceActivity {
 					// для драйвера блютус есть настройки
 					if (value.equals(getResources().getString(
 							R.string.rfidDriverBluetoothClass))) {
-
-						drvSettingScr.setEnabled(true);
-						drvSettingScr.removeAll();
-						// стрим интерфейс с настройками драйвера блютус
-						BluetoothAdapter adapter;
-						adapter = BluetoothAdapter.getDefaultAdapter();
-						if (adapter != null) {
-							ListPreference listPreference = new ListPreference(
-									getActivity());
-							listPreference.setKey(getResources().getString(
-									R.string.rfidDrvBluetoothServer));
-							listPreference.setTitle("Доступные устройства");
-							List<String> names = new ArrayList<String>();
-							List<String> values = new ArrayList<String>();
-
-							Set<BluetoothDevice> deviceSet = adapter
-									.getBondedDevices();
-							for (BluetoothDevice device : deviceSet) {
-								names.add(device.getName());
-								values.add(device.getAddress());
-							}
-
-							listPreference.setEntries(names
-									.toArray(new String[] {}));
-							listPreference.setEntryValues(values
-									.toArray(new String[] {}));
-							drvSettingScr.addPreference(listPreference);
-						}
-
+						setUpBluetoothDriverGUI(drvSettingScr);
 					} else {
 						drvSettingScr.setEnabled(false);
 					}
@@ -109,11 +81,41 @@ public class ToirPreferences extends PreferenceActivity {
 						R.string.rfidDriverBluetoothClass);
 				if (!currentDrv.equals(bluetoothDrv)) {
 					drvSettingScr.setEnabled(false);
+				} else {
+					setUpBluetoothDriverGUI(drvSettingScr);
 				}
 			} else {
 				drvSettingScr.setEnabled(false);
 			}
 
+		}
+
+		private void setUpBluetoothDriverGUI(PreferenceScreen screen) {
+
+			screen.setEnabled(true);
+			screen.removeAll();
+			// стрим интерфейс с настройками драйвера блютус
+			BluetoothAdapter adapter;
+			adapter = BluetoothAdapter.getDefaultAdapter();
+			if (adapter != null) {
+				ListPreference listPreference = new ListPreference(
+						getActivity());
+				listPreference.setKey(getResources().getString(
+						R.string.rfidDrvBluetoothServer));
+				listPreference.setTitle("Доступные устройства");
+				List<String> names = new ArrayList<String>();
+				List<String> values = new ArrayList<String>();
+
+				Set<BluetoothDevice> deviceSet = adapter.getBondedDevices();
+				for (BluetoothDevice device : deviceSet) {
+					names.add(device.getName());
+					values.add(device.getAddress());
+				}
+
+				listPreference.setEntries(names.toArray(new String[] {}));
+				listPreference.setEntryValues(values.toArray(new String[] {}));
+				screen.addPreference(listPreference);
+			}
 		}
 	}
 
