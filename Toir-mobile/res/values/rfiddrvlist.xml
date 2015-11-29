@@ -8,6 +8,7 @@
         <item>QRcode</item>
         <item>Barcode2D</item>
         <item>Driver C5</item>
+        <item>Bluetooth driver</item>
     </string-array>
     <string-array name="drvClassNameList">
         <item>RfidDriverNull</item>
@@ -16,6 +17,7 @@
         <item>RfidDriverQRcode</item>
         <item>RfidDriverBarcode2D</item>
         <item>RfidDriverC5</item>
+        <item>@string/rfidDriverBluetoothClass</item>
     </string-array>
 
 </resources>

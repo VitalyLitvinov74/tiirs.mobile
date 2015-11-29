@@ -28,7 +28,10 @@
     <string name="write_15693">Записать метку</string>
     <string name="serverUrl">serverUrl</string>
     <string name="updateUrl">updateUrl</string>
-    <string name="RFIDDriver">RFIDDriver</string>
+    <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
+    <string name="rfidDriverBluetoothClass">RfidDriverBluetoothClass</string>
+    <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
+    <string name="rfidDrvBluetoothServer">rfidDrvBluetoothServer</string>
     <string name="references">Справочники</string>
     <string name="get_task">Получить наряд</string>
     <string name="back">Назад</string>
