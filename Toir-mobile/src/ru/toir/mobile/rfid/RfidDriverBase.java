@@ -3,7 +3,6 @@
  */
 package ru.toir.mobile.rfid;
 
-import android.app.DialogFragment;
 import android.os.Handler;
 
 /**
@@ -29,18 +28,12 @@ public abstract class RfidDriverBase implements IRfidDriver {
 
 	public static final String RESULT_RFID_TAG_ID = "tagId";
 
-	// диалог в котором драйвер реализует интерфейс пользователя
-	// TODO избавиться от этого члена
-	protected static DialogFragment mDialogFragment;
-
 	// Handler который будет обрабатывать сообщение от драйвера
 	protected static Handler mHandler;
 
-	public RfidDriverBase(DialogFragment dialog, Handler handler) {
+	public RfidDriverBase(Handler handler) {
 
-		mDialogFragment = dialog;
 		mHandler = handler;
 
 	}
-
 }

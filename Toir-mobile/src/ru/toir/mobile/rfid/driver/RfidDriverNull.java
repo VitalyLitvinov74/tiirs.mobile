@@ -2,6 +2,7 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Handler;
 import android.os.Message;
@@ -17,8 +18,16 @@ import android.view.ViewGroup;
  */
 public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
 
-	public RfidDriverNull(DialogFragment dialog, Handler handler) {
-		super(dialog, handler);
+	public RfidDriverNull(Handler handler) {
+		super(handler);
+	}
+
+	public RfidDriverNull(Handler handler, Activity activity) {
+		super(handler);
+	}
+
+	public RfidDriverNull(Handler handler, DialogFragment dialogFragment) {
+		super(handler);
 	}
 
 	@Override

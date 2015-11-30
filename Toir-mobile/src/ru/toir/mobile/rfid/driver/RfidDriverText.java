@@ -3,6 +3,7 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Handler;
 import android.os.Message;
@@ -28,8 +29,16 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 	private String TAG = "RfidDriverText";
 
-	public RfidDriverText(DialogFragment dialog, Handler handler) {
-		super(dialog, handler);
+	public RfidDriverText(Handler handler) {
+		super(handler);
+	}
+
+	public RfidDriverText(Handler handler, DialogFragment dialogFragment) {
+		super(handler);
+	}
+
+	public RfidDriverText(Handler handler, Activity activity) {
+		super(handler);
 	}
 
 	@Override
