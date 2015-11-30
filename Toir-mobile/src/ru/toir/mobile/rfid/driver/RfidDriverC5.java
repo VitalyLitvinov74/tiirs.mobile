@@ -33,7 +33,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public RfidDriverC5(Handler handler, Activity activity) {
 		super(handler);
 	}
-	
+
 	public RfidDriverC5(Handler handler, DialogFragment dialogFragment) {
 		super(handler);
 	}
@@ -43,14 +43,17 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 		Log.d(TAG, "init");
 
-		reader.Init("/dev/ttyMT2");
-		reader.Open("/dev/ttyMT2");
-		if (reader.SetTransmissionPower(1950) == 0x11) {
+		if (reader.Init("/dev/ttyMT2") == 0) {
+			reader.Open("/dev/ttyMT2");
 			if (reader.SetTransmissionPower(1950) == 0x11) {
-				reader.SetTransmissionPower(1950);
+				if (reader.SetTransmissionPower(1950) == 0x11) {
+					reader.SetTransmissionPower(1950);
+				}
 			}
+			return true;
+		} else {
+			return false;
 		}
-		return true;
 	}
 
 	@Override

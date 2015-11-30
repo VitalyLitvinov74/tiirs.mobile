@@ -531,7 +531,7 @@ public class reader {
 	 * 
 	 * @param strpath
 	 */
-	static public native void Init(String strpath);
+	static public native int Init(String strpath);
 
 	/**
 	 * open device
