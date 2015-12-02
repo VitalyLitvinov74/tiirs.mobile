@@ -907,18 +907,19 @@ jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
 	int PCEPCLen;
 
 	passwordLen = (*env)->GetArrayLength(env, jKPassword);
-	password = (unsigned char *) (*env)->GetByteArrayElements(env, jKPassword, &copy);
+	password = (unsigned char *) (*env)->GetByteArrayElements(env, jKPassword,
+			&copy);
 	PCEPCLen = (*env)->GetArrayLength(env, jEPC);
 	PCEPC = (unsigned char *) (*env)->GetByteArrayElements(env, jEPC, &copy);
 
-	if (passwordLen <= 3 || !password || PCEPCLen < nUL || !PCEPC
-			|| (result = 16, MagicKill(nUL + 6, password, nUL, PCEPC) != nUL + 13)) {
+	if (passwordLen <= 3 || !password || PCEPCLen < nUL || !PCEPC || (result =
+			16, MagicKill(nUL + 6, password, nUL, PCEPC) != nUL + 13)) {
 		result = 17;
 	}
-	
+
 	(*env)->ReleaseByteArrayElements(env, jKPassword, password, 0);
 	(*env)->ReleaseByteArrayElements(env, jEPC, PCEPC, 0);
-	
+
 	return result;
 }
 
