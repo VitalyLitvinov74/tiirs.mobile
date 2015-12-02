@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import android.view.ViewGroup;
  *         </p>
  */
 public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
+
+	public static final String DRIVER_NAME = "Null драйвер";
 
 	public RfidDriverNull(Handler handler) {
 		super(handler);
@@ -89,4 +93,19 @@ public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
 		mHandler.sendMessage(message);
 	}
 
+	/**
+	 * <p>Метод создаёт интерфейс настроек драйвера</p>
+	 * @param screen
+	 * @return
+	 */
+	public static PreferenceScreen getSettingsView(PreferenceScreen screen) {
+
+		CheckBoxPreference checkBoxPreference = new CheckBoxPreference(
+				screen.getContext());
+		checkBoxPreference.setTitle("Тестовый чек бокс");
+		checkBoxPreference.setKey("rfidDrvNullTestCheckBox");
+		screen.addPreference(checkBoxPreference);
+
+		return screen;
+	}
 }

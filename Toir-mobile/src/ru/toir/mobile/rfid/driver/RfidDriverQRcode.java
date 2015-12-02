@@ -35,6 +35,7 @@ import android.widget.TextView;
  */
 public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
+	public static final String DRIVER_NAME = "Драйвер QR кодов";
 	private String TAG = "RFIDQRcode";
 	private Camera mCamera;
 	private CameraPreview mPreview;

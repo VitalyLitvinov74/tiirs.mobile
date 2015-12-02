@@ -27,6 +27,7 @@ import android.widget.SpinnerAdapter;
  */
 public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
+	public static final String DRIVER_NAME = "Текстовый драйвер";
 	private String TAG = "RfidDriverText";
 
 	public RfidDriverText(Handler handler) {

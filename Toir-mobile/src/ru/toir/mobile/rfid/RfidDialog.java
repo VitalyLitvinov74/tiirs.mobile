@@ -70,13 +70,11 @@ public class RfidDialog extends DialogFragment {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(mContext);
 		driverClassName = sp.getString(
-				mContext.getString(R.string.rfidDriverListPrefKey),
-				mContext.getString(R.string.rfidDriverNullClass));
+				mContext.getString(R.string.rfidDriverListPrefKey), null);
 
 		// пытаемся получить класс драйвера
 		try {
-			driverClass = Class.forName("ru.toir.mobile.rfid.driver."
-					+ driverClassName);
+			driverClass = Class.forName(driverClassName);
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, e.toString());
 			Message message = new Message();

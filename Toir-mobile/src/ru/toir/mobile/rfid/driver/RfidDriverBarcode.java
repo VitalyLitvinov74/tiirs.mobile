@@ -22,6 +22,7 @@ import android.view.ViewGroup;
  */
 public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
+	public static final String DRIVER_NAME = "Драйвер штрихкодов Barcode";
 	private IntentIntegrator integrator;
 	private DialogFragment dialogFragment;
 	private Activity activity;

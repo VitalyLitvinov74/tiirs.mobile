@@ -12,8 +12,6 @@
             android:title="@string/pref_server_url" />
 
         <ListPreference
-            android:entries="@array/drvNameList"
-            android:entryValues="@array/drvClassNameList"
             android:key="@string/rfidDriverListPrefKey"
             android:title="@string/pref_rfid_driver" />
     </PreferenceCategory>

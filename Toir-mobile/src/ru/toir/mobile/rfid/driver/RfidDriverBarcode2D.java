@@ -26,6 +26,7 @@ import android.widget.EditText;
  */
 public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
+	public static final String DRIVER_NAME = "Драйвер лазерного считывателя штрихкодов";
 	private final static String TAG = "RfidDriverBarcode2D";
 	private Handler c5Handler;
 	// view в котором будет текстовое поле в которое будет помещен распознанный

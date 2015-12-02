@@ -22,6 +22,7 @@ import android.view.ViewGroup;
  */
 public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
+	public static final String DRIVER_NAME = "Драйвер UHF C5";
 	private static final String TAG = "RfidDriverC5";
 	// по умолчанию таймаут на операцию 5 секунд
 	private static final int timeOut = 5000;

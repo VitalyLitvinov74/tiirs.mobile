@@ -1,10 +1,11 @@
 package ru.toir.mobile;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+import dalvik.system.DexFile;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -13,9 +14,12 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.view.View;
 
 public class ToirPreferences extends PreferenceActivity {
+
+	private static final String TAG = "ToirPreferences";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +43,53 @@ public class ToirPreferences extends PreferenceActivity {
 			SharedPreferences preferences = PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext());
 
-			// элемент интерфейса со списком драйверов считываетелей
+			// получаем список драйверов по имени класса
+			List<String> driverClassList = new ArrayList<String>();
+			try {
+				DexFile df = new DexFile(getApplicationContext()
+						.getPackageCodePath());
+				for (Enumeration<String> iter = df.entries(); iter
+						.hasMoreElements();) {
+					String classPath = iter.nextElement();
+					if (classPath.contains("ru.toir.mobile.rfid.driver")
+							&& !classPath.contains("$")) {
+						driverClassList.add(classPath);
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// строим список драйверов с именами и классами
+			Class<?> driverClass;
+			List<String> drvNames = new ArrayList<String>();
+			List<String> drvKeys = new ArrayList<String>();
+			for (String classPath : driverClassList) {
+
+				driverClass = null;
+				try {
+					// пытаемся получить класс драйвера
+					driverClass = Class.forName(classPath);
+					// пытаемся получить свойство DRIVER_NAME
+					String name = (String) (driverClass
+							.getDeclaredField("DRIVER_NAME").get(new String()));
+					if (name != null && !name.equals("")) {
+						drvNames.add(name);
+						drvKeys.add(classPath);
+					}
+				} catch (Exception e) {
+					Log.e(TAG, e.toString());
+				}
+			}
+
+			// элемент интерфейса со списком драйверов считывателей
 			drvList = (ListPreference) findPreference(getResources().getString(
 					R.string.rfidDriverListPrefKey));
+
+			// указываем названия и значения для элементов списка
+			drvList.setEntries(drvNames.toArray(new String[] {}));
+			drvList.setEntryValues(drvKeys.toArray(new String[] {}));
+
 			// при изменении драйвера, включаем дополнительный экран с
 			// настройками драйвера
 			drvList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -52,10 +100,9 @@ public class ToirPreferences extends PreferenceActivity {
 
 					String value = (String) newValue;
 
-					// для драйвера блютус есть настройки
-					if (value.equals(getResources().getString(
-							R.string.rfidDriverBluetoothClass))) {
-						setUpBluetoothDriverGUI(drvSettingScr);
+					// проверяем есть ли настройки у драйвера
+					if (hasSettingsSreen(value)) {
+						drvSettingScr.setEnabled(true);
 					} else {
 						drvSettingScr.setEnabled(false);
 					}
@@ -71,18 +118,15 @@ public class ToirPreferences extends PreferenceActivity {
 			drvSettingScr = (PreferenceScreen) findPreference(getResources()
 					.getString(R.string.rfidDrvSettingKey));
 
-			// перед показом экрана настроек приложения пользователю,
-			// включаем экран настройки драйвера считывателя
+			// проверяем есть ли настройки у драйвера
 			String currentDrv = preferences.getString(
 					getResources().getString(R.string.rfidDriverListPrefKey),
 					null);
 			if (currentDrv != null) {
-				String bluetoothDrv = getResources().getString(
-						R.string.rfidDriverBluetoothClass);
-				if (!currentDrv.equals(bluetoothDrv)) {
-					drvSettingScr.setEnabled(false);
+				if (hasSettingsSreen(currentDrv)) {
+					drvSettingScr.setEnabled(true);
 				} else {
-					setUpBluetoothDriverGUI(drvSettingScr);
+					drvSettingScr.setEnabled(false);
 				}
 			} else {
 				drvSettingScr.setEnabled(false);
@@ -90,33 +134,35 @@ public class ToirPreferences extends PreferenceActivity {
 
 		}
 
-		private void setUpBluetoothDriverGUI(PreferenceScreen screen) {
+		private boolean hasSettingsSreen(String classPath) {
 
-			screen.setEnabled(true);
-			screen.removeAll();
-			// стрим интерфейс с настройками драйвера блютус
-			BluetoothAdapter adapter;
-			adapter = BluetoothAdapter.getDefaultAdapter();
-			if (adapter != null) {
-				ListPreference listPreference = new ListPreference(
-						getActivity());
-				listPreference.setKey(getResources().getString(
-						R.string.rfidDrvBluetoothServer));
-				listPreference.setTitle("Доступные устройства");
-				List<String> names = new ArrayList<String>();
-				List<String> values = new ArrayList<String>();
+			Class<?> driverClass;
+			try {
+				// пытаемся получить класс драйвера
+				driverClass = Class.forName(classPath);
 
-				Set<BluetoothDevice> deviceSet = adapter.getBondedDevices();
-				for (BluetoothDevice device : deviceSet) {
-					names.add(device.getName());
-					values.add(device.getAddress());
+				// пытаемся получить метод getSettingsView
+				Method method = driverClass.getMethod("getSettingsView",
+						new Class[] { PreferenceScreen.class });
+
+				// передаём драйверу "чистый" экран
+				drvSettingScr.removeAll();
+
+				// пытаемся вызвать метод
+				PreferenceScreen screen = (PreferenceScreen) method.invoke(
+						null, drvSettingScr);
+
+				// если драйвер не вернул экран, значит настроек для него нет
+				if (screen != null) {
+					return true;
+				} else {
+					return false;
 				}
-
-				listPreference.setEntries(names.toArray(new String[] {}));
-				listPreference.setEntryValues(values.toArray(new String[] {}));
-				screen.addPreference(listPreference);
+			} catch (Exception e) {
+				return false;
 			}
 		}
+
 	}
 
 }
