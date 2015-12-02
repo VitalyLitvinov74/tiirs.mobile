@@ -17,5 +17,6 @@
         android:id="@+id/action_about"
         android:orderInCategory="102"
         android:title="@string/action_about"
-        android:onClick="onActionAbout" />    
+        android:onClick="onActionAbout" />
+    <item android:id="@+id/btServer" android:onClick="onActionBTServer" android:title="Bluetooth сервер"></item>    
 </menu>

@@ -78,5 +78,6 @@
     <string name="divider"> | </string>
     <string name="application_full_name">Мобильный ТОиР</string>
     <string name="open_documentation">Открыть документацию</string>
+    <string name="title_activity_btserver">BTServerActivity</string>
 
 </resources>
