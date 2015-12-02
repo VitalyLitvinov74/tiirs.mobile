@@ -1,7 +1,11 @@
 package ru.toir.mobile;
 
+import java.util.UUID;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,44 +18,139 @@ import android.widget.Button;
 public class BTServerActivity extends Activity {
 
 	private static final String TAG = "BTServerActivity";
+	private static final int BT_ENABLE_REQUEST_CODE = 666;
+
+	public static final String BT_SERVER_UUID = "E8627152-8F74-460B-B31E-A879194BB431";
+	public static final String BT_SERVICE_RECORD_NAME = "ToirBTServer";
+
 	BluetoothAdapter adapter;
 	Button startServerButton;
+
+	IntentFilter btChangeStateFilter;
 	BroadcastReceiver btChangeStateReceiver;
+
+	ServerListener listener;
+
+	boolean needStart;
+
+	private class ServerListener extends Thread {
+
+		private BluetoothServerSocket serverSocket;
+		private UUID uuid;
+
+		public ServerListener() {
+
+			serverSocket = null;
+			uuid = null;
+			try {
+				uuid = UUID.fromString(BT_SERVER_UUID);
+			} catch (Exception e) {
+				Log.e(TAG, e.getLocalizedMessage());
+			}
+		}
+
+		@Override
+		public void run() {
+
+			Log.d(TAG, "Запускаем поток ожидания входящего соединения...");
+			
+			adapter.cancelDiscovery();
+			
+			// получаем серверный сокет
+			try {
+				serverSocket = adapter.listenUsingRfcommWithServiceRecord(
+						BT_SERVICE_RECORD_NAME, uuid);
+				Log.d(TAG, "Получили серверный сокет...");
+			} catch (Exception e) {
+				Log.d(TAG, e.getLocalizedMessage());
+			}
+
+			// запускаем ожидание соединения от клиента
+			if (serverSocket != null) {
+				while (true) {
+					try {
+						Log.d(TAG, "Запускаем приём соединения...");
+						BluetoothSocket socket = serverSocket.accept(5000);
+						Log.d(TAG, "Входящее соединение получено...");
+						// запускаем поток сервера, ожидающего команды
+					} catch (Exception e) {
+						Log.e(TAG, e.getLocalizedMessage());
+					} finally {
+						if (isInterrupted()) {
+							break;
+						}
+					}
+				}
+			} else {
+				Log.e(TAG, "Серверный сокет не получили!!!");
+			}
+			Log.d(TAG, "Завершился поток ожидания входящего соединения...");
+		}
+	}
+
+	public BTServerActivity() {
+
+		needStart = false;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_btserver);
 
-		// регистрируем обработчик сообщений изменения состояния
+		// создаём приёмник для обработки сообщений о изменении состояния
 		// адаптера блютус
-		IntentFilter filter = new IntentFilter(
+		btChangeStateFilter = new IntentFilter(
 				BluetoothAdapter.ACTION_STATE_CHANGED);
-		if (btChangeStateReceiver == null) {
-			btChangeStateReceiver = new BroadcastReceiver() {
+		btChangeStateReceiver = new BroadcastReceiver() {
 
-				@Override
-				public void onReceive(Context context, Intent intent) {
-					Bundle extra = intent.getExtras();
-					int state = extra.getInt(BluetoothAdapter.EXTRA_STATE);
-					if (state == BluetoothAdapter.STATE_OFF) {
-						Log.d(TAG, "BT Off");
-						// видимо если сервер был запущен, его нужно прибить,
-						// если этого еще раньше не произошло в виду
-						// изчезновения открытого сокета
-					} else if (state == BluetoothAdapter.STATE_ON) {
-						Log.d(TAG, "BT On");
-						// unregisterReceiver(btChangeStateReceiver);
-						// TODO запускаем поток ожидания соединения от
-						// клиента
-						adapter.cancelDiscovery();
-						Log.d(TAG, "Запускаем сервер...");
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				
+				Bundle extra = intent.getExtras();
+				int state = extra.getInt(BluetoothAdapter.EXTRA_STATE);
+
+				switch (state) {
+				case BluetoothAdapter.STATE_ON:
+					Log.d(TAG, "BT On");
+
+					if (needStart) {
+						if (listener != null) {
+							listener.interrupt();
+							listener = null;
+						}
+
+						// запускаем поток с ожиданием подключения от клиента
+						listener = new ServerListener();
+						listener.start();
+						needStart = false;
 					}
-				}
-			};
-		}
-		registerReceiver(btChangeStateReceiver, filter);
 
+					break;
+
+				case BluetoothAdapter.STATE_OFF:
+					Log.d(TAG, "BT Off");
+
+					// если поток запущен, прерываем его
+					if (listener != null) {
+						listener.interrupt();
+						listener = null;
+					}
+
+					if (needStart) {
+						// просим включить блютус
+						Intent intentStartBT = new Intent(
+								BluetoothAdapter.ACTION_REQUEST_ENABLE);
+						startActivityForResult(intentStartBT,
+								BT_ENABLE_REQUEST_CODE);
+					}
+
+					break;
+				}
+			}
+		};
+
+		// обработчик кнопки запуска сервера
 		startServerButton = (Button) findViewById(R.id.startBTServerButton);
 		startServerButton.setOnClickListener(new View.OnClickListener() {
 
@@ -60,27 +159,51 @@ public class BTServerActivity extends Activity {
 
 				if (adapter != null) {
 					// проверяем что адаптер находится в состоянии доступности
-					int scanMode = adapter.getScanMode();
-					switch (scanMode) {
-					case BluetoothAdapter.SCAN_MODE_NONE:
-						Log.d(TAG, "SCAN_MODE_NONE");
-						// просим пользователя включить блютус
-						Intent i = new Intent(
+					int state = adapter.getState();
+
+					switch (state) {
+					case BluetoothAdapter.STATE_ON:
+						Log.d(TAG, "Запускаем сервер с кнопки...");
+
+						if (listener != null) {
+							listener.interrupt();
+							listener = null;
+						}
+
+						// запускаем ожидание соединения
+						listener = new ServerListener();
+						listener.start();
+						break;
+
+					case BluetoothAdapter.STATE_OFF:
+						Log.d(TAG, "Просим включить блютус...");
+
+						// указываем на необходимость запуска ожидания входящего
+						// соединения
+						needStart = true;
+
+						// просим включить блютус
+						Intent intent = new Intent(
 								BluetoothAdapter.ACTION_REQUEST_ENABLE);
-						startActivity(i);
+						startActivityForResult(intent, BT_ENABLE_REQUEST_CODE);
 						break;
 
-					case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-						Log.d(TAG, "SCAN_MODE_CONNECTABLE");
-						Log.d(TAG, "Запускаем сервер...");
-						adapter.cancelDiscovery();
-						// TODO запускаем поток ожидания соединения от клиента
+					case BluetoothAdapter.STATE_TURNING_ON:
+						Log.d(TAG,
+								"Адаптер стартует, необходимость запуска ожидания входящего соединения...");
+
+						// указываем на необходимость запуска ожидания входящего
+						// соединения
+						needStart = true;
 						break;
 
-					case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-						Log.d(TAG, "SCAN_MODE_CONNECTABLE_DISCOVERABLE");
-						adapter.cancelDiscovery();
-						// TODO запускаем поток ожидания соединения от клиента
+					case BluetoothAdapter.STATE_TURNING_OFF:
+						Log.d(TAG,
+								"Адаптер выключается, необходимость запуска ожидания входящего соединения...");
+
+						// указываем на необходимость запуска ожидания входящего
+						// соединения
+						needStart = true;
 						break;
 					}
 				}
@@ -94,15 +217,44 @@ public class BTServerActivity extends Activity {
 	}
 
 	@Override
-	protected void onResume() {
-		Log.d(TAG, "onResume");
-		super.onResume();
+	protected void onStart() {
+
+		Log.d(TAG, "onStart");
+
+		registerReceiver(btChangeStateReceiver, btChangeStateFilter);
+
+		super.onStart();
 	}
 
 	@Override
-	protected void onPause() {
-		Log.d(TAG, "onPause");
-		super.onPause();
+	protected void onStop() {
+
+		Log.d(TAG, "onStop");
+
+		unregisterReceiver(btChangeStateReceiver);
+
+		if (listener != null) {
+			listener.interrupt();
+			listener = null;
+		}
+
+		super.onStop();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		if (requestCode == BT_ENABLE_REQUEST_CODE) {
+			if (resultCode != Activity.RESULT_OK) {
+				Log.d(TAG, "отказались включать блютус");
+				// пользователь отказался от включения блютус
+				// либо произошла еще какая-то ошибка
+				needStart = false;
+			}
+			return;
+		}
+
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 }
