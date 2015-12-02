@@ -75,7 +75,7 @@
         android:layout_below="@+id/eril_type_label"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eril_image"
-        android:text="Дата последнего обслуживания:" />
+        android:text="Последнее обслуживание:" />
 
     <TextView
         android:id="@+id/eril_last_operation_date"

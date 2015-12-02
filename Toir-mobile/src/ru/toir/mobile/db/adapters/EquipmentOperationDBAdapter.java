@@ -160,6 +160,27 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 
 	/**
 	 * <p>
+	 * Возвращает все записи из таблицы equipment_operation
+	 * </p>
+	 * 
+	 * @return ArrayList<EquipmentOperation>
+	 */
+	public List<EquipmentOperation> getEquipmentOperations() {
+
+		List<EquipmentOperation> operations = new ArrayList<EquipmentOperation>();
+		Cursor cursor = mDb.query(TABLE_NAME, new String[] { "*" }, null, null,
+				null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				operations.add(getItem(cursor));
+			} while (cursor.moveToNext());
+		}
+		return operations;
+
+	}
+
+	/**
+	 * <p>
 	 * Возвращает запись из таблицы equipment_operation
 	 * </p>
 	 * 
