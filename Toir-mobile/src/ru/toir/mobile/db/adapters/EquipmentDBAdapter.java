@@ -489,8 +489,8 @@ public class EquipmentDBAdapter extends BaseDBAdapter {
 			sortOrder = orderByField;
 		}
 
-		cursor = queryBuilder.query(mDb, null, null, paramArray, null, null,
-				sortOrder);
+		cursor = queryBuilder.query(mDb, null, null, paramArray,
+				getFullName(TABLE_NAME, FIELD_UUID), null, sortOrder);
 
 		return cursor;
 	}
