@@ -5,9 +5,7 @@ package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
-
 import com.google.zxing.integration.android.IntentIntegrator;
-
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Handler;

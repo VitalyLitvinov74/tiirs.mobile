@@ -1,6 +1,5 @@
 package ru.toir.mobile.rfid.driver;
 
-import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -18,7 +17,7 @@ import android.view.ViewGroup;
  *         Драйвер считывателя RFID который ни чего не делает.
  *         </p>
  */
-public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
+public class RfidDriverNull extends RfidDriverBase {
 
 	public static final String DRIVER_NAME = "Null драйвер";
 
@@ -94,11 +93,13 @@ public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
 	}
 
 	/**
-	 * <p>Метод создаёт интерфейс настроек драйвера</p>
-	 * @param screen
-	 * @return
+	 * <p>
+	 * Интерфейс настроек драйвера
+	 * </p>
+	 * 
+	 * @return PreferenceScreen Если настроек нет должен вернуть null
 	 */
-	public static PreferenceScreen getSettingsView(PreferenceScreen screen) {
+	public static PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
 
 		CheckBoxPreference checkBoxPreference = new CheckBoxPreference(
 				screen.getContext());
@@ -108,4 +109,5 @@ public class RfidDriverNull extends RfidDriverBase implements IRfidDriver {
 
 		return screen;
 	}
+
 }

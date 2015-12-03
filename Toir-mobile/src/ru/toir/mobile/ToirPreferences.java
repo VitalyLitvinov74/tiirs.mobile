@@ -101,7 +101,7 @@ public class ToirPreferences extends PreferenceActivity {
 					String value = (String) newValue;
 
 					// проверяем есть ли настройки у драйвера
-					if (hasSettingsSreen(value)) {
+					if (getDrvSettingsSreen(value, drvSettingScr) != null) {
 						drvSettingScr.setEnabled(true);
 					} else {
 						drvSettingScr.setEnabled(false);
@@ -123,7 +123,7 @@ public class ToirPreferences extends PreferenceActivity {
 					getResources().getString(R.string.rfidDriverListPrefKey),
 					null);
 			if (currentDrv != null) {
-				if (hasSettingsSreen(currentDrv)) {
+				if (getDrvSettingsSreen(currentDrv, drvSettingScr) != null) {
 					drvSettingScr.setEnabled(true);
 				} else {
 					drvSettingScr.setEnabled(false);
@@ -134,32 +134,32 @@ public class ToirPreferences extends PreferenceActivity {
 
 		}
 
-		private boolean hasSettingsSreen(String classPath) {
+		private PreferenceScreen getDrvSettingsSreen(String classPath,
+				PreferenceScreen rootScreen) {
 
 			Class<?> driverClass;
+			Method method;
+			PreferenceScreen screen;
+
 			try {
 				// пытаемся получить класс драйвера
 				driverClass = Class.forName(classPath);
 
-				// пытаемся получить метод getSettingsView
-				Method method = driverClass.getMethod("getSettingsView",
+				// пытаемся получить метод getSettingsScreen
+				method = driverClass.getMethod("getSettingsScreen",
 						new Class[] { PreferenceScreen.class });
 
 				// передаём драйверу "чистый" экран
-				drvSettingScr.removeAll();
+				rootScreen.removeAll();
 
 				// пытаемся вызвать метод
-				PreferenceScreen screen = (PreferenceScreen) method.invoke(
-						null, drvSettingScr);
+				screen = (PreferenceScreen) method.invoke(null, rootScreen);
 
-				// если драйвер не вернул экран, значит настроек для него нет
-				if (screen != null) {
-					return true;
-				} else {
-					return false;
-				}
+				// возвращаем результат
+				return screen;
 			} catch (Exception e) {
-				return false;
+				Log.e(TAG, e.getLocalizedMessage());
+				return null;
 			}
 		}
 

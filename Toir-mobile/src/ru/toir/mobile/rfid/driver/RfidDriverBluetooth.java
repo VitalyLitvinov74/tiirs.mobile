@@ -134,17 +134,20 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	}
 
 	/**
-	 * <p>Метод создаёт интерфейс настроек драйвера</p>
-	 * @param screen
-	 * @return
+	 * <p>
+	 * Интерфейс настроек драйвера
+	 * </p>
+	 * 
+	 * @return PreferenceScreen Если настроек нет должен вернуть null
 	 */
-	public static PreferenceScreen getSettingsView(PreferenceScreen screen) {
+	public static PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
 
 		// строим интерфейс с настройками драйвера блютус
 		BluetoothAdapter adapter;
 		adapter = BluetoothAdapter.getDefaultAdapter();
 		if (adapter != null) {
-			ListPreference listPreference = new ListPreference(screen.getContext());
+			ListPreference listPreference = new ListPreference(
+					screen.getContext());
 			listPreference.setKey("rfidDrvBluetoothServer");
 			listPreference.setTitle("Доступные устройства");
 			List<String> names = new ArrayList<String>();
