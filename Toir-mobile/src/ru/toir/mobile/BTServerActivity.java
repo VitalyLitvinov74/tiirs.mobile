@@ -1,6 +1,11 @@
 package ru.toir.mobile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
+
+import ru.toir.mobile.rfid.RfidDialog;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +37,61 @@ public class BTServerActivity extends Activity {
 
 	ServerListener listener;
 
+	RfidDialog rfidDialog;
+
 	boolean needStart;
+
+	private class ServerParser extends Thread {
+
+		private BluetoothSocket socket;
+		private InputStream inputStream;
+		private OutputStream outputStream;
+		private Handler handler;
+
+		public ServerParser(BluetoothSocket socket, Handler handler) {
+			if (socket != null) {
+				this.socket = socket;
+				this.handler = handler;
+				try {
+					inputStream = socket.getInputStream();
+					outputStream = socket.getOutputStream();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+
+			int bufferLength = 1024;
+			byte[] buffer = new byte[bufferLength];
+			int count = 0;
+			int offset = 0;
+			int parseOffset = 0;
+
+			if (inputStream != null) {
+				try {
+					while (true) {
+						count = inputStream.read(buffer, offset, bufferLength
+								- offset);
+						if (count > 0) {
+							offset += count;
+							if (offset >= bufferLength) {
+								offset = 0;
+							}
+						}
+
+						// TODO Реализовать разбор данных от клиента
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+
+				}
+			}
+		}
+
+	}
 
 	private class ServerListener extends Thread {
 
@@ -53,9 +113,9 @@ public class BTServerActivity extends Activity {
 		public void run() {
 
 			Log.d(TAG, "Запускаем поток ожидания входящего соединения...");
-			
+
 			adapter.cancelDiscovery();
-			
+
 			// получаем серверный сокет
 			try {
 				serverSocket = adapter.listenUsingRfcommWithServiceRecord(
@@ -106,7 +166,7 @@ public class BTServerActivity extends Activity {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				
+
 				Bundle extra = intent.getExtras();
 				int state = extra.getInt(BluetoothAdapter.EXTRA_STATE);
 
@@ -214,6 +274,7 @@ public class BTServerActivity extends Activity {
 		if (adapter == null) {
 			startServerButton.setEnabled(false);
 		}
+
 	}
 
 	@Override

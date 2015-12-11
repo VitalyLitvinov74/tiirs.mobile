@@ -3,6 +3,7 @@
  */
 package ru.toir.mobile.rfid;
 
+import android.content.Context;
 import android.os.Handler;
 
 /**
@@ -30,10 +31,16 @@ public abstract class RfidDriverBase implements IRfidDriver {
 
 	// Handler который будет обрабатывать сообщение от драйвера
 	protected static Handler mHandler;
+	
+	protected Context context;
 
 	public RfidDriverBase(Handler handler) {
 
 		mHandler = handler;
 
+	}
+	
+	public void setContext(Context context) {
+		this.context = context;
 	}
 }

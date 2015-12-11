@@ -97,6 +97,9 @@ public class RfidDialog extends DialogFragment {
 			mHandler.sendMessage(message);
 		}
 
+		// передаём в драйвер контекст
+		driver.setContext(mContext);
+
 		// инициализируем драйвер
 		if (!driver.init()) {
 			Message message = new Message();
