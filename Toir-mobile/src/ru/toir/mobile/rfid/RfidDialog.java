@@ -61,6 +61,8 @@ public class RfidDialog extends DialogFragment {
 	 */
 	private Handler mHandler;
 
+	private boolean isInited = false;
+
 	public RfidDialog(Context context, Handler handler) {
 
 		mContext = context;
@@ -106,6 +108,8 @@ public class RfidDialog extends DialogFragment {
 			message.what = RfidDriverBase.RESULT_RFID_INIT_ERROR;
 			mHandler.sendMessage(message);
 
+		} else {
+			isInited = true;
 		}
 
 	}
@@ -118,7 +122,10 @@ public class RfidDialog extends DialogFragment {
 
 		getDialog().setTitle("Поднесите метку");
 
-		View view = driver.getView(inflater, viewGroup);
+		View view = null;
+		if (isInited) {
+			view = driver.getView(inflater, viewGroup);
+		}
 
 		return view;
 	}
@@ -127,6 +134,10 @@ public class RfidDialog extends DialogFragment {
 	public void onStart() {
 
 		super.onStart();
+
+		if (!isInited) {
+			return;
+		}
 
 		if (isStarted) {
 			return;
