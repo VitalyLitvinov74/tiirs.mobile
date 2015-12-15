@@ -15,10 +15,14 @@
             android:key="@string/rfidDriverListPrefKey"
             android:title="@string/pref_rfid_driver" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:key="drvSettingsCategory"
+        android:title="Настройки драйверов" >
 
-    <PreferenceScreen
-        android:key="@string/rfidDrvSettingKey"
-        android:title="Настройки драйвера RFID" >
-    </PreferenceScreen>
+        <PreferenceScreen
+            android:key="@string/rfidDrvSettingKey"
+            android:title="Настройки драйвера RFID" >
+        </PreferenceScreen>
+    </PreferenceCategory>
 
 </PreferenceScreen>
