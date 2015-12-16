@@ -22,9 +22,27 @@
         android:id="@+id/startBTServerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/bluetoothServerStatusLabel"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="132dp"
         android:text="Запустить сервер" />
+
+    <Button
+        android:id="@+id/stopBTServerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/startBTServerButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Остановить сервер" />
+
+    <Button
+        android:id="@+id/testBTServerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/stopBTServerButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Тест" />
 
 </RelativeLayout>

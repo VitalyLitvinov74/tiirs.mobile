@@ -13,8 +13,8 @@ import android.util.Log;
  * @author Dmitriy Logachov
  * 
  */
-public class ServerCommunicator implements ICommunicator {
-	
+public class ServerCommunicator extends Thread implements ICommunicator {
+
 	private static final String TAG = "ServerCommunicator";
 
 	private BluetoothSocket socket;
@@ -52,6 +52,8 @@ public class ServerCommunicator implements ICommunicator {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				listener.onMessage(new byte[] { 6 });
+
 				return;
 			}
 		}
@@ -77,6 +79,28 @@ public class ServerCommunicator implements ICommunicator {
 			e.printStackTrace();
 		}
 
+	}
+
+	@Override
+	public void run() {
+
+		int bufferLength = 1024;
+		int count;
+		byte buffer[] = new byte[bufferLength];
+
+		while (true) {
+			try {
+				count = inputStream.read(buffer, 0, bufferLength);
+				if (count >= 0) {
+					listener.onMessage(Arrays.copyOfRange(buffer, 0, count));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				listener.onMessage(new byte[] { 6 });
+
+				return;
+			}
+		}
 	}
 
 }

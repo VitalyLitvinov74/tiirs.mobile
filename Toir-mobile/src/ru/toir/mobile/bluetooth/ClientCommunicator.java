@@ -15,7 +15,7 @@ import android.util.Log;
  * 
  */
 public class ClientCommunicator implements ICommunicator {
-	
+
 	private static final String TAG = "ClientCommunicator";
 
 	private BluetoothSocket socket;
@@ -55,7 +55,8 @@ public class ClientCommunicator implements ICommunicator {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				return;
+				listener.onMessage(new byte[] { 6 });
+				break;
 			}
 		}
 

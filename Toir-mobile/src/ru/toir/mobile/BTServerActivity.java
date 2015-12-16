@@ -1,21 +1,14 @@
 package ru.toir.mobile;
 
-import java.util.UUID;
-
-import ru.toir.mobile.bluetooth.ICommunicatorListener;
-import ru.toir.mobile.bluetooth.ServerCommunicator;
+import ru.toir.mobile.bluetooth.ServerListener;
 import ru.toir.mobile.rfid.RfidDialog;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,180 +21,83 @@ public class BTServerActivity extends Activity {
 
 	public static final String BT_SERVER_UUID = "E8627152-8F74-460B-B31E-A879194BB431";
 	public static final String BT_SERVICE_RECORD_NAME = "ToirBTServer";
+	public static final String SERVER_STATE_ACTION = "ru.toir.mobile.btserver.state";
+	public static final String SERVER_STATE_PARAM = "state";
 
-	private BluetoothAdapter adapter;
+	public static final int SERVER_STATE_STOPED = 1;
+	public static final int SERVER_STATE_WAITING_CONNECTION = 2;
+	public static final int SERVER_STATE_CONNECTED = 3;
+	public static final int SERVER_STATE_DISCONNECTED = 4;
+
 	private Button startServerButton;
+	private Button stopServerButton;
 	private TextView serverStatusTextView;
 
 	private IntentFilter btChangeStateFilter;
 	private BroadcastReceiver btChangeStateReceiver;
 
-	private ServerListener listener;
+	private IntentFilter serverStateFilter;
+	private BroadcastReceiver serverStateReceiver;
+
+	// объект отвечающий за ожидание входящего соединения от клиента
+	private ServerListener serverListener;
 
 	private RfidDialog rfidDialog;
-	private ServerCommunicator communicator;
 
+	// флаг необходимости запуска сервера, в ситуации когда адаптер находится в
+	// промежуточных состояниях
 	private boolean needStart;
-
-	// обработчик сообщений из потока чтения данных с
-	// клиента для работы с интерфейсом
-	private Handler uiHandler;
-
-	private class ServerListener extends Thread {
-
-		private BluetoothServerSocket serverSocket;
-		private UUID uuid;
-		private Handler handler;
-
-		public ServerListener(Handler handler) {
-
-			this.handler = handler;
-			serverSocket = null;
-			uuid = null;
-			try {
-				uuid = UUID.fromString(BT_SERVER_UUID);
-			} catch (Exception e) {
-				Log.e(TAG, e.getLocalizedMessage());
-			}
-		}
-
-		@Override
-		public void run() {
-
-			Message message;
-
-			Log.d(TAG, "Запускаем поток ожидания входящего соединения...");
-
-			adapter.cancelDiscovery();
-
-			// получаем серверный сокет
-			try {
-				serverSocket = adapter.listenUsingRfcommWithServiceRecord(
-						BT_SERVICE_RECORD_NAME, uuid);
-				Log.d(TAG, "Получили серверный сокет...");
-			} catch (Exception e) {
-				Log.d(TAG, e.getLocalizedMessage());
-			}
-
-			// запускаем ожидание соединения от клиента
-			if (serverSocket != null) {
-				while (true) {
-					try {
-						message = new Message();
-						message.what = 1;
-						message.obj = "Ожидание соединения с клиентом...";
-						if (handler != null) {
-							handler.sendMessage(message);
-						}
-
-						Log.d(TAG, "Запускаем приём соединения...");
-						BluetoothSocket socket = serverSocket.accept();
-
-						Log.d(TAG, "Входящее соединение получено...");
-
-						message = new Message();
-						message.what = 2;
-						message.obj = "Соединение установленно...";
-						if (handler != null) {
-							handler.sendMessage(message);
-						}
-
-						// запускаем поток сервера, ожидающего команды
-						ICommunicatorListener listener = new ICommunicatorListener() {
-
-							@Override
-							public void onMessage(byte[] message) {
-								Log.d(TAG, "Получили сообщение от клиента!!!");
-								switch (message[0]) {
-								case 1:
-									Log.d(TAG, "Чтение id метки...");
-									byte[] data = new byte[] { 1, '0', '1',
-											'2', '3', '4', '5', '6', '7' };
-									communicator.write(data);
-									break;
-								case 2:
-									Log.d(TAG,
-											"Чтение данных случайной метки..");
-									communicator.write(new byte[] { 2 });
-									break;
-								case 3:
-									Log.d(TAG,
-											"Чтение данных конкретной метки...");
-									communicator.write(new byte[] { 3 });
-									break;
-								case 4:
-									Log.d(TAG,
-											"Запись данных в случайную метку...");
-									communicator.write(new byte[] { 4 });
-									break;
-								case 5:
-									Log.d(TAG,
-											"Запись данных в конкретную метку...");
-									communicator.write(new byte[] { 5 });
-									break;
-								default:
-									Log.d(TAG,
-											"Неизвестная команда от клиента...");
-									break;
-								}
-							}
-						};
-						communicator = new ServerCommunicator(socket, listener);
-						communicator.startCommunication();
-						break;
-					} catch (Exception e) {
-						Log.e(TAG, e.getLocalizedMessage());
-					} finally {
-						if (isInterrupted()) {
-							break;
-						}
-					}
-				}
-			} else {
-				Log.e(TAG, "Серверный сокет не получили!!!");
-			}
-			Log.d(TAG, "Завершился поток ожидания входящего соединения...");
-			// разблокируем кнопку запуска
-			message = new Message();
-			message.what = 3;
-			message.obj = "Остановлен...";
-			if (handler != null) {
-				handler.sendMessage(message);
-			}
-
-		}
-	}
 
 	public BTServerActivity() {
 
 		needStart = false;
 
-		uiHandler = new Handler(new Handler.Callback() {
-
-			@Override
-			public boolean handleMessage(Message msg) {
-
-				serverStatusTextView.setText((String) msg.obj);
-
-				switch (msg.what) {
-				case 1:
-					startServerButton.setEnabled(false);
-					break;
-				case 2:
-					break;
-				case 3:
-					startServerButton.setEnabled(true);
-					break;
-				}
-				return true;
-			}
-		});
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_btserver);
+
+		// создаём приёмник для сообщений о изменении состояния сервера
+		serverStateFilter = new IntentFilter(SERVER_STATE_ACTION);
+		serverStateReceiver = new BroadcastReceiver() {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+
+				int state = intent.getIntExtra(SERVER_STATE_PARAM, 0);
+
+				switch (state) {
+				case SERVER_STATE_STOPED:
+					serverStatusTextView.setText("Остановлен...");
+					startServerButton.setEnabled(true);
+					stopServerButton.setEnabled(false);
+					break;
+				case SERVER_STATE_WAITING_CONNECTION:
+					serverStatusTextView
+							.setText("Ожидание входящего соединения от клиента...");
+					startServerButton.setEnabled(false);
+					stopServerButton.setEnabled(true);
+					break;
+				case SERVER_STATE_CONNECTED:
+					serverStatusTextView.setText("Соединение установленно...");
+					startServerButton.setEnabled(false);
+					stopServerButton.setEnabled(false);
+					break;
+				case SERVER_STATE_DISCONNECTED:
+					serverStatusTextView.setText("Клиент отключился...");
+					startServerButton.setEnabled(true);
+					stopServerButton.setEnabled(false);
+					startServerListener();
+					break;
+				default:
+					break;
+				}
+			}
+		};
 
 		// создаём приёмник для обработки сообщений о изменении состояния
 		// адаптера блютус
@@ -220,14 +116,12 @@ public class BTServerActivity extends Activity {
 					Log.d(TAG, "BT On");
 
 					if (needStart) {
-						if (listener != null) {
-							listener.interrupt();
-							listener = null;
-						}
+						stopServerListener();
 
 						// запускаем поток с ожиданием подключения от клиента
-						listener = new ServerListener(uiHandler);
-						listener.start();
+						serverListener = new ServerListener(
+								getApplicationContext());
+						serverListener.start();
 						needStart = false;
 					}
 
@@ -236,11 +130,7 @@ public class BTServerActivity extends Activity {
 				case BluetoothAdapter.STATE_OFF:
 					Log.d(TAG, "BT Off");
 
-					// если поток запущен, прерываем его
-					if (listener != null) {
-						listener.interrupt();
-						listener = null;
-					}
+					stopServerListener();
 
 					if (needStart) {
 						// просим включить блютус
@@ -256,67 +146,42 @@ public class BTServerActivity extends Activity {
 		};
 
 		// обработчик кнопки запуска сервера
+		Button testButton = (Button) findViewById(R.id.testBTServerButton);
+		testButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				serverListener.test();
+			}
+		});
+
+
+		
+		// обработчик кнопки запуска сервера
 		startServerButton = (Button) findViewById(R.id.startBTServerButton);
 		startServerButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
-				if (adapter != null) {
-					// проверяем что адаптер находится в состоянии доступности
-					int state = adapter.getState();
-
-					switch (state) {
-					case BluetoothAdapter.STATE_ON:
-						Log.d(TAG, "Запускаем сервер с кнопки...");
-
-						if (listener != null) {
-							listener.interrupt();
-							listener = null;
-						}
-
-						// запускаем ожидание соединения
-						listener = new ServerListener(uiHandler);
-						listener.start();
-						break;
-
-					case BluetoothAdapter.STATE_OFF:
-						Log.d(TAG, "Просим включить блютус...");
-
-						// указываем на необходимость запуска ожидания входящего
-						// соединения
-						needStart = true;
-
-						// просим включить блютус
-						Intent intent = new Intent(
-								BluetoothAdapter.ACTION_REQUEST_ENABLE);
-						startActivityForResult(intent, BT_ENABLE_REQUEST_CODE);
-						break;
-
-					case BluetoothAdapter.STATE_TURNING_ON:
-						Log.d(TAG,
-								"Адаптер стартует, необходимость запуска ожидания входящего соединения...");
-
-						// указываем на необходимость запуска ожидания входящего
-						// соединения
-						needStart = true;
-						break;
-
-					case BluetoothAdapter.STATE_TURNING_OFF:
-						Log.d(TAG,
-								"Адаптер выключается, необходимость запуска ожидания входящего соединения...");
-
-						// указываем на необходимость запуска ожидания входящего
-						// соединения
-						needStart = true;
-						break;
-					}
-				}
+				Log.d(TAG, "Запускаем сервер с кнопки...");
+				startServerListener();
 			}
 		});
 
-		adapter = BluetoothAdapter.getDefaultAdapter();
-		if (adapter == null) {
+		// обработчик кнопки остановки сервера
+		stopServerButton = (Button) findViewById(R.id.stopBTServerButton);
+		stopServerButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				Log.d(TAG, "Останавливаем сервер с кнопки...");
+				stopServerListener();
+			}
+		});
+
+		if (BluetoothAdapter.getDefaultAdapter() == null) {
 			startServerButton.setEnabled(false);
 		}
 
@@ -330,6 +195,9 @@ public class BTServerActivity extends Activity {
 		Log.d(TAG, "onStart");
 
 		registerReceiver(btChangeStateReceiver, btChangeStateFilter);
+		registerReceiver(serverStateReceiver, serverStateFilter);
+
+		startServerListener();
 
 		super.onStart();
 	}
@@ -340,18 +208,9 @@ public class BTServerActivity extends Activity {
 		Log.d(TAG, "onStop");
 
 		unregisterReceiver(btChangeStateReceiver);
+		unregisterReceiver(serverStateReceiver);
 
-		if (listener != null) {
-			listener.interrupt();
-			listener = null;
-		}
-
-		uiHandler = null;
-
-		if (communicator != null) {
-			communicator.stopCommunication();
-			communicator = null;
-		}
+		stopServerListener();
 
 		super.onStop();
 	}
@@ -370,6 +229,66 @@ public class BTServerActivity extends Activity {
 		}
 
 		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	private void startServerListener() {
+
+		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		if (adapter != null) {
+			// проверяем что адаптер находится в состоянии доступности
+			int state = adapter.getState();
+
+			switch (state) {
+			case BluetoothAdapter.STATE_ON:
+				Log.d(TAG, "Запускаем сервер...");
+
+				stopServerListener();
+
+				// запускаем ожидание соединения
+				serverListener = new ServerListener(getApplicationContext());
+				serverListener.start();
+				break;
+
+			case BluetoothAdapter.STATE_OFF:
+				Log.d(TAG, "Просим включить блютус...");
+
+				// указываем на необходимость запуска ожидания входящего
+				// соединения
+				needStart = true;
+
+				// просим включить блютус
+				Intent intent = new Intent(
+						BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(intent, BT_ENABLE_REQUEST_CODE);
+				break;
+
+			case BluetoothAdapter.STATE_TURNING_ON:
+				Log.d(TAG,
+						"Адаптер стартует, необходимость запуска ожидания входящего соединения...");
+
+				// указываем на необходимость запуска ожидания входящего
+				// соединения
+				needStart = true;
+				break;
+
+			case BluetoothAdapter.STATE_TURNING_OFF:
+				Log.d(TAG,
+						"Адаптер выключается, необходимость запуска ожидания входящего соединения...");
+
+				// указываем на необходимость запуска ожидания входящего
+				// соединения
+				needStart = true;
+				break;
+			}
+		}
+	}
+
+	private void stopServerListener() {
+
+		if (serverListener != null) {
+			serverListener.cancel();
+			serverListener = null;
+		}
 	}
 
 }

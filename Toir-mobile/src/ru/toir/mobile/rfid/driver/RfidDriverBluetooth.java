@@ -67,13 +67,6 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public boolean init() {
 
-		// TODO инициализация возможно должна быть реализована по другому,
-		// т.к. запрос на выполнение команд серверу может быть отдан до того,
-		// как отработает поток соединения с сервером, соответсвенно нужно
-		// инициализацию делать блокирующей, чтоб не было запуска команды
-		// серверу
-		// до того как с ним будет установленно соединение!!!
-
 		if (context != null) {
 			SharedPreferences preferences = PreferenceManager
 					.getDefaultSharedPreferences(context);
@@ -119,9 +112,9 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				return false;
 			}
 
-			// TODO реализовать запуск потока для соединение с сервером
-			// нужно реализовать блокирующий вариант соединения с сервером
-
+			// блокирующий вариант соединения с сервером, для того что-бы
+			// предотвратить ситуацию когда соединение еще не установлено, а
+			// запрос с командой уже отправляем
 			if (device != null) {
 				BluetoothSocket socket;
 				try {
@@ -138,8 +131,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 					e.printStackTrace();
 					return false;
 				}
-				
-				
+
 				// TODO создаём объект/поток? работы с сервером
 				ICommunicatorListener listener = new ICommunicatorListener() {
 
@@ -174,6 +166,10 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 							Log.d(TAG, "Записали данные в конкретную метку...");
 							msg.what = RESULT_RFID_CANCEL;
 							break;
+						case 6:
+							Log.d(TAG, "Соединение с сервером потеряно...");
+							msg.what = RESULT_RFID_CANCEL;
+							break;
 						default:
 							Log.d(TAG, "Неизвестный ответ сервера...");
 							msg.what = RESULT_RFID_CANCEL;
@@ -186,15 +182,14 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 				communicator = new ClientCommunicator(socket, listener);
 
-				new Thread(){
+				new Thread() {
 
 					@Override
 					public void run() {
 						communicator.startCommunication();
 					}
-					
-				}.start();
 
+				}.start();
 
 			}
 
