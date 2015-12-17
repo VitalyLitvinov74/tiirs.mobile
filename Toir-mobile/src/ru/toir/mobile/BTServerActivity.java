@@ -28,13 +28,8 @@ public class BTServerActivity extends Activity {
 	private IntentFilter btChangeStateFilter;
 	private BroadcastReceiver btChangeStateReceiver;
 
-	private IntentFilter serverStateFilter;
-	private BroadcastReceiver serverStateReceiver;
-
 	// объект сервера блютус
 	private BTRfidServer mBtRfidServer;
-
-	private RfidDialog rfidDialog;
 
 	// флаг необходимости запуска сервера, в ситуации когда адаптер находится в
 	// промежуточных состояниях
@@ -53,7 +48,31 @@ public class BTServerActivity extends Activity {
 			public boolean handleMessage(Message msg) {
 
 				switch (msg.what) {
+				case BTRfidServer.SERVER_STATE_STOPED:
+					serverStatusTextView.setText("Остановлен...");
+					startServerButton.setEnabled(true);
+					stopServerButton.setEnabled(false);
+					break;
+				case BTRfidServer.SERVER_STATE_WAITING_CONNECTION:
+					serverStatusTextView
+							.setText("Ожидание входящего соединения от клиента...");
+					startServerButton.setEnabled(false);
+					stopServerButton.setEnabled(true);
+					break;
+				case BTRfidServer.SERVER_STATE_CONNECTED:
+					serverStatusTextView.setText("Соединение установленно...");
+					startServerButton.setEnabled(false);
+					stopServerButton.setEnabled(false);
+					break;
+				case BTRfidServer.SERVER_STATE_DISCONNECTED:
+					serverStatusTextView.setText("Клиент отключился...");
+					startServerButton.setEnabled(true);
+					stopServerButton.setEnabled(false);
+					startServerListener();
+					break;
+				// рыба для тестов
 				case 666:
+					RfidDialog rfidDialog;
 					Log.d(TAG, "Получили сообщение от клиента!!!");
 					byte[] message = (byte[]) msg.obj;
 					switch (message[0]) {
@@ -79,18 +98,6 @@ public class BTServerActivity extends Activity {
 						Log.d(TAG, "Запись данных в конкретную метку...");
 						mBtRfidServer.write(new byte[] { 5 });
 						break;
-					case 6:
-						Log.d(TAG, "Соединение с клиентом разорвано...");
-						// TODO: исправить или удалить как только будет
-						// реализован новый механизм оповещения приложения о
-						// состоянии сервера
-
-						Intent intent = new Intent(
-								BTRfidServer.SERVER_STATE_ACTION);
-						intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
-								BTRfidServer.SERVER_STATE_DISCONNECTED);
-						getApplicationContext().sendBroadcast(intent);
-						break;
 					default:
 						Log.d(TAG, "Неизвестная команда от клиента...");
 						break;
@@ -103,9 +110,7 @@ public class BTServerActivity extends Activity {
 			}
 		});
 
-		// создаём объект сервера блютус
-		mBtRfidServer = new BTRfidServer(getApplicationContext(), mHandler);
-
+		mBtRfidServer = null;
 	}
 
 	@Override
@@ -114,45 +119,6 @@ public class BTServerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_btserver);
-
-		// создаём приёмник для сообщений о изменении состояния сервера
-		serverStateFilter = new IntentFilter(BTRfidServer.SERVER_STATE_ACTION);
-		serverStateReceiver = new BroadcastReceiver() {
-
-			@Override
-			public void onReceive(Context context, Intent intent) {
-
-				int state = intent.getIntExtra(BTRfidServer.SERVER_STATE_PARAM,
-						0);
-
-				switch (state) {
-				case BTRfidServer.SERVER_STATE_STOPED:
-					serverStatusTextView.setText("Остановлен...");
-					startServerButton.setEnabled(true);
-					stopServerButton.setEnabled(false);
-					break;
-				case BTRfidServer.SERVER_STATE_WAITING_CONNECTION:
-					serverStatusTextView
-							.setText("Ожидание входящего соединения от клиента...");
-					startServerButton.setEnabled(false);
-					stopServerButton.setEnabled(true);
-					break;
-				case BTRfidServer.SERVER_STATE_CONNECTED:
-					serverStatusTextView.setText("Соединение установленно...");
-					startServerButton.setEnabled(false);
-					stopServerButton.setEnabled(false);
-					break;
-				case BTRfidServer.SERVER_STATE_DISCONNECTED:
-					serverStatusTextView.setText("Клиент отключился...");
-					startServerButton.setEnabled(true);
-					stopServerButton.setEnabled(false);
-					startServerListener();
-					break;
-				default:
-					break;
-				}
-			}
-		};
 
 		// создаём приёмник для обработки сообщений о изменении состояния
 		// адаптера блютус
@@ -171,13 +137,8 @@ public class BTServerActivity extends Activity {
 					Log.d(TAG, "BT On");
 
 					if (needStart) {
-						// stopServerListener();
-						//
-						// // запускаем поток с ожиданием подключения от клиента
-						// serverListener = new ServerListener(
-						// getApplicationContext());
-						// serverListener.start();
-						mBtRfidServer.startListen();
+						// запускаем поток с ожиданием подключения от клиента
+						mBtRfidServer.startServer();
 						needStart = false;
 					}
 
@@ -186,7 +147,7 @@ public class BTServerActivity extends Activity {
 				case BluetoothAdapter.STATE_OFF:
 					Log.d(TAG, "BT Off");
 
-					stopServerListener();
+					mBtRfidServer.stopServer();
 
 					if (needStart) {
 						// просим включить блютус
@@ -219,7 +180,7 @@ public class BTServerActivity extends Activity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Запускаем сервер с кнопки...");
-				// startServerListener();
+				startServerListener();
 			}
 		});
 
@@ -231,7 +192,7 @@ public class BTServerActivity extends Activity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Останавливаем сервер с кнопки...");
-				// stopServerListener();
+				mBtRfidServer.stopServer();
 			}
 		});
 
@@ -241,31 +202,23 @@ public class BTServerActivity extends Activity {
 
 		serverStatusTextView = (TextView) findViewById(R.id.bluetoothServerStatus);
 
+		// создаём объект сервера блютус
+		mBtRfidServer = new BTRfidServer(getApplicationContext(), mHandler);
 	}
 
 	@Override
 	protected void onStart() {
-
-		Log.d(TAG, "onStart");
-
+		Log.d(TAG, "onStart()");
 		registerReceiver(btChangeStateReceiver, btChangeStateFilter);
-		registerReceiver(serverStateReceiver, serverStateFilter);
-
-		// startServerListener();
-
+		startServerListener();
 		super.onStart();
 	}
 
 	@Override
 	protected void onStop() {
-
-		Log.d(TAG, "onStop");
-
+		Log.d(TAG, "onStop()");
 		unregisterReceiver(btChangeStateReceiver);
-		unregisterReceiver(serverStateReceiver);
-
-		// stopServerListener();
-
+		mBtRfidServer.stopServer();
 		super.onStop();
 	}
 
@@ -296,14 +249,9 @@ public class BTServerActivity extends Activity {
 			case BluetoothAdapter.STATE_ON:
 				Log.d(TAG, "Запускаем сервер...");
 
-				stopServerListener();
-
 				// запускаем ожидание соединения
-				// serverListener = new ServerListener(getApplicationContext());
-				// serverListener.start();
-				mBtRfidServer.startListen();
+				mBtRfidServer.startServer();
 				break;
-
 			case BluetoothAdapter.STATE_OFF:
 				Log.d(TAG, "Просим включить блютус...");
 
@@ -337,13 +285,4 @@ public class BTServerActivity extends Activity {
 			}
 		}
 	}
-
-	private void stopServerListener() {
-
-		// if (serverListener != null) {
-		// serverListener.cancel();
-		// serverListener = null;
-		// }
-	}
-
 }

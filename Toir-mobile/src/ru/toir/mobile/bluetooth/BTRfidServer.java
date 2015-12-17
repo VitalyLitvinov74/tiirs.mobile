@@ -12,9 +12,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 /**
@@ -31,7 +29,8 @@ public class BTRfidServer {
 
 	private BluetoothAdapter mAdapter;
 
-	public static final UUID BT_SERVICE_RECORD_UUID = UUID.fromString("E8627152-8F74-460B-B31E-A879194BB431");
+	public static final UUID BT_SERVICE_RECORD_UUID = UUID
+			.fromString("E8627152-8F74-460B-B31E-A879194BB431");
 	public static final String BT_SERVICE_RECORD_NAME = "ToirBTServer";
 
 	private AcceptThread mAcceptThread;
@@ -45,6 +44,9 @@ public class BTRfidServer {
 	public static final int SERVER_STATE_CONNECTED = 3;
 	public static final int SERVER_STATE_DISCONNECTED = 4;
 
+	// текущее состояние сервера
+	private int mState;
+
 	/**
 	 * Конструктор.
 	 */
@@ -57,7 +59,8 @@ public class BTRfidServer {
 	/**
 	 * Запускаем ожидание входящего соединения от клиента.
 	 */
-	public void startListen() {
+	public void startServer() {
+		Log.d(TAG, "startListen()");
 		if (mAcceptThread != null) {
 			mAcceptThread.cancel();
 			mAcceptThread = null;
@@ -71,6 +74,27 @@ public class BTRfidServer {
 		if (mAcceptThread == null) {
 			mAcceptThread = new AcceptThread();
 			mAcceptThread.start();
+
+			// сообщаем активити о том что перешли в режим ожидания входящего
+			// сообщения
+			mHandler.obtainMessage(SERVER_STATE_WAITING_CONNECTION)
+					.sendToTarget();
+		}
+	}
+
+	/**
+	 * Останавливаем ожидание входящего соединения от клиента.
+	 */
+	public void stopServer() {
+		Log.d(TAG, "stopServer()");
+		if (mAcceptThread != null) {
+			mAcceptThread.cancel();
+			mAcceptThread = null;
+		}
+
+		if (mCommunicationThread != null) {
+			mCommunicationThread.cancel();
+			mCommunicationThread = null;
 		}
 	}
 
@@ -81,6 +105,7 @@ public class BTRfidServer {
 	 *            Сокет через который работаем с клиентом.
 	 */
 	private void startCommunication(BluetoothSocket socket) {
+		Log.d(TAG, "startCommunication()");
 		if (mCommunicationThread != null) {
 			mCommunicationThread.cancel();
 			mCommunicationThread = null;
@@ -88,6 +113,7 @@ public class BTRfidServer {
 
 		if (mCommunicationThread == null) {
 			mCommunicationThread = new CommunicationThread(socket);
+			mCommunicationThread.start();
 		}
 	}
 
@@ -98,7 +124,26 @@ public class BTRfidServer {
 	 *            Массив данных отправляемых клиенту.
 	 */
 	public void write(byte[] buffer) {
+		Log.d(TAG, "write()");
 		mCommunicationThread.write(buffer);
+	}
+
+	/**
+	 * Установка текущего состояния сервера.
+	 * 
+	 * @param state
+	 */
+	public void setState(int state) {
+		mState = state;
+	}
+
+	/**
+	 * Текущее состояние сервера.
+	 * 
+	 * @return
+	 */
+	public int getState() {
+		return mState;
 	}
 
 	/**
@@ -108,7 +153,7 @@ public class BTRfidServer {
 	 * 
 	 */
 	private class AcceptThread extends Thread {
-		private static final String TAG = "ServerListener";
+		private static final String TAG = "AcceptThread";
 		private BluetoothServerSocket mServerSocket;
 
 		/**
@@ -131,63 +176,45 @@ public class BTRfidServer {
 
 		@Override
 		public void run() {
-			Intent intent;
-			Log.d(TAG, "Запускаем поток ожидания входящего соединения...");
+			Log.d(TAG, "run()");
 			mAdapter.cancelDiscovery();
 
 			// запускаем ожидание соединения от клиента
 			if (mServerSocket != null) {
-				intent = new Intent(SERVER_STATE_ACTION);
-				intent.putExtra(SERVER_STATE_PARAM,
-						SERVER_STATE_WAITING_CONNECTION);
-				mContext.sendBroadcast(intent);
-
 				while (true) {
 					try {
-						Log.d(TAG,
-								"Запуск ожидания входящего соединения от клиента...");
 						BluetoothSocket socket = mServerSocket.accept();
 						Log.d(TAG, "Входящее соединение получено...");
 
 						// освобождаем серверный сокет
 						cancel();
 
-						// сообщаем о том что соединение установленно
-						intent = new Intent(SERVER_STATE_ACTION);
-						intent.putExtra(SERVER_STATE_PARAM,
-								SERVER_STATE_CONNECTED);
-						mContext.sendBroadcast(intent);
-
 						// запускаем поток сервера, ожидающего команды
 						startCommunication(socket);
 						break;
-					} catch (Exception e) {
+					} catch (IOException e) {
 						Log.e(TAG, e.getLocalizedMessage());
+
+						// сообщаем активити о том что отключили режим ожидания
+						// входящего соединения
+						mHandler.obtainMessage(SERVER_STATE_STOPED)
+								.sendToTarget();
 						break;
 					}
 				}
 			} else {
 				Log.e(TAG, "Серверный сокет не получили!!!");
-				intent = new Intent(SERVER_STATE_ACTION);
-				intent.putExtra(SERVER_STATE_PARAM,
-						"Серверный сокет не получили!!!");
-				mContext.sendBroadcast(intent);
-				return;
 			}
 
 			Log.d(TAG, "Завершился поток ожидания входящего соединения...");
 		}
 
 		public void cancel() {
+			Log.d(TAG, "cancel()");
 			try {
 				mServerSocket.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-			} finally {
-				mServerSocket = null;
-				Intent intent = new Intent(SERVER_STATE_ACTION);
-				intent.putExtra(SERVER_STATE_PARAM, SERVER_STATE_STOPED);
-				mContext.sendBroadcast(intent);
 			}
 		}
 	}
@@ -198,7 +225,7 @@ public class BTRfidServer {
 	 *         Класс отвечающий за работу через установленное соединение.
 	 */
 	private class CommunicationThread extends Thread {
-		private static final String TAG = "ServerCommunicator";
+		private static final String TAG = "CommunicationThread";
 
 		private BluetoothSocket mSocket;
 		private InputStream mInputStream;
@@ -221,6 +248,7 @@ public class BTRfidServer {
 		}
 
 		public void write(byte[] command) {
+			Log.d(TAG, "write()");
 			try {
 				mOutputStream.write(command);
 				Log.d(TAG, "Успешно отправили данные клиенту...");
@@ -231,6 +259,7 @@ public class BTRfidServer {
 
 		@Override
 		public void run() {
+			Log.d(TAG, "run()");
 			int bufferLength = 1024;
 			int count;
 			byte buffer[] = new byte[bufferLength];
@@ -242,22 +271,27 @@ public class BTRfidServer {
 						// TODO: Реализовать разбор данных от клиента
 						// TODO: Заменить 666 на подходящий код комманды
 						// считывателя
-						Message msg = mHandler.obtainMessage(666,
-								Arrays.copyOfRange(buffer, 0, count));
-						mHandler.sendMessage(msg);
+						mHandler.obtainMessage(666,
+								Arrays.copyOfRange(buffer, 0, count))
+								.sendToTarget();
 					}
-				} catch (Exception e) {
+				} catch (IOException e) {
 					e.printStackTrace();
-					// TODO: Заменить 666 на подходящий код комманды
-					// считывателя
-					Message msg = mHandler.obtainMessage(666, new byte[] { 6 });
-					mHandler.sendMessage(msg);
-					return;
+
+					// сообщаем что соединение с клиентом потеряно
+					mHandler.obtainMessage(SERVER_STATE_DISCONNECTED)
+							.sendToTarget();
+					break;
+				} catch (IndexOutOfBoundsException e) {
+					// случилось невероятное
 				}
 			}
+
+			Log.d(TAG, "Завершился поток взаимодействия с клиентом...");
 		}
 
 		public void cancel() {
+			Log.d(TAG, "cancel()");
 			try {
 				mSocket.close();
 			} catch (IOException e) {
