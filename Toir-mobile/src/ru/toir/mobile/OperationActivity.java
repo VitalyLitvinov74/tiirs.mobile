@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
@@ -35,10 +34,6 @@ import ru.toir.mobile.db.tables.OperationPatternStepResult;
 import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
-import ru.toir.mobile.rfid.EquipmentTagStructure;
-import ru.toir.mobile.rfid.RfidDriverBase;
-import ru.toir.mobile.rfid.TagRecordStructure;
-import ru.toir.mobile.utils.DataUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -50,7 +45,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
@@ -92,8 +86,6 @@ public class OperationActivity extends Activity {
 	private String taskUuid;
 	private String operation_uuid;
 	private String equipment_uuid;
-	private String operation_result_uuid;
-	private String operation_type_uuid;
 
 	private String taskname = "";
 	private String taskstatus = "";
@@ -123,13 +115,6 @@ public class OperationActivity extends Activity {
 	// сохранения файла изображения с именем шага операции
 	private String currentStepUuid;
 	Preview mPreview;
-
-	private RfidDriverBase driver;
-
-	TagRecordStructure tagrecord = new TagRecordStructure();
-	TagRecordStructure tagrecord2 = new TagRecordStructure();
-	private ArrayList<TagRecordStructure> tagrecords = new ArrayList<TagRecordStructure>();
-	EquipmentTagStructure equipmenttag = new EquipmentTagStructure();
 
 	/**
 	 * Класс для представления множителей (частоты, напряжения, тока...)
@@ -561,7 +546,6 @@ public class OperationActivity extends Activity {
 				operationResult = equipmentOperationResultDBAdapter
 						.getItemByOperation(operation_uuid);
 				operationResult.setOperation_result_uuid(result.getUuid());
-				operation_result_uuid = result.getUuid();
 				operationResult.setEnd_date(new Date().getTime());
 				equipmentOperationResultDBAdapter.update(operationResult);
 
@@ -573,20 +557,9 @@ public class OperationActivity extends Activity {
 						new ToirDatabaseContext(getApplicationContext()));
 				EquipmentOperation operation = operationDBAdapter
 						.getItem(operation_uuid);
-				operation_type_uuid = operation.getOperation_type_uuid();
 
 				operation.setOperation_status_uuid(operationStatusUuid);
 				operationDBAdapter.update(operation);
-
-				// обновляем информацию об операции в метке устройства
-				// читаем > обновляем > записываем
-				// if (EquipmentTagStructure.getInstance().get_equipment_uuid()
-				// == null) {
-				// setContentView(R.layout.rfid_read);
-				// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-				// rfid.read((byte)
-				// RFIDDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
-				// }
 
 				// всё ли операции выполненны?
 				List<EquipmentOperation> operations = operationDBAdapter
@@ -843,111 +816,6 @@ public class OperationActivity extends Activity {
 			mCamera = null;
 		}
 
-	}
-
-	// TODO разобраться зачем это
-	public void CallbackOnReadLable(String result) {
-		// driver.SetOperationType((byte)
-		// RfidDriverC5.READ_EQUIPMENT_OPERATION_LABLE_ID);
-		// driver.readTagId((byte)
-		// RfidDriverC5.READ_EQUIPMENT_OPERATION_MEMORY);
-		driver.readTagId();
-	}
-
-	// TODO разобраться зачем это
-	public void Callback(String result) {
-		if (result == null) {
-			setResult(RfidDriverBase.RESULT_RFID_READ_ERROR);
-		} else {
-			if (result.length() < 100) {
-				Toast.makeText(this, "Ответ слишком короткий",
-						Toast.LENGTH_SHORT).show();
-				return;
-			}
-			byte out_buffer[];
-
-			// парсим ответ
-			equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result
-					.substring(0, 32)));
-			equipmenttag.set_last(result.substring(36, 40));
-			equipmenttag.set_status(result.substring(32, 36).toLowerCase(
-					Locale.ENGLISH));
-			tagrecord.operation_date = Long.parseLong(result.substring(40, 56),
-					16);
-			tagrecord.operation_length = Short.parseShort(
-					result.substring(56, 60), 16);
-			tagrecord.operation_type = result.substring(60, 64).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord.operation_result = result.substring(64, 68).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord.user = result.substring(68, 72).toLowerCase(
-					Locale.ENGLISH);
-			tagrecords.add(0, tagrecord);
-			tagrecord2.operation_date = Long.parseLong(
-					result.substring(72, 88), 16);
-			tagrecord2.operation_length = Short.parseShort(
-					result.substring(88, 92), 16);
-			tagrecord2.operation_type = result.substring(92, 96).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord2.operation_result = result.substring(96, 100)
-					.toLowerCase(Locale.ENGLISH);
-			tagrecord2.user = result.substring(100, 104).toLowerCase(
-					Locale.ENGLISH);
-			tagrecords.add(1, tagrecord2);
-
-			// вариант 2 с хранением данных в глобальной структуре
-			EquipmentTagStructure.getInstance().set_equipment_uuid(
-					DataUtils.StringToUUID(result.substring(0, 32)));
-			EquipmentTagStructure.getInstance().set_status(
-					result.substring(32, 36).toLowerCase(Locale.ENGLISH));
-			EquipmentTagStructure.getInstance().set_last(
-					result.substring(36, 40));
-
-			// заполоняем структуру результата обследования
-			if (equipmenttag.get_last() == "1")
-				equipmenttag.set_last("2");
-			else
-				equipmenttag.set_last("1");
-			// TODO добавить статус оборудования после обслуживания
-			// equipmenttag.set_status("?");
-			Time now = new Time();
-			now.setToNow();
-			tagrecord.operation_date = now.toMillis(false);
-			// TODO решить как считать время выполнения операции
-			tagrecord.operation_length = 0;
-			tagrecord.operation_result = operation_result_uuid;
-
-			EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-					new ToirDatabaseContext(getApplicationContext()));
-			EquipmentOperation operation = operationDBAdapter
-					.getItem(operation_uuid);
-			operation.getOperation_type_uuid();
-			tagrecord.operation_result = operation_result_uuid;
-			tagrecord.operation_type = operation_type_uuid;
-			tagrecord.user = AuthorizedUser.getInstance().getUuid();
-
-			if (equipmenttag.get_last() == "1")
-				tagrecords.set(0, tagrecord);
-			else
-				tagrecords.set(1, tagrecord);
-
-			// for (int pointer=0;
-			// pointer<equipmenttag.toString().length()+2*tagrecord.toString().length())
-			out_buffer = (equipmenttag.toString() + tagrecord.toString() + tagrecord2
-					.toString()).getBytes();
-			// driver.SetOperationType((byte)
-			// RfidDriverC5.WRITE_EQUIPMENT_OPERATION_MEMORY);
-			// TODO исправить на новый вариант записи в метку
-			// driver.write(out_buffer);
-		}
-	}
-
-	public void CallbackOnWrite(String result) {
-		if (result == null) {
-			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
-		} else {
-			finish();
-		}
 	}
 
 	/*
