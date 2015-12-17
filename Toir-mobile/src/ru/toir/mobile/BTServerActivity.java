@@ -1,6 +1,6 @@
 package ru.toir.mobile;
 
-import ru.toir.mobile.bluetooth.ServerListener;
+import ru.toir.mobile.bluetooth.BTRfidServer;
 import ru.toir.mobile.rfid.RfidDialog;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,16 +20,6 @@ public class BTServerActivity extends Activity {
 
 	private static final String TAG = "BTServerActivity";
 	private static final int BT_ENABLE_REQUEST_CODE = 666;
-
-	public static final String BT_SERVER_UUID = "E8627152-8F74-460B-B31E-A879194BB431";
-	public static final String BT_SERVICE_RECORD_NAME = "ToirBTServer";
-	public static final String SERVER_STATE_ACTION = "ru.toir.mobile.btserver.state";
-	public static final String SERVER_STATE_PARAM = "state";
-
-	public static final int SERVER_STATE_STOPED = 1;
-	public static final int SERVER_STATE_WAITING_CONNECTION = 2;
-	public static final int SERVER_STATE_CONNECTED = 3;
-	public static final int SERVER_STATE_DISCONNECTED = 4;
 
 	private Button startServerButton;
 	private Button stopServerButton;
@@ -39,8 +31,8 @@ public class BTServerActivity extends Activity {
 	private IntentFilter serverStateFilter;
 	private BroadcastReceiver serverStateReceiver;
 
-	// объект отвечающий за ожидание входящего соединения от клиента
-	private ServerListener serverListener;
+	// объект сервера блютус
+	private BTRfidServer mBtRfidServer;
 
 	private RfidDialog rfidDialog;
 
@@ -48,9 +40,71 @@ public class BTServerActivity extends Activity {
 	// промежуточных состояниях
 	private boolean needStart;
 
+	// обработчик сообщений от блютус сервера
+	private Handler mHandler;
+
 	public BTServerActivity() {
 
 		needStart = false;
+
+		mHandler = new Handler(new Handler.Callback() {
+
+			@Override
+			public boolean handleMessage(Message msg) {
+
+				switch (msg.what) {
+				case 666:
+					Log.d(TAG, "Получили сообщение от клиента!!!");
+					byte[] message = (byte[]) msg.obj;
+					switch (message[0]) {
+					case 1:
+						Log.d(TAG, "Чтение id метки...");
+						byte[] data = new byte[] { 1, '0', '1', '2', '3', '4',
+								'5', '6', '7' };
+						mBtRfidServer.write(data);
+						break;
+					case 2:
+						Log.d(TAG, "Чтение данных случайной метки..");
+						mBtRfidServer.write(new byte[] { 2 });
+						break;
+					case 3:
+						Log.d(TAG, "Чтение данных конкретной метки...");
+						mBtRfidServer.write(new byte[] { 3 });
+						break;
+					case 4:
+						Log.d(TAG, "Запись данных в случайную метку...");
+						mBtRfidServer.write(new byte[] { 4 });
+						break;
+					case 5:
+						Log.d(TAG, "Запись данных в конкретную метку...");
+						mBtRfidServer.write(new byte[] { 5 });
+						break;
+					case 6:
+						Log.d(TAG, "Соединение с клиентом разорвано...");
+						// TODO: исправить или удалить как только будет
+						// реализован новый механизм оповещения приложения о
+						// состоянии сервера
+
+						Intent intent = new Intent(
+								BTRfidServer.SERVER_STATE_ACTION);
+						intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
+								BTRfidServer.SERVER_STATE_DISCONNECTED);
+						getApplicationContext().sendBroadcast(intent);
+						break;
+					default:
+						Log.d(TAG, "Неизвестная команда от клиента...");
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+				return true;
+			}
+		});
+
+		// создаём объект сервера блютус
+		mBtRfidServer = new BTRfidServer(getApplicationContext(), mHandler);
 
 	}
 
@@ -62,32 +116,33 @@ public class BTServerActivity extends Activity {
 		setContentView(R.layout.activity_btserver);
 
 		// создаём приёмник для сообщений о изменении состояния сервера
-		serverStateFilter = new IntentFilter(SERVER_STATE_ACTION);
+		serverStateFilter = new IntentFilter(BTRfidServer.SERVER_STATE_ACTION);
 		serverStateReceiver = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
 
-				int state = intent.getIntExtra(SERVER_STATE_PARAM, 0);
+				int state = intent.getIntExtra(BTRfidServer.SERVER_STATE_PARAM,
+						0);
 
 				switch (state) {
-				case SERVER_STATE_STOPED:
+				case BTRfidServer.SERVER_STATE_STOPED:
 					serverStatusTextView.setText("Остановлен...");
 					startServerButton.setEnabled(true);
 					stopServerButton.setEnabled(false);
 					break;
-				case SERVER_STATE_WAITING_CONNECTION:
+				case BTRfidServer.SERVER_STATE_WAITING_CONNECTION:
 					serverStatusTextView
 							.setText("Ожидание входящего соединения от клиента...");
 					startServerButton.setEnabled(false);
 					stopServerButton.setEnabled(true);
 					break;
-				case SERVER_STATE_CONNECTED:
+				case BTRfidServer.SERVER_STATE_CONNECTED:
 					serverStatusTextView.setText("Соединение установленно...");
 					startServerButton.setEnabled(false);
 					stopServerButton.setEnabled(false);
 					break;
-				case SERVER_STATE_DISCONNECTED:
+				case BTRfidServer.SERVER_STATE_DISCONNECTED:
 					serverStatusTextView.setText("Клиент отключился...");
 					startServerButton.setEnabled(true);
 					stopServerButton.setEnabled(false);
@@ -116,12 +171,13 @@ public class BTServerActivity extends Activity {
 					Log.d(TAG, "BT On");
 
 					if (needStart) {
-						stopServerListener();
-
-						// запускаем поток с ожиданием подключения от клиента
-						serverListener = new ServerListener(
-								getApplicationContext());
-						serverListener.start();
+						// stopServerListener();
+						//
+						// // запускаем поток с ожиданием подключения от клиента
+						// serverListener = new ServerListener(
+						// getApplicationContext());
+						// serverListener.start();
+						mBtRfidServer.startListen();
 						needStart = false;
 					}
 
@@ -145,18 +201,16 @@ public class BTServerActivity extends Activity {
 			}
 		};
 
-		// обработчик кнопки запуска сервера
+		// тестовая кнопка
 		Button testButton = (Button) findViewById(R.id.testBTServerButton);
 		testButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				serverListener.test();
+
 			}
 		});
 
-
-		
 		// обработчик кнопки запуска сервера
 		startServerButton = (Button) findViewById(R.id.startBTServerButton);
 		startServerButton.setOnClickListener(new View.OnClickListener() {
@@ -165,7 +219,7 @@ public class BTServerActivity extends Activity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Запускаем сервер с кнопки...");
-				startServerListener();
+				// startServerListener();
 			}
 		});
 
@@ -177,7 +231,7 @@ public class BTServerActivity extends Activity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Останавливаем сервер с кнопки...");
-				stopServerListener();
+				// stopServerListener();
 			}
 		});
 
@@ -197,7 +251,7 @@ public class BTServerActivity extends Activity {
 		registerReceiver(btChangeStateReceiver, btChangeStateFilter);
 		registerReceiver(serverStateReceiver, serverStateFilter);
 
-		startServerListener();
+		// startServerListener();
 
 		super.onStart();
 	}
@@ -210,7 +264,7 @@ public class BTServerActivity extends Activity {
 		unregisterReceiver(btChangeStateReceiver);
 		unregisterReceiver(serverStateReceiver);
 
-		stopServerListener();
+		// stopServerListener();
 
 		super.onStop();
 	}
@@ -245,8 +299,9 @@ public class BTServerActivity extends Activity {
 				stopServerListener();
 
 				// запускаем ожидание соединения
-				serverListener = new ServerListener(getApplicationContext());
-				serverListener.start();
+				// serverListener = new ServerListener(getApplicationContext());
+				// serverListener.start();
+				mBtRfidServer.startListen();
 				break;
 
 			case BluetoothAdapter.STATE_OFF:
@@ -285,10 +340,10 @@ public class BTServerActivity extends Activity {
 
 	private void stopServerListener() {
 
-		if (serverListener != null) {
-			serverListener.cancel();
-			serverListener = null;
-		}
+		// if (serverListener != null) {
+		// serverListener.cancel();
+		// serverListener = null;
+		// }
 	}
 
 }

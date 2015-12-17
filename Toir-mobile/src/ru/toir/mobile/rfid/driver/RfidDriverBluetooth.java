@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
@@ -25,7 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import ru.toir.mobile.BTServerActivity;
+import ru.toir.mobile.bluetooth.BTRfidServer;
 import ru.toir.mobile.bluetooth.ClientCommunicator;
 import ru.toir.mobile.bluetooth.ICommunicator;
 import ru.toir.mobile.bluetooth.ICommunicatorListener;
@@ -42,12 +41,11 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	public static final String DRIVER_NAME = "Bluetooth драйвер";
-	private String serverMAC;
-	private static final String serverMACPrefKey = "rfidDrvBluetoothServer";
-	private BluetoothAdapter adapter;
-	private BluetoothDevice device;
-	private UUID serverUuid;
-	private ICommunicator communicator;
+	private String mServerMac;
+	public static final String SERVER_MAC_PREF_KEY = "rfidDrvBluetoothServer";
+	private BluetoothAdapter mAdapter;
+	private BluetoothDevice mDevice;
+	private ICommunicator mCommunicator;
 
 	/**
 	 * @param handler
@@ -66,34 +64,33 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public boolean init() {
-
 		if (context != null) {
 			SharedPreferences preferences = PreferenceManager
 					.getDefaultSharedPreferences(context);
-			serverMAC = preferences.getString(serverMACPrefKey, null);
-
-			if (serverMAC == null) {
+			mServerMac = preferences.getString(SERVER_MAC_PREF_KEY, null);
+			if (mServerMac == null) {
 				return false;
 			}
-			Log.d(TAG, "serverMAC = " + serverMAC);
 
-			adapter = BluetoothAdapter.getDefaultAdapter();
-			if (adapter == null) {
+			Log.d(TAG, "serverMAC = " + mServerMac);
+
+			mAdapter = BluetoothAdapter.getDefaultAdapter();
+			if (mAdapter == null) {
 				return false;
 			}
 
 			// если адаптер не включен, вернём false
-			int btState = adapter.getState();
+			int btState = mAdapter.getState();
 			if (btState != BluetoothAdapter.STATE_ON) {
 				return false;
 			}
 
-			device = adapter.getRemoteDevice(serverMAC);
+			mDevice = mAdapter.getRemoteDevice(mServerMac);
 
-			Set<BluetoothDevice> devices = adapter.getBondedDevices();
+			Set<BluetoothDevice> devices = mAdapter.getBondedDevices();
 			boolean devicePaired = false;
 			for (BluetoothDevice device : devices) {
-				if (serverMAC.equals(device.getAddress())) {
+				if (mServerMac.equals(device.getAddress())) {
 					devicePaired = true;
 					break;
 				}
@@ -105,21 +102,14 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				return false;
 			}
 
-			try {
-				serverUuid = UUID.fromString(BTServerActivity.BT_SERVER_UUID);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return false;
-			}
-
 			// блокирующий вариант соединения с сервером, для того что-бы
 			// предотвратить ситуацию когда соединение еще не установлено, а
 			// запрос с командой уже отправляем
-			if (device != null) {
+			if (mDevice != null) {
 				BluetoothSocket socket;
 				try {
-					socket = device
-							.createRfcommSocketToServiceRecord(serverUuid);
+					socket = mDevice
+							.createRfcommSocketToServiceRecord(BTRfidServer.BT_SERVICE_RECORD_UUID);
 				} catch (Exception e) {
 					e.printStackTrace();
 					return false;
@@ -137,7 +127,6 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 					@Override
 					public void onMessage(byte[] message) {
-
 						Message msg = new Message();
 
 						Log.d(TAG, "Получили сообщение от сервера!!!");
@@ -180,17 +169,16 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 					}
 				};
 
-				communicator = new ClientCommunicator(socket, listener);
+				mCommunicator = new ClientCommunicator(socket, listener);
 
 				new Thread() {
 
 					@Override
 					public void run() {
-						communicator.startCommunication();
+						mCommunicator.startCommunication();
 					}
 
 				}.start();
-
 			}
 
 			return true;
@@ -201,53 +189,47 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-
-		if (communicator != null) {
-			communicator.write(new byte[] { 1 });
+		if (mCommunicator != null) {
+			mCommunicator.write(new byte[] { 1 });
 		}
 	}
 
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-
-		if (communicator != null) {
-			communicator.write(new byte[] { 2 });
+		if (mCommunicator != null) {
+			mCommunicator.write(new byte[] { 2 });
 		}
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-
-		if (communicator != null) {
-			communicator.write(new byte[] { 3 });
+		if (mCommunicator != null) {
+			mCommunicator.write(new byte[] { 3 });
 		}
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-
-		if (communicator != null) {
-			communicator.write(new byte[] { 4 });
+		if (mCommunicator != null) {
+			mCommunicator.write(new byte[] { 4 });
 		}
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-
-		if (communicator != null) {
-			communicator.write(new byte[] { 5 });
+		if (mCommunicator != null) {
+			mCommunicator.write(new byte[] { 5 });
 		}
 	}
 
 	@Override
 	public void close() {
-
-		if (communicator != null) {
-			communicator.stopCommunication();
+		if (mCommunicator != null) {
+			mCommunicator.stopCommunication();
 		}
 	}
 
@@ -277,7 +259,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 		if (adapter != null) {
 			ListPreference listPreference = new ListPreference(
 					screen.getContext());
-			listPreference.setKey(serverMACPrefKey);
+			listPreference.setKey(SERVER_MAC_PREF_KEY);
 			listPreference.setTitle("Доступные устройства");
 			List<String> names = new ArrayList<String>();
 			List<String> values = new ArrayList<String>();
@@ -295,5 +277,4 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 		return screen;
 	}
-
 }

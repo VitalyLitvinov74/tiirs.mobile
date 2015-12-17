@@ -3,10 +3,6 @@
  */
 package ru.toir.mobile.bluetooth;
 
-import java.util.UUID;
-
-import ru.toir.mobile.BTServerActivity;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -23,7 +19,6 @@ public class ServerListener extends Thread {
 	private static final String TAG = "ServerListener";
 
 	private BluetoothServerSocket serverSocket;
-	private UUID uuid;
 	private BluetoothAdapter adapter;
 	private Context context;
 
@@ -38,7 +33,6 @@ public class ServerListener extends Thread {
 
 		this.context = context;
 		serverSocket = null;
-		uuid = null;
 		adapter = BluetoothAdapter.getDefaultAdapter();
 
 		final Context context2 = context;
@@ -72,10 +66,9 @@ public class ServerListener extends Thread {
 					break;
 				case 6:
 					Log.d(TAG, "Соединение с клиентом разорвано...");
-					Intent intent = new Intent(
-							BTServerActivity.SERVER_STATE_ACTION);
-					intent.putExtra(BTServerActivity.SERVER_STATE_PARAM,
-							BTServerActivity.SERVER_STATE_DISCONNECTED);
+					Intent intent = new Intent(BTRfidServer.SERVER_STATE_ACTION);
+					intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
+							BTRfidServer.SERVER_STATE_DISCONNECTED);
 					context2.sendBroadcast(intent);
 					break;
 				default:
@@ -85,17 +78,11 @@ public class ServerListener extends Thread {
 			}
 		};
 
-		// получаем UUID сервиса
-		try {
-			uuid = UUID.fromString(BTServerActivity.BT_SERVER_UUID);
-		} catch (Exception e) {
-			Log.e(TAG, e.getLocalizedMessage());
-		}
-
 		// получаем серверный сокет
 		try {
 			serverSocket = adapter.listenUsingRfcommWithServiceRecord(
-					BTServerActivity.BT_SERVICE_RECORD_NAME, uuid);
+					BTRfidServer.BT_SERVICE_RECORD_NAME,
+					BTRfidServer.BT_SERVICE_RECORD_UUID);
 			Log.d(TAG, "Получили серверный сокет...");
 		} catch (Exception e) {
 			Log.d(TAG, e.getLocalizedMessage());
@@ -115,9 +102,9 @@ public class ServerListener extends Thread {
 		// запускаем ожидание соединения от клиента
 		if (serverSocket != null) {
 
-			intent = new Intent(BTServerActivity.SERVER_STATE_ACTION);
-			intent.putExtra(BTServerActivity.SERVER_STATE_PARAM,
-					BTServerActivity.SERVER_STATE_WAITING_CONNECTION);
+			intent = new Intent(BTRfidServer.SERVER_STATE_ACTION);
+			intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
+					BTRfidServer.SERVER_STATE_WAITING_CONNECTION);
 			context.sendBroadcast(intent);
 
 			while (true) {
@@ -132,16 +119,16 @@ public class ServerListener extends Thread {
 					cancel();
 
 					// сообщаем о том что соединение установленно
-					intent = new Intent(BTServerActivity.SERVER_STATE_ACTION);
-					intent.putExtra(BTServerActivity.SERVER_STATE_PARAM,
-							BTServerActivity.SERVER_STATE_CONNECTED);
+					intent = new Intent(BTRfidServer.SERVER_STATE_ACTION);
+					intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
+							BTRfidServer.SERVER_STATE_CONNECTED);
 					context.sendBroadcast(intent);
 
 					// запускаем поток сервера, ожидающего команды
 					communicator = new ServerCommunicator(socket,
 							communicatorListener);
 					communicator.start();
-//					communicator.startCommunication();
+					// communicator.startCommunication();
 
 					break;
 				} catch (Exception e) {
@@ -151,8 +138,8 @@ public class ServerListener extends Thread {
 			}
 		} else {
 			Log.e(TAG, "Серверный сокет не получили!!!");
-			intent = new Intent(BTServerActivity.SERVER_STATE_ACTION);
-			intent.putExtra(BTServerActivity.SERVER_STATE_PARAM,
+			intent = new Intent(BTRfidServer.SERVER_STATE_ACTION);
+			intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
 					"Серверный сокет не получили!!!");
 			context.sendBroadcast(intent);
 			return;
@@ -170,9 +157,9 @@ public class ServerListener extends Thread {
 			e.printStackTrace();
 		} finally {
 			serverSocket = null;
-			Intent intent = new Intent(BTServerActivity.SERVER_STATE_ACTION);
-			intent.putExtra(BTServerActivity.SERVER_STATE_PARAM,
-					BTServerActivity.SERVER_STATE_STOPED);
+			Intent intent = new Intent(BTRfidServer.SERVER_STATE_ACTION);
+			intent.putExtra(BTRfidServer.SERVER_STATE_PARAM,
+					BTRfidServer.SERVER_STATE_STOPED);
 			context.sendBroadcast(intent);
 		}
 	}
