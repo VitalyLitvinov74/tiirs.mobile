@@ -157,7 +157,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 							break;
 						case 6:
 							Log.d(TAG, "Соединение с сервером потеряно...");
-							msg.what = RESULT_RFID_CANCEL;
+							msg.what = RESULT_RFID_DISCONNECT;
 							break;
 						default:
 							Log.d(TAG, "Неизвестный ответ сервера...");

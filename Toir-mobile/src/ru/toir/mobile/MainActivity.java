@@ -325,7 +325,6 @@ public class MainActivity extends FragmentActivity {
 		startAuthorise();
 	}
 
-	
 	/**
 	 * Обработчик клика меню запуска блютус сервера
 	 * 
@@ -336,7 +335,7 @@ public class MainActivity extends FragmentActivity {
 		Intent i = new Intent(MainActivity.this, BTServerActivity.class);
 		startActivity(i);
 	}
-	
+
 	/**
 	 * Обработчик клика меню обновления приложения
 	 * 

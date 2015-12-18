@@ -168,7 +168,8 @@ public class BTServerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-
+				Log.d(TAG, "Accept = " + mBtRfidServer.mAcceptThread);
+				Log.d(TAG, "Communication = " + mBtRfidServer.mCommunicationThread);
 			}
 		});
 

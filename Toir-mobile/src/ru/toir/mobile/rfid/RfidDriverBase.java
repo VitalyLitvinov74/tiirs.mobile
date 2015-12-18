@@ -26,6 +26,7 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	public static final int RESULT_RFID_WRITE_ERROR = 4;
 	public static final int RESULT_RFID_CANCEL = 5;
 	public static final int RESULT_RFID_TIMEOUT = 6;
+	public static final int RESULT_RFID_DISCONNECT = 7;
 
 	public static final String RESULT_RFID_TAG_ID = "tagId";
 

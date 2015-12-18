@@ -22,6 +22,7 @@ public class ClientCommunicator implements ICommunicator {
 	private InputStream inputStream;
 	private OutputStream outputStream;
 	private ICommunicatorListener listener;
+	private boolean stopDriver = false;
 
 	public ClientCommunicator(BluetoothSocket socket,
 			ICommunicatorListener listener) {
@@ -42,20 +43,23 @@ public class ClientCommunicator implements ICommunicator {
 	public void startCommunication() {
 
 		int bufferLength = 1024;
-		int count;
+		int count = 0;
 		byte buffer[] = new byte[bufferLength];
 
 		while (true) {
 			try {
 				Log.d(TAG, "Читаем данные с сервера...");
 				count = inputStream.read(buffer, 0, bufferLength);
-				if (count >= 0) {
+				if (count > 0) {
 					Log.d(TAG, "прочитано байт = " + count);
 					listener.onMessage(Arrays.copyOfRange(buffer, 0, count));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				listener.onMessage(new byte[] { 6 });
+				if (!stopDriver) {
+					// если драйвер не останавливается штатно, шлём сообщение
+					listener.onMessage(new byte[] { 6 });
+				}
 				break;
 			}
 		}
@@ -64,7 +68,7 @@ public class ClientCommunicator implements ICommunicator {
 
 	@Override
 	public void stopCommunication() {
-
+		stopDriver = true;
 		try {
 			socket.close();
 		} catch (Exception e) {

@@ -33,8 +33,8 @@ public class BTRfidServer {
 			.fromString("E8627152-8F74-460B-B31E-A879194BB431");
 	public static final String BT_SERVICE_RECORD_NAME = "ToirBTServer";
 
-	private AcceptThread mAcceptThread;
-	private CommunicationThread mCommunicationThread;
+	public AcceptThread mAcceptThread;
+	public CommunicationThread mCommunicationThread;
 
 	public static final String SERVER_STATE_ACTION = "ru.toir.mobile.btserver.state";
 	public static final String SERVER_STATE_PARAM = "state";
@@ -60,7 +60,7 @@ public class BTRfidServer {
 	 * Запускаем ожидание входящего соединения от клиента.
 	 */
 	public void startServer() {
-		Log.d(TAG, "startListen()");
+		Log.d(TAG, "startServer()");
 		if (mAcceptThread != null) {
 			mAcceptThread.cancel();
 			mAcceptThread = null;
@@ -168,7 +168,7 @@ public class BTRfidServer {
 						BT_SERVICE_RECORD_NAME, BT_SERVICE_RECORD_UUID);
 				Log.d(TAG, "Получили серверный сокет...");
 			} catch (Exception e) {
-				Log.d(TAG, e.getLocalizedMessage());
+				Log.e(TAG, e.getLocalizedMessage());
 			}
 
 			mServerSocket = socket;
@@ -203,7 +203,7 @@ public class BTRfidServer {
 					}
 				}
 			} else {
-				Log.e(TAG, "Серверный сокет не получили!!!");
+				Log.d(TAG, "Серверный сокет не получили!!!");
 			}
 
 			Log.d(TAG, "Завершился поток ожидания входящего соединения...");
@@ -214,7 +214,7 @@ public class BTRfidServer {
 			try {
 				mServerSocket.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.e(TAG, e.getLocalizedMessage());
 			}
 		}
 	}
@@ -240,7 +240,7 @@ public class BTRfidServer {
 				tmpInputStream = socket.getInputStream();
 				tmpOutputStream = socket.getOutputStream();
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.e(TAG, e.getLocalizedMessage());
 			}
 
 			mInputStream = tmpInputStream;
@@ -253,7 +253,7 @@ public class BTRfidServer {
 				mOutputStream.write(command);
 				Log.d(TAG, "Успешно отправили данные клиенту...");
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.e(TAG, e.getLocalizedMessage());
 			}
 		}
 
@@ -261,13 +261,13 @@ public class BTRfidServer {
 		public void run() {
 			Log.d(TAG, "run()");
 			int bufferLength = 1024;
-			int count;
+			int count = 0;
 			byte buffer[] = new byte[bufferLength];
 
 			while (true) {
 				try {
 					count = mInputStream.read(buffer, 0, bufferLength);
-					if (count >= 0) {
+					if (count > 0) {
 						// TODO: Реализовать разбор данных от клиента
 						// TODO: Заменить 666 на подходящий код комманды
 						// считывателя
@@ -276,7 +276,7 @@ public class BTRfidServer {
 								.sendToTarget();
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					Log.e(TAG, e.getLocalizedMessage());
 
 					// сообщаем что соединение с клиентом потеряно
 					mHandler.obtainMessage(SERVER_STATE_DISCONNECTED)
@@ -295,7 +295,7 @@ public class BTRfidServer {
 			try {
 				mSocket.close();
 			} catch (IOException e) {
-				Log.d(TAG, e.getLocalizedMessage());
+				Log.e(TAG, e.getLocalizedMessage());
 			}
 		}
 	}
