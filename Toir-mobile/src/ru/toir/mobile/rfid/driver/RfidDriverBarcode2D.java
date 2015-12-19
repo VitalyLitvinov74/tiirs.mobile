@@ -25,12 +25,12 @@ import android.widget.EditText;
  *         </p>
  */
 public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
-
 	public static final String DRIVER_NAME = "Драйвер лазерного считывателя штрихкодов";
 	private final static String TAG = "RfidDriverBarcode2D";
 	private Handler c5Handler;
-	// view в котором будет текстовое поле в которое будет помещен распознанный
-	// код
+
+	// view в котором будет текстовое поле,
+	// в которое будет помещен распознанный код
 	private static View driverView;
 
 	public RfidDriverBarcode2D(Handler handler) {
@@ -67,53 +67,42 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 						tagId = "";
 					}
 				}
+
 				Log.d(TAG, tagId);
-				Message message = new Message();
-				message.what = RESULT_RFID_SUCCESS;
-				message.obj = tagId;
-				mHandler.sendMessage(message);
+				sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId)
+						.sendToTarget();
 				break;
 			}
 			case Scanner.BARCODE_NOREAD: {
-				Message message = new Message();
-				message.what = RESULT_RFID_READ_ERROR;
-				mHandler.sendMessage(message);
+				sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 				break;
 			}
 			default:
 				break;
 			}
 		}
-
 	};
 
 	@Override
 	public boolean init() {
-
 		// initialize the scanner
 		Scanner.InitSCA();
-		
 		c5Handler = new MainHandler();
-		
 		Scanner.m_handler = c5Handler;
-
 		return true;
 	}
 
 	@Override
 	public void readTagId() {
-
 		Scanner.ReadHW();
 	}
 
 	@Override
 	public void close() {
-
 	}
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-
 		driverView = inflater.inflate(R.layout.bar2d_read, viewGroup);
 
 		// инициализируем текстовое поле ввода в которое по нажатии железной
@@ -126,33 +115,28 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 				@Override
 				public void onTextChanged(CharSequence s, int start,
 						int before, int count) {
-
-					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
-					message.obj = s.toString();
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_SUCCESS, s.toString())
+							.sendToTarget();
 				}
 
 				@Override
 				public void beforeTextChanged(CharSequence s, int start,
 						int count, int after) {
-
 				}
 
 				@Override
 				public void afterTextChanged(Editable s) {
-
 				}
 			});
-			Button button = (Button) driverView.findViewById(R.id.cancelBar2DScan);
+
+			Button button = (Button) driverView
+					.findViewById(R.id.cancelBar2DScan);
 			button.setOnClickListener(new View.OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
-					
-					Message message = new Message();
-					message.what = RESULT_RFID_CANCEL;
-					mHandler.sendMessage(message);				}
+					sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+				}
 			});
 		}
 
@@ -162,36 +146,25 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-		Message message = new Message();
-		message.what = RESULT_RFID_READ_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_READ_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_WRITE_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_WRITE_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
 
 }

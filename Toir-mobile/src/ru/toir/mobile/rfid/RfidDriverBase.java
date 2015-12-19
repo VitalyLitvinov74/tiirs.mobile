@@ -31,17 +31,14 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	public static final String RESULT_RFID_TAG_ID = "tagId";
 
 	// Handler который будет обрабатывать сообщение от драйвера
-	protected static Handler mHandler;
-	
-	protected Context context;
+	protected static Handler sHandler;
+	protected Context mContext;
 
 	public RfidDriverBase(Handler handler) {
-
-		mHandler = handler;
-
+		sHandler = handler;
 	}
-	
+
 	public void setContext(Context context) {
-		this.context = context;
+		mContext = context;
 	}
 }

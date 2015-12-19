@@ -24,6 +24,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	public static final String DRIVER_NAME = "Драйвер UHF C5";
 	private static final String TAG = "RfidDriverC5";
+
 	// по умолчанию таймаут на операцию 5 секунд
 	private static final int timeOut = 5000;
 
@@ -41,7 +42,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public boolean init() {
-
 		Log.d(TAG, "init");
 
 		if (reader.Init("/dev/ttyMT2") == 0) {
@@ -59,7 +59,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-
 		reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -68,18 +67,13 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				if (msg.what == reader.RESULT_SUCCESS) {
 					String data = (String) msg.obj;
 					Log.d(TAG, data);
-					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
-					message.obj = data;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj)
+							.sendToTarget();
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
-					Message message = new Message();
-					message.what = RESULT_RFID_READ_ERROR;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
+							.sendToTarget();
 				}
 				return true;
 			}
@@ -91,15 +85,13 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void close() {
-
 		reader.m_handler = null;
-		mHandler = null;
+		sHandler = null;
 		reader.Close();
 	}
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-
 		View view = inflater.inflate(R.layout.rfid_read, viewGroup);
 		return view;
 	}
@@ -110,7 +102,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-
 		final String lPassword = password;
 		final int lMemoryBank = memoryBank;
 		final int lAddress = address;
@@ -131,35 +122,29 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 							if (msg.what == reader.RESULT_SUCCESS) {
 								String data = (String) msg.obj;
 								Log.d(TAG, data);
-								Message message = new Message();
-								message.what = RESULT_RFID_SUCCESS;
-								message.obj = data;
-								mHandler.sendMessage(message);
+								sHandler.obtainMessage(RESULT_RFID_SUCCESS,
+										msg.obj).sendToTarget();
 							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								Message message = new Message();
-								message.what = RESULT_RFID_TIMEOUT;
-								mHandler.sendMessage(message);
+								sHandler.obtainMessage(RESULT_RFID_TIMEOUT)
+										.sendToTarget();
 							} else {
-								Message message = new Message();
-								message.what = RESULT_RFID_READ_ERROR;
-								mHandler.sendMessage(message);
+								sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
+										.sendToTarget();
 							}
 							return true;
 						}
 					});
+
 					// читаем данные из памяти метки
 					reader.readTagData(lPassword, pcepc, lMemoryBank, lAddress,
 							lCount, timeOut);
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
 					Log.d("TAG", "вышел таймаут.");
-					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
 					Log.d("TAG", "что-то пошло не так.");
-					Message message = new Message();
-					message.what = RESULT_RFID_READ_ERROR;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
+							.sendToTarget();
 				}
 				return true;
 			}
@@ -178,27 +163,21 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
 				if (msg.what == reader.RESULT_SUCCESS) {
 					// данные успешно прочитаны
-					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
-					message.obj = msg.obj;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj)
+							.sendToTarget();
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
 					Log.d("TAG", "вышел таймаут.");
-					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
 					Log.d("TAG", "что-то пошло не так.");
-					Message message = new Message();
-					message.what = RESULT_RFID_READ_ERROR;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
+							.sendToTarget();
 				}
 				return true;
 			}
@@ -213,7 +192,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-
 		final String lPassword = password;
 		final int lMemoryBank = memoryBank;
 		final int lAddress = address;
@@ -230,40 +208,35 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 						@Override
 						public boolean handleMessage(Message msg) {
-
 							if (msg.what == reader.RESULT_SUCCESS) {
-								Message message = new Message();
-								message.what = RESULT_RFID_SUCCESS;
-								mHandler.sendMessage(message);
+								sHandler.obtainMessage(RESULT_RFID_SUCCESS)
+										.sendToTarget();
 							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								Message message = new Message();
-								message.what = RESULT_RFID_TIMEOUT;
-								mHandler.sendMessage(message);
+								sHandler.obtainMessage(RESULT_RFID_TIMEOUT)
+										.sendToTarget();
 							} else {
-								Message message = new Message();
-								message.what = RESULT_RFID_WRITE_ERROR;
-								mHandler.sendMessage(message);
+								sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR)
+										.sendToTarget();
 							}
 							return true;
 						}
 					});
+
 					// пишем данные в метку
 					reader.writeTagData(lPassword, pcepc, lMemoryBank,
 							lAddress, lData, timeOut);
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
 					Log.d("TAG", "вышел таймаут.");
-					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
 					Log.d("TAG", "что-то пошло не так.");
-					Message message = new Message();
-					message.what = RESULT_RFID_READ_ERROR;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
+							.sendToTarget();
 				}
 				return true;
 			}
 		});
+
 		reader.m_handler = handler;
 
 		// запускаем поиск метки
@@ -273,34 +246,26 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-
 		Handler handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
 				if (msg.what == reader.RESULT_SUCCESS) {
 					// данные успешно записаны
-					Message message = new Message();
-					message.what = RESULT_RFID_SUCCESS;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
 					Log.d("TAG", "вышел таймаут.");
-					Message message = new Message();
-					message.what = RESULT_RFID_TIMEOUT;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
 					Log.d("TAG", "что-то пошло не так.");
-					Message message = new Message();
-					message.what = RESULT_RFID_WRITE_ERROR;
-					mHandler.sendMessage(message);
+					sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR)
+							.sendToTarget();
 				}
 				return true;
 			}
 		});
 
 		reader.m_handler = handler;
-
 		reader.writeTagData(password, tagId, memoryBank, address, data, timeOut);
 	}
-
 }

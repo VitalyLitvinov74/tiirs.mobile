@@ -3,6 +3,7 @@
  */
 package ru.toir.mobile.rfid.driver;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,8 +27,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import ru.toir.mobile.bluetooth.BTRfidServer;
 import ru.toir.mobile.bluetooth.ClientCommunicator;
-import ru.toir.mobile.bluetooth.ICommunicator;
-import ru.toir.mobile.bluetooth.ICommunicatorListener;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
@@ -45,7 +44,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public static final String SERVER_MAC_PREF_KEY = "rfidDrvBluetoothServer";
 	private BluetoothAdapter mAdapter;
 	private BluetoothDevice mDevice;
-	private ICommunicator mCommunicator;
+	private ClientCommunicator mCommunicator;
 
 	/**
 	 * @param handler
@@ -64,9 +63,9 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public boolean init() {
-		if (context != null) {
+		if (mContext != null) {
 			SharedPreferences preferences = PreferenceManager
-					.getDefaultSharedPreferences(context);
+					.getDefaultSharedPreferences(mContext);
 			mServerMac = preferences.getString(SERVER_MAC_PREF_KEY, null);
 			if (mServerMac == null) {
 				return false;
@@ -110,75 +109,74 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				try {
 					socket = mDevice
 							.createRfcommSocketToServiceRecord(BTRfidServer.BT_SERVICE_RECORD_UUID);
-				} catch (Exception e) {
-					e.printStackTrace();
+				} catch (IOException e) {
+					Log.e(TAG, e.getLocalizedMessage());
 					return false;
 				}
 
 				try {
 					socket.connect();
-				} catch (Exception e) {
-					e.printStackTrace();
+				} catch (IOException e) {
+					Log.e(TAG, e.getLocalizedMessage());
 					return false;
 				}
 
-				// TODO создаём объект/поток? работы с сервером
-				ICommunicatorListener listener = new ICommunicatorListener() {
+				// обработчик сообщений из потока работы с сервером
+				Handler handler = new Handler(new Handler.Callback() {
 
 					@Override
-					public void onMessage(byte[] message) {
-						Message msg = new Message();
+					public boolean handleMessage(Message message) {
+						byte[] buffer = (byte[]) message.obj;
 
 						Log.d(TAG, "Получили сообщение от сервера!!!");
 
-						switch (message[0]) {
+						switch (message.what) {
 						case 1:
 							String tagId = new String(Arrays.copyOfRange(
-									message, 1, message.length));
+									buffer, 1, buffer.length));
 							Log.d(TAG, "Прочитали id метки... id=" + tagId);
-							msg.what = RESULT_RFID_SUCCESS;
-							msg.obj = tagId;
+							sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId)
+									.sendToTarget();
 							break;
 						case 2:
 							Log.d(TAG, "Прочитали данные случайной метки..");
-							msg.what = RESULT_RFID_CANCEL;
+							sHandler.obtainMessage(RESULT_RFID_CANCEL)
+									.sendToTarget();
 							break;
 						case 3:
 							Log.d(TAG, "Прочитали данные конкретной метки...");
-							msg.what = RESULT_RFID_CANCEL;
+							sHandler.obtainMessage(RESULT_RFID_CANCEL)
+									.sendToTarget();
 							break;
 						case 4:
 							Log.d(TAG, "Записали данные в случайную метку...");
-							msg.what = RESULT_RFID_CANCEL;
+							sHandler.obtainMessage(RESULT_RFID_CANCEL)
+									.sendToTarget();
 							break;
 						case 5:
 							Log.d(TAG, "Записали данные в конкретную метку...");
-							msg.what = RESULT_RFID_CANCEL;
+							sHandler.obtainMessage(RESULT_RFID_CANCEL)
+									.sendToTarget();
 							break;
 						case 6:
 							Log.d(TAG, "Соединение с сервером потеряно...");
-							msg.what = RESULT_RFID_DISCONNECT;
+							sHandler.obtainMessage(RESULT_RFID_DISCONNECT)
+									.sendToTarget();
 							break;
 						default:
 							Log.d(TAG, "Неизвестный ответ сервера...");
-							msg.what = RESULT_RFID_CANCEL;
+							sHandler.obtainMessage(RESULT_RFID_CANCEL)
+									.sendToTarget();
 							break;
 						}
 
-						mHandler.sendMessage(msg);
+						return true;
 					}
-				};
+				});
 
-				mCommunicator = new ClientCommunicator(socket, listener);
-
-				new Thread() {
-
-					@Override
-					public void run() {
-						mCommunicator.startCommunication();
-					}
-
-				}.start();
+				// создаём поток работы с сервером
+				mCommunicator = new ClientCommunicator(socket, handler);
+				mCommunicator.start();
 			}
 
 			return true;
@@ -229,7 +227,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void close() {
 		if (mCommunicator != null) {
-			mCommunicator.stopCommunication();
+			mCommunicator.cancel();
 		}
 	}
 
@@ -237,7 +235,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
 		// создаём текстовое поле
-		TextView textView = new TextView(context);
+		TextView textView = new TextView(mContext);
 		textView.setText("Считайте метку внешним устройством...");
 		textView.setGravity(Gravity.CENTER_HORIZONTAL);
 		textView.setTextSize(32);

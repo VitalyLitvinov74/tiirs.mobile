@@ -9,7 +9,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,18 +49,15 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-
 		integrator.initiateScan();
 	}
 
 	@Override
 	public void close() {
-
 	}
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-
 		if (activity != null) {
 			integrator = new IntentIntegrator(dialogFragment);
 		} else if (dialogFragment != null) {
@@ -74,37 +70,25 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_READ_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_READ_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_WRITE_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-
-		Message message = new Message();
-		message.what = RESULT_RFID_WRITE_ERROR;
-		mHandler.sendMessage(message);
+		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
 
 }
