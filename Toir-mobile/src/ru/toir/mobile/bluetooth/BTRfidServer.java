@@ -167,7 +167,7 @@ public class BTRfidServer {
 				socket = mAdapter.listenUsingRfcommWithServiceRecord(
 						BT_SERVICE_RECORD_NAME, BT_SERVICE_RECORD_UUID);
 				Log.d(TAG, "Получили серверный сокет...");
-			} catch (Exception e) {
+			} catch (IOException e) {
 				Log.e(TAG, e.getLocalizedMessage());
 			}
 
@@ -180,30 +180,25 @@ public class BTRfidServer {
 			mAdapter.cancelDiscovery();
 
 			// запускаем ожидание соединения от клиента
-			if (mServerSocket != null) {
-				while (true) {
-					try {
-						BluetoothSocket socket = mServerSocket.accept();
-						Log.d(TAG, "Входящее соединение получено...");
+			while (true) {
+				try {
+					BluetoothSocket socket = mServerSocket.accept();
+					Log.d(TAG, "Входящее соединение получено...");
 
-						// освобождаем серверный сокет
-						cancel();
+					// освобождаем серверный сокет
+					cancel();
 
-						// запускаем поток сервера, ожидающего команды
-						startCommunication(socket);
-						break;
-					} catch (IOException e) {
-						Log.e(TAG, e.getLocalizedMessage());
+					// запускаем поток сервера, ожидающего команды
+					startCommunication(socket);
+					break;
+				} catch (IOException e) {
+					Log.e(TAG, e.getLocalizedMessage());
 
-						// сообщаем активити о том что отключили режим ожидания
-						// входящего соединения
-						mHandler.obtainMessage(SERVER_STATE_STOPED)
-								.sendToTarget();
-						break;
-					}
+					// сообщаем активити о том что отключили режим ожидания
+					// входящего соединения
+					mHandler.obtainMessage(SERVER_STATE_STOPED).sendToTarget();
+					break;
 				}
-			} else {
-				Log.d(TAG, "Серверный сокет не получили!!!");
 			}
 
 			Log.d(TAG, "Завершился поток ожидания входящего соединения...");
@@ -213,8 +208,11 @@ public class BTRfidServer {
 			Log.d(TAG, "cancel()");
 			try {
 				mServerSocket.close();
-			} catch (Exception e) {
+				Thread.sleep(2000);
+			} catch (IOException e) {
 				Log.e(TAG, e.getLocalizedMessage());
+			} catch (NullPointerException e) {
+			} catch (InterruptedException e) {
 			}
 		}
 	}
@@ -294,8 +292,11 @@ public class BTRfidServer {
 			Log.d(TAG, "cancel()");
 			try {
 				mSocket.close();
+				Thread.sleep(2000);
 			} catch (IOException e) {
 				Log.e(TAG, e.getLocalizedMessage());
+			} catch (NullPointerException e) {
+			} catch (InterruptedException e) {
 			}
 		}
 	}

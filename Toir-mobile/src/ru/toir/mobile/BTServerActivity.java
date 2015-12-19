@@ -49,26 +49,30 @@ public class BTServerActivity extends Activity {
 
 				switch (msg.what) {
 				case BTRfidServer.SERVER_STATE_STOPED:
+					Log.e(TAG, "SERVER_STATE_STOPED");
 					serverStatusTextView.setText("Остановлен...");
 					startServerButton.setEnabled(true);
 					stopServerButton.setEnabled(false);
 					break;
 				case BTRfidServer.SERVER_STATE_WAITING_CONNECTION:
+					Log.e(TAG, "SERVER_STATE_WAITING_CONNECTION");
 					serverStatusTextView
 							.setText("Ожидание входящего соединения от клиента...");
 					startServerButton.setEnabled(false);
 					stopServerButton.setEnabled(true);
 					break;
 				case BTRfidServer.SERVER_STATE_CONNECTED:
+					Log.e(TAG, "SERVER_STATE_CONNECTED");
 					serverStatusTextView.setText("Соединение установленно...");
 					startServerButton.setEnabled(false);
 					stopServerButton.setEnabled(false);
 					break;
 				case BTRfidServer.SERVER_STATE_DISCONNECTED:
+					Log.e(TAG, "SERVER_STATE_DISCONNECTED");
 					serverStatusTextView.setText("Клиент отключился...");
 					startServerButton.setEnabled(true);
 					stopServerButton.setEnabled(false);
-					startServerListener();
+					mBtRfidServer.startServer();
 					break;
 				// рыба для тестов
 				case 666:
@@ -155,6 +159,8 @@ public class BTServerActivity extends Activity {
 								BluetoothAdapter.ACTION_REQUEST_ENABLE);
 						startActivityForResult(intentStartBT,
 								BT_ENABLE_REQUEST_CODE);
+						// TODO: нужно просто гасить сервер и активити а при
+						// старте активити проверять включен блютус или нет
 					}
 
 					break;
@@ -168,8 +174,7 @@ public class BTServerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Log.d(TAG, "Accept = " + mBtRfidServer.mAcceptThread);
-				Log.d(TAG, "Communication = " + mBtRfidServer.mCommunicationThread);
+				System.gc();
 			}
 		});
 
@@ -181,7 +186,8 @@ public class BTServerActivity extends Activity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Запускаем сервер с кнопки...");
-				startServerListener();
+				// startServerListener();
+				mBtRfidServer.startServer();
 			}
 		});
 
@@ -211,7 +217,7 @@ public class BTServerActivity extends Activity {
 	protected void onStart() {
 		Log.d(TAG, "onStart()");
 		registerReceiver(btChangeStateReceiver, btChangeStateFilter);
-		startServerListener();
+		// startServerListener();
 		super.onStart();
 	}
 

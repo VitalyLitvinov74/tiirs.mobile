@@ -3,44 +3,48 @@
  */
 package ru.toir.mobile.bluetooth;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
 import android.util.Log;
 
 /**
  * @author Dmitriy Logachov
  * 
  */
-public class ClientCommunicator implements ICommunicator {
+public class ClientCommunicator extends Thread {
 
 	private static final String TAG = "ClientCommunicator";
 
-	private BluetoothSocket socket;
-	private InputStream inputStream;
-	private OutputStream outputStream;
-	private ICommunicatorListener listener;
+	private BluetoothSocket mSocket;
+	private InputStream mInputStream;
+	private OutputStream mOutputStream;
+	private Handler mHandler;
 	private boolean stopDriver = false;
 
-	public ClientCommunicator(BluetoothSocket socket,
-			ICommunicatorListener listener) {
+	public ClientCommunicator(BluetoothSocket socket, Handler handler) {
 
-		this.socket = socket;
-		this.listener = listener;
+		mSocket = socket;
+		mHandler = handler;
+		InputStream tmpInputStream = null;
+		OutputStream tmpOutputStream = null;
 
 		try {
-			inputStream = socket.getInputStream();
-			outputStream = socket.getOutputStream();
-		} catch (Exception e) {
-			e.printStackTrace();
+			tmpInputStream = socket.getInputStream();
+			tmpOutputStream = socket.getOutputStream();
+		} catch (IOException e) {
+			Log.e(TAG, e.getLocalizedMessage());
 		}
 
+		mInputStream = tmpInputStream;
+		mOutputStream = tmpOutputStream;
 	}
 
 	@Override
-	public void startCommunication() {
+	public void run() {
 
 		int bufferLength = 1024;
 		int count = 0;
@@ -49,16 +53,18 @@ public class ClientCommunicator implements ICommunicator {
 		while (true) {
 			try {
 				Log.d(TAG, "Читаем данные с сервера...");
-				count = inputStream.read(buffer, 0, bufferLength);
+				count = mInputStream.read(buffer, 0, bufferLength);
 				if (count > 0) {
 					Log.d(TAG, "прочитано байт = " + count);
-					listener.onMessage(Arrays.copyOfRange(buffer, 0, count));
+					mHandler.obtainMessage(buffer[0],
+							Arrays.copyOfRange(buffer, 0, count))
+							.sendToTarget();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				if (!stopDriver) {
 					// если драйвер не останавливается штатно, шлём сообщение
-					listener.onMessage(new byte[] { 6 });
+					mHandler.obtainMessage(6, new byte[] { 6 }).sendToTarget();
 				}
 				break;
 			}
@@ -66,24 +72,21 @@ public class ClientCommunicator implements ICommunicator {
 
 	}
 
-	@Override
-	public void stopCommunication() {
+	public void cancel() {
 		stopDriver = true;
 		try {
-			socket.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+			mSocket.close();
+		} catch (IOException e) {
+			Log.e(TAG, e.getLocalizedMessage());
 		}
 	}
 
-	@Override
 	public void write(byte[] command) {
 
 		try {
-			outputStream.write(command);
+			mOutputStream.write(command);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getLocalizedMessage());
 		}
 	}
-
 }
