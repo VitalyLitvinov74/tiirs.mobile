@@ -21,12 +21,9 @@ import android.util.Log;
  *         Класс сервера работающего с блютус.
  */
 public class BTRfidServer {
-
 	private static final String TAG = "BTRfidServer";
 
-	private Context mContext;
 	private Handler mHandler;
-
 	private BluetoothAdapter mAdapter;
 
 	public static final UUID BT_SERVICE_RECORD_UUID = UUID
@@ -51,7 +48,6 @@ public class BTRfidServer {
 	 * Конструктор.
 	 */
 	public BTRfidServer(Context context, Handler handler) {
-		mContext = context;
 		mHandler = handler;
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
@@ -184,9 +180,7 @@ public class BTRfidServer {
 				try {
 					BluetoothSocket socket = mServerSocket.accept();
 					Log.d(TAG, "Входящее соединение получено...");
-
-					// освобождаем серверный сокет
-					cancel();
+					Thread.sleep(1000);
 
 					// запускаем поток сервера, ожидающего команды
 					startCommunication(socket);
@@ -198,6 +192,7 @@ public class BTRfidServer {
 					// входящего соединения
 					mHandler.obtainMessage(SERVER_STATE_STOPED).sendToTarget();
 					break;
+				} catch (InterruptedException e) {
 				}
 			}
 
@@ -208,11 +203,9 @@ public class BTRfidServer {
 			Log.d(TAG, "cancel()");
 			try {
 				mServerSocket.close();
-				Thread.sleep(2000);
 			} catch (IOException e) {
 				Log.e(TAG, e.getLocalizedMessage());
 			} catch (NullPointerException e) {
-			} catch (InterruptedException e) {
 			}
 		}
 	}

@@ -76,7 +76,7 @@ public class BTServerActivity extends Activity {
 					serverStatusTextView.setText("Клиент отключился...");
 					startServerButton.setEnabled(true);
 					stopServerButton.setEnabled(false);
-					mBtRfidServer.startServer();
+					startServerListener();
 					break;
 				// рыба для тестов
 				case 666:
@@ -85,11 +85,6 @@ public class BTServerActivity extends Activity {
 					switch (message[0]) {
 					case 1:
 						Log.d(TAG, "Чтение id метки...");
-						// byte[] data = new byte[] { 1, '0', '1', '2', '3',
-						// '4',
-						// '5', '6', '7' };
-						// mBtRfidServer.write(data);
-
 						Handler handler = new Handler(new Handler.Callback() {
 
 							@Override
@@ -227,8 +222,7 @@ public class BTServerActivity extends Activity {
 			public void onClick(View v) {
 
 				Log.d(TAG, "Запускаем сервер с кнопки...");
-				// startServerListener();
-				mBtRfidServer.startServer();
+				startServerListener();
 			}
 		});
 
@@ -258,7 +252,7 @@ public class BTServerActivity extends Activity {
 	protected void onStart() {
 		Log.d(TAG, "onStart()");
 		registerReceiver(btChangeStateReceiver, btChangeStateFilter);
-		// startServerListener();
+		startServerListener();
 		super.onStart();
 	}
 
