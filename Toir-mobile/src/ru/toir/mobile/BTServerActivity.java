@@ -2,6 +2,7 @@ package ru.toir.mobile;
 
 import ru.toir.mobile.bluetooth.BTRfidServer;
 import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BTServerActivity extends Activity {
 
@@ -37,6 +39,8 @@ public class BTServerActivity extends Activity {
 
 	// обработчик сообщений от блютус сервера
 	private Handler mHandler;
+
+	private RfidDialog rfidDialog;
 
 	public BTServerActivity() {
 
@@ -76,15 +80,52 @@ public class BTServerActivity extends Activity {
 					break;
 				// рыба для тестов
 				case 666:
-					RfidDialog rfidDialog;
 					Log.d(TAG, "Получили сообщение от клиента!!!");
 					byte[] message = (byte[]) msg.obj;
 					switch (message[0]) {
 					case 1:
 						Log.d(TAG, "Чтение id метки...");
-						byte[] data = new byte[] { 1, '0', '1', '2', '3', '4',
-								'5', '6', '7' };
-						mBtRfidServer.write(data);
+						// byte[] data = new byte[] { 1, '0', '1', '2', '3',
+						// '4',
+						// '5', '6', '7' };
+						// mBtRfidServer.write(data);
+
+						Handler handler = new Handler(new Handler.Callback() {
+
+							@Override
+							public boolean handleMessage(Message msg) {
+
+								Log.d(TAG, "Получили сообщение из драйвера.");
+
+								if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+									String tagId = (String) msg.obj;
+									byte[] tagIdbyte = tagId.getBytes();
+									Log.d(TAG, tagId);
+									byte[] tmpData = new byte[tagIdbyte.length + 1];
+									tmpData[0] = 1;
+									for (int i = 0; i < tagIdbyte.length; i++) {
+										tmpData[i + 1] = tagIdbyte[i];
+									}
+									mBtRfidServer.write(tmpData);
+								} else {
+									// по кодам из RFID можно показать более
+									// подробные сообщения
+									Toast.makeText(getApplicationContext(),
+											"Операция прервана",
+											Toast.LENGTH_SHORT).show();
+								}
+
+								// закрываем диалог
+								rfidDialog.dismiss();
+
+								return true;
+							}
+						});
+
+						rfidDialog = new RfidDialog(getApplicationContext(),
+								handler);
+						rfidDialog.readTagId();
+						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 						break;
 					case 2:
 						Log.d(TAG, "Чтение данных случайной метки..");
