@@ -4,6 +4,8 @@
 package ru.toir.mobile.rfid.driver;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import ru.toir.mobile.bluetooth.BTRfidServer;
-import ru.toir.mobile.bluetooth.ClientCommunicator;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
@@ -44,7 +45,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public static final String SERVER_MAC_PREF_KEY = "rfidDrvBluetoothServer";
 	private BluetoothAdapter mAdapter;
 	private BluetoothDevice mDevice;
-	private ClientCommunicator mCommunicator;
+	private CommunicationThread mCommunicationThread;
 
 	/**
 	 * @param handler
@@ -175,8 +176,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				});
 
 				// создаём поток работы с сервером
-				mCommunicator = new ClientCommunicator(socket, handler);
-				mCommunicator.start();
+				mCommunicationThread = new CommunicationThread(socket, handler);
+				mCommunicationThread.start();
 			}
 
 			return true;
@@ -187,47 +188,47 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-		if (mCommunicator != null) {
-			mCommunicator.write(new byte[] { 1 });
+		if (mCommunicationThread != null) {
+			mCommunicationThread.write(new byte[] { 1 });
 		}
 	}
 
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-		if (mCommunicator != null) {
-			mCommunicator.write(new byte[] { 2 });
+		if (mCommunicationThread != null) {
+			mCommunicationThread.write(new byte[] { 2 });
 		}
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-		if (mCommunicator != null) {
-			mCommunicator.write(new byte[] { 3 });
+		if (mCommunicationThread != null) {
+			mCommunicationThread.write(new byte[] { 3 });
 		}
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-		if (mCommunicator != null) {
-			mCommunicator.write(new byte[] { 4 });
+		if (mCommunicationThread != null) {
+			mCommunicationThread.write(new byte[] { 4 });
 		}
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-		if (mCommunicator != null) {
-			mCommunicator.write(new byte[] { 5 });
+		if (mCommunicationThread != null) {
+			mCommunicationThread.write(new byte[] { 5 });
 		}
 	}
 
 	@Override
 	public void close() {
-		if (mCommunicator != null) {
-			mCommunicator.cancel();
+		if (mCommunicationThread != null) {
+			mCommunicationThread.cancel();
 		}
 	}
 
@@ -274,5 +275,85 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 		}
 
 		return screen;
+	}
+	
+	/**
+	 * @author Dmitriy Logachov
+	 * 
+	 */
+	private class CommunicationThread extends Thread {
+
+		private static final String TAG = "CommunicationThread";
+
+		private BluetoothSocket mSocket;
+		private InputStream mInputStream;
+		private OutputStream mOutputStream;
+		private Handler mHandler;
+		private boolean stopDriver = false;
+
+		public CommunicationThread(BluetoothSocket socket, Handler handler) {
+
+			mSocket = socket;
+			mHandler = handler;
+			InputStream tmpInputStream = null;
+			OutputStream tmpOutputStream = null;
+
+			try {
+				tmpInputStream = socket.getInputStream();
+				tmpOutputStream = socket.getOutputStream();
+			} catch (IOException e) {
+				Log.e(TAG, e.getLocalizedMessage());
+			}
+
+			mInputStream = tmpInputStream;
+			mOutputStream = tmpOutputStream;
+		}
+
+		@Override
+		public void run() {
+
+			int bufferLength = 1024;
+			int count = 0;
+			byte buffer[] = new byte[bufferLength];
+
+			while (true) {
+				try {
+					Log.d(TAG, "Читаем данные с сервера...");
+					count = mInputStream.read(buffer, 0, bufferLength);
+					if (count > 0) {
+						Log.d(TAG, "прочитано байт = " + count);
+						mHandler.obtainMessage(buffer[0],
+								Arrays.copyOfRange(buffer, 0, count))
+								.sendToTarget();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					if (!stopDriver) {
+						// если драйвер не останавливается штатно, шлём сообщение
+						mHandler.obtainMessage(6, new byte[] { 6 }).sendToTarget();
+					}
+					break;
+				}
+			}
+
+		}
+
+		public void cancel() {
+			stopDriver = true;
+			try {
+				mSocket.close();
+			} catch (IOException e) {
+				Log.e(TAG, e.getLocalizedMessage());
+			}
+		}
+
+		public void write(byte[] command) {
+
+			try {
+				mOutputStream.write(command);
+			} catch (Exception e) {
+				Log.e(TAG, e.getLocalizedMessage());
+			}
+		}
 	}
 }
