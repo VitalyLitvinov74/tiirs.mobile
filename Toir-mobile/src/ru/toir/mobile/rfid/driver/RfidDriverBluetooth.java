@@ -561,6 +561,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				try {
 					Log.d(TAG, "Читаем данные с сервера...");
 					count = mInputStream.read(buffer, 0, bufferLength);
+					// TODO: реализовать разбор данных поступающих с сервера
 					if (count > 0) {
 						Log.d(TAG, "прочитано байт = " + count);
 						mHandler.obtainMessage(buffer[0],

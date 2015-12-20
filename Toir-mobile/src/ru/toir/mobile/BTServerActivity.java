@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class BTServerActivity extends Activity {
 
@@ -80,29 +79,24 @@ public class BTServerActivity extends Activity {
 					break;
 				case BTRfidServer.SERVER_STATE_READ_COMMAND:
 					Log.d(TAG, "Получили сообщение от клиента!!!");
-					byte[] message = (byte[]) msg.obj;
-					switch (message[0]) {
-					case RfidDialog.READER_COMMAND_READ_ID:
+					Bundle bundle = (Bundle) msg.obj;
+					// разбираемся какую команду нужно выполнить
+					switch (msg.arg1) {
+					case RfidDialog.READER_COMMAND_READ_ID: {
 						Log.d(TAG, "Чтение id метки...");
 						Handler handler = new Handler(new Handler.Callback() {
 
 							@Override
 							public boolean handleMessage(Message msg) {
 								Log.d(TAG, "Получили сообщение из драйвера.");
-
+								String tagId = null;
 								if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-									String tagId = (String) msg.obj;
+									tagId = (String) msg.obj;
 									Log.d(TAG, tagId);
-
-									// отправляем полученное значение клиенту
-									mBtRfidServer.sendId(tagId);
-								} else {
-									// по кодам из RFID можно показать более
-									// подробные сообщения
-									Toast.makeText(getApplicationContext(),
-											"Операция прервана",
-											Toast.LENGTH_SHORT).show();
 								}
+
+								// отправляем полученное значение клиенту
+								mBtRfidServer.answerReadId(tagId, msg.what);
 
 								// закрываем диалог
 								rfidDialog.dismiss();
@@ -115,22 +109,152 @@ public class BTServerActivity extends Activity {
 						rfidDialog.readTagId();
 						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 						break;
-					case RfidDialog.READER_COMMAND_READ_DATA:
+					}
+					case RfidDialog.READER_COMMAND_READ_DATA: {
 						Log.d(TAG, "Чтение данных случайной метки..");
-						mBtRfidServer.write(new byte[] { 2 });
+
+						// получаем данные для выполнения операции
+						String password = bundle.getString("password");
+						int memoryBank = bundle.getInt("memoryBank");
+						int address = bundle.getInt("address");
+						int count = bundle.getInt("count");
+
+						Handler handler = new Handler(new Handler.Callback() {
+
+							@Override
+							public boolean handleMessage(Message msg) {
+								Log.d(TAG, "Получили сообщение из драйвера.");
+								String data = null;
+								if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+									data = (String) msg.obj;
+									Log.d(TAG, data);
+								}
+
+								// отправляем полученное значение клиенту
+								mBtRfidServer.answerReadData(
+										RfidDialog.READER_COMMAND_READ_DATA,
+										data, msg.what);
+
+								// закрываем диалог
+								rfidDialog.dismiss();
+								return true;
+							}
+						});
+
+						rfidDialog = new RfidDialog(getApplicationContext(),
+								handler);
+						rfidDialog.readTagData(password, memoryBank, address,
+								count);
+						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
+
 						break;
-					case RfidDialog.READER_COMMAND_READ_DATA_ID:
+					}
+					case RfidDialog.READER_COMMAND_READ_DATA_ID: {
 						Log.d(TAG, "Чтение данных конкретной метки...");
-						mBtRfidServer.write(new byte[] { 3 });
+
+						// получаем данные для выполнения операции
+						String password = bundle.getString("password");
+						String tagId = bundle.getString("tagId");
+						int memoryBank = bundle.getInt("memoryBank");
+						int address = bundle.getInt("address");
+						int count = bundle.getInt("count");
+
+						Handler handler = new Handler(new Handler.Callback() {
+
+							@Override
+							public boolean handleMessage(Message msg) {
+								Log.d(TAG, "Получили сообщение из драйвера.");
+								String data = null;
+								if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+									data = (String) msg.obj;
+									Log.d(TAG, data);
+								}
+
+								// отправляем полученное значение клиенту
+								mBtRfidServer.answerReadData(
+										RfidDialog.READER_COMMAND_READ_DATA_ID,
+										data, msg.what);
+
+								// закрываем диалог
+								rfidDialog.dismiss();
+								return true;
+							}
+						});
+
+						rfidDialog = new RfidDialog(getApplicationContext(),
+								handler);
+						rfidDialog.readTagData(password, tagId, memoryBank,
+								address, count);
+						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 						break;
-					case RfidDialog.READER_COMMAND_WRITE_DATA:
+					}
+					case RfidDialog.READER_COMMAND_WRITE_DATA: {
 						Log.d(TAG, "Запись данных в случайную метку...");
-						mBtRfidServer.write(new byte[] { 4 });
+
+						// получаем данные для выполнения операции
+						String password = bundle.getString("password");
+						int memoryBank = bundle.getInt("memoryBank");
+						int address = bundle.getInt("address");
+						String data = bundle.getString("data");
+
+						Handler handler = new Handler(new Handler.Callback() {
+
+							@Override
+							public boolean handleMessage(Message msg) {
+								Log.d(TAG, "Получили сообщение из драйвера.");
+
+								// отправляем полученное значение клиенту
+								mBtRfidServer.answerWriteData(
+										RfidDialog.READER_COMMAND_WRITE_DATA,
+										msg.what);
+
+								// закрываем диалог
+								rfidDialog.dismiss();
+								return true;
+							}
+						});
+
+						rfidDialog = new RfidDialog(getApplicationContext(),
+								handler);
+						rfidDialog.writeTagData(password, memoryBank, address,
+								data);
+						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 						break;
-					case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
+					}
+					case RfidDialog.READER_COMMAND_WRITE_DATA_ID: {
 						Log.d(TAG, "Запись данных в конкретную метку...");
-						mBtRfidServer.write(new byte[] { 5 });
+
+						// получаем данные для выполнения операции
+						String password = bundle.getString("password");
+						String tagId = bundle.getString("tagId");
+						int memoryBank = bundle.getInt("memoryBank");
+						int address = bundle.getInt("address");
+						String data = bundle.getString("data");
+
+						Handler handler = new Handler(new Handler.Callback() {
+
+							@Override
+							public boolean handleMessage(Message msg) {
+								Log.d(TAG, "Получили сообщение из драйвера.");
+
+								// отправляем полученное значение клиенту
+								mBtRfidServer.answerWriteData(
+										RfidDialog.READER_COMMAND_WRITE_DATA,
+										msg.what);
+
+								// закрываем диалог
+								rfidDialog.dismiss();
+								return true;
+							}
+						});
+
+						rfidDialog = new RfidDialog(getApplicationContext(),
+								handler);
+						rfidDialog.writeTagData(password, tagId, memoryBank,
+								address, data);
+						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 						break;
+					}
 					default:
 						Log.d(TAG, "Неизвестная команда от клиента...");
 						break;
