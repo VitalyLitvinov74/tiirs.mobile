@@ -78,30 +78,24 @@ public class BTServerActivity extends Activity {
 					stopServerButton.setEnabled(false);
 					startServerListener();
 					break;
-				// рыба для тестов
-				case 666:
+				case BTRfidServer.SERVER_STATE_READ_COMMAND:
 					Log.d(TAG, "Получили сообщение от клиента!!!");
 					byte[] message = (byte[]) msg.obj;
 					switch (message[0]) {
-					case 1:
+					case RfidDialog.READER_COMMAND_READ_ID:
 						Log.d(TAG, "Чтение id метки...");
 						Handler handler = new Handler(new Handler.Callback() {
 
 							@Override
 							public boolean handleMessage(Message msg) {
-
 								Log.d(TAG, "Получили сообщение из драйвера.");
 
 								if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 									String tagId = (String) msg.obj;
-									byte[] tagIdbyte = tagId.getBytes();
 									Log.d(TAG, tagId);
-									byte[] tmpData = new byte[tagIdbyte.length + 1];
-									tmpData[0] = 1;
-									for (int i = 0; i < tagIdbyte.length; i++) {
-										tmpData[i + 1] = tagIdbyte[i];
-									}
-									mBtRfidServer.write(tmpData);
+
+									// отправляем полученное значение клиенту
+									mBtRfidServer.sendId(tagId);
 								} else {
 									// по кодам из RFID можно показать более
 									// подробные сообщения
@@ -112,7 +106,6 @@ public class BTServerActivity extends Activity {
 
 								// закрываем диалог
 								rfidDialog.dismiss();
-
 								return true;
 							}
 						});
@@ -122,19 +115,19 @@ public class BTServerActivity extends Activity {
 						rfidDialog.readTagId();
 						rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 						break;
-					case 2:
+					case RfidDialog.READER_COMMAND_READ_DATA:
 						Log.d(TAG, "Чтение данных случайной метки..");
 						mBtRfidServer.write(new byte[] { 2 });
 						break;
-					case 3:
+					case RfidDialog.READER_COMMAND_READ_DATA_ID:
 						Log.d(TAG, "Чтение данных конкретной метки...");
 						mBtRfidServer.write(new byte[] { 3 });
 						break;
-					case 4:
+					case RfidDialog.READER_COMMAND_WRITE_DATA:
 						Log.d(TAG, "Запись данных в случайную метку...");
 						mBtRfidServer.write(new byte[] { 4 });
 						break;
-					case 5:
+					case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
 						Log.d(TAG, "Запись данных в конкретную метку...");
 						mBtRfidServer.write(new byte[] { 5 });
 						break;

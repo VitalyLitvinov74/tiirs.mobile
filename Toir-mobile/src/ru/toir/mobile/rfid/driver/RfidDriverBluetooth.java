@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import ru.toir.mobile.bluetooth.BTRfidServer;
 import ru.toir.mobile.rfid.IRfidDriver;
+import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
 /**
@@ -189,7 +190,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagId() {
 		if (mCommunicationThread != null) {
-			mCommunicationThread.write(new byte[] { 1 });
+			mCommunicationThread.write(new byte[] { (byte) 0xBB, 0x00,
+					RfidDialog.READER_COMMAND_READ_ID, 0x00, 0x00, 0x7E });
 		}
 	}
 
@@ -197,7 +199,56 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
 		if (mCommunicationThread != null) {
-			mCommunicationThread.write(new byte[] { 2 });
+			// маркер начала, тип пакета, команда, размер полезной нагрузки,
+			// маркер конца
+			int serviceDataLength = 1 + 1 + 1 + 2 + 1;
+			int payloadLength;
+			byte[] passwordBuffer = password.getBytes();
+
+			// 2 байта на длину пароля + длина пароля
+			payloadLength = 2 + passwordBuffer.length;
+
+			// банк памяти, смещение, количество данных
+			payloadLength += 1 + 2 + 2;
+			byte[] commandBuffer = new byte[serviceDataLength + payloadLength];
+			int commandBufferIndex = 0;
+
+			// маркер начала пакета
+			commandBuffer[commandBufferIndex++] = (byte) 0xBB;
+
+			// тип пакета
+			commandBuffer[commandBufferIndex++] = 0x00;
+
+			// команда
+			commandBuffer[commandBufferIndex++] = RfidDialog.READER_COMMAND_READ_DATA;
+
+			// размер полезной нагрузки
+			commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
+
+			// размер данных пароля к метке
+			commandBuffer[commandBufferIndex++] = (byte) ((passwordBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (passwordBuffer.length & 0xFF);
+
+			// пароль к метке
+			for (int i = 0; i < passwordBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = passwordBuffer[i];
+			}
+
+			// банк памяти
+			commandBuffer[commandBufferIndex++] = (byte) memoryBank;
+
+			// смещение в банке памяти
+			commandBuffer[commandBufferIndex++] = (byte) ((address >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (address & 0xFF);
+
+			// количество данных
+			commandBuffer[commandBufferIndex++] = (byte) ((count >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (count & 0xFF);
+
+			// маркер конца
+			commandBuffer[commandBufferIndex++] = 0x7E;
+			mCommunicationThread.write(commandBuffer);
 		}
 	}
 
@@ -205,7 +256,67 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
 		if (mCommunicationThread != null) {
-			mCommunicationThread.write(new byte[] { 3 });
+			// маркер начала, тип пакета, команда, размер полезной нагрузки,
+			// маркер конца
+			int serviceDataLength = 1 + 1 + 1 + 2 + 1;
+			int payloadLength;
+			byte[] passwordBuffer = password.getBytes();
+			byte[] tagIdBuffer = tagId.getBytes();
+
+			// 2 байта на длину пароля + длина пароля
+			payloadLength = 2 + passwordBuffer.length;
+
+			// 2 байта на длину id метки + длина id метки
+			payloadLength += 2 + tagIdBuffer.length;
+
+			// банк памяти, смещение, количество данных
+			payloadLength += 1 + 2 + 2;
+			byte[] commandBuffer = new byte[serviceDataLength + payloadLength];
+			int commandBufferIndex = 0;
+
+			// маркер начала пакета
+			commandBuffer[commandBufferIndex++] = (byte) 0xBB;
+			// тип пакета
+			commandBuffer[commandBufferIndex++] = 0x00;
+			// команда
+			commandBuffer[commandBufferIndex++] = RfidDialog.READER_COMMAND_READ_DATA_ID;
+
+			// размер полезной нагрузки
+			commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
+
+			// размер данных пароля к метке
+			commandBuffer[commandBufferIndex++] = (byte) ((passwordBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (passwordBuffer.length & 0xFF);
+
+			// пароль к метке
+			for (int i = 0; i < passwordBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = passwordBuffer[i];
+			}
+
+			// размер данных id метке
+			commandBuffer[commandBufferIndex++] = (byte) ((tagIdBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (tagIdBuffer.length & 0xFF);
+
+			// id метки
+			for (int i = 0; i < tagIdBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = tagIdBuffer[i];
+			}
+
+			// банк памяти
+			commandBuffer[commandBufferIndex++] = (byte) memoryBank;
+
+			// смещение в банке памяти
+			commandBuffer[commandBufferIndex++] = (byte) ((address >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (address & 0xFF);
+
+			// количество данных
+			commandBuffer[commandBufferIndex++] = (byte) ((count >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (count & 0xFF);
+
+			// маркер конца
+			commandBuffer[commandBufferIndex++] = 0x7E;
+			mCommunicationThread.write(commandBuffer);
 		}
 	}
 
@@ -213,7 +324,65 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
 		if (mCommunicationThread != null) {
-			mCommunicationThread.write(new byte[] { 4 });
+			// маркер начала, тип пакета, команда, размер полезной нагрузки,
+			// маркер конца
+			int serviceDataLength = 1 + 1 + 1 + 2 + 1;
+			int payloadLength;
+			byte[] passwordBuffer = password.getBytes();
+			byte[] dataBuffer = data.getBytes();
+
+			// 2 байта на длину пароля + длина пароля
+			payloadLength = 2 + passwordBuffer.length;
+
+			// 2 байта на длину данных + длина данных
+			payloadLength = 2 + dataBuffer.length;
+
+			// банк памяти, смещение
+			payloadLength += 1 + 2;
+			byte[] commandBuffer = new byte[serviceDataLength + payloadLength];
+			int commandBufferIndex = 0;
+
+			// маркер начала пакета
+			commandBuffer[commandBufferIndex++] = (byte) 0xBB;
+
+			// тип пакета
+			commandBuffer[commandBufferIndex++] = 0x00;
+
+			// команда
+			commandBuffer[commandBufferIndex++] = RfidDialog.READER_COMMAND_WRITE_DATA;
+
+			// размер полезной нагрузки
+			commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
+
+			// размер данных пароля к метке
+			commandBuffer[commandBufferIndex++] = (byte) ((passwordBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (passwordBuffer.length & 0xFF);
+
+			// пароль к метке
+			for (int i = 0; i < passwordBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = passwordBuffer[i];
+			}
+
+			// банк памяти
+			commandBuffer[commandBufferIndex++] = (byte) memoryBank;
+
+			// смещение в банке памяти
+			commandBuffer[commandBufferIndex++] = (byte) ((address >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (address & 0xFF);
+
+			// размер данных
+			commandBuffer[commandBufferIndex++] = (byte) ((dataBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (dataBuffer.length & 0xFF);
+
+			// данные
+			for (int i = 0; i < passwordBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = dataBuffer[i];
+			}
+
+			// маркер конца
+			commandBuffer[commandBufferIndex++] = 0x7E;
+			mCommunicationThread.write(commandBuffer);
 		}
 	}
 
@@ -221,7 +390,79 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
 		if (mCommunicationThread != null) {
-			mCommunicationThread.write(new byte[] { 5 });
+			// маркер начала, тип пакета, команда, размер полезной нагрузки,
+			// маркер конца
+			int serviceDataLength;
+			serviceDataLength = 1 + 1 + 1 + 2 + 1;
+			int payloadLength;
+			byte[] passwordBuffer = password.getBytes();
+			byte[] tagIdBuffer = tagId.getBytes();
+			byte[] dataBuffer = data.getBytes();
+
+			// 2 байта на длину пароля + длина пароля
+			payloadLength = 2 + passwordBuffer.length;
+
+			// 2 байта на id метки + длина id метки
+			payloadLength = 2 + tagIdBuffer.length;
+
+			// 2 байта на длину данных + длина данных
+			payloadLength = 2 + dataBuffer.length;
+
+			// банк памяти, смещение
+			payloadLength += 1 + 2;
+			byte[] commandBuffer = new byte[serviceDataLength + payloadLength];
+			int commandBufferIndex = 0;
+
+			// маркер начала пакета
+			commandBuffer[commandBufferIndex++] = (byte) 0xBB;
+
+			// тип пакета
+			commandBuffer[commandBufferIndex++] = 0x00;
+
+			// команда
+			commandBuffer[commandBufferIndex++] = RfidDialog.READER_COMMAND_WRITE_DATA_ID;
+
+			// размер полезной нагрузки
+			commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
+
+			// размер данных пароля к метке
+			commandBuffer[commandBufferIndex++] = (byte) ((passwordBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (passwordBuffer.length & 0xFF);
+
+			// пароль к метке
+			for (int i = 0; i < passwordBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = passwordBuffer[i];
+			}
+
+			// размер данных id метки
+			commandBuffer[commandBufferIndex++] = (byte) ((tagIdBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (tagIdBuffer.length & 0xFF);
+
+			// id метки
+			for (int i = 0; i < tagIdBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = tagIdBuffer[i];
+			}
+
+			// банк памяти
+			commandBuffer[commandBufferIndex++] = (byte) memoryBank;
+
+			// смещение в банке памяти
+			commandBuffer[commandBufferIndex++] = (byte) ((address >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (address & 0xFF);
+
+			// размер данных
+			commandBuffer[commandBufferIndex++] = (byte) ((dataBuffer.length >> 8) & 0xFF);
+			commandBuffer[commandBufferIndex++] = (byte) (dataBuffer.length & 0xFF);
+
+			// данные
+			for (int i = 0; i < passwordBuffer.length; i++) {
+				commandBuffer[commandBufferIndex++] = dataBuffer[i];
+			}
+
+			// маркер конца
+			commandBuffer[commandBufferIndex++] = 0x7E;
+			mCommunicationThread.write(commandBuffer);
 		}
 	}
 
@@ -276,7 +517,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 		return screen;
 	}
-	
+
 	/**
 	 * @author Dmitriy Logachov
 	 * 
@@ -329,8 +570,10 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				} catch (Exception e) {
 					e.printStackTrace();
 					if (!stopDriver) {
-						// если драйвер не останавливается штатно, шлём сообщение
-						mHandler.obtainMessage(6, new byte[] { 6 }).sendToTarget();
+						// если драйвер не останавливается штатно, шлём
+						// сообщение
+						mHandler.obtainMessage(6, new byte[] { 6 })
+								.sendToTarget();
 					}
 					break;
 				}

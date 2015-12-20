@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.UUID;
+
+import ru.toir.mobile.rfid.RfidDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -40,6 +42,7 @@ public class BTRfidServer {
 	public static final int SERVER_STATE_WAITING_CONNECTION = 2;
 	public static final int SERVER_STATE_CONNECTED = 3;
 	public static final int SERVER_STATE_DISCONNECTED = 4;
+	public static final int SERVER_STATE_READ_COMMAND = 5;
 
 	// текущее состояние сервера
 	private int mState;
@@ -140,6 +143,52 @@ public class BTRfidServer {
 	 */
 	public int getState() {
 		return mState;
+	}
+
+	/**
+	 * Отправка id метки в ответ на запрос её чтения.
+	 * 
+	 * @param tagId
+	 *            Id метки отправляемый клиенту.
+	 */
+	public void sendId(String tagId) {
+		// маркер начала, тип пакета, команда, размер полезной нагрузки,
+		// маркер конца
+		int serviceDataLength = 1 + 1 + 1 + 2 + 1;
+		int payloadLength;
+		byte[] tagIdBuffer = tagId.getBytes();
+
+		// 2 байта на id метки + длина id метки
+		payloadLength = 2 + tagIdBuffer.length;
+
+		byte[] commandBuffer = new byte[serviceDataLength + payloadLength];
+		int commandBufferIndex = 0;
+
+		// маркер начала пакета
+		commandBuffer[commandBufferIndex++] = (byte) 0xBB;
+
+		// тип пакета
+		commandBuffer[commandBufferIndex++] = 0x01;
+
+		// команда
+		commandBuffer[commandBufferIndex++] = RfidDialog.READER_COMMAND_READ_ID;
+
+		// размер полезной нагрузки
+		commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+		commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
+
+		// размер данных id метки
+		commandBuffer[commandBufferIndex++] = (byte) ((tagIdBuffer.length >> 8) & 0xFF);
+		commandBuffer[commandBufferIndex++] = (byte) (tagIdBuffer.length & 0xFF);
+
+		// id метки
+		for (int i = 0; i < tagIdBuffer.length; i++) {
+			commandBuffer[commandBufferIndex++] = tagIdBuffer[i];
+		}
+
+		// маркер конца
+		commandBuffer[commandBufferIndex++] = 0x7E;
+		mCommunicationThread.write(commandBuffer);
 	}
 
 	/**
@@ -260,9 +309,7 @@ public class BTRfidServer {
 					count = mInputStream.read(buffer, 0, bufferLength);
 					if (count > 0) {
 						// TODO: Реализовать разбор данных от клиента
-						// TODO: Заменить 666 на подходящий код комманды
-						// считывателя
-						mHandler.obtainMessage(666,
+						mHandler.obtainMessage(SERVER_STATE_READ_COMMAND,
 								Arrays.copyOfRange(buffer, 0, count))
 								.sendToTarget();
 					}
