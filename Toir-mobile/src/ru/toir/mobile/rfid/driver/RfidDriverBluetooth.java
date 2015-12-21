@@ -16,6 +16,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.SharedPreferences;
+import android.hardware.uhf.magic.reader;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.ListPreference;
@@ -128,37 +130,32 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 					@Override
 					public boolean handleMessage(Message message) {
-						byte[] buffer = (byte[]) message.obj;
+						Bundle bundle = (Bundle) message.obj;
+						int result = bundle.getInt("result");
+						String data = bundle.getString("data");
 
 						Log.d(TAG, "Получили сообщение от сервера!!!");
 
 						switch (message.what) {
-						case 1:
-							String tagId = new String(Arrays.copyOfRange(
-									buffer, 1, buffer.length));
-							Log.d(TAG, "Прочитали id метки... id=" + tagId);
-							sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId)
-									.sendToTarget();
+						case RfidDialog.READER_COMMAND_READ_ID:
+							Log.d(TAG, "Прочитали id метки... id=" + data);
+							sHandler.obtainMessage(result, data).sendToTarget();
 							break;
-						case 2:
+						case RfidDialog.READER_COMMAND_READ_DATA:
 							Log.d(TAG, "Прочитали данные случайной метки..");
-							sHandler.obtainMessage(RESULT_RFID_CANCEL)
-									.sendToTarget();
+							sHandler.obtainMessage(result, data).sendToTarget();
 							break;
-						case 3:
+						case RfidDialog.READER_COMMAND_READ_DATA_ID:
 							Log.d(TAG, "Прочитали данные конкретной метки...");
-							sHandler.obtainMessage(RESULT_RFID_CANCEL)
-									.sendToTarget();
+							sHandler.obtainMessage(result, data).sendToTarget();
 							break;
-						case 4:
+						case RfidDialog.READER_COMMAND_WRITE_DATA:
 							Log.d(TAG, "Записали данные в случайную метку...");
-							sHandler.obtainMessage(RESULT_RFID_CANCEL)
-									.sendToTarget();
+							sHandler.obtainMessage(result, data).sendToTarget();
 							break;
-						case 5:
+						case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
 							Log.d(TAG, "Записали данные в конкретную метку...");
-							sHandler.obtainMessage(RESULT_RFID_CANCEL)
-									.sendToTarget();
+							sHandler.obtainMessage(result, data).sendToTarget();
 							break;
 						case 6:
 							Log.d(TAG, "Соединение с сервером потеряно...");
@@ -552,26 +549,135 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 		@Override
 		public void run() {
-
-			int bufferLength = 1024;
+			Log.d(TAG, "run()");
 			int count = 0;
+			int bufferLength = 1024;
 			byte buffer[] = new byte[bufferLength];
+			int dataLength = 1024;
+			byte data[] = new byte[dataLength];
+			int dataIndex = 0;
+			int bufferIndex = 0;
+			int parseIndex = 0;
+
+			boolean packetStart = false;
+			boolean typePacketExists = false;
+			boolean commandExists = false;
+			int command = 0;
+			boolean payloadLengthExists = false;
+			int payloadLength = 0;
+			byte[] payloadLenBuff = new byte[2];
+			int payloadLenBuffIndex = 0;
+			boolean packetEnd = false;
 
 			while (true) {
 				try {
 					Log.d(TAG, "Читаем данные с сервера...");
-					count = mInputStream.read(buffer, 0, bufferLength);
+					count = mInputStream.read(buffer, bufferIndex, bufferLength
+							- bufferIndex);
 					// TODO: реализовать разбор данных поступающих с сервера
 					if (count > 0) {
 						Log.d(TAG, "прочитано байт = " + count);
-						mHandler.obtainMessage(buffer[0],
-								Arrays.copyOfRange(buffer, 0, count))
-								.sendToTarget();
+						bufferIndex += count;
+						while (parseIndex < bufferIndex) {
+							if (packetStart) {
+								if (typePacketExists) {
+									if (commandExists) {
+										if (payloadLengthExists) {
+											if (packetEnd) {
+												// пакет разобран
+												// мы сюда не должны попадать
+											} else {
+												byte tmpData = buffer[parseIndex++];
+												if (tmpData == 0x7E
+														&& dataIndex == dataLength) {
+													// добрались до конца пакета
+													packetEnd = true;
+
+													Bundle bundle = parseCommand(
+															command, data,
+															payloadLength);
+													mHandler.obtainMessage(
+															command, -1, -1,
+															bundle)
+															.sendToTarget();
+
+													// сбрасываем всё
+													packetStart = false;
+													typePacketExists = false;
+													payloadLengthExists = false;
+													payloadLength = 0;
+													payloadLenBuffIndex = 0;
+													commandExists = false;
+													dataIndex = 0;
+													packetEnd = false;
+
+												} else {
+													if (dataIndex >= payloadLength) {
+														// не нашли маркера
+														// конца пакета после
+														// полезной нагрузки
+														// сбрасываем всё
+														packetStart = false;
+														typePacketExists = false;
+														payloadLengthExists = false;
+														payloadLength = 0;
+														payloadLenBuffIndex = 0;
+														commandExists = false;
+														dataIndex = 0;
+														packetEnd = false;
+													} else {
+														data[dataIndex++] = tmpData;
+													}
+												}
+											}
+										} else {
+											payloadLenBuff[payloadLenBuffIndex++] = buffer[parseIndex++];
+											if (payloadLenBuffIndex >= 2) {
+												// TODO: исправить!!!!
+												payloadLength = payloadLenBuff[0] << 8 + payloadLenBuff[1];
+												payloadLengthExists = true;
+											}
+										}
+									} else {
+										command = buffer[parseIndex++];
+										int[] commands = new int[] {
+												RfidDialog.READER_COMMAND_READ_ID,
+												RfidDialog.READER_COMMAND_READ_DATA,
+												RfidDialog.READER_COMMAND_READ_DATA_ID,
+												RfidDialog.READER_COMMAND_WRITE_DATA,
+												RfidDialog.READER_COMMAND_WRITE_DATA_ID };
+										if (Arrays.binarySearch(commands,
+												command) > 0) {
+											commandExists = true;
+										} else {
+											command = 0;
+											packetStart = false;
+											typePacketExists = false;
+										}
+									}
+								} else {
+									if (buffer[parseIndex++] == 0x01) {
+										typePacketExists = true;
+									} else {
+										packetStart = false;
+									}
+								}
+							} else {
+								if (buffer[parseIndex++] == 0xBB) {
+									packetStart = true;
+								}
+							}
+						}
+
+						if (bufferIndex >= bufferLength) {
+							bufferIndex = 0;
+							parseIndex = 0;
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					if (!stopDriver) {
-						// если драйвер не останавливается штатно, шлём
+						// если драйвер останавливается не штатно, шлём
 						// сообщение
 						mHandler.obtainMessage(6, new byte[] { 6 })
 								.sendToTarget();
@@ -580,6 +686,75 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 				}
 			}
 
+		}
+
+		private Bundle parseCommand(int command, byte[] data, int dataLength) {
+			switch (command) {
+			case RfidDialog.READER_COMMAND_READ_ID:
+				return parseCommandReadTagId(data, dataLength);
+			case RfidDialog.READER_COMMAND_READ_DATA:
+			case RfidDialog.READER_COMMAND_READ_DATA_ID:
+				return parseCommandReadData(data, dataLength);
+			case RfidDialog.READER_COMMAND_WRITE_DATA:
+			case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
+				return parseCommandWriteData(data, dataLength);
+			default:
+				return null;
+			}
+		}
+
+		private Bundle parseCommandReadTagId(byte[] data, int dataLength) {
+			Bundle bundle = new Bundle();
+			int index = 0;
+
+			// результат выполнения команды
+			int result = reader.byteToInt(data, index, 1);
+			index += 1;
+			bundle.putInt("result", result);
+
+			// длина id метки
+			int tagIdLength = reader.byteToInt(data, index, 2);
+			index += 2;
+
+			// id метки
+			byte[] tagIdBuffer = new byte[tagIdLength];
+			for (int i = 0; i < tagIdLength; i++) {
+				tagIdBuffer[i] = data[index++];
+			}
+			String tagId = tagIdBuffer.toString();
+			bundle.putString("data", tagId);
+			return bundle;
+		}
+
+		private Bundle parseCommandReadData(byte[] data, int dataLength) {
+			Bundle bundle = new Bundle();
+			int index = 0;
+
+			// результат выполнения команды
+			int result = reader.byteToInt(data, index, 1);
+			index += 1;
+			bundle.putInt("result", result);
+
+			// данные
+			byte[] dataBuffer = new byte[dataLength - 1];
+			for (int i = 0; i < dataLength - 1; i++) {
+				dataBuffer[i] = data[index++];
+			}
+			String tagId = dataBuffer.toString();
+			bundle.putString("data", tagId);
+			return bundle;
+		}
+
+		private Bundle parseCommandWriteData(byte[] data, int dataLength) {
+			Bundle bundle = new Bundle();
+			int index = 0;
+
+			// результат выполнения команды
+			int result = reader.byteToInt(data, index, 1);
+			index += 1;
+			bundle.putInt("result", result);
+			bundle.putString("data", null);
+			return bundle;
 		}
 
 		public void cancel() {

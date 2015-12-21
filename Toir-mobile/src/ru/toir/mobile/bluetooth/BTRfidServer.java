@@ -497,6 +497,7 @@ public class BTRfidServer {
 										} else {
 											payloadLenBuff[payloadLenBuffIndex++] = buffer[parseIndex++];
 											if (payloadLenBuffIndex >= 2) {
+												// TODO: исправить!!!!
 												payloadLength = payloadLenBuff[0] << 8 + payloadLenBuff[1];
 												payloadLengthExists = true;
 											}
