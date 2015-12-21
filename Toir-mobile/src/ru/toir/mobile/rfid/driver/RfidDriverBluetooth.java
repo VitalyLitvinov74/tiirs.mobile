@@ -50,6 +50,9 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	private BluetoothDevice mDevice;
 	private CommunicationThread mCommunicationThread;
 
+	public static final int DRIVER_STATE_READ_ANSWER = 1;
+	public static final int DRIVER_STATE_DISCONNECT = 2;
+
 	/**
 	 * @param handler
 	 */
@@ -140,28 +143,44 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 						}
 
 						switch (message.what) {
-						case RfidDialog.READER_COMMAND_READ_ID:
-							Log.d(TAG, "Прочитали id метки... id=" + data);
-							sHandler.obtainMessage(result, data).sendToTarget();
+						case DRIVER_STATE_READ_ANSWER:
+							switch (message.arg1) {
+							case RfidDialog.READER_COMMAND_READ_ID:
+								Log.d(TAG, "Прочитали id метки... id=" + data);
+								sHandler.obtainMessage(result, data)
+										.sendToTarget();
+								break;
+							case RfidDialog.READER_COMMAND_READ_DATA:
+								Log.d(TAG, "Прочитали данные случайной метки..");
+								sHandler.obtainMessage(result, data)
+										.sendToTarget();
+								break;
+							case RfidDialog.READER_COMMAND_READ_DATA_ID:
+								Log.d(TAG,
+										"Прочитали данные конкретной метки...");
+								sHandler.obtainMessage(result, data)
+										.sendToTarget();
+								break;
+							case RfidDialog.READER_COMMAND_WRITE_DATA:
+								Log.d(TAG,
+										"Записали данные в случайную метку...");
+								sHandler.obtainMessage(result, data)
+										.sendToTarget();
+								break;
+							case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
+								Log.d(TAG,
+										"Записали данные в конкретную метку...");
+								sHandler.obtainMessage(result, data)
+										.sendToTarget();
+								break;
+							default:
+								Log.d(TAG, "Не известная команда...");
+								sHandler.obtainMessage(RESULT_RFID_CANCEL, null)
+										.sendToTarget();
+								break;
+							}
 							break;
-						case RfidDialog.READER_COMMAND_READ_DATA:
-							Log.d(TAG, "Прочитали данные случайной метки..");
-							sHandler.obtainMessage(result, data).sendToTarget();
-							break;
-						case RfidDialog.READER_COMMAND_READ_DATA_ID:
-							Log.d(TAG, "Прочитали данные конкретной метки...");
-							sHandler.obtainMessage(result, data).sendToTarget();
-							break;
-						case RfidDialog.READER_COMMAND_WRITE_DATA:
-							Log.d(TAG, "Записали данные в случайную метку...");
-							sHandler.obtainMessage(result, data).sendToTarget();
-							break;
-						case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
-							Log.d(TAG, "Записали данные в конкретную метку...");
-							sHandler.obtainMessage(result, data).sendToTarget();
-							break;
-						case 6:
-							// TODO: заменить на подходящую константу
+						case DRIVER_STATE_DISCONNECT:
 							Log.d(TAG, "Соединение с сервером потеряно...");
 							sHandler.obtainMessage(RESULT_RFID_DISCONNECT)
 									.sendToTarget();
@@ -601,8 +620,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 															command, data,
 															payloadLength);
 													mHandler.obtainMessage(
-															command, -1, -1,
-															bundle)
+															DRIVER_STATE_READ_ANSWER,
+															command, -1, bundle)
 															.sendToTarget();
 
 													// сбрасываем всё
@@ -683,8 +702,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 					if (!stopDriver) {
 						// если драйвер останавливается не штатно, шлём
 						// сообщение
-						// TODO: заменить на подходящую константу
-						mHandler.obtainMessage(6, null).sendToTarget();
+						mHandler.obtainMessage(DRIVER_STATE_DISCONNECT, null)
+								.sendToTarget();
 					}
 					break;
 				}
