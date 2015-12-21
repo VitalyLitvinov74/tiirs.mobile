@@ -354,6 +354,8 @@ public class BTRfidServer {
 					mHandler.obtainMessage(SERVER_STATE_STOPED).sendToTarget();
 					break;
 				} catch (InterruptedException e) {
+				} catch (NullPointerException e) {
+					break;
 				}
 			}
 
