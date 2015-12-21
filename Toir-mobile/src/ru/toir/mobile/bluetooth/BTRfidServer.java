@@ -185,17 +185,15 @@ public class BTRfidServer {
 		commandBuffer[commandBufferIndex++] = RfidDialog.READER_COMMAND_READ_ID;
 
 		// размер полезной нагрузки
-		byte[] tmpLength = reader.intToByte(payloadLength, 0);
-		commandBuffer[commandBufferIndex++] = tmpLength[2];
-		commandBuffer[commandBufferIndex++] = tmpLength[3];
+		commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+		commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
 
 		// результат выполнения команды
 		commandBuffer[commandBufferIndex++] = (byte) (result);
 
 		// размер данных id метки
-		tmpLength = reader.intToByte(tagIdBuffer.length, 0);
-		commandBuffer[commandBufferIndex++] = tmpLength[2];
-		commandBuffer[commandBufferIndex++] = tmpLength[3];
+		commandBuffer[commandBufferIndex++] = (byte) ((tagIdBuffer.length >> 8) & 0xFF);
+		commandBuffer[commandBufferIndex++] = (byte) (tagIdBuffer.length & 0xFF);
 
 		// id метки
 		for (int i = 0; i < tagIdBuffer.length; i++) {
@@ -248,9 +246,8 @@ public class BTRfidServer {
 		commandBuffer[commandBufferIndex++] = (byte) command;
 
 		// размер полезной нагрузки
-		byte[] tmpLength = reader.intToByte(payloadLength, 0);
-		commandBuffer[commandBufferIndex++] = tmpLength[2];
-		commandBuffer[commandBufferIndex++] = tmpLength[3];
+		commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+		commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
 
 		// результат выполнения команды
 		commandBuffer[commandBufferIndex++] = (byte) result;
@@ -295,9 +292,8 @@ public class BTRfidServer {
 		commandBuffer[commandBufferIndex++] = (byte) command;
 
 		// размер полезной нагрузки
-		byte[] tmpLength = reader.intToByte(payloadLength, 0);
-		commandBuffer[commandBufferIndex++] = tmpLength[2];
-		commandBuffer[commandBufferIndex++] = tmpLength[3];
+		commandBuffer[commandBufferIndex++] = (byte) ((payloadLength >> 8) & 0xFF);
+		commandBuffer[commandBufferIndex++] = (byte) (payloadLength & 0xFF);
 
 		// результат выполнения
 		commandBuffer[commandBufferIndex++] = (byte) result;
@@ -497,8 +493,8 @@ public class BTRfidServer {
 										} else {
 											payloadLenBuff[payloadLenBuffIndex++] = buffer[parseIndex++];
 											if (payloadLenBuffIndex >= 2) {
-												// TODO: исправить!!!!
-												payloadLength = payloadLenBuff[0] << 8 + payloadLenBuff[1];
+												payloadLength = ((int) (0xFF & payloadLenBuff[0]) << 8)
+														+ (int) (0xFF & payloadLenBuff[1]);
 												payloadLengthExists = true;
 											}
 										}

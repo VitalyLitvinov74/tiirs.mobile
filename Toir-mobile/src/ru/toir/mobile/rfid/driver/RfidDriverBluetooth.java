@@ -158,6 +158,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 							sHandler.obtainMessage(result, data).sendToTarget();
 							break;
 						case 6:
+							// TODO: заменить на подходящую константу
 							Log.d(TAG, "Соединение с сервером потеряно...");
 							sHandler.obtainMessage(RESULT_RFID_DISCONNECT)
 									.sendToTarget();
@@ -633,8 +634,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 										} else {
 											payloadLenBuff[payloadLenBuffIndex++] = buffer[parseIndex++];
 											if (payloadLenBuffIndex >= 2) {
-												// TODO: исправить!!!!
-												payloadLength = payloadLenBuff[0] << 8 + payloadLenBuff[1];
+												payloadLength = ((int) (0xFF & payloadLenBuff[0]) << 8)
+														+ (int) (0xFF & payloadLenBuff[1]);
 												payloadLengthExists = true;
 											}
 										}
@@ -679,6 +680,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 					if (!stopDriver) {
 						// если драйвер останавливается не штатно, шлём
 						// сообщение
+						// TODO: заменить на подходящую константу
 						mHandler.obtainMessage(6, new byte[] { 6 })
 								.sendToTarget();
 					}
