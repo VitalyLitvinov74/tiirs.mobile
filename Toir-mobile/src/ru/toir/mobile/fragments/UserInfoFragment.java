@@ -137,8 +137,9 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new ToirDatabaseContext(
-					getActivity().getApplicationContext()));
+			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+					new ToirDatabaseContext(getActivity()
+							.getApplicationContext()));
 			ArrayList<Task> taskList = taskDBAdapter.getOrders();
 			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 					new ToirDatabaseContext(getActivity()
@@ -152,7 +153,8 @@ public class UserInfoFragment extends Fragment {
 
 			for (Task item : taskList) {
 				element = new HashMap<String, String>();
-				element.put("name",
+				element.put(
+						"name",
 						"["
 								+ DataUtils.getDate(item.getCreatedAt(),
 										"dd-MM-yyyy HH:mm")
@@ -166,15 +168,18 @@ public class UserInfoFragment extends Fragment {
 
 				if (taskStatusUuid
 						.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
-					element.put("img", Integer.toString(R.drawable.forbidden_32));
+					element.put("img",
+							Integer.toString(R.drawable.forbidden_32));
 				}
 
 				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.COMPLETE)) {
-					element.put("img", Integer.toString(R.drawable.checkmark_32));
+					element.put("img",
+							Integer.toString(R.drawable.checkmark_32));
 				}
 
 				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.IN_WORK)) {
-					element.put("img", Integer.toString(R.drawable.information_32));
+					element.put("img",
+							Integer.toString(R.drawable.information_32));
 				}
 
 				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.NEW)) {
@@ -185,8 +190,8 @@ public class UserInfoFragment extends Fragment {
 			}
 
 			SimpleAdapter adapter = new SimpleAdapter(getActivity()
-					.getApplicationContext(), elementList, R.layout.listview1row,
-					from, to);
+					.getApplicationContext(), elementList,
+					R.layout.listview1row, from, to);
 
 			ListView lv;
 			lv = (ListView) view.findViewById(R.id.user_listView_main);

@@ -130,11 +130,14 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 					@Override
 					public boolean handleMessage(Message message) {
-						Bundle bundle = (Bundle) message.obj;
-						int result = bundle.getInt("result");
-						String data = bundle.getString("data");
-
 						Log.d(TAG, "Получили сообщение от сервера!!!");
+						Bundle bundle = (Bundle) message.obj;
+						int result = -1;
+						String data = null;
+						if (bundle != null) {
+							result = bundle.getInt("result");
+							data = bundle.getString("data");
+						}
 
 						switch (message.what) {
 						case RfidDialog.READER_COMMAND_READ_ID:
@@ -325,15 +328,15 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 			// маркер начала, тип пакета, команда, размер полезной нагрузки,
 			// маркер конца
 			int serviceDataLength = 1 + 1 + 1 + 2 + 1;
-			int payloadLength;
+			int payloadLength = 0;
 			byte[] passwordBuffer = password.getBytes();
 			byte[] dataBuffer = data.getBytes();
 
 			// 2 байта на длину пароля + длина пароля
-			payloadLength = 2 + passwordBuffer.length;
+			payloadLength += 2 + passwordBuffer.length;
 
 			// 2 байта на длину данных + длина данных
-			payloadLength = 2 + dataBuffer.length;
+			payloadLength += 2 + dataBuffer.length;
 
 			// банк памяти, смещение
 			payloadLength += 1 + 2;
@@ -392,19 +395,19 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 			// маркер конца
 			int serviceDataLength;
 			serviceDataLength = 1 + 1 + 1 + 2 + 1;
-			int payloadLength;
+			int payloadLength = 0;
 			byte[] passwordBuffer = password.getBytes();
 			byte[] tagIdBuffer = tagId.getBytes();
 			byte[] dataBuffer = data.getBytes();
 
 			// 2 байта на длину пароля + длина пароля
-			payloadLength = 2 + passwordBuffer.length;
+			payloadLength += 2 + passwordBuffer.length;
 
 			// 2 байта на id метки + длина id метки
-			payloadLength = 2 + tagIdBuffer.length;
+			payloadLength += 2 + tagIdBuffer.length;
 
 			// 2 байта на длину данных + длина данных
-			payloadLength = 2 + dataBuffer.length;
+			payloadLength += 2 + dataBuffer.length;
 
 			// банк памяти, смещение
 			payloadLength += 1 + 2;
@@ -575,7 +578,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 					Log.d(TAG, "Читаем данные с сервера...");
 					count = mInputStream.read(buffer, bufferIndex, bufferLength
 							- bufferIndex);
-					// TODO: реализовать разбор данных поступающих с сервера
+					// разбор данных поступающих с сервера
 					if (count > 0) {
 						Log.d(TAG, "прочитано байт = " + count);
 						bufferIndex += count;
@@ -589,8 +592,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 												// мы сюда не должны попадать
 											} else {
 												byte tmpData = buffer[parseIndex++];
-												if (tmpData == 0x7E
-														&& dataIndex == dataLength) {
+												if (tmpData == (byte) 0x7E
+														&& dataIndex == payloadLength) {
 													// добрались до конца пакета
 													packetEnd = true;
 
@@ -640,7 +643,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 											}
 										}
 									} else {
-										command = buffer[parseIndex++];
+										command = (int) (buffer[parseIndex++] & 0xFF);
 										int[] commands = new int[] {
 												RfidDialog.READER_COMMAND_READ_ID,
 												RfidDialog.READER_COMMAND_READ_DATA,
@@ -648,7 +651,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 												RfidDialog.READER_COMMAND_WRITE_DATA,
 												RfidDialog.READER_COMMAND_WRITE_DATA_ID };
 										if (Arrays.binarySearch(commands,
-												command) > 0) {
+												command) > -1) {
 											commandExists = true;
 										} else {
 											command = 0;
@@ -657,14 +660,14 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 										}
 									}
 								} else {
-									if (buffer[parseIndex++] == 0x01) {
+									if (buffer[parseIndex++] == (byte) 0x01) {
 										typePacketExists = true;
 									} else {
 										packetStart = false;
 									}
 								}
 							} else {
-								if (buffer[parseIndex++] == 0xBB) {
+								if (buffer[parseIndex++] == (byte) 0xBB) {
 									packetStart = true;
 								}
 							}
@@ -681,8 +684,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 						// если драйвер останавливается не штатно, шлём
 						// сообщение
 						// TODO: заменить на подходящую константу
-						mHandler.obtainMessage(6, new byte[] { 6 })
-								.sendToTarget();
+						mHandler.obtainMessage(6, null).sendToTarget();
 					}
 					break;
 				}
@@ -723,7 +725,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 			for (int i = 0; i < tagIdLength; i++) {
 				tagIdBuffer[i] = data[index++];
 			}
-			String tagId = tagIdBuffer.toString();
+			String tagId = new String(tagIdBuffer);
 			bundle.putString("data", tagId);
 			return bundle;
 		}
@@ -742,7 +744,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 			for (int i = 0; i < dataLength - 1; i++) {
 				dataBuffer[i] = data[index++];
 			}
-			String tagId = dataBuffer.toString();
+			String tagId = new String(dataBuffer);
 			bundle.putString("data", tagId);
 			return bundle;
 		}

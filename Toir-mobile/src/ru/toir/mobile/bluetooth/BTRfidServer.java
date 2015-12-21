@@ -448,8 +448,8 @@ public class BTRfidServer {
 												// мы сюда не должны попадать
 											} else {
 												byte tmpData = buffer[parseIndex++];
-												if (tmpData == 0x7E
-														&& dataIndex == dataLength) {
+												if (tmpData == (byte) 0x7E
+														&& dataIndex == payloadLength) {
 													// добрались до конца пакета
 													packetEnd = true;
 
@@ -499,7 +499,7 @@ public class BTRfidServer {
 											}
 										}
 									} else {
-										command = buffer[parseIndex++];
+										command = (int) (buffer[parseIndex++] & 0xFF);
 										int[] commands = new int[] {
 												RfidDialog.READER_COMMAND_READ_ID,
 												RfidDialog.READER_COMMAND_READ_DATA,
@@ -507,7 +507,7 @@ public class BTRfidServer {
 												RfidDialog.READER_COMMAND_WRITE_DATA,
 												RfidDialog.READER_COMMAND_WRITE_DATA_ID };
 										if (Arrays.binarySearch(commands,
-												command) > 0) {
+												command) > -1) {
 											commandExists = true;
 										} else {
 											command = 0;
@@ -516,14 +516,14 @@ public class BTRfidServer {
 										}
 									}
 								} else {
-									if (buffer[parseIndex++] == 0x00) {
+									if (buffer[parseIndex++] == (byte) 0x00) {
 										typePacketExists = true;
 									} else {
 										packetStart = false;
 									}
 								}
 							} else {
-								if (buffer[parseIndex++] == 0xBB) {
+								if (buffer[parseIndex++] == (byte) 0xBB) {
 									packetStart = true;
 								}
 							}
@@ -574,13 +574,13 @@ public class BTRfidServer {
 			index += 2;
 
 			// сам пароль в виде строки
-			String password = Arrays.copyOfRange(data, index,
-					passwordLength + 1).toString();
+			String password = new String(Arrays.copyOfRange(data, index,
+					passwordLength + index));
 			index += passwordLength;
 			bundle.putString("password", password);
 
 			// банк памяти
-			int memoryBank = data[index++];
+			int memoryBank = reader.byteToInt(data, index++, 1);
 			bundle.putInt("memoryBank", memoryBank);
 
 			// смещение в банке памяти
@@ -604,8 +604,8 @@ public class BTRfidServer {
 			index += 2;
 
 			// сам пароль в виде строки
-			String password = Arrays.copyOfRange(data, index,
-					passwordLength + 1).toString();
+			String password = new String(Arrays.copyOfRange(data, index,
+					passwordLength + index));
 			index += passwordLength;
 			bundle.putString("password", password);
 
@@ -614,8 +614,8 @@ public class BTRfidServer {
 			index += 2;
 
 			// сама id метки в виде строки
-			String tagId = Arrays.copyOfRange(data, index, tagIdLength + 1)
-					.toString();
+			String tagId = new String(Arrays.copyOfRange(data, index,
+					tagIdLength + index));
 			index += tagIdLength;
 			bundle.putString("tagId", tagId);
 
@@ -644,13 +644,13 @@ public class BTRfidServer {
 			index += 2;
 
 			// сам пароль в виде строки
-			String password = Arrays.copyOfRange(data, index,
-					passwordLength + 1).toString();
+			String password = new String(Arrays.copyOfRange(data, index,
+					passwordLength + index));
 			index += passwordLength;
 			bundle.putString("password", password);
 
 			// банк памяти
-			int memoryBank = data[index++];
+			int memoryBank = reader.byteToInt(data, index++, 1);
 			bundle.putInt("memoryBank", memoryBank);
 
 			// смещение в банке памяти
@@ -663,8 +663,8 @@ public class BTRfidServer {
 			index += 2;
 
 			// сами данные
-			String tmpData = Arrays.copyOfRange(data, index, tmpDataLength + 1)
-					.toString();
+			String tmpData = new String(Arrays.copyOfRange(data, index,
+					tmpDataLength + index));
 			bundle.putString("data", tmpData);
 			return bundle;
 		}
@@ -678,8 +678,8 @@ public class BTRfidServer {
 			index += 2;
 
 			// сам пароль в виде строки
-			String password = Arrays.copyOfRange(data, index,
-					passwordLength + 1).toString();
+			String password = new String(Arrays.copyOfRange(data, index,
+					passwordLength + index));
 			index += passwordLength;
 			bundle.putString("password", password);
 
@@ -688,13 +688,13 @@ public class BTRfidServer {
 			index += 2;
 
 			// сама id метки в виде строки
-			String tagId = Arrays.copyOfRange(data, index, tagIdLength + 1)
-					.toString();
+			String tagId = new String(Arrays.copyOfRange(data, index,
+					tagIdLength + index));
 			index += tagIdLength;
 			bundle.putString("tagId", tagId);
 
 			// банк памяти
-			int memoryBank = data[index++];
+			int memoryBank = reader.byteToInt(data, index++, 1);
 			bundle.putInt("memoryBank", memoryBank);
 
 			// смещение в банке памяти
@@ -707,8 +707,8 @@ public class BTRfidServer {
 			index += 2;
 
 			// сами данные
-			String tmpData = Arrays.copyOfRange(data, index, tmpDataLength + 1)
-					.toString();
+			String tmpData = new String(Arrays.copyOfRange(data, index,
+					tmpDataLength + index));
 			bundle.putString("data", tmpData);
 			return bundle;
 		}
