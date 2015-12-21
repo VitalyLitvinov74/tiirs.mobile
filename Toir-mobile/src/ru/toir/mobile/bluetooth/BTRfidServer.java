@@ -54,6 +54,7 @@ public class BTRfidServer {
 	public BTRfidServer(Context context, Handler handler) {
 		mHandler = handler;
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mState = SERVER_STATE_STOPED;
 	}
 
 	/**
@@ -77,6 +78,7 @@ public class BTRfidServer {
 
 			// сообщаем активити о том что перешли в режим ожидания входящего
 			// сообщения
+			setState(SERVER_STATE_WAITING_CONNECTION);
 			mHandler.obtainMessage(SERVER_STATE_WAITING_CONNECTION)
 					.sendToTarget();
 		}
@@ -96,6 +98,10 @@ public class BTRfidServer {
 			mCommunicationThread.cancel();
 			mCommunicationThread = null;
 		}
+
+		// сообщаем активити о том что остановили сервер
+		setState(SERVER_STATE_STOPED);
+		mHandler.obtainMessage(SERVER_STATE_STOPED).sendToTarget();
 	}
 
 	/**
@@ -133,7 +139,7 @@ public class BTRfidServer {
 	 * 
 	 * @param state
 	 */
-	public void setState(int state) {
+	public synchronized void setState(int state) {
 		mState = state;
 	}
 
@@ -142,7 +148,7 @@ public class BTRfidServer {
 	 * 
 	 * @return
 	 */
-	public int getState() {
+	public synchronized int getState() {
 		return mState;
 	}
 
@@ -348,18 +354,22 @@ public class BTRfidServer {
 					break;
 				} catch (IOException e) {
 					Log.e(TAG, e.getLocalizedMessage());
-
-					// сообщаем активити о том что отключили режим ожидания
-					// входящего соединения
-					mHandler.obtainMessage(SERVER_STATE_STOPED).sendToTarget();
 					break;
 				} catch (InterruptedException e) {
+					Log.e(TAG, e.getLocalizedMessage());
+					break;
 				} catch (NullPointerException e) {
+					Log.e(TAG, "mServerSocket = null");
 					break;
 				}
 			}
 
 			Log.d(TAG, "Завершился поток ожидания входящего соединения...");
+
+			// сообщаем активити о том что отключили режим ожидания
+			// входящего соединения
+			setState(SERVER_STATE_STOPED);
+			mHandler.obtainMessage(SERVER_STATE_STOPED).sendToTarget();
 		}
 
 		public void cancel() {
@@ -539,6 +549,7 @@ public class BTRfidServer {
 					Log.e(TAG, e.getLocalizedMessage());
 
 					// сообщаем что соединение с клиентом потеряно
+					setState(SERVER_STATE_STOPED);
 					mHandler.obtainMessage(SERVER_STATE_DISCONNECTED)
 							.sendToTarget();
 					break;

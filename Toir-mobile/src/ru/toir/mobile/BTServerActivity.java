@@ -58,7 +58,9 @@ public class BTServerActivity extends Activity {
 					BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(intentStartBT, BT_ENABLE_REQUEST_CODE);
 		} else {
-			mBtRfidServer.startServer();
+			if (mBtRfidServer.getState() != BTRfidServer.SERVER_STATE_WAITING_CONNECTION) {
+				mBtRfidServer.startServer();
+			}
 		}
 	}
 
@@ -66,7 +68,9 @@ public class BTServerActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		Log.d(TAG, "onResume()");
-		mBtRfidServer.startServer();
+		if (mBtRfidServer.getState() != BTRfidServer.SERVER_STATE_WAITING_CONNECTION) {
+			mBtRfidServer.startServer();
+		}
 	}
 
 	@Override
@@ -101,10 +105,6 @@ public class BTServerActivity extends Activity {
 			case BTRfidServer.SERVER_STATE_STOPED:
 				Log.e(TAG, "SERVER_STATE_STOPED");
 				serverStatusTextView.setText("Остановлен...");
-				if (!mBluetoothAdapter.isEnabled()) {
-					finish();
-				}
-
 				break;
 			case BTRfidServer.SERVER_STATE_WAITING_CONNECTION:
 				Log.e(TAG, "SERVER_STATE_WAITING_CONNECTION");
@@ -118,7 +118,9 @@ public class BTServerActivity extends Activity {
 			case BTRfidServer.SERVER_STATE_DISCONNECTED:
 				Log.e(TAG, "SERVER_STATE_DISCONNECTED");
 				serverStatusTextView.setText("Клиент отключился...");
-				mBtRfidServer.startServer();
+				if (mBtRfidServer.getState() != BTRfidServer.SERVER_STATE_WAITING_CONNECTION) {
+					mBtRfidServer.startServer();
+				}
 				break;
 			case BTRfidServer.SERVER_STATE_READ_COMMAND:
 				Log.d(TAG, "Получили сообщение от клиента!!!");
