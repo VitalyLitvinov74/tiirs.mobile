@@ -9,10 +9,8 @@ public class ToirPreferences extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getFragmentManager()
-				.beginTransaction()
-				.replace(android.R.id.content,
-						new ToirPreferenceFragment(getApplicationContext()))
+		getFragmentManager().beginTransaction()
+				.replace(android.R.id.content, new ToirPreferenceFragment())
 				.commit();
 	}
 

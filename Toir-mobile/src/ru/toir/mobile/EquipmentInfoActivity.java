@@ -226,7 +226,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						return true;
 					}
 				});
-				rfidDialog = new RfidDialog(getApplicationContext(), handler);
+				rfidDialog = new RfidDialog();
+				rfidDialog.setHandler(handler);
 
 				// читаем метку с конкретным id для теста
 				// rfidDialog.readTagData("0000000000",
@@ -277,7 +278,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						return true;
 					}
 				});
-				rfidDialog = new RfidDialog(getApplicationContext(), handler);
+				rfidDialog = new RfidDialog();
+				rfidDialog.setHandler(handler);
 				// тестовые данные для примера
 				String data = "0a0a0a0a";
 				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";

@@ -214,7 +214,8 @@ public class BTServerActivity extends Activity {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog = new RfidDialog();
+		rfidDialog.setHandler(handler);
 		rfidDialog.readTagId();
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 	}
@@ -250,7 +251,8 @@ public class BTServerActivity extends Activity {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog = new RfidDialog();
+		rfidDialog.setHandler(handler);
 		rfidDialog.readTagData(password, memoryBank, address, count);
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 	}
@@ -287,7 +289,8 @@ public class BTServerActivity extends Activity {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog = new RfidDialog();
+		rfidDialog.setHandler(handler);
 		rfidDialog.readTagData(password, tagId, memoryBank, address, count);
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 	}
@@ -318,7 +321,8 @@ public class BTServerActivity extends Activity {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog = new RfidDialog();
+		rfidDialog.setHandler(handler);
 		rfidDialog.writeTagData(password, memoryBank, address, data);
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 	}
@@ -350,7 +354,8 @@ public class BTServerActivity extends Activity {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog = new RfidDialog();
+		rfidDialog.setHandler(handler);
 		rfidDialog.writeTagData(password, tagId, memoryBank, address, data);
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 	}

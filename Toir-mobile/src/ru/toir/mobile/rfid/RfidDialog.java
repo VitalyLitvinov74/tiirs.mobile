@@ -7,7 +7,6 @@ import java.lang.reflect.Constructor;
 import com.google.zxing.integration.android.IntentIntegrator;
 import ru.toir.mobile.R;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -36,8 +35,6 @@ public class RfidDialog extends DialogFragment {
 	private Class<?> driverClass;
 	private RfidDriverBase driver;
 
-	private Context mContext;
-
 	// команда драйвера которая должна быть выполнена при старте диалога
 	private int command;
 
@@ -63,16 +60,20 @@ public class RfidDialog extends DialogFragment {
 
 	private boolean isInited = false;
 
-	public RfidDialog(Context context, Handler handler) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
+			Bundle savedInstanceState) {
 
-		mContext = context;
-		mHandler = handler;
+		super.onCreate(savedInstanceState);
+
+		getDialog().setTitle("Поднесите метку");
 
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager
-				.getDefaultSharedPreferences(mContext);
-		driverClassName = sp.getString(
-				mContext.getString(R.string.rfidDriverListPrefKey), null);
+				.getDefaultSharedPreferences(getActivity()
+						.getApplicationContext());
+		driverClassName = sp.getString(getActivity().getApplicationContext()
+				.getString(R.string.rfidDriverListPrefKey), null);
 
 		// пытаемся получить класс драйвера
 		try {
@@ -101,10 +102,10 @@ public class RfidDialog extends DialogFragment {
 		driver.setIntegration(this);
 
 		// передаём в драйвер контекст
-		driver.setContext(mContext);
+		driver.setContext(getActivity().getApplicationContext());
 
 		// передаём в драйвер обработчик
-		driver.setHandler(handler);
+		driver.setHandler(mHandler);
 
 		// инициализируем драйвер
 		if (!driver.init()) {
@@ -115,16 +116,6 @@ public class RfidDialog extends DialogFragment {
 		} else {
 			isInited = true;
 		}
-
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
-			Bundle savedInstanceState) {
-
-		super.onCreate(savedInstanceState);
-
-		getDialog().setTitle("Поднесите метку");
 
 		View view = null;
 		if (isInited) {
@@ -173,7 +164,6 @@ public class RfidDialog extends DialogFragment {
 			driver.readTagId();
 			break;
 		}
-
 	}
 
 	/**
@@ -314,5 +304,9 @@ public class RfidDialog extends DialogFragment {
 		super.onDestroyView();
 		driver.close();
 		driver = null;
+	}
+	
+	public void setHandler(Handler handler) {
+		mHandler = handler;
 	}
 }

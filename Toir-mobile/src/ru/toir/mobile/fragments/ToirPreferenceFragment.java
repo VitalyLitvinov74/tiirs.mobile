@@ -11,7 +11,6 @@ import java.util.List;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import dalvik.system.DexFile;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -32,12 +31,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 
 	private ListPreference drvList;
 	private PreferenceScreen drvSettingScr;
-	private Context context;
 	private PreferenceCategory drvSettingCategory;
-
-	public ToirPreferenceFragment(Context context) {
-		this.context = context;
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,12 +40,14 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		addPreferencesFromResource(R.xml.preferences);
 
 		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(context);
+				.getDefaultSharedPreferences(getActivity()
+						.getApplicationContext());
 
 		// получаем список драйверов по имени класса
 		List<String> driverClassList = new ArrayList<String>();
 		try {
-			DexFile df = new DexFile(context.getPackageCodePath());
+			DexFile df = new DexFile(getActivity().getApplicationContext()
+					.getPackageCodePath());
 			for (Enumeration<String> iter = df.entries(); iter
 					.hasMoreElements();) {
 				String classPath = iter.nextElement();
@@ -147,7 +143,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		try {
 			// пытаемся получить класс драйвера
 			driverClass = Class.forName(classPath);
-			
+
 			// пытаемся создать объект драйвера
 			Constructor<?> c = driverClass.getConstructor();
 			RfidDriverBase driver = (RfidDriverBase) c.newInstance();
