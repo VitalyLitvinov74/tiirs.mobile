@@ -3,9 +3,6 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import android.app.DialogFragment;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -25,38 +22,46 @@ import android.widget.SpinnerAdapter;
  *         </p>
  */
 public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
-
+	public static final String DRIVER_NAME = "Текстовый драйвер";
 	private String TAG = "RfidDriverText";
-
-	public RfidDriverText(DialogFragment dialog, Handler handler) {
-		super(dialog, handler);
-	}
 
 	@Override
 	public boolean init() {
-		/*
-		 * Для этого драйвера ни какой специальной инициализации не нужно.
-		 */
-
+		// Для этого драйвера ни какой специальной инициализации не нужно.
 		return true;
 	}
 
 	@Override
 	public void readTagId() {
-		/*
-		 * В данном драйвере реального считывания не происходит.
-		 */
+		// В данном драйвере реального считывания не происходит.
+	}
+
+	@Override
+	public void readTagData(String password, int memoryBank, int address,
+			int count) {
+		// В данном драйвере реального считывания не происходит.
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+	}
+
+	@Override
+	public void readTagData(String password, String tagId, int memoryBank,
+			int address, int count) {
+		// В данном драйвере реального считывания не происходит.
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-		/*
-		 * В данном драйвере реальной записи не происходит.
-		 */
-		Message message = new Message();
-		message.what = RESULT_RFID_WRITE_ERROR;
-		mHandler.sendMessage(message);
+		// В данном драйвере реальной записи не происходит.
+		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank,
+			int address, String data) {
+		// В данном драйвере реальной записи не происходит.
+		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
 
 	@Override
@@ -73,15 +78,11 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 			@Override
 			public void onClick(View v) {
-
 				Log.d(TAG, "pressed OK");
-
 				Spinner spinner = (Spinner) v.getRootView().findViewById(
 						R.id.rfid_dialog_text_spinner_lables);
-				Message message = new Message();
-				message.what = RESULT_RFID_SUCCESS;
-				message.obj = spinner.getSelectedItem();
-				mHandler.sendMessage(message);
+				sHandler.obtainMessage(RESULT_RFID_SUCCESS,
+						spinner.getSelectedItem()).sendToTarget();
 			}
 		});
 
@@ -91,12 +92,8 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 			@Override
 			public void onClick(View v) {
-
 				Log.d(TAG, "pressed CANCEL");
-
-				Message message = new Message();
-				message.what = RESULT_RFID_CANCEL;
-				mHandler.sendMessage(message);
+				sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
 			}
 		});
 
@@ -111,50 +108,14 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
-
 				Log.d(TAG, (String) parent.getItemAtPosition(position));
 			}
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
-
 			}
 		});
 
 		return view;
 	}
-
-	@Override
-	public void readTagData(String password, int memoryBank, int address,
-			int count) {
-		/*
-		 * В данном драйвере реального считывания не происходит.
-		 */
-		Message message = new Message();
-		message.what = RESULT_RFID_READ_ERROR;
-		mHandler.sendMessage(message);
-	}
-
-	@Override
-	public void readTagData(String password, String tagId, int memoryBank,
-			int address, int count) {
-		/*
-		 * В данном драйвере реального считывания не происходит.
-		 */
-		Message message = new Message();
-		message.what = RESULT_RFID_READ_ERROR;
-		mHandler.sendMessage(message);
-	}
-
-	@Override
-	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, String data) {
-		/*
-		 * В данном драйвере реальной записи не происходит.
-		 */
-		Message message = new Message();
-		message.what = RESULT_RFID_WRITE_ERROR;
-		mHandler.sendMessage(message);
-	}
-
 }

@@ -1,36 +1,29 @@
-/**
- * 
- */
 package ru.toir.mobile.rfid.driver;
 
-import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import com.google.zxing.integration.android.IntentIntegrator;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 /**
  * @author Dmitriy Logachov
- * 
+ *         <p>
+ *         Драйвер считывателя RFID который ни чего не делает.
+ *         </p>
  */
-public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
+public class RfidDriverNull extends RfidDriverBase {
+	public static final String DRIVER_NAME = "Null драйвер";
 
-	public static final String DRIVER_NAME = "Драйвер штрихкодов Barcode";
-	private IntentIntegrator mIntegrator;
-	
 	@Override
 	public boolean init() {
-		if (mActivity == null && mFragment == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return true;
 	}
 
 	@Override
 	public void readTagId() {
-		mIntegrator.initiateScan();
+		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 	}
 
 	@Override
@@ -39,12 +32,6 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-		if (mActivity != null) {
-			mIntegrator = new IntentIntegrator(mActivity);
-		} else if (mFragment != null) {
-			mIntegrator = new IntentIntegrator(mFragment);
-		}
-
 		return null;
 	}
 
@@ -70,5 +57,22 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
 		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+	}
+
+	/**
+	 * <p>
+	 * Интерфейс настроек драйвера
+	 * </p>
+	 * 
+	 * @return PreferenceScreen Если настроек нет должен вернуть null
+	 */
+	@Override
+	public PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
+		CheckBoxPreference checkBoxPreference = new CheckBoxPreference(
+				screen.getContext());
+		checkBoxPreference.setTitle("Тестовый чек бокс");
+		checkBoxPreference.setKey("rfidDrvNullTestCheckBox");
+		screen.addPreference(checkBoxPreference);
+		return screen;
 	}
 }

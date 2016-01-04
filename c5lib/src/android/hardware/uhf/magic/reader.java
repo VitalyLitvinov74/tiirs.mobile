@@ -369,9 +369,6 @@ public class reader {
 			return 0;
 		}
 
-		// TODO нужно проверить такой вариант
-		tmpMask = 3;
-
 		result |= (tmpMask << (shiftBits + 10));
 		result |= (lockType << shiftBits);
 
@@ -494,6 +491,7 @@ public class reader {
 	}
 
 	/**
+	 * Перевод строки шестнадцатеричных значений в массив byte
 	 * 
 	 * @param string
 	 * @return
@@ -531,7 +529,7 @@ public class reader {
 	 * 
 	 * @param strpath
 	 */
-	static public native void Init(String strpath);
+	static public native int Init(String strpath);
 
 	/**
 	 * open device

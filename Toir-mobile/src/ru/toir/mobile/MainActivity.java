@@ -262,7 +262,7 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public boolean handleMessage(Message msg) {
 
-				Log.d(TAG, "Получили сообщение из драйвра.");
+				Log.d(TAG, "Получили сообщение из драйвера.");
 
 				if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
 					String tagId = (String) msg.obj;
@@ -297,7 +297,8 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 
-		rfidDialog = new RfidDialog(getApplicationContext(), handler);
+		rfidDialog = new RfidDialog();
+		rfidDialog.setHandler(handler);
 		rfidDialog.readTagId();
 		rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 
@@ -328,7 +329,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Обработчик клика меню обновления приложения
 	 * 
-	 * @param view
+	 * @param menuItem
 	 */
 	public void onActionUpdate(MenuItem menuItem) {
 

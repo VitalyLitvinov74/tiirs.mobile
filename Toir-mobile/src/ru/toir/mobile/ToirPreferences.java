@@ -1,32 +1,17 @@
 package ru.toir.mobile;
 
-import android.app.Activity;
+import ru.toir.mobile.fragments.ToirPreferenceFragment;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+import android.preference.PreferenceActivity;
 
-public class ToirPreferences extends Activity {
+public class ToirPreferences extends PreferenceActivity {
 
-	/* (non-Javadoc)
-	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
-	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getFragmentManager().beginTransaction().replace(android.R.id.content, new ToirPreferenceFragment()).commit();
+		getFragmentManager().beginTransaction()
+				.replace(android.R.id.content, new ToirPreferenceFragment())
+				.commit();
 	}
-	
-	public class ToirPreferenceFragment extends PreferenceFragment {
-
-		/* (non-Javadoc)
-		 * @see android.preference.PreferenceFragment#onCreate(android.os.Bundle)
-		 */
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.preferences);
-		}
-		
-	}
-
 
 }

@@ -80,7 +80,7 @@ public class ParseThread extends Thread {
 		int count;
 		int buffIndex = 0;
 		String readedString;
-		byte[] data = new byte[65];
+		byte[] data = new byte[1024];
 		int dataIndex = 0;
 
 		int parseIndex = 0;

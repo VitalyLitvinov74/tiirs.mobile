@@ -3,8 +3,11 @@
  */
 package ru.toir.mobile.rfid;
 
-import android.app.DialogFragment;
+import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
 import android.os.Handler;
+import android.preference.PreferenceScreen;
 
 /**
  * @author Dmitriy Logachov
@@ -26,21 +29,36 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	public static final int RESULT_RFID_WRITE_ERROR = 4;
 	public static final int RESULT_RFID_CANCEL = 5;
 	public static final int RESULT_RFID_TIMEOUT = 6;
+	public static final int RESULT_RFID_DISCONNECT = 7;
 
 	public static final String RESULT_RFID_TAG_ID = "tagId";
 
-	// диалог в котором драйвер реализует интерфейс пользователя
-	// TODO избавиться от этого члена
-	protected static DialogFragment mDialogFragment;
-
 	// Handler который будет обрабатывать сообщение от драйвера
-	protected static Handler mHandler;
+	protected static Handler sHandler;
+	protected Context mContext;
+	protected Fragment mFragment;
+	protected Activity mActivity;
 
-	public RfidDriverBase(DialogFragment dialog, Handler handler) {
-
-		mDialogFragment = dialog;
-		mHandler = handler;
-
+	public void setHandler(Handler handler) {
+		sHandler = handler;
 	}
 
+	public void setContext(Context context) {
+		mContext = context;
+	}
+
+	@Override
+	public void setIntegration(Activity activity) {
+		mActivity = activity;
+	}
+
+	@Override
+	public void setIntegration(Fragment fragment) {
+		mFragment = fragment;
+	}
+
+	@Override
+	public PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
+		return null;
+	}
 }

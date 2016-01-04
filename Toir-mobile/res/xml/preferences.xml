@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-	<PreferenceCategory
-	    android:title="@string/pref_cat_main">
-		
-		<EditTextPreference
-			android:key="@string/updateUrl"
-			android:title="@string/pref_update_url"
-			android:dialogTitle="@string/pref_update_url_dialog_title" />
-		<EditTextPreference
-			android:key="@string/serverUrl"
-			android:title="@string/pref_server_url"
-			android:dialogTitle="@string/pref_server_url_dialog_title" />
-		<ListPreference
-		    android:key="@string/RFIDDriver"
-			android:title="@string/pref_rfid_driver"
-			android:entries="@array/drvNameList"
-			android:entryValues="@array/drvClassNameList" />
-		 
-	</PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_cat_main" >
+        <EditTextPreference
+            android:dialogTitle="@string/pref_update_url_dialog_title"
+            android:key="@string/updateUrl"
+            android:title="@string/pref_update_url" />
+        <EditTextPreference
+            android:dialogTitle="@string/pref_server_url_dialog_title"
+            android:key="@string/serverUrl"
+            android:title="@string/pref_server_url" />
+
+        <ListPreference
+            android:key="@string/rfidDriverListPrefKey"
+            android:title="@string/pref_rfid_driver" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="drvSettingsCategory"
+        android:title="Настройки драйверов" >
+
+        <PreferenceScreen
+            android:key="@string/rfidDrvSettingKey"
+            android:title="Настройки драйвера RFID" >
+        </PreferenceScreen>
+    </PreferenceCategory>
+
 </PreferenceScreen>

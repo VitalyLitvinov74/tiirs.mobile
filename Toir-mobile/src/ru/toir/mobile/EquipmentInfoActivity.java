@@ -1,11 +1,9 @@
 package ru.toir.mobile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import ru.toir.mobile.utils.DataUtils;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
@@ -29,11 +27,8 @@ import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
-import ru.toir.mobile.rfid.EquipmentTagStructure;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import ru.toir.mobile.rfid.TagRecordStructure;
-import ru.toir.mobile.rfid.UserTagStructure;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -51,19 +46,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 
 	private final static String TAG = "EquipmentInfoActivity";
 
-	public final static int READ_EQUIPMENT_LABLE = 1;
-	public final static int WRITE_EQUIPMENT_LABLE = 2;
-	public final static int WRITE_USER_LABLE = 4;
-
 	private String equipment_uuid;
-	private byte regim;
 	private ListView lv;
-
-	TagRecordStructure tagrecord = new TagRecordStructure();
-	TagRecordStructure tagrecord2 = new TagRecordStructure();
-	private ArrayList<TagRecordStructure> tagrecords = new ArrayList<TagRecordStructure>();
-	EquipmentTagStructure equipmenttag = new EquipmentTagStructure();
-	UserTagStructure usertag = new UserTagStructure();
 
 	private TextView tv_equipment_name;
 	private TextView tv_equipment_type;
@@ -71,9 +55,7 @@ public class EquipmentInfoActivity extends FragmentActivity {
 	private TextView tv_equipment_tasks;
 	private TextView tv_equipment_critical;
 	private ImageView tv_equipment_image;
-	private TextView tv_equipment_status;
 	private TextView tv_equipment_task_date;
-	private TextView tv_equipment_documentation;
 	private Button read_rfid_button;
 	private Button write_rfid_button;
 	private Button write_button;
@@ -197,12 +179,10 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
 		tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
 		tv_equipment_position = (TextView) findViewById(R.id.equipment_position);
-		tv_equipment_status = (TextView) findViewById(R.id.equipment_status);
 		tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
 		tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
 		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_tasks);
 		tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
-		tv_equipment_documentation = (TextView) findViewById(R.id.equipment_text_documentation);
 		lv = (ListView) findViewById(R.id.equipment_info_operation_list);
 		FillListViewOperations();
 
@@ -246,7 +226,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						return true;
 					}
 				});
-				rfidDialog = new RfidDialog(getApplicationContext(), handler);
+				rfidDialog = new RfidDialog();
+				rfidDialog.setHandler(handler);
 
 				// читаем метку с конкретным id для теста
 				// rfidDialog.readTagData("0000000000",
@@ -297,7 +278,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 						return true;
 					}
 				});
-				rfidDialog = new RfidDialog(getApplicationContext(), handler);
+				rfidDialog = new RfidDialog();
+				rfidDialog.setHandler(handler);
 				// тестовые данные для примера
 				String data = "0a0a0a0a";
 				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
@@ -442,12 +424,6 @@ public class EquipmentInfoActivity extends FragmentActivity {
 			tv_equipment_image.setImageBitmap(myBitmap);
 		}
 
-		// заполняем структуру для записи в метку
-		equipmenttag.set_equipment_uuid(equipment.getUuid());
-		equipmenttag.set_status(equipment.getEquipment_status_uuid().substring(
-				9, 13));
-		equipmenttag.set_last("0001");
-
 		// адаптер для listview с документацией
 		ListView documentationListView = (ListView) findViewById(R.id.e_l_documentation_listView);
 		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
@@ -549,227 +525,10 @@ public class EquipmentInfoActivity extends FragmentActivity {
 					hm.put("img", Integer.toString(R.drawable.img_status_1));
 				}
 				aList.add(hm);
-
-				// заполняем структуру для записи в метку
-				// TODO должны записываться последние две записи об обслуживании
-				// tagrecord.operation_date = Long.parseLong(
-				// equipmentOperationResultDBAdapter.getStartDateByUUID(
-				// equipmentOperationList.get(cnt)
-				// .getEquipment_uuid()).toString(), 16);
-				// tagrecord.operation_length = Short.parseShort("2050", 16);
-				// tagrecord.operation_type = equipmentOperationList.get(cnt)
-				// .getOperation_type_uuid().substring(9, 13)
-				// .toLowerCase(Locale.ENGLISH);
-				// temp = equipmentOperationList.get(cnt).getUuid();
-				// if (!temp.equals("") && temp != null) {
-				// equipmentOperationResult = equipmentOperationResultDBAdapter
-				// .getItemByOperation(temp);
-				// if (equipmentOperationResult != null)
-				// tagrecord.operation_result =
-				// equipmentOperationResultDBAdapter
-				// .getItemByOperation(
-				// equipmentOperationList.get(cnt)
-				// .getUuid())
-				// .getOperation_result_uuid().substring(9, 13)
-				// .toLowerCase(Locale.ENGLISH);
-				// else
-				// tagrecord.operation_result = "8888";
-				// }
-				// // tagrecord.user =
-				// // AuthorizedUser.getInstance().getUuid().substring(9,
-				// // 13).toLowerCase(Locale.ENGLISH);
-				// tagrecord.user = "9bf0";
-				// if (cnt < 2)
-				// tagrecords.add(cnt, tagrecord);
-				// cnt++;
 			}
 		SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(),
 				aList, R.layout.listview, from, to);
 		// Setting the adapter to the listView
 		lv.setAdapter(adapter);
-	}
-
-	// TODO наследие старой архитектуры драйверов rfid
-	public void CallbackOnReadLable(String result) {
-		if (result.length() >= 20) {
-			if (regim == WRITE_EQUIPMENT_LABLE) {
-				// driver.SetOperationType(RfidDriverC5.WRITE_EQUIPMENT_MEMORY);
-				byte out_buffer[] = {};
-				try {
-					out_buffer = DataUtils.PackToSend(equipmenttag, tagrecords);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				// driver.write(out_buffer);
-			}
-			if (regim == WRITE_USER_LABLE) {
-				// driver.SetOperationType(RfidDriverC5.WRITE_USER_MEMORY);
-				byte out_buffer[] = {};
-				UsersDBAdapter users = new UsersDBAdapter(
-						new ToirDatabaseContext(getApplicationContext()));
-				Users user = users.getUserByTagId(AuthorizedUser.getInstance()
-						.getTagId());
-				usertag.set_user_uuid(user.getUuid());
-				usertag.set_name(user.getName());
-				usertag.set_whois(user.getWhois());
-				try {
-					out_buffer = DataUtils.PackToSendUserData(usertag);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				// driver.write(out_buffer);
-			}
-			if (regim == READ_EQUIPMENT_LABLE) {
-				// driver.readTagId(RfidDriverC5.READ_EQUIPMENT_MEMORY);
-			}
-		} else
-			Toast.makeText(this, "Ответ некорректен: " + result,
-					Toast.LENGTH_SHORT).show();
-	}
-
-	// TODO наследие старой архитектуры драйверов rfid
-	public void CallbackOnWrite(String result) {
-		if (result == null) {
-			setResult(RfidDriverBase.RESULT_RFID_WRITE_ERROR);
-		} else {
-			Toast.makeText(this, "Запись успешно завершена", Toast.LENGTH_SHORT)
-					.show();
-			finish();
-		}
-	}
-
-	// TODO наследие старой архитектуры драйверов rfid
-	public void Callback(String result) {
-		// Intent data = null;
-		if (result == null) {
-			setResult(RfidDriverBase.RESULT_RFID_READ_ERROR);
-		} else {
-			if (result.length() < 100) {
-				Toast.makeText(this, "Ответ слишком короткий",
-						Toast.LENGTH_SHORT).show();
-				return;
-			}
-			// парсим ответ
-			equipmenttag.set_equipment_uuid(DataUtils.StringToUUID(result
-					.substring(0, 32)));
-			equipmenttag.set_status(result.substring(32, 36).toLowerCase(
-					Locale.ENGLISH));
-			equipmenttag.set_last(result.substring(36, 40));
-			tagrecord.operation_date = Long.parseLong(result.substring(40, 48),
-					16);
-			tagrecord.operation_length = Short.parseShort(
-					result.substring(48, 50), 16);
-			tagrecord.operation_type = result.substring(50, 54).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord.operation_result = result.substring(54, 58).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord.user = result.substring(58, 62).toLowerCase(
-					Locale.ENGLISH);
-			tagrecords.add(0, tagrecord);
-			tagrecord2.operation_date = Long.parseLong(
-					result.substring(62, 70), 16);
-			tagrecord2.operation_length = Short.parseShort(
-					result.substring(70, 72), 16);
-			tagrecord2.operation_type = result.substring(72, 76).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord2.operation_result = result.substring(76, 80).toLowerCase(
-					Locale.ENGLISH);
-			tagrecord2.user = result.substring(80, 84).toLowerCase(
-					Locale.ENGLISH);
-			tagrecords.add(1, tagrecord2);
-
-			// вариант 2 с хранением данных в глобальной структуре
-			EquipmentTagStructure.getInstance().set_equipment_uuid(
-					DataUtils.StringToUUID(result.substring(0, 32)));
-			EquipmentTagStructure.getInstance().set_status(
-					result.substring(32, 36).toLowerCase(Locale.ENGLISH));
-			EquipmentTagStructure.getInstance().set_last(
-					result.substring(36, 40));
-
-			EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-					new ToirDatabaseContext(getApplicationContext()));
-			EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-					new ToirDatabaseContext(getApplicationContext()));
-			OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-					new ToirDatabaseContext(getApplicationContext()));
-			EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-					new ToirDatabaseContext(getApplicationContext()));
-			EquipmentStatusDBAdapter equipmentStatusDBAdapter = new EquipmentStatusDBAdapter(
-					new ToirDatabaseContext(getApplicationContext()));
-
-			tv_equipment_name.setText("Название: "
-					+ eqDBAdapter.getEquipsNameByUUID(equipmenttag
-							.get_equipment_uuid()));
-			tv_equipment_type.setText("Тип: "
-					+ eqTypeDBAdapter.getNameByUUID(eqDBAdapter
-							.getEquipsTypeByUUID(equipmenttag
-									.get_equipment_uuid())));
-			tv_equipment_position.setText(""
-					+ eqDBAdapter.getLocationCoordinatesByUUID(equipmenttag
-							.get_equipment_uuid()));
-			tv_equipment_status.setText(equipmentStatusDBAdapter
-					.getNameByPartOfUUID(equipmenttag.get_status()));
-			tv_equipment_documentation.setText("TAGID: "
-					+ equipmenttag.get_equipment_uuid());
-
-			int cnt = 0, operation_type = 0;
-			List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-			String[] from = { "name", "descr", "img" };
-			int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
-			// пока две записи
-			while (cnt < 2) {
-				HashMap<String, String> hm = new HashMap<String, String>();
-
-				hm.put("name",
-						"Операция: "
-								+ operationTypeDBAdapter
-										.getOperationTypeByPartOfUUID(tagrecords
-												.get(cnt).operation_type)
-								+ " ["
-								+ DataUtils.getDate(
-										tagrecords.get(cnt).operation_date,
-										"dd.MM.yyyy HH:mm") + "]");
-				hm.put("descr",
-						"Результат: ["
-								+ equipmentOperationResultDBAdapter
-										.getOperationResultByPartOfUUID(tagrecords
-												.get(cnt).operation_result)
-								+ "]");
-				// Creation row
-				operation_type = equipmentOperationResultDBAdapter
-						.getOperationResultTypeByPartOfUUID(tagrecords.get(cnt).operation_result);
-				switch (operation_type) {
-				case 1:
-					hm.put("img", Integer.toString(R.drawable.img_status_4));
-					break;
-				case 2:
-					hm.put("img", Integer.toString(R.drawable.img_status_3));
-					break;
-				case 3:
-					hm.put("img", Integer.toString(R.drawable.img_status_1));
-					break;
-				default:
-					hm.put("img", Integer.toString(R.drawable.img_status_1));
-				}
-				aList.add(hm);
-				cnt++;
-			}
-			SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(),
-					aList, R.layout.listview, from, to);
-			// Setting the adapter to the listView
-			lv.setAdapter(adapter);
-
-			// tv_equipment_id.setText("TAGID: " +
-			// equipmenttag.get_equipment_uuid());
-			if (tagrecords.get(0).operation_date > 0) {
-				tv_equipment_task_date.setText(DataUtils.getDate(
-						tagrecords.get(0).operation_date, "dd.MM.yyyy HH:mm"));
-				tv_equipment_tasks
-						.setText(equipmentOperationResultDBAdapter
-								.getOperationResultByPartOfUUID(tagrecords
-										.get(0).operation_result));
-			} else
-				tv_equipment_task_date.setText("еще не обслуживалось");
-		}
 	}
 }

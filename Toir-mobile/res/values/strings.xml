@@ -4,7 +4,7 @@
     <string name="app_name">Toir-mobile</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Настройки приложения</string>
-    <string name="action_about">О программе</string>  
+    <string name="action_about">О программе</string>
     <string name="pleasePutTag">Поднесите метку</string>
     <string name="readTag">Считать</string>
     <string name="cancel">Отмена</string>
@@ -21,14 +21,15 @@
     <string name="find_fail">Метка не найдена</string>
     <string name="read_fail">Чтение закончилось неудачей</string>
     <string name="write_15693_fail">Запись закончилась неудачей</string>
-    <string name="write_15693_success">Запись успешна</string>   
+    <string name="write_15693_success">Запись успешна</string>
     <string name="init">Инициализировать</string>
     <string name="find">Найти</string>
     <string name="read_15693">Считать метку</string>
     <string name="write_15693">Записать метку</string>
     <string name="serverUrl">serverUrl</string>
     <string name="updateUrl">updateUrl</string>
-    <string name="RFIDDriver">RFIDDriver</string>
+    <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
+    <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Справочники</string>
     <string name="get_task">Получить наряд</string>
     <string name="back">Назад</string>
@@ -45,9 +46,9 @@
     <string name="server_date_connect">Дата связи с сервером:</string>
     <string name="tasks_quantity">Статистика нарядов:</string>
     <string name="boss_contact">Контакт начальника:</string>
-    <string name="type">Тип:</string>   
-    <string name="critical">Критичность:</string>     
-    <string name="last_date">Дата обслуживания:</string> 
+    <string name="type">Тип:</string>
+    <string name="critical">Критичность:</string>
+    <string name="last_date">Дата обслуживания:</string>
     <string name="last_result">Результат обслуживания:</string>
     <string name="documentation">Документация:</string>
     <string name="pleaseScanImg">Наведите камеру на код</string>
@@ -69,4 +70,6 @@
     <string name="divider"> | </string>
     <string name="application_full_name">Мобильный ТОиР</string>
     <string name="open_documentation">Открыть документацию</string>
+    <string name="title_activity_btserver">BTServerActivity</string>
+
 </resources>

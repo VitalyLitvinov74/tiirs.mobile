@@ -7,7 +7,6 @@ import java.lang.reflect.Constructor;
 import com.google.zxing.integration.android.IntentIntegrator;
 import ru.toir.mobile.R;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -36,8 +35,6 @@ public class RfidDialog extends DialogFragment {
 	private Class<?> driverClass;
 	private RfidDriverBase driver;
 
-	private Context mContext;
-
 	// команда драйвера которая должна быть выполнена при старте диалога
 	private int command;
 
@@ -61,21 +58,26 @@ public class RfidDialog extends DialogFragment {
 	 */
 	private Handler mHandler;
 
-	public RfidDialog(Context context, Handler handler) {
+	private boolean isInited = false;
 
-		mContext = context;
-		mHandler = handler;
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
+			Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+
+		getDialog().setTitle("Поднесите метку");
 
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager
-				.getDefaultSharedPreferences(mContext);
-		driverClassName = sp.getString(mContext.getString(R.string.RFIDDriver),
-				"RFIDDriverNull");
+				.getDefaultSharedPreferences(getActivity()
+						.getApplicationContext());
+		driverClassName = sp.getString(getActivity().getApplicationContext()
+				.getString(R.string.rfidDriverListPrefKey), null);
 
 		// пытаемся получить класс драйвера
 		try {
-			driverClass = Class.forName("ru.toir.mobile.rfid.driver."
-					+ driverClassName);
+			driverClass = Class.forName(driverClassName);
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, e.toString());
 			Message message = new Message();
@@ -86,9 +88,8 @@ public class RfidDialog extends DialogFragment {
 
 		// пытаемся создать объект драйвера
 		try {
-			Constructor<?> c = driverClass.getConstructor(DialogFragment.class,
-					Handler.class);
-			driver = (RfidDriverBase) c.newInstance(this, handler);
+			Constructor<?> c = driverClass.getConstructor();
+			driver = (RfidDriverBase) c.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Message message = new Message();
@@ -96,25 +97,30 @@ public class RfidDialog extends DialogFragment {
 			mHandler.sendMessage(message);
 		}
 
+		// т.к. работаем из DialogFragment, устанавливаем в качестве элемента
+		// интеграции DialogFragment
+		driver.setIntegration(this);
+
+		// передаём в драйвер контекст
+		driver.setContext(getActivity().getApplicationContext());
+
+		// передаём в драйвер обработчик
+		driver.setHandler(mHandler);
+
 		// инициализируем драйвер
 		if (!driver.init()) {
 			Message message = new Message();
 			message.what = RfidDriverBase.RESULT_RFID_INIT_ERROR;
 			mHandler.sendMessage(message);
 
+		} else {
+			isInited = true;
 		}
 
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
-			Bundle savedInstanceState) {
-
-		super.onCreate(savedInstanceState);
-
-		getDialog().setTitle("Поднесите метку");
-
-		View view = driver.getView(inflater, viewGroup);
+		View view = null;
+		if (isInited) {
+			view = driver.getView(inflater, viewGroup);
+		}
 
 		return view;
 	}
@@ -123,6 +129,10 @@ public class RfidDialog extends DialogFragment {
 	public void onStart() {
 
 		super.onStart();
+
+		if (!isInited) {
+			return;
+		}
 
 		if (isStarted) {
 			return;
@@ -154,7 +164,6 @@ public class RfidDialog extends DialogFragment {
 			driver.readTagId();
 			break;
 		}
-
 	}
 
 	/**
@@ -296,5 +305,8 @@ public class RfidDialog extends DialogFragment {
 		driver.close();
 		driver = null;
 	}
-
+	
+	public void setHandler(Handler handler) {
+		mHandler = handler;
+	}
 }
