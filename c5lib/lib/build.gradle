@@ -1,0 +1,60 @@
+apply plugin: 'com.android.model.library'
+
+model {
+    android {
+        compileSdkVersion = 23
+        buildToolsVersion = "23.0.2"
+
+        defaultConfig.with {
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 19
+            versionCode = 1
+            versionName = "1.0"
+        }
+    }
+
+    android.ndk {
+        moduleName = "uhf-tools"
+        ldLibs.add("log")
+        abiFilters.add("armeabi")
+    }
+
+    android.buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles.add(file('proguard-rules.pro'))
+        }
+    }
+
+//    android.productFlavors {
+//        // for detailed abiFilter descriptions, refer to "Supported ABIs" @
+//        // https://developer.android.com/ndk/guides/abis.html#sa
+//        create("arm") {
+//            ndk.abiFilters += "armeabi"
+//        }
+//    }
+}
+
+apply plugin: 'maven'
+
+artifacts {
+    def coreAarFile = file("build/${archivesBaseName}.aar")
+    archives coreAarFile
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // TODO: настройку локального репозитория вынести в локальные конфигурационные файлы
+            repository(url: "file:///home/koputo/myrepo/android")
+            pom.groupId = 'android.hardware'
+            pom.artifactId = 'uhf-tools'
+            pom.version = '1.0'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+}

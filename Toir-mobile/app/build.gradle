@@ -1,0 +1,79 @@
+apply plugin: 'com.android.model.application'
+model {
+
+    android {
+        compileSdkVersion = 23
+        buildToolsVersion = "23.0.2"
+
+        defaultConfig.with {
+            applicationId = "ru.toir.mobile"
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 15
+            versionCode = 1
+            versionName = "1.0"
+        }
+    }
+
+    android.buildTypes {
+//        debug {
+//            minifyEnabled = false
+//            signingConfig = signConf
+//        }
+        release {
+            minifyEnabled = false
+            proguardFiles.add(file('proguard-rules.pro'))
+//            signingConfig = signingConfigs.release
+            signingConfig = $.android.signingConfigs.get("release")
+        }
+    }
+
+    android.lintOptions {
+        checkReleaseBuilds true
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError true
+    }
+
+    android.signingConfigs {
+        Properties properties = new Properties()
+        properties.load(new FileInputStream("gradle.properties.koputo"))
+//        debug {
+//            storeFile = file(properties.getProperty("RELEASE_STORE_FILE"))
+//            storePassword = properties.getProperty("RELEASE_STORE_PASSWORD")
+//            keyAlias = properties.getProperty("RELEASE_KEY_ALIAS")
+//            keyPassword = properties.getProperty("RELEASE_KEY_PASSWORD")
+//        }
+        create("release") {
+            storeFile = file(properties.getProperty("RELEASE_STORE_FILE"))
+            storePassword = properties.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = properties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = properties.getProperty("RELEASE_KEY_PASSWORD")
+            //signConf = it
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        url "file:///home/koputo/myrepo/android"
+        //artifactUrls mavenLocal()
+    }
+}
+
+dependencies {
+    compile 'com.google.zxing:core:3.2.0'
+    compile 'com.google.zxing:android-integration:3.2.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    compile 'org.osmdroid:osmdroid-android:4.2'
+    compile 'me.dm7.barcodescanner:zbar:1.8.3'
+    //compile 'com.google.guava:guava:14.0'
+    //compile 'com.android.support:appcompat-v7:23.1.1'
+    //compile 'com.android.support:support-v4:18.0.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //compile project(':uhf-tools')
+    compile 'ru.yandex.koputo:uhf-tools:1.0@aar'
+}
