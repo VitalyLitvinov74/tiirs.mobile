@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import android.app.Activity;
-import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -52,21 +50,6 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	public static final int DRIVER_STATE_READ_ANSWER = 1;
 	public static final int DRIVER_STATE_DISCONNECT = 2;
-
-	/**
-	 * @param handler
-	 */
-	public RfidDriverBluetooth(Handler handler) {
-		super(handler);
-	}
-
-	public RfidDriverBluetooth(Handler handler, DialogFragment dialogFragment) {
-		super(handler);
-	}
-
-	public RfidDriverBluetooth(Handler handler, Activity activity) {
-		super(handler);
-	}
 
 	@Override
 	public boolean init() {
@@ -511,7 +494,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 	 * 
 	 * @return PreferenceScreen Если настроек нет должен вернуть null
 	 */
-	public static PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
+	public PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
 
 		// строим интерфейс с настройками драйвера блютус
 		BluetoothAdapter adapter;

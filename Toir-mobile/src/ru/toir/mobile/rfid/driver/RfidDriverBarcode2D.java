@@ -3,8 +3,6 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import android.app.Activity;
-import android.app.DialogFragment;
 import android.hardware.barcode.Scanner;
 import android.os.Handler;
 import android.os.Message;
@@ -32,18 +30,6 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	// view в котором будет текстовое поле,
 	// в которое будет помещен распознанный код
 	private static View driverView;
-
-	public RfidDriverBarcode2D(Handler handler) {
-		super(handler);
-	}
-
-	public RfidDriverBarcode2D(Handler handler, Activity activity) {
-		super(handler);
-	}
-
-	public RfidDriverBarcode2D(Handler handler, DialogFragment dialogFragment) {
-		super(handler);
-	}
 
 	private static class MainHandler extends Handler {
 
@@ -166,5 +152,4 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
-
 }

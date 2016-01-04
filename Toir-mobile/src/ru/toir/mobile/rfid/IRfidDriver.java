@@ -1,5 +1,8 @@
 package ru.toir.mobile.rfid;
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,4 +121,31 @@ public interface IRfidDriver {
 	 */
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup);
 
+	/**
+	 * Передаём в драйвер активити в которую при необходимости драйвер может
+	 * предать результат из собственной активити.
+	 * 
+	 * @param activity
+	 *            Активити в которой будет обрабатываться onActivityResult
+	 */
+	public void setIntegration(Activity activity);
+
+	/**
+	 * Передаём в драйвер фрагмент в который при необходимости драйвер может
+	 * предать результат из собственной активити.
+	 * 
+	 * @param fragment
+	 *            Фрагмент в котором будет обрабатываться onActivityResult
+	 */
+	public void setIntegration(Fragment fragment);
+
+	/**
+	 * Интерфейс индивидуальных настроек драйвера.
+	 * 
+	 * @param screen
+	 *            Экран настроек в котором драйвер строит свой интерфейс.
+	 * @return Если настроек нет, должен вернуть null, в противном случае
+	 *         переданный раннее screen.
+	 */
+	public PreferenceScreen getSettingsScreen(PreferenceScreen screen);
 }

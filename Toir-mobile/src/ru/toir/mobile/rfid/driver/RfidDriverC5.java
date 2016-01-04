@@ -3,8 +3,6 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import android.app.Activity;
-import android.app.DialogFragment;
 import android.hardware.uhf.magic.reader;
 import android.os.Handler;
 import android.os.Message;
@@ -27,18 +25,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	// по умолчанию таймаут на операцию 5 секунд
 	private static final int timeOut = 5000;
-
-	public RfidDriverC5(Handler handler) {
-		super(handler);
-	}
-
-	public RfidDriverC5(Handler handler, Activity activity) {
-		super(handler);
-	}
-
-	public RfidDriverC5(Handler handler, DialogFragment dialogFragment) {
-		super(handler);
-	}
 
 	@Override
 	public boolean init() {

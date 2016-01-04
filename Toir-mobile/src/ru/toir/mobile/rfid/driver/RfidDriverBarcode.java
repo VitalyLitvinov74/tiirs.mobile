@@ -6,9 +6,6 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import com.google.zxing.integration.android.IntentIntegrator;
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,27 +17,11 @@ import android.view.ViewGroup;
 public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
 	public static final String DRIVER_NAME = "Драйвер штрихкодов Barcode";
-	private IntentIntegrator integrator;
-	private DialogFragment dialogFragment;
-	private Activity activity;
-
-	public RfidDriverBarcode(Handler handler) {
-		super(handler);
-	}
-
-	public RfidDriverBarcode(Handler handler, DialogFragment dialog) {
-		super(handler);
-		dialogFragment = dialog;
-	}
-
-	public RfidDriverBarcode(Activity activity, Handler handler) {
-		super(handler);
-		this.activity = activity;
-	}
-
+	private IntentIntegrator mIntegrator;
+	
 	@Override
 	public boolean init() {
-		if (activity == null || dialogFragment == null) {
+		if (mActivity == null && mFragment == null) {
 			return false;
 		} else {
 			return true;
@@ -49,7 +30,7 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-		integrator.initiateScan();
+		mIntegrator.initiateScan();
 	}
 
 	@Override
@@ -58,10 +39,10 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-		if (activity != null) {
-			integrator = new IntentIntegrator(dialogFragment);
-		} else if (dialogFragment != null) {
-			integrator = new IntentIntegrator(activity);
+		if (mActivity != null) {
+			mIntegrator = new IntentIntegrator(mActivity);
+		} else if (mFragment != null) {
+			mIntegrator = new IntentIntegrator(mFragment);
 		}
 
 		return null;
@@ -90,5 +71,4 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
-
 }

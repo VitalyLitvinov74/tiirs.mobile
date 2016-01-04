@@ -86,12 +86,9 @@ public class RfidDialog extends DialogFragment {
 		}
 
 		// пытаемся создать объект драйвера
-		// т.к. работаем из DialogFragment, ищем соответственно конструктор
-		// RfidDriverBase(Handler, DialogFragment)
 		try {
-			Constructor<?> c = driverClass.getConstructor(Handler.class,
-					DialogFragment.class);
-			driver = (RfidDriverBase) c.newInstance(handler, this);
+			Constructor<?> c = driverClass.getConstructor();
+			driver = (RfidDriverBase) c.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Message message = new Message();
@@ -99,8 +96,15 @@ public class RfidDialog extends DialogFragment {
 			mHandler.sendMessage(message);
 		}
 
+		// т.к. работаем из DialogFragment, устанавливаем в качестве элемента
+		// интеграции DialogFragment
+		driver.setIntegration(this);
+
 		// передаём в драйвер контекст
 		driver.setContext(mContext);
+
+		// передаём в драйвер обработчик
+		driver.setHandler(handler);
 
 		// инициализируем драйвер
 		if (!driver.init()) {
@@ -311,5 +315,4 @@ public class RfidDialog extends DialogFragment {
 		driver.close();
 		driver = null;
 	}
-
 }

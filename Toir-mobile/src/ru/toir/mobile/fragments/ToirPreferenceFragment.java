@@ -4,12 +4,12 @@
 package ru.toir.mobile.fragments;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
 import ru.toir.mobile.R;
+import ru.toir.mobile.rfid.RfidDriverBase;
 import dalvik.system.DexFile;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -142,22 +142,21 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 			PreferenceScreen rootScreen) {
 
 		Class<?> driverClass;
-		Method method;
 		PreferenceScreen screen;
 
 		try {
 			// пытаемся получить класс драйвера
 			driverClass = Class.forName(classPath);
-
-			// пытаемся получить метод getSettingsScreen
-			method = driverClass.getMethod("getSettingsScreen",
-					new Class[] { PreferenceScreen.class });
+			
+			// пытаемся создать объект драйвера
+			Constructor<?> c = driverClass.getConstructor();
+			RfidDriverBase driver = (RfidDriverBase) c.newInstance();
 
 			// передаём драйверу "чистый" экран
 			rootScreen.removeAll();
 
 			// пытаемся вызвать метод
-			screen = (PreferenceScreen) method.invoke(null, rootScreen);
+			screen = driver.getSettingsScreen(rootScreen);
 
 			// возвращаем результат
 			return screen;

@@ -3,8 +3,11 @@
  */
 package ru.toir.mobile.rfid;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Handler;
+import android.preference.PreferenceScreen;
 
 /**
  * @author Dmitriy Logachov
@@ -33,12 +36,29 @@ public abstract class RfidDriverBase implements IRfidDriver {
 	// Handler который будет обрабатывать сообщение от драйвера
 	protected static Handler sHandler;
 	protected Context mContext;
+	protected Fragment mFragment;
+	protected Activity mActivity;
 
-	public RfidDriverBase(Handler handler) {
+	public void setHandler(Handler handler) {
 		sHandler = handler;
 	}
 
 	public void setContext(Context context) {
 		mContext = context;
+	}
+
+	@Override
+	public void setIntegration(Activity activity) {
+		mActivity = activity;
+	}
+
+	@Override
+	public void setIntegration(Fragment fragment) {
+		mFragment = fragment;
+	}
+
+	@Override
+	public PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
+		return null;
 	}
 }

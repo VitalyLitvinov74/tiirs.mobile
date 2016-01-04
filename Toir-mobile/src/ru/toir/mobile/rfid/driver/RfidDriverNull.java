@@ -1,9 +1,6 @@
 package ru.toir.mobile.rfid.driver;
 
 import ru.toir.mobile.rfid.RfidDriverBase;
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
@@ -18,18 +15,6 @@ import android.view.ViewGroup;
  */
 public class RfidDriverNull extends RfidDriverBase {
 	public static final String DRIVER_NAME = "Null драйвер";
-
-	public RfidDriverNull(Handler handler) {
-		super(handler);
-	}
-
-	public RfidDriverNull(Handler handler, Activity activity) {
-		super(handler);
-	}
-
-	public RfidDriverNull(Handler handler, DialogFragment dialogFragment) {
-		super(handler);
-	}
 
 	@Override
 	public boolean init() {
@@ -81,8 +66,8 @@ public class RfidDriverNull extends RfidDriverBase {
 	 * 
 	 * @return PreferenceScreen Если настроек нет должен вернуть null
 	 */
-	public static PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
-
+	@Override
+	public PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
 		CheckBoxPreference checkBoxPreference = new CheckBoxPreference(
 				screen.getContext());
 		checkBoxPreference.setTitle("Тестовый чек бокс");
@@ -90,5 +75,4 @@ public class RfidDriverNull extends RfidDriverBase {
 		screen.addPreference(checkBoxPreference);
 		return screen;
 	}
-
 }

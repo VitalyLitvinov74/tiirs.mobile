@@ -9,8 +9,6 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -49,18 +47,6 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	static {
 		System.loadLibrary("iconv");
 	};
-
-	public RfidDriverQRcode(Handler handler) {
-		super(handler);
-	}
-
-	public RfidDriverQRcode(Handler handler, Activity activity) {
-		super(handler);
-	}
-
-	public RfidDriverQRcode(Handler handler, DialogFragment dialogFragment) {
-		super(handler);
-	}
 
 	@Override
 	public boolean init() {
@@ -196,5 +182,4 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
 		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
 	}
-
 }
