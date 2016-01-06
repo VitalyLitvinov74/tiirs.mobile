@@ -15,16 +15,28 @@ model {
     }
 
     android.buildTypes {
-//        debug {
-//            minifyEnabled = false
+        debug {
+            minifyEnabled = false
 //            signingConfig = signConf
-//        }
+        }
         release {
             minifyEnabled = false
             proguardFiles.add(file('proguard-rules.pro'))
 //            signingConfig = signingConfigs.release
             signingConfig = $.android.signingConfigs.get("release")
         }
+    }
+
+
+    android.productFlavors {
+        create("arm") {
+            ndk.abiFilters.add("armeabi")
+        }
+//        create("arm7") {
+//            ndk.abiFilters.add("armeabi-v7a")
+//        }
+//        create('all') {
+//        }
     }
 
     android.lintOptions {
@@ -48,7 +60,7 @@ model {
             storePassword = properties.getProperty("RELEASE_STORE_PASSWORD")
             keyAlias = properties.getProperty("RELEASE_KEY_ALIAS")
             keyPassword = properties.getProperty("RELEASE_KEY_PASSWORD")
-            //signConf = it
+//            signConf = it
         }
     }
 }
@@ -72,4 +84,5 @@ dependencies {
     compile 'me.dm7.barcodescanner:zbar:1.8.3'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'android.hardware:uhf-tools:1.0@aar'
+    //compile 'ru.yandex.koputo:uhf-tools:1.0@aar'
 }

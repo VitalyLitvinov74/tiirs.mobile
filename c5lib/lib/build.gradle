@@ -16,7 +16,10 @@ model {
     android.ndk {
         moduleName = "uhf-tools"
         ldLibs.add("log")
-        ldFlags.add('-mthumb')
+//        ldFlags.add('-mthumb')
+//        ldFlags.each {
+//            println(it)
+//        }
     }
 
     android.buildTypes {
