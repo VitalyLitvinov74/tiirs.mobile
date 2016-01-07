@@ -41,9 +41,12 @@ model {
     }
 }
 
+def rootDir = property('rootDir')
+
 apply plugin: 'maven'
 
 artifacts {
+    // TODO: здесь нужно что-то более универсальное
     def coreAarFile = file("build/outputs/aar/${archivesBaseName}-arm-release.aar")
     archives coreAarFile
 }
@@ -51,8 +54,14 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
+            //def rootDir = property('rootDir')
+            Properties properties = new Properties()
+            properties.load(new FileInputStream("${rootDir}/local.properties"))
+            //def lr = '/home/koputo/localRepo'
+
             // TODO: настройку локального репозитория вынести в локальные конфигурационные файлы
-            repository(url: "file:///home/koputo/myrepo/android")
+            repository(url: "file://${properties.getProperty('localRepo')}")
+            //repository(url: lr)
             pom.groupId = 'android.hardware'
             pom.artifactId = 'uhf-tools'
             pom.version = '1.0'

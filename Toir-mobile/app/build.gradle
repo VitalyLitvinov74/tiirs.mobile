@@ -17,23 +17,21 @@ model {
     android.buildTypes {
         debug {
             minifyEnabled = false
-//            signingConfig = signConf
         }
         release {
             minifyEnabled = false
             proguardFiles.add(file('proguard-rules.pro'))
-//            signingConfig = signingConfigs.release
-            signingConfig = $.android.signingConfigs.get("release")
+            signingConfig = $.android.signingConfigs.get('release')
         }
     }
 
 
     android.productFlavors {
-        create("arm") {
-            ndk.abiFilters.add("armeabi")
+        create('arm') {
+            ndk.abiFilters.add('armeabi')
         }
-//        create("arm7") {
-//            ndk.abiFilters.add("armeabi-v7a")
+//        create('arm7') {
+//            ndk.abiFilters.add('armeabi-v7a')
 //        }
 //        create('all') {
 //        }
@@ -47,31 +45,37 @@ model {
     }
 
     android.signingConfigs {
+        def rootDir = property('rootDir')
         Properties properties = new Properties()
-        properties.load(new FileInputStream("gradle.properties.koputo"))
-//        debug {
-//            storeFile = file(properties.getProperty("RELEASE_STORE_FILE"))
-//            storePassword = properties.getProperty("RELEASE_STORE_PASSWORD")
-//            keyAlias = properties.getProperty("RELEASE_KEY_ALIAS")
-//            keyPassword = properties.getProperty("RELEASE_KEY_PASSWORD")
-//        }
+        properties.load(new FileInputStream("${rootDir}/local.properties"))
+        debug {
+            // это сделано для того, чтоб не прибивать приложение вместе с базой
+            // при установке release версии приложения
+            storeFile = file(properties.getProperty('STORE_FILE'))
+            storePassword = properties.getProperty('STORE_PASSWORD')
+            keyAlias = properties.getProperty('KEY_ALIAS')
+            keyPassword = properties.getProperty('KEY_PASSWORD')
+        }
         create("release") {
-            storeFile = file(properties.getProperty("RELEASE_STORE_FILE"))
-            storePassword = properties.getProperty("RELEASE_STORE_PASSWORD")
-            keyAlias = properties.getProperty("RELEASE_KEY_ALIAS")
-            keyPassword = properties.getProperty("RELEASE_KEY_PASSWORD")
-//            signConf = it
+            storeFile = file(properties.getProperty('STORE_FILE'))
+            storePassword = properties.getProperty('STORE_PASSWORD')
+            keyAlias = properties.getProperty('KEY_ALIAS')
+            keyPassword = properties.getProperty('KEY_PASSWORD')
         }
     }
 }
 
+def rd = property('rootDir')
+Properties prop = new Properties()
+prop.load(new FileInputStream("${rd}/local.properties"))
+def localRepo = prop.getProperty('localRepo')
+
 repositories {
     maven {
-        url "https://jitpack.io"
+        url 'https://jitpack.io'
     }
     maven {
-        url "file:///home/koputo/myrepo/android"
-        //artifactUrls mavenLocal()
+        url "file://${localRepo}"
     }
 }
 
@@ -84,5 +88,4 @@ dependencies {
     compile 'me.dm7.barcodescanner:zbar:1.8.3'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'android.hardware:uhf-tools:1.0@aar'
-    //compile 'ru.yandex.koputo:uhf-tools:1.0@aar'
 }
