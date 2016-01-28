@@ -16,6 +16,7 @@ model {
     android.ndk {
         moduleName = "uhf-tools"
         ldLibs.add("log")
+        CFlags.add("-std=c99");
 //        ldFlags.add('-mthumb')
 //        ldFlags.each {
 //            println(it)
@@ -54,14 +55,10 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
-            //def rootDir = property('rootDir')
             Properties properties = new Properties()
             properties.load(new FileInputStream("${rootDir}/local.properties"))
-            //def lr = '/home/koputo/localRepo'
 
-            // TODO: настройку локального репозитория вынести в локальные конфигурационные файлы
             repository(url: "file://${properties.getProperty('localRepo')}")
-            //repository(url: lr)
             pom.groupId = 'android.hardware'
             pom.artifactId = 'uhf-tools'
             pom.version = '1.0'
