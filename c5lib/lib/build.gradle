@@ -64,6 +64,8 @@ uploadArchives {
             pom.version = '1.0'
         }
     }
+    // TODO: воткнул чтоб избавиться от сообщения "Not all execution paths return a value"
+    return true;
 }
 
 dependencies {

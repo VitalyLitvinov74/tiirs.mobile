@@ -85,9 +85,7 @@ public class Scanner {
 	 * BARCODE_READ, timeout send Message BARCODE_NOREAD
 	 */
 	static public void Read() {
-		if (m_bASYC) {
-			return;
-		} else {
+		if (!m_bASYC) {
 			StartASYC();
 		}
 	}
@@ -98,6 +96,7 @@ public class Scanner {
 	 * поле ввода на котором установлен фокус ввода.
 	 */
 	static public void ReadHW() {
+        Log.i(TAG, "Dummy method ReadHW()");
 	}
 
 	/**

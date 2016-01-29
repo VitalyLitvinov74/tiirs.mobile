@@ -34,23 +34,19 @@ public class ParseThread extends Thread {
 	// обработчик повторной отправки команды в считыватель
 	private Handler resendCommandHandler = null;
 
-	// обработчик таймера на выполнение операции
-	private Handler readTimerHandler = null;
-	private Runnable readTimerRunnable = null;
-
 	/**
 	 * Конструктор
 	 * 
-	 * @param command
-	 * @param timeOut
+	 * @param command Команда ответ на которую мы должны разобрать.
+	 * @param timeOut Время на выполнение разбора ответа.
 	 */
 	public ParseThread(byte command, int timeOut) {
 
 		expectCommand = command;
 
 		if (timeOut > 0) {
-			readTimerHandler = new Handler();
-			readTimerRunnable = new Runnable() {
+			Handler readTimerHandler = new Handler();
+			Runnable readTimerRunnable = new Runnable() {
 
 				@Override
 				public void run() {

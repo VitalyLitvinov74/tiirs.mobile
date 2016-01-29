@@ -16,9 +16,9 @@ int32_t poweroff();
 
 int32_t openportserial(uint8_t *ppath, uint32_t baud);
 
-int32_t writeport(void *pout, int32_t oldsize);
+int32_t writeport(void *pout, int32_t oldSize);
 
-ssize_t readportserial(void *pout, uint32_t oldsize);
+ssize_t readportserial(void *pout, uint32_t oldSize);
 
 void closeport();
 
@@ -122,9 +122,9 @@ int8_t *TAG = "ScannerJNI";
 
 #define TMP_BUFFER_SIZE 1024
 
-int32_t writeport(void *pout, int32_t oldsize) {
+int32_t writeport(void *pout, int32_t oldSize) {
 
-    size_t count = (size_t) oldsize;
+    size_t count = (size_t) oldSize;
     ssize_t rc;
 
     if (g_port >= 0) {
@@ -132,7 +132,7 @@ int32_t writeport(void *pout, int32_t oldsize) {
             rc = write(g_port, pout, count);
             if (rc >= 0) {
                 if (count == rc) {
-                    return oldsize;
+                    return oldSize;
                 }
                 count -= rc;
             }
@@ -141,12 +141,12 @@ int32_t writeport(void *pout, int32_t oldsize) {
     return 0;
 }
 
-ssize_t readportserial(void *pout, uint32_t oldsize) {
+ssize_t readportserial(void *pout, uint32_t oldSize) {
 
     ssize_t result = 0;
 
     if (g_port >= 0) {
-        result = read(g_port, pout, oldsize);
+        result = read(g_port, pout, oldSize);
     }
 
     return result;
@@ -273,38 +273,28 @@ void Reset() {
 void MagicCheckSum(void *pBuffer, uint32_t nLen) {
 
     uint8_t *buffer = pBuffer;
-    uint8_t checkSum;
+    uint8_t checkSum = 0;
 
-    checkSum = 0;
     if (nLen > 1) {
-//        uint8_t value;
-//        uint32_t i = 1;
-//        do {
-//            value = buffer[i++];
-//            checkSum = (checkSum + value) & 0xFF;
-//        } while (i != nLen);
         for (uint32_t i = 1; i < nLen; i++) {
             checkSum = checkSum + buffer[i];
         }
     }
+
     buffer[nLen] = checkSum;
 }
 
 bool MagicIsCheckSum(void *pBuffer, uint32_t nLen) {
 
-    uint8_t checkSum;
+    uint8_t checkSum = 0;
     uint8_t *buffer = pBuffer;
-    int32_t i;
-    uint8_t value;
 
-    checkSum = 0;
     if (nLen > 1) {
-        i = 1;
-        do {
-            value = buffer[i++];
-            checkSum = (checkSum + value);
-        } while (i != nLen);
+        for (uint32_t i = 1; i < nLen; i++) {
+            checkSum = checkSum + buffer[i];
+        }
     }
+
     if ((buffer[nLen] - checkSum) <= 0) {
         return true;
     } else {
