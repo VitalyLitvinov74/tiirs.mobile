@@ -5,211 +5,60 @@
 #include "firmware.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "reader.h"
+
+// данные названия не отражают суть, т.к. не известно,
+// что именно делают эти команды
+#define READER_START 9
+#define READER_STOP 8
+#define CTRL_START 1
+#define CTRL_STOP 2
+
+#define READER_POWER_ON 7
+#define READER_POWER_OFF 6
 
 // устройство считывателя
 // /dev/ttyMT2
 
-// низкоуровневая работа с устройством
-int32_t poweron();
+// устройство управления питанием считывателя(наше)
+int8_t *deviceCtrlName = (int8_t *) "/dev/msm_io_cm7";
 
-int32_t poweroff();
+// дескриптор порта управляющего устройства
+int32_t deviceCtrlHandler = -1;
 
-int32_t openportserial(uint8_t *ppath, uint32_t baud);
+// дескриптор порта считывателя
+int32_t deviceHandler = -1;
 
-int32_t writeport(void *pout, int32_t oldSize);
-
-ssize_t readportserial(void *pout, uint32_t oldSize);
-
-void closeport();
-
-void closeserial();
-
-int32_t rf_fw_download(uint8_t *path);
-
-// сервисные функции
-void Cleantemp();
-
-void Reset();
-
-void MagicCheckSum(void *pBuffer, uint32_t nLen);
-
-bool MagicIsCheckSum(void *pBuffer, uint32_t nLen);
-
-uint32_t MagicMakeMessageData(uint8_t btCmd, uint8_t *pdata, uint32_t nlen);
-
-int32_t MagicGetParameter();
-
-int32_t MagicInventory();
-
-int32_t MagicWriteTagMemory(int32_t nPL, uint8_t *APassword, int32_t nUL,
-                            uint8_t *EPC, uint8_t membank, int32_t nSA,
-                            int32_t nDL,
-                            uint8_t *DT);
-
-int32_t MagicReadTagMemory(int32_t nPL, uint8_t *APassword, uint32_t nUL,
-                           uint8_t *EPC, uint8_t membank, int32_t nSA,
-                           int32_t nDL);
-
-int32_t MagicSetTransmissionPower(int32_t nPower);
-
-int32_t MagicGetTransmissionPower();
-
-int32_t MagicLock(uint32_t nPL, uint8_t *aPassword, uint32_t nUL, uint8_t *EPC,
-                  uint32_t nLD);
-
-int32_t MagicKill(uint32_t nPL, uint8_t *KPassword, uint32_t nUL, uint8_t *EPC);
-
-// экспортируемые функции
-jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
-                                                 jstring jPath);
-
-jint Java_android_hardware_uhf_magic_reader_Open(JNIEnv *env, jclass jc,
-                                                 jstring jPath);
-
-jint Java_android_hardware_uhf_magic_reader_Read(JNIEnv *env, jclass jc,
-                                                 jbyteArray jpout, jint nStart,
-                                                 jint nread);
-
-jint Java_android_hardware_uhf_magic_reader_Write(JNIEnv *env, jclass jc,
-                                                  jbyteArray jpout, jint nStart,
-                                                  jint nwrite);
-
-jint Java_android_hardware_uhf_magic_reader_Inventory(JNIEnv *env, jclass jc);
-
-jint Java_android_hardware_uhf_magic_reader_WriteTag(JNIEnv *env, jclass jc,
-                                                     jbyteArray jAPassword,
-                                                     jint nUL,
-                                                     jbyteArray jPCEPC,
-                                                     jbyte membank,
-                                                     jint nSA, jint nDL,
-                                                     jbyteArray jDT);
-
-jint Java_android_hardware_uhf_magic_reader_ReadTag(JNIEnv *env, jclass jc,
-                                                    jbyteArray jAPassword,
-                                                    jint nUL, jbyteArray jEPC,
-                                                    jbyte membank,
-                                                    jint nSA, jint nDL);
-
-void Java_android_hardware_uhf_magic_reader_Clean(JNIEnv *env, jclass jc);
-
-void Java_android_hardware_uhf_magic_reader_Close(JNIEnv *env, jclass jc);
-
-jint Java_android_hardware_uhf_magic_reader_SetTransmissionPower(JNIEnv *env,
-                                                                 jclass jc,
-                                                                 jint nPower);
-
-jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env,
-                                                                 jclass jc);
-
-jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc,
-                                                 jbyteArray jAPassword,
-                                                 jint nUL, jbyteArray jEPC,
-                                                 jint nLD);
-
-jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
-                                                 jbyteArray jKPassword,
-                                                 jint nUL, jbyteArray jEPC);
-
-uint8_t *device_pwr = (uint8_t *) "/dev/msm_io_cm7"; // устройство управления питанием считывателя(наше)
-
-int32_t g_port = -1; // дескриптор порта считывателя
-
-uint8_t Magicmessagebuf[1024]; // глобальный массив в котором строятся команды считывателю
-
-int32_t setio = -1; // дескриптор порта управляющего устройства?
-
+// метка для сообщений
 int8_t *TAG = "ScannerJNI";
 
 #define TMP_BUFFER_SIZE 1024
 
-int32_t writeport(void *pout, int32_t oldSize) {
+// глобальный массив в котором строятся команды считывателю
+uint8_t Magicmessagebuf[1024];
 
-    size_t count = (size_t) oldSize;
-    ssize_t rc;
 
-    if (g_port >= 0) {
-        while (1) {
-            rc = write(g_port, pout, count);
-            if (rc >= 0) {
-                if (count == rc) {
-                    return oldSize;
-                }
-                count -= rc;
-            }
-        }
-    }
-    return 0;
-}
+/**
+ * Открываем устройство считывателя.
+ * Возвращает
+ *  0 порт открыт,
+ *  1 порт уже открыт,
+ * -1 не удалось открыть порт,
+ * -2 не удалось получить конфигурацию порта,
+ * -3 не удалось установить новую конфигурацию порта.
+ */
+int32_t openSerial(int8_t *path, uint32_t baud) {
 
-ssize_t readportserial(void *pout, uint32_t oldSize) {
-
-    ssize_t result = 0;
-
-    if (g_port >= 0) {
-        result = read(g_port, pout, oldSize);
-    }
-
-    return result;
-}
-
-void Cleantemp() {
-
-    // хз где в ndk эта константа
-    uint32_t FLUSH_BOTH = 2;
-    if (g_port < 0) {
-        ioctl(g_port, TCFLSH, FLUSH_BOTH);
-    }
-}
-
-int32_t poweroff() {
-
-    int32_t rc = -1;
-
-    if (setio > 0) {
-        rc = ioctl(setio, 1, 6);
-    }
-
-    return rc;
-}
-
-void closeport() {
-
-    if (setio > 0) {
-        ioctl(setio, 1, 8);
-        close(setio);
-        setio = -1;
-    }
-
-    if (g_port > 0) {
-        close(g_port);
-        g_port = -1;
-    }
-
-    poweroff();
-}
-
-void closeserial() {
-
-    if (g_port > 0) {
-        close(g_port);
-        g_port = -1;
-    }
-}
-
-int32_t openportserial(uint8_t *ppath, uint32_t baud) {
-
-    int32_t result;
-    int32_t fd;
+    int32_t rc;
     struct termios cfg;
 
-    result = 1; // порт уже открыт
-    if (g_port <= 0) {
-        fd = open((const char *) ppath, O_RDWR);
-        g_port = fd;
-        if (fd > 0) {
-            if (ioctl(fd, TCGETS, &cfg)) {
-                close(g_port);
-                result = -2; // не удалось получить конфигурацию порта
+    rc = 1; // порт уже открыт
+    if (deviceHandler < 0) {
+        deviceHandler = open((const char *) path, O_RDWR);
+        if (deviceHandler > 0) {
+            if (ioctl(deviceHandler, TCGETS, &cfg)) {
+                close(deviceHandler);
+                rc = -2; // не удалось получить конфигурацию порта
             } else {
                 cfg.c_iflag = IGNPAR | INPCK | IUCLC | IXANY;
                 cfg.c_oflag = OLCUC | ONLCR | OCRNL;
@@ -218,57 +67,433 @@ int32_t openportserial(uint8_t *ppath, uint32_t baud) {
                 cfg.c_cflag = baud | CS8; // установка скорости и длины данных
                 cfg.c_cc[VMIN] = 0; // минимальное количество байтов для приёма
                 cfg.c_cc[VTIME] = 1; // время ожидания данных в секундах
-                if (ioctl(g_port, TCSETS, &cfg)) {
-                    close(g_port);
-                    result = -3; // не удалось установить новую конфигурацию порта
+                if (ioctl(deviceHandler, TCSETS, &cfg)) {
+                    close(deviceHandler);
+                    rc = -3; // не удалось установить новую конфигурацию порта
                 } else {
-                    result = 0; // порт успешно открыт и установлена новая конфигурация
+                    rc = 0; // порт успешно открыт и установлена новая конфигурация
                 }
             }
         } else {
-            result = -1; // не удалось открыть порт
+            rc = -1; // не удалось открыть порт
+        }
+    }
+
+    return rc;
+}
+
+/**
+ * Закрываем устройство считывателя.
+ */
+int32_t closeSerial() {
+
+    int32_t rc = -1;
+
+    if (deviceHandler > 0) {
+        rc = close(deviceHandler);
+    }
+
+    deviceHandler = -1;
+
+    return rc;
+}
+
+/**
+ * Пишем в устройство считывателя.
+ */
+int32_t writeSerial(void *buffer, int32_t size) {
+
+    size_t count = (size_t) size;
+    ssize_t rc;
+
+    if (deviceHandler >= 0) {
+        while (1) {
+            rc = write(deviceHandler, buffer, count);
+            if (rc >= 0) {
+                if (count == rc) {
+                    return size;
+                }
+                count -= rc;
+            }
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Читаем из устройства считывателя.
+ */
+ssize_t readSerial(void *buffer, int32_t size) {
+
+    ssize_t rc = 0;
+
+    if (deviceHandler >= 0) {
+        rc = read(deviceHandler, buffer, (size_t) size);
+    }
+
+    return rc;
+}
+
+/**
+ * Сбрасываем буферы устройства считывателя.
+ */
+int32_t flushSerial() {
+
+    int32_t rc = -1;
+
+    uint32_t FLUSH_BOTH = 2;
+    if (deviceHandler > 0) {
+        rc = ioctl(deviceHandler, TCFLSH, FLUSH_BOTH);
+    }
+
+    return rc;
+}
+
+/**
+ * Открываем устройство управления считывателем
+ */
+int32_t openCtrl(int8_t *path) {
+
+    if (deviceCtrlHandler > 0) {
+        close(deviceCtrlHandler);
+    }
+
+    deviceCtrlHandler = open((const char *) path, O_RDWR);
+
+    return deviceCtrlHandler;
+}
+
+/**
+ * Закрываем устройство управления считывателем
+ */
+int32_t closeCtrl() {
+
+    int32_t rc = -1;
+
+    if (deviceCtrlHandler > 0) {
+        rc = close(deviceCtrlHandler);
+    }
+
+    return rc;
+}
+
+/**
+ * Подаём питание на считыватель.
+ */
+int32_t powerOn() {
+
+    int32_t rc = -1;
+
+    if (deviceCtrlHandler > 0) {
+        rc = ioctl(deviceCtrlHandler, 1, READER_POWER_ON);
+    }
+
+    return rc;
+}
+
+/**
+ * Выключаем питание считывателя.
+ */
+int32_t powerOff() {
+
+    int32_t rc = -1;
+
+    if (deviceCtrlHandler > 0) {
+        rc = ioctl(deviceCtrlHandler, 1, READER_POWER_OFF);
+    }
+
+    return rc;
+}
+
+/**
+ * Сборос устройства управления считывателем.
+ */
+int32_t resetCtrl() {
+
+    int32_t rc = -1;
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "resetCtrl");
+
+    if (deviceCtrlHandler > 0) {
+        rc = ioctl(deviceCtrlHandler, 1, CTRL_STOP);
+        if (rc < 0) {
+            return rc;
+        }
+
+        rc = ioctl(deviceCtrlHandler, 1, READER_POWER_OFF);
+        if (rc < 0) {
+            return rc;
+        }
+
+        rc = ioctl(deviceCtrlHandler, 1, READER_STOP);
+        if (rc < 0) {
+            return rc;
+        }
+
+        // 0.3 cекунды
+        usleep(300000);
+
+        rc = ioctl(deviceCtrlHandler, 1, CTRL_START);
+        if (rc < 0) {
+            return rc;
+        }
+
+        rc = ioctl(deviceCtrlHandler, 1, READER_POWER_ON);
+        if (rc < 0) {
+            return rc;
+        }
+
+        rc = ioctl(deviceCtrlHandler, 1, READER_START);
+        if (rc < 0) {
+            return rc;
+        }
+
+        // 0.1 cекунды
+        usleep(100000);
+    }
+
+    return rc;
+}
+
+/**
+ * Выключаем питание считывателя, закрываем устройство управления считывателем,
+ * закрываем устройство считывателя.
+ */
+void closeAll() {
+
+    powerOff();
+
+    if (deviceCtrlHandler > 0) {
+        ioctl(deviceCtrlHandler, 1, READER_STOP);
+        closeCtrl();
+    }
+
+    closeSerial();
+
+}
+
+/**
+ * Создаёт строку шестнадцатеричных значений по данным из переданного буффера.
+ */
+int8_t *makeHexString(void *buffer, int32_t start, int32_t count) {
+
+    int8_t *result;
+    uint8_t *charBuffer = buffer;
+    int32_t resultLen = count * 2 + 1;
+
+    result = calloc((size_t) resultLen, 1);
+    if (result != NULL) {
+        for (int32_t i = 0; i < count; i++) {
+            sprintf(&result[i * 2], "%02X", charBuffer[start + i]);
         }
     }
     return result;
 }
 
-int32_t poweron() {
+/**
+ * Проверяем инициализирован ли считываетль.
+ */
 
-    int32_t rc = -1;
+bool readerIsInited() {
 
-    if (setio > 0) {
-        rc = ioctl(setio, 1, 7);
-    } else {
-        setio = open((const char *) device_pwr, O_RDWR);
-        if (setio > 0) {
-            rc = ioctl(setio, 1, 7);
-        }
+    int32_t readCount = 0;
+    size_t bufferLen = 11;
+    uint8_t *inBuffer;
+
+    inBuffer = calloc(bufferLen, 1);
+
+    // не ясно какие параметры мы получим,
+    // но сам факт их наличия говорит о том, что считыватель инициализирован
+    MagicGetParameter();
+
+    // пытаемся получить ответ от считывателя
+    // вообще ответ целиком занимает 11 байт в частном случае
+    for (int32_t index = 0; index < bufferLen; index++) {
+        readCount += readSerial(&inBuffer[index], 1);
     }
-    return rc;
-}
 
-void Reset() {
+    int8_t *resultHexStr = makeHexString(inBuffer, 0, bufferLen);
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "На запрос параметров прочитали %d байт.", readCount);
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "На запрос параметров получили ответ: %s",
+                        (char *) resultHexStr);
 
-    int32_t fd;
-
-    __android_log_print(ANDROID_LOG_INFO, TAG, "reset");
-
-    fd = open((const char *) device_pwr, O_RDWR);
-    if (fd > 0) {
-        ioctl(fd, 1, 2);
-        ioctl(fd, 1, 6);
-        ioctl(fd, 1, 8);
-        usleep(300000); // 0.3 cекунды
-        ioctl(fd, 1, 1);
-        ioctl(fd, 1, 7);
-        ioctl(fd, 1, 9);
-        usleep(100000); // 0.1 cекунды
-        close(fd);
+    if (readCount >= 4) {
+        // предположительно считыватель ответил как надо, всё путём
+        __android_log_print(ANDROID_LOG_INFO, TAG,
+                            "Cчитыватель инициализирован.");
+        return true;
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, TAG,
+                            "Cчитыватель не инициализирован.");
+        return false;
     }
 }
 
 /**
- * какая-то контрольная сумма
+ * Функция заливает в считыватель прошивку.
+ */
+int32_t firmwareDownload(int8_t *path) {
+
+    int32_t readCount = 0;
+
+    uint8_t end[6] = {0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3};
+    uint8_t cmd;
+    uint8_t inBuffer[1];
+    int32_t answer = 0;
+
+    if (resetCtrl() < 0) {
+        return -1;
+    }
+
+    if (openSerial(path, B9600) < 0) {
+        return -1;
+    }
+
+    cmd = 0xFE;
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xFE");
+    // подключаемся на 9600
+    for (int32_t i = 0; i < 10; i++) {
+
+        writeSerial(&cmd, 1);
+        usleep(5000); // 0.005 cекунды
+
+        readCount = readSerial(inBuffer, 1);
+
+        if (readCount > 0) {
+
+            __android_log_print(ANDROID_LOG_INFO, TAG, "Прочитали = %02X",
+                                (int) inBuffer[0]);
+
+            if (inBuffer[0] == 0xFF) {
+                // считыватель ответил
+                answer = 1;
+                break;
+            }
+        }
+
+        usleep(3000); // 0.003 cекунды
+    }
+
+    // на 9600 считыватель не ответил
+    // подключаемся на 115200
+    if (answer == 0) {
+
+        closeSerial();
+        if (openSerial(path, B115200) < 0) {
+            return -1;
+        }
+
+        for (int32_t i = 0; i < 10; i++) {
+            writeSerial(&cmd, 1);
+            usleep(5000); // 0.005 cекунды
+
+            readCount = readSerial(inBuffer, 1);
+
+            if (readCount > 0) {
+
+                __android_log_print(ANDROID_LOG_INFO, TAG,
+                                    "Прочитали = %02X", inBuffer[0]);
+
+                if (inBuffer[0] == 0xFF) {
+                    // считыватель ответил
+                    answer = 1;
+                    break;
+                }
+            }
+
+            usleep(3000); // 0.003 cекунды
+        }
+    }
+
+    // неудалось подключится к считывателю
+    if (answer == 0) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG,
+                            "Считыватель не ответил.");
+        closeSerial();
+        return -1;
+    }
+
+    // до считывателя видимо достучались
+    // начинаем заливать прошивку
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xB5");
+    cmd = 0xB5;
+    writeSerial(&cmd, 1);
+    usleep(5000); // 0.005 cекунды
+    closeSerial();
+
+    if (openSerial(path, B115200) < 0) {
+        return -1;
+    }
+    usleep(10000); // 0.01 cекунды
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xDB");
+    answer = 0;
+    cmd = 0xDB;
+    int32_t tryCount;
+    for (tryCount = 0; tryCount < 100; tryCount++) {
+
+        writeSerial(&cmd, 1);
+        usleep(5000); // 0.005 cекунды
+
+        readCount = readSerial(inBuffer, 1);
+
+        if (readCount > 0) {
+
+            __android_log_print(ANDROID_LOG_INFO, TAG, "Прочитали = %02X",
+                                inBuffer[0]);
+
+            if (inBuffer[0] == 0xBF) {
+                // считыватель ответил на команду заливки прошивки
+                answer = 1;
+                break;
+            }
+        }
+
+        usleep(3000); // 0.003 cекунды
+    }
+
+    // считыватель не ответил
+    if (answer == 0) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG,
+                            "Считыватель не ответил на команду заливки прошивки.");
+        closeSerial();
+        return -1;
+    }
+
+    usleep(5000); // 0.005 cекунды
+
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "С %d попытки начинаем заливать прошивку.",
+                        tryCount);
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xFD");
+    cmd = 0xFD;
+    writeSerial(&cmd, 1);
+    usleep(5000); // 0.005 cекунды
+
+    for (int32_t i = 0; i < FIRMWARE_LENGTH; i++) {
+        writeSerial(&firmware[i], 1);
+    }
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Записано %d байт",
+                        FIRMWARE_LENGTH);
+
+    usleep(10000); // 0.01 cекунды
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "Отправляем cmd = 0xD3D3D3D3D3D3");
+    writeSerial(end, 6);
+
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "Запись прошивки успешна завершена.");
+
+    closeSerial();
+    return 0;
+}
+
+/**
+ * Самопальная контрольная сумма.
  */
 void MagicCheckSum(void *pBuffer, uint32_t nLen) {
 
@@ -284,6 +509,9 @@ void MagicCheckSum(void *pBuffer, uint32_t nLen) {
     buffer[nLen] = checkSum;
 }
 
+/**
+ * Проверка самопальной контрольной суммы.
+ */
 bool MagicIsCheckSum(void *pBuffer, uint32_t nLen) {
 
     uint8_t checkSum = 0;
@@ -303,7 +531,7 @@ bool MagicIsCheckSum(void *pBuffer, uint32_t nLen) {
 }
 
 /**
- * возвращает полную длину пакета
+ * Строит указанную команду, возвращает полную длину пакета команды.
  */
 uint32_t MagicMakeMessageData(uint8_t btCmd, uint8_t *pdata, uint32_t nlen) {
 
@@ -319,6 +547,9 @@ uint32_t MagicMakeMessageData(uint8_t btCmd, uint8_t *pdata, uint32_t nlen) {
     return result;
 }
 
+/**
+ * Команда поиска метки.
+ */
 int32_t MagicInventory() {
 
     int32_t packetLen;
@@ -326,60 +557,17 @@ int32_t MagicInventory() {
     uint8_t arybuf[2] = {0};
 
     packetLen = MagicMakeMessageData(0x22, arybuf, 2);
-    result = writeport(Magicmessagebuf, packetLen);
+    result = writeSerial(Magicmessagebuf, packetLen);
 
     return result;
 }
 
-int32_t MagicWriteTagMemory(int32_t nPL, uint8_t *APassword, int32_t nUL,
-                            uint8_t *EPC, uint8_t membank, int32_t nSA,
-                            int32_t nDL,
-                            uint8_t *DT) {
-
-    size_t tmpPcecpLen;
-    uint8_t *tmpBuff;
-    uint32_t packetLen;
-    int32_t result;
-    uint8_t *arybuf;
-
-    arybuf = calloc(TMP_BUFFER_SIZE, 1);
-
-    if (arybuf == NULL) {
-        return -1;
-    }
-
-    tmpPcecpLen = (size_t) nUL;
-
-    arybuf[0] = (uint8_t) ((nPL & 0xFF00) >> 8);
-    arybuf[1] = (uint8_t) nPL;
-
-    memcpy(&arybuf[2], APassword, 4);
-
-    arybuf[6] = (uint8_t) ((nUL & 0xFF00) >> 8);
-    arybuf[7] = (uint8_t) nUL;
-    memcpy(&arybuf[8], EPC, tmpPcecpLen);
-
-    tmpBuff = &arybuf[nUL];
-    tmpBuff[8] = membank;
-    tmpBuff[9] = (uint8_t) ((nSA & 0xFF00) >> 8);
-    tmpBuff[10] = (uint8_t) nSA;
-    tmpPcecpLen += 13;
-    tmpBuff[11] = (uint8_t) ((nDL & 0xFF00) >> 8);
-    tmpBuff[12] = (uint8_t) nDL;
-    memcpy(&arybuf[tmpPcecpLen], DT, (size_t) nDL);
-
-    packetLen = MagicMakeMessageData(0x49, arybuf, tmpPcecpLen + nDL);
-
-    result = writeport(Magicmessagebuf, packetLen);
-
-    free(arybuf);
-
-    return result;
-}
-
-int32_t MagicReadTagMemory(int32_t nPL, uint8_t *APassword, uint32_t nUL,
-                           uint8_t *EPC, uint8_t membank, int32_t nSA,
-                           int32_t nDL) {
+/**
+ * Команда чтения данных из метки.
+ */
+int32_t MagicReadTagMemory(int32_t pwdLen, uint8_t *pwd, uint32_t pcepcLen,
+                           uint8_t *pcepc, uint8_t membank, int32_t offset,
+                           int32_t dataLen) {
 
     uint8_t *tmpArray;
     uint32_t packetLen;
@@ -393,235 +581,331 @@ int32_t MagicReadTagMemory(int32_t nPL, uint8_t *APassword, uint32_t nUL,
     }
 
     // рамер полезной нагрузки
-    arybuf[0] = (uint8_t) ((nPL & 0xFF00) >> 8);
-    arybuf[1] = (uint8_t) nPL;
+    arybuf[0] = (uint8_t) ((pwdLen & 0xFF00) >> 8);
+    arybuf[1] = (uint8_t) pwdLen;
     // пароль к метке
-    memcpy(&arybuf[2], APassword, 4);
+    memcpy(&arybuf[2], pwd, 4);
     // размер pc+epc
-    arybuf[6] = (uint8_t) ((nUL & 0xFF00) >> 8);
-    arybuf[7] = (uint8_t) nUL;
+    arybuf[6] = (uint8_t) ((pcepcLen & 0xFF00) >> 8);
+    arybuf[7] = (uint8_t) pcepcLen;
     // pcepc
-    memcpy(&arybuf[8], EPC, (size_t) nUL);
+    memcpy(&arybuf[8], pcepc, (size_t) pcepcLen);
 
-    tmpArray = &arybuf[nUL];
+    tmpArray = &arybuf[pcepcLen];
     // область памяти
     tmpArray[8] = membank;
     // смещение в памяти
-    tmpArray[9] = (uint8_t) ((nSA & 0xFF00) >> 8);
-    tmpArray[10] = (uint8_t) nSA;
+    tmpArray[9] = (uint8_t) ((offset & 0xFF00) >> 8);
+    tmpArray[10] = (uint8_t) offset;
     // размер данных для чтения
-    tmpArray[11] = (uint8_t) ((nDL & 0xFF00) >> 8);
-    tmpArray[12] = (uint8_t) nDL;
+    tmpArray[11] = (uint8_t) ((dataLen & 0xFF00) >> 8);
+    tmpArray[12] = (uint8_t) dataLen;
 
     // формируем команду
-    packetLen = MagicMakeMessageData(0x39, arybuf, (nUL + 13));
+    packetLen = MagicMakeMessageData(0x39, arybuf, (pcepcLen + 13));
 
     // отправляем команду в считыватель
-    result = writeport(Magicmessagebuf, packetLen);
+    result = writeSerial(Magicmessagebuf, packetLen);
 
     free(arybuf);
 
     return result;
 }
 
-int8_t *makeHexString(void *buffer, uint32_t start, uint32_t count) {
+/**
+ * Команда записи данных в метку.
+ */
+int32_t MagicWriteTagMemory(int32_t pwdLen, uint8_t *pwd, int32_t pcepcLen,
+                            uint8_t *pcepc, uint8_t membank, int32_t offset,
+                            int32_t dataLen, uint8_t *data) {
 
-    int8_t *result;
-    int8_t *charBuffer = buffer;
-    uint32_t resultLen = count * 2 + 1;
+    size_t tmpPcecpLen;
+    uint8_t *tmpBuff;
+    uint32_t packetLen;
+    int32_t result;
+    uint8_t *arybuf;
 
-    result = calloc(resultLen, 1);
-    if (result != NULL) {
-        for (uint32_t i = 0; i < count; i++) {
-            sprintf(&result[i * 2], "%02X", charBuffer[start + i]);
-        }
+    arybuf = calloc(TMP_BUFFER_SIZE, 1);
+
+    if (arybuf == NULL) {
+        return -1;
     }
+
+    tmpPcecpLen = (size_t) pcepcLen;
+
+    arybuf[0] = (uint8_t) ((pwdLen & 0xFF00) >> 8);
+    arybuf[1] = (uint8_t) pwdLen;
+
+    memcpy(&arybuf[2], pwd, 4);
+
+    arybuf[6] = (uint8_t) ((pcepcLen & 0xFF00) >> 8);
+    arybuf[7] = (uint8_t) pcepcLen;
+    memcpy(&arybuf[8], pcepc, tmpPcecpLen);
+
+    tmpBuff = &arybuf[pcepcLen];
+    tmpBuff[8] = membank;
+    tmpBuff[9] = (uint8_t) ((offset & 0xFF00) >> 8);
+    tmpBuff[10] = (uint8_t) offset;
+    tmpPcecpLen += 13;
+    tmpBuff[11] = (uint8_t) ((dataLen & 0xFF00) >> 8);
+    tmpBuff[12] = (uint8_t) dataLen;
+    memcpy(&arybuf[tmpPcecpLen], data, (size_t) dataLen);
+
+    packetLen = MagicMakeMessageData(0x49, arybuf, tmpPcecpLen + dataLen);
+
+    result = writeSerial(Magicmessagebuf, packetLen);
+
+    free(arybuf);
+
     return result;
 }
 
-// оригинальный вариант
-int32_t rf_fw_download(unsigned char *path) {
-makeHexString(NULL,0,0);
-    int32_t readCount = 0;
+/**
+ * Команда на получение каких-то параметров.
+ */
+int32_t MagicGetParameter() {
 
-    uint8_t end[6] = {0xD3, 0xD3, 0xD3, 0xD3, 0xD3, 0xD3};
-    uint8_t cmd;
-    uint8_t inBuffer[1];
-    int32_t answer = 0;
-    int32_t i;
+    uint32_t len;
+    uint8_t arybuf[2] = {0};
 
-    poweron();
-    poweron();
-
-    openportserial(path, B115200);
-
-    MagicGetParameter();
-
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-    readCount += readportserial(inBuffer, 1);
-
-    closeserial();
-
-    if (readCount <= 4) {
-        // видимо считыватель не ответил так как нам хотелось
-        // видимо это проверка на наличие прошивки
-        // далее идёт процесс обновления прошивки
-
-        Reset();
-
-        openportserial(path, B9600);
-
-        cmd = 0xFE;
-        __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xFE");
-        // подключаемся на 9600
-        for (i = 0; i < 10; i++) {
-
-            writeport(&cmd, 1);
-            usleep(5000); // 0.005 cекунды
-
-            readCount = readportserial(inBuffer, 1);
-
-            if (readCount > 0) {
-
-                __android_log_print(ANDROID_LOG_INFO, TAG, "Прочитали = %02X",
-                                    (int) inBuffer[0]);
-
-                if (inBuffer[0] == 0xFF) {
-                    // считыватель ответил
-                    answer = 1;
-                    break;
-                }
-            }
-
-            usleep(3000); // 0.003 cекунды
-        }
-
-        // на 9600 считыватель не ответил
-        // подключаемся на 115200
-        if (answer == 0) {
-
-            closeserial();
-            openportserial(path, B115200);
-
-            for (i = 0; i < 10; i++) {
-                writeport(&cmd, 1);
-                usleep(5000); // 0.005 cекунды
-
-                readCount = readportserial(inBuffer, 1);
-
-                if (readCount > 0) {
-
-                    __android_log_print(ANDROID_LOG_INFO, TAG,
-                                        "Прочитали = %02X", inBuffer[0]);
-
-                    if (inBuffer[0] == 0xFF) {
-                        // считыватель ответил
-                        answer = 1;
-                        break;
-                    }
-                }
-
-                usleep(3000); // 0.003 cекунды
-            }
-        }
-
-        // неудалось подключится к считывателю
-        if (answer == 0) {
-            __android_log_print(ANDROID_LOG_ERROR, TAG,
-                                "Считыватель не ответил.");
-            closeserial();
-            return -1;
-        }
-
-        // до считывателя видимо достучались
-        // начинаем заливать прошивку
-        __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xB5");
-        cmd = 0xB5;
-        writeport(&cmd, 1);
-        usleep(5000); // 0.005 cекунды
-        closeserial();
-
-        openportserial(path, B115200);
-        usleep(10000); // 0.01 cекунды
-
-        __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xDB");
-        answer = 0;
-        cmd = 0xDB;
-        for (i = 0; i < 100; i++) {
-
-            writeport(&cmd, 1);
-            usleep(5000); // 0.005 cекунды
-
-            readCount = readportserial(inBuffer, 1);
-
-            if (readCount > 0) {
-
-                __android_log_print(ANDROID_LOG_INFO, TAG, "Прочитали = %02X",
-                                    inBuffer[0]);
-
-                if (inBuffer[0] == 0xBF) {
-                    // считыватель ответил на команду заливки прошивки
-                    answer = 1;
-                    break;
-                }
-            }
-
-            usleep(3000); // 0.003 cекунды
-        }
-
-        // считыватель не ответил
-        if (answer == 0) {
-            __android_log_print(ANDROID_LOG_ERROR, TAG,
-                                "Считыватель не ответил на команду заливки прошивки.");
-            closeserial();
-            return -1;
-        }
-
-        usleep(5000); // 0.005 cекунды
-
-        __android_log_print(ANDROID_LOG_INFO, TAG,
-                            "С %d попытки начинаем заливать прошивку.", i);
-
-        __android_log_print(ANDROID_LOG_INFO, TAG, "Отправляем cmd = 0xFD");
-        cmd = 0xFD;
-        writeport(&cmd, 1);
-        usleep(5000); // 0.005 cекунды
-
-        uint32_t fwIndex = 0;
-        for (fwIndex = 0; fwIndex < FIRMWARE_LENGTH; fwIndex++) {
-            writeport(&firmware[fwIndex], 1);
-        }
-        __android_log_print(ANDROID_LOG_INFO, TAG, "Записано %d байт",
-                            FIRMWARE_LENGTH);
-
-        usleep(10000); // 0.01 cекунды
-        __android_log_print(ANDROID_LOG_INFO, TAG,
-                            "Отправляем cmd = 0xD3D3D3D3D3D3");
-        writeport(end, 6);
-
-        __android_log_print(ANDROID_LOG_INFO, TAG,
-                            "Запись прошивки успешна завершена.");
-
-        closeserial();
-        return 0;
-    } else {
-        // предположительно считыватель ответил как надо, всё путём
-        __android_log_print(ANDROID_LOG_INFO, TAG,
-                            "Прочитали %d байт, считыватель уже инициализирован.",
-                            readCount);
-        return 0;
-    }
+    len = MagicMakeMessageData(0xF1, arybuf, 2);
+    return writeSerial(Magicmessagebuf, len);
 }
 
+/**
+ * Команда установки условий доступа к областям памяти метки.
+ */
+int32_t MagicLock(uint32_t nPL, uint8_t *aPassword, uint32_t nUL, uint8_t *EPC,
+                  uint32_t nLD) {
+
+    uint8_t *tmpBuff;
+    uint32_t packetLen;
+    int32_t result;
+    uint8_t *arybuf;
+
+    arybuf = calloc(TMP_BUFFER_SIZE, 1);
+
+    if (arybuf == NULL) {
+        return -1;
+    }
+
+    arybuf[0] = (uint8_t) ((nPL & 0xFF00) >> 8);
+    arybuf[1] = (uint8_t) nPL;
+    memcpy(&arybuf[2], aPassword, 4);
+    arybuf[6] = (uint8_t) ((nUL & 0xFF00) >> 8);
+    arybuf[7] = (uint8_t) nUL;
+    memcpy(&arybuf[8], EPC, (size_t) nUL);
+    tmpBuff = &arybuf[nUL];
+    tmpBuff[8] = (uint8_t) (nLD & 0xFF0000 >> 16);
+    tmpBuff[9] = (uint8_t) ((nLD & 0xFF00) >> 8);
+    tmpBuff[10] = (uint8_t) nLD;
+    packetLen = MagicMakeMessageData(0x82, arybuf, nUL + 11);
+
+    result = writeSerial(Magicmessagebuf, packetLen);
+
+    free(arybuf);
+
+    return result;
+}
+
+/**
+ * Команда вечной блокировки метки.
+ */
+int32_t MagicKill(uint32_t nPL, uint8_t *KPassword, uint32_t nUL,
+                  uint8_t *EPC) {
+
+    uint32_t packetLen;
+    int32_t result;
+    uint8_t *arybuf;
+
+    arybuf = calloc(TMP_BUFFER_SIZE, 1);
+
+    if (arybuf == NULL) {
+        return -1;
+    }
+
+    arybuf[0] = (uint8_t) ((nPL & 0xFF00) >> 8);
+    arybuf[1] = (uint8_t) nPL;
+    memcpy(&arybuf[2], KPassword, 4);
+    arybuf[6] = (uint8_t) ((nUL & 0xFF00) >> 8);
+    arybuf[7] = (uint8_t) nUL;
+    memcpy(&arybuf[8], EPC, nUL);
+    packetLen = MagicMakeMessageData(0x65, arybuf, nUL + 8);
+    result = writeSerial(Magicmessagebuf, packetLen);
+
+    free(arybuf);
+
+    return result;
+}
+
+/**
+ * Команда установки мощности передаваемого сигнала.
+ */
+int32_t MagicSetTransmissionPower(int32_t nPower) {
+
+    uint32_t pktLen;
+    uint8_t arybuf[4];
+
+    arybuf[0] = 0;
+    arybuf[1] = 2;
+    arybuf[2] = (uint8_t) ((nPower & 0xFF00) >> 8);
+    arybuf[3] = (uint8_t) nPower;
+    pktLen = MagicMakeMessageData(0xB6, arybuf, 4);
+
+    return writeSerial(Magicmessagebuf, pktLen);
+}
+
+/**
+ * Команда получение текущей мощности передаваемого сигнала.
+ */
+int32_t MagicGetTransmissionPower() {
+
+    uint32_t packetLen;
+    uint8_t arybuf[2] = {0, 0};
+
+    packetLen = MagicMakeMessageData(0xB7, arybuf, 2);
+    return writeSerial(Magicmessagebuf, packetLen);
+}
+
+/**
+ * Инициализация считывателя.
+ * Возвращает 0 если успешно.
+ */
+jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
+                                                 jstring jPath) {
+
+    jbyte *path;
+    jboolean copy = JNI_TRUE;
+    JNIEnv e = *env;
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Init: %p", jc);
+
+    path = (jbyte *) e->GetStringUTFChars(env, jPath, &copy);
+
+    int32_t rc;
+
+    // открыть управляющее устройство
+    rc = openCtrl(deviceCtrlName);
+    if (rc < 0) {
+        return -1;
+    }
+
+    // подать питание на считыватель
+    rc = powerOn();
+    if (rc < 0) {
+        return -1;
+    }
+
+    // открыть устройство считывателя
+    rc = openSerial(path, B115200);
+    if (rc < 0) {
+        return -1;
+    }
+
+    // проверить инициализирован он или нет, если нет залить прошивку
+    bool inited = readerIsInited();
+    closeSerial();
+    if (!inited) {
+        rc = firmwareDownload(path);
+        if (rc < 0) {
+            return -1;
+        }
+
+        // открыть устройство считывателя
+        rc = openSerial(path, B115200);
+        if (rc < 0) {
+            return -1;
+        }
+
+        // проверить что прошивка залита и считыватель работает
+        inited = readerIsInited();
+        closeSerial();
+        if (!inited) {
+            return -1;
+        }
+    }
+
+    // важнейшая часть инициализации!!! без установки мощности считыватель не считыватель
+    int32_t power = 1950;
+
+    rc = openSerial(path, B115200);
+    if (rc < 0) {
+        return -1;
+    }
+
+    rc = Java_android_hardware_uhf_magic_reader_SetTransmissionPower(NULL, NULL,
+                                                                     power);
+    if (rc == 0x11) {
+        rc = Java_android_hardware_uhf_magic_reader_SetTransmissionPower(NULL,
+                                                                         NULL,
+                                                                         power);
+        if (rc == 0x11) {
+            rc = Java_android_hardware_uhf_magic_reader_SetTransmissionPower(
+                    NULL, NULL, power);
+            if (rc == 0x11) {
+                return -1;
+            }
+        }
+    }
+
+    closeSerial();
+
+
+    e->ReleaseStringUTFChars(env, jPath, path);
+
+    return 0;
+}
+
+/**
+ * Открываем порт считывателя для работы.
+ */
+jint Java_android_hardware_uhf_magic_reader_Open(JNIEnv *env, jclass jc,
+                                                 jstring devicePath) {
+
+    jbyte *path;
+    int32_t rc;
+    jboolean copy = JNI_TRUE;
+    JNIEnv e = *env;
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Open: %p", jc);
+
+    path = (jbyte *) e->GetStringUTFChars(env, devicePath, &copy);
+
+    rc = openSerial(path, B115200);
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "Открытие порта считывателя, rc = %d", rc);
+
+    e->ReleaseStringUTFChars(env, devicePath, path);
+
+    return rc;
+}
+
+/**
+ * Закрываем все открытые устройства.
+ */
+void Java_android_hardware_uhf_magic_reader_Close(JNIEnv *env, jclass jc) {
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Close: %p, %p", env, jc);
+
+    closeAll();
+}
+
+/**
+ * Сбрасываем буферы порта считывателя.
+ */
+void Java_android_hardware_uhf_magic_reader_Clean(JNIEnv *env, jclass jc) {
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Clean: %p, %p", env, jc);
+
+    flushSerial();
+}
+
+/**
+ * Читаем напрямую из порта считывателя.
+ */
 jint Java_android_hardware_uhf_magic_reader_Read(JNIEnv *env, jclass jc,
-                                                 jbyteArray jpout, jint nStart,
-                                                 jint nread) {
+                                                 jbyteArray buffer, jint start,
+                                                 jint count) {
 
     JNIEnv e = *env;
     jsize arrayLen;
@@ -631,25 +915,51 @@ jint Java_android_hardware_uhf_magic_reader_Read(JNIEnv *env, jclass jc,
 
     __android_log_print(ANDROID_LOG_INFO, TAG, "Read: %p", jc);
 
-    arrayLen = e->GetArrayLength(env, jpout);
-    arrayElements = e->GetByteArrayElements(env, jpout, 0);
+    arrayLen = e->GetArrayLength(env, buffer);
+    arrayElements = e->GetByteArrayElements(env, buffer, 0);
 
     if (arrayLen > 0 && arrayElements) {
-        pointer = (uint8_t *) (arrayElements + nStart);
-        if (arrayLen > nread) {
-            readed = readportserial(pointer, (uint32_t) nread);
+        pointer = (uint8_t *) (arrayElements + start);
+        if (arrayLen > count) {
+            readed = readSerial(pointer, count);
         } else {
-            readed = readportserial(pointer, (uint32_t) arrayLen);
+            readed = readSerial(pointer, arrayLen);
         }
     } else {
         readed = 0;
     }
 
-    e->ReleaseByteArrayElements(env, jpout, arrayElements, 0);
+    e->ReleaseByteArrayElements(env, buffer, arrayElements, 0);
 
     return readed;
 }
 
+/**
+ * Пишем напрямую в порт считывателя.
+ */
+jint Java_android_hardware_uhf_magic_reader_Write(JNIEnv *env, jclass jc,
+                                                  jbyteArray jpout, jint nStart,
+                                                  jint nwrite) {
+
+    jint result;
+    jboolean copy = JNI_TRUE;
+    jbyte *data;
+    JNIEnv e = *env;
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Write: %p", jc);
+
+    data = e->GetByteArrayElements(env, jpout, &copy);
+
+    result = writeSerial(&data[nStart], (uint32_t) nwrite);
+
+    e->ReleaseByteArrayElements(env, jpout, data, 0);
+
+    return result;
+}
+
+/**
+ * Пишем данные в метку.
+ */
 jint Java_android_hardware_uhf_magic_reader_WriteTag(JNIEnv *env, jclass jc,
                                                      jbyteArray jAPassword,
                                                      jint nUL,
@@ -697,6 +1007,9 @@ jint Java_android_hardware_uhf_magic_reader_WriteTag(JNIEnv *env, jclass jc,
     return result;
 }
 
+/**
+ * Читаем данные из метки.
+ */
 jint Java_android_hardware_uhf_magic_reader_ReadTag(JNIEnv *env, jclass jc,
                                                     jbyteArray jAPassword,
                                                     jint nUL, jbyteArray jEPC,
@@ -731,118 +1044,24 @@ jint Java_android_hardware_uhf_magic_reader_ReadTag(JNIEnv *env, jclass jc,
     return result;
 }
 
+/**
+ * Поиск доступной метки.
+ */
 jint Java_android_hardware_uhf_magic_reader_Inventory(JNIEnv *env, jclass jc) {
 
     __android_log_print(ANDROID_LOG_INFO, TAG, "Inventory: %p, %p", env, jc);
 
-    return 0x11 - ((MagicInventory() - 7) <= 0);
+    int32_t rc;
+
+    rc = MagicInventory();
+
+    // в чём тайный смысл - не ясно (rc всегда равно 7)
+    return 0x11 - ((rc - 7) <= 0);
 }
 
-void Java_android_hardware_uhf_magic_reader_Close(JNIEnv *env, jclass jc) {
-
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Close: %p, %p", env, jc);
-
-    closeport();
-}
-
-void Java_android_hardware_uhf_magic_reader_Clean(JNIEnv *env, jclass jc) {
-
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Clean: %p, %p", env, jc);
-
-    Cleantemp();
-}
-
-jint Java_android_hardware_uhf_magic_reader_Open(JNIEnv *env, jclass jc,
-                                                 jstring jPath) {
-
-    jbyte *path;
-    int32_t result;
-    jboolean copy = JNI_TRUE;
-    JNIEnv e = *env;
-
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Open: %p", jc);
-
-    path = (jbyte *) e->GetStringUTFChars(env, jPath, &copy);
-
-    result = openportserial((uint8_t *) path, B115200);
-    __android_log_print(ANDROID_LOG_INFO, TAG,
-                        "Открытие порта считывателя, result = %d", result);
-
-    e->ReleaseByteArrayElements(env, jPath, path, 0);
-
-    return result;
-}
-
-jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
-                                                 jstring jPath) {
-
-    jbyte *path;
-    jboolean copy = JNI_TRUE;
-    JNIEnv e = *env;
-
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Init: %p", jc);
-
-    path = (jbyte *) e->GetStringUTFChars(env, jPath, &copy);
-
-    int32_t result = rf_fw_download((uint8_t *) path);
-
-    e->ReleaseByteArrayElements(env, jPath, path, 0);
-
-    return result;
-}
-
-int32_t MagicGetParameter() {
-
-    uint32_t len;
-    uint8_t arybuf[2] = {0};
-
-    len = MagicMakeMessageData(0xF1, arybuf, 2);
-    return writeport(Magicmessagebuf, len);
-}
-
-jint Java_android_hardware_uhf_magic_reader_Write(JNIEnv *env, jclass jc,
-                                                  jbyteArray jpout, jint nStart,
-                                                  jint nwrite) {
-
-    jint result;
-    jboolean copy = JNI_TRUE;
-    jbyte *data;
-    JNIEnv e = *env;
-
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Write: %p", jc);
-
-    data = e->GetByteArrayElements(env, jpout, &copy);
-
-    result = writeport(&data[nStart], (uint32_t) nwrite);
-
-    e->ReleaseByteArrayElements(env, jpout, data, 0);
-
-    return result;
-}
-
-int32_t MagicSetTransmissionPower(int32_t nPower) {
-
-    uint32_t pktLen;
-    uint8_t arybuf[4];
-
-    arybuf[0] = 0;
-    arybuf[1] = 2;
-    arybuf[2] = (uint8_t) ((nPower & 0xFF00) >> 8);
-    arybuf[3] = (uint8_t) nPower;
-    pktLen = MagicMakeMessageData(0xB6, arybuf, 4);
-
-    return writeport(Magicmessagebuf, pktLen);
-}
-
-int32_t MagicGetTransmissionPower() {
-
-    uint32_t packetLen;
-    uint8_t arybuf[2] = {0, 0};
-
-    packetLen = MagicMakeMessageData(0xB7, arybuf, 2);
-    return writeport(Magicmessagebuf, packetLen);
-}
-
+/**
+ * Устанавливаем мощность передаваемого сигнала.
+ */
 jint Java_android_hardware_uhf_magic_reader_SetTransmissionPower(JNIEnv *env,
                                                                  jclass jc,
                                                                  jint nPower) {
@@ -858,24 +1077,28 @@ jint Java_android_hardware_uhf_magic_reader_SetTransmissionPower(JNIEnv *env,
     MagicSetTransmissionPower(nPower);
 
     while (1) {
-        count += readportserial(&Magicbuf[count], 8);
+        count += readSerial(&Magicbuf[count], 8);
         ++watchDog;
         if (count > 7) {
             break;
         }
         // если не было прочитано более 7 символов, 20 раз подряд, возвращаем ошибку
         if (watchDog > 19) {
-            return 0x11;
+            return -1;
         }
     }
 
     if (MagicIsCheckSum(Magicbuf, 6)) {
+        // возвращаем код выполнения полученный от считывателя
         return Magicbuf[5];
     }
 
-    return 0x11;
+    return -1;
 }
 
+/**
+ * Получаем текущую мощность передаваемого сигнала.
+ */
 jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env,
                                                                  jclass jc) {
 
@@ -890,7 +1113,7 @@ jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env,
     MagicGetTransmissionPower();
 
     while (1) {
-        count += readportserial(&Magicbuf[count], 9);
+        count += readSerial(&Magicbuf[count], 9);
         ++watchDog;
         if (count > 8) {
             break;
@@ -909,6 +1132,9 @@ jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env,
     return (Magicbuf[5] << 8) | Magicbuf[6];
 }
 
+/**
+ * Устанавливаем маску доступа к областям метки.
+ */
 jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc,
                                                  jbyteArray jAPassword,
                                                  jint nUL, jbyteArray jEPC,
@@ -941,39 +1167,9 @@ jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc,
     return result;
 }
 
-int32_t MagicLock(uint32_t nPL, uint8_t *aPassword, uint32_t nUL, uint8_t *EPC,
-                  uint32_t nLD) {
-
-    uint8_t *tmpBuff;
-    uint32_t packetLen;
-    int32_t result;
-    uint8_t *arybuf;
-
-    arybuf = calloc(TMP_BUFFER_SIZE, 1);
-
-    if (arybuf == NULL) {
-        return -1;
-    }
-
-    arybuf[0] = (uint8_t) ((nPL & 0xFF00) >> 8);
-    arybuf[1] = (uint8_t) nPL;
-    memcpy(&arybuf[2], aPassword, 4);
-    arybuf[6] = (uint8_t) ((nUL & 0xFF00) >> 8);
-    arybuf[7] = (uint8_t) nUL;
-    memcpy(&arybuf[8], EPC, (size_t) nUL);
-    tmpBuff = &arybuf[nUL];
-    tmpBuff[8] = (uint8_t) (nLD & 0xFF0000 >> 16);
-    tmpBuff[9] = (uint8_t) ((nLD & 0xFF00) >> 8);
-    tmpBuff[10] = (uint8_t) nLD;
-    packetLen = MagicMakeMessageData(0x82, arybuf, nUL + 11);
-
-    result = writeport(Magicmessagebuf, packetLen);
-
-    free(arybuf);
-
-    return result;
-}
-
+/**
+ * Блокируем навечно метку.
+ */
 jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
                                                  jbyteArray jKPassword,
                                                  jint nUL, jbyteArray jEPC) {
@@ -1003,33 +1199,6 @@ jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
 
     e->ReleaseByteArrayElements(env, jKPassword, password, 0);
     e->ReleaseByteArrayElements(env, jEPC, PCEPC, 0);
-
-    return result;
-}
-
-int32_t MagicKill(uint32_t nPL, uint8_t *KPassword, uint32_t nUL,
-                  uint8_t *EPC) {
-
-    uint32_t packetLen;
-    int32_t result;
-    uint8_t *arybuf;
-
-    arybuf = calloc(TMP_BUFFER_SIZE, 1);
-
-    if (arybuf == NULL) {
-        return -1;
-    }
-
-    arybuf[0] = (uint8_t) ((nPL & 0xFF00) >> 8);
-    arybuf[1] = (uint8_t) nPL;
-    memcpy(&arybuf[2], KPassword, 4);
-    arybuf[6] = (uint8_t) ((nUL & 0xFF00) >> 8);
-    arybuf[7] = (uint8_t) nUL;
-    memcpy(&arybuf[8], EPC, nUL);
-    packetLen = MagicMakeMessageData(0x65, arybuf, nUL + 8);
-    result = writeport(Magicmessagebuf, packetLen);
-
-    free(arybuf);
 
     return result;
 }
