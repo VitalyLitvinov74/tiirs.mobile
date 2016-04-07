@@ -1,41 +1,28 @@
 package ru.toir.mobile.fragments;
 
-import ru.toir.mobile.R;
-import java.util.ArrayList;
-
+import android.annotation.SuppressLint;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.MenuInflater;
-
-import com.github.mikephil.charting.data.Entry;
-//import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.Legend.LegendPosition;
-
-import android.annotation.SuppressLint;
-import android.graphics.PointF;
-import android.graphics.RectF;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-//import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import java.text.DecimalFormat;
-//import com.github.mikephil.charting.utils.ValueFormatter;
 import com.github.mikephil.charting.charts.BarChart;
-//import com.github.mikephil.charting.charts.BarLineChartBase;
-//import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.Legend.LegendForm;
-//import com.github.mikephil.charting.components.Legend.LegendPosition;
+import com.github.mikephil.charting.components.Legend.LegendPosition;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.XAxis.XAxisPosition;
 import com.github.mikephil.charting.components.YAxis;
@@ -45,18 +32,30 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.DataSet;
-//import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.filter.Approximator;
 import com.github.mikephil.charting.data.filter.Approximator.ApproximatorType;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Highlight;
 
-public class ChartsFragment extends Fragment implements OnSeekBarChangeListener, OnChartValueSelectedListener 
+import java.util.ArrayList;
+
+import ru.toir.mobile.R;
+
+public class ChartsFragment extends Fragment implements OnSeekBarChangeListener, OnChartValueSelectedListener
 	{
      protected BarChart mChart;
      private SeekBar mSeekBarX, mSeekBarY;
      private TextView tvX, tvY; 	 
      private Typeface mTf;
+
+     public ChartsFragment() {
+            // Required empty public constructor
+     }
+
+     public static ChartsFragment newInstance(String title) {
+            return (new ChartsFragment());
+     }
 
      protected String[] mMonths = new String[] {
              "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"

@@ -1,18 +1,11 @@
 package ru.toir.mobile.fragments;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import ru.toir.mobile.R;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -22,7 +15,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.support.v4.app.Fragment;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import ru.toir.mobile.R;
 
 public class NativeCameraFragment extends Fragment {
 
@@ -32,7 +34,17 @@ public class NativeCameraFragment extends Fragment {
 	boolean fragmentCreated = false;
 	boolean fragmentShowed = false;
 
-	@Override
+    public NativeCameraFragment() {
+        // Required empty public constructor
+    }
+
+    public static NativeCameraFragment newInstance(String title) {
+        //FragmentAddUser f = new FragmentAddUser();
+        //Bundle args = new Bundle();
+        return (new NativeCameraFragment());
+    }
+
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 

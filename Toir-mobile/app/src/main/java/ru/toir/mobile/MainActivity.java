@@ -1,31 +1,64 @@
 package ru.toir.mobile;
 
-import java.io.File;
-import com.astuetz.PagerSlidingTabStrip;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
+import com.mikepenz.octicons_typeface_library.Octicons;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
-import ru.toir.mobile.fragments.PageAdapter;
+import ru.toir.mobile.fragments.ChartsFragment;
+import ru.toir.mobile.fragments.EquipmentsFragment;
+import ru.toir.mobile.fragments.FragmentAddUser;
+import ru.toir.mobile.fragments.FragmentEditUser;
+import ru.toir.mobile.fragments.GPSFragment;
+import ru.toir.mobile.fragments.NativeCameraFragment;
+import ru.toir.mobile.fragments.ReferenceFragment;
+import ru.toir.mobile.fragments.TaskFragment;
+import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TokenServiceHelper;
@@ -35,15 +68,48 @@ import ru.toir.mobile.rest.UsersServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
+    private static final int PROFILE_ADD = 1;
+    private static final int PROFILE_SETTINGS = 2;
+    private static final int MAX_USER_PROFILE = 10;
 
-	private static final String TAG = "MainActivity";
+    private static final int NO_FRAGMENT = 0;
+    private static final int FRAGMENT_CAMERA = 1;
+    private static final int FRAGMENT_CHARTS = 2;
+    private static final int FRAGMENT_EQUIPMENT = 3;
+    private static final int FRAGMENT_GPS = 4;
+    private static final int FRAGMENT_TASKS = 5;
+    private static final int FRAGMENT_REFERENCES = 6;
+    private static final int FRAGMENT_USERS = 7;
+    private static final int FRAGMENT_USER = 8;
+    private static final int FRAGMENT_OTHER = 10;
+
+    private static final int DRAWER_TASKS = 11;
+    private static final int DRAWER_DOWNLOAD = 12;
+    private static final int DRAWER_INFO = 13;
+    private static final int DRAWER_EXIT = 14;
+    private static final int DRAWER_ONLINE = 15;
+
+    private static final String TAG = "MainActivity";
 	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
 	private RfidDialog rfidDialog;
+    private static final int PROFILE_SETTING = 1;
+    private AccountHeader headerResult = null;
+    private Drawer result = null;
+    Bundle savedInstance=null;
 
-	public static class RFIDReadAction {
+    public int currentFragment = NO_FRAGMENT;
+    private ArrayList<IProfile> iprofilelist;
+    private List<Users> profilesList;
+    private long users_id[];
+    private int cnt = 0;
+    ProgressDialog mProgressDialog;
+    private boolean isActive = false;
+    private int ActiveUserID;
+
+    public static class RFIDReadAction {
 		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
 		public static final int READ_EQUIPMENT_TAG_BEFORE_OPERATION = 2;
 	}
@@ -75,11 +141,12 @@ public class MainActivity extends FragmentActivity {
 								.getInstance().getTagId());
 						// в зависимости от результата либо дать работать, либо
 						// не дать
-						if (user != null && user.isActive()) {
+						if (user != null) {
+                            users.setActiveUser(user.get_id());
 							isLogged = true;
 							AuthorizedUser.getInstance()
 									.setUuid(user.getUuid());
-							setMainLayout();
+							setMainLayout(savedInstance);
 						} else {
 							Toast.makeText(getApplicationContext(),
 									"Нет доступа.", Toast.LENGTH_LONG).show();
@@ -107,6 +174,7 @@ public class MainActivity extends FragmentActivity {
 			int provider = intent.getIntExtra(
 					ProcessorService.Extras.PROVIDER_EXTRA, 0);
 			Log.d(TAG, "" + provider);
+			
 			if (provider == ProcessorService.Providers.TOKEN_PROVIDER) {
 				int method = intent.getIntExtra(
 						ProcessorService.Extras.METHOD_EXTRA, 0);
@@ -142,7 +210,7 @@ public class MainActivity extends FragmentActivity {
 							isLogged = true;
 							AuthorizedUser.getInstance()
 									.setUuid(user.getUuid());
-							setMainLayout();
+							setMainLayout(savedInstance);
 						} else {
 							Toast.makeText(getApplicationContext(),
 									"Нет доступа.", Toast.LENGTH_LONG).show();
@@ -161,9 +229,8 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
-
+		savedInstance = savedInstanceState;
 		// инициализация приложения
 		init();
 
@@ -193,7 +260,7 @@ public class MainActivity extends FragmentActivity {
 					splashShown = true;
 
 					if (isLogged) {
-						setMainLayout();
+						setMainLayout(savedInstance);
 					} else {
 						setContentView(R.layout.login_layout);
 					}
@@ -201,7 +268,7 @@ public class MainActivity extends FragmentActivity {
 			}, 3000);
 		} else {
 			if (isLogged) {
-				setMainLayout();
+				setMainLayout(savedInstanceState);
 			} else {
 				setContentView(R.layout.login_layout);
 			}
@@ -307,14 +374,162 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Устанавливам основной экран приложения
 	 */
-	void setMainLayout() {
-		setContentView(R.layout.main_layout);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		pager = (ViewPager) findViewById(R.id.pager);
-		pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
+	//@SuppressWarnings("deprecation")
+	void setMainLayout(Bundle savedInstanceState) {
+		setContentView(R.layout.activity_main);
+
+        // Handle Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundResource(R.drawable.header);
+        toolbar.setSubtitle("Обслуживание и ремонт");
+        //set the back arrow in the toolbar
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.app_name);
+
+        iprofilelist = new ArrayList<>();
+        users_id = new long[MAX_USER_PROFILE];
+
+        // Create the AccountHeader
+        headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(
+                        new ProfileSettingDrawerItem().withName("Добавить пользователя").withDescription("Добавить пользователя").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_plus)).withIdentifier(PROFILE_SETTING),
+                        new ProfileSettingDrawerItem().withName("Редактировать пользователей").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings))
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
+                        if (profile instanceof IDrawerItem && profile.getIdentifier() == PROFILE_ADD) {
+                            currentFragment = FRAGMENT_USER;
+                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentAddUser.newInstance("AddProfile")).commit();
+                        }
+                        if (profile instanceof IDrawerItem && profile.getIdentifier() == PROFILE_SETTINGS) {
+                            currentFragment = FRAGMENT_USER;
+                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile")).commit();
+                        }
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .build();
+
+        fillProfileList();
+
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withHasStableIds(true)
+                .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_USERS).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_xbox).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_references).withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false),
+                        new DividerDrawerItem(),
+                        new SecondarySwitchDrawerItem().withName("Доступ к серверу").withIcon(Octicons.Icon.oct_tools).withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener).withIdentifier(DRAWER_ONLINE),
+                        new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false),
+                        new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false),
+                        new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false),
+                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == FRAGMENT_CAMERA) {
+                                currentFragment = FRAGMENT_CAMERA;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, NativeCameraFragment.newInstance("")).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
+                                currentFragment = FRAGMENT_CHARTS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance("")).commit();
+                            } else if (drawerItem.getIdentifier() == DRAWER_DOWNLOAD) {
+                                currentFragment = FRAGMENT_OTHER;
+                                mProgressDialog = new ProgressDialog(MainActivity.this);
+                                mProgressDialog.setMessage("Синхронизируем данные");
+                                mProgressDialog.setIndeterminate(true);
+                                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                mProgressDialog.setCancelable(true);
+                                final Downloader downloaderTask = new Downloader(getApplicationContext(), MainActivity.this);
+                                if (downloaderTask != null) {
+                                    downloaderTask.execute();
+                                    mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            downloaderTask.cancel(true);
+                                        }
+                                    });
+                                }
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {
+                                currentFragment = FRAGMENT_EQUIPMENT;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_GPS) {
+                                currentFragment = FRAGMENT_GPS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_TASKS) {
+                                currentFragment = FRAGMENT_TASKS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, TaskFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_REFERENCES) {
+                                currentFragment = FRAGMENT_REFERENCES;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReferenceFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_USERS) {
+                                currentFragment = FRAGMENT_USERS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
+                                new AlertDialog.Builder(view.getContext())
+                                        .setTitle("Информация о программе")
+                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_info)
+                                        .show();
+                            } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
+                                System.exit(0);
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .build();
+
+        //if you have many different types of DrawerItems you can magically pre-cache those items to get a better scroll performance
+        //make sure to init the cache after the DrawerBuilder was created as this will first clear the cache to make sure no old elements are in
+        RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
+        //only set the active selection or active profile if we do not recreate the activity
+        if (savedInstanceState == null) {
+            // set the selection to the item with the identifier 11
+            result.setSelection(21, false);
+            //set the active profile
+            if (iprofilelist.size() > 0) {
+                for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
+                    if (ActiveUserID > 0 && iprofilelist.get(cnt).getIdentifier() == ActiveUserID + 2)
+                        headerResult.setActiveProfile(iprofilelist.get(cnt));
+                }
+            }
+        }
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+
+        if (ActiveUserID <= 0) {
+            Toast.makeText(getApplicationContext(),
+                    "Пожалуйста зарегистрируйтесь", Toast.LENGTH_LONG).show();
+        }
+        //((ViewGroup) findViewById(R.id.frame_container)).addView(result.getSlider());
+		//pager = (ViewPager) findViewById(R.id.pager);
+		//pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
 		// Bind the tabs to the ViewPager
-		PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-		tabs.setViewPager(pager);
+		//PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+		//tabs.setViewPager(pager);
 	}
 
 	/**
@@ -352,7 +567,7 @@ public class MainActivity extends FragmentActivity {
 		file.mkdirs();
 		File outputFile = new File(path, "Toir-mobile.apk");
 
-		Downloader d = new Downloader(MainActivity.this);
+		Downloader d = new Downloader(getApplicationContext(), MainActivity.this);
 		d.execute(updateUrl, outputFile.toString());
 	}
 
@@ -446,4 +661,84 @@ public class MainActivity extends FragmentActivity {
 		return super.onKeyDown(keyCode, event);
 	}
 
+    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+            UsersDBAdapter users = new UsersDBAdapter(
+                    new ToirDatabaseContext(getApplicationContext()));
+            Users user = users.getActiveUser();
+
+            if (drawerItem.getIdentifier() == 12) {
+                if (isChecked) {
+                    isActive = true;
+                    user.setActive(true);
+                    users.replaceItem(user);
+                } else
+                    isActive = false;
+                user.setActive(false);
+                users.replaceItem(user);
+            }
+        }
+    };
+
+    private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
+        @Override
+        public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+            return false;
+        }
+    };
+
+    /* функция заполняет массив профилей - пользователей */
+
+    public void fillProfileList() {
+        UsersDBAdapter users = new UsersDBAdapter(
+                new ToirDatabaseContext(getApplicationContext()));
+        profilesList = users.getAllItems();
+        cnt = 0;
+        for (Users item : profilesList) {
+            addProfile(item);
+            users_id[cnt] = item.get_id();
+            cnt = cnt + 1;
+            if (cnt > MAX_USER_PROFILE) break;
+        }
+    }
+
+    public void addProfile(Users item) {
+        IProfile new_profile;
+        String target_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator + item.getImage();
+        File imgFile = new File(target_filename);
+        if (imgFile.exists()) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            // first two elements reserved
+            new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(myBitmap).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
+        } else
+            new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(R.drawable.profile_default_small).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
+        iprofilelist.add(new_profile);
+        headerResult.addProfile(new_profile, headerResult.getProfiles().size());
+    }
+
+    public void refreshProfileList() {
+        UsersDBAdapter users = new UsersDBAdapter(
+                new ToirDatabaseContext(getApplicationContext()));
+        profilesList = users.getAllItems();
+        cnt = 0;
+        for (Users item : profilesList) {
+            users_id[cnt] = item.get_id();
+            cnt = cnt + 1;
+            if (cnt > MAX_USER_PROFILE) break;
+        }
+    }
+
+    public void deleteProfile(int id) {
+        int id_remove;
+        for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
+            if (users_id[cnt] == id) {
+                iprofilelist.remove(cnt);
+                //headerResult.removeProfile(cnt);
+                id_remove=(int)(users_id[cnt]+2);
+                headerResult.removeProfileByIdentifier(id_remove);
+            }
+        }
+        refreshProfileList();
+    }
 }
