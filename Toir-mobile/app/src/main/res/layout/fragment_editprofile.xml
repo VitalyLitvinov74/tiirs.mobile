@@ -28,6 +28,7 @@
                 android:layout_gravity="start"
                 android:layout_weight="1"
                 android:hint="@string/profile_image" />
+
 	        <ImageView android:id="@+id/profile_add_image"
 	            android:layout_width="wrap_content"
                 android:layout_gravity="start"

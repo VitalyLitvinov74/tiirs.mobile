@@ -143,6 +143,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/black"
                     android:text="@string/id"
+                    android:padding="3dip"
                     android:textSize="16sp" />
             </TableRow>
 
@@ -155,6 +156,8 @@
                     android:id="@+id/user_text_date_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#222244"
+                    android:padding="3dip"
                     android:text="@string/server_date_connect"
                     android:textSize="16sp" />
 
@@ -163,6 +166,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="05-10-2015 22:45"
+                    android:padding="3dip"
                     android:textSize="16sp" />
             </TableRow>
 
@@ -175,6 +179,8 @@
                     android:id="@+id/user_text_tasks_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#222244"
+                    android:padding="3dip"
                     android:text="@string/tasks_quantity"
                     android:textSize="16sp" />
 
@@ -182,6 +188,7 @@
                     android:id="@+id/user_text_tasks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="3dip"
                     android:layout_gravity="center"
                     android:textSize="16sp" />
             </TableRow>
@@ -195,11 +202,14 @@
                     android:id="@+id/user_text_boss_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#222244"
+                    android:padding="3dip"
                     android:text="@string/boss_contact"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/user_text_boss"
+                    android:padding="3dip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp" />
@@ -214,6 +224,8 @@
                     android:id="@+id/user_text_gprs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#222244"
+                    android:padding="3dip"
                     android:layout_weight="0.25"
                     android:text="@string/gprsstatus"
                     android:textSize="16sp" />
@@ -236,6 +248,8 @@
                     android:id="@+id/user_text_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="#222244"
+                    android:padding="3dip"
                     android:layout_weight="0.25"
                     android:text="@string/gpsstatus"
                     android:textSize="16sp" />

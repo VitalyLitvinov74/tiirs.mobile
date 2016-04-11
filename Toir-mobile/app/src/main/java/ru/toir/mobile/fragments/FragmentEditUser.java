@@ -55,7 +55,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         name = (EditText) view.findViewById(R.id.profile_add_name);
         login = (EditText) view.findViewById(R.id.profile_add_login);
         pass = (EditText) view.findViewById(R.id.profile_add_password);
-        login.setEnabled(false);
+        //login.setEnabled(false);
 
         UsersDBAdapter users = new UsersDBAdapter(
                 new ToirDatabaseContext(getActivity().getApplicationContext()));
@@ -137,7 +137,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Long id = users.replaceItem(user.getUuid(),name.getText().toString(), user.getLogin(),user.getPass(),user.getType(),user.getTag_id(),true,user.getWhois(),user.getImage(), false);
+                Long id = users.replaceItem(user.getUuid(),name.getText().toString(), login.getText().toString(),user.getPass(),user.getType(),user.getTag_id(),true,user.getWhois(),user.getImage(), false);
                 if (id>0)
                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("Welcome")).commit();
                 break;

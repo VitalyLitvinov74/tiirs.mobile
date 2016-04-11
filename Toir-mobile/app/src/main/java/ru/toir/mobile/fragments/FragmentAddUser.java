@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
@@ -56,11 +54,11 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
         typeSpinner = (Spinner) view.findViewById(R.id.profile_add_type);
         whoSpinner = (Spinner) view.findViewById(R.id.profile_add_whois);
 
-        ArrayAdapter<String> langSpinnerAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                new ArrayList<String>());
-        typeSpinner.setAdapter(langSpinnerAdapter);
-        whoSpinner.setAdapter(langSpinnerAdapter);
+        //ArrayAdapter<String> langSpinnerAdapter = new ArrayAdapter<>(getContext(),
+        //        android.R.layout.simple_spinner_dropdown_item,
+        //        new ArrayList<String>());
+        //typeSpinner.setAdapter(langSpinnerAdapter);
+        //whoSpinner.setAdapter(langSpinnerAdapter);
 
         name = (EditText) view.findViewById(R.id.profile_add_name);
         login = (EditText) view.findViewById(R.id.profile_add_login);

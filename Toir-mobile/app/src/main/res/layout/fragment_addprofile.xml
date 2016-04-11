@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:orientation="vertical">
+
         <EditText
             android:id="@+id/profile_add_name"
             android:layout_width="wrap_content"
@@ -40,12 +41,16 @@
             android:id="@+id/profile_add_type"
             android:layout_height="wrap_content"
             android:entries="@array/profile_type"
+            android:height="30sp"
+            android:padding="5dip"
             android:prompt="@string/profile_type"
             android:layout_width="match_parent"/>
         <Spinner
             android:id="@+id/profile_add_whois"
             android:layout_height="wrap_content"
             android:entries="@array/profile_whois"
+            android:height="30sp"
+            android:padding="5dip"
             android:prompt="@string/profile_whois"
             android:layout_width="match_parent"/>
 

@@ -40,6 +40,8 @@ public class UserInfoFragment extends Fragment {
 	private TextView tv_user_gps;
 	private TextView tv_user_status;
 	private ImageView user_image;
+    private ImageView user_status_gps;
+    private ImageView user_status_gprs;
 
 	private TextView tv_user_date;
 	private TextView tv_user_tasks;
@@ -81,6 +83,11 @@ public class UserInfoFragment extends Fragment {
 		tv_user_tasks = (TextView) view.findViewById(R.id.user_text_tasks);
 		tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
 
+        user_status_gps = (ImageView) view.findViewById(R.id.user_status_gps);
+        user_status_gprs = (ImageView) view.findViewById(R.id.user_status_gprs);
+
+        user_status_gprs.setImageResource(R.drawable.ic_stat_name);
+        user_status_gps.setImageResource(R.drawable.ic_action_name);
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
 		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
