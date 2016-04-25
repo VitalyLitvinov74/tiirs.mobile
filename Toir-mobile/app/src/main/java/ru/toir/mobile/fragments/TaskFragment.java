@@ -125,7 +125,7 @@ public class TaskFragment extends Fragment {
 						 * (которые изменили свой статус на "В работе")
 						 */
 
-						// сообщаем количество полученных нарядов
+						// ообщаем количество полученных нарядов
 						int count = bundle
 								.getInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT);
 						if (count > 0) {

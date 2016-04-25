@@ -21,11 +21,9 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 	ProgressDialog dialog;
 	Context context;
 	File outputFile;
-    private MainActivity activity;
 
-    public Downloader(Context d, MainActivity a) {
+    public Downloader(Context d) {
 		context = d;
-        this.activity = a;
 		dialog = new ProgressDialog(context);
 		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена", new DialogInterface.OnClickListener() {
 			@Override
@@ -109,6 +107,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 	protected void onPreExecute() {
 		super.onPreExecute();
 		dialog.show();
+        dialog.setMax(100);
 	}
 
 	/* (non-Javadoc)

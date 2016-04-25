@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 							setMainLayout(savedInstance);
 						} else {
 							Toast.makeText(getApplicationContext(),
-									"Нет доступа.", Toast.LENGTH_LONG).show();
+                                    "Нет доступа.", Toast.LENGTH_LONG).show();
 
 						}
 					} else {
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 						String message = bundle
 								.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getApplicationContext(), message,
-								Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_LONG).show();
 					}
 					authorizationDialog.dismiss();
 				}
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 						usersServiceHelper.getUser();
 
 						Toast.makeText(getApplicationContext(),
-								"Токен получен.", Toast.LENGTH_SHORT).show();
+                                "Токен получен.", Toast.LENGTH_SHORT).show();
 					} else {
 						// TODO реализовать проверку на то что пользователя нет
 						// на сервере
@@ -212,13 +212,13 @@ public class MainActivity extends AppCompatActivity {
 							setMainLayout(savedInstance);
 						} else {
 							Toast.makeText(getApplicationContext(),
-									"Нет доступа.", Toast.LENGTH_LONG).show();
+                                    "Нет доступа.", Toast.LENGTH_LONG).show();
 						}
 
 						String message = bundle
 								.getString(IServiceProvider.MESSAGE);
 						Toast.makeText(getApplicationContext(), message,
-								Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_LONG).show();
 						authorizationDialog.dismiss();
 					}
 				}
@@ -296,20 +296,20 @@ public class MainActivity extends AppCompatActivity {
 			Log.d(TAG, "db.version=" + helper.getVersion());
 			if (!helper.isDBActual()) {
 				Toast toast = Toast.makeText(this, "База данных не актуальна!",
-						Toast.LENGTH_LONG);
+                        Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.CENTER, 0, 0);
 				toast.show();
 			} else {
 				Toast toast = Toast.makeText(this, "База данных актуальна!",
-						Toast.LENGTH_SHORT);
+                        Toast.LENGTH_SHORT);
 				toast.setGravity(Gravity.BOTTOM, 0, 0);
 				toast.show();
 				success = true;
 			}
 		} catch (Exception e) {
 			Toast toast = Toast.makeText(this,
-					"Не удалось открыть/обновить базу данных!",
-					Toast.LENGTH_LONG);
+                    "Не удалось открыть/обновить базу данных!",
+                    Toast.LENGTH_LONG);
 			toast.setGravity(Gravity.BOTTOM, 0, 0);
 			toast.show();
 		}
@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
 				} else {
 					// по кодам из RFID можно показать более подробные сообщения
 					Toast.makeText(getApplicationContext(),
-							"Операция прервана", Toast.LENGTH_SHORT).show();
+                            "Операция прервана", Toast.LENGTH_SHORT).show();
 				}
 
 				// закрываем диалог
@@ -408,6 +408,20 @@ public class MainActivity extends AppCompatActivity {
                             currentFragment = FRAGMENT_USER;
                             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile")).commit();
                         }
+                        if (profile instanceof IDrawerItem && profile.getIdentifier() > PROFILE_SETTINGS) {
+                            int profileId = profile.getIdentifier() - 2;
+                            int profile_pos=0;
+                            for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++)
+                                if (users_id[profile_pos] == profileId) break;
+
+                            UsersDBAdapter profileDBAdapter = new UsersDBAdapter(
+                                    new ToirDatabaseContext(getApplicationContext()));
+                            headerResult.setActiveProfile(iprofilelist.get(profile_pos));
+                            profileDBAdapter.setActiveUser(profilesList.get(profile_pos).get_id());
+                            profilesList.get(profile_pos).setActive(true);
+                            currentFragment=FRAGMENT_USER;
+                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                        }
                         return false;
                     }
                 })
@@ -449,21 +463,32 @@ public class MainActivity extends AppCompatActivity {
                                 currentFragment = FRAGMENT_CHARTS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance("")).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_DOWNLOAD) {
-                                currentFragment = FRAGMENT_OTHER;
+                                currentFragment = DRAWER_DOWNLOAD;
                                 mProgressDialog = new ProgressDialog(MainActivity.this);
                                 mProgressDialog.setMessage("Синхронизируем данные");
                                 mProgressDialog.setIndeterminate(true);
                                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 mProgressDialog.setCancelable(true);
-                                final Downloader downloaderTask = new Downloader(getApplicationContext(), MainActivity.this);
+                                final Downloader downloaderTask = new Downloader(MainActivity.this);
                                 if (downloaderTask != null) {
-                                    downloaderTask.execute();
-                                    mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialog) {
-                                            downloaderTask.cancel(true);
-                                        }
-                                    });
+                                    SharedPreferences sp = PreferenceManager
+                                            .getDefaultSharedPreferences(getApplicationContext());
+                                    String updateUrl = sp.getString(getString(R.string.updateUrl), "");
+
+                                    if (!updateUrl.equals("")) {
+                                        String path = Environment.getExternalStorageDirectory() + "/Download/";
+                                        File file = new File(path);
+                                        file.mkdirs();
+                                        File outputFile = new File(path, "Toir-mobile.apk");
+
+                                        downloaderTask.execute(updateUrl, outputFile.toString());
+                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                downloaderTask.cancel(true);
+                                            }
+                                        });
+                                    }
                                 }
                             } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
@@ -555,7 +580,7 @@ public class MainActivity extends AppCompatActivity {
 
 		if (updateUrl.equals("")) {
 			Toast toast = Toast.makeText(this, "Не указан URL для обновления!",
-					Toast.LENGTH_SHORT);
+                    Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
 			return;
@@ -566,7 +591,7 @@ public class MainActivity extends AppCompatActivity {
 		file.mkdirs();
 		File outputFile = new File(path, "Toir-mobile.apk");
 
-		Downloader d = new Downloader(getApplicationContext(), MainActivity.this);
+		Downloader d = new Downloader(MainActivity.this);
 		d.execute(updateUrl, outputFile.toString());
 	}
 
