@@ -765,4 +765,10 @@ public class MainActivity extends AppCompatActivity {
         }
         refreshProfileList();
     }
+
+    public void mOnClickMethod(View view) {
+        //openOptionsMenu();
+        Intent i = new Intent(MainActivity.this, ToirPreferences.class);
+        startActivity(i);
+    }
 }
