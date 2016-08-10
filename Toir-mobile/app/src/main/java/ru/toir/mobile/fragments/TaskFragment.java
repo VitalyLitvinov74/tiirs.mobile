@@ -1,42 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
-import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.OperationActivity;
-import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.SortField;
-import ru.toir.mobile.db.adapters.BaseDBAdapter;
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
-import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
-import ru.toir.mobile.db.adapters.TaskDBAdapter;
-import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
-import ru.toir.mobile.db.tables.CriticalType;
-import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.db.tables.OperationStatus;
-import ru.toir.mobile.db.tables.Task;
-import ru.toir.mobile.db.tables.Users;
-import ru.toir.mobile.db.tables.OperationType;
-import ru.toir.mobile.rest.IServiceProvider;
-import ru.toir.mobile.rest.ProcessorService;
-import ru.toir.mobile.rest.TaskServiceHelper;
-import ru.toir.mobile.rest.TaskServiceProvider;
-import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.RfidDriverBase;
-import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
-import ru.toir.mobile.serverapi.result.TaskRes;
-import ru.toir.mobile.utils.DataUtils;
-import ru.toir.mobile.db.tables.TaskStatus;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -68,6 +31,44 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.OperationActivity;
+import ru.toir.mobile.R;
+import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.SortField;
+import ru.toir.mobile.db.adapters.BaseDBAdapter;
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.tables.CriticalType;
+import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.OperationStatus;
+import ru.toir.mobile.db.tables.OperationType;
+import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.TaskStatus;
+import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.rest.IServiceProvider;
+import ru.toir.mobile.rest.ProcessorService;
+import ru.toir.mobile.rest.TaskServiceHelper;
+import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
+import ru.toir.mobile.serverapi.result.TaskRes;
+import ru.toir.mobile.utils.DataUtils;
+
 public class TaskFragment extends Fragment {
 
 	private String TAG = "TaskFragment";
@@ -92,7 +93,11 @@ public class TaskFragment extends Fragment {
 	private ProgressDialog processDialog;
 	private RfidDialog rfidDialog;
 
-	// фильтр для получения сообщений при получении нарядов с сервера
+    public static TaskFragment newInstance() {
+        return (new TaskFragment());
+    }
+
+    // фильтр для получения сообщений при получении нарядов с сервера
 	private IntentFilter mFilterGetTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_GET_TASK);
 	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
@@ -120,7 +125,7 @@ public class TaskFragment extends Fragment {
 						 * (которые изменили свой статус на "В работе")
 						 */
 
-						// сообщаем количество полученных нарядов
+						// ообщаем количество полученных нарядов
 						int count = bundle
 								.getInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT);
 						if (count > 0) {

@@ -38,7 +38,7 @@
     <string name="description">описание</string>
     <string name="id">ID</string>
     <string name="whois">Должность</string>
-    <string name="current_location">Текущие координаты:</string>
+    <string name="current_location">Координаты:</string>
     <string name="no_gps_data">Нет данных GPS</string>
     <string name="current_status">Текущий статус</string>
     <string name="gpsstatus">Состояние GPS</string>
@@ -71,5 +71,29 @@
     <string name="application_full_name">Мобильный ТОиР</string>
     <string name="open_documentation">Открыть документацию</string>
     <string name="title_activity_btserver">BTServerActivity</string>
+    <string name="profile_tagid">Метка карточки</string>
+    <string name="profile_add_name">Имя пользователя</string>
+    <string name="profile_image">Изображение аватар</string>
+
+    <string name="profile_type">Тип пользователя</string>
+    <string name="profile_whois">Должность</string>
+    <string name="profile_login">Логин</string>
+    <string name="profile_password">Пароль</string>
+    <string name="profile_submit_button">Добавить</string>
+    <string name="profile_submit_delete">Удалить пользователя</string>
+
+    <string name="menu">Настройки</string>
+    <string name="menu_camera">Тест камеры</string>
+    <string name="menu_charts">Тест графиков</string>
+    <string name="menu_equipment">Оборудование</string>
+    <string name="menu_gps">Карта</string>
+    <string name="menu_tasks">Задачи</string>
+    <string name="menu_references">Справочники</string>
+    <string name="menu_users">Пользователи</string>
+
+    <string name="profile_type_administrator">Администратор</string>
+    <string name="profile_type_engeneer">Пользователь</string>
+    <string name="profile_whois_shef">Начальник</string>
+    <string name="profile_whois_engeneer">Инженер</string>
 
 </resources>

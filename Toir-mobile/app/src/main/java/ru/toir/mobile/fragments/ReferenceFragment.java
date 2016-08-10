@@ -1,35 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.SortField;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
-import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
-import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
-import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
-import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.tables.Equipment;
-import ru.toir.mobile.db.tables.EquipmentStatus;
-import ru.toir.mobile.db.tables.EquipmentType;
-import ru.toir.mobile.db.tables.CriticalType;
-import ru.toir.mobile.db.tables.MeasureType;
-import ru.toir.mobile.db.tables.DocumentationType;
-import ru.toir.mobile.db.tables.EquipmentDocumentation;
-import ru.toir.mobile.db.tables.OperationResult;
-import ru.toir.mobile.db.tables.OperationType;
-import ru.toir.mobile.db.tables.TaskStatus;
-import ru.toir.mobile.rest.IServiceProvider;
-import ru.toir.mobile.rest.ProcessorService;
-import ru.toir.mobile.rest.ReferenceServiceHelper;
-import ru.toir.mobile.rest.ReferenceServiceProvider;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,12 +16,44 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
-import android.widget.ListView;
-import android.widget.ArrayAdapter;
-import android.widget.SimpleAdapter;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import ru.toir.mobile.R;
+import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.SortField;
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.tables.CriticalType;
+import ru.toir.mobile.db.tables.DocumentationType;
+import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
+import ru.toir.mobile.db.tables.EquipmentStatus;
+import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.db.tables.MeasureType;
+import ru.toir.mobile.db.tables.OperationResult;
+import ru.toir.mobile.db.tables.OperationType;
+import ru.toir.mobile.db.tables.TaskStatus;
+import ru.toir.mobile.rest.IServiceProvider;
+import ru.toir.mobile.rest.ProcessorService;
+import ru.toir.mobile.rest.ReferenceServiceHelper;
+import ru.toir.mobile.rest.ReferenceServiceProvider;
 
 public class ReferenceFragment extends Fragment {
 
@@ -96,6 +98,10 @@ public class ReferenceFragment extends Fragment {
 			}
 		}
 	};
+
+    public static ReferenceFragment newInstance() {
+        return (new ReferenceFragment());
+    }
 
 	/*
 	 * (non-Javadoc)

@@ -10,7 +10,7 @@
         <item>Результаты операций:operation_result</item>
         <item>Типы операций:operation_type</item>
         <item>Статусы нарядов:task_status</item>
-        <item>Состояния оборудования:equipment_status</item>
+        <item>Состояния:equipment_status</item>
     </string-array>
 
 </resources>

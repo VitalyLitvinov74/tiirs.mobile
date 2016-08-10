@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="profile_type">
+        <item>@string/profile_type_administrator</item>
+        <item>@string/profile_type_engeneer</item>
+    </string-array>
+    <string-array name="profile_whois">
+        <item>@string/profile_whois_shef</item>
+        <item>@string/profile_whois_engeneer</item>
+    </string-array>
+
+</resources>

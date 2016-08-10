@@ -14,5 +14,6 @@
         <attr name="pstsShouldExpand" format="boolean" />
         <attr name="pstsTextAllCaps" format="boolean" />
     </declare-styleable>
+	<color name="colorPrimary">#3E50B4</color>
 
 </resources>

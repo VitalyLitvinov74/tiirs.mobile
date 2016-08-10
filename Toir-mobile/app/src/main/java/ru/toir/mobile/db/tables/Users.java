@@ -18,6 +18,7 @@ public class Users {
 	private String tag_id;
 	private boolean active;
 	private String whois;
+    private String image;
 
 	/**
 	 * 
@@ -33,7 +34,7 @@ public class Users {
 	}
 
 	/**
-	 * @param _id the _id to set
+	 * @param uuid the _id to set
 	 */
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
@@ -159,10 +160,24 @@ public class Users {
 	}
 
 	/**
-	 * @param whois the whois to set
+	 * @param image the image to set
 	 */
-	public void setWhois(String whois) {
-		this.whois = whois;
+	public void setImage(String image) {
+		this.image = image;
 	}
+
+    /**
+     * @return the image
+     */
+    public String getImage() {
+        return image;
+    }
+
+    /**
+     * @param whois the whois to set
+     */
+    public void setWhois(String whois) {
+        this.whois = whois;
+    }
 
 }

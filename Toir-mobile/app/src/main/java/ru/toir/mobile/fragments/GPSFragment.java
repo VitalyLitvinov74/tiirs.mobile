@@ -1,14 +1,10 @@
 package ru.toir.mobile.fragments;
 
-import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -21,22 +17,32 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Bundle;
-import org.osmdroid.views.overlay.OverlayItem;
+
 import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.R;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.adapters.TaskDBAdapter;
-import ru.toir.mobile.db.tables.*;
+import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.location.LocationManager;
-import android.location.Location;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
 
 public class GPSFragment extends Fragment {
 
@@ -51,7 +57,14 @@ public class GPSFragment extends Fragment {
 	// private SimpleCursorAdapter equipmentAdapter;
 	private int LastItemPosition = -1;
 
-	/**
+    public GPSFragment() {
+    }
+
+    public static GPSFragment newInstance() {
+        return (new GPSFragment());
+    }
+
+    /**
 	 * Класс объекта оборудования для отображения на крате
 	 * 
 	 * @author koputo

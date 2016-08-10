@@ -1,15 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.*;
-import ru.toir.mobile.db.tables.*;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -19,12 +9,28 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import ru.toir.mobile.utils.DataUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.R;
+import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.adapters.GPSDBAdapter;
+import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.tables.GpsTrack;
+import ru.toir.mobile.db.tables.Task;
+import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.utils.DataUtils;
 
 public class UserInfoFragment extends Fragment {
 
@@ -34,12 +40,18 @@ public class UserInfoFragment extends Fragment {
 	private TextView tv_user_gps;
 	private TextView tv_user_status;
 	private ImageView user_image;
+    private ImageView user_status_gps;
+    private ImageView user_status_gprs;
 
 	private TextView tv_user_date;
 	private TextView tv_user_tasks;
 	private TextView tv_user_boss;
 
-	/*
+    public static UserInfoFragment newInstance() {
+        return (new UserInfoFragment());
+    }
+
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -71,6 +83,11 @@ public class UserInfoFragment extends Fragment {
 		tv_user_tasks = (TextView) view.findViewById(R.id.user_text_tasks);
 		tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
 
+        user_status_gps = (ImageView) view.findViewById(R.id.user_status_gps);
+        user_status_gprs = (ImageView) view.findViewById(R.id.user_status_gprs);
+
+        user_status_gprs.setImageResource(R.drawable.ic_stat_name);
+        user_status_gps.setImageResource(R.drawable.ic_action_name);
 		String tagId = AuthorizedUser.getInstance().getTagId();
 
 		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(

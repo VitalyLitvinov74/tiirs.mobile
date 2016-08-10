@@ -1,13 +1,5 @@
 package ru.toir.mobile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,13 +8,21 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class Downloader extends AsyncTask<String, Integer, String> {
 	
 	ProgressDialog dialog;
 	Context context;
 	File outputFile;
-	
-	public Downloader(Context d) {
+
+    public Downloader(Context d) {
 		context = d;
 		dialog = new ProgressDialog(context);
 		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена", new DialogInterface.OnClickListener() {
@@ -36,7 +36,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		dialog.setCancelable(false);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.os.AsyncTask#doInBackground(Params[])
 	 */
@@ -107,6 +107,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 	protected void onPreExecute() {
 		super.onPreExecute();
 		dialog.show();
+        dialog.setMax(100);
 	}
 
 	/* (non-Javadoc)

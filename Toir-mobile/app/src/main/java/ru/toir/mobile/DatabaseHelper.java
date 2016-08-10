@@ -3,17 +3,17 @@
  */
 package ru.toir.mobile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * @author Dmitriy Logachov
@@ -26,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static Context sContext;
 	private String updatePath = "updatedb";
 	private static final String DATABASE_NAME = "toir.db";
-	private static final int DATABASE_VERSION = 28;
+	private static final int DATABASE_VERSION = 29;
 
 	public static synchronized DatabaseHelper getInstance(Context context) {
 

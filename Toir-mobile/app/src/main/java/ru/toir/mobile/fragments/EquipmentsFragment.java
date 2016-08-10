@@ -1,17 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import java.util.ArrayList;
-import ru.toir.mobile.R;
-import ru.toir.mobile.EquipmentInfoActivity;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.SortField;
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.tables.EquipmentType;
-import ru.toir.mobile.utils.DataUtils;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -28,6 +16,20 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import ru.toir.mobile.EquipmentInfoActivity;
+import ru.toir.mobile.R;
+import ru.toir.mobile.ToirDatabaseContext;
+import ru.toir.mobile.db.SortField;
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.utils.DataUtils;
+
 public class EquipmentsFragment extends Fragment {
 
 	private boolean isInit;
@@ -43,9 +45,8 @@ public class EquipmentsFragment extends Fragment {
 
 	private SimpleCursorAdapter equipmentAdapter;
 
-	public static EquipmentsFragment newInstance() {
-		EquipmentsFragment f = new EquipmentsFragment();
-		return f;
+    public static EquipmentsFragment newInstance() {
+		return new EquipmentsFragment();
 	}
 
 	/*
