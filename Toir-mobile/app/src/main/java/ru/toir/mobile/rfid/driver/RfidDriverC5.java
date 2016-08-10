@@ -18,8 +18,11 @@ import android.view.ViewGroup;
  *         текстового файла.
  *         </p>
  */
+@SuppressWarnings("unused")
+// объект класса создаётся не напрямую
 public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
-
+	@SuppressWarnings("unused")
+    // к этому свойству обращаемся не на прямую
 	public static final String DRIVER_NAME = "Драйвер UHF C5";
 	private static final String TAG = "RfidDriverC5";
 
@@ -73,13 +76,12 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	public void close() {
 		reader.m_handler = null;
 		sHandler = null;
-		reader.Close();
+		//reader.Close();
 	}
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-		View view = inflater.inflate(R.layout.rfid_read, viewGroup);
-		return view;
+        return inflater.inflate(R.layout.rfid_read, viewGroup);
 	}
 
 	/**
@@ -93,7 +95,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		final int lAddress = address;
 		final int lCount = count;
 
-		Handler handler = new Handler(new Handler.Callback() {
+        reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
@@ -136,8 +138,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			}
 		});
 
-		reader.m_handler = handler;
-
 		// запускаем поиск метки
 		reader.readTagId(timeOut);
 
@@ -149,7 +149,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-		Handler handler = new Handler(new Handler.Callback() {
+        reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
@@ -169,8 +169,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			}
 		});
 
-		reader.m_handler = handler;
-
 		// запускаем чтение данных из метки
 		reader.readTagData(password, tagId, memoryBank, address, count, timeOut);
 	}
@@ -183,7 +181,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 		final int lAddress = address;
 		final String lData = data;
 
-		Handler handler = new Handler(new Handler.Callback() {
+        reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
@@ -223,8 +221,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			}
 		});
 
-		reader.m_handler = handler;
-
 		// запускаем поиск метки
 		reader.readTagId(timeOut);
 	}
@@ -232,7 +228,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-		Handler handler = new Handler(new Handler.Callback() {
+        reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
 			public boolean handleMessage(Message msg) {
@@ -251,7 +247,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 			}
 		});
 
-		reader.m_handler = handler;
 		reader.writeTagData(password, tagId, memoryBank, address, data, timeOut);
 	}
 }

@@ -38,15 +38,9 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 public class MainActivity extends FragmentActivity {
 
 	private static final String TAG = "MainActivity";
-	public static final int RETURN_CODE_READ_RFID = 1;
 	private boolean isLogged = false;
 	public ViewPager pager;
 	private RfidDialog rfidDialog;
-
-	public static class RFIDReadAction {
-		public static final int READ_USER_TAG_BEFORE_LOGIN = 1;
-		public static final int READ_EQUIPMENT_TAG_BEFORE_OPERATION = 2;
-	}
 
 	private ProgressDialog authorizationDialog;
 
@@ -68,7 +62,7 @@ public class MainActivity extends FragmentActivity {
 							ProcessorService.Extras.RESULT_EXTRA, false);
 					Bundle bundle = intent
 							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-					if (result == true) {
+					if (result) {
 						UsersDBAdapter users = new UsersDBAdapter(
 								new ToirDatabaseContext(getApplicationContext()));
 						Users user = users.getUserByTagId(AuthorizedUser
@@ -117,7 +111,7 @@ public class MainActivity extends FragmentActivity {
 					Bundle bundle = intent
 							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					Log.d(TAG, "" + result);
-					if (result == true) {
+					if (result) {
 						// запрашиваем актуальную информацию по пользователю
 						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(
 								getApplicationContext(),
@@ -221,7 +215,7 @@ public class MainActivity extends FragmentActivity {
 
 	public boolean initDB() {
 		boolean success = false;
-		DatabaseHelper helper = null;
+		DatabaseHelper helper;
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
@@ -320,7 +314,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Обработчик клика кнопки "Войти"
 	 * 
-	 * @param view
+	 * @param view Event's view
 	 */
 	public void onClickLogin(View view) {
 		startAuthorise();
@@ -329,7 +323,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Обработчик клика меню обновления приложения
 	 * 
-	 * @param menuItem
+	 * @param menuItem Элемент меню
 	 */
 	public void onActionUpdate(MenuItem menuItem) {
 
@@ -349,11 +343,11 @@ public class MainActivity extends FragmentActivity {
 
 		String path = Environment.getExternalStorageDirectory() + "/Download/";
 		File file = new File(path);
-		file.mkdirs();
-		File outputFile = new File(path, "Toir-mobile.apk");
-
-		Downloader d = new Downloader(MainActivity.this);
-		d.execute(updateUrl, outputFile.toString());
+		if (file.mkdirs()) {
+			File outputFile = new File(path, "Toir-mobile.apk");
+			Downloader d = new Downloader(MainActivity.this);
+			d.execute(updateUrl, outputFile.toString());
+		}
 	}
 
 	public void onActionSettings(MenuItem menuItem) {
@@ -440,9 +434,9 @@ public class MainActivity extends FragmentActivity {
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			// return true;
-		}
+//		if (keyCode == KeyEvent.KEYCODE_BACK) {
+//			 return true;
+//		}
 		return super.onKeyDown(keyCode, event);
 	}
 

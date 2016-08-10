@@ -10,3 +10,6 @@ c5lib/gen
 c5lib/obj
 c5lib/libs/armeabi
 c5lib/build
+*.iml
+.idea
+.gradle
