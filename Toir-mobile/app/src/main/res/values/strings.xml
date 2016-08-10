@@ -71,6 +71,7 @@
     <string name="application_full_name">Мобильный ТОиР</string>
     <string name="open_documentation">Открыть документацию</string>
     <string name="title_activity_btserver">BTServerActivity</string>
+
     <string name="profile_tagid">Метка карточки</string>
     <string name="profile_add_name">Имя пользователя</string>
     <string name="profile_image">Изображение аватар</string>

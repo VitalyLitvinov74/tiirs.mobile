@@ -18,5 +18,9 @@
         android:onClick="onActionAbout"
         android:orderInCategory="102"
         android:title="@string/action_about"/>
-
+    <item
+        android:id="@+id/btServer"
+        android:onClick="onActionBTServer"
+        android:title="Bluetooth сервер"/>
 </menu>
+

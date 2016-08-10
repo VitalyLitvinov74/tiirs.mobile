@@ -564,6 +564,17 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	/**
+	 * Обработчик клика меню запуска блютус сервера
+	 *
+	 * @param menuItem
+	 */
+	public void onActionBTServer(MenuItem menuItem) {
+		Log.d(TAG, "onActionBTServer");
+		Intent i = new Intent(MainActivity.this, BTServerActivity.class);
+		startActivity(i);
+	}
+
+	/**
 	 * Обработчик клика меню обновления приложения
 	 * 
 	 * @param menuItem Элемент меню

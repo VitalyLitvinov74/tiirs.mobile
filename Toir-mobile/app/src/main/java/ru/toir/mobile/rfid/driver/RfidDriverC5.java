@@ -149,6 +149,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
+
         reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
@@ -228,6 +229,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
+
         reader.m_handler = new Handler(new Handler.Callback() {
 
 			@Override
