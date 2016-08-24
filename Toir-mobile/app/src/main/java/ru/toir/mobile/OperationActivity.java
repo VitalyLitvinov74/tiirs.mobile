@@ -3,6 +3,48 @@
  */
 package ru.toir.mobile;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,41 +78,10 @@ import ru.toir.mobile.db.tables.OperationResult;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.Task;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.NumberPicker;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
 /**
  * @author Dmitriy Logachov
  */
-public class OperationActivity extends Activity {
+public class OperationActivity extends AppCompatActivity {
 
     private static final String TAG = "OperationActivity";
 
@@ -78,6 +89,11 @@ public class OperationActivity extends Activity {
     public static final String TASK_UUID_EXTRA = "task_uuid";
     public static final String EQUIPMENT_UUID_EXTRA = "equipment_uuid";
     public static final String EQUIPMENT_TAG_EXTRA = "equipment_tag";
+
+    private AccountHeader headerResult = null;
+    private static final int DRAWER_INFO = 13;
+    private static final int DRAWER_EXIT = 14;
+    private Drawer result = null;
 
     private OperationPattern pattern;
     private ArrayList<OperationPatternStep> patternSteps;
@@ -149,8 +165,9 @@ public class OperationActivity extends Activity {
         operation_uuid = b.getString(OPERATION_UUID_EXTRA);
         taskUuid = b.getString(TASK_UUID_EXTRA);
         equipment_uuid = b.getString(EQUIPMENT_UUID_EXTRA);
-        setContentView(R.layout.taskwork_fragment);
+        //setContentView(R.layout.taskwork_fragment);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setMainLayout(savedInstanceState);
 
         resultButtonLayout = (LinearLayout) findViewById(R.id
                 .twf_resultButtonLayout);
@@ -886,4 +903,76 @@ public class OperationActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+
+    /**
+     * Устанавливам основной экран приложения
+     */
+    //@SuppressWarnings("deprecation")
+    void setMainLayout(Bundle savedInstanceState) {
+        setContentView(R.layout.taskwork_fragment);
+
+        // Handle Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundResource(R.drawable.header);
+        toolbar.setSubtitle("Обслуживание и ремонт");
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setTitle(R.string.app_name);
+        }
+
+        // Create the AccountHeader
+        headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .withSavedInstance(savedInstanceState)
+                .build();
+
+        //iprofilelist = new ArrayList<>();
+        //users_id = new long[MAX_USER_PROFILE];
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withHasStableIds(true)
+                .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false),
+                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == DRAWER_INFO) {
+                                new AlertDialog.Builder(view.getContext())
+                                        .setTitle("Информация о программе")
+                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_info)
+                                        .show();
+                            } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
+                                System.exit(0);
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .build();
+
+        //if you have many different types of DrawerItems you can magically pre-cache those items to get a better scroll performance
+        //make sure to init the cache after the DrawerBuilder was created as this will first clear the cache to make sure no old elements are in
+        RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
+        //only set the active selection or active profile if we do not recreate the activity
+        if (savedInstanceState == null) {
+            // set the selection to the item with the identifier 11
+            result.setSelection(21, false);
+        }
+        //getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+    }
 }

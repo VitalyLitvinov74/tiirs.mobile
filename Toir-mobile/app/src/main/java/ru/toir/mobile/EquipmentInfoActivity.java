@@ -1,14 +1,6 @@
 package ru.toir.mobile;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import ru.toir.mobile.utils.DataUtils;
-import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.*;
-import ru.toir.mobile.db.tables.*;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -23,13 +15,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import ru.toir.mobile.rest.IServiceProvider;
-import ru.toir.mobile.rest.ProcessorService;
-import ru.toir.mobile.rest.ReferenceServiceHelper;
-import ru.toir.mobile.rest.ReferenceServiceProvider;
-import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.RfidDriverBase;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -42,14 +30,54 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EquipmentInfoActivity extends FragmentActivity {
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
+import ru.toir.mobile.db.tables.Equipment;
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
+import ru.toir.mobile.db.tables.EquipmentOperation;
+import ru.toir.mobile.db.tables.EquipmentOperationResult;
+import ru.toir.mobile.db.tables.OperationResult;
+import ru.toir.mobile.rest.IServiceProvider;
+import ru.toir.mobile.rest.ProcessorService;
+import ru.toir.mobile.rest.ReferenceServiceHelper;
+import ru.toir.mobile.rest.ReferenceServiceProvider;
+import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.utils.DataUtils;
+
+public class EquipmentInfoActivity extends AppCompatActivity {
 
 	private final static String TAG = "EquipmentInfoActivity";
 
 	private String equipment_uuid;
 	private ListView lv;
 
-	private TextView tv_equipment_name;
+    private AccountHeader headerResult = null;
+    private static final int DRAWER_INFO = 13;
+    private static final int DRAWER_EXIT = 14;
+    private Drawer result = null;
+
+    private TextView tv_equipment_name;
 	private TextView tv_equipment_type;
 	private TextView tv_equipment_position;
 	private TextView tv_equipment_tasks;
@@ -172,7 +200,8 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		Bundle b = getIntent().getExtras();
 		equipment_uuid = b.getString("equipment_uuid");
-		setContentView(R.layout.equipment_layout);
+		//setContentView(R.layout.equipment_layout);
+        setMainLayout(savedInstanceState);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		// tv_equipment_id = (TextView) findViewById(R.id.equipment_text_name);
@@ -531,4 +560,72 @@ public class EquipmentInfoActivity extends FragmentActivity {
 		// Setting the adapter to the listView
 		lv.setAdapter(adapter);
 	}
+
+    void setMainLayout(Bundle savedInstanceState) {
+        setContentView(R.layout.equipment_layout);
+
+        // Handle Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundResource(R.drawable.header);
+        toolbar.setSubtitle("Обслуживание и ремонт");
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setTitle(R.string.app_name);
+        }
+
+        // Create the AccountHeader
+        headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .withSavedInstance(savedInstanceState)
+                .build();
+
+        //iprofilelist = new ArrayList<>();
+        //users_id = new long[MAX_USER_PROFILE];
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withHasStableIds(true)
+                .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false),
+                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == DRAWER_INFO) {
+                                new AlertDialog.Builder(view.getContext())
+                                        .setTitle("Информация о программе")
+                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_info)
+                                        .show();
+                            } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
+                                System.exit(0);
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .build();
+
+        //if you have many different types of DrawerItems you can magically pre-cache those items to get a better scroll performance
+        //make sure to init the cache after the DrawerBuilder was created as this will first clear the cache to make sure no old elements are in
+        RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
+        //only set the active selection or active profile if we do not recreate the activity
+        if (savedInstanceState == null) {
+            // set the selection to the item with the identifier 11
+            result.setSelection(21, false);
+        }
+        //getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+    }
 }
