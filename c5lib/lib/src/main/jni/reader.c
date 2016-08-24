@@ -30,7 +30,7 @@ int32_t deviceCtrlHandler = -1;
 int32_t deviceHandler = -1;
 
 // метка для сообщений
-int8_t *TAG = "ScannerJNI";
+const char *TAG = "ScannerJNI";
 
 #define TMP_BUFFER_SIZE 1024
 
@@ -285,7 +285,7 @@ int8_t *makeHexString(void *buffer, int32_t start, int32_t count) {
     result = calloc((size_t) resultLen, 1);
     if (result != NULL) {
         for (int32_t i = 0; i < count; i++) {
-            sprintf(&result[i * 2], "%02X", charBuffer[start + i]);
+            sprintf((char *)&result[i * 2], "%02X", charBuffer[start + i]);
         }
     }
     return result;
@@ -851,7 +851,7 @@ jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
     closeSerial();
 
 
-    e->ReleaseStringUTFChars(env, jPath, path);
+    e->ReleaseStringUTFChars(env, jPath, (char *)path);
 
     return 0;
 }
@@ -875,7 +875,7 @@ jint Java_android_hardware_uhf_magic_reader_Open(JNIEnv *env, jclass jc,
     __android_log_print(ANDROID_LOG_INFO, TAG,
                         "Открытие порта считывателя, rc = %d", rc);
 
-    e->ReleaseStringUTFChars(env, devicePath, path);
+    e->ReleaseStringUTFChars(env, devicePath, (char *)path);
 
     return rc;
 }
@@ -1201,4 +1201,136 @@ jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
     e->ReleaseByteArrayElements(env, jEPC, PCEPC, 0);
 
     return result;
+}
+
+int32_t MagicGetChannel() {
+    int32_t packetLen;
+    uint8_t arybuf[5];
+    int32_t result;
+
+    memset(arybuf, 0, 5);
+
+    packetLen = MagicMakeMessageData(0xAA, arybuf, 2);
+    result = writeSerial(Magicmessagebuf, packetLen);
+
+    return result;
+}
+
+jint Java_android_hardware_uhf_magic_reader_GetChannel(JNIEnv *env, jclass jc) {
+    int32_t watchDog = 0;
+    int32_t count = 0;
+    uint8_t Magicbuf[32];
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicGetChannel: %p, %p",
+                        env, jc);
+
+    MagicGetChannel();
+
+    while ( 1 ) {
+        count += readSerial(&Magicbuf[count], 9);
+        ++watchDog;
+        if (count > 7) {
+            break;
+        }
+
+        if ( watchDog > 19 ) {
+            return 17;
+        }
+    }
+
+    if ( MagicIsCheckSum(Magicbuf, 6) ) {
+        return Magicbuf[5];
+    }
+
+    return 17;
+}
+
+int32_t MagicSetChannel(uint8_t channel) {
+    int32_t packetLen;
+    uint8_t arybuf[5];
+    int32_t result;
+
+    memset(arybuf, 0, 5);
+
+    arybuf[1] = 1;
+    arybuf[2] = channel;
+    packetLen = MagicMakeMessageData(0xAB, arybuf, 3);
+    result = writeSerial(Magicmessagebuf, packetLen);
+
+    return result;
+}
+
+jint Java_android_hardware_uhf_magic_reader_SetChannel(JNIEnv *env, jclass jc, jbyte channel) {
+    jint result;
+    int32_t watchDog = 0;
+    int32_t count = 0;
+    uint8_t Magicbuf[32];
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicSetChannel: %p, %p, %d",
+                        env, jc, channel);
+
+    result = 17 - ((uint32_t)(MagicSetChannel((uint8_t)channel) - 8) <= 0);
+
+    while (1) {
+        count += readSerial(&Magicbuf[count], 8);
+        ++watchDog;
+        if (count > 7) {
+            break;
+        }
+
+        if (watchDog > 19) {
+            return 17;
+        }
+    }
+
+    if (MagicIsCheckSum(Magicbuf, 6)) {
+        return result;
+    }
+
+    return 17;
+}
+
+int32_t MagicSetFrequency(uint8_t region) {
+    int32_t packetLen;
+    uint8_t arybuf[5];
+    int32_t result;
+
+    memset(arybuf, 0, 5);
+
+    arybuf[1] = 1;
+    arybuf[2] = region;
+    packetLen = MagicMakeMessageData(0x07, arybuf, 3);
+    result = writeSerial(Magicmessagebuf, packetLen);
+
+    return result;
+}
+
+jint Java_android_hardware_uhf_magic_reader_SetFrequency(JNIEnv *env, jclass jc, jbyte region) {
+    jint result;
+    int32_t watchDog = 0;
+    int32_t count = 0;
+    uint8_t Magicbuf[32];
+
+    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicSetFrequency: %p, %p, %d",
+                        env, jc, region);
+
+    result = 17 - ((uint32_t )(MagicSetFrequency((uint8_t)region) - 8) <= 0);
+
+    while (1) {
+        count += readSerial(&Magicbuf[count], 8);
+        ++watchDog;
+        if (count > 7) {
+            break;
+        }
+
+        if (watchDog > 19) {
+            return 17;
+        }
+    }
+
+    if (MagicIsCheckSum(Magicbuf, 6)) {
+        return result;
+    }
+
+    return 17;
 }

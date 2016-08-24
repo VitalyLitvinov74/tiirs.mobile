@@ -59,6 +59,13 @@ int32_t MagicLock(uint32_t nPL, uint8_t *aPassword, uint32_t nUL, uint8_t *EPC,
 
 int32_t MagicKill(uint32_t nPL, uint8_t *KPassword, uint32_t nUL, uint8_t *EPC);
 
+int32_t MagicGetChannel();
+
+int32_t MagicSetChannel(uint8_t channel);
+
+int32_t MagicSetFrequency(uint8_t region);
+
+
 
 jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
                                                  jstring jPath);
@@ -109,5 +116,11 @@ jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc,
 jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
                                                  jbyteArray jKPassword,
                                                  jint nUL, jbyteArray jEPC);
+
+jint Java_android_hardware_uhf_magic_reader_GetChannel(JNIEnv *env, jclass jc);
+
+jint Java_android_hardware_uhf_magic_reader_SetChannel(JNIEnv *env, jclass jc, jbyte channel);
+
+jint Java_android_hardware_uhf_magic_reader_SetFrequency(JNIEnv *env, jclass jc, jbyte region);
 
 #endif //C5TOOLAS_READER_H

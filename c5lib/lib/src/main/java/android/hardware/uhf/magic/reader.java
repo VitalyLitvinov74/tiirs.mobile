@@ -709,7 +709,7 @@ public class reader {
      *            03 Europe 06 of South Korea
      * @return
      */
-    // static public native int SetFrequency(byte region);
+     static public native int SetFrequency(byte region);
 
     /**
      * set working channel
@@ -731,7 +731,7 @@ public class reader {
      *            frequency: CH_Index = (Freq_CH-917.1M) /0.2M
      * @return
      */
-    // static public native int SetChannel(byte channel);
+     static public native int SetChannel(byte channel);
 
     /**
      * get working channel
@@ -748,7 +748,7 @@ public class reader {
      * formula of European channel parameters, Freq_CH channel frequency:
      * Freq_CH = CH_Index * 0.2M + 865.1M
      */
-    // static public native int GetChannel();
+     static public native int GetChannel();
 
     /**
      * set to automatic frequency hopping pattern or cancel automatic frequency
