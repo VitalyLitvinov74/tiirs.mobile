@@ -1,7 +1,11 @@
 package ru.toir.mobile.fragments;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -113,6 +117,28 @@ public class UserInfoFragment extends Fragment {
 			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
 			// Toast.makeText(getActivity(), user.getUuid(),
 			// Toast.LENGTH_SHORT).show();
+
+            LocationManager manager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (statusOfGPS)
+                user_status_gps.setImageResource(R.drawable.checkmark_32);
+            else
+                user_status_gps.setImageResource(R.drawable.forbidden_32);
+
+            ConnectivityManager cm = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            if (activeNetwork != null) { // connected to the internet
+                if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                    // connected to wifi
+                    user_status_gprs.setImageResource(R.drawable.wifi_32);
+                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    // connected to the mobile provider's data plan
+                    user_status_gprs.setImageResource(R.drawable.gprs_32);
+                }
+            } else {
+                user_status_gprs.setImageResource(R.drawable.forbidden_32);
+            }
+
 			if (gpstrack != null) {
 				tv_user_gps.setText(Float.parseFloat(gpstrack.getLatitude())
 						+ " / " + Float.parseFloat(gpstrack.getLongitude()));
@@ -215,4 +241,5 @@ public class UserInfoFragment extends Fragment {
 			lv.setAdapter(adapter);
 		}
 	}
+
 }
