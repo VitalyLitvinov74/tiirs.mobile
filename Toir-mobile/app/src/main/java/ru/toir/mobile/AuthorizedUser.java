@@ -29,7 +29,7 @@ public class AuthorizedUser {
 	}
 
 	/**
-	 * @param mUuid the mUuid to set
+	 * @param Uuid the mUuid to set
 	 */
 	public void setUuid(String Uuid) {
 		this.mUuid = Uuid;
@@ -43,7 +43,7 @@ public class AuthorizedUser {
 	}
 
 	/**
-	 * @param mTagId the mTagId to set
+	 * @param TagId the mTagId to set
 	 */
 	public void setTagId(String TagId) {
 		this.mTagId = TagId;
@@ -57,7 +57,7 @@ public class AuthorizedUser {
 	}
 
 	/**
-	 * @param mToken the mToken to set
+	 * @param Token the mToken to set
 	 */
 	public void setToken(String Token) {
 		this.mToken = Token;

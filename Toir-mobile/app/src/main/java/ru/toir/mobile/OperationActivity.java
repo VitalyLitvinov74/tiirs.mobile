@@ -88,12 +88,11 @@ public class OperationActivity extends AppCompatActivity {
     public static final String OPERATION_UUID_EXTRA = "operation_uuid";
     public static final String TASK_UUID_EXTRA = "task_uuid";
     public static final String EQUIPMENT_UUID_EXTRA = "equipment_uuid";
-    public static final String EQUIPMENT_TAG_EXTRA = "equipment_tag";
+    //public static final String EQUIPMENT_TAG_EXTRA = "equipment_tag";
 
     private AccountHeader headerResult = null;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
-    private Drawer result = null;
 
     private OperationPattern pattern;
     private ArrayList<OperationPatternStep> patternSteps;
@@ -233,7 +232,7 @@ public class OperationActivity extends AppCompatActivity {
         patternSteps = patternStepDBAdapter.getItems(pattern.getUuid());
 
         // получаем варианты выполнения шагов
-        ArrayList<String> uuids = new ArrayList<String>();
+        ArrayList<String> uuids = new ArrayList<>();
         for (OperationPatternStep step : patternSteps) {
             uuids.add(step.getUuid());
         }
@@ -278,7 +277,7 @@ public class OperationActivity extends AppCompatActivity {
     private void showStep(String uuid) {
 
         currentStepUuid = uuid;
-        OperationPatternStep step = null;
+        OperationPatternStep step;
 
         step = getStep(uuid);
 
@@ -384,7 +383,7 @@ public class OperationActivity extends AppCompatActivity {
     /**
      * Создание элементов интерфейса для шагов операции с измерениями значений
      *
-     * @param measureType
+     * @param measureType - тип осуществляемого измерения
      */
     private void measureUI(String measureType) {
 
@@ -496,8 +495,8 @@ public class OperationActivity extends AppCompatActivity {
     /**
      * Сохранение результата измерения
      *
-     * @param type
-     * @param resultUuid
+     * @param type - тип измерения
+     * @param resultUuid - идентификатор результата
      * @return
      */
     private boolean saveMeasureValue(String type, String resultUuid) {
@@ -631,7 +630,7 @@ public class OperationActivity extends AppCompatActivity {
         });
 
         ArrayAdapter<OperationResult> resultsAdapter = new
-				ArrayAdapter<OperationResult>(
+				ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item,
                 operationResults);
         Spinner spinner = new Spinner(getApplicationContext());
@@ -931,7 +930,7 @@ public class OperationActivity extends AppCompatActivity {
 
         //iprofilelist = new ArrayList<>();
         //users_id = new long[MAX_USER_PROFILE];
-        result = new DrawerBuilder()
+        Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)

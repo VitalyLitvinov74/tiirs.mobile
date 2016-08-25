@@ -32,7 +32,9 @@
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Справочники</string>
     <string name="get_task">Получить наряд</string>
+    <string name="choose_tag">Выберите метку из меню</string>
     <string name="back">Назад</string>
+    <string name="ok">ОК</string>
     <string name="make_photo">Снять</string>
     <string name="image_description">изображение</string>
     <string name="description">описание</string>
@@ -55,6 +57,7 @@
     <string name="scan_process">Процесс сканирования</string>
     <string name="empty"></string>
     <string name="created">Создан: </string>
+    <string name="off">Отключен: </string>
     <string name="status">Статус: </string>
     <string name="closed">Закрыт: </string>
     <string name="operation_status_title">Статус операции</string>
@@ -64,9 +67,14 @@
     <string name="result_title">Результат: </string>
     <string name="step_image_descr">Изображение шага операции</string>
     <string name="task_title">Наряд: </string>
+    <string name="stat_status">Состояние:</string>
+    <string name="operation">Операция:</string>
     <string name="operation_step_title">Шаг:</string>
+    <string name="operation_list">Список операций</string>
+    <string name="additional_information">Дополнительная информация</string>
     <string name="operation_step_descr_title">Описание шага обслуживания</string>
     <string name="operation_status_change_title">Изменить статус операции</string>
+    <string name="operation_choose_status">Выберите статус завершения операции</string>>
     <string name="divider"> | </string>
     <string name="application_full_name">Мобильный ТОиР</string>
     <string name="open_documentation">Открыть документацию</string>

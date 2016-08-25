@@ -10,8 +10,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorSecondary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:elevation="4dp" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <ScrollView
         android:layout_below="@id/toolbar"
@@ -64,7 +63,7 @@
                         style="@style/textNormalSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Статус:" />
+                        android:text="@string/status" />
 
                     <TextView
                         android:id="@+id/twf_task_status"
@@ -102,7 +101,7 @@
                         style="@style/textNormalSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Состояние:" />
+                        android:text="@string/stat_status" />
 
                     <TextView
                         android:id="@+id/twf_equipment_status"
@@ -121,7 +120,7 @@
                         style="@style/textNormalSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Операция:" />
+                        android:text="@string/operation" />
 
                     <TextView
                         android:id="@+id/twf_equipment_operation"
