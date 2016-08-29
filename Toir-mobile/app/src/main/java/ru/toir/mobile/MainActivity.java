@@ -457,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, NativeCameraFragment.newInstance("")).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
                                 currentFragment = FRAGMENT_CHARTS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance("")).commit();
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
                                 mProgressDialog = new ProgressDialog(MainActivity.this);
@@ -779,5 +779,4 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(MainActivity.this, ToirPreferences.class);
         startActivity(i);
     }
-
 }

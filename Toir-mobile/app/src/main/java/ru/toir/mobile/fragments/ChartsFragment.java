@@ -1,6 +1,7 @@
 package ru.toir.mobile.fragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -53,7 +54,7 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
             // Required empty public constructor
      }
 
-     public static ChartsFragment newInstance(String title) {
+     public static ChartsFragment newInstance() {
             return (new ChartsFragment());
      }
 
@@ -114,6 +115,7 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         rightAxis.setTypeface(mTf);
         rightAxis.setLabelCount(8);
         rightAxis.setTextColor(getResources().getColor(R.color.white));
+        rightAxis.setTextColor(Color.WHITE);
         //rightAxis.setValueFormatter(custom);
         rightAxis.setSpaceTop(15f);
 
@@ -121,7 +123,7 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         l.setPosition(LegendPosition.BELOW_CHART_LEFT);
         l.setForm(LegendForm.SQUARE);
         l.setFormSize(9f);
-        l.setTextColor(getResources().getColor(R.color.white));
+        l.setTextColor(Color.WHITE);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
         setData(12, 50);
@@ -254,12 +256,12 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
 
     private void setData(int count, float range) {
 
-        ArrayList<String> xVals = new ArrayList<String>();
+        ArrayList<String> xVals = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             xVals.add(mMonths[i % 12]);
         }
 
-        ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+        ArrayList<BarEntry> yVals1 = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             float mult = (range + 1);
@@ -270,7 +272,7 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         BarDataSet set1 = new BarDataSet(yVals1, "DataSet");
         set1.setBarSpacePercent(35f);
 
-        ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
+        ArrayList<BarDataSet> dataSets = new ArrayList<>();
         dataSets.add(set1);
 
         BarData data = new BarData(xVals, dataSets);
@@ -300,5 +302,5 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
     }
 
     public void onNothingSelected() {
-    };
+    }
 }
