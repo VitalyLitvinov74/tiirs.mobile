@@ -1,70 +1,59 @@
-apply plugin: 'com.android.model.application'
-model {
+apply plugin: 'com.android.application'
 
-    android {
-        compileSdkVersion = 23
-        buildToolsVersion = "23.0.3"
-
-        defaultConfig.with {
-            applicationId = "ru.toir.mobile"
-            minSdkVersion.apiLevel = 15
-            targetSdkVersion.apiLevel = 15
-            versionCode = 1
-            versionName = "1.0"
-        }
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    defaultConfig {
+        applicationId "ru.toir.mobile"
+        minSdkVersion 15
+        targetSdkVersion 15
+        versionCode 1
+        versionName "1.0"
+        signingConfig signingConfigs.debug
     }
-
-    android.buildTypes {
-        debug {
-            minifyEnabled = false
-        }
-        release {
-            minifyEnabled = false
-            proguardFiles.add(file('proguard-rules.pro'))
-            signingConfig = $.android.signingConfigs.get('release')
-        }
-    }
-
-
-    android.productFlavors {
-        create('arm') {
-            ndk.abiFilters.add('armeabi')
-        }
-//        create('arm7') {
-//            ndk.abiFilters.add('armeabi-v7a')
-//        }
-//        create('all') {
-//        }
-    }
-
-    android.lintOptions {
-        checkReleaseBuilds true
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
-        abortOnError false
-    }
-
-    android.signingConfigs {
+    signingConfigs {
         def rootDir = property('rootDir')
         Properties properties = new Properties()
         properties.load(new FileInputStream("${rootDir}/local.properties"))
         debug {
             // это сделано для того, чтоб не прибивать приложение вместе с базой
             // при установке release версии приложения
-            storeFile = file(properties.getProperty('STORE_FILE'))
-            storePassword = properties.getProperty('STORE_PASSWORD')
-            keyAlias = properties.getProperty('KEY_ALIAS')
-            keyPassword = properties.getProperty('KEY_PASSWORD')
+            storeFile file(properties.getProperty('STORE_FILE'))
+            storePassword properties.getProperty('STORE_PASSWORD')
+            keyAlias properties.getProperty('KEY_ALIAS')
+            keyPassword properties.getProperty('KEY_PASSWORD')
         }
-        create("release") {
-            storeFile = file(properties.getProperty('STORE_FILE'))
-            storePassword = properties.getProperty('STORE_PASSWORD')
-            keyAlias = properties.getProperty('KEY_ALIAS')
-            keyPassword = properties.getProperty('KEY_PASSWORD')
+        release {
+            storeFile file(properties.getProperty('STORE_FILE'))
+            storePassword properties.getProperty('STORE_PASSWORD')
+            keyAlias properties.getProperty('KEY_ALIAS')
+            keyPassword properties.getProperty('KEY_PASSWORD')
         }
+    }
+//    buildTypes {
+//        debug {
+//            minifyEnabled false
+//        }
+//        release {
+//            minifyEnabled false
+//            proguardFiles.add(file('proguard-rules.pro'))
+//            signingConfig = signingConfigs.get('release')
+//        }
+//
+//
+//    }
+    productFlavors {
     }
 }
 
+//lintOptions {
+//    checkReleaseBuilds true
+//    // Or, if you prefer, you can continue to check for errors in release builds,
+//    // but continue the build even when errors are found:
+//    abortOnError false
+//}
+//
+//
 def rd = property('rootDir')
 Properties prop = new Properties()
 prop.load(new FileInputStream("${rd}/local.properties"))
@@ -90,11 +79,8 @@ dependencies {
     compile 'me.dm7.barcodescanner:zbar:1.8.3'
     compile 'android.hardware:uhf-tools:1.0@aar'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    //    compile 'android.hardware:uhf-tools:1.0@aar'
     compile 'com.mikepenz:iconics-core:2.5.5@aar'
     compile 'com.android.support:recyclerview-v7:23.0.0'
-    //compile 'android.hardware:uhf-tools:1.0@aar'
     compile('com.mikepenz:materialdrawer:4.6.4@aar') {
         transitive = true
         //exclude group: 'com.mikepenz'
