@@ -48,6 +48,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
 import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.fragments.ChartsFragment;
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
 	private ProgressDialog authorizationDialog;
 
 	private boolean splashShown = false;
+
+    private Realm realmDB;
 
 	// фильтр для сообщений при получении пользователя с сервера
 	private final IntentFilter mFilterGetUser = new IntentFilter(
@@ -223,6 +226,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		savedInstance = savedInstanceState;
+
+        // получаем базу realm
+        realmDB = Realm.getDefaultInstance();
+        Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
+
 		// инициализация приложения
 		init();
 

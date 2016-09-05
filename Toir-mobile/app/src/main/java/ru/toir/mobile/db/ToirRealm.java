@@ -30,6 +30,7 @@ public class ToirRealm {
 
         Realm.setDefaultConfiguration(realmConfig);
 
+        // инициализируем интерфейс для отладки через Google Chrome
         Stetho.initialize(
                 Stetho.newInitializerBuilder(context)
                         .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
