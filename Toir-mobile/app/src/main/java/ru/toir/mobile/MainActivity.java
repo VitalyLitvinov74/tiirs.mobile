@@ -38,19 +38,17 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
-import com.mikepenz.octicons_typeface_library.Octicons;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.tables.Users;
+import io.realm.RealmResults;
+import ru.toir.mobile.db.ToirRealm;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.FragmentAddUser;
@@ -83,31 +81,29 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_REFERENCES = 6;
     private static final int FRAGMENT_USERS = 7;
     private static final int FRAGMENT_USER = 8;
-    private static final int FRAGMENT_OTHER = 10;
+    //private static final int FRAGMENT_OTHER = 10;
 
     private static final int DRAWER_TASKS = 11;
     private static final int DRAWER_DOWNLOAD = 12;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
-    private static final int DRAWER_ONLINE = 15;
+    //private static final int DRAWER_ONLINE = 15;
 
     private static final String TAG = "MainActivity";
 	private boolean isLogged = false;
 	private RfidDialog rfidDialog;
     private AccountHeader headerResult = null;
-    private Drawer result = null;
     Bundle savedInstance=null;
 
     public int currentFragment = NO_FRAGMENT;
     private ArrayList<IProfile> iprofilelist;
-    private List<Users> profilesList;
+    //private List<Users> profilesList;
+    private RealmResults<User> profilesList;
     private long users_id[];
     private int cnt = 0;
     ProgressDialog mProgressDialog;
-    private boolean isActive = false;
-    private int ActiveUserID;
 
-	private ProgressDialog authorizationDialog;
+    private ProgressDialog authorizationDialog;
 
 	private boolean splashShown = false;
 
@@ -130,14 +126,20 @@ public class MainActivity extends AppCompatActivity {
 					Bundle bundle = intent
 							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					if (result) {
-						UsersDBAdapter users = new UsersDBAdapter(
-								new ToirDatabaseContext(getApplicationContext()));
-						Users user = users.getUserByTagId(AuthorizedUser
-								.getInstance().getTagId());
-						// в зависимости от результата либо дать работать, либо
-						// не дать
+						//UsersDBAdapter users = new UsersDBAdapter(
+						//		new ToirDatabaseContext(getApplicationContext()));
+                        //Users user = users.getUserByTagId(AuthorizedUser
+                        //        .getInstance().getTagId());
+                        final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+						// в зависимости от результата либо дать работать, либо не дать
 						if (user != null) {
-                            users.setActiveUser(user.get_id());
+                            realmDB.beginTransaction();
+                            RealmResults<User> users = realmDB.where(User.class).findAll();
+                            for (int i = 0; i < users.size(); i++)
+                                users.get(i).setActive(false);
+                            user.setActive(true);
+                            realmDB.commitTransaction();
+
 							isLogged = true;
 							AuthorizedUser.getInstance()
 									.setUuid(user.getUuid());
@@ -194,11 +196,11 @@ public class MainActivity extends AppCompatActivity {
 						// на сервере
 						// токен не получен, сервер не ответил...
 						// проверяем наличие пользователя в локальной базе
-						UsersDBAdapter users = new UsersDBAdapter(
-								new ToirDatabaseContext(getApplicationContext()));
-						Users user = users.getUserByTagId(AuthorizedUser
-								.getInstance().getTagId());
-
+                        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+						//UsersDBAdapter users = new UsersDBAdapter(
+						//		new ToirDatabaseContext(getApplicationContext()));
+						//Users user = users.getUserByTagId(AuthorizedUser
+						//		.getInstance().getTagId());
 						// в зависимости от результата либо дать работать, либо
 						// не дать
 						if (user != null && user.isActive()) {
@@ -227,13 +229,8 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		savedInstance = savedInstanceState;
 
-        // получаем базу realm
-        realmDB = Realm.getDefaultInstance();
-        Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
-
 		// инициализация приложения
 		init();
-
 		// this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
@@ -284,22 +281,43 @@ public class MainActivity extends AppCompatActivity {
 			// принудительное обновление приложения
 			finish();
 		}
-	}
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                User profile = realmDB.createObject(User.class);
+                profile.setName("Иванов О.А.");
+                profile.setImage("profile");
+                profile.setLogin("olejek8@yandex.ru");
+                profile.setPass("12345");
+                profile.setType(2);
+                profile.setUuid(java.util.UUID.randomUUID().toString());
+                profile.setTagId("01234567");
+                profile.setWhoIs("бугорчик");
+                profile.setActive(true);
+                profile.setImage("");
+            }
+        });
+    }
 
 	public boolean initDB() {
 		boolean success = false;
-		DatabaseHelper helper;
+		//DatabaseHelper helper;
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
-			helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
-					getApplicationContext()));
-			Log.d(TAG, "db.version=" + helper.getVersion());
-			if (!helper.isDBActual()) {
+            ToirRealm.init(this);
+            // получаем базу realm
+            realmDB = Realm.getDefaultInstance();
+            Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
+            //helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
+			//		getApplicationContext()));
+			Log.d(TAG, "db.version=" + realmDB.getVersion());
+			if (Realm.getDefaultInstance().getVersion()==0) {
 				Toast toast = Toast.makeText(this, "База данных не актуальна!",
                         Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.CENTER, 0, 0);
 				toast.show();
+                success = true;
 			} else {
 				Toast toast = Toast.makeText(this, "База данных актуальна!",
                         Toast.LENGTH_SHORT);
@@ -406,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
                         if (profile instanceof IDrawerItem && profile.getIdentifier() == PROFILE_ADD) {
                             currentFragment = FRAGMENT_USER;
-                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentAddUser.newInstance("AddProfile")).commit();
+                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentAddUser.newInstance()).commit();
                         }
                         if (profile instanceof IDrawerItem && profile.getIdentifier() == PROFILE_SETTINGS) {
                             currentFragment = FRAGMENT_USER;
@@ -418,10 +436,16 @@ public class MainActivity extends AppCompatActivity {
                             for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++)
                                 if (users_id[profile_pos] == profileId) break;
 
-                            UsersDBAdapter profileDBAdapter = new UsersDBAdapter(
-                                    new ToirDatabaseContext(getApplicationContext()));
                             headerResult.setActiveProfile(iprofilelist.get(profile_pos));
-                            profileDBAdapter.setActiveUser(profilesList.get(profile_pos).get_id());
+                            realmDB.beginTransaction();
+                            RealmResults<User> users = realmDB.where(User.class).findAll();
+                            for (int i = 0; i < users.size(); i++)
+                                users.get(i).setActive(false);
+                            User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+                            if (user != null) user.setActive(true);
+                            realmDB.commitTransaction();
+
+                            //profileDBAdapter.setActiveUser(profilesList.get(profile_pos).get_id());
                             profilesList.get(profile_pos).setActive(true);
                             currentFragment=FRAGMENT_USER;
                             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
@@ -434,22 +458,22 @@ public class MainActivity extends AppCompatActivity {
 
         fillProfileList();
 
-        result = new DrawerBuilder()
+        Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
+                        //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_references).withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false),
                         new DividerDrawerItem(),
-                        new SecondarySwitchDrawerItem().withName("Доступ к серверу").withIcon(Octicons.Icon.oct_tools).withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener).withIdentifier(DRAWER_ONLINE),
-                        new DividerDrawerItem(),
+                        //new SecondarySwitchDrawerItem().withName("Доступ к серверу").withIcon(Octicons.Icon.oct_tools).withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener).withIdentifier(DRAWER_ONLINE),
+                        //new DividerDrawerItem(),
                         new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false),
                         new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false),
                         new DividerDrawerItem(),
@@ -483,16 +507,16 @@ public class MainActivity extends AppCompatActivity {
                                         String path = Environment.getExternalStorageDirectory() + "/Download/";
                                         File file = new File(path);
                                         if (file.mkdirs()) {
-											File outputFile = new File(path, "Toir-mobile.apk");
+                                            File outputFile = new File(path, "Toir-mobile.apk");
 
-											downloaderTask.execute(updateUrl, outputFile.toString());
-											mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-												@Override
-												public void onCancel(DialogInterface dialog) {
-													downloaderTask.cancel(true);
-												}
-											});
-										}
+                                            downloaderTask.execute(updateUrl, outputFile.toString());
+                                            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                                @Override
+                                                public void onCancel(DialogInterface dialog) {
+                                                    downloaderTask.cancel(true);
+                                                }
+                                            });
+                                        }
                                     }
                                 }
                             } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {
@@ -535,13 +559,14 @@ public class MainActivity extends AppCompatActivity {
         //make sure to init the cache after the DrawerBuilder was created as this will first clear the cache to make sure no old elements are in
         RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
         //only set the active selection or active profile if we do not recreate the activity
+        int activeUserID = 0;
         if (savedInstanceState == null) {
             // set the selection to the item with the identifier 11
             result.setSelection(21, false);
             //set the active profile
             if (iprofilelist.size() > 0) {
                 for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
-                    if (ActiveUserID > 0 && iprofilelist.get(cnt).getIdentifier() == ActiveUserID + 2)
+                    if (activeUserID > 0 && iprofilelist.get(cnt).getIdentifier() == activeUserID + 2)
                         headerResult.setActiveProfile(iprofilelist.get(cnt));
                 }
             }
@@ -549,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
 
-        if (ActiveUserID <= 0) {
+        if (activeUserID <= 0) {
             Toast.makeText(getApplicationContext(),
                     "Пожалуйста зарегистрируйтесь", Toast.LENGTH_LONG).show();
         }
@@ -573,7 +598,7 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * Обработчик клика меню запуска блютус сервера
 	 *
-	 * @param menuItem
+	 * @param menuItem - пункт меню
 	 */
 	public void onActionBTServer(MenuItem menuItem) {
 		Log.d(TAG, "onActionBTServer");
@@ -704,19 +729,19 @@ public class MainActivity extends AppCompatActivity {
     private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-            UsersDBAdapter users = new UsersDBAdapter(
-                    new ToirDatabaseContext(getApplicationContext()));
-            Users user = users.getActiveUser();
-
+            //UsersDBAdapter users = new UsersDBAdapter(
+            //        new ToirDatabaseContext(getApplicationContext()));
+            User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
             if (drawerItem.getIdentifier() == 12) {
+                boolean isActive = false;
                 if (isChecked) {
                     isActive = true;
                     user.setActive(true);
-                    users.replaceItem(user);
+                    //users.replaceItem(user);
                 } else
                     isActive = false;
                 user.setActive(false);
-                users.replaceItem(user);
+                //users.replaceItem(user);
             }
         }
     };
@@ -731,11 +756,12 @@ public class MainActivity extends AppCompatActivity {
     /* функция заполняет массив профилей - пользователей */
 
     public void fillProfileList() {
-        UsersDBAdapter users = new UsersDBAdapter(
-                new ToirDatabaseContext(getApplicationContext()));
-        profilesList = users.getAllItems();
+        //UsersDBAdapter users = new UsersDBAdapter(
+        //        new ToirDatabaseContext(getApplicationContext()));
+        //User users = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findAll();
+        RealmResults<User> profilesList = realmDB.where(User.class).findAll();
         cnt = 0;
-        for (Users item : profilesList) {
+        for (User item : profilesList) {
             addProfile(item);
             users_id[cnt] = item.get_id();
             cnt = cnt + 1;
@@ -743,7 +769,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addProfile(Users item) {
+    public void addProfile(User item) {
         IProfile new_profile;
         String target_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator + item.getImage();
         File imgFile = new File(target_filename);
@@ -758,11 +784,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshProfileList() {
-        UsersDBAdapter users = new UsersDBAdapter(
-                new ToirDatabaseContext(getApplicationContext()));
-        profilesList = users.getAllItems();
+        //UsersDBAdapter users = new UsersDBAdapter(
+        //        new ToirDatabaseContext(getApplicationContext()));
+        profilesList = realmDB.where(User.class).findAll();
         cnt = 0;
-        for (Users item : profilesList) {
+        for (User item : profilesList) {
             users_id[cnt] = item.get_id();
             cnt = cnt + 1;
             if (cnt > MAX_USER_PROFILE) break;

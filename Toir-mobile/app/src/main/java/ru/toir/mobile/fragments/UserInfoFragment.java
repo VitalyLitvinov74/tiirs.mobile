@@ -20,23 +20,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
-import ru.toir.mobile.db.adapters.TaskDBAdapter;
-import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.GpsTrack;
-import ru.toir.mobile.db.tables.Task;
-import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.utils.DataUtils;
 
 public class UserInfoFragment extends Fragment {
+    private Realm realmDB;
 
 	private TextView tv_user_name;
 	private TextView tv_user_id;
@@ -67,6 +70,7 @@ public class UserInfoFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater
 				.inflate(R.layout.user_layout, container, false);
+        realmDB = Realm.getDefaultInstance();
 		FillListViewTasks(rootView);
 		initView(rootView);
 
@@ -92,23 +96,24 @@ public class UserInfoFragment extends Fragment {
 
         user_status_gprs.setImageResource(R.drawable.ic_stat_name);
         user_status_gps.setImageResource(R.drawable.ic_action_name);
-		String tagId = AuthorizedUser.getInstance().getTagId();
-
-		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-				getActivity().getApplicationContext()));
-		Users user = users.getUserByTagId(tagId);
-		if (user == null) {
+		//String tagId = AuthorizedUser.getInstance().getTagId();
+		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
+		//		getActivity().getApplicationContext()));
+		//Users user = users.getUserByTagId(tagId);
+        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+        //RealmResults<User> users = realmDB.where(User.class).findAll();
+        if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			if (user.getTag_id().length() > 20)
-				tv_user_id.setText("ID: " + user.getTag_id().substring(0, 20));
+			if (user.getTagId().length() > 20)
+				tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
 			else
-				tv_user_id.setText("ID: " + user.getTag_id());
+				tv_user_id.setText("ID: " + user.getTagId());
 			tv_user_name.setText("ФИО: " + user.getName());
-			tv_user_date.setText("11.10.2015 10:54");
+			tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
 			tv_user_tasks.setText("2/2");
-			tv_user_boss.setText("+79227000286");
+			tv_user_boss.setText(user.getContact());
 
 			tv_user_type.setText("Должность: " + user.getWhoIs());
 			tv_user_status.setText("Статус: задание");
@@ -172,60 +177,63 @@ public class UserInfoFragment extends Fragment {
 	private void FillListViewTasks(View view) {
 
 		String tagId = AuthorizedUser.getInstance().getTagId();
-		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-				getActivity().getApplicationContext()));
-		Users user = users.getUserByTagId(tagId);
-
+		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
+		//		getActivity().getApplicationContext()));
+        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+		//Users user = users.getUserByTagId(tagId);
 		if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
-			ArrayList<Task> taskList = taskDBAdapter.getOrders();
-			TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
+			//TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
+			//		new ToirDatabaseContext(getActivity()
+			//				.getApplicationContext()));
+			//ArrayList<Task> taskList = taskDBAdapter.getOrders();
+            RealmResults<Orders> orders = realmDB.where(Orders.class).equalTo("userUuid",AuthorizedUser.getInstance().getTagId()).findAll();
+
+            //TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
+			//		new ToirDatabaseContext(getActivity()
+			//				.getApplicationContext()));
 
 			List<HashMap<String, String>> elementList = new ArrayList<HashMap<String, String>>();
 			String[] from = { "name", "img" };
 			int[] to = { R.id.lv1_firstLine, R.id.lv1_icon };
-			String taskStatusUuid;
+			String orderStatusUuid;
+            String orderStatusTitle="неизвестен";
 			HashMap<String, String> element;
 
-			for (Task item : taskList) {
+			for (Orders item : orders) {
 				element = new HashMap<String, String>();
+                OrderStatus orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",item.getOrderStatusUuid()).findFirst();
+                if (orderStatus!=null) orderStatusTitle=orderStatus.getTitle();
 				element.put(
 						"name",
 						"["
-								+ DataUtils.getDate(item.getCreatedAt(),
+								+ DataUtils.getDate(item.getReceiveDate(),
 										"dd-MM-yyyy HH:mm")
 								+ "] Статус: "
-								+ taskStatusDBAdapter.getNameByUUID(item
-										.getTask_status_uuid()));
+								+ orderStatusTitle);
 				// default
 				element.put("img", Integer.toString(R.drawable.checkmark_32));
+                orderStatusUuid = item.getOrderStatusUuid();
 
-				taskStatusUuid = item.getTask_status_uuid();
-
-				if (taskStatusUuid
-						.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
+				if (orderStatusUuid
+						.equals(OrderStatus.Status.UNCOMPLETE)) {
 					element.put("img",
 							Integer.toString(R.drawable.forbidden_32));
 				}
 
-				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.COMPLETE)) {
+				if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE)) {
 					element.put("img",
 							Integer.toString(R.drawable.checkmark_32));
 				}
 
-				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.IN_WORK)) {
+				if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK)) {
 					element.put("img",
 							Integer.toString(R.drawable.information_32));
 				}
 
-				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.NEW)) {
+				if (orderStatusUuid.equals(OrderStatus.Status.NEW)) {
 					element.put("img", Integer.toString(R.drawable.help_32));
 				}
 

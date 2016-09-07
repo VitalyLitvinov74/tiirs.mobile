@@ -37,4 +37,8 @@ public class ToirRealm {
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(context).build())
                         .build());
     }
+
+    public static boolean isDBActual() {
+        return Realm.getDefaultInstance().getVersion() == Realm.getDefaultInstance().getVersion();
+    }
 }

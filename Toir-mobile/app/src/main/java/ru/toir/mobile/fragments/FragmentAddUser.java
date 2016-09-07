@@ -22,11 +22,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import io.realm.Realm;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.tables.Users;
+//import ru.toir.mobile.ToirDatabaseContext;
+//import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.realm.User;
+//import ru.toir.mobile.db.tables.Users;
 
 public class FragmentAddUser extends Fragment implements View.OnClickListener {
     private static final int PICK_PHOTO_FOR_AVATAR = 1;
@@ -34,18 +36,20 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
     private EditText name,login,pass,tag_id;
     Spinner typeSpinner;
     Spinner whoSpinner;
+    private Realm realmDB;
 
     public FragmentAddUser() {
         // Required empty public constructor
     }
 
-    public static FragmentAddUser newInstance(String title) {
+    public static FragmentAddUser newInstance() {
         return (new FragmentAddUser());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_addprofile, container, false);
+        realmDB = Realm.getDefaultInstance();
         iView = (ImageView) view.findViewById(R.id.profile_add_image);
         iView.setOnClickListener(this); // calling onClick() method
         Button one = (Button) view.findViewById(R.id.profile_button_submit);
@@ -107,14 +111,14 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.profile_button_submit:
-                UsersDBAdapter users = new UsersDBAdapter(
-                        new ToirDatabaseContext(getActivity().getApplicationContext()));
-                Users profile;
+                //UsersDBAdapter users = new UsersDBAdapter(
+                //        new ToirDatabaseContext(getActivity().getApplicationContext()));
+                //Users profile;
+                User user = realmDB.where(User.class).equalTo("tagId", tag_id.getText().toString()).findFirst();
                 String image_name = "profile";
-                profile = users.getUserByTagId(tag_id.getText().toString());
-                if (profile!=null) {
+                if (user!=null) {
                      Toast.makeText(getActivity().getApplicationContext(),
-                            "Пользователь с логином " + profile.getLogin() + " уже есть на этом устройстве", Toast.LENGTH_LONG).show();
+                            "Пользователь с логином " + user.getLogin() + " уже есть на этом устройстве", Toast.LENGTH_LONG).show();
                      break;
                     }
                 if (name.getText().toString().length()<2 || login.getText().toString().length()<2 || tag_id.getText().toString().length()<2)
@@ -123,27 +127,27 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
                                 "Вы должны заполнить все поля!", Toast.LENGTH_LONG).show();
                         break;
                     }
-                profile = new Users();
+                User profile = realmDB.createObject(User.class);
                 profile.setName(name.getText().toString());
                 profile.setImage(image_name);
                 profile.setLogin(login.getText().toString());
                 profile.setPass(pass.getText().toString());
                 profile.setType(typeSpinner.getSelectedItemPosition());
                 profile.setUuid(java.util.UUID.randomUUID().toString());
-                profile.setTag_id(tag_id.getText().toString());
-                profile.setWhois(whoSpinner.getSelectedItem().toString());
+                profile.setTagId(tag_id.getText().toString());
+                profile.setWhoIs(whoSpinner.getSelectedItem().toString());
                 profile.setActive(true);
-                long id = users.replaceItem(profile);
                 try {
-                    image_name ="profile"+id+".jpg";
+                    image_name ="profile"+profile.get_id()+".jpg";
                     storeImage(image_name);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 profile.setImage(image_name);
-                users.replaceItem(profile.getUuid(),profile.getName(),profile.getLogin(),profile.getPass(),profile.getType(),profile.getTag_id(),true,profile.getWhois(),profile.getImage(),false);
-                profile=users.getUserByTagId(tag_id.getText().toString());
-                if (profile!=null)
+                //users.replaceItem(profile.getUuid(),profile.getName(),profile.getLogin(),profile.getPass(),profile.getType(),profile.getTag_id(),true,profile.getWhois(),profile.getImage(),false);
+                //TODO проверка, нужна ли
+                user = realmDB.where(User.class).equalTo("tagId", tag_id.getText().toString()).findFirst();
+                if (user.get_id()>0)
                     {
                        ((MainActivity)getActivity()).addProfile(profile);
                         ((MainActivity)getActivity()).refreshProfileList();
