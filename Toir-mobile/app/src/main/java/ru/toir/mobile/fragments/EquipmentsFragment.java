@@ -19,10 +19,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
@@ -250,6 +250,10 @@ public class EquipmentsFragment extends Fragment {
         if (!equipmentModelUuid.equals(""))
             equipment = realmDB.where(Equipment.class).equalTo("equipmentModelUuid",equipmentModelUuid).findAll();
 
+        //realm.addChangeListener(listener);
+        RealmList data = getRealmListData();
+        ArrayAdapter adapter = new ArrayAdapter(data);
+        listView.setAdapter(adapter);
         //equipmentListView.removeAllViews();
         //equipmentListView.addView(equipment);
 	}
