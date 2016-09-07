@@ -360,19 +360,19 @@ public class TaskFragment extends Fragment {
 		});
 
 		// адаптеры для выпадающих списков по типу содержимого
-		operationTypeAdapter = new ArrayAdapter<OperationType>(getActivity(),
+		operationTypeAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<OperationType>());
 
-		criticalTypeAdapter = new ArrayAdapter<CriticalType>(getActivity(),
+		criticalTypeAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<CriticalType>());
 
-		taskStatusAdapter = new ArrayAdapter<TaskStatus>(getActivity(),
+		taskStatusAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<TaskStatus>());
 
-		sortFieldAdapter = new ArrayAdapter<SortField>(getActivity(),
+		sortFieldAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<SortField>());
 
@@ -643,8 +643,8 @@ public class TaskFragment extends Fragment {
 	/**
 	 * Диалог изменения статуса операции
 	 * 
-	 * @param operationUuid
-	 * @param taskUuid
+	 * @param operationUuid - uuid операции
+	 * @param taskUuid - uuid задачи
 	 */
 	private void closeOperationManual(final String operationUuid,
 			final String taskUuid) {
@@ -716,7 +716,7 @@ public class TaskFragment extends Fragment {
 			}
 		}
 
-		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<OperationStatus>(
+		ArrayAdapter<OperationStatus> adapter = new ArrayAdapter<>(
 				getActivity(), android.R.layout.simple_spinner_dropdown_item,
 				operationStatusList);
 		Spinner statusSpinner = (Spinner) myView
@@ -729,7 +729,7 @@ public class TaskFragment extends Fragment {
 	/**
 	 * Диалог ручного закрытия наряда
 	 * 
-	 * @param taskUuid
+	 * @param taskUuid - - uuid задачи
 	 */
 	private void closeTaskManual(final String taskUuid) {
 

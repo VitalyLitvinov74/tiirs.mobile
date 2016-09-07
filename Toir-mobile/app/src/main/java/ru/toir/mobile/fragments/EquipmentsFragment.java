@@ -29,6 +29,7 @@ import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
+import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.utils.DataUtils;
 
@@ -48,20 +49,12 @@ public class EquipmentsFragment extends Fragment {
 	private ArrayAdapter<EquipmentType> typeSpinnerAdapter;
 
 	private SpinnerListener spinnerListener;
-
 	private SimpleCursorAdapter equipmentAdapter;
 
     public static EquipmentsFragment newInstance() {
 		return new EquipmentsFragment();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
-	 * android.view.ViewGroup, android.os.Bundle)
-	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -161,27 +154,32 @@ public class EquipmentsFragment extends Fragment {
 
 	private void fillTypeSpinner() {
 
-		EquipmentTypeDBAdapter typeDBAdapter = new EquipmentTypeDBAdapter(
-				new ToirDatabaseContext(getActivity()));
-		ArrayList<EquipmentType> typeList = typeDBAdapter.getItems();
+		//EquipmentTypeDBAdapter typeDBAdapter = new EquipmentTypeDBAdapter(
+		//		new ToirDatabaseContext(getActivity()));
+		//ArrayList<EquipmentType> typeList = typeDBAdapter.getItems();
 
-		EquipmentType allTypes = new EquipmentType();
-		allTypes.setUuid(null);
-		allTypes.setTitle("Все типы");
-		typeList.add(0, allTypes);
+        RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
+        //typeSpinnerAdapter = new ArrayAdapter(equipmentType);
+        //typeSpinner.setAdapter(typeSpinnerAdapter);
 
+		//EquipmentType allTypes = new EquipmentType();
+		// TODO стоит наверное добавить запись "любой тип" напрямую в таблицу?
+		//allTypes.setUuid(null);
+		//allTypes.setTitle("Все типы");
+		//typeList.add(0, allTypes);
 		typeSpinnerAdapter.clear();
-		typeSpinnerAdapter.addAll(typeList);
+		typeSpinnerAdapter.addAll(equipmentType);
 		typeSpinnerAdapter.notifyDataSetChanged();
-
 	}
 
 	private void fillSortFieldSpinner() {
 
 		sortSpinnerAdapter.clear();
 		sortSpinnerAdapter.add(new SortField("Сортировка", null));
-		sortSpinnerAdapter.add(new SortField("По степени критичности",
-				CriticalTypeDBAdapter.Projection.TYPE));
+        sortSpinnerAdapter.add(new SortField("По степени критичности",
+                "criticalTypeUuid"));
+		//sortSpinnerAdapter.add(new SortField("По степени критичности",
+		//		CriticalTypeDBAdapter.Projection.TYPE));
 		sortSpinnerAdapter.add(new SortField("По статусу",
 				EquipmentStatusDBAdapter.Projection.TITLE));
 		sortSpinnerAdapter.add(new SortField("По дате обслуживания",
@@ -229,24 +227,31 @@ public class EquipmentsFragment extends Fragment {
 					.getSelectedItem();
 			if (typeSelected != null) {
 				type = typeSelected.getUuid();
-
 			}
 
 			SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
 			if (fieldSelected != null) {
 				orderBy = fieldSelected.getField();
 			}
-
 			FillListViewEquipments(type, orderBy);
 		}
 	}
 
-	private void FillListViewEquipments(String type, String sort) {
-		EquipmentDBAdapter adapter = new EquipmentDBAdapter(
-				new ToirDatabaseContext(getActivity()));
+	private void FillListViewEquipments(String equipmentModelUuid, String equipmentStatusUuid, String criticalTypeUuid,  String sort) {
+		//EquipmentDBAdapter adapter = new EquipmentDBAdapter(
+		//		new ToirDatabaseContext(getActivity()));
+		//equipmentAdapter.changeCursor(adapter.getItemsWithInfo(type, sort));
+        //TODO получаем из realm с сортировкой
+        RealmResults<Equipment> equipment;
+        if (!criticalTypeUuid.equals(""))
+            equipment = realmDB.where(Equipment.class).equalTo("criticalTypeUuid",criticalTypeUuid).findAll();
+        if (!equipmentStatusUuid.equals(""))
+            equipment = realmDB.where(Equipment.class).equalTo("equipmentStatusUuid",equipmentStatusUuid).findAll();
+        if (!equipmentModelUuid.equals(""))
+            equipment = realmDB.where(Equipment.class).equalTo("equipmentModelUuid",equipmentModelUuid).findAll();
 
-		equipmentAdapter.changeCursor(adapter.getItemsWithInfo(type, sort));
-
+        //equipmentListView.removeAllViews();
+        //equipmentListView.addView(equipment);
 	}
 
 	@Override

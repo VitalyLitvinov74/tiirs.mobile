@@ -89,7 +89,8 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
                 InputStream inputStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
                 Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
                 if (myBitmap!=null) {
-                    int height= (int) ((int)200*(float)((float)myBitmap.getHeight()/(float)myBitmap.getWidth()));
+                    //int height= (int) ((int)200*(float)((float)myBitmap.getHeight()/(float)myBitmap.getWidth()));
+                    int height= (int) (200*(float)(myBitmap.getHeight()/myBitmap.getWidth()));
                     if (height>0) {
                         Bitmap myBitmap2 = Bitmap.createScaledBitmap(myBitmap, 200, height, false);
                         iView.setImageBitmap(myBitmap2);
@@ -127,6 +128,7 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
                                 "Вы должны заполнить все поля!", Toast.LENGTH_LONG).show();
                         break;
                     }
+                realmDB.beginTransaction();
                 User profile = realmDB.createObject(User.class);
                 profile.setName(name.getText().toString());
                 profile.setImage(image_name);
@@ -144,6 +146,8 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
                     e.printStackTrace();
                 }
                 profile.setImage(image_name);
+                realmDB.commitTransaction();
+
                 //users.replaceItem(profile.getUuid(),profile.getName(),profile.getLogin(),profile.getPass(),profile.getType(),profile.getTag_id(),true,profile.getWhois(),profile.getImage(),false);
                 //TODO проверка, нужна ли
                 user = realmDB.where(User.class).equalTo("tagId", tag_id.getText().toString()).findFirst();
@@ -167,7 +171,9 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
         String target_filename = sd_card.getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getActivity().getPackageName() + File.separator + "img" + File.separator + name;
         File target_file = new File (target_filename);
         if (!target_file.getParentFile().exists()) {
-            target_file.getParentFile().mkdirs();
+            if (!target_file.getParentFile().mkdirs())
+                Toast.makeText(getActivity().getApplicationContext(),
+                        "Невозможно создать директорию!", Toast.LENGTH_LONG).show();
         }
         iView.buildDrawingCache();
         bmp = iView.getDrawingCache();
