@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
     public int currentFragment = NO_FRAGMENT;
     private ArrayList<IProfile> iprofilelist;
+    int activeUserID = 0;
     //private List<Users> profilesList;
     private RealmResults<User> profilesList;
     private long users_id[];
@@ -466,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false),
                         //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
+                        //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false),
@@ -486,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == FRAGMENT_CAMERA) {
                                 currentFragment = FRAGMENT_CAMERA;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, NativeCameraFragment.newInstance("")).commit();
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, NativeCameraFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
                                 currentFragment = FRAGMENT_CHARTS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance()).commit();
@@ -559,7 +560,6 @@ public class MainActivity extends AppCompatActivity {
         //make sure to init the cache after the DrawerBuilder was created as this will first clear the cache to make sure no old elements are in
         RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
         //only set the active selection or active profile if we do not recreate the activity
-        int activeUserID = 0;
         if (savedInstanceState == null) {
             // set the selection to the item with the identifier 11
             result.setSelection(21, false);
@@ -733,14 +733,16 @@ public class MainActivity extends AppCompatActivity {
             //        new ToirDatabaseContext(getApplicationContext()));
             User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
             if (drawerItem.getIdentifier() == 12) {
-                boolean isActive = false;
+                realmDB.beginTransaction();
                 if (isChecked) {
-                    isActive = true;
+                    //isActive = true;
                     user.setActive(true);
                     //users.replaceItem(user);
-                } else
-                    isActive = false;
-                user.setActive(false);
+                } else {
+                    //isActive = false;
+                    user.setActive(false);
+                }
+                realmDB.commitTransaction();
                 //users.replaceItem(user);
             }
         }

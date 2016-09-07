@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
@@ -36,11 +37,10 @@ import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.Equipment;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.Task;
-import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
 
@@ -52,6 +52,8 @@ public class GPSFragment extends Fragment {
 	private ListView lv_equipment;
 	Location location;
 	TextView gpsLog;
+    private Realm realmDB;
+    private User user;
 	ArrayList<OverlayItem> aOverlayItemArray;
 	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
 	// private SimpleCursorAdapter equipmentAdapter;
@@ -88,17 +90,18 @@ public class GPSFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
+        realmDB = Realm.getDefaultInstance();
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		// String equipmentUUID = "";
 		Float equipment_latitude = 0f, equipment_longitude = 0f;
-		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-				getActivity().getApplicationContext()));
+		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
+		//		getActivity().getApplicationContext()));
 		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
 		// (если он будет храниться глобально, то запрашивать постоянно уже не
 		// надо будет)
-		Users user = users.getUserByTagId(tagId);
+		//Users user = users.getUserByTagId(tagId);
+        user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
 		LocationManager lm = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
 		if (lm != null) {

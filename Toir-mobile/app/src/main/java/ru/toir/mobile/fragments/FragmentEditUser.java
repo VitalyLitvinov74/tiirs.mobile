@@ -21,18 +21,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import io.realm.Realm;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.db.realm.User;
 
 public class FragmentEditUser extends Fragment implements View.OnClickListener {
     private static final int PICK_PHOTO_FOR_AVATAR = 1;
     private ImageView iView;
     private EditText name,login,pass;
     private String image_name;
-    Users user;
+    private Realm realmDB;
+    private User user;
 
     public FragmentEditUser() {
         // Required empty public constructor
@@ -45,6 +45,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_editprofile, container, false);
+        realmDB = Realm.getDefaultInstance();
         iView = (ImageView) view.findViewById(R.id.profile_add_image);
         iView.setOnClickListener(this); // calling onClick() method
         Button one = (Button) view.findViewById(R.id.profile_button_submit);
@@ -57,9 +58,10 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         pass = (EditText) view.findViewById(R.id.profile_add_password);
         //login.setEnabled(false);
 
-        UsersDBAdapter users = new UsersDBAdapter(
-                new ToirDatabaseContext(getActivity().getApplicationContext()));
-        user = users.getActiveUser();
+        User user = realmDB.where(User.class).equalTo("active", true).findFirst();
+        //UsersDBAdapter users = new UsersDBAdapter(
+        //        new ToirDatabaseContext(getActivity().getApplicationContext()));
+        //user = users.getActiveUser();
         if (user==null) {
             Toast.makeText(getActivity().getApplicationContext(), "Пользователь не выбран, пожалуйста выберите или содайте профиль", Toast.LENGTH_LONG).show();
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("")).commit();
@@ -73,7 +75,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
 
             File sd_card = Environment.getExternalStorageDirectory();
             String target_filename = sd_card.getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getActivity().getPackageName() + File.separator + "img" + File.separator + user.getImage();
-            File imgFile = new  File(target_filename);
+            File imgFile = new File(target_filename);
             if(imgFile.exists()){
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 iView.setImageBitmap(myBitmap);
@@ -114,8 +116,8 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        UsersDBAdapter users = new UsersDBAdapter(
-                new ToirDatabaseContext(getActivity().getApplicationContext()));
+        //UsersDBAdapter users = new UsersDBAdapter(
+        //        new ToirDatabaseContext(getActivity().getApplicationContext()));
 
         switch (v.getId()) {
 
@@ -137,15 +139,21 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Long id = users.replaceItem(user.getUuid(),name.getText().toString(), login.getText().toString(),user.getPass(),user.getType(),user.getTag_id(),true,user.getWhois(),user.getImage(), false);
-                if (id>0)
-                       getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("Welcome")).commit();
+                user = realmDB.where(User.class).equalTo("active", true).findFirst();
+                realmDB.beginTransaction();
+                user.setName(name.getText().toString());
+                user.setLogin(login.getText().toString());
+                user.setPass(pass.getText().toString());
+                realmDB.commitTransaction();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("Welcome")).commit();
                 break;
 
             case R.id.profile_button_delete:
-                long user_id = users.getActiveUser().get_id();
-                users.deleteItem(user.getTag_id());
-                ((MainActivity)getActivity()).deleteProfile((int)user_id);
+                user = realmDB.where(User.class).equalTo("active", true).findFirst();
+                ((MainActivity)getActivity()).deleteProfile((int)user.get_id());
+                realmDB.beginTransaction();
+                user.deleteFromRealm();
+                realmDB.commitTransaction();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("Welcome")).commit();
                 break;
 

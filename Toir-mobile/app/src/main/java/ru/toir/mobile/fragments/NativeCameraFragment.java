@@ -38,7 +38,7 @@ public class NativeCameraFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static NativeCameraFragment newInstance(String title) {
+    public static NativeCameraFragment newInstance() {
         //FragmentAddUser f = new FragmentAddUser();
         //Bundle args = new Bundle();
         return (new NativeCameraFragment());

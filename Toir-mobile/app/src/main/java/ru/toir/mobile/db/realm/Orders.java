@@ -4,8 +4,8 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Dmitriy Logachev
- * Created on 05.09.16.
+ * @author Olejek
+ * Created on 07.09.16.
  */
 public class Orders extends RealmObject {
     @PrimaryKey
@@ -16,8 +16,8 @@ public class Orders extends RealmObject {
     private String userUuid;
     private int receiveDate;
     private int startDate;
-    private int createdAt;
-    private int changedAt;
+    private long createdAt;
+    private long changedAt;
     private int openDate;
     private int closeDate;
     private String orderStatusUuid;
@@ -122,5 +122,19 @@ public class Orders extends RealmObject {
     }
     public void setUpdate(int updated) {
         this.updated = updated;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getChangedAt() {
+        return changedAt;
+    }
+    public void setChangedAt(long changedAt) {
+        this.changedAt = changedAt;
     }
 }

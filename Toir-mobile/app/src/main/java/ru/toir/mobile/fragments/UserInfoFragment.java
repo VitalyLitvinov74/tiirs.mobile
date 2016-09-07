@@ -175,8 +175,7 @@ public class UserInfoFragment extends Fragment {
 	}
 
 	private void FillListViewTasks(View view) {
-
-		String tagId = AuthorizedUser.getInstance().getTagId();
+		//String tagId = AuthorizedUser.getInstance().getTagId();
 		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 		//		getActivity().getApplicationContext()));
         User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
@@ -190,7 +189,6 @@ public class UserInfoFragment extends Fragment {
 			//				.getApplicationContext()));
 			//ArrayList<Task> taskList = taskDBAdapter.getOrders();
             RealmResults<Orders> orders = realmDB.where(Orders.class).equalTo("userUuid",AuthorizedUser.getInstance().getTagId()).findAll();
-
             //TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
 			//		new ToirDatabaseContext(getActivity()
 			//				.getApplicationContext()));
@@ -203,7 +201,7 @@ public class UserInfoFragment extends Fragment {
 			HashMap<String, String> element;
 
 			for (Orders item : orders) {
-				element = new HashMap<String, String>();
+				element = new HashMap<>();
                 OrderStatus orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",item.getOrderStatusUuid()).findFirst();
                 if (orderStatus!=null) orderStatusTitle=orderStatus.getTitle();
 				element.put(

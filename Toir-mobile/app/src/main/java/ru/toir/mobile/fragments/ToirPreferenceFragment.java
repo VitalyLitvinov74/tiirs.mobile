@@ -3,14 +3,6 @@
  */
 package ru.toir.mobile.fragments;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import ru.toir.mobile.R;
-import ru.toir.mobile.rfid.RfidDriverBase;
-import dalvik.system.DexFile;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -20,6 +12,16 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
+import dalvik.system.DexFile;
+import ru.toir.mobile.R;
+import ru.toir.mobile.rfid.RfidDriverBase;
 
 /**
  * @author koputo
@@ -44,7 +46,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 						.getApplicationContext());
 
 		// получаем список драйверов по имени класса
-		List<String> driverClassList = new ArrayList<String>();
+		List<String> driverClassList = new ArrayList<>();
 		try {
 			DexFile df = new DexFile(getActivity().getApplicationContext()
 					.getPackageCodePath());
@@ -63,7 +65,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		// строим список драйверов с именами и классами
 		Class<?> driverClass;
 		List<String> drvNames = new ArrayList<String>();
-		List<String> drvKeys = new ArrayList<String>();
+		List<String> drvKeys = new ArrayList<>();
 		for (String classPath : driverClassList) {
 
 			driverClass = null;
@@ -71,8 +73,10 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 				// пытаемся получить класс драйвера
 				driverClass = Class.forName(classPath);
 				// пытаемся получить свойство DRIVER_NAME
-				String name = (String) (driverClass
-						.getDeclaredField("DRIVER_NAME").get(new String()));
+				//String name = (String) (driverClass
+				//		.getDeclaredField("DRIVER_NAME").get(new String()));
+                String name = (String) (driverClass
+                		.getDeclaredField("DRIVER_NAME").get(""));
 				if (name != null && !name.equals("")) {
 					drvNames.add(name);
 					drvKeys.add(classPath);

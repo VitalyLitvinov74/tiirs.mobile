@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
@@ -27,10 +29,14 @@ import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-import ru.toir.mobile.db.tables.EquipmentType;
+import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.utils.DataUtils;
 
+//import ru.toir.mobile.db.tables.EquipmentType;
+
 public class EquipmentsFragment extends Fragment {
+    private Realm realmDB;
+    private EquipmentType equipmentType;
 
 	private boolean isInit;
 
@@ -62,13 +68,20 @@ public class EquipmentsFragment extends Fragment {
 
 		View rootView = inflater.inflate(R.layout.equipment_reference_layout,
 				container, false);
+        realmDB = Realm.getDefaultInstance();
 
 		// обработчик для выпадающих списков у нас один
 		spinnerListener = new SpinnerListener();
 
 		// настраиваем сортировку по типу оборудования
 		typeSpinner = (Spinner) rootView.findViewById(R.id.erl_type_spinner);
-		typeSpinnerAdapter = new ArrayAdapter<EquipmentType>(getContext(),
+        //typeSpinnerAdapter = realmDB.where(EquipmentType.class).findAll();
+        //RealmResults<EquipmentType> equipmentType;
+        //equipmentType = realmDB.where(EquipmentType.class).findAll();
+        //typeSpinnerAdapter = new ArrayAdapter(equipmentType);
+        //typeSpinner.setAdapter(typeSpinnerAdapter);
+
+        typeSpinnerAdapter = new ArrayAdapter<EquipmentType>(getContext(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<EquipmentType>());
 		typeSpinner.setAdapter(typeSpinnerAdapter);
@@ -83,6 +96,7 @@ public class EquipmentsFragment extends Fragment {
 		sortSpinner.setAdapter(sortSpinnerAdapter);
 		sortSpinner.setOnItemSelectedListener(spinnerListener);
 
+        // TODO и тут я затупил
 		equipmentListView = (ListView) rootView
 				.findViewById(R.id.erl_equipment_listView);
 

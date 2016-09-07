@@ -114,7 +114,7 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         rightAxis.setDrawGridLines(false);
         rightAxis.setTypeface(mTf);
         rightAxis.setLabelCount(8);
-        rightAxis.setTextColor(getResources().getColor(R.color.white));
+        //rightAxis.setTextColor(ContextCompat.getColor(context, R.color.your_color););
         rightAxis.setTextColor(Color.WHITE);
         //rightAxis.setValueFormatter(custom);
         rightAxis.setSpaceTop(15f);
