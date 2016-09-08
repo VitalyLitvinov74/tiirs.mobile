@@ -248,7 +248,7 @@ public class GPSFragment extends Fragment {
 				// пример тупой, но полагю это почти то что тебе было нужно
 				ViewPager pager = (ViewPager) getActivity().findViewById(
 						R.id.pager);
-				pager.setCurrentItem(PageAdapter.TASK_FRAGMENT);
+				//pager.setCurrentItem(PageAdapter.TASK_FRAGMENT);
 
 				return super.onLongPressHelper(index, item);
 			}

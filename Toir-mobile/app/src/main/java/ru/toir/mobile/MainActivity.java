@@ -47,7 +47,6 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import ru.toir.mobile.db.ToirRealm;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
@@ -282,6 +281,25 @@ public class MainActivity extends AppCompatActivity {
 			// принудительное обновление приложения
 			finish();
 		}
+        /*
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Equipment equipment = realmDB.createObject(Equipment.class);
+                equipment.setCriticalTypeUuid("1234-5678");
+                equipment.setEquipmentModelUuid("1234-5678");
+                equipment.setEquipmentStatusUuid("1234-5678");
+                equipment.setImage("image");
+                equipment.setInventoryNumber("IN:001212");
+                equipment.setUuid("8877-5678");
+                equipment.setTitle("Котел газовый GTV-12121");
+                equipment.setTagId("1234-5678");
+                equipment.setUserUuid("89121-12122");
+                equipment.setLocation("55.34453,45.234234");
+            }
+        });
+        */
+        /*
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -297,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
                 profile.setActive(true);
                 profile.setImage("");
             }
-        });
+        });*/
     }
 
 	public boolean initDB() {
@@ -306,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
-//            ToirRealm.init(this);
+            //ToirRealm.init(this);
             // получаем базу realm
             realmDB = Realm.getDefaultInstance();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
