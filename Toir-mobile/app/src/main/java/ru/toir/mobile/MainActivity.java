@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
 		try {
-            ToirRealm.init(this);
+//            ToirRealm.init(this);
             // получаем базу realm
             realmDB = Realm.getDefaultInstance();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
