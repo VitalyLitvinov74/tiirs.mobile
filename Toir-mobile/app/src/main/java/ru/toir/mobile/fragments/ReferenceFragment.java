@@ -30,15 +30,24 @@ import java.util.List;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.SortField;
+import ru.toir.mobile.db.adapters.AlertTypeAdapter;
+import ru.toir.mobile.db.adapters.CriticalTypeAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
+import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentStatusAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationStatusAdapter;
+import ru.toir.mobile.db.adapters.OperationTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.DocumentationType;
@@ -122,14 +131,14 @@ public class ReferenceFragment extends Fragment {
 		extraSpinner = (Spinner) rootView.findViewById(R.id.spinner3);
 		contentListView = (ListView) rootView.findViewById(R.id.listView1);
 
-		typeList = new ArrayList<SortField>();
-		typeSpinnerAdapter = new ArrayAdapter<SortField>(getActivity()
+		typeList = new ArrayList<>();
+		typeSpinnerAdapter = new ArrayAdapter<>(getActivity()
 				.getApplicationContext(),
 				android.R.layout.simple_spinner_dropdown_item, typeList);
 		typeSpinner.setAdapter(typeSpinnerAdapter);
 
-		extraList = new ArrayList<SortField>();
-		extraSpinnerAdapter = new ArrayAdapter<SortField>(getActivity()
+		extraList = new ArrayList<>();
+		extraSpinnerAdapter = new ArrayAdapter<>(getActivity()
 				.getApplicationContext(),
 				android.R.layout.simple_spinner_dropdown_item, extraList);
 		extraSpinner.setAdapter(extraSpinnerAdapter);
@@ -143,14 +152,14 @@ public class ReferenceFragment extends Fragment {
 				R.array.references_array);
 		String[] tmpValue;
 		SortField item;
-		referenceList = new ArrayList<SortField>();
+		referenceList = new ArrayList<>();
 		for (String value : referenceArray) {
 			tmpValue = value.split(":");
 			item = new SortField(tmpValue[0], tmpValue[1]);
 			referenceList.add(item);
 		}
 
-		referenceSpinnerAdapter = new ArrayAdapter<SortField>(getActivity(),
+		referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item, referenceList);
 
 		referenceSpinner.setAdapter(referenceSpinnerAdapter);
@@ -184,48 +193,52 @@ public class ReferenceFragment extends Fragment {
 					.getItemAtPosition(position);
 			String selected = selectedItem.getField();
 
-			if (selected.equals(EquipmentDBAdapter.TABLE_NAME)) {
+			if (selected.equals(EquipmentAdapter.TABLE_NAME)) {
 
 				fillTypeExtraEquipment();
 				fillListViewEquipment("", "");
 
-			} else if (selected
-					.equals(EquipmentDocumentationDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(DocumentationTypeAdapter.TABLE_NAME)) {
 
 				fillTypeExtraDocumentation();
 				fillListViewDocumentation("");
 
-			} else if (selected.equals(EquipmentTypeDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(EquipmentTypeAdapter.TABLE_NAME)) {
 
 				fillTypeExtraEquipmentType();
 				fillListViewEquipmentType();
 
-			} else if (selected.equals(CriticalTypeDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(CriticalTypeAdapter.TABLE_NAME)) {
 
 				fillTypeExtraCriticalType();
 				fillListViewCriticalType();
 
-			} else if (selected.equals(MeasureTypeDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(AlertTypeAdapter.TABLE_NAME)) {
 
 				fillTypeExtraMeasurementType();
 				fillListViewMeasurementType();
 
-			} else if (selected.equals(OperationResultDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(OperationVerdictAdapter.TABLE_NAME)) {
 
 				fillTypeExtraOperationResult();
 				fillListViewOperationResult();
 
-			} else if (selected.equals(OperationTypeDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(OperationTypeAdapter.TABLE_NAME)) {
 
 				fillTypeExtraOperationType();
 				fillListViewOperationType();
+
+            } else if (selected.equals(OperationStatusAdapter.TABLE_NAME)) {
+
+                fillTypeExtraOperationType();
+                fillListViewOperationType();
 
 			} else if (selected.equals(TaskStatusDBAdapter.TABLE_NAME)) {
 
 				fillTypeExtraTaskStatus();
 				fillListViewTaskStatus();
 
-			} else if (selected.equals(EquipmentStatusDBAdapter.TABLE_NAME)) {
+			} else if (selected.equals(EquipmentStatusAdapter.TABLE_NAME)) {
 
 				fillTypeExtraEquipmentStatus();
 				fillListViewEquipmentStatus();

@@ -281,11 +281,21 @@ public class MainActivity extends AppCompatActivity {
 			// принудительное обновление приложения
 			finish();
 		}
+
         /*
+        final RealmResults<Equipment> results = realmDB.where(Equipment.class).findAll();
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                results.deleteAllFromRealm();
+            }
+        });
+
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Equipment equipment = realmDB.createObject(Equipment.class);
+                equipment.set_id(1);
                 equipment.setCriticalTypeUuid("1234-5678");
                 equipment.setEquipmentModelUuid("1234-5678");
                 equipment.setEquipmentStatusUuid("1234-5678");
@@ -296,10 +306,12 @@ public class MainActivity extends AppCompatActivity {
                 equipment.setTagId("1234-5678");
                 equipment.setUserUuid("89121-12122");
                 equipment.setLocation("55.34453,45.234234");
+                equipment.setLatitude(55);
+                equipment.setLongitude(55);
+                equipment.setStartDate(123123122);
             }
-        });
-        */
-        /*
+        });*/
+                /*
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

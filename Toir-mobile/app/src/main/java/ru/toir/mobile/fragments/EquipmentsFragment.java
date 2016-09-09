@@ -1,7 +1,6 @@
 package ru.toir.mobile.fragments;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,9 +20,6 @@ import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
 
@@ -31,8 +27,7 @@ import ru.toir.mobile.db.realm.EquipmentType;
 
 public class EquipmentsFragment extends Fragment {
     private Realm realmDB;
-    private EquipmentType equipmentType;
-
+    //private EquipmentType equipmentType;
 	private boolean isInit;
 
 	private Spinner sortSpinner;
@@ -62,13 +57,7 @@ public class EquipmentsFragment extends Fragment {
 
 		// настраиваем сортировку по типу оборудования
 		typeSpinner = (Spinner) rootView.findViewById(R.id.erl_type_spinner);
-        //typeSpinnerAdapter = realmDB.where(EquipmentType.class).findAll();
-        //RealmResults<EquipmentType> equipmentType;
-        //equipmentType = realmDB.where(EquipmentType.class).findAll();
-        //typeSpinnerAdapter = new ArrayAdapter(equipmentType);
-        //typeSpinner.setAdapter(typeSpinnerAdapter);
-
-        typeSpinnerAdapter = new ArrayAdapter<EquipmentType>(getContext(),
+        typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<EquipmentType>());
 		typeSpinner.setAdapter(typeSpinnerAdapter);
@@ -77,7 +66,7 @@ public class EquipmentsFragment extends Fragment {
 		// настраиваем сортировку по полям
 		sortSpinner = (Spinner) rootView
 				.findViewById(R.id.erl_sort_field_spinner);
-		sortSpinnerAdapter = new ArrayAdapter<SortField>(getContext(),
+		sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<SortField>());
 		sortSpinner.setAdapter(sortSpinnerAdapter);
@@ -85,10 +74,6 @@ public class EquipmentsFragment extends Fragment {
 
 		equipmentListView = (ListView) rootView
 				.findViewById(R.id.erl_equipment_listView);
-
-        RealmResults<Equipment> equipments = realmDB.where(Equipment.class).findAll();
-        equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
-        equipmentListView.setAdapter(equipmentAdapter);
 
 		// создаём "пустой" адаптер для отображения списка оборудования
         /*
@@ -139,11 +124,6 @@ public class EquipmentsFragment extends Fragment {
 	}
 
 	private void fillTypeSpinner() {
-
-		//EquipmentTypeDBAdapter typeDBAdapter = new EquipmentTypeDBAdapter(
-		//		new ToirDatabaseContext(getActivity()));
-		//ArrayList<EquipmentType> typeList = typeDBAdapter.getItems();
-
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
         //typeSpinnerAdapter = new ArrayAdapter(equipmentType);
         //typeSpinner.setAdapter(typeSpinnerAdapter);
@@ -164,12 +144,10 @@ public class EquipmentsFragment extends Fragment {
 		sortSpinnerAdapter.add(new SortField("Сортировка", null));
         sortSpinnerAdapter.add(new SortField("По степени критичности",
                 "criticalTypeUuid"));
-		//sortSpinnerAdapter.add(new SortField("По степени критичности",
-		//		CriticalTypeDBAdapter.Projection.TYPE));
 		sortSpinnerAdapter.add(new SortField("По статусу",
-				EquipmentStatusDBAdapter.Projection.TITLE));
+				"equipmentStatusUuid"));
 		sortSpinnerAdapter.add(new SortField("По дате обслуживания",
-				EquipmentOperationDBAdapter.Projection.CHANGED_AT));
+				"startDate"));
 
 	}
 
@@ -179,10 +157,11 @@ public class EquipmentsFragment extends Fragment {
 		@Override
 		public void onItemClick(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
-			Cursor cursor = (Cursor) parentView.getItemAtPosition(position);
+            // TODO разобраться как вернуть объект при клике
+            Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
+            equipment = (Equipment)parentView.getSelectedItem();
 
-			String equipment_uuid = cursor.getString(cursor
-					.getColumnIndex(EquipmentDBAdapter.Projection.UUID));
+			String equipment_uuid = equipment.getUuid();
 
 			Intent equipmentInfo = new Intent(getActivity(),
 					EquipmentInfoActivity.class);
@@ -195,7 +174,7 @@ public class EquipmentsFragment extends Fragment {
 	}
 
 	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
-		boolean userSelect = false;
+		//boolean userSelect = false;
 
 		@Override
 		public void onNothingSelected(AdapterView<?> parentView) {
@@ -223,9 +202,6 @@ public class EquipmentsFragment extends Fragment {
 	}
 
 	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
-		//EquipmentDBAdapter adapter = new EquipmentDBAdapter(
-		//		new ToirDatabaseContext(getActivity()));
-		//equipmentAdapter.changeCursor(adapter.getItemsWithInfo(type, sort));
         RealmResults<Equipment> equipments;
         if (equipmentModelUuid!=null) {
             if (sort!=null)
@@ -239,14 +215,8 @@ public class EquipmentsFragment extends Fragment {
             else
                 equipments = realmDB.where(Equipment.class).findAll();
         }
-
         equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
         equipmentListView.setAdapter(equipmentAdapter);
-
-        //RealmResults<Equipment> equipment;
-        //RealmList<DetailPerson> detailperson;
-        //equipmentListView.removeAllViews();
-        //equipmentListView.addView(equipment);
 	}
 
 	@Override

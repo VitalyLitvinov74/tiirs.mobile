@@ -18,6 +18,7 @@ import ru.toir.mobile.db.realm.Equipment;
  * Created by koputo on 08.09.16.
  */
 public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements ListAdapter {
+    public static final String TABLE_NAME = "equipment";
 
     private static class ViewHolder{
         TextView uuid;
@@ -60,12 +61,12 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.equipmentStatusUuid = (TextView) convertView.findViewById(R.id.eril_status);
             viewHolder.criticalTypeUuid = (TextView) convertView.findViewById(R.id.eril_critical);
             viewHolder.startDate = (TextView) convertView.findViewById(R.id.eril_last_operation_date);
-            viewHolder.location = (TextView) convertView.findViewById(R.id.eril_location);
+            //viewHolder.location = (TextView) convertView.findViewById(R.id.eril_location);
             viewHolder.equipmentModelUuid = (TextView) convertView.findViewById(R.id.eril_type);
             viewHolder.inventoryNumber = (TextView) convertView.findViewById(R.id.eril_inventory_number);
             viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
@@ -78,7 +79,10 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         viewHolder.title.setText(equipment.getTitle());
         viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
         viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModelUuid());
-        viewHolder.location.setText(equipment.getLocation());
+        //viewHolder.location.setText(equipment.getLocation());
+        viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatusUuid());
+        viewHolder.criticalTypeUuid.setText(equipment.getCriticalTypeUuid());
+        viewHolder.startDate.setText(""+equipment.getStartDate());
         return convertView;
     }
 }
