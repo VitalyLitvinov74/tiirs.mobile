@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -18,11 +19,12 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
  * Created by koputo on 08.09.16.
  */
 public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> implements ListAdapter {
-    public static final String TABLE_NAME = "equipmentStatus";
+    public static final String TABLE_NAME = "EquipmentStatus";
 
     private static class ViewHolder{
         TextView uuid;
         TextView title;
+        ImageView icon;
     }
 
     public EquipmentStatusAdapter(@NonNull Context context, int resId, RealmResults<EquipmentStatus> data) {
@@ -54,6 +56,8 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
             viewHolder = new ViewHolder();
             viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
             viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+            viewHolder.icon = (ImageView) convertView.findViewById(R.id.lv_icon);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -62,7 +66,9 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
         if (adapterData!=null) {
             EquipmentStatus equipmentStatus = adapterData.get(position);
             viewHolder.title.setText(equipmentStatus.getTitle());
-            viewHolder.title.setText(equipmentStatus.getUuid());
+            viewHolder.uuid.setText(equipmentStatus.getUuid());
+            //TODO сопоставление изображений
+            viewHolder.icon.setImageResource(R.drawable.img_3);
         }
         return convertView;
     }

@@ -18,7 +18,7 @@ import ru.toir.mobile.db.realm.Equipment;
  * Created by koputo on 08.09.16.
  */
 public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements ListAdapter {
-    public static final String TABLE_NAME = "equipment";
+    public static final String TABLE_NAME = "Equipment";
 
     private static class ViewHolder{
         TextView uuid;

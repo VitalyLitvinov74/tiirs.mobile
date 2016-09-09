@@ -47,6 +47,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
@@ -282,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
 			finish();
 		}
 
-        /*
+
         final RealmResults<Equipment> results = realmDB.where(Equipment.class).findAll();
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
@@ -290,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 results.deleteAllFromRealm();
             }
         });
-
+/*
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -310,8 +311,8 @@ public class MainActivity extends AppCompatActivity {
                 equipment.setLongitude(55);
                 equipment.setStartDate(123123122);
             }
-        });*/
-                /*
+        });
+
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -327,7 +328,42 @@ public class MainActivity extends AppCompatActivity {
                 profile.setActive(true);
                 profile.setImage("");
             }
-        });*/
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AlertType equipment = realmDB.createObject(AlertType.class);
+                equipment.set_id(1);
+                equipment.setUuid("0dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                equipment.setTitle("Критичный");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                CriticalType equipment = realmDB.createObject(CriticalType.class);
+                equipment.set_id(1);
+                equipment.setUuid("0dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                equipment.setTitle("Критичный");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                OrderStatus equipment = realmDB.createObject(OrderStatus.class);
+                equipment.set_id(1);
+                equipment.setUuid("0dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                equipment.setTitle("Выполнен");
+                OrderStatus equipment2 = realmDB.createObject(OrderStatus.class);
+                equipment2.set_id(1);
+                equipment2.setUuid("55987f48-ccbd-41ee-b832-49001a56d1f7");
+                equipment2.setTitle("Получен");
+            }
+        });
+*/
     }
 
 	public boolean initDB() {

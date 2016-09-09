@@ -18,7 +18,7 @@ import ru.toir.mobile.db.realm.DocumentationType;
  * Created by koputo on 08.09.16.
  */
 public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType> implements ListAdapter {
-    public static final String TABLE_NAME = "documentationType";
+    public static final String TABLE_NAME = "DocumentationType";
 
     private static class ViewHolder{
         TextView uuid;

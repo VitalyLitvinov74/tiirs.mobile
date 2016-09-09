@@ -3,9 +3,6 @@
  */
 package ru.toir.mobile.rfid;
 
-import java.lang.reflect.Constructor;
-import com.google.zxing.integration.android.IntentIntegrator;
-import ru.toir.mobile.R;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+
+import java.lang.reflect.Constructor;
+
+import ru.toir.mobile.R;
 
 /**
  * @author Dmitriy Logachov
@@ -213,7 +216,7 @@ public class RfidDialog extends DialogFragment {
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
 	 * @param password
-	 * @param tagId
+	 * @param id
 	 * @param memoryBank
 	 * @param address
 	 * @param count
@@ -259,7 +262,7 @@ public class RfidDialog extends DialogFragment {
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
 	 * @param password
-	 * @param tagId
+	 * @param id
 	 * @param memoryBank
 	 * @param address
 	 * @param data
