@@ -50,6 +50,7 @@ import io.realm.RealmResults;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
+import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.FragmentAddUser;
 import ru.toir.mobile.fragments.FragmentEditUser;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_REFERENCES = 6;
     private static final int FRAGMENT_USERS = 7;
     private static final int FRAGMENT_USER = 8;
+    private static final int FRAGMENT_DOCS = 9;
     //private static final int FRAGMENT_OTHER = 10;
 
     private static final int DRAWER_TASKS = 11;
@@ -538,6 +540,7 @@ public class MainActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_references).withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false),
+                        new PrimaryDrawerItem().withName("Документация").withDescription("Документация").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_DOCS).withSelectable(false),
                         new DividerDrawerItem(),
                         //new SecondarySwitchDrawerItem().withName("Доступ к серверу").withIcon(Octicons.Icon.oct_tools).withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener).withIdentifier(DRAWER_ONLINE),
                         //new DividerDrawerItem(),
@@ -598,6 +601,9 @@ public class MainActivity extends AppCompatActivity {
                             } else if (drawerItem.getIdentifier() == FRAGMENT_REFERENCES) {
                                 currentFragment = FRAGMENT_REFERENCES;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReferenceFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_DOCS) {
+                                currentFragment = FRAGMENT_DOCS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, DocumentationFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_USERS) {
                                 currentFragment = FRAGMENT_USERS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
