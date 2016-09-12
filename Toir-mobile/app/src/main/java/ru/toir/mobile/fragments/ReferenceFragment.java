@@ -55,20 +55,10 @@ public class ReferenceFragment extends Fragment {
     private Realm realmDB;
 
 	private Spinner referenceSpinner;
-	//private Spinner typeSpinner;
-	//private Spinner extraSpinner;
-
 	private ListView contentListView;
 
 	private ArrayList<SortField> referenceList;
-	//private ArrayList<SortField> typeList;
-	//private ArrayList<SortField> extraList;
-
 	private ArrayAdapter<SortField> referenceSpinnerAdapter;
-	//private ArrayAdapter<SortField> typeSpinnerAdapter;
-	//private ArrayAdapter<SortField> extraSpinnerAdapter;
-
-	//private TypeExtraSpinnerListener typeExtraSpinnerListener;
 	private ReferenceSpinnerListener referenceSpinnerListener;
 
 	private ProgressDialog getReferencesDialog;

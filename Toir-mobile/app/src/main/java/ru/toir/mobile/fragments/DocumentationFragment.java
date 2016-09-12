@@ -20,7 +20,6 @@ import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
-import ru.toir.mobile.db.realm.EquipmentType;
 
 public class DocumentationFragment extends Fragment {
     private Realm realmDB;
@@ -31,7 +30,8 @@ public class DocumentationFragment extends Fragment {
 	private ListView documentationListView;
 
 	private ArrayAdapter<SortField> sortSpinnerAdapter;
-	private ArrayAdapter<DocumentationType> typeSpinnerAdapter;
+	//private ArrayAdapter<DocumentationType> typeSpinnerAdapter;
+    private ArrayAdapter<String> typeSpinnerAdapter;
 
 	private SpinnerListener spinnerListener;
     private DocumentationAdapter documentationAdapter;
@@ -53,9 +53,12 @@ public class DocumentationFragment extends Fragment {
 
 		// настраиваем сортировку по типу оборудования
 		typeSpinner = (Spinner) rootView.findViewById(R.id.documentation_spinner_type);
+        //typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
+		//		android.R.layout.simple_spinner_dropdown_item,
+		//		new ArrayList<DocumentationType>());
         typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
-				android.R.layout.simple_spinner_dropdown_item,
-				new ArrayList<DocumentationType>());
+                android.R.layout.simple_spinner_dropdown_item,
+                new ArrayList<String>());
 		typeSpinner.setAdapter(typeSpinnerAdapter);
 		typeSpinner.setOnItemSelectedListener(spinnerListener);
 
@@ -93,10 +96,17 @@ public class DocumentationFragment extends Fragment {
 	private void fillTypeSpinner() {
         RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
 		// TODO стоит наверное добавить запись "любой тип" напрямую в таблицу?
-		typeSpinnerAdapter.clear();
-		typeSpinnerAdapter.addAll(documentationType);
+        typeSpinnerAdapter.clear();
+
+        //DocumentationType allDocumentationTypes = new DocumentationType();
+        //allDocumentationTypes.set_id(0);
+        //allDocumentationTypes.setTitle("Все типы");
+        //allDocumentationTypes.setUuid(null);
+        typeSpinnerAdapter.add("Все типы");
+        for (int i=0;i<documentationType.size();i++)
+            typeSpinnerAdapter.add(documentationType.get(i).getTitle());
 		typeSpinnerAdapter.notifyDataSetChanged();
-	}
+    }
 
 	private void fillSortFieldSpinner() {
 
@@ -116,9 +126,9 @@ public class DocumentationFragment extends Fragment {
 		public void onItemClick(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
             // TODO разобраться как вернуть объект при клике
-            Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
-            documentation = (Documentation)parentView.getSelectedItem();
-			String documentation_uuid = documentation.getUuid();
+            //Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
+            //documentation = (Documentation)parentView.getSelectedItem();
+			//String documentation_uuid = documentation.getUuid();
             // TODO добавить вывод документации на экран
 			/*Intent documentationInfo = new Intent(getActivity(),
 					EquipmentInfoActivity.class);
@@ -139,11 +149,11 @@ public class DocumentationFragment extends Fragment {
 		@Override
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
-
+            /*
 			String type = null;
 			String orderBy = null;
 
-			EquipmentType typeSelected = (EquipmentType) typeSpinner
+			DocumentationType typeSelected = (DocumentationType) typeSpinner
 					.getSelectedItem();
 			if (typeSelected != null) {
 				type = typeSelected.getUuid();
@@ -154,6 +164,7 @@ public class DocumentationFragment extends Fragment {
 				orderBy = fieldSelected.getField();
 			}
 			FillListViewDocumentation(type, orderBy);
+			*/
 		}
 	}
 

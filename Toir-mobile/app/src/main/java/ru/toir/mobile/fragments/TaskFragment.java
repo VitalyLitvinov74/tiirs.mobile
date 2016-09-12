@@ -235,7 +235,7 @@ public class TaskFragment extends Fragment {
 		});
 
 		// создаём "пустой" адаптер для отображения операций над оборудованием
-		String[] operationFrom = { EquipmentOperationDBAdapter.Projection._ID,
+        String[] operationFrom = { EquipmentOperationDBAdapter.Projection._ID,
 				EquipmentDBAdapter.Projection.TITLE,
 				OperationTypeDBAdapter.Projection.TITLE,
 				OperationStatusDBAdapter.Projection.TITLE,
@@ -245,6 +245,8 @@ public class TaskFragment extends Fragment {
 		operationAdapter = new SimpleCursorAdapter(getActivity(),
 				R.layout.equipment_operation_item, null, operationFrom,
 				operationTo, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+
 		// это нужно для отображения произвольных изображений
 		operationAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 
@@ -470,6 +472,7 @@ public class TaskFragment extends Fragment {
 
 		CriticalType allCriticalType = new CriticalType();
 		allCriticalType.setUuid(null);
+
 		criticalTypeList.add(0, allCriticalType);
 		criticalTypeAdapter.clear();
 		criticalTypeAdapter.addAll(criticalTypeList);

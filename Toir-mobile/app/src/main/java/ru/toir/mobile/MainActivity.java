@@ -47,7 +47,6 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
@@ -284,7 +283,36 @@ public class MainActivity extends AppCompatActivity {
 			// принудительное обновление приложения
 			finish();
 		}
-
+/*
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DocumentationType documentation = realmDB.createObject(DocumentationType.class);
+                documentation.set_id(1);
+                documentation.setUuid("1dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setTitle("Паспорт");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DocumentationType documentation = realmDB.createObject(DocumentationType.class);
+                documentation.set_id(2);
+                documentation.setUuid("4dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setTitle("Руководство");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Documentation documentation = realmDB.createObject(Documentation.class);
+                documentation.set_id(2);
+                documentation.setDocumentationTypeUuid("1dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setEquipmentUuid("8877-5678");
+                documentation.setUuid("6dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setTitle("Руководство на котел GTV-40");
+            }
+        });
 
         final RealmResults<Equipment> results = realmDB.where(Equipment.class).findAll();
         realmDB.executeTransaction(new Realm.Transaction() {
@@ -293,12 +321,12 @@ public class MainActivity extends AppCompatActivity {
                 results.deleteAllFromRealm();
             }
         });
-/*
+
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Equipment equipment = realmDB.createObject(Equipment.class);
-                equipment.set_id(1);
+                equipment.set_id(2);
                 equipment.setCriticalTypeUuid("1234-5678");
                 equipment.setEquipmentModelUuid("1234-5678");
                 equipment.setEquipmentStatusUuid("1234-5678");
@@ -319,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm) {
                 User profile = realmDB.createObject(User.class);
+                profile.set_id(1);
                 profile.setName("Иванов О.А.");
                 profile.setImage("profile");
                 profile.setLogin("olejek8@yandex.ru");
@@ -540,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_references).withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false),
-                        new PrimaryDrawerItem().withName("Документация").withDescription("Документация").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_DOCS).withSelectable(false),
+                        new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false),
                         new DividerDrawerItem(),
                         //new SecondarySwitchDrawerItem().withName("Доступ к серверу").withIcon(Octicons.Icon.oct_tools).withChecked(true).withOnCheckedChangeListener(onCheckedChangeListener).withIdentifier(DRAWER_ONLINE),
                         //new DividerDrawerItem(),

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -11,33 +12,34 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.Documentation;
+import ru.toir.mobile.db.realm.Orders;
 
 /**
- * @author koputo
- * Created by koputo on 08.09.16.
+ * @author olejek
+ * Created by olejek on 12.09.16.
  */
-public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implements ListAdapter {
-    public static final String TABLE_NAME = "Documentation";
+public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
+    public static final String TABLE_NAME = "Orders";
 
     private static class ViewHolder{
-        TextView information;
+        TextView uuid;
         TextView title;
+        ImageView icon;
     }
 
-    public DocumentationAdapter(@NonNull Context context, int resId, RealmResults<Documentation> data) {
+    public OrderAdapter(@NonNull Context context, int resId, RealmResults<Orders> data) {
         super(context, data);
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<Documentation> rows = realm.where(Documentation.class).findAll();
+        RealmResults<Orders> rows = realm.where(Orders.class).findAll();
         return rows.size();
     }
 
     @Override
-    public Documentation getItem(int position) {
+    public Orders getItem(int position) {
         return null;
     }
 
@@ -50,20 +52,23 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listview, parent, false);
+            convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.information = (TextView) convertView.findViewById(R.id.lv_secondLine);
+            viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
             viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+            viewHolder.icon = (ImageView) convertView.findViewById(R.id.lv_icon);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Documentation Documentation = adapterData.get(position);
-        viewHolder.title.setText(Documentation.getTitle());
-        viewHolder.information.setText(Documentation.getUuid());
-        //TODO добавить запрос на расшифровку типа документации и на название оборудования
-        //viewHolder.information.setText(DocumentationType.get Documentation.getDocumentationTypeUuid());
+        if (adapterData!=null) {
+            Orders order = adapterData.get(position);
+            viewHolder.title.setText(order.getTitle());
+            viewHolder.uuid.setText(order.getUuid());
+            viewHolder.icon.setImageResource(R.drawable.img_3);
+        }
         return convertView;
     }
 }

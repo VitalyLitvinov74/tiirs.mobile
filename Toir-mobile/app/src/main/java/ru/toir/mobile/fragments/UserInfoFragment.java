@@ -189,9 +189,6 @@ public class UserInfoFragment extends Fragment {
 			//				.getApplicationContext()));
 			//ArrayList<Task> taskList = taskDBAdapter.getOrders();
             RealmResults<Orders> orders = realmDB.where(Orders.class).equalTo("userUuid",AuthorizedUser.getInstance().getTagId()).findAll();
-            //TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-			//		new ToirDatabaseContext(getActivity()
-			//				.getApplicationContext()));
 
 			List<HashMap<String, String>> elementList = new ArrayList<HashMap<String, String>>();
 			String[] from = { "name", "img" };

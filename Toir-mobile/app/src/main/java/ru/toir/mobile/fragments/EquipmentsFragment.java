@@ -27,7 +27,6 @@ import ru.toir.mobile.db.realm.EquipmentType;
 
 public class EquipmentsFragment extends Fragment {
     private Realm realmDB;
-    //private EquipmentType equipmentType;
 	private boolean isInit;
 
 	private Spinner sortSpinner;

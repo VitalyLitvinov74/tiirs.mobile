@@ -10,7 +10,6 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
-import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.DocumentationType;
 
 /**
@@ -21,7 +20,6 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
     public static final String TABLE_NAME = "DocumentationType";
 
     private static class ViewHolder{
-        TextView uuid;
         TextView title;
     }
 
@@ -41,6 +39,12 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
         return null;
     }
 
+    public RealmResults<DocumentationType> getAllItems() {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<DocumentationType> rows = realm.where(DocumentationType.class).findAll();
+        return rows;
+    }
+
     @Override
     public long getItemId(int position) {
         return 0;
@@ -48,22 +52,23 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+        DocumentationType documentationType = adapterData.get(position);
+        textView.setText(documentationType.getTitle());
+        /*
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
+            convertView = inflater.inflate(R.layout.listview, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+            viewHolder.title = (TextView) convertView.findViewById(android.R.id.title);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (adapterData!=null) {
-            DocumentationType documentationType = adapterData.get(position);
-            viewHolder.title.setText(documentationType.getTitle());
-            viewHolder.title.setText(documentationType.getUuid());
-        }
-        return convertView;
+        DocumentationType documentationType = adapterData.get(position);
+        viewHolder.title.setText(documentationType.getTitle());
+        return convertView;*/
+        return textView;
     }
 }

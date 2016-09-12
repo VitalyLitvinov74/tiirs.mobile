@@ -11,10 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,23 +23,25 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.TaskDBAdapter;
-import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
+import ru.toir.mobile.db.adapters.EquipmentAdapter;
+import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.db.tables.Equipment;
-import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
+
+//import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
+//import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
+//import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
+//import ru.toir.mobile.db.adapters.TaskDBAdapter;
+//import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 
 public class GPSFragment extends Fragment {
 
@@ -54,6 +53,12 @@ public class GPSFragment extends Fragment {
 	TextView gpsLog;
     private Realm realmDB;
     private User user;
+    private Tasks task;
+    private RealmResults<Tasks> tasks;
+    private Orders order;
+    private RealmResults<Orders> orders;
+    private RealmResults<Equipment> equipment;
+
 	ArrayList<OverlayItem> aOverlayItemArray;
 	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
 	// private SimpleCursorAdapter equipmentAdapter;
@@ -92,6 +97,12 @@ public class GPSFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
         realmDB = Realm.getDefaultInstance();
+        EquipmentAdapter equipmentAdapter;
+        Equipment equipment;
+        RealmResults<Equipment> equipments2 = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
+        RealmResults<Equipment> equipments = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
+        ListView equipmentListView;
+
 		String tagId = AuthorizedUser.getInstance().getTagId();
 		// String equipmentUUID = "";
 		Float equipment_latitude = 0f, equipment_longitude = 0f;
@@ -144,19 +155,49 @@ public class GPSFragment extends Fragment {
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
 		mapView.getOverlays().add(aItemizedIconOverlay);
 
+		//!!!!
+        equipmentListView = (ListView) rootView
+                .findViewById(R.id.gps_listView);
+
+        orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
+        for (Orders itemOrder : orders) {
+            tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
+            for (Tasks itemTask : tasks) {
+                equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findAll();
+                equipment = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
+                equipments2.add(equipment);
+                curLatitude = curLatitude - 0.0001;
+                curLongitude = curLongitude - 0.0001;
+
+                EquipmentOverlayItem olItem = new EquipmentOverlayItem(
+                        equipment.getTitle(), "Device",
+                        new GeoPoint(equipment_latitude,
+                                equipment_longitude));
+                olItem.equipment = equipment;
+                Drawable newMarker = this.getResources()
+                        .getDrawable(R.drawable.marker_equip);
+                olItem.setMarker(newMarker);
+                overlayItemArray.add(olItem);
+            }
+        }
+        if (equipments!=null) {
+            equipmentAdapter = new EquipmentAdapter(getContext(), R.id.gps_listView, equipments);
+            equipmentListView.setAdapter(equipmentAdapter);
+        }
+
+        /*
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<Task> taskList = taskDBAdapter.getOrdersByUser(
+        ArrayList<Task> taskList = taskDBAdapter.getOrdersByUser(
 				user.getUuid(), TaskStatusDBAdapter.Status.IN_WORK, "");
-
 		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
 		String[] equipmentFrom = { "name", "location" };
 		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine };
+
 		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);
 
 		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
-
 		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
 				new ToirDatabaseContext(getActivity().getApplicationContext()));
 
@@ -233,7 +274,7 @@ public class GPSFragment extends Fragment {
 				LastItemPosition = position;
 			}
 		});
-
+        */
 		TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
 			@Override
