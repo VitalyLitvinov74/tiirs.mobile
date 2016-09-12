@@ -1,6 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,13 +15,11 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
-import ru.toir.mobile.db.adapters.EquipmentAdapter;
+import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
 
 public class DocumentationFragment extends Fragment {
@@ -119,18 +116,16 @@ public class DocumentationFragment extends Fragment {
 		public void onItemClick(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
             // TODO разобраться как вернуть объект при клике
-            Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
-            equipment = (Equipment)parentView.getSelectedItem();
-
-			String equipment_uuid = equipment.getUuid();
-
-			Intent equipmentInfo = new Intent(getActivity(),
+            Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
+            documentation = (Documentation)parentView.getSelectedItem();
+			String documentation_uuid = documentation.getUuid();
+            // TODO добавить вывод документации на экран
+			/*Intent documentationInfo = new Intent(getActivity(),
 					EquipmentInfoActivity.class);
-
 			Bundle bundle = new Bundle();
 			bundle.putString("equipment_uuid", equipment_uuid);
 			equipmentInfo.putExtras(bundle);
-			getActivity().startActivity(equipmentInfo);
+			getActivity().startActivity(equipmentInfo);*/
 		}
 	}
 
@@ -158,26 +153,26 @@ public class DocumentationFragment extends Fragment {
 			if (fieldSelected != null) {
 				orderBy = fieldSelected.getField();
 			}
-			FillListViewEquipments(type, orderBy);
+			FillListViewDocumentation(type, orderBy);
 		}
 	}
 
-	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
-        RealmResults<Equipment> equipments;
-        if (equipmentModelUuid!=null) {
+	private void FillListViewDocumentation(String documentationTypeUuid,  String sort) {
+        RealmResults<Documentation> documentation;
+        if (documentationTypeUuid!=null) {
             if (sort!=null)
-                equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAllSorted(sort);
+                documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAllSorted(sort);
             else
-                equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAll();
+                documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAll();
         }
         else {
             if (sort!=null)
-                equipments = realmDB.where(Equipment.class).findAllSorted(sort);
+                documentation = realmDB.where(Documentation.class).findAllSorted(sort);
             else
-                equipments = realmDB.where(Equipment.class).findAll();
+                documentation = realmDB.where(Documentation.class).findAll();
         }
-        equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
-        equipmentListView.setAdapter(equipmentAdapter);
+        documentationAdapter = new DocumentationAdapter(getContext(),R.id.documentation_listView, documentation);
+        documentationListView.setAdapter(documentationAdapter);
 	}
 
 	@Override
