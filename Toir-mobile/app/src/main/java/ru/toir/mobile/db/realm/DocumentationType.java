@@ -12,6 +12,7 @@ public class DocumentationType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
+    private String icon;
     private long createdAt;
     private long changedAt;
 
@@ -27,6 +28,13 @@ public class DocumentationType extends RealmObject {
     }
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public String getTitle() {

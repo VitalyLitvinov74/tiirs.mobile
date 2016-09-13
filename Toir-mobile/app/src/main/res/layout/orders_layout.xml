@@ -1,60 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <Spinner
+            android:id="@+id/ol_reference_spinner"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/ol_type_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@+id/ol_orders_list_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" >
+        </ListView>
+    </LinearLayout>
 
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:background="@color/black" >
-
-                <Button
-                    android:id="@+id/getTask"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="1"
-                    android:minHeight="20dp"
-                    android:text="@string/get_task"
-                    android:textSize="12sp" />
-            </TableRow>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:scrollbarAlwaysDrawVerticalTrack="false"
-                android:scrollbars="vertical" >
-
-                <TableLayout
-                    android:id="@+id/TableLayout01"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" >
-                </TableLayout>
-
-                <TableLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" >
-
-                        <Button
-                            android:id="@+id/button3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:layout_marginTop="5dp"
-                            android:background="@drawable/button4"
-                            android:minHeight="20dp"
-                            android:minWidth="54dp"
-                            android:text="@string/back"
-                            android:textSize="12sp"
-                            android:visibility="invisible" />
-                </TableLayout>
-            </LinearLayout>
-        </TableLayout>
+</LinearLayout>

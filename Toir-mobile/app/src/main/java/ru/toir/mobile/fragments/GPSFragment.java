@@ -7,7 +7,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +98,6 @@ public class GPSFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
         EquipmentAdapter equipmentAdapter;
         Equipment equipment;
-        RealmResults<Equipment> equipments2 = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
         RealmResults<Equipment> equipments = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
         ListView equipmentListView;
 
@@ -162,10 +160,12 @@ public class GPSFragment extends Fragment {
         orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         for (Orders itemOrder : orders) {
             tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
+            //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findAll();
                 equipment = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
-                equipments2.add(equipment);
+                //equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
+                equipments.add(equipment);
                 curLatitude = curLatitude - 0.0001;
                 curLongitude = curLongitude - 0.0001;
 
@@ -287,8 +287,8 @@ public class GPSFragment extends Fragment {
 						.show();
 
 				// пример тупой, но полагю это почти то что тебе было нужно
-				ViewPager pager = (ViewPager) getActivity().findViewById(
-						R.id.pager);
+				//ViewPager pager = (ViewPager) getActivity().findViewById(
+				//		R.id.pager);
 				//pager.setCurrentItem(PageAdapter.TASK_FRAGMENT);
 
 				return super.onLongPressHelper(index, item);

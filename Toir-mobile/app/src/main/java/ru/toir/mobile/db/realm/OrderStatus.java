@@ -12,6 +12,7 @@ public class OrderStatus extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
+    private String icon;
     private long createdAt;
     private long changedAt;
 
@@ -47,6 +48,13 @@ public class OrderStatus extends RealmObject {
     }
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public long getCreatedAt() {
