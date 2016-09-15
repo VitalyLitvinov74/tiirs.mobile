@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 07.09.16.
+ *         Created on 07.09.16.
  */
 public class EquipmentStatus extends RealmObject {
     @PrimaryKey
@@ -20,7 +20,6 @@ public class EquipmentStatus extends RealmObject {
      * Класс констант статуса наряда
      *
      * @author Dmitriy Logachov
-     *
      */
     public class Status {
         public static final String WORK = "75ad2a48-16d8-4592-ba38-8137b38ad669";
@@ -34,6 +33,7 @@ public class EquipmentStatus extends RealmObject {
     public long get_id() {
         return _id;
     }
+
     public void set_id(long _id) {
         this._id = _id;
     }
@@ -41,6 +41,7 @@ public class EquipmentStatus extends RealmObject {
     public String getUuid() {
         return uuid;
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -48,6 +49,7 @@ public class EquipmentStatus extends RealmObject {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -55,6 +57,7 @@ public class EquipmentStatus extends RealmObject {
     public String getIcon() {
         return icon;
     }
+
     public void setIcon(String icon) {
         this.icon = icon;
     }
@@ -62,6 +65,7 @@ public class EquipmentStatus extends RealmObject {
     public long getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
@@ -69,6 +73,7 @@ public class EquipmentStatus extends RealmObject {
     public long getChangedAt() {
         return changedAt;
     }
+
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }

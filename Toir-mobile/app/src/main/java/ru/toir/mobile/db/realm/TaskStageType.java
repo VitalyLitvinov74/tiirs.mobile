@@ -5,9 +5,9 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- *         Created on 07.09.16.
+ *         Created on 15.09.16.
  */
-public class OperationVerdict extends RealmObject {
+public class TaskStageType extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -63,4 +63,5 @@ public class OperationVerdict extends RealmObject {
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }
+
 }

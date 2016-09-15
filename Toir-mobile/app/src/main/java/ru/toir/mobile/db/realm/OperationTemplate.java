@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 13.09.16.
+ *         Created on 13.09.16.
  */
 public class OperationTemplate extends RealmObject {
     @PrimaryKey
@@ -18,13 +18,16 @@ public class OperationTemplate extends RealmObject {
     private int first_step;
     private int last_step;
     private String equipmentModelUuid;
+    private EquipmentModel equipmentModel;
     private String operationTypeUuid;
+    private OperationType operationType;
     private long createdAt;
     private long changedAt;
 
     public long get_id() {
         return _id;
     }
+
     public void set_id(long _id) {
         this._id = _id;
     }
@@ -32,6 +35,7 @@ public class OperationTemplate extends RealmObject {
     public String getUuid() {
         return uuid;
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -39,6 +43,7 @@ public class OperationTemplate extends RealmObject {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -46,6 +51,7 @@ public class OperationTemplate extends RealmObject {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -53,6 +59,7 @@ public class OperationTemplate extends RealmObject {
     public String getImage() {
         return image;
     }
+
     public void setImage(String image) {
         this.image = image;
     }
@@ -60,6 +67,7 @@ public class OperationTemplate extends RealmObject {
     public int getNormative() {
         return normative;
     }
+
     public void setNormative(int normative) {
         this.normative = normative;
     }
@@ -67,6 +75,7 @@ public class OperationTemplate extends RealmObject {
     public int getFirst_step() {
         return first_step;
     }
+
     public void setFirst_step(int first_step) {
         this.first_step = first_step;
     }
@@ -74,6 +83,7 @@ public class OperationTemplate extends RealmObject {
     public int getLast_step() {
         return last_step;
     }
+
     public void setLast_step(int last_step) {
         this.last_step = last_step;
     }
@@ -81,20 +91,39 @@ public class OperationTemplate extends RealmObject {
     public String getEquipmentModelUuid() {
         return equipmentModelUuid;
     }
+
     public void setEquipmentModelUuid(String equipmentModelUuid) {
         this.equipmentModelUuid = equipmentModelUuid;
+    }
+
+    public EquipmentModel getEquipmentModel() {
+        return equipmentModel;
+    }
+
+    public void setEquipmentModel(EquipmentModel equipmentModel) {
+        this.equipmentModel = equipmentModel;
     }
 
     public String getOperationTypeUuid() {
         return operationTypeUuid;
     }
+
     public void setOperationTypeUuid(String operationTypeUuid) {
         this.operationTypeUuid = operationTypeUuid;
+    }
+
+    public OperationType getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(OperationType operationType) {
+        this.operationType = operationType;
     }
 
     public long getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
@@ -102,6 +131,7 @@ public class OperationTemplate extends RealmObject {
     public long getChangedAt() {
         return changedAt;
     }
+
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }

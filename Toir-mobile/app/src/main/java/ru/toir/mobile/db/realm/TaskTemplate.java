@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 13.09.16.
+ *         Created on 13.09.16.
  */
 public class TaskTemplate extends RealmObject {
     @PrimaryKey
@@ -16,7 +16,9 @@ public class TaskTemplate extends RealmObject {
     private String image;
     private int normative;
     private String equipmentModelUuid;
+    private EquipmentModel equipmentModel;
     private String taskTypeUuid;
+    private TaskType taskType;
     private long createdAt;
     private long changedAt;
 
@@ -24,6 +26,7 @@ public class TaskTemplate extends RealmObject {
     public long get_id() {
         return _id;
     }
+
     public void set_id(long _id) {
         this._id = _id;
     }
@@ -31,6 +34,7 @@ public class TaskTemplate extends RealmObject {
     public String getUuid() {
         return uuid;
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -38,6 +42,7 @@ public class TaskTemplate extends RealmObject {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -45,6 +50,7 @@ public class TaskTemplate extends RealmObject {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -52,6 +58,7 @@ public class TaskTemplate extends RealmObject {
     public String getImage() {
         return image;
     }
+
     public void setImage(String image) {
         this.image = image;
     }
@@ -59,19 +66,39 @@ public class TaskTemplate extends RealmObject {
     public String getEquipmentModelUuid() {
         return equipmentModelUuid;
     }
+
     public void setEquipmentModelUuid(String equipmentModelUuid) {
         this.equipmentModelUuid = equipmentModelUuid;
     }
+
+    public EquipmentModel getEquipmentModel() {
+        return equipmentModel;
+    }
+
+    public void setEquipmentModel(EquipmentModel equipmentModel) {
+        this.equipmentModel = equipmentModel;
+    }
+
     public String getTaskTypeUuid() {
         return taskTypeUuid;
     }
+
     public void setTaskTypeUuid(String taskTypeUuid) {
         this.taskTypeUuid = taskTypeUuid;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     public int getNormative() {
         return normative;
     }
+
     public void setNormative(int normative) {
         this.normative = normative;
     }
@@ -79,6 +106,7 @@ public class TaskTemplate extends RealmObject {
     public long getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
@@ -86,6 +114,7 @@ public class TaskTemplate extends RealmObject {
     public long getChangedAt() {
         return changedAt;
     }
+
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }

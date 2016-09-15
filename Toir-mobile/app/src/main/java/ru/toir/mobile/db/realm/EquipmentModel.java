@@ -5,13 +5,14 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 07.09.16.
+ *         Created on 07.09.16.
  */
 public class EquipmentModel extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String equipmentTypeUuid;
+    private EquipmentType equipmentType;
     private String title;
     private long createdAt;
     private long changedAt;
@@ -19,6 +20,7 @@ public class EquipmentModel extends RealmObject {
     public long get_id() {
         return _id;
     }
+
     public void set_id(long _id) {
         this._id = _id;
     }
@@ -26,6 +28,7 @@ public class EquipmentModel extends RealmObject {
     public String getUuid() {
         return uuid;
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -33,6 +36,7 @@ public class EquipmentModel extends RealmObject {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -40,13 +44,23 @@ public class EquipmentModel extends RealmObject {
     public String getEquipmentTypeUuid() {
         return title;
     }
+
     public void setEquipmentTypeUuid(String equipmentTypeUuid) {
         this.equipmentTypeUuid = equipmentTypeUuid;
+    }
+
+    public EquipmentType getEquipmentType() {
+        return equipmentType;
+    }
+
+    public void setEquipmentType(EquipmentType equipmentType) {
+        this.equipmentType = equipmentType;
     }
 
     public long getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
@@ -54,6 +68,7 @@ public class EquipmentModel extends RealmObject {
     public long getChangedAt() {
         return changedAt;
     }
+
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }

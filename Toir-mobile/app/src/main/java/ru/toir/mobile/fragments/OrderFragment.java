@@ -50,6 +50,7 @@ import ru.toir.mobile.db.adapters.TaskDBAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.TaskStages;
@@ -57,7 +58,6 @@ import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
@@ -70,25 +70,23 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.TaskRes;
 
+//import ru.toir.mobile.db.tables.OperationStatus;
+
 public class OrderFragment extends Fragment {
+    OrderAdapter orderAdapter;
+    TaskAdapter taskAdapter;
+    TaskStageAdapter taskStageAdapter;
 	private String TAG = "OrderFragment";
     private Realm realmDB;
     private View rootView;
-
 	private int Level = 0;
 	private String currentOrderUuid = "";
     private String currentTaskUuid = "";
     private String currentTaskStageUuid = "";
     private String currentOperationUuid = "";
-
 	private Spinner referenceSpinner;
 	private Spinner typeSpinner;
 	private ListView mainListView;
-
-    OrderAdapter orderAdapter;
-    TaskAdapter taskAdapter;
-    TaskStageAdapter taskStageAdapter;
-
 	private SimpleCursorAdapter operationAdapter;
 	private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
 	private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
@@ -100,15 +98,18 @@ public class OrderFragment extends Fragment {
 
 	private ProgressDialog processDialog;
 	private RfidDialog rfidDialog;
-
-    public static OrderFragment newInstance() {
-        return (new OrderFragment());
-    }
-
     // фильтр для получения сообщений при получении нарядов с сервера
 	private IntentFilter mFilterGetTask = new IntentFilter(
 			TaskServiceProvider.Actions.ACTION_GET_TASK);
-	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
+	// TODO решить нужны ли фильтры на все возможные варианты отправки
+	// состояния/результатов
+	// фильтр для получения сообщений при получении нарядов с сервера
+	private IntentFilter mFilterSendTask = new IntentFilter(
+			TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+
+    public static OrderFragment newInstance() {
+        return (new OrderFragment());
+    }	private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			int provider = intent.getIntExtra(
@@ -163,45 +164,9 @@ public class OrderFragment extends Fragment {
 		}
 	};
 
-	// TODO решить нужны ли фильтры на все возможные варианты отправки
-	// состояния/результатов
-	// фильтр для получения сообщений при получении нарядов с сервера
-	private IntentFilter mFilterSendTask = new IntentFilter(
-			TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
-	private BroadcastReceiver mReceiverSendTaskResult = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			int provider = intent.getIntExtra(
-					ProcessorService.Extras.PROVIDER_EXTRA, 0);
-			Log.d(TAG, "" + provider);
-			if (provider == ProcessorService.Providers.TASK_PROVIDER) {
-				int method = intent.getIntExtra(
-						ProcessorService.Extras.METHOD_EXTRA, 0);
-				Log.d(TAG, "" + method);
-				if (method == TaskServiceProvider.Methods.TASK_SEND_RESULT) {
-					boolean result = intent.getBooleanExtra(
-							ProcessorService.Extras.RESULT_EXTRA, false);
-					Log.d(TAG, "" + result);
-					if (result == true) {
-						Toast.makeText(getActivity(), "Результаты отправлены.",
-								Toast.LENGTH_SHORT).show();
-					} else {
-						Toast.makeText(getActivity(),
-								"Ошибка при отправке результатов.",
-								Toast.LENGTH_LONG).show();
-					}
-
-					// закрываем диалог получения наряда
-					processDialog.dismiss();
-					getActivity().unregisterReceiver(mReceiverSendTaskResult);
-				}
-			}
-		}
-	};
-
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
 	 * android.view.ViewGroup, android.os.Bundle)
@@ -281,7 +246,37 @@ public class OrderFragment extends Fragment {
 		fillListViewOrders(null, null);
 		fillSpinnersOrders();
 
-	}
+	}	private BroadcastReceiver mReceiverSendTaskResult = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int provider = intent.getIntExtra(
+					ProcessorService.Extras.PROVIDER_EXTRA, 0);
+			Log.d(TAG, "" + provider);
+			if (provider == ProcessorService.Providers.TASK_PROVIDER) {
+				int method = intent.getIntExtra(
+						ProcessorService.Extras.METHOD_EXTRA, 0);
+				Log.d(TAG, "" + method);
+				if (method == TaskServiceProvider.Methods.TASK_SEND_RESULT) {
+					boolean result = intent.getBooleanExtra(
+							ProcessorService.Extras.RESULT_EXTRA, false);
+					Log.d(TAG, "" + result);
+					if (result == true) {
+						Toast.makeText(getActivity(), "Результаты отправлены.",
+								Toast.LENGTH_SHORT).show();
+					} else {
+						Toast.makeText(getActivity(),
+								"Ошибка при отправке результатов.",
+								Toast.LENGTH_LONG).show();
+					}
+
+					// закрываем диалог получения наряда
+					processDialog.dismiss();
+					getActivity().unregisterReceiver(mReceiverSendTaskResult);
+				}
+			}
+		}
+	};
+
     // Orders --------------------------------------------------------------------------------------
 	private void fillSpinnersOrders() {
 		//TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
@@ -332,7 +327,7 @@ public class OrderFragment extends Fragment {
             mainListView.setAdapter(orderAdapter);
 		}
 	}
-    // ---------------------------------------------------------------------------------------------
+
     // Tasks----------------------------------------------------------------------------------------
     private void fillListViewTasks(String orderUuid) {
        RealmResults<Tasks> tasks;
@@ -343,6 +338,7 @@ public class OrderFragment extends Fragment {
        TaskAdapter taskAdapter = new TaskAdapter(getContext(),R.id.tl_tasks_list_view, tasks);
        mainListView.setAdapter(taskAdapter);
     }
+
     // Orders----------------------------------------------------------------------------------------
     private void fillListViewTaskStage(String taskUuid) {
         RealmResults<TaskStages> taskStages;
@@ -350,6 +346,7 @@ public class OrderFragment extends Fragment {
         TaskStageAdapter taskStageAdapter = new TaskStageAdapter(getContext(),R.id.tsl_taskstage_list_view, taskStages);
         mainListView.setAdapter(taskStageAdapter);
     }
+
     // Operations----------------------------------------------------------------------------------------
     private void fillListViewOperations(String taskStageUuid) {
         RealmResults<Operation> operations;
@@ -406,110 +403,9 @@ public class OrderFragment extends Fragment {
             }
 	}
 
-	public class ListViewLongClickListener implements
-			AdapterView.OnItemLongClickListener {
-
-		@Override
-		public boolean onItemLongClick(AdapterView<?> parent, View view,
-				int position, long id) {
-
-			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-
-			if (Level == 1) {
-				// находимся на "экране" с операциями
-				String operationUuid = cursor
-						.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
-				String taskUuid = cursor
-						.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
-
-				EquipmentOperationDBAdapter operationDbAdapter = new EquipmentOperationDBAdapter(
-						new ToirDatabaseContext(getActivity()));
-				EquipmentOperation operation = operationDbAdapter
-						.getItem(operationUuid);
-				String operationStatus = operation.getOperation_status_uuid();
-
-				// менять произвольно статус операции позволяем только если
-				// статус операции "Новая" или "В работе"
-				if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)
-						|| operationStatus
-								.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
-
-					// показываем диалог изменения статуса
-					closeOperationManual(operationUuid, taskUuid);
-				} else {
-
-					// операция уже выполнена, изменить статус нельзя
-					// сообщаем об этом
-					AlertDialog.Builder dialog = new AlertDialog.Builder(
-							getContext());
-					dialog.setTitle("Внимание!");
-					dialog.setMessage("Изменить статус операции нельзя!");
-					dialog.setPositiveButton(android.R.string.ok,
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-
-									dialog.dismiss();
-								}
-							});
-					dialog.show();
-
-				}
-
-			} else if (Level == 0) {
-
-				// находимся на экране с нарядами
-				String taskUuid = cursor.getString(cursor
-						.getColumnIndex(TaskDBAdapter.Projection.UUID));
-
-				TaskDBAdapter adapter = new TaskDBAdapter(
-						new ToirDatabaseContext(getContext()));
-				Task task = adapter.getItem(taskUuid);
-
-				// проверяем статус наряда
-				String taskStatusUuid = task.getTask_status_uuid();
-				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.COMPLETE)
-						|| taskStatusUuid
-								.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
-
-					// наряд уже закрыт, изменить статус нельзя
-					// сообщаем об этом
-					AlertDialog.Builder dialog = new AlertDialog.Builder(
-							getContext());
-					dialog.setTitle("Внимание!");
-					dialog.setMessage("Изменить статус наряда уже нельзя!");
-					dialog.setPositiveButton(android.R.string.ok,
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-
-									dialog.dismiss();
-								}
-							});
-					dialog.show();
-
-				} else {
-
-					// наряд можно закрыть принудительно
-					closeTaskManual(taskUuid);
-				}
-
-			}
-
-			return true;
-		}
-
-	}
-
 	/**
 	 * Диалог изменения статуса операции
-	 * 
+	 *
 	 * @param operationUuid - uuid операции
 	 * @param taskUuid - uuid задачи
 	 */
@@ -536,8 +432,7 @@ public class OrderFragment extends Fragment {
 						.getSelectedItem();
 
 				// выставляем выбранный статус
-				EquipmentOperationDBAdapter dbAdapter = new EquipmentOperationDBAdapter(
-						new ToirDatabaseContext(getActivity()));
+                OperationAdapter operationAdapter = new OperationAdapter(getContext(),R.id.op_operation_list_view, operations);
 				dbAdapter.setOperationStatus(operationUuid, status.getUuid());
 
 				// текущие значения фильтров
@@ -595,7 +490,7 @@ public class OrderFragment extends Fragment {
 
 	/**
 	 * Диалог ручного закрытия наряда
-	 * 
+	 *
 	 * @param taskUuid - - uuid задачи
 	 */
 	private void closeTaskManual(final String taskUuid) {
@@ -670,47 +565,12 @@ public class OrderFragment extends Fragment {
 
 	}
 
-	private class ReferenceSpinnerListener implements
-			AdapterView.OnItemSelectedListener {
-
-		@Override
-		public void onNothingSelected(AdapterView<?> parentView) {
-		}
-
-		@Override
-		public void onItemSelected(AdapterView<?> parentView,
-				View selectedItemView, int position, long id) {
-
-			Log.d(TAG, "reference spinner onItemSelected");
-			if (Level == 0) {
-				String taskStatusUuid = ((TaskStatus) referenceSpinner
-						.getSelectedItem()).getUuid();
-
-				String orderByField = ((SortField) typeSpinner
-						.getSelectedItem()).getField();
-
-				fillListViewTask(taskStatusUuid, orderByField);
-			}
-
-			if (Level == 1) {
-				String operationTypeUuid = ((OperationType) referenceSpinner
-						.getSelectedItem()).getUuid();
-
-				String criticalTypeUuid = ((CriticalType) typeSpinner
-						.getSelectedItem()).getUuid();
-
-				fillListViewOperation(currentTaskUuid, operationTypeUuid,
-						criticalTypeUuid);
-			}
-		}
-	}
-
 	private void fillListViewOperation(String task_uuid,
 			String operation_type_uuid, String critical_type_uuid) {
 
 		// обновляем содержимое курсора
 		changeCursorOperations(task_uuid, operation_type_uuid,
-				critical_type_uuid);
+                critical_type_uuid);
 
 		mainListView.setAdapter(operationAdapter);
 
@@ -764,7 +624,7 @@ public class OrderFragment extends Fragment {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
 	 * android.view.MenuInflater)
@@ -956,21 +816,21 @@ public class OrderFragment extends Fragment {
 		processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		processDialog.setCancelable(false);
 		processDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						getActivity().unregisterReceiver(mReceiverGetTask);
-						Toast.makeText(getActivity(),
-								"Отправка результатов отменена",
-								Toast.LENGTH_SHORT).show();
-					}
-				});
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getActivity().unregisterReceiver(mReceiverGetTask);
+                        Toast.makeText(getActivity(),
+                                "Отправка результатов отменена",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
 		processDialog.show();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see android.support.v4.app.Fragment#onResume()
 	 */
 	@Override
@@ -1001,4 +861,143 @@ public class OrderFragment extends Fragment {
 				operationTypeUuid, criticalTypeUuid));
 	}
 
+	public class ListViewLongClickListener implements
+			AdapterView.OnItemLongClickListener {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view,
+				int position, long id) {
+
+			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+
+			if (Level == 1) {
+				// находимся на "экране" с операциями
+				String operationUuid = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
+				String taskUuid = cursor
+						.getString(cursor
+								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
+
+				EquipmentOperationDBAdapter operationDbAdapter = new EquipmentOperationDBAdapter(
+						new ToirDatabaseContext(getActivity()));
+				EquipmentOperation operation = operationDbAdapter
+						.getItem(operationUuid);
+				String operationStatus = operation.getOperation_status_uuid();
+
+				// менять произвольно статус операции позволяем только если
+				// статус операции "Новая" или "В работе"
+				if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)
+						|| operationStatus
+								.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
+
+					// показываем диалог изменения статуса
+					closeOperationManual(operationUuid, taskUuid);
+				} else {
+
+					// операция уже выполнена, изменить статус нельзя
+					// сообщаем об этом
+					AlertDialog.Builder dialog = new AlertDialog.Builder(
+							getContext());
+					dialog.setTitle("Внимание!");
+					dialog.setMessage("Изменить статус операции нельзя!");
+					dialog.setPositiveButton(android.R.string.ok,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									dialog.dismiss();
+								}
+							});
+					dialog.show();
+
+				}
+
+			} else if (Level == 0) {
+
+				// находимся на экране с нарядами
+				String taskUuid = cursor.getString(cursor
+						.getColumnIndex(TaskDBAdapter.Projection.UUID));
+
+				TaskDBAdapter adapter = new TaskDBAdapter(
+						new ToirDatabaseContext(getContext()));
+				Task task = adapter.getItem(taskUuid);
+
+				// проверяем статус наряда
+				String taskStatusUuid = task.getTask_status_uuid();
+				if (taskStatusUuid.equals(TaskStatusDBAdapter.Status.COMPLETE)
+						|| taskStatusUuid
+								.equals(TaskStatusDBAdapter.Status.UNCOMPLETE)) {
+
+					// наряд уже закрыт, изменить статус нельзя
+					// сообщаем об этом
+					AlertDialog.Builder dialog = new AlertDialog.Builder(
+							getContext());
+					dialog.setTitle("Внимание!");
+					dialog.setMessage("Изменить статус наряда уже нельзя!");
+					dialog.setPositiveButton(android.R.string.ok,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+									dialog.dismiss();
+								}
+							});
+					dialog.show();
+
+				} else {
+
+					// наряд можно закрыть принудительно
+					closeTaskManual(taskUuid);
+				}
+
+			}
+
+			return true;
+		}
+
+	}
+
+	private class ReferenceSpinnerListener implements
+			AdapterView.OnItemSelectedListener {
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parentView) {
+		}
+
+		@Override
+		public void onItemSelected(AdapterView<?> parentView,
+				View selectedItemView, int position, long id) {
+
+			Log.d(TAG, "reference spinner onItemSelected");
+			if (Level == 0) {
+				String taskStatusUuid = ((TaskStatus) referenceSpinner
+						.getSelectedItem()).getUuid();
+
+				String orderByField = ((SortField) typeSpinner
+						.getSelectedItem()).getField();
+
+				fillListViewTask(taskStatusUuid, orderByField);
+			}
+
+			if (Level == 1) {
+				String operationTypeUuid = ((OperationType) referenceSpinner
+						.getSelectedItem()).getUuid();
+
+				String criticalTypeUuid = ((CriticalType) typeSpinner
+						.getSelectedItem()).getUuid();
+
+				fillListViewOperation(currentTaskUuid, operationTypeUuid,
+						criticalTypeUuid);
+			}
+		}
+	}
+
 }
+
+
+

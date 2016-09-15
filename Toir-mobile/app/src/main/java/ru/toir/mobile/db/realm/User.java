@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Dmitriy Logachev
- * Created on 05.09.16.
+ *         Created on 05.09.16.
  */
 public class User extends RealmObject {
     @PrimaryKey

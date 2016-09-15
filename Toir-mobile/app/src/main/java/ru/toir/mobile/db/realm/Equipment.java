@@ -5,18 +5,21 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 07.09.16.
+ *         Created on 07.09.16.
  */
 public class Equipment extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String equipmentModelUuid;
+    private EquipmentModel equipmentModel;
     private String equipmentStatusUuid;
+    private EquipmentStatus equipmentStatus;
     private String title;
     private String inventoryNumber;
     private String location;
     private String criticalTypeUuid;
+    private CriticalType criticalType;
     private String userUuid;
     private int startDate;
     private float latitude;
@@ -29,6 +32,7 @@ public class Equipment extends RealmObject {
     public long get_id() {
         return _id;
     }
+
     public void set_id(long _id) {
         this._id = _id;
     }
@@ -36,6 +40,7 @@ public class Equipment extends RealmObject {
     public String getUuid() {
         return uuid;
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -43,6 +48,7 @@ public class Equipment extends RealmObject {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -50,20 +56,39 @@ public class Equipment extends RealmObject {
     public String getEquipmentModelUuid() {
         return equipmentModelUuid;
     }
+
     public void setEquipmentModelUuid(String equipmentModelUuid) {
         this.equipmentModelUuid = equipmentModelUuid;
+    }
+
+    public EquipmentModel getEquipmentModel() {
+        return equipmentModel;
+    }
+
+    public void setEquipmentModel(EquipmentModel equipmentModel) {
+        this.equipmentModel = equipmentModel;
     }
 
     public String getEquipmentStatusUuid() {
         return equipmentStatusUuid;
     }
+
     public void setEquipmentStatusUuid(String equipmentStatusUuid) {
         this.equipmentStatusUuid = equipmentStatusUuid;
+    }
+
+    public EquipmentStatus getEquipmentStatus() {
+        return equipmentStatus;
+    }
+
+    public void setEquipmentStatus(EquipmentStatus equipmentStatus) {
+        this.equipmentStatus = equipmentStatus;
     }
 
     public String getInventoryNumber() {
         return inventoryNumber;
     }
+
     public void setInventoryNumber(String inventoryNumber) {
         this.inventoryNumber = inventoryNumber;
     }
@@ -71,6 +96,7 @@ public class Equipment extends RealmObject {
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
@@ -78,13 +104,23 @@ public class Equipment extends RealmObject {
     public String getCriticalTypeUuid() {
         return criticalTypeUuid;
     }
+
     public void setCriticalTypeUuid(String criticalTypeUuid) {
         this.criticalTypeUuid = criticalTypeUuid;
+    }
+
+    public CriticalType getCriticalType() {
+        return criticalType;
+    }
+
+    public void setCriticalType(CriticalType criticalType) {
+        this.criticalType = criticalType;
     }
 
     public String getUserUuid() {
         return userUuid;
     }
+
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
     }
@@ -92,6 +128,7 @@ public class Equipment extends RealmObject {
     public int getStartDate() {
         return startDate;
     }
+
     public void setStartDate(int startDate) {
         this.startDate = startDate;
     }
@@ -99,6 +136,7 @@ public class Equipment extends RealmObject {
     public float getLatitude() {
         return latitude;
     }
+
     public void setLatitude(float latitude) {
         this.latitude = latitude;
     }
@@ -106,6 +144,7 @@ public class Equipment extends RealmObject {
     public float getLongitude() {
         return longitude;
     }
+
     public void setLongitude(float longitude) {
         this.longitude = longitude;
     }
@@ -113,6 +152,7 @@ public class Equipment extends RealmObject {
     public String getImage() {
         return image;
     }
+
     public void setImage(String image) {
         this.image = image;
     }
@@ -120,6 +160,7 @@ public class Equipment extends RealmObject {
     public String getTagId() {
         return tagId;
     }
+
     public void setTagId(String tagId) {
         this.tagId = tagId;
     }
@@ -127,6 +168,7 @@ public class Equipment extends RealmObject {
     public long getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
@@ -134,6 +176,7 @@ public class Equipment extends RealmObject {
     public long getChangedAt() {
         return changedAt;
     }
+
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }

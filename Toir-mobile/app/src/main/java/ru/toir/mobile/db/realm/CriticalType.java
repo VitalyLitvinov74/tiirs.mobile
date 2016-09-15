@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 07.09.16.
+ *         Created on 07.09.16.
  */
 public class CriticalType extends RealmObject {
     @PrimaryKey
@@ -19,6 +19,7 @@ public class CriticalType extends RealmObject {
     public long get_id() {
         return _id;
     }
+
     public void set_id(long _id) {
         this._id = _id;
     }
@@ -26,6 +27,7 @@ public class CriticalType extends RealmObject {
     public String getUuid() {
         return uuid;
     }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -33,6 +35,7 @@ public class CriticalType extends RealmObject {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -40,6 +43,7 @@ public class CriticalType extends RealmObject {
     public String getIcon() {
         return icon;
     }
+
     public void setIcon(String icon) {
         this.icon = icon;
     }
@@ -47,6 +51,7 @@ public class CriticalType extends RealmObject {
     public long getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
@@ -54,6 +59,7 @@ public class CriticalType extends RealmObject {
     public long getChangedAt() {
         return changedAt;
     }
+
     public void setChangedAt(long changedAt) {
         this.changedAt = changedAt;
     }

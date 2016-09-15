@@ -202,17 +202,21 @@ public class EquipmentsFragment extends Fragment {
 
 	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
         RealmResults<Equipment> equipments;
-        if (equipmentModelUuid!=null) {
-            if (sort!=null)
+        if (equipmentModelUuid != null) {
+            if (sort!=null) {
                 equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAllSorted(sort);
-            else
+            }
+            else {
                 equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAll();
+            }
         }
         else {
-            if (sort!=null)
+            if (sort!=null) {
                 equipments = realmDB.where(Equipment.class).findAllSorted(sort);
-            else
+            }
+            else {
                 equipments = realmDB.where(Equipment.class).findAll();
+            }
         }
         equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
         equipmentListView.setAdapter(equipmentAdapter);
