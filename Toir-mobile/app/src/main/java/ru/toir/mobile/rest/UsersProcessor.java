@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
+import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
-import ru.toir.mobile.db.tables.Users;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.RestClient.Method;
-import ru.toir.mobile.serverapi.UserSrv;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -46,8 +44,8 @@ public class UsersProcessor {
 	/**
 	 * Получаем и сохраняем информацию по пользователю
 	 * 
-	 * @param bundle
-	 * @return
+	 * @param bundle Параметры для выполнения запроса
+	 * @return Bundle с результатом выполнения запроса
 	 */
 	public Bundle getUser(Bundle bundle) {
 
@@ -59,16 +57,16 @@ public class UsersProcessor {
 			return result;
 		}
 
-		URI requestUri = null;
+		URI requestUri;
 		String token = AuthorizedUser.getInstance().getToken();
-		String jsonString = null;
+		String jsonString;
 
 		try {
 			requestUri = new URI(mServerUrl + USERS_GET_USER_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 
-			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
-			List<String> tList = new ArrayList<String>();
+			Map<String, List<String>> headers = new ArrayMap<>();
+			List<String> tList = new ArrayList<>();
 			tList.add("bearer " + token);
 			headers.put("Authorization", tList);
 
@@ -78,31 +76,20 @@ public class UsersProcessor {
 			if (response.mStatus == 200) {
 
 				jsonString = new String(response.mBody, "UTF-8");
-				Log.d("test", jsonString);
 
-				UserSrv serverUser = new Gson().fromJson(jsonString,
-						UserSrv.class);
-				if (serverUser != null) {
-					UsersDBAdapter adapter = new UsersDBAdapter(
-							new ToirDatabaseContext(mContext));
-					Users user = adapter.getItem(AuthorizedUser.getInstance()
-							.getTagId());
-					if (user == null) {
-						user = new Users();
-					}
-					user.setUuid(serverUser.getId());
-					user.setName(serverUser.getUserName());
-					user.setLogin(serverUser.getEmail());
-					// TODO с сервера не приходит хэш
-					user.setPass("password");
-					// TODO с сервера не приходит тип
-					user.setType(3);
-					// TODO реализовать сохранение хэша вместо ид метки
-					user.setTag_id(AuthorizedUser.getInstance().getTagId());
-					user.setActive(serverUser.isIsActive());
-					// TODO с сервера не приходит должность
-					user.setWhois("Бугор");
-					adapter.replaceItem(user);
+                User user =  new Gson().fromJson(jsonString, User.class);
+				if (user != null) {
+                    Realm realm = Realm.getDefaultInstance();
+                    User realmUser = realm.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+                    realm.beginTransaction();
+                    if (realmUser == null) {
+                        realmUser = realm.copyToRealm(user);
+                    } else {
+                        realmUser = realm.copyToRealmOrUpdate(user);
+                    }
+                    realm.commitTransaction();
+                    Log.d("test", "realm user = " + realmUser);
+
 					result.putBoolean(IServiceProvider.RESULT, true);
 					return result;
 				} else {

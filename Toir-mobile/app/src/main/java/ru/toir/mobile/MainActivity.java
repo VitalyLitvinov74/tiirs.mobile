@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 						//		new ToirDatabaseContext(getApplicationContext()));
                         //Users user = users.getUserByTagId(AuthorizedUser
                         //        .getInstance().getTagId());
-                        final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+                        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
 						// в зависимости от результата либо дать работать, либо не дать
 						if (user != null) {
                             realmDB.beginTransaction();
@@ -404,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
 		// переопределёнными путями к базе
 		try {
             //ToirRealm.init(this);
-            // получаем базу realm
+			// получаем базу realm
             realmDB = Realm.getDefaultInstance();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             //helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
