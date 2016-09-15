@@ -14,7 +14,7 @@ import io.realm.RealmConfiguration;
  */
 public class ToirRealm {
     public static void init(Context context) {
-        init(context, "toir");
+        init(context, "toir.realm");
     }
 
     public static void init(Context context, String dbName) {
