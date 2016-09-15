@@ -23,42 +23,44 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.OperationActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.SortField;
-import ru.toir.mobile.db.adapters.BaseDBAdapter;
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
 import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
+import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
-import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
+import ru.toir.mobile.db.adapters.OrderAdapter;
+import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskDBAdapter;
+import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
-import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Tasks;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.CriticalType;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.OperationStatus;
 import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.db.tables.Task;
 import ru.toir.mobile.db.tables.TaskStatus;
-import ru.toir.mobile.db.tables.Users;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceHelper;
@@ -67,18 +69,25 @@ import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.TaskRes;
-import ru.toir.mobile.utils.DataUtils;
 
 public class OrderFragment extends Fragment {
-
 	private String TAG = "OrderFragment";
+    private Realm realmDB;
+    private View rootView;
 
 	private int Level = 0;
 	private String currentOrderUuid = "";
+    private String currentTaskUuid = "";
+    private String currentTaskStageUuid = "";
+    private String currentOperationUuid = "";
 
 	private Spinner referenceSpinner;
 	private Spinner typeSpinner;
 	private ListView mainListView;
+
+    OrderAdapter orderAdapter;
+    TaskAdapter taskAdapter;
+    TaskStageAdapter taskStageAdapter;
 
 	private SimpleCursorAdapter operationAdapter;
 	private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
@@ -86,9 +95,8 @@ public class OrderFragment extends Fragment {
 	private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
 	private ArrayAdapter<OperationType> operationTypeAdapter;
 	private ArrayAdapter<CriticalType> criticalTypeAdapter;
-	private ArrayAdapter<TaskStatus> taskStatusAdapter;
+	private ArrayAdapter<OrderStatus> orderStatusAdapter;
 	private ArrayAdapter<SortField> sortFieldAdapter;
-	private SimpleCursorAdapter taskAdapter;
 
 	private ProgressDialog processDialog;
 	private RfidDialog rfidDialog;
@@ -202,8 +210,9 @@ public class OrderFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.orders_layout, container,
+		rootView = inflater.inflate(R.layout.orders_layout, container,
 				false);
+        realmDB = Realm.getDefaultInstance();
 
 		mainListView = (ListView) rootView
 				.findViewById(R.id.ol_orders_list_view);
@@ -238,6 +247,7 @@ public class OrderFragment extends Fragment {
         // !! адаптер уехал в адаптер
 
 		// адаптеры для выпадающих списков по типу содержимого
+        /*
 		operationTypeAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<OperationType>());
@@ -253,7 +263,7 @@ public class OrderFragment extends Fragment {
 		sortFieldAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<SortField>());
-
+        */
 		// так как обработчики пока одни на всё, ставим их один раз
 		mainListView.setOnItemClickListener(mainListViewClickListener);
 		mainListView.setOnItemLongClickListener(mainListViewLongClickListener);
@@ -268,93 +278,87 @@ public class OrderFragment extends Fragment {
 	private void initView() {
 
 		Level = 0;
-		fillListViewTask(null, null);
-		fillSpinnersTasks();
+		fillListViewOrders(null, null);
+		fillSpinnersOrders();
 
 	}
+    // Orders --------------------------------------------------------------------------------------
+	private void fillSpinnersOrders() {
+		//TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
+		//		new ToirDatabaseContext(getActivity().getApplicationContext()));
+		//ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
+		//		.getAllItems();
+        RealmResults<OrderStatus> orderStatus = realmDB.where(OrderStatus.class).findAll();
+        ArrayAdapter<OrderStatus> statusSpinnerAdapter;
+        statusSpinnerAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                new ArrayList<OrderStatus>());
 
-	private void fillSpinnersTasks() {
-		TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
-				.getAllItems();
-
-		TaskStatus allStatus = new TaskStatus();
-		allStatus.setUuid(null);
-		allStatus.setTitle("Все статусы");
-		taskStatusList.add(0, allStatus);
-		taskStatusAdapter.clear();
-		taskStatusAdapter.addAll(taskStatusList);
-		referenceSpinner.setAdapter(taskStatusAdapter);
+        statusSpinnerAdapter.clear();
+        statusSpinnerAdapter.addAll(orderStatus);
+        statusSpinnerAdapter.notifyDataSetChanged();
 
 		sortFieldAdapter.clear();
 		sortFieldAdapter.add(new SortField("Сортировка", null));
-		sortFieldAdapter.add(new SortField("По дате создания", BaseDBAdapter
-				.getFullName(TaskDBAdapter.TABLE_NAME,
-						TaskDBAdapter.FIELD_CREATED_AT)));
-		sortFieldAdapter.add(new SortField("По дате получения", BaseDBAdapter
-				.getFullName(TaskDBAdapter.TABLE_NAME,
-						TaskDBAdapter.FIELD_CLOSE_DATE)));
-		sortFieldAdapter.add(new SortField("По дате изменения", BaseDBAdapter
-				.getFullName(TaskDBAdapter.TABLE_NAME,
-						TaskDBAdapter.FIELD_CHANGED_AT)));
-		sortFieldAdapter.add(new SortField("По статусу отправки", BaseDBAdapter
-				.getFullName(TaskDBAdapter.TABLE_NAME,
-						TaskDBAdapter.FIELD_UPDATED)));
+		sortFieldAdapter.add(new SortField("По дате начала", "startDate"));
+		sortFieldAdapter.add(new SortField("По дате получения", "recieveDate"));
+		sortFieldAdapter.add(new SortField("По дате отправки", "attemptSendDate"));
+        // TODO глупо сортировать просто по UUID
+		sortFieldAdapter.add(new SortField("По статусу", "orderStatusUuid"));
 		typeSpinner.setAdapter(sortFieldAdapter);
 
 	}
 
-	private void fillListViewTask(String taskStatus, String orderByField) {
-
-		String tagId = AuthorizedUser.getInstance().getTagId();
-		UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-				getActivity().getApplicationContext()));
-		Users user = users.getUserByTagId(tagId);
-
-		if (user == null) {
-			Toast.makeText(getActivity(), "Нет такого пользователя!",
-					Toast.LENGTH_SHORT).show();
-		} else {
-			TaskDBAdapter taskDbAdapter = new TaskDBAdapter(
-					new ToirDatabaseContext(getActivity()
-							.getApplicationContext()));
-
-			taskAdapter.changeCursor(taskDbAdapter.getTaskWithInfo(
-					user.getUuid(), taskStatus, orderByField));
-
-			mainListView.setAdapter(taskAdapter);
+	private void fillListViewOrders(String orderStatus, String orderByField) {
+        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+        if (user == null) {
+            Toast.makeText(getActivity(), "Нет такого пользователя!",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            RealmResults<Orders> orders;
+            if (orderStatus!=null) {
+                if (orderByField!=null)
+                    orders = realmDB.where(Orders.class).equalTo("orderStatusUuid", orderStatus).findAllSorted(orderByField);
+                else
+                    orders = realmDB.where(Orders.class).equalTo("orderStatusUuid", orderStatus).findAll();
+            }
+            else {
+                if (orderByField!=null)
+                    orders = realmDB.where(Orders.class).findAllSorted(orderByField);
+                else
+                    orders = realmDB.where(Orders.class).findAll();
+            }
+            orderAdapter = new OrderAdapter(getContext(),R.id.ol_orders_list_view, orders);
+            mainListView.setAdapter(orderAdapter);
 		}
 	}
+    // ---------------------------------------------------------------------------------------------
+    // Tasks----------------------------------------------------------------------------------------
+    private void fillListViewTasks(String orderUuid) {
+       RealmResults<Tasks> tasks;
+       mainListView = (ListView) rootView
+                .findViewById(R.id.tl_tasks_list_view);
 
-	private void fillSpinnersEquipment() {
-
-		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		ArrayList<OperationType> operationTypeList = operationTypeDBAdapter
-				.getAllItems();
-		ArrayList<CriticalType> criticalTypeList = criticalTypeDBAdapter
-				.getAllItems();
-
-		OperationType allOperation = new OperationType();
-		allOperation.setTitle("Все операции");
-		allOperation.setUuid(null);
-		operationTypeList.add(0, allOperation);
-		operationTypeAdapter.clear();
-		operationTypeAdapter.addAll(operationTypeList);
-		referenceSpinner.setAdapter(operationTypeAdapter);
-
-		CriticalType allCriticalType = new CriticalType();
-		allCriticalType.setUuid(null);
-
-		criticalTypeList.add(0, allCriticalType);
-		criticalTypeAdapter.clear();
-		criticalTypeAdapter.addAll(criticalTypeList);
-		typeSpinner.setAdapter(criticalTypeAdapter);
-
-	}
+       tasks = realmDB.where(Tasks.class).equalTo("orderUuid", orderUuid).findAllSorted("startDate");
+       TaskAdapter taskAdapter = new TaskAdapter(getContext(),R.id.tl_tasks_list_view, tasks);
+       mainListView.setAdapter(taskAdapter);
+    }
+    // Orders----------------------------------------------------------------------------------------
+    private void fillListViewTaskStage(String taskUuid) {
+        RealmResults<TaskStages> taskStages;
+        taskStages = realmDB.where(TaskStages.class).equalTo("taskUuid", taskUuid).findAllSorted("startDate");
+        TaskStageAdapter taskStageAdapter = new TaskStageAdapter(getContext(),R.id.tsl_taskstage_list_view, taskStages);
+        mainListView.setAdapter(taskStageAdapter);
+    }
+    // Operations----------------------------------------------------------------------------------------
+    private void fillListViewOperations(String taskStageUuid) {
+        RealmResults<Operation> operations;
+        mainListView = (ListView) rootView
+                .findViewById(R.id.op_operation_list_view);
+        operations = realmDB.where(Operation.class).equalTo("taskStageUuid", taskStageUuid).findAllSorted("startDate");
+        OperationAdapter operationAdapter = new OperationAdapter(getContext(),R.id.op_operation_list_view, operations);
+        mainListView.setAdapter(operationAdapter);
+    }
 
 	public class ListViewClickListener implements
 			AdapterView.OnItemClickListener {
@@ -363,59 +367,43 @@ public class OrderFragment extends Fragment {
 				int position, long id) {
 
 			Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-
+            // Orders
+            // находимся на "экране" нарядов
+            if (Level == 0) {
+                currentOrderUuid  = orderAdapter.getItem(position).getUuid();
+                fillListViewTasks(currentOrderUuid);
+                mainListView = (ListView) rootView
+                        .findViewById(R.id.ol_orders_list_view);
+                Level = 1;
+                return;
+            }
+            // Tasks
 			if (Level == 1) {
-
-				// находимся на "экране" операций
-				String operationUuid = cursor
-						.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.UUID));
-				String taskUuid = cursor
-						.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.TASK_UUID));
-				String equipmentUuid = cursor.getString(cursor
-						.getColumnIndex(EquipmentDBAdapter.Projection.UUID));
-				String operationStatus = cursor
-						.getString(cursor
-								.getColumnIndex(EquipmentOperationDBAdapter.Projection.OPERATION_STATUS_UUID));
-
-				if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)
-						|| operationStatus
-								.equals(OperationStatusDBAdapter.Status.IN_WORK)) {
-
-					initOperationPattern(operationUuid, taskUuid, equipmentUuid);
-
-				} else {
-
-					// операция уже выполнена
-					// сообщаем об этом
-					AlertDialog.Builder dialog = new AlertDialog.Builder(
-							getContext());
-					dialog.setTitle("Внимание!");
-					dialog.setMessage("Операция уже выполнена. Повторное выполнение невозможно!");
-					dialog.setPositiveButton(android.R.string.ok,
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-
-									dialog.dismiss();
-								}
-							});
-					dialog.show();
-				}
-
-			} else if (Level == 0) {
-
-				// находимся на "экране" нарядов
-				currentTaskUuid = cursor.getString(cursor
-						.getColumnIndex(TaskDBAdapter.Projection.UUID));
-				fillListViewOperation(currentTaskUuid, null, null);
-				fillSpinnersEquipment();
-				Level = 1;
-			}
-		}
+                currentTaskUuid = taskAdapter.getItem(position).getUuid();
+                mainListView = (ListView) rootView
+                        .findViewById(R.id.tsl_taskstage_list_view);
+                fillListViewTaskStage(currentTaskUuid);
+                Level = 2;
+                return;
+            }
+            // TaskStage
+            if (Level == 2) {
+                currentTaskStageUuid = taskStageAdapter.getItem(position).getUuid();
+                mainListView = (ListView) rootView
+                        .findViewById(R.id.op_operation_list_view);
+                fillListViewOperations(currentTaskStageUuid);
+                Level = 3;
+                return;
+            }
+            // Operation
+            if (Level == 3) {
+                currentOperationUuid = operationAdapter.getItem(position).getUuid();
+                // TODO отмечаем операцию как завершенную ?
+                //if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)	|| operationStatus.equals(OperationStatusDBAdapter.Status.IN_WORK))
+                // else dialog.setMessage("Операция уже выполнена. Повторное выполнение невозможно!");
+                //initOperationPattern(operationUuid, taskUuid, equipmentUuid);
+                return;
+            }
 	}
 
 	public class ListViewLongClickListener implements

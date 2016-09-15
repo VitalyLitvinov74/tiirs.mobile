@@ -5,7 +5,7 @@
     android:orientation="horizontal" >
 
     <ImageView
-        android:id="@+id/ti_ImageStatus"
+        android:id="@+id/tsi_ImageStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/status"
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content" >
 
             <TextView
-                android:id="@+id/ti_Name"
+                android:id="@+id/tsi_Name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
@@ -37,7 +37,7 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/ti_Status"
+                android:id="@+id/tsi_Status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content" >
 
             <TextView
-                android:id="@+id/ti_Equipment"
+                android:id="@+id/tsi_StartDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="6dp"
@@ -69,7 +69,7 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/ti_StartDate"
+                android:id="@+id/tsi_EndDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"

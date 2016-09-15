@@ -17,37 +17,38 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.OrderStatus;
-import ru.toir.mobile.db.realm.Orders;
-import ru.toir.mobile.utils.DataUtils;
+import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.TaskStatus;
+import ru.toir.mobile.db.realm.TaskTemplate;
+import ru.toir.mobile.db.realm.Tasks;
 
 /**
  * @author olejek
- * Created by olejek on 12.09.16.
+ * Created by olejek on 13.09.16.
  */
-public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
-    public static final String TABLE_NAME = "Orders";
+public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter {
+    public static final String TABLE_NAME = "Tasks";
 
     private static class ViewHolder{
-        TextView created;
+        TextView equipment;
         TextView title;
         TextView status;
         ImageView icon;
     }
 
-    public OrderAdapter(@NonNull Context context, int resId, RealmResults<Orders> data) {
+    public TaskAdapter(@NonNull Context context, int resId, RealmResults<Tasks> data) {
         super(context, data);
     }
 
     @Override
     public int getCount() {
         Realm realmDB = Realm.getDefaultInstance();
-        RealmResults<Orders> rows = realmDB.where(Orders.class).findAll();
+        RealmResults<Tasks> rows = realmDB.where(Tasks.class).findAll();
         return rows.size();
     }
 
     @Override
-    public Orders getItem(int position) {
+    public Tasks getItem(int position) {
         return null;
     }
 
@@ -56,40 +57,56 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         return 0;
     }
 
+    public String getTaskTitle(String taskTemplateUuid) {
+            Realm realmDB = Realm.getDefaultInstance();
+            TaskTemplate taskTemplate = realmDB.where(TaskTemplate.class).equalTo("uuid",taskTemplateUuid).findFirst();
+            return taskTemplate.getTitle();
+    }
+
+    public String getTaskStatusTitle(String taskStatusUuid) {
+        Realm realmDB = Realm.getDefaultInstance();
+        TaskStatus taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid",taskStatusUuid).findFirst();
+        return taskStatus.getTitle();
+    }
+
+    public String getEquipmentTitle(String equipmentUuid) {
+        Realm realmDB = Realm.getDefaultInstance();
+        Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid",equipmentUuid).findFirst();
+        return equipment.getTitle();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         Realm realmDB = Realm.getDefaultInstance();
-        OrderStatus orderStatus;
+        TaskStatus taskStatus;
         String pathToImages;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.order_item, parent, false);
+            convertView = inflater.inflate(R.layout.task_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.created = (TextView) convertView.findViewById(R.id.orderi_Create);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.orderi_Name);
-            viewHolder.status = (TextView) convertView.findViewById(R.id.orderi_Status);
-            viewHolder.icon = (ImageView) convertView.findViewById(R.id.orderi_ImageStatus);
+            viewHolder.title = (TextView) convertView.findViewById(R.id.ti_Name);
+            viewHolder.status = (TextView) convertView.findViewById(R.id.ti_Status);
+            viewHolder.equipment = (TextView) convertView.findViewById(R.id.ti_Equipment);
+            viewHolder.icon = (ImageView) convertView.findViewById(R.id.ti_ImageStatus);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         if (adapterData!=null) {
-            Orders order = adapterData.get(position);
-            viewHolder.title.setText(order.getTitle());
-            long lDate = order.getReceiveDate();
-            String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
-            viewHolder.created.setText(sDate);
+            Tasks task = adapterData.get(position);
+            viewHolder.title.setText(getTaskTitle(task.getTaskTemplateUuid()));
+            viewHolder.status.setText(getTaskStatusTitle(task.getTaskStatusUuid()));
+            viewHolder.equipment.setText(getEquipmentTitle(task.getEquipmentUuid()));
 
-            orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",order.getOrderStatusUuid()).findFirst();
-            viewHolder.status.setText(order.getOrderStatusUuid());
+            taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid",task.getTaskStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
                     + File.separator + "data"
                     + File.separator + "ru.toir.mobile"
                     + File.separator + "img"
                     + File.separator;
-            File imgFile = new File(pathToImages + orderStatus.getIcon());
+            File imgFile = new File(pathToImages + taskStatus.getIcon());
             if (imgFile.exists() && imgFile.isFile()) {
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
                         .getAbsolutePath());

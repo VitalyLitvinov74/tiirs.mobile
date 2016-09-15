@@ -5,22 +5,21 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 12.09.16.
+ * Created on 14.09.16.
  */
-public class Tasks extends RealmObject {
+public class TaskStages extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String comment;
-    private String orderUuid;
+    private String taskUuid;
     private String equipmentUuid;
-    private String taskVerdictUuid;
-    private String taskStatusUuid;
-    private String taskTemplateUuid;
-    private int prevCode;
-    private int nextCode;
+    private String taskStageVerdict;
+    private String taskStageStatus;
+    private String taskStageTemplate;
     private int startDate;
     private int endDate;
+    private int flowOrder;
     private long createdAt;
     private long changedAt;
 
@@ -46,11 +45,11 @@ public class Tasks extends RealmObject {
         this.comment = comment;
     }
 
-    public String getOrderUuid() {
-        return orderUuid;
+    public String getTaskUuid() {
+        return taskUuid;
     }
-    public void setOrderUuid(String orderUuid) {
-        this.orderUuid = orderUuid;
+    public void setTaskUuid(String taskUuid) {
+        this.taskUuid = taskUuid;
     }
 
     public String getEquipmentUuid() {
@@ -60,38 +59,31 @@ public class Tasks extends RealmObject {
         this.equipmentUuid = equipmentUuid;
     }
 
-    public String getTaskVerdictUuid() {
-        return taskVerdictUuid;
+    public String getTaskStageVerdict() {
+        return taskStageVerdict;
     }
-    public void setTaskVerdictUuid(String taskVerdictUuid) {
-        this.taskVerdictUuid = taskVerdictUuid;
+    public void setTaskStageVerdict(String taskStageVerdict) {
+        this.taskStageVerdict = taskStageVerdict;
     }
-    public String getTaskStatusUuid() {
-        return taskStatusUuid;
+    public String getTaskStageStatusUuid() {
+        return taskStageStatus;
     }
-    public void setTaskStatusUuid(String taskStatusUuid) {
-        this.taskStatusUuid = taskStatusUuid;
-    }
-
-    public String getTaskTemplateUuid() {
-        return taskTemplateUuid;
-    }
-    public void setTaskTemplateUuid(String taskTemplateUuid) {
-        this.taskTemplateUuid = taskTemplateUuid;
+    public void setTaskStageStatusUuid(String taskStageStatus) {
+        this.taskStageStatus = taskStageStatus;
     }
 
-    public int getPrevCode() {
-        return prevCode;
+    public String getTaskStageTemplateUuid() {
+        return taskStageTemplate;
     }
-    public void setPrevCode(int prevCode) {
-        this.prevCode = prevCode;
+    public void setTaskStageTemplateUuid(String taskStageTemplate) {
+        this.taskStageTemplate = taskStageTemplate;
     }
 
-    public int getNextCode() {
-        return nextCode;
+    public int getFlowOrder() {
+        return flowOrder;
     }
-    public void setNextCode(int nextCode) {
-        this.nextCode = nextCode;
+    public void setFlowOrder(int flowOrder) {
+        this.flowOrder = flowOrder;
     }
 
     public int getStartDate() {
@@ -104,7 +96,7 @@ public class Tasks extends RealmObject {
     public int getEndDate() {
         return endDate;
     }
-    public void setEndDate(int endDate) {
+    public void setEndDate(int closeDate) {
         this.endDate = endDate;
     }
 

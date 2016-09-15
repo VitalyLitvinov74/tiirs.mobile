@@ -83,7 +83,7 @@ public class Orders extends RealmObject {
     }
 
     public int getCloseDate() {
-        return receiveDate;
+        return closeDate;
     }
     public void setCloseDate(int closeDate) {
         this.closeDate = closeDate;
