@@ -47,6 +47,10 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
@@ -58,14 +62,10 @@ import ru.toir.mobile.fragments.NativeCameraFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.TaskFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
-import ru.toir.mobile.rest.IServiceProvider;
-import ru.toir.mobile.rest.ProcessorService;
-import ru.toir.mobile.rest.TokenServiceHelper;
-import ru.toir.mobile.rest.TokenServiceProvider;
-import ru.toir.mobile.rest.UsersServiceHelper;
-import ru.toir.mobile.rest.UsersServiceProvider;
+import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.serverapi.TokenSrv;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PROFILE_ADD = 1;
@@ -91,139 +91,142 @@ public class MainActivity extends AppCompatActivity {
     //private static final int DRAWER_ONLINE = 15;
 
     private static final String TAG = "MainActivity";
-	private boolean isLogged = false;
-	private RfidDialog rfidDialog;
-    private AccountHeader headerResult = null;
-    Bundle savedInstance=null;
-
+    // фильтр для сообщений при получении пользователя с сервера
+    private final IntentFilter mFilterGetUser = new IntentFilter(
+            ToirAPIFactory.Actions.ACTION_GET_USER);
+    // фильтр для получения сообщений при получении токена с сервера
+    private final IntentFilter mFilterGetToken = new IntentFilter(
+            ToirAPIFactory.Actions.ACTION_GET_TOKEN);
     public int currentFragment = NO_FRAGMENT;
-    private ArrayList<IProfile> iprofilelist;
+    Bundle savedInstance=null;
     int activeUserID = 0;
+    ProgressDialog mProgressDialog;
+    private boolean isLogged = false;
+    private RfidDialog rfidDialog;
+    private AccountHeader headerResult = null;
+    private ArrayList<IProfile> iprofilelist;
     //private List<Users> profilesList;
     private RealmResults<User> profilesList;
     private long users_id[];
     private int cnt = 0;
-    ProgressDialog mProgressDialog;
-
     private ProgressDialog authorizationDialog;
-
 	private boolean splashShown = false;
-
     private Realm realmDB;
-
-	// фильтр для сообщений при получении пользователя с сервера
-	private final IntentFilter mFilterGetUser = new IntentFilter(
-			UsersServiceProvider.Actions.ACTION_GET_USER);
-	private BroadcastReceiver mReceiverGetUser = new BroadcastReceiver() {
+    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+            //UsersDBAdapter users = new UsersDBAdapter(
+            //        new ToirDatabaseContext(getApplicationContext()));
+            User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+            if (drawerItem.getIdentifier() == 12) {
+                realmDB.beginTransaction();
+                if (isChecked) {
+                    //isActive = true;
+                    user.setActive(true);
+                    //users.replaceItem(user);
+                } else {
+                    //isActive = false;
+                    user.setActive(false);
+                }
+                realmDB.commitTransaction();
+                //users.replaceItem(user);
+            }
+        }
+    };
+    private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
+        @Override
+        public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+            return false;
+        }
+    };
+    private BroadcastReceiver mReceiverGetUser = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			int provider = intent.getIntExtra(
-					ProcessorService.Extras.PROVIDER_EXTRA, 0);
-			if (provider == ProcessorService.Providers.USERS_PROVIDER) {
-				int method = intent.getIntExtra(
-						ProcessorService.Extras.METHOD_EXTRA, 0);
-				if (method == UsersServiceProvider.Methods.GET_USER) {
-					boolean result = intent.getBooleanExtra(
-							ProcessorService.Extras.RESULT_EXTRA, false);
-					Bundle bundle = intent
-							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-					if (result) {
-						//UsersDBAdapter users = new UsersDBAdapter(
-						//		new ToirDatabaseContext(getApplicationContext()));
-                        //Users user = users.getUserByTagId(AuthorizedUser
-                        //        .getInstance().getTagId());
-                        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-						// в зависимости от результата либо дать работать, либо не дать
-						if (user != null) {
-                            realmDB.beginTransaction();
-                            RealmResults<User> users = realmDB.where(User.class).findAll();
-                            for (int i = 0; i < users.size(); i++)
-                                users.get(i).setActive(false);
-                            user.setActive(true);
-                            realmDB.commitTransaction();
 
-							isLogged = true;
-							AuthorizedUser.getInstance()
-									.setUuid(user.getUuid());
-							setMainLayout(savedInstance);
-						} else {
-							Toast.makeText(getApplicationContext(),
-                                    "Нет доступа.", Toast.LENGTH_LONG).show();
+            boolean result = intent.getBooleanExtra("result", false);
+            if (result) {
+                User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+                // в зависимости от результата либо дать работать, либо не дать
+                if (user != null) {
+                    realmDB.beginTransaction();
+                    RealmResults<User> users = realmDB.where(User.class).findAll();
+                    for (int i = 0; i < users.size(); i++) {
+                        users.get(i).setActive(false);
+                    }
+                    user.setActive(true);
+                    realmDB.commitTransaction();
 
-						}
-					} else {
-						// сообщаем описание неудачи
-						String message = bundle
-								.getString(IServiceProvider.MESSAGE);
-						Toast.makeText(getApplicationContext(), message,
-                                Toast.LENGTH_LONG).show();
-					}
-					authorizationDialog.dismiss();
-				}
-			}
-		}
+                    isLogged = true;
+                    AuthorizedUser.getInstance().setUuid(user.getUuid());
+                    setMainLayout(savedInstance);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Нет доступа.",
+                            Toast.LENGTH_LONG).show();
+
+                }
+            } else {
+                // сообщаем описание неудачи
+                Toast.makeText(getApplicationContext(), "Что-то пошло не так!!!",
+                        Toast.LENGTH_LONG).show();
+            }
+
+            authorizationDialog.dismiss();
+        }
 	};
-
-	// фильтр для получения сообщений при получении токена с сервера
-	private final IntentFilter mFilterGetToken = new IntentFilter(
-			TokenServiceProvider.Actions.ACTION_GET_TOKEN);
 	private BroadcastReceiver mReceiverGetToken = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			int provider = intent.getIntExtra(
-					ProcessorService.Extras.PROVIDER_EXTRA, 0);
-			Log.d(TAG, "" + provider);
-			
-			if (provider == ProcessorService.Providers.TOKEN_PROVIDER) {
-				int method = intent.getIntExtra(
-						ProcessorService.Extras.METHOD_EXTRA, 0);
-				Log.d(TAG, "" + method);
-				if (method == TokenServiceProvider.Methods.GET_TOKEN_BY_TAG) {
-					boolean result = intent.getBooleanExtra(
-							ProcessorService.Extras.RESULT_EXTRA, false);
-					Bundle bundle = intent
-							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-					Log.d(TAG, "" + result);
-					if (result) {
-						// запрашиваем актуальную информацию по пользователю
-						UsersServiceHelper usersServiceHelper = new UsersServiceHelper(
-								getApplicationContext(),
-								UsersServiceProvider.Actions.ACTION_GET_USER);
-						usersServiceHelper.getUser();
 
-						Toast.makeText(getApplicationContext(),
-                                "Токен получен.", Toast.LENGTH_SHORT).show();
-					} else {
-						// TODO реализовать проверку на то что пользователя нет
-						// на сервере
-						// токен не получен, сервер не ответил...
-						// проверяем наличие пользователя в локальной базе
-                        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
-						//UsersDBAdapter users = new UsersDBAdapter(
-						//		new ToirDatabaseContext(getApplicationContext()));
-						//Users user = users.getUserByTagId(AuthorizedUser
-						//		.getInstance().getTagId());
-						// в зависимости от результата либо дать работать, либо
-						// не дать
-						if (user != null && user.isActive()) {
-							isLogged = true;
-							AuthorizedUser.getInstance()
-									.setUuid(user.getUuid());
-							setMainLayout(savedInstance);
-						} else {
-							Toast.makeText(getApplicationContext(),
-                                    "Нет доступа.", Toast.LENGTH_LONG).show();
-						}
+            boolean result = intent.getBooleanExtra("result", false);
+            if (result) {
+                Call<User> call = ToirAPIFactory.getUserService().user(AuthorizedUser.getInstance()
+                        .getToken());
+                call.enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Response<User> response, Retrofit retrofit) {
+                        Log.d("test", "user response =" + response);
+                        if (response.isSuccess()) {
+                            User user = response.body();
+                            Log.d("test", "user = " + user);
+                            Intent resultIntent = new Intent(ToirAPIFactory.Actions.ACTION_GET_USER);
+                            resultIntent.setPackage(getApplicationContext().getPackageName());
+                            if (user != null) {
+                                resultIntent.putExtra("result", true);
+                            } else {
+                                resultIntent.putExtra("result", false);
+                            }
+                            getApplicationContext().sendBroadcast(resultIntent);
+                        }
 
-						String message = bundle
-								.getString(IServiceProvider.MESSAGE);
-						Toast.makeText(getApplicationContext(), message,
-                                Toast.LENGTH_LONG).show();
-						authorizationDialog.dismiss();
-					}
-				}
-			}
-		}
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.d("test", "get user info failure");
+                    }
+                });
+
+                Toast.makeText(getApplicationContext(),
+                        "Токен получен.", Toast.LENGTH_SHORT).show();
+            } else {
+                // TODO реализовать проверку на то что пользователя нет
+                // на сервере
+                // токен не получен, сервер не ответил...
+                // проверяем наличие пользователя в локальной базе
+                User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+                // в зависимости от результата либо дать работать, либо не дать
+                if (user != null && user.isActive()) {
+                    isLogged = true;
+                    AuthorizedUser.getInstance().setUuid(user.getUuid());
+                    setMainLayout(savedInstance);
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Нет доступа.", Toast.LENGTH_LONG).show();
+                }
+
+                authorizationDialog.dismiss();
+            }
+        }
 	};
 
 	@Override
@@ -283,6 +286,11 @@ public class MainActivity extends AppCompatActivity {
 			// принудительное обновление приложения
 			finish();
 		}
+
+        Context context = getApplicationContext();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        ToirApplication.serverUrl = sp.getString(context.getString(R.string.serverUrl), null);
+
 /*
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
@@ -435,8 +443,8 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * 
-	 */
+     *
+     */
 	public void startAuthorise() {
 
 		isLogged = false;
@@ -463,11 +471,33 @@ public class MainActivity extends AppCompatActivity {
 					authorizationDialog.show();
 
 					// запрашиваем токен
-					TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
-							getApplicationContext(),
-							TokenServiceProvider.Actions.ACTION_GET_TOKEN);
-					tokenServiceHelper.GetTokenByTag(tagId);
-				} else {
+                    Call<TokenSrv> token = ToirAPIFactory.getTokenService().user(tagId);
+                    token.enqueue(new Callback<TokenSrv>() {
+                        @Override
+                        public void onResponse(Response<TokenSrv> response, Retrofit retrofit) {
+                            Log.d("test", "token response =" + response);
+                            if (response.isSuccess()) {
+                                TokenSrv token = response.body();
+                                Log.d("test", "token = " + token);
+                                Intent resultIntent = new Intent(ToirAPIFactory.Actions.ACTION_GET_TOKEN);
+                                resultIntent.setPackage(getApplicationContext().getPackageName());
+                                if (token != null) {
+                                    AuthorizedUser.getInstance().setToken(token.getAccessToken());
+                                    resultIntent.putExtra("result", true);
+                                    resultIntent.putExtra("token", token.getAccessToken());
+                                } else {
+                                    resultIntent.putExtra("result", false);
+                                }
+                                getApplicationContext().sendBroadcast(resultIntent);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Log.d("test", "get token failure");
+                        }
+                    });
+                } else {
 					// по кодам из RFID можно показать более подробные сообщения
 					Toast.makeText(getApplicationContext(),
                             "Операция прервана", Toast.LENGTH_SHORT).show();
@@ -689,8 +719,8 @@ public class MainActivity extends AppCompatActivity {
 
 	/**
 	 * Обработчик клика кнопки "Войти"
-	 * 
-	 * @param view Event's view
+     *
+     * @param view Event's view
 	 */
 	public void onClickLogin(View view) {
 		startAuthorise();
@@ -709,8 +739,8 @@ public class MainActivity extends AppCompatActivity {
 
 	/**
 	 * Обработчик клика меню обновления приложения
-	 * 
-	 * @param menuItem Элемент меню
+     *
+     * @param menuItem Элемент меню
 	 */
 	public void onActionUpdate(MenuItem menuItem) {
 
@@ -751,110 +781,81 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		} else if (id == R.id.action_update) {
-			return true;
-		} else if (id == R.id.action_about) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.action_update) {
+            return true;
+        } else if (id == R.id.action_about) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 	/*
-	 * (non-Javadoc)
-	 * 
+     * (non-Javadoc)
+	 *
 	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
 	 */
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
-		outState.putBoolean("isLogged", isLogged);
-		outState.putBoolean("splashShown", splashShown);
-		outState.putString("tagId", AuthorizedUser.getInstance().getTagId());
-		outState.putString("token", AuthorizedUser.getInstance().getToken());
-		outState.putString("userUuid", AuthorizedUser.getInstance().getUuid());
-	}
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
+        outState.putBoolean("isLogged", isLogged);
+        outState.putBoolean("splashShown", splashShown);
+        outState.putString("tagId", AuthorizedUser.getInstance().getTagId());
+        outState.putString("token", AuthorizedUser.getInstance().getToken());
+        outState.putString("userUuid", AuthorizedUser.getInstance().getUuid());
+    }
 
 	/*
-	 * (non-Javadoc)
-	 * 
+     * (non-Javadoc)
+	 *
 	 * @see android.support.v4.app.FragmentActivity#onStart()
 	 */
 	@Override
-	protected void onStart() {
-		super.onStart();
-		registerReceiver(mReceiverGetUser, mFilterGetUser);
-		registerReceiver(mReceiverGetToken, mFilterGetToken);
-	}
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(mReceiverGetUser, mFilterGetUser);
+        registerReceiver(mReceiverGetToken, mFilterGetToken);
+    }
 
 	/*
-	 * (non-Javadoc)
-	 * 
+     * (non-Javadoc)
+	 *
 	 * @see android.support.v4.app.FragmentActivity#onStop()
 	 */
 	@Override
-	protected void onStop() {
-		super.onStop();
-		unregisterReceiver(mReceiverGetUser);
-		unregisterReceiver(mReceiverGetToken);
-	}
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mReceiverGetUser);
+        unregisterReceiver(mReceiverGetToken);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
-	 * android.view.KeyEvent)
-	 */
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
+     * android.view.KeyEvent)
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
 //		if (keyCode == KeyEvent.KEYCODE_BACK) {
 //			 return true;
 //		}
 		return super.onKeyDown(keyCode, event);
 	}
-
-    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-            //UsersDBAdapter users = new UsersDBAdapter(
-            //        new ToirDatabaseContext(getApplicationContext()));
-            User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
-            if (drawerItem.getIdentifier() == 12) {
-                realmDB.beginTransaction();
-                if (isChecked) {
-                    //isActive = true;
-                    user.setActive(true);
-                    //users.replaceItem(user);
-                } else {
-                    //isActive = false;
-                    user.setActive(false);
-                }
-                realmDB.commitTransaction();
-                //users.replaceItem(user);
-            }
-        }
-    };
-
-    private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
-        @Override
-        public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
-            return false;
-        }
-    };
 
     /* функция заполняет массив профилей - пользователей */
 

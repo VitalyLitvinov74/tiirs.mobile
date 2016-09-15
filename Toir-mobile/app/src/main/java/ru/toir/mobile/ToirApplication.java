@@ -10,6 +10,8 @@ import ru.toir.mobile.db.ToirRealm;
 @SuppressWarnings("unused")
 public class ToirApplication extends Application {
 
+	public static String serverUrl = "";
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
