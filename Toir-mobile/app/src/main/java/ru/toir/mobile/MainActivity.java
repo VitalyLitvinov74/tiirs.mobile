@@ -55,8 +55,8 @@ import ru.toir.mobile.fragments.FragmentAddUser;
 import ru.toir.mobile.fragments.FragmentEditUser;
 import ru.toir.mobile.fragments.GPSFragment;
 import ru.toir.mobile.fragments.NativeCameraFragment;
-import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
+import ru.toir.mobile.fragments.TaskFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
     //private static final int DRAWER_ONLINE = 15;
-    private static final int FRAGMENT_ORDERS = 16;
 
     private static final String TAG = "MainActivity";
 	private boolean isLogged = false;
@@ -284,8 +283,118 @@ public class MainActivity extends AppCompatActivity {
 			// принудительное обновление приложения
 			finish();
 		}
+/*
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DocumentationType documentation = realmDB.createObject(DocumentationType.class);
+                documentation.set_id(1);
+                documentation.setUuid("1dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setTitle("Паспорт");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DocumentationType documentation = realmDB.createObject(DocumentationType.class);
+                documentation.set_id(2);
+                documentation.setUuid("4dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setTitle("Руководство");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Documentation documentation = realmDB.createObject(Documentation.class);
+                documentation.set_id(2);
+                documentation.setDocumentationTypeUuid("1dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setEquipmentUuid("8877-5678");
+                documentation.setUuid("6dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                documentation.setTitle("Руководство на котел GTV-40");
+            }
+        });
 
-        //LoadTestData.LoadAllTestData();
+        final RealmResults<Equipment> results = realmDB.where(Equipment.class).findAll();
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                results.deleteAllFromRealm();
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Equipment equipment = realmDB.createObject(Equipment.class);
+                equipment.set_id(2);
+                equipment.setCriticalTypeUuid("1234-5678");
+                equipment.setEquipmentModelUuid("1234-5678");
+                equipment.setEquipmentStatusUuid("1234-5678");
+                equipment.setImage("image");
+                equipment.setInventoryNumber("IN:001212");
+                equipment.setUuid("8877-5678");
+                equipment.setTitle("Котел газовый GTV-12121");
+                equipment.setTagId("1234-5678");
+                equipment.setUserUuid("89121-12122");
+                equipment.setLocation("55.34453,45.234234");
+                equipment.setLatitude(55);
+                equipment.setLongitude(55);
+                equipment.setStartDate(123123122);
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                User profile = realmDB.createObject(User.class);
+                profile.set_id(1);
+                profile.setName("Иванов О.А.");
+                profile.setImage("profile");
+                profile.setLogin("olejek8@yandex.ru");
+                profile.setPass("12345");
+                profile.setType(2);
+                profile.setUuid(java.util.UUID.randomUUID().toString());
+                profile.setTagId("01234567");
+                profile.setWhoIs("бугорчик");
+                profile.setActive(true);
+                profile.setImage("");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AlertType equipment = realmDB.createObject(AlertType.class);
+                equipment.set_id(1);
+                equipment.setUuid("0dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                equipment.setTitle("Критичный");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                CriticalType equipment = realmDB.createObject(CriticalType.class);
+                equipment.set_id(1);
+                equipment.setUuid("0dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                equipment.setTitle("Критичный");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                OrderStatus equipment = realmDB.createObject(OrderStatus.class);
+                equipment.set_id(1);
+                equipment.setUuid("0dd8d4f8-5c98-4124-86ed-97eebc2059f6");
+                equipment.setTitle("Выполнен");
+                OrderStatus equipment2 = realmDB.createObject(OrderStatus.class);
+                equipment2.set_id(1);
+                equipment2.setUuid("55987f48-ccbd-41ee-b832-49001a56d1f7");
+                equipment2.setTitle("Получен");
+            }
+        });
+*/
     }
 
 	public boolean initDB() {
@@ -458,7 +567,7 @@ public class MainActivity extends AppCompatActivity {
                         //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_ORDERS).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_references).withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false),
                         new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false),
                         new DividerDrawerItem(),
@@ -516,8 +625,8 @@ public class MainActivity extends AppCompatActivity {
                                 currentFragment = FRAGMENT_GPS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_TASKS) {
-                                currentFragment = FRAGMENT_ORDERS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, OrderFragment.newInstance()).commit();
+                                currentFragment = FRAGMENT_TASKS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, TaskFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_REFERENCES) {
                                 currentFragment = FRAGMENT_REFERENCES;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReferenceFragment.newInstance()).commit();
