@@ -49,20 +49,26 @@ public class AlertTypeAdapter extends RealmBaseAdapter<AlertType> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+        if (parent.getId() == R.id.simple_spinner) {
+            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            AlertType alertType = adapterData.get(position);
+            textView.setText(alertType.getTitle());
+            return textView;
         }
-
-        if (adapterData!=null) {
-            AlertType AlertType = adapterData.get(position);
-            viewHolder.title.setText(AlertType.getTitle());
-            viewHolder.title.setText(AlertType.getUuid());
+        if (parent.getId() == R.id.reference_listView) {
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            AlertType alertType = adapterData.get(position);
+            viewHolder.title.setText(alertType.getTitle());
+            viewHolder.uuid.setText(alertType.getUuid());
+            return convertView;
         }
         return convertView;
     }

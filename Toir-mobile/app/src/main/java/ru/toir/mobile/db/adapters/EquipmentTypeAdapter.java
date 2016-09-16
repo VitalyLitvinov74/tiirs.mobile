@@ -11,7 +11,6 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.EquipmentType;
 
 /**
@@ -49,10 +48,28 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-        EquipmentType equipmentType = adapterData.get(position);
-        textView.setText(equipmentType.getTitle());
-        return textView;
+        ViewHolder viewHolder;
+
+        if (parent.getId() == R.id.simple_spinner) {
+            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            EquipmentType equipmentType = adapterData.get(position);
+            textView.setText(equipmentType.getTitle());
+            return textView;
+        }
+        if (parent.getId() == R.id.reference_listView) {
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            EquipmentType equipmentType = adapterData.get(position);
+            viewHolder.title.setText(equipmentType.getTitle());
+            return convertView;
+        }
+        return convertView;
     }
 
 }

@@ -49,20 +49,26 @@ public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implemen
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listview, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+        if (parent.getId() == R.id.simple_spinner) {
+            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            CriticalType criticalType = adapterData.get(position);
+            textView.setText(criticalType.getTitle());
+            return textView;
         }
-
-        if (adapterData!=null) {
-            CriticalType CriticalType = adapterData.get(position);
-            viewHolder.title.setText(CriticalType.getTitle());
-            viewHolder.uuid.setText(CriticalType.getUuid());
+        if (parent.getId() == R.id.reference_listView) {
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            CriticalType criticalType = adapterData.get(position);
+            viewHolder.title.setText(criticalType.getTitle());
+            viewHolder.uuid.setText(criticalType.getUuid());
+            return convertView;
         }
         return convertView;
     }

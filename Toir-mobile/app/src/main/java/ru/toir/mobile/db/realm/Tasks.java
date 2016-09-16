@@ -181,6 +181,7 @@ public class Tasks extends RealmObject {
     public void setTaskStages(RealmList<TaskStages> taskStages) {
         this.taskStages = taskStages;
     }
+
     public void addTaskStage(TaskStages taskStage) {
         this.taskStages.add(taskStage);
     }

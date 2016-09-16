@@ -52,7 +52,7 @@ public class DocumentationFragment extends Fragment {
 		spinnerListener = new SpinnerListener();
 
 		// настраиваем сортировку по типу оборудования
-		typeSpinner = (Spinner) rootView.findViewById(R.id.documentation_spinner_type);
+		typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
         //typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
 		//		android.R.layout.simple_spinner_dropdown_item,
 		//		new ArrayList<DocumentationType>());

@@ -49,20 +49,26 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.status_spinner_item, parent, false);
-            viewHolder = new ViewHolder();
-            //viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.spinner_item);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+        if (parent.getId() == R.id.simple_spinner) {
+            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            OperationStatus operationStatus = adapterData.get(position);
+            textView.setText(operationStatus.getTitle());
+            return textView;
         }
-
-        if (adapterData!=null) {
+        if (parent.getId() == R.id.reference_listView) {
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
             OperationStatus operationStatus = adapterData.get(position);
             viewHolder.title.setText(operationStatus.getTitle());
-            //viewHolder.title.setText(operationStatus.getUuid());
+            viewHolder.uuid.setText(operationStatus.getUuid());
+            return convertView;
         }
         return convertView;
     }

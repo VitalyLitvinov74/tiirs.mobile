@@ -49,20 +49,26 @@ public class OperationTypeAdapter extends RealmBaseAdapter<OperationType> implem
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+        if (parent.getId() == R.id.simple_spinner) {
+            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            OperationType operationType = adapterData.get(position);
+            textView.setText(operationType.getTitle());
+            return textView;
         }
-
-        if (adapterData!=null) {
-            OperationType OperationType = adapterData.get(position);
-            viewHolder.title.setText(OperationType.getTitle());
-            viewHolder.title.setText(OperationType.getUuid());
+        if (parent.getId() == R.id.reference_listView) {
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            OperationType operationType = adapterData.get(position);
+            viewHolder.title.setText(operationType.getTitle());
+            viewHolder.uuid.setText(operationType.getUuid());
+            return convertView;
         }
         return convertView;
     }
