@@ -9,7 +9,7 @@
         android:layout_height="wrap_content" >
 
         <Spinner
-            android:id="@+id/documentation_spinner_type"
+            android:id="@+id/simple_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />

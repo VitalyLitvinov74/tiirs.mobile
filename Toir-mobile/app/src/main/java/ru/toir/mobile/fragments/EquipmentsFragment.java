@@ -103,7 +103,7 @@ public class EquipmentsFragment extends Fragment {
 			}
 		});
         */
-		equipmentListView.setOnItemClickListener(new ListviewClickListener());
+		//equipmentListView.setOnItemClickListener(new ListviewClickListener());
 
 		initView();
 

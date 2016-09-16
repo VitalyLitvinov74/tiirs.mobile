@@ -53,7 +53,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (parent.getId() == R.id.documentation_spinner_type) {
+        if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
             DocumentationType documentationType = adapterData.get(position);
             textView.setText(documentationType.getTitle());

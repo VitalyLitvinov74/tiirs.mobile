@@ -43,28 +43,27 @@ import java.util.ArrayList;
 
 import ru.toir.mobile.R;
 
-public class ChartsFragment extends Fragment implements OnSeekBarChangeListener, OnChartValueSelectedListener
-	{
-     protected BarChart mChart;
-     private SeekBar mSeekBarX, mSeekBarY;
-     private TextView tvX, tvY; 	 
-     private Typeface mTf;
+public class ChartsFragment extends Fragment implements OnSeekBarChangeListener, OnChartValueSelectedListener {
+    protected BarChart mChart;
+    private SeekBar mSeekBarX, mSeekBarY;
+    private TextView tvX, tvY;
+    private Typeface mTf;
 
-     public ChartsFragment() {
-            // Required empty public constructor
-     }
+    public ChartsFragment() {
+        // Required empty public constructor
+    }
 
-     public static ChartsFragment newInstance() {
-            return (new ChartsFragment());
-     }
+    public static ChartsFragment newInstance() {
+        return (new ChartsFragment());
+    }
 
-     protected String[] mMonths = new String[] {
-             "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
-     };
+    protected String[] mMonths = new String[]{
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
+    };
 
-     @Override     
- 	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.activity_barchart, container, false);
         tvX = (TextView) rootView.findViewById(R.id.tvXMax);
@@ -136,19 +135,19 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         mSeekBarX.setOnSeekBarChangeListener(this);
         setHasOptionsMenu(true);
         // mChart.setDrawLegend(false);
-        
-		rootView.setFocusableInTouchMode(true);
-		rootView.requestFocus();
+
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
 
         return rootView;
     }
 
-     @Override
-     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-         inflater.inflate(R.menu.bar, menu);
-     	 getActivity().getMenuInflater().inflate(R.menu.bar, menu);
-         super.onCreateOptionsMenu(menu,inflater);
-     }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.bar, menu);
+        getActivity().getMenuInflater().inflate(R.menu.bar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
