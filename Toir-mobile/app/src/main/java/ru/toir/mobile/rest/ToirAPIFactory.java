@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.rest.interfaces.ICriticalType;
+import ru.toir.mobile.rest.interfaces.ITokenService;
+import ru.toir.mobile.rest.interfaces.IUserService;
 
 /**
  * @author Dmitriy Logachev
@@ -38,6 +41,11 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static ICriticalType getCriticalTypeService() {
+        return getRetrofit().create(ICriticalType.class);
+    }
+
+    @NonNull
     private static Retrofit getRetrofit() {
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
@@ -49,6 +57,7 @@ public class ToirAPIFactory {
     public static final class Actions {
         public static final String ACTION_GET_TOKEN = "action_get_token";
         public static final String ACTION_GET_USER = "action_get_user";
+        public static final String ACTION_GET_ALL_REFERENCE = "action_get_all_reference";
     }
 
 }

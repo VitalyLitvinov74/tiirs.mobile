@@ -1,4 +1,4 @@
-package ru.toir.mobile.rest;
+package ru.toir.mobile.rest.interfaces;
 
 import retrofit.Call;
 import retrofit.http.Field;

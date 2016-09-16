@@ -49,7 +49,7 @@ import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
-import ru.toir.mobile.rest.ReferenceServiceProvider;
+import ru.toir.mobile.rest.ToirAPIFactory;
 
 public class ReferenceFragment extends Fragment {
     private Realm realmDB;
@@ -64,7 +64,7 @@ public class ReferenceFragment extends Fragment {
 	private ProgressDialog getReferencesDialog;
 
 	private IntentFilter mFilterGetReference = new IntentFilter(
-			ReferenceServiceProvider.Actions.ACTION_GET_ALL);
+			ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
 	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
 
 		@Override
@@ -134,65 +134,6 @@ public class ReferenceFragment extends Fragment {
 		return rootView;
 	}
 
-	/**
-	 * 
-	 * @author Dmitriy Logachov
-	 *         <p>
-	 *         Класс реализует обработку выбора элемента выпадающего списка
-	 *         справочников.
-	 *         </p>
-	 * 
-	 */
-	private class ReferenceSpinnerListener implements
-			AdapterView.OnItemSelectedListener {
-
-		@Override
-		public void onItemSelected(AdapterView<?> parentView,
-				View selectedItemView, int position, long id) {
-
-			SortField selectedItem = (SortField) parentView
-					.getItemAtPosition(position);
-			String selected = selectedItem.getField();
-
-            switch (selected) {
-                case DocumentationTypeAdapter.TABLE_NAME:
-                    fillListViewDocumentationType();
-                    break;
-                case EquipmentTypeAdapter.TABLE_NAME:
-                    fillListViewEquipmentType();
-                    break;
-                case CriticalTypeAdapter.TABLE_NAME:
-                    fillListViewCriticalType();
-                    break;
-                case AlertTypeAdapter.TABLE_NAME:
-                    fillListViewAlertType();
-                    break;
-                case OperationVerdictAdapter.TABLE_NAME:
-                    fillListViewOperationVerdict();
-                    break;
-                case OperationTypeAdapter.TABLE_NAME:
-                    fillListViewOperationType();
-                    break;
-                case OperationStatusAdapter.TABLE_NAME:
-                    fillListViewOperationStatus();
-                    break;
-                case TaskStatusAdapter.TABLE_NAME:
-                    fillListViewTaskStatus();
-                    break;
-                case EquipmentStatusAdapter.TABLE_NAME:
-                    fillListViewEquipmentStatus();
-                    break;
-                default:
-                    break;
-            }
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> parentView) {
-
-		}
-	}
-
 	private void fillListViewDocumentationType() {
         RealmResults<DocumentationType> documentationType;
         documentationType = realmDB.where(DocumentationType.class).findAll();
@@ -258,7 +199,7 @@ public class ReferenceFragment extends Fragment {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
 	 * android.view.MenuInflater)
@@ -268,7 +209,7 @@ public class ReferenceFragment extends Fragment {
 
 		super.onCreateOptionsMenu(menu, inflater);
 
-		// добавляем элемент меню для получения наряда
+		// добавляем элемент меню для обновления справочников
 		MenuItem getTask = menu.add("Обновить справочники");
 		getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
@@ -278,7 +219,7 @@ public class ReferenceFragment extends Fragment {
 
 				ReferenceServiceHelper rsh = new ReferenceServiceHelper(
 						getActivity().getApplicationContext(),
-						ReferenceServiceProvider.Actions.ACTION_GET_ALL);
+						ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
 
 				getActivity().registerReceiver(mReceiverGetReference,
 						mFilterGetReference);
@@ -309,5 +250,62 @@ public class ReferenceFragment extends Fragment {
 				return true;
 			}
 		});
+	}
+
+	/**
+	 * @author Dmitriy Logachov
+	 *         <p>
+	 *         Класс реализует обработку выбора элемента выпадающего списка
+	 *         справочников.
+	 *         </p>
+	 */
+	private class ReferenceSpinnerListener implements
+			AdapterView.OnItemSelectedListener {
+
+		@Override
+		public void onItemSelected(AdapterView<?> parentView,
+								   View selectedItemView, int position, long id) {
+
+			SortField selectedItem = (SortField) parentView
+					.getItemAtPosition(position);
+			String selected = selectedItem.getField();
+
+			switch (selected) {
+				case DocumentationTypeAdapter.TABLE_NAME:
+					fillListViewDocumentationType();
+					break;
+				case EquipmentTypeAdapter.TABLE_NAME:
+					fillListViewEquipmentType();
+					break;
+				case CriticalTypeAdapter.TABLE_NAME:
+					fillListViewCriticalType();
+					break;
+				case AlertTypeAdapter.TABLE_NAME:
+					fillListViewAlertType();
+					break;
+				case OperationVerdictAdapter.TABLE_NAME:
+					fillListViewOperationVerdict();
+					break;
+				case OperationTypeAdapter.TABLE_NAME:
+					fillListViewOperationType();
+					break;
+				case OperationStatusAdapter.TABLE_NAME:
+					fillListViewOperationStatus();
+					break;
+				case TaskStatusAdapter.TABLE_NAME:
+					fillListViewTaskStatus();
+					break;
+				case EquipmentStatusAdapter.TABLE_NAME:
+					fillListViewEquipmentStatus();
+					break;
+				default:
+					break;
+			}
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parentView) {
+
+		}
 	}
 }

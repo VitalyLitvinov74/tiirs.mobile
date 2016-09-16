@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
             boolean result = intent.getBooleanExtra("result", false);
             if (result) {
-                Call<User> call = ToirAPIFactory.getUserService().user(AuthorizedUser.getInstance()
+                Call<User> call = ToirAPIFactory.getUserService().user("bearer " + AuthorizedUser.getInstance()
                         .getToken());
                 call.enqueue(new Callback<User>() {
                     @Override
@@ -187,6 +187,10 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("test", "user response =" + response);
                         if (response.isSuccess()) {
                             User user = response.body();
+                            Realm realm = Realm.getDefaultInstance();
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(user);
+                            realm.commitTransaction();
                             Log.d("test", "user = " + user);
                             Intent resultIntent = new Intent(ToirAPIFactory.Actions.ACTION_GET_USER);
                             resultIntent.setPackage(getApplicationContext().getPackageName());

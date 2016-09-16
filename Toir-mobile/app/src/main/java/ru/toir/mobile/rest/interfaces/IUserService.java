@@ -1,4 +1,4 @@
-package ru.toir.mobile.rest;
+package ru.toir.mobile.rest.interfaces;
 
 import java.util.List;
 

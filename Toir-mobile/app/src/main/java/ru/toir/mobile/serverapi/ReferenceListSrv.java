@@ -17,35 +17,12 @@ public class ReferenceListSrv {
 	@Expose
 	private String ReferenceName;
 	@Expose
-	private ArrayList<Link> Links = new ArrayList<Link>();
+	private ArrayList<Link> Links = new ArrayList<>();
 	@Expose
 	private String Id;
 
-	public class Link {
-
-		@Expose
-		private String link;
-
-		/**
-		 * 
-		 * @return The link
-		 */
-		public String getLink() {
-			return link;
-		}
-
-		/**
-		 * 
-		 * @param link
-		 *            The link
-		 */
-		public void setLink(String link) {
-			this.link = link;
-		}
-	}
-
 	/**
-	 * 
+	 *
 	 * @return The Name
 	 */
 	public String getName() {
@@ -53,7 +30,7 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param Name
 	 *            The Name
 	 */
@@ -62,7 +39,7 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The ReferenceName
 	 */
 	public String getReferenceName() {
@@ -70,7 +47,7 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param ReferenceName
 	 *            The ReferenceName
 	 */
@@ -79,7 +56,7 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The Links
 	 */
 	public ArrayList<Link> getLinks() {
@@ -87,7 +64,7 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param Links
 	 *            The Links
 	 */
@@ -96,7 +73,7 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The Id
 	 */
 	public String getId() {
@@ -104,12 +81,32 @@ public class ReferenceListSrv {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param Id
 	 *            The Id
 	 */
 	public void setId(String Id) {
 		this.Id = Id;
+	}
+
+	public class Link {
+
+		@Expose
+		private String link;
+
+		/**
+		 * @return The link
+		 */
+		public String getLink() {
+			return link;
+		}
+
+		/**
+		 * @param link The link
+		 */
+		public void setLink(String link) {
+			this.link = link;
+		}
 	}
 
 }
