@@ -50,10 +50,10 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
+            convertView = inflater.inflate(R.layout.status_spinner_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+            //viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+            viewHolder.title = (TextView) convertView.findViewById(R.id.spinner_item);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -62,7 +62,7 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
         if (adapterData!=null) {
             OperationStatus operationStatus = adapterData.get(position);
             viewHolder.title.setText(operationStatus.getTitle());
-            viewHolder.title.setText(operationStatus.getUuid());
+            //viewHolder.title.setText(operationStatus.getUuid());
         }
         return convertView;
     }

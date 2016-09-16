@@ -10,6 +10,7 @@ import android.widget.TextView;
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.DocumentationType;
 
 /**
@@ -52,23 +53,26 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-        DocumentationType documentationType = adapterData.get(position);
-        textView.setText(documentationType.getTitle());
-        /*
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listview, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(android.R.id.title);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+        if (parent.getId() == R.id.documentation_spinner_type) {
+            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            DocumentationType documentationType = adapterData.get(position);
+            textView.setText(documentationType.getTitle());
+            return textView;
         }
-
-        DocumentationType documentationType = adapterData.get(position);
-        viewHolder.title.setText(documentationType.getTitle());
-        return convertView;*/
-        return textView;
+        if (parent.getId() == R.id.reference_listView) {
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            DocumentationType documentationType = adapterData.get(position);
+            viewHolder.title.setText(documentationType.getTitle());
+            return convertView;
+        }
+        return null;
     }
 }

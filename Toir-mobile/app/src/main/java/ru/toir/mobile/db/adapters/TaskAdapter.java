@@ -82,7 +82,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
         TaskStatus taskStatus;
         String pathToImages;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.task_item, parent, false);
+            convertView = inflater.inflate(R.layout.task_item_n, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.title = (TextView) convertView.findViewById(R.id.ti_Name);
             viewHolder.status = (TextView) convertView.findViewById(R.id.ti_Status);

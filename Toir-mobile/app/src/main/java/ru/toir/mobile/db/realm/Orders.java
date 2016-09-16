@@ -114,7 +114,7 @@ public class Orders extends RealmObject {
         return orderStatus;
     }
 
-    public void setOrderStatusUuid(OrderStatus orderStatus) {
+    public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
 
@@ -130,7 +130,7 @@ public class Orders extends RealmObject {
         return orderVerdict;
     }
 
-    public void setOrderVerdictUuid(OrderVerdict orderVerdict) {
+    public void setOrderVerdict(OrderVerdict orderVerdict) {
         this.orderVerdict = orderVerdict;
     }
 
@@ -180,5 +180,9 @@ public class Orders extends RealmObject {
 
     public void setTasks(RealmList<Tasks> tasks) {
         this.tasks = tasks;
+    }
+
+    public void addTask(Tasks task) {
+        this.tasks.add(task);
     }
 }

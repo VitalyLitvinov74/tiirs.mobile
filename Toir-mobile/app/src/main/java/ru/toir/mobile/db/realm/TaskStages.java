@@ -169,7 +169,11 @@ public class TaskStages extends RealmObject {
         return operations;
     }
 
-    public void setTasks(RealmList<Operation> operations) {
+    public void setOperations(RealmList<Operation> operations) {
         this.operations = operations;
+    }
+
+    public void addOperations(Operation operation) {
+        this.operations.add(operation);
     }
 }

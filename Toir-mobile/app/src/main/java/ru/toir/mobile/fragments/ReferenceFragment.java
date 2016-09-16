@@ -105,8 +105,8 @@ public class ReferenceFragment extends Fragment {
 				false);
         realmDB = Realm.getDefaultInstance();
 
-		referenceSpinner = (Spinner) rootView.findViewById(R.id.spinner);
-		contentListView = (ListView) rootView.findViewById(R.id.listView1);
+		referenceSpinner = (Spinner) rootView.findViewById(R.id.reference_spinner);
+		contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
 
 		// получаем список справочников, разбиваем его на ключ:значение
 		String[] referenceArray = getResources().getStringArray(

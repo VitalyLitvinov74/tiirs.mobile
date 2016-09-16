@@ -70,6 +70,14 @@ public class Tasks extends RealmObject {
         this.equipmentUuid = equipmentUuid;
     }
 
+    public Equipment getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(Equipment equipment) {
+        this.equipment = equipment;
+    }
+
     public String getTaskVerdictUuid() {
         return taskVerdictUuid;
     }
@@ -170,8 +178,12 @@ public class Tasks extends RealmObject {
         return taskStages;
     }
 
-    public void setTasks(RealmList<TaskStages> taskStages) {
+    public void setTaskStages(RealmList<TaskStages> taskStages) {
         this.taskStages = taskStages;
     }
+    public void addTaskStage(TaskStages taskStage) {
+        this.taskStages.add(taskStage);
+    }
+
 
 }

@@ -162,6 +162,7 @@ public class GPSFragment extends Fragment {
             tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
             //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
+                //equipments = realmDB.where(Equipment.class).equalTo("uuid", itemOrder.getTasks().get(0).getEquipment().getUuid()).findAll();
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findAll();
                 equipment = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
                 //equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
