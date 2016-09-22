@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -262,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
 						setMainLayout(savedInstance);
 					} else {
 						setContentView(R.layout.login_layout);
+                        ShowSettings();
 					}
 				}
 			}, 3000);
@@ -270,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
 				setMainLayout(savedInstanceState);
 			} else {
 				setContentView(R.layout.login_layout);
+                ShowSettings();
 			}
 		}
 
@@ -302,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
 			if (Realm.getDefaultInstance().getVersion()==0) {
 				Toast toast = Toast.makeText(this, "База данных не актуальна!",
                         Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.setGravity(Gravity.BOTTOM, 0, 0);
 				toast.show();
                 success = true;
 			} else {
@@ -804,5 +807,19 @@ public class MainActivity extends AppCompatActivity {
         //openOptionsMenu();
         Intent i = new Intent(MainActivity.this, ToirPreferences.class);
         startActivity(i);
+    }
+
+
+    public void ShowSettings() {
+        TextView settings;
+        settings = (TextView)findViewById(R.id.login_current_settings);
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        String updateUrl = sp.getString(getString(R.string.updateUrl), "");
+        String serverUrl = sp.getString(getString(R.string.serverUrl), "");
+        String driverName = "не знаю как получить";
+        //sp.getString(getString(R.string.updateUrl), "");
+        // указываем названия и значения для элементов списка
+        settings.setText("Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName);
     }
 }
