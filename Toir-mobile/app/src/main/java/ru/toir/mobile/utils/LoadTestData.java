@@ -107,7 +107,7 @@ public class LoadTestData {
         final Realm realmDB;
         realmDB = Realm.getDefaultInstance();
 
-        final String userTestUuid="1dd8d4f8-5c98-4444-86ed-97eebc2059f6";
+        final String userTestUuid="4462ed77-9bf0-4542-b127-f4ecefce49da";
         final String equipmentUuid="1dd8d4f8-5c98-4444-86ed-97ddbc2059f6";
         final String equipmentUuid2="1dd8d4f8-5c98-4444-86ed-97aabc2059f6";
 
@@ -836,6 +836,7 @@ public class LoadTestData {
             order.setAttemptCount(0);
             order.setAttemptSendDate(1212122211);
             order.setAuthorUuid(userTestUuid);
+            order.setUserUuid(userTestUuid);
             order.setCloseDate(1212122111);
             order.setOpenDate(1212122011);
             order.setOrderStatusUuid(orderStatusUuid);

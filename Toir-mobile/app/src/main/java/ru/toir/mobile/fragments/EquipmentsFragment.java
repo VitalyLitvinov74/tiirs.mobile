@@ -20,6 +20,7 @@ import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
 
@@ -34,7 +35,8 @@ public class EquipmentsFragment extends Fragment {
 	private ListView equipmentListView;
 
 	private ArrayAdapter<SortField> sortSpinnerAdapter;
-	private ArrayAdapter<EquipmentType> typeSpinnerAdapter;
+	private EquipmentTypeAdapter typeSpinnerAdapter;
+    //private ArrayAdapter<String> typeSpinnerAdapter;
 
 	private SpinnerListener spinnerListener;
     private EquipmentAdapter equipmentAdapter;
@@ -54,14 +56,6 @@ public class EquipmentsFragment extends Fragment {
 		// обработчик для выпадающих списков у нас один
 		spinnerListener = new SpinnerListener();
 
-		// настраиваем сортировку по типу оборудования
-		typeSpinner = (Spinner) rootView.findViewById(R.id.erl_type_spinner);
-        typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
-				android.R.layout.simple_spinner_dropdown_item,
-				new ArrayList<EquipmentType>());
-		typeSpinner.setAdapter(typeSpinnerAdapter);
-		typeSpinner.setOnItemSelectedListener(spinnerListener);
-
 		// настраиваем сортировку по полям
 		sortSpinner = (Spinner) rootView
 				.findViewById(R.id.erl_sort_field_spinner);
@@ -74,7 +68,15 @@ public class EquipmentsFragment extends Fragment {
 		equipmentListView = (ListView) rootView
 				.findViewById(R.id.erl_equipment_listView);
 
-		// создаём "пустой" адаптер для отображения списка оборудования
+
+        RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
+        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
+        typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(),R.id.simple_spinner, equipmentType);
+        typeSpinnerAdapter.notifyDataSetChanged();
+        typeSpinner.setAdapter(typeSpinnerAdapter);
+        typeSpinner.setOnItemSelectedListener(spinnerListener);
+
+        // создаём "пустой" адаптер для отображения списка оборудования
         /*
 		equipmentAdapter = new SimpleCursorAdapter(getContext(),
 				R.layout.equipment_reference_item_layout, null, equipmentFrom,
@@ -103,7 +105,7 @@ public class EquipmentsFragment extends Fragment {
 			}
 		});
         */
-		//equipmentListView.setOnItemClickListener(new ListviewClickListener());
+		equipmentListView.setOnItemClickListener(new ListviewClickListener());
 
 		initView();
 
@@ -118,12 +120,13 @@ public class EquipmentsFragment extends Fragment {
 	private void initView() {
 
 		FillListViewEquipments(null, null);
-		fillTypeSpinner();
+		//fillTypeSpinner();
 		fillSortFieldSpinner();
 	}
-
+/*
 	private void fillTypeSpinner() {
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
+        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
         //typeSpinnerAdapter = new ArrayAdapter(equipmentType);
         //typeSpinner.setAdapter(typeSpinnerAdapter);
 
@@ -134,9 +137,26 @@ public class EquipmentsFragment extends Fragment {
 		//typeList.add(0, allTypes);
 		typeSpinnerAdapter.clear();
 		typeSpinnerAdapter.addAll(equipmentType);
-		typeSpinnerAdapter.notifyDataSetChanged();
-	}
 
+        //typeSpinnerAdapter.add("Все типы");
+        //for (int i=0;i<equipmentType.size();i++)
+        //    typeSpinnerAdapter.add(equipmentType.get(i));
+		typeSpinnerAdapter.notifyDataSetChanged();
+
+        // настраиваем сортировку по типу оборудования
+
+        typeSpinnerAdapter = new ArrayAdapter<EquipmentType>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                //new ArrayList<String>());
+                new ArrayList<EquipmentType>());
+        typeSpinner.setAdapter(typeSpinnerAdapter);
+        typeSpinner.setOnItemSelectedListener(spinnerListener);
+
+        typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(),R.id.simple_spinner, equipments);
+        typeSpinner.setAdapter(typeSpinnerAdapter);
+
+	}
+*/
 	private void fillSortFieldSpinner() {
 
 		sortSpinnerAdapter.clear();
@@ -150,55 +170,55 @@ public class EquipmentsFragment extends Fragment {
 
 	}
 
-	public class ListviewClickListener implements
-			AdapterView.OnItemClickListener {
+        public class ListviewClickListener implements
+                AdapterView.OnItemClickListener {
 
-		@Override
-		public void onItemClick(AdapterView<?> parentView,
-				View selectedItemView, int position, long id) {
-            // TODO разобраться как вернуть объект при клике
-            Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
-            equipment = (Equipment)parentView.getSelectedItem();
+            @Override
+            public void onItemClick(AdapterView<?> parentView,
+                    View selectedItemView, int position, long id) {
+                // TODO разобраться как вернуть объект при клике
+                Equipment equipment;// (Equipment)parentView.getItemAtPosition(position);
+                equipment = (Equipment)parentView.getSelectedItem();
 
-			String equipment_uuid = equipment.getUuid();
+                String equipment_uuid = equipment.getUuid();
 
-			Intent equipmentInfo = new Intent(getActivity(),
-					EquipmentInfoActivity.class);
+                Intent equipmentInfo = new Intent(getActivity(),
+                        EquipmentInfoActivity.class);
 
-			Bundle bundle = new Bundle();
-			bundle.putString("equipment_uuid", equipment_uuid);
-			equipmentInfo.putExtras(bundle);
-			getActivity().startActivity(equipmentInfo);
-		}
-	}
+                Bundle bundle = new Bundle();
+                bundle.putString("equipment_uuid", equipment_uuid);
+                equipmentInfo.putExtras(bundle);
+                getActivity().startActivity(equipmentInfo);
+            }
+        }
 
-	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
-		//boolean userSelect = false;
+        public class SpinnerListener implements AdapterView.OnItemSelectedListener {
+            //boolean userSelect = false;
 
-		@Override
-		public void onNothingSelected(AdapterView<?> parentView) {
-		}
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
 
-		@Override
-		public void onItemSelected(AdapterView<?> parentView,
-				View selectedItemView, int position, long id) {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView,
+                    View selectedItemView, int position, long id) {
+/*
+                String type = null;
+                String orderBy = null;
 
-			String type = null;
-			String orderBy = null;
+                EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
+                //String typeSelected = typeSpinner.getSelectedItem();
+                if (typeSelected != null) {
+                    type = typeSelected.getUuid();
+                }
 
-			EquipmentType typeSelected = (EquipmentType) typeSpinner
-					.getSelectedItem();
-			if (typeSelected != null) {
-				type = typeSelected.getUuid();
-			}
-
-			SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
-			if (fieldSelected != null) {
-				orderBy = fieldSelected.getField();
-			}
-			FillListViewEquipments(type, orderBy);
-		}
-	}
+                SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
+                if (fieldSelected != null) {
+                    orderBy = fieldSelected.getField();
+                }
+                FillListViewEquipments(type, orderBy);*/
+            }
+        }
 
 	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
         RealmResults<Equipment> equipments;
@@ -221,7 +241,7 @@ public class EquipmentsFragment extends Fragment {
         equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
         equipmentListView.setAdapter(equipmentAdapter);
 	}
-
+/*
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
 
@@ -230,5 +250,5 @@ public class EquipmentsFragment extends Fragment {
 			initView();
 		}
 	}
-
+*/
 }

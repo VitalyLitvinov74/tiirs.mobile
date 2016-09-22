@@ -287,7 +287,6 @@ public class MainActivity extends AppCompatActivity {
 
 	public boolean initDB() {
 		boolean success = false;
-        //LoadTestData.LoadAllTestData();
         //DatabaseHelper helper;
 		// создаём базу данных, в качестве контекста передаём свой, с
 		// переопределёнными путями к базе
@@ -295,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
             //ToirRealm.init(this);
 			// получаем базу realm
             realmDB = Realm.getDefaultInstance();
+            //LoadTestData.LoadAllTestData();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             //helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
 			//		getApplicationContext()));

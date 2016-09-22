@@ -18,6 +18,7 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
+import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
 
@@ -30,8 +31,7 @@ public class DocumentationFragment extends Fragment {
 	private ListView documentationListView;
 
 	private ArrayAdapter<SortField> sortSpinnerAdapter;
-	//private ArrayAdapter<DocumentationType> typeSpinnerAdapter;
-    private ArrayAdapter<String> typeSpinnerAdapter;
+	private DocumentationTypeAdapter typeSpinnerAdapter;
 
 	private SpinnerListener spinnerListener;
     private DocumentationAdapter documentationAdapter;
@@ -51,16 +51,12 @@ public class DocumentationFragment extends Fragment {
 		// обработчик для выпадающих списков у нас один
 		spinnerListener = new SpinnerListener();
 
-		// настраиваем сортировку по типу оборудования
-		typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        //typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
-		//		android.R.layout.simple_spinner_dropdown_item,
-		//		new ArrayList<DocumentationType>());
-        typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                new ArrayList<String>());
-		typeSpinner.setAdapter(typeSpinnerAdapter);
-		typeSpinner.setOnItemSelectedListener(spinnerListener);
+        RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
+        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
+        typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(),R.id.simple_spinner, documentationType);
+        typeSpinnerAdapter.notifyDataSetChanged();
+        typeSpinner.setAdapter(typeSpinnerAdapter);
+        typeSpinner.setOnItemSelectedListener(spinnerListener);
 
 		// настраиваем сортировку по полям
 		sortSpinner = (Spinner) rootView
@@ -89,24 +85,9 @@ public class DocumentationFragment extends Fragment {
 	private void initView() {
 
 		FillListViewDocumentation(null, null);
-		fillTypeSpinner();
+		//fillTypeSpinner();
 		fillSortFieldSpinner();
 	}
-
-	private void fillTypeSpinner() {
-        RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
-		// TODO стоит наверное добавить запись "любой тип" напрямую в таблицу?
-        typeSpinnerAdapter.clear();
-
-        //DocumentationType allDocumentationTypes = new DocumentationType();
-        //allDocumentationTypes.set_id(0);
-        //allDocumentationTypes.setTitle("Все типы");
-        //allDocumentationTypes.setUuid(null);
-        typeSpinnerAdapter.add("Все типы");
-        for (int i=0;i<documentationType.size();i++)
-            typeSpinnerAdapter.add(documentationType.get(i).getTitle());
-		typeSpinnerAdapter.notifyDataSetChanged();
-    }
 
 	private void fillSortFieldSpinner() {
 

@@ -1,7 +1,9 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -51,9 +53,12 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
         ViewHolder viewHolder;
 
         if (parent.getId() == R.id.simple_spinner) {
-            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            //TextView textView = (TextView) View.inflate(context, R.layout.simple_spinner_item, null);
+            TextView textView = new TextView(context);
             EquipmentType equipmentType = adapterData.get(position);
             textView.setText(equipmentType.getTitle());
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            textView.setTextColor(Color.WHITE);
             return textView;
         }
         if (parent.getId() == R.id.reference_listView) {
@@ -69,7 +74,7 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
             viewHolder.title.setText(equipmentType.getTitle());
             return convertView;
         }
-        return convertView;
+        return null;
     }
 
 }

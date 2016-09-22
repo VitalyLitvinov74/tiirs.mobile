@@ -62,6 +62,7 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
                 convertView = inflater.inflate(R.layout.listview, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

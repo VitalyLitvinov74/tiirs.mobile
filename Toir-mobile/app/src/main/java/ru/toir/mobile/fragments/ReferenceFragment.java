@@ -186,8 +186,8 @@ public class ReferenceFragment extends Fragment {
 	private void fillListViewTaskStatus() {
         RealmResults<TaskStatus> taskStatuses;
         taskStatuses = realmDB.where(TaskStatus.class).findAll();
-        TaskStatusAdapter taskAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(),R.id.reference_listView, taskStatuses);
-        contentListView.setAdapter(taskAdapter);
+        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(),R.id.reference_listView, taskStatuses);
+        contentListView.setAdapter(taskStatusAdapter);
 	}
 
 	private void fillListViewEquipmentStatus() {

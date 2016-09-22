@@ -12,6 +12,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author koputo
@@ -79,11 +80,12 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         Equipment equipment = adapterData.get(position);
         viewHolder.title.setText(equipment.getTitle());
         viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
-        viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModelUuid());
+        viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
         //viewHolder.location.setText(equipment.getLocation());
-        viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatusUuid());
-        viewHolder.criticalTypeUuid.setText(equipment.getCriticalTypeUuid());
-        viewHolder.startDate.setText(""+equipment.getStartDate());
+        viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatus().getTitle());
+        viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
+        String sDate = DataUtils.getDate(equipment.getStartDate(), "dd.MM.yyyy HH:ss");
+        viewHolder.startDate.setText(sDate);
         return convertView;
     }
 }
