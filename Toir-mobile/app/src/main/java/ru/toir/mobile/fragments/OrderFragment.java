@@ -28,6 +28,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
+import ru.toir.mobile.db.adapters.OrderStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.realm.Operation;
@@ -57,8 +58,10 @@ public class OrderFragment extends Fragment {
     private String currentTaskUuid = "";
     private String currentTaskStageUuid = "";
     private String currentOperationUuid = "";
-	private Spinner referenceSpinner;
-	private Spinner typeSpinner;
+
+	private Spinner sortSpinner;
+	private Spinner statusSpinner;
+
 	private ListView mainListView;
 	//private SimpleCursorAdapter operationAdapter;
 	private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
@@ -66,7 +69,7 @@ public class OrderFragment extends Fragment {
 	//private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
 	private ArrayAdapter<OperationType> operationTypeAdapter;
 	private ArrayAdapter<CriticalType> criticalTypeAdapter;
-	private ArrayAdapter<OrderStatus> orderStatusAdapter;
+	private OrderStatusAdapter statusSpinnerAdapter;
 	private ArrayAdapter<SortField> sortFieldAdapter;
 
 	private ProgressDialog processDialog;
@@ -153,13 +156,14 @@ public class OrderFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
 
 		mainListView = (ListView) rootView
-				.findViewById(R.id.ol_orders_list_view);
+				.findViewById(R.id.list_view);
 
-		referenceSpinner = (Spinner) rootView
-				.findViewById(R.id.ol_reference_spinner);
+        sortSpinner = (Spinner) rootView
+				.findViewById(R.id.ol_sort_spinner);
+
+        statusSpinner = (Spinner) rootView
+                .findViewById(R.id.simple_spinner);
 		//referenceSpinner.setOnItemSelectedListener(filterSpinnerListener);
-
-		typeSpinner = (Spinner) rootView.findViewById(R.id.ol_type_spinner);
 		//typeSpinner.setOnItemSelectedListener(filterSpinnerListener);
 
 		setHasOptionsMenu(true);
@@ -197,11 +201,11 @@ public class OrderFragment extends Fragment {
 		taskStatusAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<TaskStatus>());
-
+*/
 		sortFieldAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<SortField>());
-        */
+
 		// так как обработчики пока одни на всё, ставим их один раз
 		mainListView.setOnItemClickListener(mainListViewClickListener);
 		//mainListView.setOnItemLongClickListener(mainListViewLongClickListener);
@@ -252,28 +256,23 @@ public class OrderFragment extends Fragment {
 
     // Orders --------------------------------------------------------------------------------------
 	private void fillSpinnersOrders() {
-		//TaskStatusDBAdapter taskStatusDBAdapter = new TaskStatusDBAdapter(
-		//		new ToirDatabaseContext(getActivity().getApplicationContext()));
-		//ArrayList<TaskStatus> taskStatusList = taskStatusDBAdapter
-		//		.getAllItems();
         RealmResults<OrderStatus> orderStatus = realmDB.where(OrderStatus.class).findAll();
-        ArrayAdapter<OrderStatus> statusSpinnerAdapter;
-        statusSpinnerAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                new ArrayList<OrderStatus>());
-        statusSpinnerAdapter.clear();
-        statusSpinnerAdapter.addAll(orderStatus);
-        statusSpinnerAdapter.notifyDataSetChanged();
+        statusSpinnerAdapter = new OrderStatusAdapter(getContext(),R.id.simple_spinner, orderStatus);
+        //statusSpinnerAdapter.notifyDataSetChanged();
+        statusSpinner.setAdapter(statusSpinnerAdapter);
+        //statusSpinner.setOnItemSelectedListener(spinnerListener);
+        //statusSpinnerAdapter.notifyDataSetChanged();
 
-		sortFieldAdapter.clear();
+        sortSpinner = (Spinner) rootView.findViewById(R.id.ol_sort_spinner);
+        sortFieldAdapter.clear();
 		sortFieldAdapter.add(new SortField("Сортировка", null));
 		sortFieldAdapter.add(new SortField("По дате начала", "startDate"));
 		sortFieldAdapter.add(new SortField("По дате получения", "recieveDate"));
 		sortFieldAdapter.add(new SortField("По дате отправки", "attemptSendDate"));
         // TODO глупо сортировать просто по UUID
 		sortFieldAdapter.add(new SortField("По статусу", "orderStatusUuid"));
-		typeSpinner.setAdapter(sortFieldAdapter);
-        //typeSpinner.setOnItemSelectedListener(FilterSpinnerListener);
+        sortSpinner.setAdapter(sortFieldAdapter);
+        //sortSpinner.setOnItemSelectedListener(FilterSpinnerListener);
 	}
 
 	private void fillListViewOrders(String orderStatus, String orderByField) {
@@ -295,7 +294,7 @@ public class OrderFragment extends Fragment {
                 else
                     orders = realmDB.where(Orders.class).findAll();
             }
-            orderAdapter = new OrderAdapter(getContext(),R.id.ol_orders_list_view, orders);
+            orderAdapter = new OrderAdapter(getContext(),R.id.list_view, orders);
             mainListView.setAdapter(orderAdapter);
 		}
 	}
@@ -307,7 +306,7 @@ public class OrderFragment extends Fragment {
                 .findViewById(R.id.tl_tasks_list_view);
 
        tasks = realmDB.where(Tasks.class).equalTo("orderUuid", orderUuid).findAllSorted("startDate");
-       TaskAdapter taskAdapter = new TaskAdapter(getContext(),R.id.tl_tasks_list_view, tasks);
+       TaskAdapter taskAdapter = new TaskAdapter(getContext(),R.id.list_view, tasks);
        mainListView.setAdapter(taskAdapter);
     }
 
@@ -315,7 +314,7 @@ public class OrderFragment extends Fragment {
     private void fillListViewTaskStage(String taskUuid) {
         RealmResults<TaskStages> taskStages;
         taskStages = realmDB.where(TaskStages.class).equalTo("taskUuid", taskUuid).findAllSorted("startDate");
-        TaskStageAdapter taskStageAdapter = new TaskStageAdapter(getContext(),R.id.tsl_taskstage_list_view, taskStages);
+        TaskStageAdapter taskStageAdapter = new TaskStageAdapter(getContext(),R.id.list_view, taskStages);
         mainListView.setAdapter(taskStageAdapter);
     }
 
@@ -323,9 +322,9 @@ public class OrderFragment extends Fragment {
     private void fillListViewOperations(String taskStageUuid) {
         RealmResults<Operation> operations;
         mainListView = (ListView) rootView
-                .findViewById(R.id.op_operation_list_view);
+                .findViewById(R.id.list_view);
         operations = realmDB.where(Operation.class).equalTo("taskStageUuid", taskStageUuid).findAllSorted("startDate");
-        OperationAdapter operationAdapter = new OperationAdapter(getContext(),R.id.op_operation_list_view, operations);
+        OperationAdapter operationAdapter = new OperationAdapter(getContext(),R.id.list_view, operations);
         mainListView.setAdapter(operationAdapter);
     }
 
@@ -344,7 +343,7 @@ public class OrderFragment extends Fragment {
                 }
                 fillListViewTasks(currentOrderUuid);
                 mainListView = (ListView) rootView
-                        .findViewById(R.id.ol_orders_list_view);
+                        .findViewById(R.id.list_view);
                 Level = 1;
                 return;
             }
@@ -354,7 +353,7 @@ public class OrderFragment extends Fragment {
                     currentTaskUuid = taskAdapter.getItem(position).getUuid();
                 }
                 mainListView = (ListView) rootView
-                        .findViewById(R.id.tsl_taskstage_list_view);
+                        .findViewById(R.id.list_view);
                 fillListViewTaskStage(currentTaskUuid);
                 Level = 2;
                 return;
@@ -364,7 +363,7 @@ public class OrderFragment extends Fragment {
                 if (taskStageAdapter != null)
                     currentTaskStageUuid = taskStageAdapter.getItem(position).getUuid();
                 mainListView = (ListView) rootView
-                        .findViewById(R.id.op_operation_list_view);
+                        .findViewById(R.id.list_view);
                 fillListViewOperations(currentTaskStageUuid);
                 Level = 3;
                 return;

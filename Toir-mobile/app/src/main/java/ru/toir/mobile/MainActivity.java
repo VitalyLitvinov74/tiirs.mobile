@@ -56,8 +56,8 @@ import ru.toir.mobile.fragments.FragmentAddUser;
 import ru.toir.mobile.fragments.FragmentEditUser;
 import ru.toir.mobile.fragments.GPSFragment;
 import ru.toir.mobile.fragments.NativeCameraFragment;
+import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
-import ru.toir.mobile.fragments.TaskFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
@@ -518,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_TASKS) {
                                 currentFragment = FRAGMENT_TASKS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, TaskFragment.newInstance()).commit();
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, OrderFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == FRAGMENT_REFERENCES) {
                                 currentFragment = FRAGMENT_REFERENCES;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReferenceFragment.newInstance()).commit();

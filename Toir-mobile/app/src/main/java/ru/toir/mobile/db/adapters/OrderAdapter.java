@@ -80,16 +80,14 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
             long lDate = order.getReceiveDate();
             String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
             viewHolder.created.setText(sDate);
-
-            orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",order.getOrderStatusUuid()).findFirst();
-            viewHolder.status.setText(order.getOrderStatusUuid());
+            viewHolder.status.setText(order.getOrderStatus().getTitle());
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
                     + File.separator + "data"
                     + File.separator + "ru.toir.mobile"
                     + File.separator + "img"
                     + File.separator;
-            File imgFile = new File(pathToImages + orderStatus.getIcon());
+            File imgFile = new File(pathToImages + order.getOrderStatus().getIcon());
             if (imgFile.exists() && imgFile.isFile()) {
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
                         .getAbsolutePath());

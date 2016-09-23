@@ -71,7 +71,7 @@ public class EquipmentsFragment extends Fragment {
 
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
         typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(),R.id.simple_spinner, equipmentType);
+        typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(),equipmentType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -123,40 +123,7 @@ public class EquipmentsFragment extends Fragment {
 		//fillTypeSpinner();
 		fillSortFieldSpinner();
 	}
-/*
-	private void fillTypeSpinner() {
-        RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
-        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        //typeSpinnerAdapter = new ArrayAdapter(equipmentType);
-        //typeSpinner.setAdapter(typeSpinnerAdapter);
 
-		//EquipmentType allTypes = new EquipmentType();
-		// TODO стоит наверное добавить запись "любой тип" напрямую в таблицу?
-		//allTypes.setUuid(null);
-		//allTypes.setTitle("Все типы");
-		//typeList.add(0, allTypes);
-		typeSpinnerAdapter.clear();
-		typeSpinnerAdapter.addAll(equipmentType);
-
-        //typeSpinnerAdapter.add("Все типы");
-        //for (int i=0;i<equipmentType.size();i++)
-        //    typeSpinnerAdapter.add(equipmentType.get(i));
-		typeSpinnerAdapter.notifyDataSetChanged();
-
-        // настраиваем сортировку по типу оборудования
-
-        typeSpinnerAdapter = new ArrayAdapter<EquipmentType>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                //new ArrayList<String>());
-                new ArrayList<EquipmentType>());
-        typeSpinner.setAdapter(typeSpinnerAdapter);
-        typeSpinner.setOnItemSelectedListener(spinnerListener);
-
-        typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(),R.id.simple_spinner, equipments);
-        typeSpinner.setAdapter(typeSpinnerAdapter);
-
-	}
-*/
 	private void fillSortFieldSpinner() {
 
 		sortSpinnerAdapter.clear();
@@ -202,12 +169,11 @@ public class EquipmentsFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView,
                     View selectedItemView, int position, long id) {
-/*
+
                 String type = null;
                 String orderBy = null;
 
                 EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
-                //String typeSelected = typeSpinner.getSelectedItem();
                 if (typeSelected != null) {
                     type = typeSelected.getUuid();
                 }
@@ -216,7 +182,7 @@ public class EquipmentsFragment extends Fragment {
                 if (fieldSelected != null) {
                     orderBy = fieldSelected.getField();
                 }
-                FillListViewEquipments(type, orderBy);*/
+                //FillListViewEquipments(type, orderBy);
             }
         }
 
@@ -241,7 +207,7 @@ public class EquipmentsFragment extends Fragment {
         equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
         equipmentListView.setAdapter(equipmentAdapter);
 	}
-/*
+
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
 
@@ -250,5 +216,4 @@ public class EquipmentsFragment extends Fragment {
 			initView();
 		}
 	}
-*/
 }

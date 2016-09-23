@@ -53,7 +53,7 @@ public class DocumentationFragment extends Fragment {
 
         RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
         typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(),R.id.simple_spinner, documentationType);
+        typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(),documentationType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -85,7 +85,6 @@ public class DocumentationFragment extends Fragment {
 	private void initView() {
 
 		FillListViewDocumentation(null, null);
-		//fillTypeSpinner();
 		fillSortFieldSpinner();
 	}
 
@@ -121,7 +120,6 @@ public class DocumentationFragment extends Fragment {
 	}
 
 	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
-		//boolean userSelect = false;
 
 		@Override
 		public void onNothingSelected(AdapterView<?> parentView) {
@@ -130,7 +128,6 @@ public class DocumentationFragment extends Fragment {
 		@Override
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
-            /*
 			String type = null;
 			String orderBy = null;
 
@@ -144,8 +141,7 @@ public class DocumentationFragment extends Fragment {
 			if (fieldSelected != null) {
 				orderBy = fieldSelected.getField();
 			}
-			FillListViewDocumentation(type, orderBy);
-			*/
+			//FillListViewDocumentation(type, orderBy);
 		}
 	}
 
@@ -153,10 +149,8 @@ public class DocumentationFragment extends Fragment {
         RealmResults<Documentation> documentation;
         if (documentationTypeUuid!=null) {
             if (sort!=null)
-                //documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAllSorted(sort);
                 documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
             else
-                //documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAll();
                 documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
         }
         else {
