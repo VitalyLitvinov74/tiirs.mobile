@@ -3,8 +3,11 @@
  */
 package ru.toir.mobile.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -12,13 +15,15 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
-
+import android.view.View;
+import android.widget.EditText;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
 import dalvik.system.DexFile;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -31,12 +36,16 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 
 	private static final String TAG = "ToirPreferenceFragment";
 
-	private ListPreference drvList;
 	private PreferenceScreen drvSettingScr;
 	private PreferenceCategory drvSettingCategory;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
@@ -44,6 +53,47 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getActivity()
 						.getApplicationContext());
+
+        findPreference(getString(R.string.serverUrl))
+                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        final EditTextPreference URLPreference = (EditTextPreference) findPreference(getString(R.string.serverUrl));
+                        final AlertDialog dialog = (AlertDialog) URLPreference.getDialog();
+                        URLPreference.getEditText().setError(null);
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                                .setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String errorMessage;
+                                        String text = URLPreference.getEditText().getText().toString();
+
+                                        try {
+                                            URL tURL = new URL(text);
+                                            URLPreference.getEditText().setText(tURL.toString().replaceAll("/+$", ""));
+                                            errorMessage = null;
+                                        } catch (MalformedURLException e) {
+                                            if (!text.isEmpty()) {
+                                                errorMessage = "Не верный URL!";
+                                            } else {
+                                                errorMessage = null;
+                                            }
+                                        }
+
+                                        EditText edit = URLPreference.getEditText();
+                                        if (errorMessage == null) {
+                                            edit.setError(null);
+                                            URLPreference.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
+                                            dialog.dismiss();
+                                        } else {
+                                            edit.setError(errorMessage);
+                                        }
+                                    }
+                                });
+
+                        return true;
+                    }
+                });
 
 		// получаем список драйверов по имени класса
 		List<String> driverClassList = new ArrayList<>();
@@ -64,11 +114,9 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 
 		// строим список драйверов с именами и классами
 		Class<?> driverClass;
-		List<String> drvNames = new ArrayList<String>();
-		List<String> drvKeys = new ArrayList<>();
+        List<String> drvNames = new ArrayList<>();
+        List<String> drvKeys = new ArrayList<>();
 		for (String classPath : driverClassList) {
-
-			driverClass = null;
 			try {
 				// пытаемся получить класс драйвера
 				driverClass = Class.forName(classPath);
@@ -90,12 +138,12 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		drvSettingCategory = (PreferenceCategory) findPreference("drvSettingsCategory");
 
 		// элемент интерфейса со списком драйверов считывателей
-		drvList = (ListPreference) findPreference(getResources().getString(
-				R.string.rfidDriverListPrefKey));
+        ListPreference drvList = (ListPreference) findPreference(getResources().getString(
+                R.string.rfidDriverListPrefKey));
 
 		// указываем названия и значения для элементов списка
-		drvList.setEntries(drvNames.toArray(new String[] {}));
-		drvList.setEntryValues(drvKeys.toArray(new String[] {}));
+        drvList.setEntries(drvNames.toArray(new String[]{""}));
+        drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
 
 		// при изменении драйвера, включаем дополнительный экран с
 		// настройками драйвера
@@ -135,11 +183,10 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		} else {
 			drvSettingCategory.setEnabled(false);
 		}
-
 	}
 
-	private PreferenceScreen getDrvSettingsSreen(String classPath,
-			PreferenceScreen rootScreen) {
+    private PreferenceScreen getDrvSettingsSreen(String classPath,
+                                                 PreferenceScreen rootScreen) {
 
 		Class<?> driverClass;
 		PreferenceScreen screen;
