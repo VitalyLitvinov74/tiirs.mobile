@@ -17,9 +17,7 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.TaskStatus;
-import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.Tasks;
 
 /**
@@ -49,30 +47,14 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
     @Override
     public Tasks getItem(int position) {
-        return null;
+        Tasks order = adapterData.get(position);
+        return order;
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
-    }
-
-    public String getTaskTitle(String taskTemplateUuid) {
-            Realm realmDB = Realm.getDefaultInstance();
-            TaskTemplate taskTemplate = realmDB.where(TaskTemplate.class).equalTo("uuid",taskTemplateUuid).findFirst();
-            return taskTemplate.getTitle();
-    }
-
-    public String getTaskStatusTitle(String taskStatusUuid) {
-        Realm realmDB = Realm.getDefaultInstance();
-        TaskStatus taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid",taskStatusUuid).findFirst();
-        return taskStatus.getTitle();
-    }
-
-    public String getEquipmentTitle(String equipmentUuid) {
-        Realm realmDB = Realm.getDefaultInstance();
-        Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid",equipmentUuid).findFirst();
-        return equipment.getTitle();
+        Tasks task = adapterData.get(position);
+        return task.get_id();
     }
 
     @Override
@@ -95,9 +77,9 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
         if (adapterData!=null) {
             Tasks task = adapterData.get(position);
-            viewHolder.title.setText(getTaskTitle(task.getTaskTemplateUuid()));
-            viewHolder.status.setText(getTaskStatusTitle(task.getTaskStatusUuid()));
-            viewHolder.equipment.setText(getEquipmentTitle(task.getEquipmentUuid()));
+            viewHolder.title.setText(task.getTaskTemplate().getTitle());
+            //viewHolder.status.setText(task.getTaskStatus().getTitle());
+            viewHolder.equipment.setText(task.getEquipment().getTitle());
 
             taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid",task.getTaskStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()

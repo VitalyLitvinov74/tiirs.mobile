@@ -41,19 +41,21 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
     @Override
     public int getCount() {
-        Realm realmDB = Realm.getDefaultInstance();
-        RealmResults<Orders> rows = realmDB.where(Orders.class).findAll();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Orders> rows = realm.where(Orders.class).findAll();
         return rows.size();
     }
 
     @Override
     public Orders getItem(int position) {
-        return null;
+        Orders order = adapterData.get(position);
+        return order;
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        Orders order = adapterData.get(position);
+        return order.get_id();
     }
 
     @Override

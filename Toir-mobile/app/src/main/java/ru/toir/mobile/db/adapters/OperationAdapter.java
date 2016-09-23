@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,9 +19,6 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationStatus;
-import ru.toir.mobile.db.realm.OperationTemplate;
-import ru.toir.mobile.db.realm.OperationVerdict;
 import ru.toir.mobile.utils.DataUtils;
 
 /**
@@ -51,28 +49,31 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     @Override
     public Operation getItem(int position) {
-        return null;
+        Operation operation = adapterData.get(position);
+        return operation;
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        Operation operations = adapterData.get(position);
+        return operations.get_id();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Realm realmDB = Realm.getDefaultInstance();
-        OperationStatus operationStatus;
-        OperationVerdict operationVerdict;
         String pathToImages;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.operation_item, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.title = (TextView) convertView.findViewById(R.id.op_Name);
+            viewHolder.title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             viewHolder.status = (TextView) convertView.findViewById(R.id.op_Status);
+            viewHolder.status.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             viewHolder.verdict = (TextView) convertView.findViewById(R.id.op_Verdict);
+            viewHolder.verdict.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             viewHolder.startdate = (TextView) convertView.findViewById(R.id.op_StartDate);
+            viewHolder.startdate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -80,15 +81,12 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
         if (adapterData!=null) {
             Operation operation = adapterData.get(position);
-            OperationTemplate operationTemplate = realmDB.where(OperationTemplate.class).equalTo("operationTemplateUuid",operation.getOperationTemplateUuid()).findFirst();
-            viewHolder.title.setText(operationTemplate.getTitle());
+            viewHolder.title.setText(operation.getOperationTemplate().getTitle());
             long lDate = operation.getStartDate();
             String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
             viewHolder.startdate.setText(sDate);
-            operationVerdict = realmDB.where(OperationVerdict.class).equalTo("operationVerdictUuid",operation.getOperationVerdictUuid()).findFirst();
-            viewHolder.verdict.setText(operationVerdict.getTitle());
-            operationStatus = realmDB.where(OperationStatus.class).equalTo("operationStatusUuid",operation.getOperationStatusUuid()).findFirst();
-            viewHolder.status.setText(operation.getOperationStatusUuid());
+            viewHolder.verdict.setText(operation.getOperationVerdict().getTitle());
+            viewHolder.status.setText(operation.getOperationStatus().getTitle());
             // TODO может вынести это на глобальный уровень?
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
@@ -96,7 +94,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     + File.separator + "ru.toir.mobile"
                     + File.separator + "img"
                     + File.separator;
-            File imgFile = new File(pathToImages + operationStatus.getIcon());
+            File imgFile = new File(pathToImages + operation.getOperationStatus().getIcon());
             if (imgFile.exists() && imgFile.isFile()) {
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
                         .getAbsolutePath());

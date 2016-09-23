@@ -1,9 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +8,11 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
-
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.TaskStageStatus;
-import ru.toir.mobile.db.realm.TaskStageTemplate;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.utils.DataUtils;
 
@@ -60,30 +53,14 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
 
     @Override
     public TaskStages getItem(int position) {
-        return null;
+        TaskStages taskStages = adapterData.get(position);
+        return taskStages;
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
-    }
-
-    public String getTaskStageTitle(String taskStageTemplateUuid) {
-            Realm realmDB = Realm.getDefaultInstance();
-            TaskStageTemplate taskStageTemplate = realmDB.where(TaskStageTemplate.class).equalTo("uuid", taskStageTemplateUuid).findFirst();
-            return taskStageTemplate.getTitle();
-    }
-
-    public String getTaskStageStatusTitle(String taskStageStatusUuid) {
-        Realm realmDB = Realm.getDefaultInstance();
-        TaskStageStatus taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStageStatusUuid).findFirst();
-        return taskStageStatus.getTitle();
-    }
-
-    public String getEquipmentTitle(String equipmentUuid) {
-        Realm realmDB = Realm.getDefaultInstance();
-        Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid",equipmentUuid).findFirst();
-        return equipment.getTitle();
+        TaskStages taskStages = adapterData.get(position);
+        return taskStages.get_id();
     }
 
     @Override
@@ -106,11 +83,11 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
 
         if (adapterData!=null) {
             TaskStages taskStage = adapterData.get(position);
-            viewHolder.title.setText(getTaskStageTitle(taskStage.getTaskStageTemplateUuid()));
-            viewHolder.status.setText(getTaskStageStatusTitle(taskStage.getTaskStageStatusUuid()));
+            viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
+            viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
             viewHolder.start_date.setText(DataUtils.getDate(taskStage.getStartDate(), "dd.MM.yyyy HH:ss"));
             viewHolder.end_date.setText(DataUtils.getDate(taskStage.getEndDate(), "dd.MM.yyyy HH:ss"));
-
+/*
             taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStage.getTaskStageStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
@@ -131,7 +108,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
                             .getAbsolutePath());
                     viewHolder.icon.setImageBitmap(mBitmap);
                 }
-            }
+            }*/
         }
         return convertView;
     }

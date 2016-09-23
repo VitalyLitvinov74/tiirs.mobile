@@ -27,7 +27,7 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
         TextView title;
     }
 
-    public OrderStatusAdapter(@NonNull Context context, int resId, RealmResults<OrderStatus> data) {
+    public OrderStatusAdapter(@NonNull Context context, RealmResults<OrderStatus> data) {
         super(context, data);
     }
 
@@ -74,8 +74,8 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
             if (adapterData != null) {
                 orderStatus = adapterData.get(position);
                 textView.setText(orderStatus.getTitle());
-                textView.setPadding(10,20,10,20);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                textView.setPadding(10,15,10,20);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                 textView.setTextColor(Color.WHITE);
             }
             return textView;
