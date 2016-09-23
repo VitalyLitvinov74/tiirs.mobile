@@ -34,7 +34,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
         ImageView icon;
     }
 
-    public TaskAdapter(@NonNull Context context, int resId, RealmResults<Tasks> data) {
+    public TaskAdapter(@NonNull Context context, RealmResults<Tasks> data) {
         super(context, data);
     }
 
@@ -47,14 +47,20 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
     @Override
     public Tasks getItem(int position) {
-        Tasks order = adapterData.get(position);
-        return order;
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
-        Tasks task = adapterData.get(position);
-        return task.get_id();
+        Tasks task;
+        if (adapterData != null) {
+            task = adapterData.get(position);
+            return task.get_id();
+        }
+        return 0;
     }
 
     @Override

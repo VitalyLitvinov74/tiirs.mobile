@@ -204,7 +204,7 @@ public class EquipmentsFragment extends Fragment {
                 equipments = realmDB.where(Equipment.class).findAll();
             }
         }
-        equipmentAdapter = new EquipmentAdapter(getContext(),R.id.erl_equipment_listView, equipments);
+        equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
         equipmentListView.setAdapter(equipmentAdapter);
 	}
 

@@ -17,7 +17,6 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.utils.DataUtils;
 
@@ -35,7 +34,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         ImageView icon;
     }
 
-    public OrderAdapter(@NonNull Context context, int resId, RealmResults<Orders> data) {
+    public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
         super(context, data);
     }
 
@@ -48,21 +47,25 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
     @Override
     public Orders getItem(int position) {
-        Orders order = adapterData.get(position);
-        return order;
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
-        Orders order = adapterData.get(position);
-        return order.get_id();
+        Orders order;
+        if (adapterData != null) {
+            order = adapterData.get(position);
+            return order.get_id();
+        }
+        return 0;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Realm realmDB = Realm.getDefaultInstance();
-        OrderStatus orderStatus;
         String pathToImages;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.order_item, parent, false);

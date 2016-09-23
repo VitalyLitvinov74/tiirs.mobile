@@ -182,7 +182,7 @@ public class GPSFragment extends Fragment {
             }
         }
         if (equipments!=null) {
-            equipmentAdapter = new EquipmentAdapter(getContext(), R.id.gps_listView, equipments);
+            equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
             equipmentListView.setAdapter(equipmentAdapter);
         }
 

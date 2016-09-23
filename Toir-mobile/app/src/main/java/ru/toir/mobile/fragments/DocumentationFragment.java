@@ -31,10 +31,6 @@ public class DocumentationFragment extends Fragment {
 	private ListView documentationListView;
 
 	private ArrayAdapter<SortField> sortSpinnerAdapter;
-	private DocumentationTypeAdapter typeSpinnerAdapter;
-
-	private SpinnerListener spinnerListener;
-    private DocumentationAdapter documentationAdapter;
 
     public static DocumentationFragment newInstance() {
 		return new DocumentationFragment();
@@ -49,11 +45,11 @@ public class DocumentationFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
 
 		// обработчик для выпадающих списков у нас один
-		spinnerListener = new SpinnerListener();
+        SpinnerListener spinnerListener = new SpinnerListener();
 
         RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
         typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(),documentationType);
+        DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(), documentationType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -141,7 +137,7 @@ public class DocumentationFragment extends Fragment {
 			if (fieldSelected != null) {
 				orderBy = fieldSelected.getField();
 			}
-			//FillListViewDocumentation(type, orderBy);
+	//		FillListViewDocumentation(type, orderBy);
 		}
 	}
 
@@ -159,7 +155,7 @@ public class DocumentationFragment extends Fragment {
             else
                 documentation = realmDB.where(Documentation.class).findAll();
         }
-        documentationAdapter = new DocumentationAdapter(getContext(),R.id.documentation_listView, documentation);
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
         documentationListView.setAdapter(documentationAdapter);
 	}
 

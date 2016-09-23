@@ -25,7 +25,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         TextView title;
     }
 
-    public DocumentationAdapter(@NonNull Context context, int resId, RealmResults<Documentation> data) {
+    public DocumentationAdapter(@NonNull Context context, RealmResults<Documentation> data) {
         super(context, data);
     }
 
@@ -38,11 +38,19 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
 
     @Override
     public Documentation getItem(int position) {
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
         return null;
     }
 
     @Override
     public long getItemId(int position) {
+        Documentation documentation;
+        if (adapterData != null) {
+            documentation = adapterData.get(position);
+            return documentation.get_id();
+        }
         return 0;
     }
 
@@ -59,11 +67,14 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Documentation Documentation = adapterData.get(position);
-        viewHolder.title.setText(Documentation.getTitle());
-        viewHolder.information.setText(Documentation.getUuid());
-        //TODO добавить запрос на расшифровку типа документации и на название оборудования
-        //viewHolder.information.setText(DocumentationType.get Documentation.getDocumentationTypeUuid());
+        Documentation Documentation;
+        if (adapterData != null) {
+            Documentation = adapterData.get(position);
+            viewHolder.title.setText(Documentation.getTitle());
+            viewHolder.information.setText(Documentation.getUuid());
+            //TODO добавить запрос на расшифровку типа документации и на название оборудования
+            //viewHolder.information.setText(DocumentationType.get Documentation.getDocumentationTypeUuid());
+        }
         return convertView;
     }
 }

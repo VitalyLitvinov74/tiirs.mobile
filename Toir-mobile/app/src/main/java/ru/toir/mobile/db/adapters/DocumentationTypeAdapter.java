@@ -52,7 +52,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public long getItemId(int position) {
-        DocumentationType documentationType = null;
+        DocumentationType documentationType;
         if (adapterData != null) {
             documentationType = adapterData.get(position);
             return documentationType.get_id();

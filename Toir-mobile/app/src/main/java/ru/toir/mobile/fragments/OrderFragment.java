@@ -37,8 +37,6 @@ import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.db.tables.CriticalType;
-import ru.toir.mobile.db.tables.OperationType;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceProvider;
@@ -57,18 +55,16 @@ public class OrderFragment extends Fragment {
 	private String currentOrderUuid = "";
     private String currentTaskUuid = "";
     private String currentTaskStageUuid = "";
-    private String currentOperationUuid = "";
 
 	private Spinner sortSpinner;
 	private Spinner statusSpinner;
 
 	private ListView mainListView;
-	//private SimpleCursorAdapter operationAdapter;
 	private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
 	//private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
 	private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
-	private ArrayAdapter<OperationType> operationTypeAdapter;
-	private ArrayAdapter<CriticalType> criticalTypeAdapter;
+	//private ArrayAdapter<OperationType> operationTypeAdapter;
+	//private ArrayAdapter<CriticalType> criticalTypeAdapter;
 	private OrderStatusAdapter statusSpinnerAdapter;
 	private ArrayAdapter<SortField> sortFieldAdapter;
 
@@ -293,7 +289,7 @@ public class OrderFragment extends Fragment {
                 else
                     orders = realmDB.where(Orders.class).findAll();
             }
-            orderAdapter = new OrderAdapter(getContext(),R.id.list_view, orders);
+            orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
 		}
 	}
@@ -302,7 +298,7 @@ public class OrderFragment extends Fragment {
     private void fillListViewTasks(String orderUuid) {
        RealmResults<Tasks> tasks;
        tasks = realmDB.where(Tasks.class).equalTo("orderUuid", orderUuid).findAllSorted("startDate");
-       taskAdapter = new TaskAdapter(getContext(),R.id.list_view, tasks);
+       taskAdapter = new TaskAdapter(getContext(), tasks);
        mainListView.setAdapter(taskAdapter);
     }
 
@@ -310,7 +306,7 @@ public class OrderFragment extends Fragment {
     private void fillListViewTaskStage(String taskUuid) {
         RealmResults<TaskStages> taskStages;
         taskStages = realmDB.where(TaskStages.class).equalTo("taskUuid", taskUuid).findAllSorted("startDate");
-        taskStageAdapter = new TaskStageAdapter(getContext(),R.id.list_view, taskStages);
+        taskStageAdapter = new TaskStageAdapter(getContext(), taskStages);
         mainListView.setAdapter(taskStageAdapter);
     }
 
@@ -318,7 +314,7 @@ public class OrderFragment extends Fragment {
     private void fillListViewOperations(String taskStageUuid) {
         RealmResults<Operation> operations;
         operations = realmDB.where(Operation.class).equalTo("taskStageUuid", taskStageUuid).findAllSorted("startDate");
-        operationAdapter = new OperationAdapter(getContext(),R.id.list_view, operations);
+        operationAdapter = new OperationAdapter(getContext(), operations);
         mainListView.setAdapter(operationAdapter);
     }
 
@@ -352,8 +348,9 @@ public class OrderFragment extends Fragment {
             }
             // TaskStage
             if (Level == 2) {
-                if (taskStageAdapter != null)
+                if (taskStageAdapter != null) {
                     currentTaskStageUuid = taskStageAdapter.getItem(position).getUuid();
+                }
                 fillListViewOperations(currentTaskStageUuid);
                 statusSpinner.setVisibility(View.GONE);
                 sortSpinner.setVisibility(View.GONE);
@@ -362,13 +359,12 @@ public class OrderFragment extends Fragment {
             }
             // Operation
             if (Level == 3) {
-                if (operationAdapter != null)
-                    currentOperationUuid = operationAdapter.getItem(position).getUuid();
+                //if (operationAdapter != null)
+                //    currentOperationUuid = operationAdapter.getItem(position).getUuid();
                 // TODO отмечаем операцию как завершенную ?
                 //if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)	|| operationStatus.equals(OperationStatusDBAdapter.Status.IN_WORK))
                 // else dialog.setMessage("Операция уже выполнена. Повторное выполнение невозможно!");
                 //initOperationPattern(operationUuid, taskUuid, equipmentUuid);
-                return;
             }
         }
     }

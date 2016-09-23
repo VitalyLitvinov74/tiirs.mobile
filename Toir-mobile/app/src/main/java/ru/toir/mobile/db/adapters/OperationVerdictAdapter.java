@@ -25,7 +25,7 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
         TextView title;
     }
 
-    public OperationVerdictAdapter(@NonNull Context context, int resId, RealmResults<OperationVerdict> data) {
+    public OperationVerdictAdapter(@NonNull Context context, RealmResults<OperationVerdict> data) {
         super(context, data);
     }
 
@@ -38,11 +38,19 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
 
     @Override
     public OperationVerdict getItem(int position) {
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
         return null;
     }
 
     @Override
     public long getItemId(int position) {
+        OperationVerdict operationVerdict;
+        if (adapterData != null) {
+            operationVerdict = adapterData.get(position);
+            return operationVerdict.get_id();
+        }
         return 0;
     }
 
@@ -51,8 +59,11 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
         ViewHolder viewHolder;
         if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            OperationVerdict operationVerdict = adapterData.get(position);
-            textView.setText(operationVerdict.getTitle());
+            OperationVerdict operationVerdict;
+            if (adapterData != null) {
+                operationVerdict = adapterData.get(position);
+                textView.setText(operationVerdict.getTitle());
+            }
             return textView;
         }
         if (parent.getId() == R.id.reference_listView) {
@@ -65,9 +76,12 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            OperationVerdict operationVerdict = adapterData.get(position);
-            viewHolder.title.setText(operationVerdict.getTitle());
-            viewHolder.uuid.setText(operationVerdict.getUuid());
+            OperationVerdict operationVerdict;
+            if (adapterData != null) {
+                operationVerdict = adapterData.get(position);
+                viewHolder.title.setText(operationVerdict.getTitle());
+                viewHolder.uuid.setText(operationVerdict.getUuid());
+            }
             return convertView;
         }
         return convertView;

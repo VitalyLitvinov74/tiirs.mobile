@@ -40,14 +40,20 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
 
     @Override
     public OrderStatus getItem(int position) {
-        OrderStatus orderStatus = adapterData.get(position);
-        return orderStatus;
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
+        else return null;
     }
 
     @Override
     public long getItemId(int position) {
-        OrderStatus orderStatus = adapterData.get(position);
-        return orderStatus.get_id();
+        OrderStatus orderStatus;
+        if (adapterData != null) {
+            orderStatus = adapterData.get(position);
+            return orderStatus.get_id();
+        }
+        return 0;
     }
 
     @Override
@@ -63,9 +69,12 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            OrderStatus orderStatus = adapterData.get(position);
-            viewHolder.title.setText(orderStatus.getTitle());
-            viewHolder.uuid.setText(orderStatus.getUuid());
+            OrderStatus orderStatus;
+            if (adapterData != null) {
+                orderStatus = adapterData.get(position);
+                viewHolder.title.setText(orderStatus.getTitle());
+                viewHolder.uuid.setText(orderStatus.getUuid());
+            }
             return convertView;
         }
         if (parent.getId() == R.id.simple_spinner || convertView==null) {

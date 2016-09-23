@@ -1,12 +1,17 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import java.io.File;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -24,23 +29,14 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
     public static final String TABLE_NAME = "TaskStages";
 
     private static class ViewHolder{
-        TextView equipment;
         TextView title;
-        TextView taskTitle;
-        TextView description;
-        TextView normative;
-        TextView comment;
-        TextView taskStageType;
-        TextView taskStageStatus;
-        TextView taskStageVerdict;
         TextView status;
         ImageView icon;
-        ImageView image;
         TextView start_date;
         TextView end_date;
     }
 
-    public TaskStageAdapter(@NonNull Context context, int resId, RealmResults<TaskStages> data) {
+    public TaskStageAdapter(@NonNull Context context, RealmResults<TaskStages> data) {
         super(context, data);
     }
 
@@ -53,14 +49,22 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
 
     @Override
     public TaskStages getItem(int position) {
-        TaskStages taskStages = adapterData.get(position);
-        return taskStages;
+        TaskStages taskStages;
+        if (adapterData != null) {
+            taskStages = adapterData.get(position);
+            return taskStages;
+        }
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
-        TaskStages taskStages = adapterData.get(position);
-        return taskStages.get_id();
+        TaskStages taskStages;
+        if (adapterData != null) {
+            taskStages = adapterData.get(position);
+            return taskStages.get_id();
+        }
+        return 0;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
             viewHolder.start_date.setText(DataUtils.getDate(taskStage.getStartDate(), "dd.MM.yyyy HH:ss"));
             viewHolder.end_date.setText(DataUtils.getDate(taskStage.getEndDate(), "dd.MM.yyyy HH:ss"));
-/*
+
             taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStage.getTaskStageStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
@@ -108,7 +112,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
                             .getAbsolutePath());
                     viewHolder.icon.setImageBitmap(mBitmap);
                 }
-            }*/
+            }
         }
         return convertView;
     }

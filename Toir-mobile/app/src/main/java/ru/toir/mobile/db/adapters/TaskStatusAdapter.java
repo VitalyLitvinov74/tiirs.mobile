@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -24,10 +23,9 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
     private static class ViewHolder{
         TextView uuid;
         TextView title;
-        ImageView icon;
     }
 
-    public TaskStatusAdapter(@NonNull Context context, int resId, RealmResults<TaskStatus> data) {
+    public TaskStatusAdapter(@NonNull Context context, RealmResults<TaskStatus> data) {
         super(context, data);
     }
 
@@ -53,8 +51,11 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
         ViewHolder viewHolder;
         if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            TaskStatus taskStatus = adapterData.get(position);
-            textView.setText(taskStatus.getTitle());
+            TaskStatus taskStatus;
+            if (adapterData != null) {
+                taskStatus = adapterData.get(position);
+                textView.setText(taskStatus.getTitle());
+            }
             return textView;
         }
         if (parent.getId() == R.id.reference_listView) {
@@ -67,9 +68,12 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            TaskStatus taskStatus = adapterData.get(position);
-            viewHolder.title.setText(taskStatus.getTitle());
-            viewHolder.uuid.setText(taskStatus.getUuid());
+            TaskStatus taskStatus;
+            if (adapterData != null) {
+                taskStatus = adapterData.get(position);
+                viewHolder.title.setText(taskStatus.getTitle());
+                viewHolder.uuid.setText(taskStatus.getUuid());
+            }
             //TODO сопоставление изображений
             //viewHolder.icon.setImageResource(R.drawable.img_3);
             return convertView;

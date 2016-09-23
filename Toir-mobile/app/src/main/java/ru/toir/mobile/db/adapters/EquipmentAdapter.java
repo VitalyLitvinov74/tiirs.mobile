@@ -12,6 +12,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author koputo
@@ -26,18 +27,13 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         TextView equipmentModelUuid;
         TextView equipmentStatusUuid;
         TextView title;
-        TextView inventoryNumber;
         TextView location;
+        TextView inventoryNumber;
         TextView criticalTypeUuid;
-        TextView userUuid;
         TextView startDate;
-        TextView latitude;
-        TextView longitude;
-        TextView tagId;
-        TextView image;
     }
 
-    public EquipmentAdapter(@NonNull Context context, int resId, RealmResults<Equipment> data) {
+    public EquipmentAdapter(@NonNull Context context, RealmResults<Equipment> data) {
         super(context, data);
     }
 
@@ -50,11 +46,19 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
     @Override
     public Equipment getItem(int position) {
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
         return null;
     }
 
     @Override
     public long getItemId(int position) {
+        Equipment equipment;
+        if (adapterData != null) {
+            equipment = adapterData.get(position);
+            return equipment.get_id();
+        }
         return 0;
     }
 
@@ -76,15 +80,18 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Equipment equipment = adapterData.get(position);
-        viewHolder.title.setText(equipment.getTitle());
-        //viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
-        //viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
-        //viewHolder.location.setText(equipment.getLocation());
-        //viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatus().getTitle());
-        //viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
-        //String sDate = DataUtils.getDate(equipment.getStartDate(), "dd.MM.yyyy HH:ss");
-        //viewHolder.startDate.setText(sDate);
+        Equipment equipment;
+        if (adapterData != null) {
+            equipment = adapterData.get(position);
+            viewHolder.title.setText(equipment.getTitle());
+            viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
+            viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
+            //viewHolder.location.setText(equipment.getLocation());
+            viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatus().getTitle());
+            viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
+            String sDate = DataUtils.getDate(equipment.getStartDate(), "dd.MM.yyyy HH:ss");
+            viewHolder.startDate.setText(sDate);
+        }
         return convertView;
     }
 }

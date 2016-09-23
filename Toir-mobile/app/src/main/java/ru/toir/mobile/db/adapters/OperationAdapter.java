@@ -36,7 +36,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         ImageView icon;
     }
 
-    public OperationAdapter(@NonNull Context context, int resId, RealmResults<Operation> data) {
+    public OperationAdapter(@NonNull Context context, RealmResults<Operation> data) {
         super(context, data);
     }
 
@@ -49,14 +49,22 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     @Override
     public Operation getItem(int position) {
-        Operation operation = adapterData.get(position);
-        return operation;
+        Operation operation;
+        if (adapterData != null) {
+            operation = adapterData.get(position);
+            return operation;
+        }
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
-        Operation operations = adapterData.get(position);
-        return operations.get_id();
+        Operation operations;
+        if (adapterData != null) {
+            operations = adapterData.get(position);
+            return operations.get_id();
+        }
+        return 0;
     }
 
     @Override

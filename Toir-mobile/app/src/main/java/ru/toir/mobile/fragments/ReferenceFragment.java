@@ -172,7 +172,7 @@ public class ReferenceFragment extends Fragment {
     private void fillListViewOperationVerdict() {
         RealmResults<OperationVerdict> operationVerdict;
         operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity().getApplicationContext(),R.id.reference_listView, operationVerdict);
+        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity().getApplicationContext(), operationVerdict);
         contentListView.setAdapter(operationVerdictAdapter);
     }
 
@@ -186,7 +186,7 @@ public class ReferenceFragment extends Fragment {
 	private void fillListViewTaskStatus() {
         RealmResults<TaskStatus> taskStatuses;
         taskStatuses = realmDB.where(TaskStatus.class).findAll();
-        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(),R.id.reference_listView, taskStatuses);
+        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(), taskStatuses);
         contentListView.setAdapter(taskStatusAdapter);
 	}
 
