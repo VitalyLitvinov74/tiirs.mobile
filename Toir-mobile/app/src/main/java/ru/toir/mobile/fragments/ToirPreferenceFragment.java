@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.List;
 import dalvik.system.DexFile;
 import ru.toir.mobile.R;
+import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
 /**
@@ -57,7 +58,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
         findPreference(getString(R.string.serverUrl))
                 .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
-                    public boolean onPreferenceClick(Preference preference) {
+                    public boolean onPreferenceClick(final Preference preference) {
                         final EditTextPreference URLPreference = (EditTextPreference) findPreference(getString(R.string.serverUrl));
                         final AlertDialog dialog = (AlertDialog) URLPreference.getDialog();
                         URLPreference.getEditText().setError(null);
@@ -85,6 +86,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
                                             edit.setError(null);
                                             URLPreference.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
                                             dialog.dismiss();
+                                            ToirApplication.serverUrl = edit.getText().toString();
                                         } else {
                                             edit.setError(errorMessage);
                                         }

@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.DatabaseHelper;
-import ru.toir.mobile.R;
+import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
@@ -63,11 +63,9 @@ import ru.toir.mobile.serverapi.ReferenceListSrv;
 import ru.toir.mobile.utils.DataUtils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
@@ -77,7 +75,6 @@ import android.util.Log;
 public class ReferenceProcessor {
 
     private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
-    private String mServerUrl;
     private Context mContext;
 
     /**
@@ -85,15 +82,9 @@ public class ReferenceProcessor {
      */
     public ReferenceProcessor(Context context) throws Exception {
 
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(context);
-
-        // урл к которому будем обращаться с запросами
-        mServerUrl = sp.getString(context.getString(R.string.serverUrl), "");
-
         mContext = context;
 
-        if (mServerUrl.equals("")) {
+        if (ToirApplication.serverUrl.equals("")) {
             throw new Exception("URL сервера не указан!");
         }
     }
@@ -178,7 +169,7 @@ public class ReferenceProcessor {
 
         for (String uuid : patternUuids) {
             url.setLength(0);
-            url.append(mServerUrl).append("/api/operationpatterns/")
+            url.append(ToirApplication.serverUrl).append("/api/operationpatterns/")
                     .append(uuid);
             jsonString = getReferenceData(url.toString());
 
@@ -218,7 +209,7 @@ public class ReferenceProcessor {
                     continue;
                 }
                 url.setLength(0);
-                url.append(mServerUrl).append("/api/operationpatterns/")
+                url.append(ToirApplication.serverUrl).append("/api/operationpatterns/")
                         .append(patternUuid).append("/steps/")
                         .append(step.getUuid()).append("/images/")
                         .append(step.getUuid()).append(".jpg");
@@ -321,7 +312,7 @@ public class ReferenceProcessor {
 
         for (String typeUuid : operationTypeUuids) {
             url.setLength(0);
-            url.append(mServerUrl).append('/').append(referenceUrl).append('?')
+            url.append(ToirApplication.serverUrl).append('/').append(referenceUrl).append('?')
                     .append("OperationTypeId=").append(typeUuid);
             jsonString = getReferenceData(url.toString());
             if (jsonString != null) {
@@ -392,7 +383,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
@@ -462,7 +453,7 @@ public class ReferenceProcessor {
                     .getEquipment_uuid());
 
             url.setLength(0);
-            url.append(mServerUrl).append("/api/Equipment/")
+            url.append(ToirApplication.serverUrl).append("/api/Equipment/")
                     .append(equipment.getUuid()).append("/Documents/")
                     .append(document.getUuid()).append("/file");
 
@@ -564,7 +555,7 @@ public class ReferenceProcessor {
             }
 
             url.setLength(0);
-            url.append(mServerUrl).append("/").append(filePath).append("/")
+            url.append(ToirApplication.serverUrl).append("/").append(filePath).append("/")
                     .append(fileNameEncoded);
 
             try {
@@ -663,7 +654,7 @@ public class ReferenceProcessor {
             }
 
             url.setLength(0);
-            url.append(mServerUrl).append("/").append(filePath).append("/")
+            url.append(ToirApplication.serverUrl).append("/").append(filePath).append("/")
                     .append(fileNameEncoded);
 
             try {
@@ -749,7 +740,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
@@ -812,7 +803,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
@@ -875,7 +866,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
@@ -938,7 +929,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
@@ -1001,7 +992,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
@@ -1064,7 +1055,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
@@ -1143,7 +1134,7 @@ public class ReferenceProcessor {
 
         for (String equipmentUuid : equipmentUuids) {
             url.setLength(0);
-            url.append(mServerUrl).append("/api/equipment/")
+            url.append(ToirApplication.serverUrl).append("/api/equipment/")
                     .append(equipmentUuid);
 
             jsonString = getReferenceData(url.toString());
@@ -1210,7 +1201,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        url.append(mServerUrl).append(referenceUrl);
+        url.append(ToirApplication.serverUrl).append(referenceUrl);
 
         // получаем дату последней модификации содержимого таблицы
         CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
@@ -1275,7 +1266,7 @@ public class ReferenceProcessor {
         }
         for (String equipmentUuid : equipmentUuids) {
             url.setLength(0);
-            url.append(mServerUrl)
+            url.append(ToirApplication.serverUrl)
                     .append(String.format("/api/equipment/%s/documents",
                             equipmentUuid));
             jsonString = getReferenceData(url.toString());
@@ -1445,7 +1436,7 @@ public class ReferenceProcessor {
     private String getReferenceURL(String referenceName) {
 
         String referenceUrl = null;
-        String url = mServerUrl + "/api/references";
+        String url = ToirApplication.serverUrl.concat("/api/references");
         String jsonString;
 
         jsonString = getReferenceData(url);

@@ -1,6 +1,9 @@
 package ru.toir.mobile;
 
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import ru.toir.mobile.db.ToirRealm;
 
 /**
@@ -15,6 +18,9 @@ public class ToirApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        serverUrl = preferences.getString(getString(R.string.serverUrl), "");
 
         // инициализируем базу данных Realm
         ToirRealm.init(this);
