@@ -118,23 +118,14 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		Class<?> driverClass;
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
-		for (String classPath : driverClassList) {
-			try {
-				// пытаемся получить класс драйвера
-				driverClass = Class.forName(classPath);
-				// пытаемся получить свойство DRIVER_NAME
-				//String name = (String) (driverClass
-				//		.getDeclaredField("DRIVER_NAME").get(new String()));
-                String name = (String) (driverClass
-                		.getDeclaredField("DRIVER_NAME").get(""));
-				if (name != null && !name.equals("")) {
-					drvNames.add(name);
-					drvKeys.add(classPath);
-				}
-			} catch (Exception e) {
-				Log.e(TAG, e.toString());
-			}
-		}
+        String name;
+        for (String classPath : driverClassList) {
+            name = RfidDriverBase.getDriverName(classPath);
+            if (name != null) {
+                drvNames.add(name);
+                drvKeys.add(classPath);
+            }
+        }
 
 		// категория с экраном настроек драйвера
 		drvSettingCategory = (PreferenceCategory) findPreference("drvSettingsCategory");
