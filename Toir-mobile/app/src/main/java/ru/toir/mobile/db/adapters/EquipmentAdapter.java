@@ -7,12 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author koputo
@@ -78,7 +80,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
             //viewHolder.location.setText(equipment.getLocation());
             viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatus().getTitle());
             viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
-            String sDate = DataUtils.getDate(equipment.getStartDate(), "dd.MM.yyyy HH:ss");
+            String sDate = new SimpleDateFormat("dd.MM.YYYY HH:ss", Locale.US).format(equipment.getStartDate());
             viewHolder.startDate.setText(sDate);
         }
         return convertView;

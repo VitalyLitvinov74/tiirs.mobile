@@ -809,7 +809,20 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         String updateUrl = sp.getString(getString(R.string.updateUrl), "");
         String serverUrl = sp.getString(getString(R.string.serverUrl), "");
-        String driverName = "не знаю как получить";
+        String classPath = sp.getString(getString(R.string.rfidDriverListPrefKey), "");
+        String driverName;
+        try {
+            Class<?> driverClass;
+            driverClass = Class.forName(classPath);
+            driverName = (String) (driverClass
+                    .getDeclaredField("DRIVER_NAME").get(""));
+            if (driverName == null) {
+                driverName = "не выбран";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            driverName = "ошибка";
+        }
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
         settings.setText("Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName);
