@@ -20,7 +20,6 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 
 /**
@@ -30,32 +29,38 @@ import ru.toir.mobile.db.realm.Orders;
 public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
 
-    public OrderAdapter(@NonNull Context context, int resId, RealmResults<Orders> data) {
+    public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
         super(context, data);
     }
 
     @Override
     public int getCount() {
-        Realm realmDB = Realm.getDefaultInstance();
-        RealmResults<Orders> rows = realmDB.where(Orders.class).findAll();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Orders> rows = realm.where(Orders.class).findAll();
         return rows.size();
     }
 
     @Override
     public Orders getItem(int position) {
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
         return null;
     }
 
     @Override
     public long getItemId(int position) {
+        Orders order;
+        if (adapterData != null) {
+            order = adapterData.get(position);
+            return order.get_id();
+        }
         return 0;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Realm realmDB = Realm.getDefaultInstance();
-        OrderStatus orderStatus;
         String pathToImages;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.order_item, parent, false);
@@ -75,16 +80,14 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
             Date lDate = order.getReceiveDate();
             String sDate = new SimpleDateFormat("dd.MM.YYYY", Locale.US).format(lDate);
             viewHolder.created.setText(sDate);
-
-            orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",order.getOrderStatusUuid()).findFirst();
-            viewHolder.status.setText(order.getOrderStatusUuid());
+            viewHolder.status.setText(order.getOrderStatus().getTitle());
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
                     + File.separator + "data"
                     + File.separator + "ru.toir.mobile"
                     + File.separator + "img"
                     + File.separator;
-            File imgFile = new File(pathToImages + orderStatus.getIcon());
+            File imgFile = new File(pathToImages + order.getOrderStatus().getIcon());
             if (imgFile.exists() && imgFile.isFile()) {
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
                         .getAbsolutePath());

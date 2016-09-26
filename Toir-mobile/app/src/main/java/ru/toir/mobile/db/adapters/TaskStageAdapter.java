@@ -19,9 +19,7 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.TaskStageStatus;
-import ru.toir.mobile.db.realm.TaskStageTemplate;
 import ru.toir.mobile.db.realm.TaskStages;
 
 /**
@@ -31,7 +29,7 @@ import ru.toir.mobile.db.realm.TaskStages;
 public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements ListAdapter {
     public static final String TABLE_NAME = "TaskStages";
 
-    public TaskStageAdapter(@NonNull Context context, int resId, RealmResults<TaskStages> data) {
+    public TaskStageAdapter(@NonNull Context context, RealmResults<TaskStages> data) {
         super(context, data);
     }
 
@@ -44,30 +42,22 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
 
     @Override
     public TaskStages getItem(int position) {
+        TaskStages taskStages;
+        if (adapterData != null) {
+            taskStages = adapterData.get(position);
+            return taskStages;
+        }
         return null;
     }
 
     @Override
     public long getItemId(int position) {
+        TaskStages taskStages;
+        if (adapterData != null) {
+            taskStages = adapterData.get(position);
+            return taskStages.get_id();
+        }
         return 0;
-    }
-
-    public String getTaskStageTitle(String taskStageTemplateUuid) {
-            Realm realmDB = Realm.getDefaultInstance();
-            TaskStageTemplate taskStageTemplate = realmDB.where(TaskStageTemplate.class).equalTo("uuid", taskStageTemplateUuid).findFirst();
-            return taskStageTemplate.getTitle();
-    }
-
-    public String getTaskStageStatusTitle(String taskStageStatusUuid) {
-        Realm realmDB = Realm.getDefaultInstance();
-        TaskStageStatus taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStageStatusUuid).findFirst();
-        return taskStageStatus.getTitle();
-    }
-
-    public String getEquipmentTitle(String equipmentUuid) {
-        Realm realmDB = Realm.getDefaultInstance();
-        Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid",equipmentUuid).findFirst();
-        return equipment.getTitle();
     }
 
     @Override
@@ -90,8 +80,8 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
 
         if (adapterData!=null) {
             TaskStages taskStage = adapterData.get(position);
-            viewHolder.title.setText(getTaskStageTitle(taskStage.getTaskStageTemplateUuid()));
-            viewHolder.status.setText(getTaskStageStatusTitle(taskStage.getTaskStageStatusUuid()));
+            viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
+            viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
             viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getStartDate()));
             viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getEndDate()));
 

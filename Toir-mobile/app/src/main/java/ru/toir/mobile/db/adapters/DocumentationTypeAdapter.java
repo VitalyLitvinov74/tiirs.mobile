@@ -1,7 +1,9 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -20,11 +22,7 @@ import ru.toir.mobile.db.realm.DocumentationType;
 public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType> implements ListAdapter {
     public static final String TABLE_NAME = "DocumentationType";
 
-    private static class ViewHolder{
-        TextView title;
-    }
-
-    public DocumentationTypeAdapter(@NonNull Context context, int resId, RealmResults<DocumentationType> data) {
+    public DocumentationTypeAdapter(@NonNull Context context, RealmResults<DocumentationType> data) {
         super(context, data);
     }
 
@@ -35,30 +33,31 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
         return rows.size();
     }
 
-    @Override
-    public DocumentationType getItem(int position) {
-        return null;
-    }
-
     public RealmResults<DocumentationType> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<DocumentationType> rows = realm.where(DocumentationType.class).findAll();
-        return rows;
+        return realm.where(DocumentationType.class).findAll();
+    }
+
+    @Override
+    public DocumentationType getItem(int position) {
+        if (adapterData != null) {
+            return adapterData.get(position);
+        }
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
+        DocumentationType documentationType;
+        if (adapterData != null) {
+            documentationType = adapterData.get(position);
+            return documentationType.get_id();
+        }
         return 0;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (parent.getId() == R.id.simple_spinner) {
-            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            DocumentationType documentationType = adapterData.get(position);
-            textView.setText(documentationType.getTitle());
-            return textView;
-        }
         if (parent.getId() == R.id.reference_listView) {
             ViewHolder viewHolder;
             if (convertView == null) {
@@ -69,10 +68,36 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            DocumentationType documentationType = adapterData.get(position);
-            viewHolder.title.setText(documentationType.getTitle());
+            DocumentationType documentationType;
+            if (adapterData != null) {
+                documentationType = adapterData.get(position);
+                viewHolder.title.setText(documentationType.getTitle());
+            }
             return convertView;
+        }
+
+        if (parent.getId() == R.id.simple_spinner || convertView == null) {
+            TextView textView = new TextView(context);
+            DocumentationType documentationType;
+            if (adapterData != null) {
+                documentationType = adapterData.get(position);
+                textView.setText(documentationType.getTitle());
+                textView.setPadding(10, 20, 10, 20);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                textView.setTextColor(Color.WHITE);
+            }
+            return textView;
         }
         return null;
     }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return getView(position, null, parent);
+    }
+
+    private static class ViewHolder {
+        TextView title;
+    }
+
 }

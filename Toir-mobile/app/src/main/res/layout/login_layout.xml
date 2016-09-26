@@ -7,18 +7,31 @@
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onClickLogin"
-        android:text="@string/login"
         android:layout_above="@+id/menuButton"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickLogin"
+        android:text="@string/login" />
 
     <Button
         android:id="@+id/menuButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/login_current_settings"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:onClick="mOnClickMethod"
         android:text="@string/menu" />
+
+    <TextView
+        android:id="@+id/login_current_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="55dp"
+        android:background="@drawable/back"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="16sp" />
 
 </RelativeLayout>

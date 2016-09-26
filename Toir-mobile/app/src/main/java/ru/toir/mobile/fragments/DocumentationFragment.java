@@ -18,6 +18,7 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
+import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
 
@@ -30,11 +31,6 @@ public class DocumentationFragment extends Fragment {
 	private ListView documentationListView;
 
 	private ArrayAdapter<SortField> sortSpinnerAdapter;
-	//private ArrayAdapter<DocumentationType> typeSpinnerAdapter;
-    private ArrayAdapter<String> typeSpinnerAdapter;
-
-	private SpinnerListener spinnerListener;
-    private DocumentationAdapter documentationAdapter;
 
     public static DocumentationFragment newInstance() {
 		return new DocumentationFragment();
@@ -49,16 +45,12 @@ public class DocumentationFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
 
 		// обработчик для выпадающих списков у нас один
-		spinnerListener = new SpinnerListener();
+		SpinnerListener spinnerListener = new SpinnerListener();
 
-		// настраиваем сортировку по типу оборудования
+		RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
 		typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        //typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
-		//		android.R.layout.simple_spinner_dropdown_item,
-		//		new ArrayList<DocumentationType>());
-        typeSpinnerAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                new ArrayList<String>());
+		DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(), documentationType);
+		typeSpinnerAdapter.notifyDataSetChanged();
 		typeSpinner.setAdapter(typeSpinnerAdapter);
 		typeSpinner.setOnItemSelectedListener(spinnerListener);
 
@@ -89,24 +81,8 @@ public class DocumentationFragment extends Fragment {
 	private void initView() {
 
 		FillListViewDocumentation(null, null);
-		fillTypeSpinner();
 		fillSortFieldSpinner();
 	}
-
-	private void fillTypeSpinner() {
-        RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
-		// TODO стоит наверное добавить запись "любой тип" напрямую в таблицу?
-        typeSpinnerAdapter.clear();
-
-        //DocumentationType allDocumentationTypes = new DocumentationType();
-        //allDocumentationTypes.set_id(0);
-        //allDocumentationTypes.setTitle("Все типы");
-        //allDocumentationTypes.setUuid(null);
-        typeSpinnerAdapter.add("Все типы");
-        for (int i=0;i<documentationType.size();i++)
-            typeSpinnerAdapter.add(documentationType.get(i).getTitle());
-		typeSpinnerAdapter.notifyDataSetChanged();
-    }
 
 	private void fillSortFieldSpinner() {
 
@@ -117,6 +93,32 @@ public class DocumentationFragment extends Fragment {
 		sortSpinnerAdapter.add(new SortField("По оборудованию",
 				"equipmentUuid"));
 
+	}
+
+	private void FillListViewDocumentation(String documentationTypeUuid, String sort) {
+		RealmResults<Documentation> documentation;
+		if (documentationTypeUuid != null) {
+			if (sort != null)
+				documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
+			else
+				documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
+		} else {
+			if (sort != null)
+				documentation = realmDB.where(Documentation.class).findAllSorted(sort);
+			else
+				documentation = realmDB.where(Documentation.class).findAll();
+		}
+		DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
+		documentationListView.setAdapter(documentationAdapter);
+	}
+
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser) {
+
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isVisibleToUser && isInit) {
+			initView();
+		}
 	}
 
 	public class ListviewClickListener implements
@@ -140,7 +142,6 @@ public class DocumentationFragment extends Fragment {
 	}
 
 	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
-		//boolean userSelect = false;
 
 		@Override
 		public void onNothingSelected(AdapterView<?> parentView) {
@@ -149,7 +150,6 @@ public class DocumentationFragment extends Fragment {
 		@Override
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
-            /*
 			String type = null;
 			String orderBy = null;
 
@@ -163,37 +163,7 @@ public class DocumentationFragment extends Fragment {
 			if (fieldSelected != null) {
 				orderBy = fieldSelected.getField();
 			}
-			FillListViewDocumentation(type, orderBy);
-			*/
-		}
-	}
-
-	private void FillListViewDocumentation(String documentationTypeUuid,  String sort) {
-        RealmResults<Documentation> documentation;
-        if (documentationTypeUuid!=null) {
-            if (sort!=null)
-                //documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAllSorted(sort);
-                documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
-            else
-                //documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAll();
-                documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
-        }
-        else {
-            if (sort!=null)
-                documentation = realmDB.where(Documentation.class).findAllSorted(sort);
-            else
-                documentation = realmDB.where(Documentation.class).findAll();
-        }
-        documentationAdapter = new DocumentationAdapter(getContext(),R.id.documentation_listView, documentation);
-        documentationListView.setAdapter(documentationAdapter);
-	}
-
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser) {
-
-		super.setUserVisibleHint(isVisibleToUser);
-		if (isVisibleToUser && isInit) {
-			initView();
+			//		FillListViewDocumentation(type, orderBy);
 		}
 	}
 

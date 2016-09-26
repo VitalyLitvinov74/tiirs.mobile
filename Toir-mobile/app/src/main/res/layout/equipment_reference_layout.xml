@@ -10,7 +10,7 @@
         android:orientation="horizontal" >
 
         <Spinner
-            android:id="@+id/erl_type_spinner"
+            android:id="@+id/simple_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

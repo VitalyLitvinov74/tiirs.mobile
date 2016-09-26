@@ -92,7 +92,7 @@
     <string name="profile_submit_button">Добавить</string>
     <string name="profile_submit_delete">Удалить пользователя</string>
 
-    <string name="menu">Настройки</string>
+    <string name="menu">Сменить настройки</string>
     <string name="menu_camera">Тест камеры</string>
     <string name="menu_charts">Тест графиков</string>
     <string name="menu_equipment">Оборудование</string>

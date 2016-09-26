@@ -44,12 +44,14 @@ import ru.toir.mobile.gps.TestGPSListener;
 
 public class GPSFragment extends Fragment {
 
+	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+	Location location;
+	TextView gpsLog;
+	ArrayList<OverlayItem> aOverlayItemArray;
 	private IMapController mapController;
 	private MapView mapView;
 	private double curLatitude, curLongitude;
 	private ListView lv_equipment;
-	Location location;
-	TextView gpsLog;
     private Realm realmDB;
     private User user;
     private Tasks task;
@@ -57,9 +59,6 @@ public class GPSFragment extends Fragment {
     private Orders order;
     private RealmResults<Orders> orders;
     private RealmResults<Equipment> equipment;
-
-	ArrayList<OverlayItem> aOverlayItemArray;
-	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
 	// private SimpleCursorAdapter equipmentAdapter;
 	private int LastItemPosition = -1;
 
@@ -70,23 +69,9 @@ public class GPSFragment extends Fragment {
         return (new GPSFragment());
     }
 
-    /**
-	 * Класс объекта оборудования для отображения на крате
-	 * 
-	 * @author koputo
-	 * 
-	 */
-	class EquipmentOverlayItem extends OverlayItem {
-		public Equipment equipment;
-
-		public EquipmentOverlayItem(String a, String b, GeoPoint p) {
-			super(a, b, p);
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
 	 * android.view.ViewGroup, android.os.Bundle)
@@ -182,9 +167,9 @@ public class GPSFragment extends Fragment {
             }
         }
         if (equipments!=null) {
-            equipmentAdapter = new EquipmentAdapter(getContext(), R.id.gps_listView, equipments);
-            equipmentListView.setAdapter(equipmentAdapter);
-        }
+			equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
+			equipmentListView.setAdapter(equipmentAdapter);
+		}
 
         /*
 		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
@@ -326,5 +311,18 @@ public class GPSFragment extends Fragment {
 
 	public void onInit(View view) {
 
+	}
+
+	/**
+	 * Класс объекта оборудования для отображения на крате
+	 *
+	 * @author koputo
+	 */
+	class EquipmentOverlayItem extends OverlayItem {
+		public Equipment equipment;
+
+		public EquipmentOverlayItem(String a, String b, GeoPoint p) {
+			super(a, b, p);
+		}
 	}
 }
