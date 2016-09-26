@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.realm;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -21,13 +23,13 @@ public class Equipment extends RealmObject {
     private String criticalTypeUuid;
     private CriticalType criticalType;
     private String userUuid;
-    private int startDate;
+    private Date startDate;
     private float latitude;
     private float longitude;
     private String tagId;
     private String image;
-    private long createdAt;
-    private long changedAt;
+    private Date createdAt;
+    private Date changedAt;
 
     public long get_id() {
         return _id;
@@ -125,11 +127,11 @@ public class Equipment extends RealmObject {
         this.userUuid = userUuid;
     }
 
-    public int getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(int startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
@@ -165,19 +167,19 @@ public class Equipment extends RealmObject {
         this.tagId = tagId;
     }
 
-    public long getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public long getChangedAt() {
+    public Date getChangedAt() {
         return changedAt;
     }
 
-    public void setChangedAt(long changedAt) {
+    public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
 }

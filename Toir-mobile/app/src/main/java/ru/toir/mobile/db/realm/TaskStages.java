@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.realm;
 
+import java.util.Date;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -22,11 +24,11 @@ public class TaskStages extends RealmObject {
     private TaskStageStatus taskStageStatus;
     private String taskStageTemplateUuid;
     private TaskStageTemplate taskStageTemplate;
-    private int startDate;
-    private int endDate;
+    private Date startDate;
+    private Date endDate;
     private int flowOrder;
-    private long createdAt;
-    private long changedAt;
+    private Date createdAt;
+    private Date changedAt;
     private RealmList<Operation> operations;
 
     public long get_id() {
@@ -133,35 +135,35 @@ public class TaskStages extends RealmObject {
         this.flowOrder = flowOrder;
     }
 
-    public int getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(int startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public int getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(int closeDate) {
+    public void setEndDate(Date closeDate) {
         this.endDate = endDate;
     }
 
-    public long getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public long getChangedAt() {
+    public Date getChangedAt() {
         return changedAt;
     }
 
-    public void setChangedAt(long changedAt) {
+    public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
 

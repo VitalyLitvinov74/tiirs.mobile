@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.realm;
 
+import java.util.Date;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -15,17 +17,17 @@ public class Orders extends RealmObject {
     private String title;
     private String authorUuid;
     private String userUuid;
-    private int receiveDate;
-    private int startDate;
-    private long createdAt;
-    private long changedAt;
-    private int openDate;
-    private int closeDate;
+    private Date receiveDate;
+    private Date startDate;
+    private Date createdAt;
+    private Date changedAt;
+    private Date openDate;
+    private Date closeDate;
     private String orderStatusUuid;
     private OrderStatus orderStatus;
     private String orderVerdictUuid;
     private OrderVerdict orderVerdict;
-    private int attemptSendDate;
+    private Date attemptSendDate;
     private int attemptCount;
     private int updated;
     private RealmList<Tasks> tasks;
@@ -70,35 +72,35 @@ public class Orders extends RealmObject {
         this.userUuid = userUuid;
     }
 
-    public int getReceiveDate() {
+    public Date getReceiveDate() {
         return receiveDate;
     }
 
-    public void setReceiveDate(int receiveDate) {
+    public void setReceiveDate(Date receiveDate) {
         this.receiveDate = receiveDate;
     }
 
-    public int getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(int startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public int getOpenDate() {
+    public Date getOpenDate() {
         return openDate;
     }
 
-    public void setOpenDate(int openDate) {
+    public void setOpenDate(Date openDate) {
         this.openDate = openDate;
     }
 
-    public int getCloseDate() {
+    public Date getCloseDate() {
         return closeDate;
     }
 
-    public void setCloseDate(int closeDate) {
+    public void setCloseDate(Date closeDate) {
         this.closeDate = closeDate;
     }
 
@@ -134,11 +136,11 @@ public class Orders extends RealmObject {
         this.orderVerdict = orderVerdict;
     }
 
-    public int getAttemptSendDate() {
+    public Date getAttemptSendDate() {
         return attemptSendDate;
     }
 
-    public void setAttemptSendDate(int attemptSendDate) {
+    public void setAttemptSendDate(Date attemptSendDate) {
         this.attemptSendDate = attemptSendDate;
     }
 
@@ -158,19 +160,19 @@ public class Orders extends RealmObject {
         this.updated = updated;
     }
 
-    public long getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public long getChangedAt() {
+    public Date getChangedAt() {
         return changedAt;
     }
 
-    public void setChangedAt(long changedAt) {
+    public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
 

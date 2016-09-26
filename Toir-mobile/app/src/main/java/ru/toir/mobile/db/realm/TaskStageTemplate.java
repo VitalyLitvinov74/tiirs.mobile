@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.realm;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -19,8 +21,8 @@ public class TaskStageTemplate extends RealmObject {
     private EquipmentModel equipmentModel;
     private String taskStageTypeUuid;
     private TaskStageType taskStageType;
-    private long createdAt;
-    private long changedAt;
+    private Date createdAt;
+    private Date changedAt;
 
 
     public long get_id() {
@@ -103,19 +105,19 @@ public class TaskStageTemplate extends RealmObject {
         this.normative = normative;
     }
 
-    public long getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public long getChangedAt() {
+    public Date getChangedAt() {
         return changedAt;
     }
 
-    public void setChangedAt(long changedAt) {
+    public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
 }

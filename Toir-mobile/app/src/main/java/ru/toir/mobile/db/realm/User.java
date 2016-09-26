@@ -1,5 +1,7 @@
 package ru.toir.mobile.db.realm;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -20,9 +22,9 @@ public class User extends RealmObject {
     private String whoIs;
     private String image;
     private String contact;
-    private long connectionDate;
-    private long createdAt;
-    private long changedAt;
+    private Date connectionDate;
+    private Date createdAt;
+    private Date changedAt;
 
     public long get_id() {
         return _id;
@@ -112,27 +114,27 @@ public class User extends RealmObject {
         this.contact = contact;
     }
 
-    public long getConnectionDate() {
+    public Date getConnectionDate() {
         return connectionDate;
     }
 
-    public void setConnectionDate(long connectionDate) {
+    public void setConnectionDate(Date connectionDate) {
         this.connectionDate = connectionDate;
     }
 
-    public long getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public long getChangedAt() {
+    public Date getChangedAt() {
         return changedAt;
     }
 
-    public void setChangedAt(long changedAt) {
+    public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
 }
