@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.OperationPatternStep;
+import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
 import ru.toir.mobile.serverapi.DocumentationTypeSrv;
@@ -1215,8 +1217,12 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<CriticalType> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<CriticalType>>() {
-            }.getType());
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<CriticalType> list = gson.fromJson(jsonString,
+                    new TypeToken<ArrayList<CriticalType>>() {
+                    }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(list);

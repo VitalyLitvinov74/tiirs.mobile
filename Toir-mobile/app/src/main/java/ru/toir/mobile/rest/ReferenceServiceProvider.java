@@ -14,51 +14,8 @@ public class ReferenceServiceProvider implements IServiceProvider {
 
 	private final Context mContext;
 
-	public static class Methods {
-		public static final int GET_OPERATION_RESULT = 1;
-		public static final int GET_OPERATION_PATTERN = 2;
-		public static final int GET_DOCUMENTATION_TYPE = 3;
-		public static final int GET_EQUIPMENT_STATUS = 4;
-		public static final int GET_EQUIPMENT_TYPE = 5;
-		public static final int GET_MEASURE_TYPE = 6;
-		public static final int GET_OPERATION_STATUS = 7;
-		public static final int GET_OPERATION_TYPE = 8;
-		public static final int GET_TASK_STATUS = 9;
-		public static final int GET_EQUIPMENT = 10;
-		public static final int GET_CRITICAL_TYPE = 11;
-		public static final int GET_DOCUMENTATION = 12;
-		public static final int GET_ALL = 13;
-		public static final int GET_DOCUMENTATION_FILE = 14;
-
-		public static final String GET_OPERATION_PATTERN_PARAMETER_UUID = "operationUuid";
-		public static final String GET_DOCUMENTATION_PARAMETER_UUID = "documentationUuid";
-		public static final String GET_OPERATION_RESULT_PARAMETER_UUID = "operationResultUuid";
-		public static final String GET_EQUIPMENT_PARAMETER_UUID = "equipmentUuid";
-		public static final String GET_DOCUMENTATION_FILE_PARAMETER_UUID = "documentationFileUuid";
-		public static final String GET_IMAGE_FILE_PARAMETER_UUID = "imageFileUuid";
-		
-		public static final String RESULT_GET_DOCUMENTATION_FILE_UUID = "loadedUuid";
-	}
-
-	public static class Actions {
-		public static final String ACTION_GET_ALL = "action_get_all";
-		public static final String ACTION_GET_OPERATION_RESULT = "action_get_operation_result";
-		public static final String ACTION_GET_OPERATION_PATTERN = "action_get_operation_pattern";
-		public static final String ACTION_GET_DOCUMENT_TYPE = "action_get_document_type";
-		public static final String ACTION_GET_EQUIPMENT_STATUS = "action_get_equipment_status";
-		public static final String ACTION_GET_EQUIPMENT_TYPE = "action_get_equipment_type";
-		public static final String ACTION_GET_MEASURE_TYPE = "action_get_measure_type";
-		public static final String ACTION_GET_OPERATION_STATUS = "action_get_operation_status";
-		public static final String ACTION_GET_OPERATION_TYPE = "action_get_operation_type";
-		public static final String ACTION_GET_TASK_STATUS = "action_get_task_status";
-		public static final String ACTION_GET_EQUIPMENT = "action_get_equipment";
-		public static final String ACTION_GET_CRITICAL_TYPE = "action_get_critical_type";
-		public static final String ACTION_GET_DOCUMENTATION = "action_get_documentation";
-		public static final String ACTION_GET_DOCUMENTATION_FILE = "action_get_documentation_file";
-	}
-
 	/**
-	 * 
+	 *
 	 */
 	public ReferenceServiceProvider(Context context) {
 		mContext = context;
@@ -66,7 +23,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see ru.toir.mobile.rest.IServiceProvider#RunTask(int, android.os.Bundle)
 	 */
 	@Override
@@ -111,7 +68,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getOperationResult(Bundle extras) {
 		try {
@@ -126,7 +83,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getOperationPattern(Bundle extras) {
 		try {
@@ -141,7 +98,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getDocumentType(Bundle extras) {
 		try {
@@ -156,7 +113,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getEquipmentStatus(Bundle extras) {
 		try {
@@ -171,7 +128,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getEquipmentType(Bundle extras) {
 		try {
@@ -186,7 +143,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getMeasureType(Bundle extras) {
 		try {
@@ -201,7 +158,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getOperationStatus(Bundle extras) {
 		try {
@@ -216,7 +173,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getOperationType(Bundle extras) {
 		try {
@@ -231,7 +188,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getTaskStatus(Bundle extras) {
 		try {
@@ -246,7 +203,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getEquipment(Bundle extras) {
 		try {
@@ -261,7 +218,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getCriticalType(Bundle extras) {
 		try {
@@ -276,7 +233,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getDocumentation(Bundle extras) {
 		try {
@@ -291,7 +248,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getAll(Bundle extras) {
 		try {
@@ -306,7 +263,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private Bundle getDocumentationFile(Bundle extras) {
 		try {
@@ -318,6 +275,49 @@ public class ReferenceServiceProvider implements IServiceProvider {
 			result.putString(MESSAGE, e.getMessage());
 			return result;
 		}
+	}
+
+	public static class Methods {
+		public static final int GET_OPERATION_RESULT = 1;
+		public static final int GET_OPERATION_PATTERN = 2;
+		public static final int GET_DOCUMENTATION_TYPE = 3;
+		public static final int GET_EQUIPMENT_STATUS = 4;
+		public static final int GET_EQUIPMENT_TYPE = 5;
+		public static final int GET_MEASURE_TYPE = 6;
+		public static final int GET_OPERATION_STATUS = 7;
+		public static final int GET_OPERATION_TYPE = 8;
+		public static final int GET_TASK_STATUS = 9;
+		public static final int GET_EQUIPMENT = 10;
+		public static final int GET_CRITICAL_TYPE = 11;
+		public static final int GET_DOCUMENTATION = 12;
+		public static final int GET_ALL = 13;
+		public static final int GET_DOCUMENTATION_FILE = 14;
+
+		public static final String GET_OPERATION_PATTERN_PARAMETER_UUID = "operationUuid";
+		public static final String GET_DOCUMENTATION_PARAMETER_UUID = "documentationUuid";
+		public static final String GET_OPERATION_RESULT_PARAMETER_UUID = "operationResultUuid";
+		public static final String GET_EQUIPMENT_PARAMETER_UUID = "equipmentUuid";
+		public static final String GET_DOCUMENTATION_FILE_PARAMETER_UUID = "documentationFileUuid";
+		public static final String GET_IMAGE_FILE_PARAMETER_UUID = "imageFileUuid";
+
+		public static final String RESULT_GET_DOCUMENTATION_FILE_UUID = "loadedUuid";
+	}
+
+	public static class Actions {
+		public static final String ACTION_GET_ALL = "action_get_all";
+		public static final String ACTION_GET_OPERATION_RESULT = "action_get_operation_result";
+		public static final String ACTION_GET_OPERATION_PATTERN = "action_get_operation_pattern";
+		public static final String ACTION_GET_DOCUMENT_TYPE = "action_get_document_type";
+		public static final String ACTION_GET_EQUIPMENT_STATUS = "action_get_equipment_status";
+		public static final String ACTION_GET_EQUIPMENT_TYPE = "action_get_equipment_type";
+		public static final String ACTION_GET_MEASURE_TYPE = "action_get_measure_type";
+		public static final String ACTION_GET_OPERATION_STATUS = "action_get_operation_status";
+		public static final String ACTION_GET_OPERATION_TYPE = "action_get_operation_type";
+		public static final String ACTION_GET_TASK_STATUS = "action_get_task_status";
+		public static final String ACTION_GET_EQUIPMENT = "action_get_equipment";
+		public static final String ACTION_GET_CRITICAL_TYPE = "action_get_critical_type";
+		public static final String ACTION_GET_DOCUMENTATION = "action_get_documentation";
+		public static final String ACTION_GET_DOCUMENTATION_FILE = "action_get_documentation_file";
 	}
 
 }
