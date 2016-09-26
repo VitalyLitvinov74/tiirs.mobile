@@ -805,6 +805,10 @@ public class MainActivity extends AppCompatActivity {
     public void ShowSettings() {
         TextView settings;
         settings = (TextView) findViewById(R.id.login_current_settings);
+        if (settings == null) {
+            return;
+        }
+
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         String updateUrl = sp.getString(getString(R.string.updateUrl), "");
@@ -817,5 +821,11 @@ public class MainActivity extends AppCompatActivity {
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
         settings.setText("Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ShowSettings();
     }
 }
