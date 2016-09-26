@@ -12,6 +12,9 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -21,7 +24,6 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationVerdict;
-import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author olejek
@@ -29,14 +31,6 @@ import ru.toir.mobile.utils.DataUtils;
  */
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     public static final String TABLE_NAME = "Operation";
-
-    private static class ViewHolder{
-        TextView title;
-        TextView status;
-        TextView verdict;
-        TextView startdate;
-        ImageView icon;
-    }
 
     public OperationAdapter(@NonNull Context context, int resId, RealmResults<Operation> data) {
         super(context, data);
@@ -82,8 +76,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             Operation operation = adapterData.get(position);
             OperationTemplate operationTemplate = realmDB.where(OperationTemplate.class).equalTo("operationTemplateUuid",operation.getOperationTemplateUuid()).findFirst();
             viewHolder.title.setText(operationTemplate.getTitle());
-            long lDate = operation.getStartDate();
-            String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
+            Date lDate = operation.getStartDate();
+            String sDate = new SimpleDateFormat("dd.MM.YYYY HH:ss", Locale.US).format(lDate);
             viewHolder.startdate.setText(sDate);
             operationVerdict = realmDB.where(OperationVerdict.class).equalTo("operationVerdictUuid",operation.getOperationVerdictUuid()).findFirst();
             viewHolder.verdict.setText(operationVerdict.getTitle());
@@ -112,5 +106,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             }
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView title;
+        TextView status;
+        TextView verdict;
+        TextView startdate;
+        ImageView icon;
     }
 }

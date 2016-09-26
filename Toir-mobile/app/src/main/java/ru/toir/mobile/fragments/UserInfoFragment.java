@@ -21,10 +21,12 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -36,7 +38,6 @@ import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.GpsTrack;
-import ru.toir.mobile.utils.DataUtils;
 
 public class UserInfoFragment extends Fragment {
     private Realm realmDB;
@@ -204,9 +205,8 @@ public class UserInfoFragment extends Fragment {
 				element.put(
 						"name",
 						"["
-								+ DataUtils.getDate(item.getReceiveDate(),
-										"dd-MM-yyyy HH:mm")
-								+ "] Статус: "
+                                + new SimpleDateFormat("dd.MM.YYYY HH:ss", Locale.US).format(item.getReceiveDate())
+                                + "] Статус: "
 								+ orderStatusTitle);
 				// default
 				element.put("img", Integer.toString(R.drawable.checkmark_32));

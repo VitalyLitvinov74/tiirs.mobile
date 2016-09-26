@@ -12,6 +12,8 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -21,7 +23,6 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.TaskStageStatus;
 import ru.toir.mobile.db.realm.TaskStageTemplate;
 import ru.toir.mobile.db.realm.TaskStages;
-import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author olejek
@@ -29,23 +30,6 @@ import ru.toir.mobile.utils.DataUtils;
  */
 public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements ListAdapter {
     public static final String TABLE_NAME = "TaskStages";
-
-    private static class ViewHolder{
-        TextView equipment;
-        TextView title;
-        TextView taskTitle;
-        TextView description;
-        TextView normative;
-        TextView comment;
-        TextView taskStageType;
-        TextView taskStageStatus;
-        TextView taskStageVerdict;
-        TextView status;
-        ImageView icon;
-        ImageView image;
-        TextView start_date;
-        TextView end_date;
-    }
 
     public TaskStageAdapter(@NonNull Context context, int resId, RealmResults<TaskStages> data) {
         super(context, data);
@@ -108,8 +92,8 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             TaskStages taskStage = adapterData.get(position);
             viewHolder.title.setText(getTaskStageTitle(taskStage.getTaskStageTemplateUuid()));
             viewHolder.status.setText(getTaskStageStatusTitle(taskStage.getTaskStageStatusUuid()));
-            viewHolder.start_date.setText(DataUtils.getDate(taskStage.getStartDate(), "dd.MM.yyyy HH:ss"));
-            viewHolder.end_date.setText(DataUtils.getDate(taskStage.getEndDate(), "dd.MM.yyyy HH:ss"));
+            viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getStartDate()));
+            viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getEndDate()));
 
             taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStage.getTaskStageStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -134,5 +118,22 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             }
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView equipment;
+        TextView title;
+        TextView taskTitle;
+        TextView description;
+        TextView normative;
+        TextView comment;
+        TextView taskStageType;
+        TextView taskStageStatus;
+        TextView taskStageVerdict;
+        TextView status;
+        ImageView icon;
+        ImageView image;
+        TextView start_date;
+        TextView end_date;
     }
 }

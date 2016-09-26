@@ -399,7 +399,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<DocumentationType> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<DocumentationType>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<DocumentationType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<DocumentationType>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
@@ -756,7 +759,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<EquipmentStatus> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<EquipmentStatus>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<EquipmentStatus> list = gson.fromJson(jsonString, new TypeToken<ArrayList<EquipmentStatus>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
@@ -819,7 +825,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<EquipmentType> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<EquipmentType>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<EquipmentType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<EquipmentType>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
@@ -882,7 +891,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<MeasureType> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<MeasureType>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<MeasureType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<MeasureType>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
@@ -945,7 +957,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<OperationStatus> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<OperationStatus>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<OperationStatus> list = gson.fromJson(jsonString, new TypeToken<ArrayList<OperationStatus>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
@@ -1008,7 +1023,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<OperationType> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<OperationType>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<OperationType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<OperationType>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
@@ -1081,7 +1099,10 @@ public class ReferenceProcessor {
 
         jsonString = getReferenceData(url.toString());
         if (jsonString != null) {
-            List<TaskStatus> list = new Gson().fromJson(jsonString, new TypeToken<ArrayList<TaskStatus>>() {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                    .create();
+            List<TaskStatus> list = gson.fromJson(jsonString, new TypeToken<ArrayList<TaskStatus>>() {
             }.getType());
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();

@@ -12,6 +12,9 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -19,7 +22,6 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
-import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author olejek
@@ -27,13 +29,6 @@ import ru.toir.mobile.utils.DataUtils;
  */
 public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
-
-    private static class ViewHolder{
-        TextView created;
-        TextView title;
-        TextView status;
-        ImageView icon;
-    }
 
     public OrderAdapter(@NonNull Context context, int resId, RealmResults<Orders> data) {
         super(context, data);
@@ -77,8 +72,8 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         if (adapterData!=null) {
             Orders order = adapterData.get(position);
             viewHolder.title.setText(order.getTitle());
-            long lDate = order.getReceiveDate();
-            String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
+            Date lDate = order.getReceiveDate();
+            String sDate = new SimpleDateFormat("dd.MM.YYYY", Locale.US).format(lDate);
             viewHolder.created.setText(sDate);
 
             orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",order.getOrderStatusUuid()).findFirst();
@@ -105,5 +100,12 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
             }
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView created;
+        TextView title;
+        TextView status;
+        ImageView icon;
     }
 }

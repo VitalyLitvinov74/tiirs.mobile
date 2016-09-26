@@ -1,5 +1,7 @@
 package ru.toir.mobile.utils;
 
+import java.util.Date;
+
 import io.realm.Realm;
 import ru.toir.mobile.db.realm.AlertType;
 import ru.toir.mobile.db.realm.CriticalType;
@@ -30,13 +32,11 @@ import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 
 public class LoadTestData {
-    static User profile;
-
     public static Equipment equipment;
     public static Equipment equipment2;
     public static EquipmentType equipmentType;
     public static EquipmentType equipmentType2;
-
+    static User profile;
     static EquipmentStatus equipmentStatus;
     static EquipmentStatus equipmentStatus2;
 
@@ -317,7 +317,7 @@ public class LoadTestData {
             equipment.setLocation("55.34453,45.234234");
             equipment.setLatitude(55);
             equipment.setLongitude(55);
-            equipment.setStartDate(123123122);
+            equipment.setStartDate(new Date());
             equipment.setEquipmentModel(equipmentModel);
             equipment.setCriticalType(criticalType);
             equipment.setEquipmentStatus(equipmentStatus);
@@ -341,7 +341,7 @@ public class LoadTestData {
             equipment2.setLocation("55.34453,45.234234");
             equipment2.setLatitude(55);
             equipment2.setLongitude(55);
-            equipment2.setStartDate(123123122);
+            equipment2.setStartDate(new Date());
             equipment2.setEquipmentModel(equipmentModel2);
             equipment2.setCriticalType(criticalType);
             equipment2.setEquipmentStatus(equipmentStatus);
@@ -519,9 +519,9 @@ public class LoadTestData {
             operation.setUuid(operationUuid);
             operation.setOperationStatus(operationStatus);
             operation.setOperationStatusUuid(operationStatusUuid);
-            operation.setEndDate(121212121);
+            operation.setEndDate(new Date());
             operation.setFlowOrder(1);
-            operation.setStartDate(12122122);
+            operation.setStartDate(new Date());
             operation.setOperationVerdict(operationVerdict);
             operation.setOperationVerdictUuid(operationVerdictUuid);
             operation.setOperationTemplate(operationTemplate);
@@ -537,9 +537,9 @@ public class LoadTestData {
             operation2.setUuid(operationUuid2);
             operation2.setOperationStatus(operationStatus);
             operation2.setOperationStatusUuid(operationStatusUuid);
-            operation2.setEndDate(121212123);
+            operation2.setEndDate(new Date());
             operation2.setFlowOrder(2);
-            operation2.setStartDate(121221223);
+            operation2.setStartDate(new Date());
             operation2.setOperationVerdict(operationVerdict);
             operation2.setOperationVerdictUuid(operationVerdictUuid);
             operation2.setOperationTemplate(operationTemplate2);
@@ -555,9 +555,9 @@ public class LoadTestData {
             operation3.setUuid(operationUuid3);
             operation3.setOperationStatus(operationStatus);
             operation3.setOperationStatusUuid(operationStatusUuid);
-            operation3.setEndDate(121212127);
+            operation3.setEndDate(new Date());
             operation3.setFlowOrder(3);
-            operation3.setStartDate(121221227);
+            operation3.setStartDate(new Date());
             operation3.setOperationVerdict(operationVerdict);
             operation3.setOperationVerdictUuid(operationVerdictUuid);
             operation3.setOperationTemplate(operationTemplate3);
@@ -664,9 +664,9 @@ public class LoadTestData {
             taskStage.setUuid(taskStageUuid);
             taskStage.setTaskStageStatus(taskStageStatus);
             taskStage.setTaskStageStatusUuid(taskStageStatusUuid);
-            taskStage.setEndDate(121212121);
+            taskStage.setEndDate(new Date());
             taskStage.setFlowOrder(1);
-            taskStage.setStartDate(12122122);
+            taskStage.setStartDate(new Date());
             taskStage.setTaskStageVerdict(taskStageVerdict);
             taskStage.setTaskStageVerdictUuid(taskStageVerdictUuid);
             taskStage.setTaskStageTemplate(taskStageTemplate);
@@ -686,9 +686,9 @@ public class LoadTestData {
             taskStage2.setUuid(taskStageUuid2);
             taskStage2.setTaskStageStatus(taskStageStatus);
             taskStage2.setTaskStageStatusUuid(taskStageStatusUuid);
-            taskStage2.setEndDate(121212123);
+            taskStage2.setEndDate(new Date());
             taskStage2.setFlowOrder(2);
-            taskStage2.setStartDate(121221223);
+            taskStage2.setStartDate(new Date());
             taskStage2.setTaskStageVerdict(taskStageVerdict);
             taskStage2.setTaskStageVerdictUuid(taskStageVerdictUuid);
             taskStage2.setTaskStageTemplate(taskStageTemplate2);
@@ -786,8 +786,8 @@ public class LoadTestData {
             task.setUuid(taskUuid);
             task.setTaskStatus(taskStatus);
             task.setTaskStatusUuid(taskStatusUuid);
-            task.setEndDate(121212121);
-            task.setStartDate(12122122);
+            task.setEndDate(new Date());
+            task.setStartDate(new Date());
             task.setTaskVerdict(taskVerdict);
             task.setTaskVerdictUuid(taskVerdictUuid);
             task.setTaskTemplate(taskTemplate);
@@ -811,8 +811,8 @@ public class LoadTestData {
             task2.setUuid(taskUuid2);
             task2.setTaskStatus(taskStatus);
             task2.setTaskStatusUuid(taskStatusUuid);
-            task2.setEndDate(121212121);
-            task2.setStartDate(12122122);
+            task2.setEndDate(new Date());
+            task2.setStartDate(new Date());
             task2.setTaskVerdict(taskVerdict);
             task2.setTaskVerdictUuid(taskVerdictUuid);
             task2.setTaskTemplate(taskTemplate2);
@@ -834,10 +834,10 @@ public class LoadTestData {
             order.set_id(1);
             order.setUuid(orderUuid);
             order.setAttemptCount(0);
-            order.setAttemptSendDate(1212122211);
+            order.setAttemptSendDate(new Date());
             order.setAuthorUuid(userTestUuid);
-            order.setCloseDate(1212122111);
-            order.setOpenDate(1212122011);
+            order.setCloseDate(new Date());
+            order.setOpenDate(new Date());
             order.setOrderStatusUuid(orderStatusUuid);
             order.setOrderStatus(orderStatus);
             order.setOrderVerdictUuid(orderVerdictUuid);
