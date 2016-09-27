@@ -15,6 +15,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import java.io.IOException;
@@ -115,26 +116,16 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		}
 
 		// строим список драйверов с именами и классами
-		Class<?> driverClass;
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
-		for (String classPath : driverClassList) {
-			try {
-				// пытаемся получить класс драйвера
-				driverClass = Class.forName(classPath);
-				// пытаемся получить свойство DRIVER_NAME
-				//String name = (String) (driverClass
-				//		.getDeclaredField("DRIVER_NAME").get(new String()));
-                String name = (String) (driverClass
-                		.getDeclaredField("DRIVER_NAME").get(""));
-				if (name != null && !name.equals("")) {
-					drvNames.add(name);
-					drvKeys.add(classPath);
-				}
-			} catch (Exception e) {
-				Log.e(TAG, e.toString());
-			}
-		}
+        String name;
+        for (String classPath : driverClassList) {
+            name = RfidDriverBase.getDriverName(classPath);
+            if (name != null) {
+                drvNames.add(name);
+                drvKeys.add(classPath);
+            }
+        }
 
 		// категория с экраном настроек драйвера
 		drvSettingCategory = (PreferenceCategory) findPreference("drvSettingsCategory");
@@ -214,4 +205,14 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 			return null;
 		}
 	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            getActivity().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

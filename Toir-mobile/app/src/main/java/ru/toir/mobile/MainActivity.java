@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -805,26 +806,27 @@ public class MainActivity extends AppCompatActivity {
     public void ShowSettings() {
         TextView settings;
         settings = (TextView) findViewById(R.id.login_current_settings);
+        if (settings == null) {
+            return;
+        }
+
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         String updateUrl = sp.getString(getString(R.string.updateUrl), "");
         String serverUrl = sp.getString(getString(R.string.serverUrl), "");
         String classPath = sp.getString(getString(R.string.rfidDriverListPrefKey), "");
-        String driverName;
-        try {
-            Class<?> driverClass;
-            driverClass = Class.forName(classPath);
-            driverName = (String) (driverClass
-                    .getDeclaredField("DRIVER_NAME").get(""));
-            if (driverName == null) {
-                driverName = "не выбран";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            driverName = "ошибка";
+        String driverName = RfidDriverBase.getDriverName(classPath);
+        if (driverName == null) {
+            driverName = "драйвер не выбран";
         }
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
         settings.setText("Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ShowSettings();
     }
 }
