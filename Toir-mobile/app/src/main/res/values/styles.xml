@@ -22,7 +22,7 @@
     </style>
 
     <style name="CustomTheme" parent="MaterialDrawerTheme.TranslucentStatus">
-        <!-- ...and here we setting appcompat’s color theme attrs -->
+        <!-- ...and here we setting appcompatï¿½s color theme attrs -->
         <item name="colorPrimary">#F1433C</item>
         <item name="colorPrimaryDark">#D03033</item>
         <item name="colorAccent">#02A8F3</item>

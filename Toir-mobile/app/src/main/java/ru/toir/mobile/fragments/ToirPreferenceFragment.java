@@ -15,6 +15,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import java.io.IOException;
@@ -115,7 +116,6 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		}
 
 		// строим список драйверов с именами и классами
-		Class<?> driverClass;
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
         String name;
@@ -205,4 +205,14 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 			return null;
 		}
 	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            getActivity().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
