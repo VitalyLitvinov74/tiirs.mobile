@@ -312,7 +312,7 @@ public class LoadTestData {
         public void execute(Realm realm) {
             equipmentModel = realmDB.createObject(EquipmentModel.class);
             equipmentModel.set_id(1);
-            equipmentModel.setEquipmentTypeUuid(equipmentTypeUuid);
+            equipmentModel.setEquipmentTypeUuid(equipmentModelUuid);
             equipmentModel.setEquipmentType(equipmentType);
             equipmentModel.setUuid(equipmentModelUuid);
             equipmentModel.setTitle("Тепловей 250А");
@@ -324,7 +324,7 @@ public class LoadTestData {
         public void execute(Realm realm) {
             equipmentModel2 = realmDB.createObject(EquipmentModel.class);
             equipmentModel2.set_id(2);
-            equipmentModel2.setEquipmentTypeUuid(equipmentTypeUuid2);
+            equipmentModel2.setEquipmentTypeUuid(equipmentModelUuid2);
             equipmentModel2.setEquipmentType(equipmentType2);
             equipmentModel2.setUuid(equipmentModelUuid2);
             equipmentModel2.setTitle("Unical-8800");
@@ -387,6 +387,7 @@ public class LoadTestData {
             documentation = realmDB.createObject(Documentation.class);
             documentation.set_id(1);
             documentation.setDocumentationTypeUuid(documentationTypeUuid);
+            documentation.setDocumentationType(documentationType);
             documentation.setEquipmentUuid(equipmentUuid);
             documentation.setUuid(documentationUuid);
             documentation.setTitle("Паспорт на Тепловей-250/251");
@@ -399,6 +400,7 @@ public class LoadTestData {
             documentation2 = realmDB.createObject(Documentation.class);
             documentation2.set_id(2);
             documentation2.setDocumentationTypeUuid(documentationTypeUuid2);
+            documentation2.setDocumentationType(documentationType2);
             documentation2.setEquipmentUuid(equipmentUuid2);
             documentation2.setUuid(documentationUuid2);
             documentation2.setTitle("Руководство на котел GTV-40");

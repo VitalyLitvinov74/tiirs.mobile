@@ -89,16 +89,16 @@
         android:id="@+id/eril_status_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/eril_last_operation_date_label"
+        android:layout_below="@+id/eril_critical_label"
         android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/eril_critical"
+        android:layout_toRightOf="@+id/eril_image"
         android:text="Статус:" />
 
     <TextView
         android:id="@+id/eril_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/eril_last_operation_date_label"
+        android:layout_below="@+id/eril_critical_label"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eril_status_label"
         android:text="Новое" />

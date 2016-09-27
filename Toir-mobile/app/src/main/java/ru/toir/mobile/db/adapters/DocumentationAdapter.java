@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -26,9 +25,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
 
     @Override
     public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Documentation> rows = realm.where(Documentation.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override
@@ -65,7 +62,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         Documentation Documentation;
         if (adapterData != null) {
             Documentation = adapterData.get(position);
-            if (Documentation!=null) {
+            if (Documentation != null) {
                 viewHolder.title.setText(Documentation.getTitle());
                 viewHolder.information.setText(Documentation.getUuid());
             }

@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -35,9 +34,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
     @Override
     public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Orders> rows = realm.where(Orders.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override
@@ -78,8 +75,13 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
             Orders order = adapterData.get(position);
             viewHolder.title.setText(order.getTitle());
             Date lDate = order.getReceiveDate();
-            String sDate = new SimpleDateFormat("dd.MM.YYYY", Locale.US).format(lDate);
-            viewHolder.created.setText(sDate);
+            if (lDate != null) {
+                String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
+                viewHolder.created.setText(sDate);
+            }
+            else {
+                viewHolder.created.setText("неизвестно");
+            }
             viewHolder.status.setText(order.getOrderStatus().getTitle());
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"

@@ -33,9 +33,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
     @Override
     public int getCount() {
-        Realm realmDB = Realm.getDefaultInstance();
-        RealmResults<Tasks> rows = realmDB.where(Tasks.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override

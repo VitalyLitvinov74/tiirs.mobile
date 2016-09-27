@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
@@ -29,6 +31,8 @@ public class DocumentationFragment extends Fragment {
 	private Spinner sortSpinner;
 	private Spinner typeSpinner;
 	private ListView documentationListView;
+
+    private DocumentationAdapter documentationAdapter;
 
 	private ArrayAdapter<SortField> sortSpinnerAdapter;
 
@@ -99,27 +103,17 @@ public class DocumentationFragment extends Fragment {
 		RealmResults<Documentation> documentation;
 		if (documentationTypeUuid != null) {
 			if (sort != null)
-				documentation = realmDB.where(Documentation.class).equalTo("uuid", documentationTypeUuid).findAllSorted(sort);
+				documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAllSorted(sort);
 			else
-				documentation = realmDB.where(Documentation.class).equalTo("uuid", documentationTypeUuid).findAll();
-                //documentation = realmDB.where(Documentation.class).findAll();
+				documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAll();
 		} else {
 			if (sort != null)
 				documentation = realmDB.where(Documentation.class).findAllSorted(sort);
 			else
 				documentation = realmDB.where(Documentation.class).findAll();
 		}
-        if (documentation.size()>0) {
-            DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
-            documentationListView.setAdapter(documentationAdapter);
-        }
-        else {
-            //DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
-            //documentationListView.setAdapter(documentationAdapter);
-            DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), null);
-            documentationListView.setAdapter(documentationAdapter);
-
-        }
+        documentationAdapter = new DocumentationAdapter(getContext(), documentation);
+        documentationListView.setAdapter(documentationAdapter);
 	}
 
 	@Override
@@ -138,16 +132,16 @@ public class DocumentationFragment extends Fragment {
 		public void onItemClick(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
             // TODO разобраться как вернуть объект при клике
-            //Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
+            Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
             //documentation = (Documentation)parentView.getSelectedItem();
-			//String documentation_uuid = documentation.getUuid();
+			String documentation_uuid = documentation.getUuid();
             // TODO добавить вывод документации на экран
-			/*Intent documentationInfo = new Intent(getActivity(),
+			Intent documentationInfo = new Intent(getActivity(),
 					EquipmentInfoActivity.class);
 			Bundle bundle = new Bundle();
-			bundle.putString("equipment_uuid", equipment_uuid);
-			equipmentInfo.putExtras(bundle);
-			getActivity().startActivity(equipmentInfo);*/
+			bundle.putString("equipment_uuid", documentation_uuid);
+			documentationInfo.putExtras(bundle);
+			getActivity().startActivity(documentationInfo);
 		}
 	}
 
@@ -167,6 +161,8 @@ public class DocumentationFragment extends Fragment {
 					.getSelectedItem();
 			if (typeSelected != null) {
 				type = typeSelected.getUuid();
+                // временно неопределенный тип
+                if (typeSelected.get_id() == 1) type = null;
 			}
 
 			SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();

@@ -10,7 +10,6 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -30,9 +29,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
     @Override
     public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Equipment> rows = realm.where(Equipment.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override
@@ -74,14 +71,16 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         Equipment equipment;
         if (adapterData != null) {
             equipment = adapterData.get(position);
-            viewHolder.title.setText(equipment.getTitle());
-            viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
-            viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
-            //viewHolder.location.setText(equipment.getLocation());
-            viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatus().getTitle());
-            viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
-            String sDate = new SimpleDateFormat("dd.MM.YYYY HH:ss", Locale.US).format(equipment.getStartDate());
-            viewHolder.startDate.setText(sDate);
+            if (equipment != null) {
+                viewHolder.title.setText(equipment.getTitle());
+                viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
+                viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
+                //viewHolder.location.setText(equipment.getLocation());
+                viewHolder.equipmentStatusUuid.setText(equipment.getEquipmentStatus().getTitle());
+                viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
+                String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(equipment.getStartDate());
+                viewHolder.startDate.setText(sDate);
+            }
         }
         return convertView;
     }

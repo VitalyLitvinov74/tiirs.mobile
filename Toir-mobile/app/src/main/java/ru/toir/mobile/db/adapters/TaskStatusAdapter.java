@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -26,9 +25,7 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
 
     @Override
     public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<TaskStatus> rows = realm.where(TaskStatus.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override
@@ -66,8 +63,10 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
             TaskStatus taskStatus;
             if (adapterData != null) {
                 taskStatus = adapterData.get(position);
-                viewHolder.title.setText(taskStatus.getTitle());
-                viewHolder.uuid.setText(taskStatus.getUuid());
+                if (taskStatus != null) {
+                    viewHolder.title.setText(taskStatus.getTitle());
+                    viewHolder.uuid.setText(taskStatus.getUuid());
+                }
             }
             //TODO сопоставление изображений
             //viewHolder.icon.setImageResource(R.drawable.img_3);

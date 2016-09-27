@@ -118,7 +118,6 @@ public class EquipmentsFragment extends Fragment {
 	private void initView() {
 
 		FillListViewEquipments(null, null);
-        //fillTypeSpinner();
         fillSortFieldSpinner();
     }
 
@@ -205,13 +204,14 @@ public class EquipmentsFragment extends Fragment {
             EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
             if (typeSelected != null) {
                 type = typeSelected.getUuid();
+                if (typeSelected.get_id() == 1) type = null;
             }
 
             SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
             if (fieldSelected != null) {
                 orderBy = fieldSelected.getField();
             }
-            //FillListViewEquipments(type, orderBy);
+            FillListViewEquipments(type, orderBy);
         }
     }
 }
