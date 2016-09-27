@@ -24,8 +24,6 @@ import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
 
-//import ru.toir.mobile.db.tables.EquipmentType;
-
 public class EquipmentsFragment extends Fragment {
     private Realm realmDB;
 	private boolean isInit;

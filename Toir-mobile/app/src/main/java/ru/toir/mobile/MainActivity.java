@@ -551,8 +551,8 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 new AlertDialog.Builder(view.getContext())
-                                        .setTitle("Информация о программе")
-                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setTitle("О программе")
+                                        .setMessage("ToiR Mobile v2.0.3\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                             }

@@ -65,8 +65,10 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         Documentation Documentation;
         if (adapterData != null) {
             Documentation = adapterData.get(position);
-            viewHolder.title.setText(Documentation.getTitle());
-            viewHolder.information.setText(Documentation.getUuid());
+            if (Documentation!=null) {
+                viewHolder.title.setText(Documentation.getTitle());
+                viewHolder.information.setText(Documentation.getUuid());
+            }
             //TODO добавить запрос на расшифровку типа документации и на название оборудования
             //viewHolder.information.setText(DocumentationType.get Documentation.getDocumentationTypeUuid());
         }

@@ -83,7 +83,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
                 documentationType = adapterData.get(position);
                 textView.setText(documentationType.getTitle());
                 textView.setPadding(10, 20, 10, 20);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                 textView.setTextColor(Color.WHITE);
             }
             return textView;
