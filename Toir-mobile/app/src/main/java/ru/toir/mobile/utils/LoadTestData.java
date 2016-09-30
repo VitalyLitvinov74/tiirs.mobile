@@ -202,6 +202,7 @@ public class LoadTestData {
             profile.setTagId("01234567");
             profile.setWhoIs("бугорчик");
             profile.setActive(true);
+            profile.setContact("+79227000285 Иван");
             profile.setImage("");
         }
     });
@@ -391,6 +392,7 @@ public class LoadTestData {
             documentation.setEquipmentUuid(equipmentUuid);
             documentation.setUuid(documentationUuid);
             documentation.setTitle("Паспорт на Тепловей-250/251");
+            documentation.setFileName("1.pdf");
         }
     });
 
@@ -404,6 +406,7 @@ public class LoadTestData {
             documentation2.setEquipmentUuid(equipmentUuid2);
             documentation2.setUuid(documentationUuid2);
             documentation2.setTitle("Руководство на котел GTV-40");
+            documentation2.setFileName("2.pdf");
         }
     });
 

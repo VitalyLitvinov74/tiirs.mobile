@@ -78,7 +78,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             //viewHolder.status.setText(task.getTaskStatus().getTitle());
             viewHolder.equipment.setText(task.getEquipment().getTitle());
 
-            taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid",task.getTaskStatusUuid()).findFirst();
+            taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid", task.getTaskStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
                     + File.separator + "data"
@@ -90,8 +90,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
                         .getAbsolutePath());
                 viewHolder.icon.setImageBitmap(mBitmap);
-            }
-            else {
+            } else {
                 imgFile = new File(pathToImages + "help_32.png");
                 if (imgFile.exists() && imgFile.isFile()) {
                     Bitmap mBitmap = BitmapFactory.decodeFile(imgFile

@@ -172,18 +172,16 @@ public class EquipmentsFragment extends Fragment {
         public void onItemClick(AdapterView<?> parentView,
                                 View selectedItemView, int position, long id) {
             // TODO разобраться как вернуть объект при клике
-            Equipment equipment;// (Equipment)parentView.getItemAtPosition(position);
-            equipment = (Equipment) parentView.getSelectedItem();
-
-            String equipment_uuid = equipment.getUuid();
-
-            Intent equipmentInfo = new Intent(getActivity(),
-                    EquipmentInfoActivity.class);
-
-            Bundle bundle = new Bundle();
-            bundle.putString("equipment_uuid", equipment_uuid);
-            equipmentInfo.putExtras(bundle);
-            getActivity().startActivity(equipmentInfo);
+            Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
+            if (equipment != null) {
+                String equipment_uuid = equipment.getUuid();
+                Intent equipmentInfo = new Intent(getActivity(),
+                        EquipmentInfoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("equipment_uuid", equipment_uuid);
+                equipmentInfo.putExtras(bundle);
+                getActivity().startActivity(equipmentInfo);
+            }
         }
     }
 

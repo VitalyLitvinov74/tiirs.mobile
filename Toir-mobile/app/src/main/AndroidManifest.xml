@@ -18,6 +18,7 @@
     <application
         android:name=".ToirApplication"
         android:allowBackup="true"
+        android:windowSoftInputMode="adjustPan"
         android:icon="@drawable/ic_toir_icon"
         android:label="@string/app_name"
         android:theme="@style/CustomTheme" >

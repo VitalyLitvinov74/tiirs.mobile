@@ -82,8 +82,12 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             TaskStages taskStage = adapterData.get(position);
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
             viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
-            viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getStartDate()));
-            viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getEndDate()));
+            if (taskStage.getStartDate()!=null) {
+                viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getStartDate()));
+            }
+            if (taskStage.getEndDate()!=null) {
+                viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getEndDate()));
+            }
 
             taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStage.getTaskStageStatusUuid()).findFirst();
             pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()

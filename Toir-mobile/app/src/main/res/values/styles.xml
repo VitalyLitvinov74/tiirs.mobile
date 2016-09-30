@@ -42,8 +42,14 @@
 
         <!-- CAB :D -->
         <item name="windowActionModeOverlay">true</item>
+
+	<item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
     </style>
 
+	<style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+	     <item name="android:popupBackground">#444444</item>
+	     <item name="android:textColor">#ffffff</item>
+	</style>                                  
     <!--
     Overwrite the Style of the BezelImageView for the whole MaterialDrawer
     <style name="BezelImageView">

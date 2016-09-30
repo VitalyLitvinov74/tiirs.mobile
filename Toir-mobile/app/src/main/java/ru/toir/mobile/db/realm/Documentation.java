@@ -18,6 +18,7 @@ public class Documentation extends RealmObject {
     private String equipmentUuid;
     private Equipment equipment;
     private String title;
+    private String filename;
     private Date createdAt;
     private Date changedAt;
 
@@ -43,6 +44,14 @@ public class Documentation extends RealmObject {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getFileName() {
+        return filename;
+    }
+
+    public void setFileName(String filename) {
+        this.filename = filename;
     }
 
     public String getDocumentationTypeUuid() {

@@ -1,22 +1,25 @@
 package ru.toir.mobile.fragments;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
@@ -32,9 +35,7 @@ public class DocumentationFragment extends Fragment {
 	private Spinner typeSpinner;
 	private ListView documentationListView;
 
-    private DocumentationAdapter documentationAdapter;
-
-	private ArrayAdapter<SortField> sortSpinnerAdapter;
+    private ArrayAdapter<SortField> sortSpinnerAdapter;
 
     public static DocumentationFragment newInstance() {
 		return new DocumentationFragment();
@@ -112,7 +113,7 @@ public class DocumentationFragment extends Fragment {
 			else
 				documentation = realmDB.where(Documentation.class).findAll();
 		}
-        documentationAdapter = new DocumentationAdapter(getContext(), documentation);
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
         documentationListView.setAdapter(documentationAdapter);
 	}
 
@@ -131,17 +132,29 @@ public class DocumentationFragment extends Fragment {
 		@Override
 		public void onItemClick(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
-            // TODO разобраться как вернуть объект при клике
             Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
-            //documentation = (Documentation)parentView.getSelectedItem();
-			String documentation_uuid = documentation.getUuid();
-            // TODO добавить вывод документации на экран
-			Intent documentationInfo = new Intent(getActivity(),
-					EquipmentInfoActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putString("equipment_uuid", documentation_uuid);
-			documentationInfo.putExtras(bundle);
-			getActivity().startActivity(documentationInfo);
+            MimeTypeMap mt = MimeTypeMap.getSingleton();
+            // TODO добавить путь
+            File file = new File(documentation.getUuid());
+            String[] patternList = file.getName().split("\\.");
+            String extension = patternList[patternList.length - 1];
+
+            if (mt.hasExtension(extension)) {
+                String mimeType = mt.getMimeTypeFromExtension(extension);
+                Intent target = new Intent(Intent.ACTION_VIEW);
+                target.setDataAndType(Uri.fromFile(new File(documentation.getUuid())),
+                        mimeType);
+                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                Intent viewFileIntent = Intent.createChooser(target,
+                        "Open File");
+                try {
+                    startActivity(viewFileIntent);
+                } catch (ActivityNotFoundException e) {
+                    // сообщить пользователю установить подходящее
+                    // приложение
+                }
+            }
 		}
 	}
 

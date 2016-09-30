@@ -39,12 +39,13 @@
                 android:layout_gravity="top|left"
                 android:layout_weight="1"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/service1" />
+                android:src="@drawable/kotel" />
 
             <TableLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="1dp"
+                android:layout_below="@+id/equipment_image"
                 android:background="@color/black" >
 
                 <TableRow
