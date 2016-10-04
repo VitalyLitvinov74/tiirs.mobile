@@ -2,13 +2,17 @@ package ru.toir.mobile.rest;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
@@ -47,9 +51,12 @@ public class ToirAPIFactory {
 
     @NonNull
     private static Retrofit getRetrofit() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                .create();
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(CLIENT)
                 .build();
     }

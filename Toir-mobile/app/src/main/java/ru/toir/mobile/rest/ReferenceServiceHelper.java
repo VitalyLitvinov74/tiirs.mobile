@@ -38,19 +38,17 @@ public class ReferenceServiceHelper extends ServiceHelperBase {
 
 	/**
 	 * Получаем/сохраняем шаблоны выполнения операций
-	 * 
-	 * @param name
-	 *            Список uuid шаблонов которые нужно получить
+	 *
+     * @param uuids
+     *            Список uuid шаблонов которые нужно получить
 	 */
 	public void getOperationPattern(ArrayList<String> uuids) {
 
 		Bundle bundle = new Bundle();
 		bundle.putStringArrayList(
-				ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID,
-				uuids);
-		RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN,
-				bundle);
-	}
+                ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID, uuids);
+        RunMethod(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN, bundle);
+    }
 
 	/**
 	 * Получаем/сохраняем

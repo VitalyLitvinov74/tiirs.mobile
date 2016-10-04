@@ -15,7 +15,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -49,6 +48,10 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
@@ -62,12 +65,13 @@ import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
-import ru.toir.mobile.rest.TokenServiceHelper;
+import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rest.TokenServiceProvider;
 import ru.toir.mobile.rest.UsersServiceHelper;
 import ru.toir.mobile.rest.UsersServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.serverapi.TokenSrv;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PROFILE_ADD = 1;
@@ -114,27 +118,27 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
     private Realm realmDB;
-    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-            //UsersDBAdapter users = new UsersDBAdapter(
-            //        new ToirDatabaseContext(getApplicationContext()));
-            User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-            if (drawerItem.getIdentifier() == 12) {
-                realmDB.beginTransaction();
-                if (isChecked) {
-                    //isActive = true;
-                    user.setActive(true);
-                    //users.replaceItem(user);
-                } else {
-                    //isActive = false;
-                    user.setActive(false);
-                }
-                realmDB.commitTransaction();
-                //users.replaceItem(user);
-            }
-        }
-    };
+    //    private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
+//        @Override
+//        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+//            //UsersDBAdapter users = new UsersDBAdapter(
+//            //        new ToirDatabaseContext(getApplicationContext()));
+//            User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+//            if (drawerItem.getIdentifier() == 12) {
+//                realmDB.beginTransaction();
+//                if (isChecked) {
+//                    //isActive = true;
+//                    user.setActive(true);
+//                    //users.replaceItem(user);
+//                } else {
+//                    //isActive = false;
+//                    user.setActive(false);
+//                }
+//                realmDB.commitTransaction();
+//                //users.replaceItem(user);
+//            }
+//        }
+//    };
     private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
         @Override
         public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
@@ -377,10 +381,75 @@ public class MainActivity extends AppCompatActivity {
                     authorizationDialog.show();
 
                     // запрашиваем токен
-                    TokenServiceHelper tokenServiceHelper = new TokenServiceHelper(
-                            getApplicationContext(),
-                            TokenServiceProvider.Actions.ACTION_GET_TOKEN);
-                    tokenServiceHelper.GetTokenByTag(tagId);
+                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().user(tagId);
+                    call.enqueue(new Callback<TokenSrv>() {
+                        @Override
+                        public void onResponse(Response<TokenSrv> response, Retrofit retrofit) {
+                            TokenSrv token = response.body();
+
+                            AuthorizedUser.getInstance().setToken(token.getAccessToken());
+
+                            Toast.makeText(getApplicationContext(),
+                                    "Токен получен.", Toast.LENGTH_SHORT).show();
+
+                            // запрашиваем актуальную информацию по пользователю
+                            Call<User> call = ToirAPIFactory.getUserService()
+                                    .user("bearer " + token.getAccessToken());
+                            call.enqueue(new Callback<User>() {
+                                @Override
+                                public void onResponse(Response<User> response, Retrofit retrofit) {
+                                    User user = response.body();
+                                    Realm realm = Realm.getDefaultInstance();
+                                    realm.beginTransaction();
+                                    realm.copyToRealmOrUpdate(user);
+                                    realm.commitTransaction();
+                                    isLogged = true;
+                                    AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                    setMainLayout(savedInstance);
+                                    authorizationDialog.dismiss();
+                                }
+
+                                @Override
+                                public void onFailure(Throwable t) {
+                                    // сообщаем описание неудачи
+                                    // TODO нужен какой-то механизм уведомления о причине не успеха
+//                                    String message = bundle.getString(IServiceProvider.MESSAGE);
+                                    String message = "Просто не получили пользователя.";
+                                    Toast.makeText(getApplicationContext(), message,
+                                            Toast.LENGTH_LONG).show();
+                                    authorizationDialog.dismiss();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            // TODO нужен какой-то механизм уведомления о причине не успеха
+//                            String message = bundle.getString(IServiceProvider.MESSAGE);
+                            String message = "Просто не получили токен.";
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG)
+                                    .show();
+                            // TODO реализовать проверку на то что пользователя нет на сервере
+                            // токен не получен, сервер не ответил...
+
+                            // проверяем наличие пользователя в локальной базе
+                            User user = realmDB.where(User.class)
+                                    .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                                    .findFirst();
+
+                            // в зависимости от результата либо дать работать, либо не дать
+                            if (user != null && user.isActive()) {
+                                isLogged = true;
+                                AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                setMainLayout(savedInstance);
+                            } else {
+                                Toast.makeText(getApplicationContext(),
+                                        "Нет доступа.", Toast.LENGTH_LONG).show();
+                            }
+
+                            authorizationDialog.dismiss();
+                        }
+                    });
                 } else {
                     // по кодам из RFID можно показать более подробные сообщения
                     Toast.makeText(getApplicationContext(),
@@ -410,9 +479,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar == null) {
+            return;
+        }
+
         setSupportActionBar(toolbar);
         toolbar.setBackgroundResource(R.drawable.header);
         toolbar.setSubtitle("Обслуживание и ремонт");
+
         //set the back arrow in the toolbar
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar ab = getSupportActionBar();
@@ -511,25 +585,24 @@ public class MainActivity extends AppCompatActivity {
                                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 mProgressDialog.setCancelable(true);
                                 final Downloader downloaderTask = new Downloader(MainActivity.this);
-                                if (downloaderTask != null) {
-                                    SharedPreferences sp = PreferenceManager
-                                            .getDefaultSharedPreferences(getApplicationContext());
-                                    String updateUrl = sp.getString(getString(R.string.updateUrl), "");
 
-                                    if (!updateUrl.equals("")) {
-                                        String path = Environment.getExternalStorageDirectory() + "/Download/";
-                                        File file = new File(path);
-                                        if (file.mkdirs()) {
-                                            File outputFile = new File(path, "Toir-mobile.apk");
+                                SharedPreferences sp = PreferenceManager
+                                        .getDefaultSharedPreferences(getApplicationContext());
+                                String updateUrl = sp.getString(getString(R.string.updateUrl), "");
 
-                                            downloaderTask.execute(updateUrl, outputFile.toString());
-                                            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                                @Override
-                                                public void onCancel(DialogInterface dialog) {
-                                                    downloaderTask.cancel(true);
-                                                }
-                                            });
-                                        }
+                                if (!updateUrl.equals("")) {
+                                    String path = Environment.getExternalStorageDirectory() + "/Download/";
+                                    File file = new File(path);
+                                    if (file.mkdirs()) {
+                                        File outputFile = new File(path, "Toir-mobile.apk");
+
+                                        downloaderTask.execute(updateUrl, outputFile.toString());
+                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                downloaderTask.cancel(true);
+                                            }
+                                        });
                                     }
                                 }
                             } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {
@@ -821,7 +894,8 @@ public class MainActivity extends AppCompatActivity {
         }
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
-        settings.setText("Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName);
+        String message = "Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName;
+        settings.setText(message);
     }
 
     @Override

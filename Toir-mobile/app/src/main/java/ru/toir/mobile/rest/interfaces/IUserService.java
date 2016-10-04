@@ -1,7 +1,5 @@
 package ru.toir.mobile.rest.interfaces;
 
-import java.util.List;
-
 import retrofit.Call;
 import retrofit.http.GET;
 import retrofit.http.Header;
