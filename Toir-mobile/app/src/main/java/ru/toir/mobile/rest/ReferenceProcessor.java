@@ -5,6 +5,7 @@ package ru.toir.mobile.rest;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -20,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.realm.Realm;
+import retrofit.Call;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.ToirApplication;
@@ -62,6 +64,7 @@ import ru.toir.mobile.serverapi.OperationPatternSrv;
 import ru.toir.mobile.serverapi.OperationPatternStepSrv;
 import ru.toir.mobile.serverapi.OperationResultSrv;
 import ru.toir.mobile.serverapi.ReferenceListSrv;
+import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.utils.DataUtils;
 
 import android.content.Context;
@@ -1723,15 +1726,13 @@ public class ReferenceProcessor {
 
         AuthorizedUser au = AuthorizedUser.getInstance();
         if (au.getToken() == null) {
+            Call<TokenSrv> call = ToirAPIFactory.getTokenService().user(au.getTagId());
             try {
-                TokenProcessor tp = new TokenProcessor(mContext);
-                Bundle bundle = new Bundle();
-                bundle.putString(
-                        TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
-                        au.getTagId());
-                Bundle result = tp.getTokenByTag(bundle);
-                return result.getBoolean(IServiceProvider.RESULT);
-            } catch (Exception e) {
+                retrofit.Response<TokenSrv> response = call.execute();
+                TokenSrv token = response.body();
+                au.setToken(token.getAccessToken());
+                return true;
+            } catch (IOException e) {
                 e.printStackTrace();
                 return false;
             }

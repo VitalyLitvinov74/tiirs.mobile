@@ -3,6 +3,7 @@
  */
 package ru.toir.mobile.rest;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import java.util.Set;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import retrofit.Call;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
@@ -44,6 +47,7 @@ import ru.toir.mobile.serializer.TaskSerializer;
 import ru.toir.mobile.serverapi.EquipmentOperationSrv;
 import ru.toir.mobile.serverapi.EquipmentSrv;
 import ru.toir.mobile.serverapi.TaskSrv;
+import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.serverapi.result.EquipmentOperationRes;
 import ru.toir.mobile.serverapi.result.EquipmentOperationResultRes;
 import ru.toir.mobile.serverapi.result.MeasureValueRes;
@@ -62,10 +66,9 @@ import android.util.Log;
  */
 public class TaskProcessor {
 
-	private Context mContext;
-
 	private static final String TASK_GET_URL = "/api/orders/";
 	private static final String TASK_SEND_RESULT_URL = "/api/orders/";
+	private Context mContext;
 	private String mServerUrl;
 
 	private Set<String> patternUuids;
@@ -810,15 +813,13 @@ public class TaskProcessor {
 
 		AuthorizedUser au = AuthorizedUser.getInstance();
 		if (au.getToken() == null) {
+			Call<TokenSrv> call = ToirAPIFactory.getTokenService().user(au.getTagId());
 			try {
-				TokenProcessor tp = new TokenProcessor(mContext);
-				Bundle bundle = new Bundle();
-				bundle.putString(
-						TokenServiceProvider.Methods.GET_TOKEN_PARAMETER_TAG,
-						au.getTagId());
-				Bundle result = tp.getTokenByTag(bundle);
-				return result.getBoolean(IServiceProvider.RESULT);
-			} catch (Exception e) {
+				retrofit.Response<TokenSrv> response = call.execute();
+				TokenSrv token = response.body();
+				au.setToken(token.getAccessToken());
+				return true;
+			} catch (IOException e) {
 				e.printStackTrace();
 				return false;
 			}
