@@ -50,7 +50,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listview, parent, false);
+            convertView = inflater.inflate(R.layout.listview_wb, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.information = (TextView) convertView.findViewById(R.id.lv_secondLine);
             viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);

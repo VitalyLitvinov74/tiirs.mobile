@@ -23,6 +23,7 @@ public class Orders extends RealmObject {
     private Date changedAt;
     private Date openDate;
     private Date closeDate;
+    private OrderLevel orderLevel;
     private String orderStatusUuid;
     private OrderStatus orderStatus;
     private String orderVerdictUuid;
@@ -134,6 +135,14 @@ public class Orders extends RealmObject {
 
     public void setOrderVerdict(OrderVerdict orderVerdict) {
         this.orderVerdict = orderVerdict;
+    }
+
+    public OrderLevel getOrderLevel() {
+        return orderLevel;
+    }
+
+    public void setOrderLevel(OrderLevel orderLevel) {
+        this.orderLevel = orderLevel;
     }
 
     public Date getAttemptSendDate() {

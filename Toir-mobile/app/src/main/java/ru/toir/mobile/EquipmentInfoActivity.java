@@ -13,8 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,7 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,7 +49,6 @@ import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
     private Realm realmDB;
@@ -67,6 +63,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private static final int DRAWER_EXIT = 14;
 
     private TextView tv_equipment_name;
+    private TextView tv_equipment_inventory;
+    private TextView tv_equipment_uuid;
 	private TextView tv_equipment_type;
 	private TextView tv_equipment_position;
 	private TextView tv_equipment_tasks;
@@ -192,20 +190,22 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
 		// tv_equipment_id = (TextView) findViewById(R.id.equipment_text_name);
 		tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
-		tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
-		tv_equipment_position = (TextView) findViewById(R.id.equipment_position);
-		tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
+        tv_equipment_inventory = (TextView) findViewById(R.id.equipment_text_inventory);
+        tv_equipment_uuid = (TextView) findViewById(R.id.equipment_text_uuid);
+		//tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
+		tv_equipment_position = (TextView) findViewById(R.id.equipment_text_location);
+		//tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
 		tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
-		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_tasks);
+		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_status);
 		tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
-		lv = (ListView) findViewById(R.id.equipment_info_operation_list);
-		FillListViewOperations();
+		//lv = (ListView) findViewById(R.id.equipment_info_operation_list);
+		//FillListViewOperations();
 
-        Button read_rfid_button = (Button) findViewById(R.id.button_read);
-        Button write_rfid_button = (Button) findViewById(R.id.button_write);
+        //Button read_rfid_button = (Button) findViewById(R.id.button_read);
+        //Button write_rfid_button = (Button) findViewById(R.id.button_write);
 		// временная кнопка записи в метку пользователей
-        Button write_button = (Button) findViewById(R.id.button_write_user);
-
+        //Button write_button = (Button) findViewById(R.id.button_write_user);
+        /*
 		read_rfid_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -328,7 +328,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 // структуры данных в пользовательскую метку
             }
         });
-
+*/
 		initView();
 	}
 
@@ -386,52 +386,55 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	private void initView() {
         Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
 
-		tv_equipment_name.setText("Название: " + equipment.getTitle());
-		tv_equipment_type.setText("Модель: "
-				+ equipment.getEquipmentModel().getTitle());
-		tv_equipment_position.setText(""
-				+ String.valueOf(equipment.getLatitude()) + " / "
-				+ String.valueOf(equipment.getLongitude()));
-		tv_equipment_task_date.setText(equipment.getStartDate().toString());
+        tv_equipment_name.setText(equipment.getTitle());
+        tv_equipment_inventory.setText("ИД: " + equipment.getInventoryNumber());
+        tv_equipment_uuid.setText(equipment.getUuid());
+		/*
+        tv_equipment_type.setText("Модель: "
+				+ equipment.getEquipmentModel().getTitle()); */
+        tv_equipment_position.setText(""
+                + String.valueOf(equipment.getLatitude()) + " / "
+                + String.valueOf(equipment.getLongitude()));
+
+        tv_equipment_task_date.setText(equipment.getStartDate().toString());
+        /*
 		tv_equipment_critical.setText("Критичность: "
 				+ equipment.getCriticalType().getTitle());
+*/
+        // if (equipmentOperationList != null &&
+        // equipmentOperationList.size()>0)
+        // tv_equipment_task_date.setText("" +
+        // taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
+        // else tv_equipment_task_date.setText("еще не обслуживалось");
 
-		// if (equipmentOperationList != null &&
-		// equipmentOperationList.size()>0)
-		// tv_equipment_task_date.setText("" +
-		// taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
-		// else tv_equipment_task_date.setText("еще не обслуживалось");
+
         Tasks task;
         TaskStages taskStages;
         task = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findFirst();
         if (task != null) {
             taskStages = task.getTaskStages().get(0);
-			tv_equipment_tasks.setText(""
+            tv_equipment_tasks.setText(""
                     + taskStages.getTaskStageVerdict().getTitle());
-		} else {
-			tv_equipment_tasks.setText("еще не обслуживалось");
-		}
-
-		File imgFile = new File(equipment.getImage());
-		if (imgFile.exists() && imgFile.isFile()) {
-			Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
-					.getAbsolutePath());
-			tv_equipment_image.setImageBitmap(myBitmap);
-		}
-
-		// адаптер для listview с документацией
-		ListView documentationListView = (ListView) findViewById(R.id.e_l_documentation_listView);
-        RealmResults<Documentation> documentation;
-        documentation = realmDB.where(Documentation.class).equalTo("equipmentUuid", equipment_uuid).findAll();
-
-        if (documentation != null) {
-            documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
-            assert documentationListView != null;
-            documentationListView.setAdapter(documentationAdapter);
-            documentationListView
-                        .setOnItemClickListener(new ListViewClickListener());
+        } else {
+            tv_equipment_tasks.setText("еще не обслуживалось");
         }
-	}
+
+        File imgFile = new File(equipment.getImage());
+        if (imgFile.exists() && imgFile.isFile()) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
+                    .getAbsolutePath());
+            //tv_equipment_image.setImageBitmap(myBitmap);
+        }
+
+        RealmResults<Documentation> documentation;
+        ListView documentationListView = (ListView) findViewById(R.id.equipment_documentation_listView);
+        //documentation = realmDB.where(Documentation.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
+        documentation = realmDB.where(Documentation.class).findAll();
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
+        documentationListView.setAdapter(documentationAdapter);
+        documentationListView
+                .setOnItemClickListener(new ListViewClickListener());
+        }
 
 	private void FillListViewOperations() {
         TaskAdapter taskAdapter;

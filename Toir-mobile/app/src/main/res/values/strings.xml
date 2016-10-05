@@ -40,9 +40,10 @@
     <string name="description">описание</string>
     <string name="id">ID</string>
     <string name="whois">Должность</string>
-    <string name="current_location">Координаты:</string>
+    <string name="current_location">Текущие координаты</string>
     <string name="no_gps_data">Нет данных GPS</string>
     <string name="current_status">Текущий статус</string>
+    <string name="operation_list">Список операций</string>
     <string name="gpsstatus">Состояние GPS</string>
     <string name="gprsstatus">Связь GPRS</string>
     <string name="server_date_connect">Дата связи с сервером:</string>
@@ -50,7 +51,7 @@
     <string name="boss_contact">Контакт начальника:</string>
     <string name="type">Тип:</string>
     <string name="critical">Критичность:</string>
-    <string name="last_date">Дата обслуживания:</string>
+    <string name="last_date">Дата обслуживания</string>
     <string name="last_result">Результат обслуживания:</string>
     <string name="documentation">Документация:</string>
     <string name="pleaseScanImg">Наведите камеру на код</string>
@@ -70,7 +71,6 @@
     <string name="stat_status">Состояние:</string>
     <string name="operation">Операция:</string>
     <string name="operation_step_title">Шаг:</string>
-    <string name="operation_list">Список операций</string>
     <string name="additional_information">Дополнительная информация</string>
     <string name="operation_step_descr_title">Описание шага обслуживания</string>
     <string name="operation_status_change_title">Изменить статус операции</string>
@@ -91,6 +91,9 @@
     <string name="profile_password">Пароль</string>
     <string name="profile_submit_button">Добавить</string>
     <string name="profile_submit_delete">Удалить пользователя</string>
+    <string name="driver">Драйвер</string>
+    <string name="update_server">Сервер обновления</string>
+    <string name="system_server">Сервер системы</string>
 
     <string name="menu">Сменить настройки</string>
     <string name="menu_camera">Тест камеры</string>

@@ -5,56 +5,41 @@
     android:padding="6dip" >
 
     <ImageView
-        android:id="@+id/order_ImageStatus"
+        android:id="@+id/lv_icon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_marginRight="6dip"
-        android:src="@drawable/status_easy_receive"
+        android:src="@drawable/pdf"
         android:contentDescription="@string/image_description" />
 
     <TextView
-        android:id="@+id/order_Name"
+        android:id="@+id/lv_firstLine"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_toRightOf="@id/order_ImageStatus"
+        android:layout_toRightOf="@id/lv_icon"
         android:background="#FAFAFA"
-        android:textColor="#454545"
+        android:textColor="#757575"
         android:gravity="center_vertical"
         android:text="@string/description"
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/order_Create"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/order_ImageStatus"
-        android:background="#FAFAFA"
-        android:textColor="#454545"
-        android:layout_below="@+id/order_Name"
-        android:ellipsize="marquee"
-        android:text="@string/description"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/order_status"
+        android:id="@+id/lv_secondLine"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/order_Create"
+        android:layout_toRightOf="@id/lv_icon"
         android:background="#FAFAFA"
-        android:textColor="#454545"
-        android:layout_marginTop="5dip"
-        android:layout_marginLeft="10dip"
-        android:layout_below="@+id/order_Name"
+        android:textColor="#757575"
+        android:layout_below="@+id/lv_firstLine"
         android:ellipsize="marquee"
         android:text="@string/description"
         android:textSize="12sp" />
 
-</RelativeLayout>
+</RelativeLayout> 

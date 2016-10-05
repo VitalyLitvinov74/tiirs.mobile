@@ -1,37 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:background="#FAFAFA"
+    android:fitsSystemWindows="true"
+    android:paddingTop="25dp"
     android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/login_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/status"
+        android:src="@drawable/login_header" />
+
+    <TextView
+        android:id="@+id/login_current_driver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login_header"
+        android:layout_marginTop="50dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:text="@string/driver"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/login_label_driver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login_current_driver"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/driver"
+        android:textColor="#757575"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/login_current_update_server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login_label_driver"
+        android:layout_marginTop="20dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/login_label_update_server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login_current_update_server"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#757575"
+        android:text="@string/update_server"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/login_current_system_server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login_label_update_server"
+        android:layout_marginTop="20dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/login_label_system_server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login_current_system_server"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#757575"
+        android:text="@string/system_server"
+        android:textSize="14sp" />
 
     <Button
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/menuButton"
+        android:height="30dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_below="@+id/login_label_system_server"
         android:layout_centerHorizontal="true"
         android:onClick="onClickLogin"
+        android:background="#4DD0E1"
+        android:textColor="#FAFAFA"
         android:text="@string/login" />
 
     <Button
         android:id="@+id/menuButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/login_current_settings"
+        android:height="30dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_below="@+id/loginButton"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:background="#4DD0E1"
+        android:textColor="#FAFAFA"
         android:onClick="mOnClickMethod"
         android:text="@string/menu" />
-
-    <TextView
-        android:id="@+id/login_current_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="55dp"
-        android:background="@drawable/back"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="16sp" />
 
 </RelativeLayout>

@@ -16,6 +16,7 @@ import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
+import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
@@ -57,8 +58,13 @@ public class LoadTestData {
 
     static OrderStatus orderStatus;
     static OrderStatus orderStatus2;
+    static OrderStatus orderStatus3;
 
-    static Orders order;
+    static OrderLevel orderLevel;
+    static OrderLevel orderLevel2;
+    static OrderLevel orderLevel3;
+
+    static Orders order,order2,order3;
 
     static OrderVerdict orderVerdict;
 
@@ -137,10 +143,19 @@ public class LoadTestData {
         final String documentationUuid2="8ee8a4f8-5c98-4444-86ed-823923132922";
 
         final String orderStatusUuid="8ee8a4f8-5c98-4444-86ed-243923132922";
+        final String orderStatusUuid2="8ee8a4f8-5c98-4444-86ed-243923132422";
+        final String orderStatusUuid3="8ee8a4f8-5c98-4444-86ed-243923332922";
 
         final String orderUuid="8ee8a4f8-5c98-4444-86ed-888923188922";
+        final String orderUuid2="8ee8a4f8-5c98-4444-86ed-888923188933";
+        final String orderUuid3="8ee8a4f8-5c98-4444-86ed-888923188944";
+
         final String orderVerdictUuid="8ee8a4f8-5c98-5555-86ed-888923188922";
         final String operationStatusUuid="8ee8a4f8-5c98-4444-86ed-243923132922";
+
+        final String orderLevelUuid1="8ee8a4f8-5c98-4444-86ed-421232123325";
+        final String orderLevelUuid2="8ee8a4f8-5c98-4444-86ed-421232123324";
+        final String orderLevelUuid3="8ee8a4f8-5c98-4444-86ed-421232123323";
 
         final String operationUuid="8ee8a4f8-5c98-4444-86ed-888923188922";
         final String operationUuid2="8ee8a4f8-5c98-4444-86ed-888923188924";
@@ -418,6 +433,7 @@ public class LoadTestData {
             orderStatus.set_id(1);
             orderStatus.setUuid(orderStatusUuid);
             orderStatus.setTitle("В работе");
+            orderStatus.setIcon("status_easy_work.png");
         }
     });
 
@@ -426,8 +442,20 @@ public class LoadTestData {
          public void execute(Realm realm) {
              orderStatus2 = realmDB.createObject(OrderStatus.class);
              orderStatus2.set_id(2);
-             orderStatus2.setUuid(orderStatusUuid);
+             orderStatus2.setUuid(orderStatusUuid2);
              orderStatus2.setTitle("Выполнен");
+             orderStatus2.setIcon("status_easy_ready.png");
+            }
+        });
+
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+             orderStatus3 = realmDB.createObject(OrderStatus.class);
+             orderStatus3.set_id(3);
+             orderStatus3.setUuid(orderStatusUuid3);
+             orderStatus3.setTitle("Получен");
+             orderStatus3.setIcon("status_easy_received.png");
             }
         });
 
@@ -442,7 +470,41 @@ public class LoadTestData {
         }
     });
 
-    // ---------------------------------------------------------------------------------------------
+    // OrderLevel -----------------
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            orderLevel = realmDB.createObject(OrderLevel.class);
+            orderLevel.set_id(1);
+            orderLevel.setUuid(orderLevelUuid1);
+            orderLevel.setTitle("Низкий");
+            orderLevel.setIcon("status_easy_receive.png");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                orderLevel2 = realmDB.createObject(OrderLevel.class);
+                orderLevel2.set_id(2);
+                orderLevel2.setUuid(orderLevelUuid2);
+                orderLevel2.setTitle("Средний");
+                orderLevel2.setIcon("status_mid_receive.png");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                orderLevel3 = realmDB.createObject(OrderLevel.class);
+                orderLevel3.set_id(3);
+                orderLevel3.setUuid(orderLevelUuid3);
+                orderLevel3.setTitle("Высокий");
+                orderLevel3.setIcon("status_high_receive.png");
+            }
+        });
+
+        // ---------------------------------------------------------------------------------------------
     // OperationVerdict -----------------
     realmDB.executeTransaction(new Realm.Transaction() {
         @Override
@@ -927,6 +989,8 @@ public class LoadTestData {
             order = realmDB.createObject(Orders.class);
             order.set_id(1);
             order.setUuid(orderUuid);
+            order.setUserUuid(userTestUuid);
+            order.setOrderLevel(orderLevel);
             order.setAttemptCount(0);
             order.setAttemptSendDate(new Date());
             order.setAuthorUuid(userTestUuid);
@@ -936,11 +1000,57 @@ public class LoadTestData {
             order.setOrderStatus(orderStatus);
             order.setOrderVerdictUuid(orderVerdictUuid);
             order.setOrderVerdict(orderVerdict);
-            order.setTitle("Ремонтные работы на 17.09.2016");
+            order.setTitle("Осмотр камер наблюдения");
             order.addTask(task);
             order.addTask(task2);
         }
     });
+
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            order2 = realmDB.createObject(Orders.class);
+            order2.set_id(2);
+            order2.setUserUuid(userTestUuid);
+            order2.setUuid(orderUuid2);
+            order2.setOrderLevel(orderLevel2);
+            order2.setAttemptCount(0);
+            order2.setAttemptSendDate(new Date());
+            order2.setAuthorUuid(userTestUuid);
+            order2.setCloseDate(new Date());
+            order2.setOpenDate(new Date());
+            order2.setOrderStatusUuid(orderStatusUuid2);
+            order2.setOrderStatus(orderStatus2);
+            order2.setOrderVerdictUuid(orderVerdictUuid);
+            order2.setOrderVerdict(orderVerdict);
+            order2.setTitle("Ремонтные работы по котельным");
+            order2.addTask(task);
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                order = realmDB.createObject(Orders.class);
+                order.set_id(3);
+                order.setUuid(orderUuid3);
+                order.setUserUuid(userTestUuid);
+                order.setOrderLevel(orderLevel3);
+                order.setAttemptCount(0);
+                order.setAttemptSendDate(new Date());
+                order.setAuthorUuid(userTestUuid);
+                order.setCloseDate(new Date());
+                order.setReceiveDate(new Date());
+                order.setOpenDate(new Date());
+                order.setOrderStatusUuid(orderStatusUuid3);
+                order.setOrderStatus(orderStatus3);
+                order.setOrderVerdictUuid(orderVerdictUuid);
+                order.setOrderVerdict(orderVerdict);
+                order.setTitle("Демонтаж устаревшего оборудования");
+                order.addTask(task);
+            }
+        });
+
  }
 
 }

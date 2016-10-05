@@ -5,8 +5,8 @@
     android:layout_alignParentBottom="true"
     android:layout_alignParentLeft="true"
     android:layout_alignParentRight="true"
-    android:layout_alignParentTop="true"
-    android:background="@color/black" >
+    android:background="@color/material_drawer_background"
+    android:layout_alignParentTop="true" >
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -23,22 +23,19 @@
         <TableLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            android:background="@color/black" >
+            android:layout_margin="1dp" >
 
             <TableRow
                 android:id="@+id/user_TableRow06"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="1dp"
-                android:background="@color/black"
                 android:gravity="top" >
 
                 <TextView
                     android:id="@+id/user_text_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/black"
                     android:textSize="16sp" />
             </TableRow>
 
@@ -46,14 +43,12 @@
                 android:id="@+id/user_TableRow05"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
                 android:gravity="top" >
 
                 <TextView
                     android:id="@+id/user_text_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/black"
                     android:text="@string/whois"
                     android:textAllCaps="false"
                     android:textSize="16sp" />
@@ -62,14 +57,12 @@
             <TableRow
                 android:id="@+id/user_tableRow9"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/black" >
+                android:layout_height="wrap_content" >
 
                 <TextView
                     android:id="@+id/user_text_position"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/black"
                     android:text="@string/current_location"
                     android:textSize="16sp" />
             </TableRow>
@@ -91,15 +84,14 @@
             <TableRow
                 android:id="@+id/user_tableRow10"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/black" >
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/user_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/black"
                     android:ems="10"
+                    android:textColor="#111111"
                     android:text="@string/current_status"
                     android:textAllCaps="false"
                     android:textSize="16sp" />
@@ -111,7 +103,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@color/black"
         android:baselineAligned="false"
         android:orientation="vertical" >
 
@@ -119,10 +110,10 @@
             android:id="@+id/user_listView_main"
             android:layout_width="match_parent"
             android:layout_height="135dp"
-            android:background="@color/black"
             android:maxHeight="35dp"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
+            android:textColor="#111111"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbarStyle="insideOverlay" >
         </ListView>
@@ -141,7 +132,7 @@
                     android:id="@+id/user_text_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/black"
+                    android:textColor="#111111"
                     android:text="@string/id"
                     android:padding="3dip"
                     android:textSize="16sp" />
@@ -156,8 +147,8 @@
                     android:id="@+id/user_text_date_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#222244"
                     android:padding="3dip"
+                    android:textColor="#111111"
                     android:text="@string/server_date_connect"
                     android:textSize="16sp" />
 
@@ -165,6 +156,7 @@
                     android:id="@+id/user_text_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="#111111"
                     android:text="05-10-2015 22:45"
                     android:padding="3dip"
                     android:textSize="16sp" />
@@ -179,8 +171,8 @@
                     android:id="@+id/user_text_tasks_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#222244"
                     android:padding="3dip"
+                    android:textColor="#111111"
                     android:text="@string/tasks_quantity"
                     android:textSize="16sp" />
 
@@ -189,6 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
+                    android:textColor="#111111"
                     android:layout_gravity="center"
                     android:textSize="16sp" />
             </TableRow>
@@ -202,14 +195,15 @@
                     android:id="@+id/user_text_boss_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#222244"
                     android:padding="3dip"
+                    android:textColor="#111111"
                     android:text="@string/boss_contact"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/user_text_boss"
                     android:padding="3dip"
+                    android:textColor="#111111"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp" />
@@ -224,9 +218,9 @@
                     android:id="@+id/user_text_gprs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#222244"
                     android:padding="3dip"
                     android:layout_weight="0.25"
+                    android:textColor="#111111"
                     android:text="@string/gprsstatus"
                     android:textSize="16sp" />
 
@@ -248,9 +242,9 @@
                     android:id="@+id/user_text_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#222244"
                     android:padding="3dip"
                     android:layout_weight="0.25"
+                    android:textColor="#111111"
                     android:text="@string/gpsstatus"
                     android:textSize="16sp" />
 

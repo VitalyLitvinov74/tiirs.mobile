@@ -15,7 +15,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+import android.support.annotation.IdRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -43,6 +43,8 @@ import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
     private Realm realmDB;
+
     private OnCheckedChangeListener onCheckedChangeListener = new OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
@@ -408,7 +411,28 @@ public class MainActivity extends AppCompatActivity {
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
 
-        // Handle Toolbar
+        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        assert bottomBar != null;
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                switch (tabId) {
+                    case R.id.menu_user:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                        break;
+                    case R.id.menu_orders:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, OrderFragment.newInstance()).commit();
+                        break;
+                    case R.id.menu_equipments:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
+                        break;
+                    case R.id.menu_maps:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
+                        break;
+                }
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setBackgroundResource(R.drawable.header);
@@ -804,11 +828,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void ShowSettings() {
-        TextView settings;
-        settings = (TextView) findViewById(R.id.login_current_settings);
-        if (settings == null) {
-            return;
-        }
+        TextView driver,update_server,system_server;
+        driver = (TextView) findViewById(R.id.login_current_driver);
+        update_server = (TextView) findViewById(R.id.login_current_update_server);
+        system_server = (TextView) findViewById(R.id.login_current_system_server);
 
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
@@ -821,7 +844,12 @@ public class MainActivity extends AppCompatActivity {
         }
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
-        settings.setText("Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName);
+        if (driver != null)
+            driver.setText(driverName);
+        if (update_server != null)
+            update_server.setText(updateUrl);
+        if (system_server != null)
+            system_server.setText(serverUrl);
     }
 
     @Override

@@ -14,25 +14,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
-import ru.toir.mobile.db.adapters.OrderStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.Tasks;
@@ -56,17 +49,17 @@ public class OrderFragment extends Fragment {
     private String currentTaskUuid = "";
     private String currentTaskStageUuid = "";
 
-    private Spinner sortSpinner;
-    private Spinner statusSpinner;
+    //private Spinner sortSpinner;
+    //private Spinner statusSpinner;
 
     private ListView mainListView;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     //private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
-    private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
+    //private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
     //private ArrayAdapter<OperationType> operationTypeAdapter;
     //private ArrayAdapter<CriticalType> criticalTypeAdapter;
-    private OrderStatusAdapter statusSpinnerAdapter;
-    private ArrayAdapter<SortField> sortFieldAdapter;
+    //private OrderStatusAdapter statusSpinnerAdapter;
+    //private ArrayAdapter<SortField> sortFieldAdapter;
 
     private ProgressDialog processDialog;
     private RfidDialog rfidDialog;
@@ -180,18 +173,22 @@ public class OrderFragment extends Fragment {
 
         rootView = inflater.inflate(R.layout.orders_layout, container,
                 false);
+
+        //Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        //toolbar.setSubtitle("Наряды");
+
         realmDB = Realm.getDefaultInstance();
 
         mainListView = (ListView) rootView
                 .findViewById(R.id.list_view);
-
+        /*
         sortSpinner = (Spinner) rootView
                 .findViewById(R.id.ol_sort_spinner);
 
         statusSpinner = (Spinner) rootView
                 .findViewById(R.id.simple_spinner);
         sortSpinner.setOnItemSelectedListener(filterSpinnerListener);
-        statusSpinner.setOnItemSelectedListener(filterSpinnerListener);
+        statusSpinner.setOnItemSelectedListener(filterSpinnerListener); */
 
         setHasOptionsMenu(true);
         rootView.setFocusableInTouchMode(true);
@@ -228,11 +225,10 @@ public class OrderFragment extends Fragment {
 		taskStatusAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item,
 				new ArrayList<TaskStatus>());
-*/
         sortFieldAdapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 new ArrayList<SortField>());
-
+        */
         // так как обработчики пока одни на всё, ставим их один раз
         mainListView.setOnItemClickListener(mainListViewClickListener);
         //mainListView.setOnItemLongClickListener(mainListViewLongClickListener);
@@ -248,11 +244,12 @@ public class OrderFragment extends Fragment {
 
         Level = 0;
         fillListViewOrders(null, null);
-        fillSpinnersOrders();
+        //fillSpinnersOrders();
 
     }
 
     // Orders --------------------------------------------------------------------------------------
+    /*
     private void fillSpinnersOrders() {
         RealmResults<OrderStatus> orderStatus = realmDB.where(OrderStatus.class).findAll();
         statusSpinnerAdapter = new OrderStatusAdapter(getContext(), orderStatus);
@@ -270,15 +267,14 @@ public class OrderFragment extends Fragment {
         sortFieldAdapter.add(new SortField("По статусу", "orderStatusUuid"));
         sortSpinner.setAdapter(sortFieldAdapter);
         //sortSpinner.setOnItemSelectedListener(FilterSpinnerListener);
-    }
-
+    } */
     private void fillListViewOrders(String orderStatus, String orderByField) {
         User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            RealmResults<Orders> orders;
+            /*
             if (orderStatus != null) {
                 if (orderByField != null)
                     orders = realmDB.where(Orders.class).equalTo("orderStatusUuid", orderStatus).findAllSorted(orderByField);
@@ -290,6 +286,28 @@ public class OrderFragment extends Fragment {
                 else
                     orders = realmDB.where(Orders.class).findAll();
             }
+
+            String init_date="",current_date="";
+            Date lDate;
+            RealmResults<Orders> orders;
+            orderAdapter = new OrderAdapter(getContext(), orders);
+            order.setTitle("---");
+            orders = realmDB.where(Orders.class).findAll();
+            for (Orders item : orders) {
+                lDate = item.getOpenDate();
+                if (lDate != null) {
+                    current_date = new SimpleDateFormat("dd MMMM").format(lDate);
+                    if (!init_date.equals(current_date)) {
+                        orderAdapter.addSeparatorItem(item);
+                        //orders_list.add(order);
+                        init_date = current_date;
+                    }
+                }
+                orderAdapter.addItem(item);
+                //orders_list.add(item);
+            }*/
+            RealmResults<Orders> orders;
+            orders = realmDB.where(Orders.class).findAll();
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
@@ -331,8 +349,8 @@ public class OrderFragment extends Fragment {
                     currentOrderUuid = orderAdapter.getItem(position).getUuid();
                 }
                 fillListViewTasks(currentOrderUuid);
-                statusSpinner.setVisibility(View.GONE);
-                sortSpinner.setVisibility(View.GONE);
+                //statusSpinner.setVisibility(View.GONE);
+                //sortSpinner.setVisibility(View.GONE);
                 Level = 1;
                 return;
             }
@@ -342,8 +360,8 @@ public class OrderFragment extends Fragment {
                     currentTaskUuid = taskAdapter.getItem(position).getUuid();
                 }
                 fillListViewTaskStage(currentTaskUuid);
-                statusSpinner.setVisibility(View.GONE);
-                sortSpinner.setVisibility(View.GONE);
+                //statusSpinner.setVisibility(View.GONE);
+                //sortSpinner.setVisibility(View.GONE);
                 Level = 2;
                 return;
             }
@@ -353,8 +371,8 @@ public class OrderFragment extends Fragment {
                     currentTaskStageUuid = taskStageAdapter.getItem(position).getUuid();
                 }
                 fillListViewOperations(currentTaskStageUuid);
-                statusSpinner.setVisibility(View.GONE);
-                sortSpinner.setVisibility(View.GONE);
+                //statusSpinner.setVisibility(View.GONE);
+                //sortSpinner.setVisibility(View.GONE);
                 Level = 3;
                 return;
             }
@@ -369,7 +387,7 @@ public class OrderFragment extends Fragment {
             }
         }
     }
-
+/*
     private class ReferenceSpinnerListener implements
             AdapterView.OnItemSelectedListener {
 
@@ -392,7 +410,7 @@ public class OrderFragment extends Fragment {
             }
         }
     }
-
+*/
 }
 
 
