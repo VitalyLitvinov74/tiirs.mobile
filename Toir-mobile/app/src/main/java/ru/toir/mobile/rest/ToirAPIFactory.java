@@ -14,6 +14,13 @@ import retrofit.Retrofit;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
+import ru.toir.mobile.rest.interfaces.IDocumentationType;
+import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
+import ru.toir.mobile.rest.interfaces.IEquipmentType;
+import ru.toir.mobile.rest.interfaces.IMeasureType;
+import ru.toir.mobile.rest.interfaces.IOperationStatus;
+import ru.toir.mobile.rest.interfaces.IOperationType;
+import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
 
@@ -47,6 +54,41 @@ public class ToirAPIFactory {
     @NonNull
     public static ICriticalType getCriticalTypeService() {
         return getRetrofit().create(ICriticalType.class);
+    }
+
+    @NonNull
+    public static IDocumentationType getDocumentationTypeService() {
+        return getRetrofit().create(IDocumentationType.class);
+    }
+
+    @NonNull
+    public static IEquipmentStatus getEquipmentStatusService() {
+        return getRetrofit().create(IEquipmentStatus.class);
+    }
+
+    @NonNull
+    public static IEquipmentType getEquipmentTypeService() {
+        return getRetrofit().create(IEquipmentType.class);
+    }
+
+    @NonNull
+    public static IMeasureType getMeasureTypeService() {
+        return getRetrofit().create(IMeasureType.class);
+    }
+
+    @NonNull
+    public static IOperationStatus getOperationStatus() {
+        return getRetrofit().create(IOperationStatus.class);
+    }
+
+    @NonNull
+    public static IOperationType getOperationType() {
+        return getRetrofit().create(IOperationType.class);
+    }
+
+    @NonNull
+    public static ITaskStatus getTaskStatus() {
+        return getRetrofit().create(ITaskStatus.class);
     }
 
     @NonNull

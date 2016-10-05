@@ -102,7 +102,7 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getDocumentType(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getDocumentType(extras);
+			return new ReferenceProcessor(mContext).getDocumentationType(extras);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();

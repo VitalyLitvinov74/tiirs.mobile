@@ -9,10 +9,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,9 +41,7 @@ import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
 import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
 import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.OperationStatusDBAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
-import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.EquipmentStatus;
@@ -55,7 +55,6 @@ import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import ru.toir.mobile.db.tables.EquipmentOperation;
 import ru.toir.mobile.db.tables.MeasureValue;
 import ru.toir.mobile.db.tables.OperationPatternStep;
-import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.RestClient.Method;
 import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
 import ru.toir.mobile.serverapi.DocumentationTypeSrv;
@@ -65,7 +64,6 @@ import ru.toir.mobile.serverapi.OperationPatternStepSrv;
 import ru.toir.mobile.serverapi.OperationResultSrv;
 import ru.toir.mobile.serverapi.ReferenceListSrv;
 import ru.toir.mobile.serverapi.TokenSrv;
-import ru.toir.mobile.utils.DataUtils;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -153,8 +151,8 @@ public class ReferenceProcessor {
 
         StringBuilder url = new StringBuilder();
         String jsonString;
-        ArrayList<String> patternUuids = bundle
-                .getStringArrayList(ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);
+        ArrayList<String> patternUuids = bundle.getStringArrayList(
+                ReferenceServiceProvider.Methods.GET_OPERATION_PATTERN_PARAMETER_UUID);
         boolean inParrentTransaction;
 
         SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
@@ -286,8 +284,8 @@ public class ReferenceProcessor {
             return result;
         }
 
-        String[] operationTypeUuids = bundle
-                .getStringArray(ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID);
+        String[] operationTypeUuids = bundle.getStringArray(
+                ReferenceServiceProvider.Methods.GET_OPERATION_RESULT_PARAMETER_UUID);
         StringBuilder url = new StringBuilder();
         String jsonString;
         boolean inParentTransaction;
@@ -363,7 +361,7 @@ public class ReferenceProcessor {
      * @param bundle bundle
      * @return Bundle
      */
-    public Bundle getDocumentType(@SuppressWarnings("unused") Bundle bundle) {
+    public Bundle getDocumentationType(@SuppressWarnings("unused") Bundle bundle) {
 
         Bundle result;
 
@@ -374,51 +372,27 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.DocumentType);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        DocumentationTypeDBAdapter adapter = new DocumentationTypeDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<DocumentationType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<DocumentationType>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(DocumentationType.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        Call<List<DocumentationType>> call = ToirAPIFactory.getDocumentationTypeService()
+                .documentationType("bearer " + AuthorizedUser.getInstance().getToken(),
+                        lastChangedAt);
+        try {
+            retrofit.Response<List<DocumentationType>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -441,8 +415,8 @@ public class ReferenceProcessor {
         }
 
         StringBuilder url = new StringBuilder();
-        String fileUuids[] = bundle
-                .getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID);
+        String fileUuids[] = bundle.getStringArray(
+                ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID);
         EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
                 new ToirDatabaseContext(mContext));
         EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
@@ -529,8 +503,8 @@ public class ReferenceProcessor {
         }
 
         StringBuilder url = new StringBuilder();
-        String equipmentsUuids[] = bundle
-                .getStringArray(ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
+        String equipmentsUuids[] = bundle.getStringArray(
+                ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
 
         EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
                 new ToirDatabaseContext(mContext));
@@ -627,8 +601,8 @@ public class ReferenceProcessor {
         }
 
         StringBuilder url = new StringBuilder();
-        String measureValueUuids[] = bundle
-                .getStringArray(ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
+        String measureValueUuids[] = bundle.getStringArray(
+                ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID);
 
         MeasureValueDBAdapter measureValueDBAdapter = new MeasureValueDBAdapter(
                 new ToirDatabaseContext(mContext));
@@ -734,51 +708,27 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.EquipmentStatus);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        EquipmentStatusDBAdapter adapter = new EquipmentStatusDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<EquipmentStatus> list = gson.fromJson(jsonString, new TypeToken<ArrayList<EquipmentStatus>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(EquipmentStatus.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        Call<List<EquipmentStatus>> call = ToirAPIFactory.getEquipmentStatusService()
+                .equipmentStatus("bearer " + AuthorizedUser.getInstance().getToken(),
+                        lastChangedAt);
+        try {
+            retrofit.Response<List<EquipmentStatus>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -800,51 +750,26 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.EquipmentType);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        EquipmentTypeDBAdapter adapter = new EquipmentTypeDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<EquipmentType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<EquipmentType>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(EquipmentType.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        Call<List<EquipmentType>> call = ToirAPIFactory.getEquipmentTypeService()
+                .equipmentType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+        try {
+            retrofit.Response<List<EquipmentType>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -866,51 +791,26 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.MeasureType);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        MeasureTypeDBAdapter adapter = new MeasureTypeDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<MeasureType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<MeasureType>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(MeasureType.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        Call<List<MeasureType>> call = ToirAPIFactory.getMeasureTypeService()
+                .measureType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+        try {
+            retrofit.Response<List<MeasureType>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -932,55 +832,30 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.OperationStatus);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        OperationStatusDBAdapter adapter = new OperationStatusDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<OperationStatus> list = gson.fromJson(jsonString, new TypeToken<ArrayList<OperationStatus>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(OperationStatus.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatus()
+                .operationStatus("bearer " + AuthorizedUser.getInstance().getToken(),
+                        lastChangedAt);
+        try {
+            retrofit.Response<List<OperationStatus>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
-
     /**
      * Получаем типы операций
      *
@@ -998,51 +873,26 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.OperationType);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        OperationTypeDBAdapter adapter = new OperationTypeDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<OperationType> list = gson.fromJson(jsonString, new TypeToken<ArrayList<OperationType>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(OperationType.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        Call<List<OperationType>> call = ToirAPIFactory.getOperationType()
+                .operationType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+        try {
+            retrofit.Response<List<OperationType>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -1064,61 +914,26 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.TaskStatus);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        TaskStatusDBAdapter adapter = new TaskStatusDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        SQLiteDatabase db = DatabaseHelper.getInstance(mContext)
-                .getWritableDatabase();
-        boolean inParrentTransaction;
-        inParrentTransaction = db.inTransaction();
-
-        // если транзакция не открыта раньше, открываем её
-        if (!inParrentTransaction) {
-            db.beginTransaction();
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<TaskStatus> list = gson.fromJson(jsonString, new TypeToken<ArrayList<TaskStatus>>() {
-            }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(TaskStatus.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatus()
+                .taskStatus("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+        try {
+            retrofit.Response<List<TaskStatus>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -1213,52 +1028,26 @@ public class ReferenceProcessor {
             return result;
         }
 
-        StringBuilder url = new StringBuilder();
-        String jsonString;
-        Long lastChangedAt;
+        Realm realm = Realm.getDefaultInstance();
 
-        // получаем урл справочника
-        String referenceUrl = getReferenceURL(ReferenceName.CriticalType);
-        if (referenceUrl == null) {
-            result = new Bundle();
-            result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Не известный справочник.");
-            return result;
-        }
-
-        url.append(ToirApplication.serverUrl).append(referenceUrl);
-
-        // получаем дату последней модификации содержимого таблицы
-        CriticalTypeDBAdapter adapter = new CriticalTypeDBAdapter(
-                new ToirDatabaseContext(mContext));
-        lastChangedAt = adapter.getLastChangedAt();
-        if (lastChangedAt != null) {
-            url.append('?')
-                    .append("ChangedAfter=")
-                    .append(DataUtils.getDate(lastChangedAt + 1000, dateFormat));
-        }
-
-        jsonString = getReferenceData(url.toString());
-        if (jsonString != null) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                    .create();
-            List<CriticalType> list = gson.fromJson(jsonString,
-                    new TypeToken<ArrayList<CriticalType>>() {
-                    }.getType());
-            Realm realm = Realm.getDefaultInstance();
+        // TODO: реализовать механизм хранения даты последней модификации в таблице
+        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
+        Date changed = realm.where(CriticalType.class).findFirst().getChangedAt();
+        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService()
+                .criticalType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+        try {
+            retrofit.Response<List<CriticalType>> response = call.execute();
             realm.beginTransaction();
-            realm.copyToRealmOrUpdate(list);
+            realm.copyToRealmOrUpdate(response.body());
             realm.commitTransaction();
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
-        } else {
+        } catch (IOException e) {
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, false);
-            result.putString(IServiceProvider.MESSAGE,
-                    "Ошибка получения данных справочника.");
+            result.putString(IServiceProvider.MESSAGE, "Ошибка получения данных справочника.");
             return result;
         }
     }
@@ -1280,8 +1069,8 @@ public class ReferenceProcessor {
             return result;
         }
 
-        String[] equipmentUuids = bundle
-                .getStringArray(ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
+        String[] equipmentUuids = bundle.getStringArray(
+                ReferenceServiceProvider.Methods.GET_DOCUMENTATION_PARAMETER_UUID);
         StringBuilder url = new StringBuilder();
         String jsonString;
 
@@ -1364,7 +1153,7 @@ public class ReferenceProcessor {
             return result;
         }
 
-        result = getDocumentType(bundle);
+        result = getDocumentationType(bundle);
         success = result.getBoolean(IServiceProvider.RESULT);
         if (!success) {
             return result;
@@ -1742,15 +1531,7 @@ public class ReferenceProcessor {
     }
 
     private static class ReferenceName {
-        public static String CriticalType = "CriticalityType";
-        public static String DocumentType = "DocumentType";
-        public static String EquipmentStatus = "EquipmentStatus";
-        public static String EquipmentType = "EquipmentType";
-        public static String MeasureType = "MeasureType";
         public static String OperationResult = "OperationResult";
-        public static String OperationStatus = "OperationStatus";
-        public static String OperationType = "OperationType";
-        public static String TaskStatus = "TaskStatus";
     }
 
 }
