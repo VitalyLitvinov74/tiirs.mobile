@@ -1,9 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +8,13 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 
 /**
@@ -57,14 +54,11 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Realm realmDB = Realm.getDefaultInstance();
-        TaskStatus taskStatus;
-        String pathToImages;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.task_item_n, parent, false);
+            convertView = inflater.inflate(R.layout.task_item, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.title = (TextView) convertView.findViewById(R.id.ti_Name);
-            viewHolder.status = (TextView) convertView.findViewById(R.id.ti_Status);
+            viewHolder.date = (TextView) convertView.findViewById(R.id.ti_Status);
             viewHolder.equipment = (TextView) convertView.findViewById(R.id.ti_Equipment);
             viewHolder.icon = (ImageView) convertView.findViewById(R.id.ti_ImageStatus);
             convertView.setTag(viewHolder);
@@ -72,40 +66,44 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (adapterData!=null) {
-            Tasks task = adapterData.get(position);
-            viewHolder.title.setText(task.getTaskTemplate().getTitle());
-            //viewHolder.status.setText(task.getTaskStatus().getTitle());
-            viewHolder.equipment.setText(task.getEquipment().getTitle());
-
-            taskStatus = realmDB.where(TaskStatus.class).equalTo("uuid", task.getTaskStatusUuid()).findFirst();
-            pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + File.separator + "Android"
-                    + File.separator + "data"
-                    + File.separator + "ru.toir.mobile"
-                    + File.separator + "img"
-                    + File.separator;
-            File imgFile = new File(pathToImages + taskStatus.getIcon());
-            if (imgFile.exists() && imgFile.isFile()) {
-                Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
-                        .getAbsolutePath());
-                viewHolder.icon.setImageBitmap(mBitmap);
+        Tasks task = adapterData.get(position);
+        Date lDate = task.getStartDate();
+        if (lDate != null) {
+                String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
+                viewHolder.date.setText(task.getTaskStatus().getTitle() + " " + sDate);
             } else {
-                imgFile = new File(pathToImages + "help_32.png");
-                if (imgFile.exists() && imgFile.isFile()) {
-                    Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
-                            .getAbsolutePath());
-                    viewHolder.icon.setImageBitmap(mBitmap);
-                }
+                viewHolder.date.setText("не выполнялся");
             }
-        }
+
+        viewHolder.equipment.setText(task.getEquipment().getTitle());
+        viewHolder.title.setText(task.getTaskTemplate().getTitle());
+
+            if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
+            if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
+            if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_high_receive);
+            if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                viewHolder.icon.setImageResource(R.drawable.status_easy_work);
+            if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                viewHolder.icon.setImageResource(R.drawable.status_mod_work);
+            if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                viewHolder.icon.setImageResource(R.drawable.status_high_work);
+            if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
+            if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
+            if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_high_ready);
         return convertView;
     }
 
     private static class ViewHolder {
         TextView equipment;
         TextView title;
-        TextView status;
+        TextView date;
+        //TextView status;
         ImageView icon;
     }
 }

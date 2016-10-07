@@ -135,6 +135,8 @@ public class LoadTestData {
         final String documentationTypeUuid_nd="00000000-5c98-4124-86ed-4722222";
 
         final String criticalTypeUuid="1dd8d4f8-5c98-4444-86ed-823923832933";
+        final String criticalTypeUuid2="1dd8d4f8-5c98-4444-86ed-823923832987";
+        final String criticalTypeUuid3="1dd8d4f8-5c98-4444-86ed-823923832965";
 
         final String equipmentModelUuid="6dd8a4f8-5c98-4444-86ed-823923832933";
         final String equipmentModelUuid2="6dd8a4f8-5c98-4444-86ed-823923832955";
@@ -229,9 +231,27 @@ public class LoadTestData {
             criticalType = realmDB.createObject(CriticalType.class);
             criticalType.set_id(1);
             criticalType.setUuid(criticalTypeUuid);
-            criticalType.setTitle("Критичный");
+            criticalType.setTitle("Не критичный");
         }
-    });
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                criticalType = realmDB.createObject(CriticalType.class);
+                criticalType.set_id(2);
+                criticalType.setUuid(criticalTypeUuid2);
+                criticalType.setTitle("Средний");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                criticalType = realmDB.createObject(CriticalType.class);
+                criticalType.set_id(3);
+                criticalType.setUuid(criticalTypeUuid3);
+                criticalType.setTitle("Критичный");
+            }
+        });
 
     // EquipmentType -----------------
     realmDB.executeTransaction(new Realm.Transaction() {

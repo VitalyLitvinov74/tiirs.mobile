@@ -29,20 +29,22 @@
                 android:id="@+id/user_TableRow06"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="1dp"
+                android:layout_margin="3dp"
                 android:gravity="top" >
 
                 <TextView
                     android:id="@+id/user_text_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp" />
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
                 android:id="@+id/user_TableRow05"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="3dp"
                 android:gravity="top" >
 
                 <TextView
@@ -51,7 +53,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/whois"
                     android:textAllCaps="false"
-                    android:textSize="16sp" />
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -64,7 +67,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/current_location"
-                    android:textSize="16sp" />
+                    android:textColor="#111111"
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -78,7 +82,8 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:text="@string/no_gps_data"
-                    android:textSize="16sp" />
+                    android:textColor="#111111"
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -94,7 +99,7 @@
                     android:textColor="#111111"
                     android:text="@string/current_status"
                     android:textAllCaps="false"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </TableRow>
         </TableLayout>
     </LinearLayout>
@@ -132,10 +137,10 @@
                     android:id="@+id/user_text_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="@string/id"
                     android:padding="3dip"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -148,18 +153,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="@string/server_date_connect"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/user_text_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="05-10-2015 22:45"
                     android:padding="3dip"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -172,18 +177,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="@string/tasks_quantity"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/user_text_tasks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:layout_gravity="center"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -196,17 +201,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="3dip"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="@string/boss_contact"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/user_text_boss"
                     android:padding="3dip"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -220,9 +225,9 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:layout_weight="0.25"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="@string/gprsstatus"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <ImageView
                     android:id="@+id/user_status_gprs"
@@ -244,9 +249,9 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:layout_weight="0.25"
-                    android:textColor="#111111"
+                    android:textColor="#333333"
                     android:text="@string/gpsstatus"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <ImageView
                     android:id="@+id/user_status_gps"

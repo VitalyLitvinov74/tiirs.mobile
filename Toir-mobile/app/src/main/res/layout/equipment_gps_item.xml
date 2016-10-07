@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/eril_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:background="#FAFAFA"
+        android:textColor="#222222"
+        android:textSize="14sp"
+        android:text="название"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/eril_inventory_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:background="#FAFAFA"
+        android:textColor="#454545"
+        android:textSize="14sp"
+        android:layout_toRightOf="@+id/eril_title"
+        android:text="инв. номер" />
+
+    <TextView
+        android:id="@+id/eril_critical_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:textColor="#454545"
+        android:textSize="14sp"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="5dp"
+        android:layout_toRightOf="@+id/eril_inventory_number"
+        android:text="0" />
+
+    <ImageView
+        android:id="@+id/eril_image_critical"
+        android:layout_width="23dp"
+        android:layout_height="23dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/eril_critical_level"
+        android:contentDescription="изображение статуса оборудования"
+        android:src="@drawable/critical_level_3" />
+
+    <TextView
+        android:id="@+id/eril_place"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:textColor="#222222"
+        android:textSize="14sp"
+        android:layout_below="@+id/eril_title"
+        android:text="Статус:" />
+
+    <TextView
+        android:id="@+id/eril_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/eril_title"
+        android:background="#FAFAFA"
+        android:textColor="#454545"
+        android:textSize="14sp"
+        android:layout_marginLeft="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/eril_place"
+        android:text="Новое" />
+
+</RelativeLayout>

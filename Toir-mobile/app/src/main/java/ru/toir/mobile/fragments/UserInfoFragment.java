@@ -15,18 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -34,7 +28,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
-import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.GpsTrack;
@@ -176,6 +170,7 @@ public class UserInfoFragment extends Fragment {
 	}
 
 	private void FillListViewTasks(View view) {
+        OrderAdapter orderAdapter;
 		//String tagId = AuthorizedUser.getInstance().getTagId();
 		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
 		//		getActivity().getApplicationContext()));
@@ -185,65 +180,11 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			//TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
-			//		new ToirDatabaseContext(getActivity()
-			//				.getApplicationContext()));
-			//ArrayList<Task> taskList = taskDBAdapter.getOrders();
-
             RealmResults<Orders> orders = realmDB.where(Orders.class).equalTo("userUuid", user.getUuid()).findAll();
-            //RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
-
-			List<HashMap<String, String>> elementList = new ArrayList<HashMap<String, String>>();
-			String[] from = { "name", "img" };
-			int[] to = { R.id.lv1_firstLine, R.id.lv1_icon };
-			String orderStatusUuid;
-            String orderStatusTitle="неизвестен";
-			HashMap<String, String> element;
-
-			for (Orders item : orders) {
-				element = new HashMap<>();
-                OrderStatus orderStatus = realmDB.where(OrderStatus.class).equalTo("uuid",item.getOrderStatusUuid()).findFirst();
-                if (orderStatus!=null) orderStatusTitle=orderStatus.getTitle();
-				element.put(
-						"name",
-						"["
-                                + new SimpleDateFormat("dd.MM.YYYY HH:ss", Locale.US).format(item.getReceiveDate())
-                                + "] Статус: "
-								+ orderStatusTitle);
-				// default
-				element.put("img", Integer.toString(R.drawable.checkmark_32));
-                orderStatusUuid = item.getOrderStatusUuid();
-
-				if (orderStatusUuid
-						.equals(OrderStatus.Status.UNCOMPLETE)) {
-					element.put("img",
-							Integer.toString(R.drawable.forbidden_32));
-				}
-
-				if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE)) {
-					element.put("img",
-							Integer.toString(R.drawable.checkmark_32));
-				}
-
-				if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK)) {
-					element.put("img",
-							Integer.toString(R.drawable.information_32));
-				}
-
-				if (orderStatusUuid.equals(OrderStatus.Status.NEW)) {
-					element.put("img", Integer.toString(R.drawable.help_32));
-				}
-
-				elementList.add(element);
-			}
-
-			SimpleAdapter adapter = new SimpleAdapter(getActivity()
-					.getApplicationContext(), elementList,
-					R.layout.listview1row, from, to);
-
-			ListView lv;
-			lv = (ListView) view.findViewById(R.id.user_listView_main);
-			lv.setAdapter(adapter);
+            orders = realmDB.where(Orders.class).findAll();
+            orderAdapter = new OrderAdapter(getContext(), orders);
+            ListView mainListView = (ListView) view.findViewById(R.id.user_listView_main);
+            mainListView.setAdapter(orderAdapter);
 		}
 	}
 

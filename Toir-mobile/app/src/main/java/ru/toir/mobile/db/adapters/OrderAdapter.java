@@ -105,33 +105,52 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         if (adapterData!=null) {
             Orders order = adapterData.get(position);
             Date lDate = order.getOpenDate();
+            String sDate;
             if (lDate != null) {
-                    String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
+                    sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
                     viewHolder.created.setText(sDate);
                 } else {
-                    viewHolder.created.setText("неизвестно");
+                    sDate = "неизвестно";
                 }
                 viewHolder.title.setText(order.getTitle());
                 viewHolder.status.setText(order.getOrderStatus().getTitle());
-                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Низкий"))
+                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Низкий")) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Средний"))
+                    viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Средний")) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Высокий"))
+                    viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Высокий")) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Низкий"))
+                    viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Низкий")) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Средний"))
+                    viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Средний")) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Высокий"))
+                    viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Высокий")) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Низкий"))
+                    viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Низкий"))  {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Средний"))
+                    viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Средний")) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Высокий"))
+                    viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]");
+                }
+                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Высокий")) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
-            }
+                    viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]");
+                }
+    }
         return convertView;
     }
 

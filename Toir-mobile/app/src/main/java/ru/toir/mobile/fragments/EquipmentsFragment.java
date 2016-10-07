@@ -8,11 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -32,7 +29,7 @@ public class EquipmentsFragment extends Fragment {
 	private Spinner typeSpinner;
 	private ListView equipmentListView;
 
-	private ArrayAdapter<SortField> sortSpinnerAdapter;
+	//private ArrayAdapter<SortField> sortSpinnerAdapter;
     private EquipmentTypeAdapter typeSpinnerAdapter;
     //private ArrayAdapter<String> typeSpinnerAdapter;
 
@@ -55,6 +52,7 @@ public class EquipmentsFragment extends Fragment {
 		spinnerListener = new SpinnerListener();
 
 		// настраиваем сортировку по полям
+        /*
 		sortSpinner = (Spinner) rootView
 				.findViewById(R.id.erl_sort_field_spinner);
 		sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
@@ -62,7 +60,7 @@ public class EquipmentsFragment extends Fragment {
 				new ArrayList<SortField>());
 		sortSpinner.setAdapter(sortSpinnerAdapter);
 		sortSpinner.setOnItemSelectedListener(spinnerListener);
-
+*/
 		equipmentListView = (ListView) rootView
 				.findViewById(R.id.erl_equipment_listView);
 
@@ -118,9 +116,9 @@ public class EquipmentsFragment extends Fragment {
 	private void initView() {
 
 		FillListViewEquipments(null, null);
-        fillSortFieldSpinner();
+//        fillSortFieldSpinner();
     }
-
+/*
 	private void fillSortFieldSpinner() {
 
 		sortSpinnerAdapter.clear();
@@ -133,7 +131,7 @@ public class EquipmentsFragment extends Fragment {
 				"startDate"));
 
 	}
-
+*/
 	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
         RealmResults<Equipment> equipments;
         if (equipmentModelUuid != null) {
