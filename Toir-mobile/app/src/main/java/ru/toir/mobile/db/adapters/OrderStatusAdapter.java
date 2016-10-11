@@ -77,9 +77,6 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
             if (adapterData != null) {
                 orderStatus = adapterData.get(position);
                 textView.setText(orderStatus.getTitle());
-                textView.setPadding(10, 15, 10, 20);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                textView.setTextColor(Color.WHITE);
             }
             return textView;
         }

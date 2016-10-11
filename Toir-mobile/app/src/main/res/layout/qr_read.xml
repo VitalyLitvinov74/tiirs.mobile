@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/black">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/pleaseScanImage"
@@ -15,7 +14,6 @@
         android:ems="10"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/pleaseScanImg"
-        android:textColor="@color/black"
         android:textSize="18sp" />
 
         <FrameLayout
@@ -45,6 +43,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
+            android:height="35dp"
+            android:minHeight="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="#4DD0E1"
+            android:textColor="#FAFAFA"
             android:layout_marginTop="54dp"
             android:text="@string/cancel" />
 

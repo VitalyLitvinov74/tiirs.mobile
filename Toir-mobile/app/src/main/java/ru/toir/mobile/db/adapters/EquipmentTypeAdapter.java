@@ -1,9 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -77,9 +75,6 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
             if (adapterData != null) {
                 equipmentType = adapterData.get(position);
                 textView.setText(equipmentType.getTitle());
-                textView.setPadding(10, 20, 10, 20);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                textView.setTextColor(Color.WHITE);
             }
             return textView;
         }

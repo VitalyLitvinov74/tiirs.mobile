@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="#FAFAFA"
     android:fitsSystemWindows="true"
-    android:paddingTop="25dp"
     android:layout_height="match_parent" >
 
     <ImageView
@@ -86,7 +84,7 @@
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:height="30dp"
+        android:height="35dp"
         android:minHeight="0dp"
         android:layout_marginTop="20dp"
         android:paddingLeft="10dp"
@@ -102,7 +100,7 @@
         android:id="@+id/menuButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:height="30dp"
+        android:height="35dp"
         android:minHeight="0dp"
         android:layout_marginTop="20dp"
         android:paddingLeft="10dp"

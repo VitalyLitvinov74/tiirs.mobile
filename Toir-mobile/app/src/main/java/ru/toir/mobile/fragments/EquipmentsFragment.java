@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Equipment;
@@ -46,6 +46,8 @@ public class EquipmentsFragment extends Fragment {
 
 		View rootView = inflater.inflate(R.layout.equipment_reference_layout,
 				container, false);
+        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+        toolbar.setSubtitle("Оборудование");
         realmDB = Realm.getDefaultInstance();
 
 		// обработчик для выпадающих списков у нас один
@@ -115,7 +117,7 @@ public class EquipmentsFragment extends Fragment {
 
 	private void initView() {
 
-		FillListViewEquipments(null, null);
+		FillListViewEquipments(null);
 //        fillSortFieldSpinner();
     }
 /*
@@ -132,23 +134,13 @@ public class EquipmentsFragment extends Fragment {
 
 	}
 */
-	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
+	private void FillListViewEquipments(String equipmentModelUuid) {
         RealmResults<Equipment> equipments;
         if (equipmentModelUuid != null) {
-            if (sort!=null) {
-                equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAllSorted(sort);
-            }
-            else {
-                equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAll();
-            }
+            equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAll();
         }
         else {
-            if (sort!=null) {
-                equipments = realmDB.where(Equipment.class).findAllSorted(sort);
-            }
-            else {
-                equipments = realmDB.where(Equipment.class).findAll();
-            }
+            equipments = realmDB.where(Equipment.class).findAll();
         }
         equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
         equipmentListView.setAdapter(equipmentAdapter);
@@ -203,11 +195,7 @@ public class EquipmentsFragment extends Fragment {
                 if (typeSelected.get_id() == 1) type = null;
             }
 
-            SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
-            if (fieldSelected != null) {
-                orderBy = fieldSelected.getField();
-            }
-            FillListViewEquipments(type, orderBy);
+            FillListViewEquipments(type);
         }
     }
 }

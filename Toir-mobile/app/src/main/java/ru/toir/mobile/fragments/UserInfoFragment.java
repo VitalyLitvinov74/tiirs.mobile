@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +66,9 @@ public class UserInfoFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater
 				.inflate(R.layout.user_layout, container, false);
+        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+        toolbar.setSubtitle("Пользователь");
+
         realmDB = Realm.getDefaultInstance();
 		FillListViewTasks(rootView);
 		initView(rootView);
@@ -91,12 +95,7 @@ public class UserInfoFragment extends Fragment {
 
         user_status_gprs.setImageResource(R.drawable.ic_stat_name);
         user_status_gps.setImageResource(R.drawable.ic_action_name);
-		//String tagId = AuthorizedUser.getInstance().getTagId();
-		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-		//		getActivity().getApplicationContext()));
-		//Users user = users.getUserByTagId(tagId);
         User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
-        //RealmResults<User> users = realmDB.where(User.class).findAll();
         if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
@@ -171,16 +170,12 @@ public class UserInfoFragment extends Fragment {
 
 	private void FillListViewTasks(View view) {
         OrderAdapter orderAdapter;
-		//String tagId = AuthorizedUser.getInstance().getTagId();
-		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-		//		getActivity().getApplicationContext()));
         User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
-		//Users user = users.getUserByTagId(tagId);
 		if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-            RealmResults<Orders> orders = realmDB.where(Orders.class).equalTo("userUuid", user.getUuid()).findAll();
+            RealmResults<Orders> orders;
             orders = realmDB.where(Orders.class).findAll();
             orderAdapter = new OrderAdapter(getContext(), orders);
             ListView mainListView = (ListView) view.findViewById(R.id.user_listView_main);

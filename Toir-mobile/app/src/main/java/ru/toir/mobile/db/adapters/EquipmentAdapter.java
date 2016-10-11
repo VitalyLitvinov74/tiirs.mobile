@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
@@ -25,6 +26,9 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     public static final String TABLE_NAME = "Equipment";
 
     public EquipmentAdapter(@NonNull Context context, RealmResults<Equipment> data) {
+        super(context, data);
+    }
+    public EquipmentAdapter(@NonNull Context context, RealmList<Equipment> data) {
         super(context, data);
     }
 

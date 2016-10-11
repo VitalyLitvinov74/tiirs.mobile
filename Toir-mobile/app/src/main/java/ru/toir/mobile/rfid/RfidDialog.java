@@ -69,7 +69,7 @@ public class RfidDialog extends DialogFragment {
 
 		super.onCreate(savedInstanceState);
 
-		getDialog().setTitle("Поднесите метку");
+		getDialog().setTitle("Считайте метку");
 
 		// получаем текущий драйвер считывателя
 		SharedPreferences sp = PreferenceManager
