@@ -1,9 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +8,8 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -69,10 +66,10 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.tsi_Name);
-            viewHolder.status = (TextView) convertView.findViewById(R.id.tsi_Status);
-            viewHolder.start_date = (TextView) convertView.findViewById(R.id.tsi_StartDate);
-            viewHolder.end_date = (TextView) convertView.findViewById(R.id.tsi_EndDate);
+            viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
+            //viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
+            viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);
+            viewHolder.end_date = (TextView) convertView.findViewById(R.id.ts_EndDate);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -81,35 +78,42 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
         if (adapterData!=null) {
             TaskStages taskStage = adapterData.get(position);
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
-            viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
+            //viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
             if (taskStage.getStartDate()!=null) {
-                viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getStartDate()));
-            }
-            if (taskStage.getEndDate()!=null) {
-                viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(taskStage.getEndDate()));
-            }
-
-            taskStageStatus = realmDB.where(TaskStageStatus.class).equalTo("uuid",taskStage.getTaskStageStatusUuid()).findFirst();
-            pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + File.separator + "Android"
-                    + File.separator + "data"
-                    + File.separator + "ru.toir.mobile"
-                    + File.separator + "img"
-                    + File.separator;
-            File imgFile = new File(pathToImages + taskStageStatus.getIcon());
-            if (imgFile.exists() && imgFile.isFile()) {
-                Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
-                        .getAbsolutePath());
-                viewHolder.icon.setImageBitmap(mBitmap);
-            }
-            else {
-                imgFile = new File(pathToImages + "help_32.png");
-                if (imgFile.exists() && imgFile.isFile()) {
-                    Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
-                            .getAbsolutePath());
-                    viewHolder.icon.setImageBitmap(mBitmap);
+                Date lDate = taskStage.getStartDate();
+                if (lDate != null) {
+                    viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(lDate));
+                } else {
+                    viewHolder.start_date.setText("не выполнялся");
                 }
             }
+            if (taskStage.getEndDate()!=null) {
+                Date lDate = taskStage.getEndDate();
+                if (lDate != null) {
+                    viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(lDate));
+                } else {
+                    viewHolder.end_date.setText("не выполнялся");
+                }
+            }
+
+            if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
+            if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
+            if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_high_receive);
+            if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                viewHolder.icon.setImageResource(R.drawable.status_easy_work);
+            if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                viewHolder.icon.setImageResource(R.drawable.status_mod_work);
+            if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                viewHolder.icon.setImageResource(R.drawable.status_high_work);
+            if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
+            if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
+            if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                viewHolder.icon.setImageResource(R.drawable.status_high_ready);
         }
         return convertView;
     }

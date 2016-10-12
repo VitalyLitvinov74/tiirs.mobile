@@ -137,7 +137,7 @@ public class EquipmentsFragment extends Fragment {
 	private void FillListViewEquipments(String equipmentModelUuid) {
         RealmResults<Equipment> equipments;
         if (equipmentModelUuid != null) {
-            equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAll();
+            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.uuid", equipmentModelUuid).findAll();
         }
         else {
             equipments = realmDB.where(Equipment.class).findAll();

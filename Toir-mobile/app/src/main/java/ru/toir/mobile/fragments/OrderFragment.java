@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
@@ -225,32 +226,36 @@ public class OrderFragment extends Fragment {
             Toast.makeText(getActivity(), "Нет такого пользователя!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            /*
-
-            String init_date="",current_date="";
-            Date lDate;
+            RealmList<Orders> orders_all = new RealmList<>();
             RealmResults<Orders> orders;
+            /*
+            int cnt = 0;
+            orders = realmDB.where(Orders.class).equalTo("uuid","").findAll();
             orderAdapter = new OrderAdapter(getContext(), orders);
-            order.setTitle("---");
             orders = realmDB.where(Orders.class).findAll();
             for (Orders item : orders) {
-                lDate = item.getOpenDate();
+                if (cnt == 0) {
+                    orderAdapter.addSeparatorItem(item);
+                }
+                orderAdapter.addItem(item);
+                orders_all.add(item);
                 if (lDate != null) {
                     current_date = new SimpleDateFormat("dd MMMM").format(lDate);
                     if (!init_date.equals(current_date)) {
                         orderAdapter.addSeparatorItem(item);
-                        //orders_list.add(order);
+                        orders_list.add(order);
                         init_date = current_date;
                     }
-                }
-                orderAdapter.addItem(item);
-                //orders_list.add(item);
+                cnt++;
             }*/
-            RealmResults<Orders> orders;
             orders = realmDB.where(Orders.class).findAll();
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
+            /*
+            RealmResults<Orders> orders;
+            orders = realmDB.where(Orders.class).findAll();
+            orderAdapter = new OrderAdapter(getContext(), orders);*/
     }
 
     // Tasks----------------------------------------------------------------------------------------

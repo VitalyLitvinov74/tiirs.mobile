@@ -483,8 +483,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 new AlertDialog.Builder(view.getContext())
-                                        .setTitle("Информация о программе")
-                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setTitle("О программе")
+                                        .setMessage("TOiR Mobile v2.0.5\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                             }
