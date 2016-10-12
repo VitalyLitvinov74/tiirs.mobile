@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +38,8 @@ import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -333,7 +336,28 @@ public class MainActivity extends AppCompatActivity {
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
 
-        // Handle Toolbar
+        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        assert bottomBar != null;
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                switch (tabId) {
+                    case R.id.menu_user:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                        break;
+                    case R.id.menu_orders:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, OrderFragment.newInstance()).commit();
+                        break;
+                    case R.id.menu_equipments:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
+                        break;
+                    case R.id.menu_maps:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
+                        break;
+                }
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar == null) {
             return;
@@ -439,24 +463,25 @@ public class MainActivity extends AppCompatActivity {
                                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 mProgressDialog.setCancelable(true);
                                 final Downloader downloaderTask = new Downloader(MainActivity.this);
+                                if (downloaderTask != null) {
+                                    SharedPreferences sp = PreferenceManager
+                                            .getDefaultSharedPreferences(getApplicationContext());
+                                    String updateUrl = sp.getString(getString(R.string.updateUrl), "");
 
-                                SharedPreferences sp = PreferenceManager
-                                        .getDefaultSharedPreferences(getApplicationContext());
-                                String updateUrl = sp.getString(getString(R.string.updateUrl), "");
+                                    if (!updateUrl.equals("")) {
+                                        String path = Environment.getExternalStorageDirectory() + "/Download/";
+                                        File file = new File(path);
+                                        if (file.mkdirs()) {
+                                            File outputFile = new File(path, "Toir-mobile.apk");
 
-                                if (!updateUrl.equals("")) {
-                                    String path = Environment.getExternalStorageDirectory() + "/Download/";
-                                    File file = new File(path);
-                                    if (file.mkdirs()) {
-                                        File outputFile = new File(path, "Toir-mobile.apk");
-
-                                        downloaderTask.execute(updateUrl, outputFile.toString());
-                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                            @Override
-                                            public void onCancel(DialogInterface dialog) {
-                                                downloaderTask.cancel(true);
-                                            }
-                                        });
+                                            downloaderTask.execute(updateUrl, outputFile.toString());
+                                            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                                @Override
+                                                public void onCancel(DialogInterface dialog) {
+                                                    downloaderTask.cancel(true);
+                                                }
+                                            });
+                                        }
                                     }
                                 }
                             } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {
@@ -479,8 +504,8 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 new AlertDialog.Builder(view.getContext())
-                                        .setTitle("Информация о программе")
-                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setTitle("О программе")
+                                        .setMessage("ToiR Mobile v2.0.3\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                             }
@@ -727,11 +752,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void ShowSettings() {
-        TextView settings;
-        settings = (TextView) findViewById(R.id.login_current_settings);
-        if (settings == null) {
-            return;
-        }
+        TextView driver,update_server,system_server;
+        driver = (TextView) findViewById(R.id.login_current_driver);
+        update_server = (TextView) findViewById(R.id.login_current_update_server);
+        system_server = (TextView) findViewById(R.id.login_current_system_server);
 
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
@@ -744,8 +768,12 @@ public class MainActivity extends AppCompatActivity {
         }
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
-        String message = "Адрес обновления: " + updateUrl + "\nАдрес сервера: " + serverUrl + "\nДрайвер: " + driverName;
-        settings.setText(message);
+        if (driver != null)
+            driver.setText(driverName);
+        if (update_server != null)
+            update_server.setText(updateUrl);
+        if (system_server != null)
+            system_server.setText(serverUrl);
     }
 
     @Override

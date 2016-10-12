@@ -1,37 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#FAFAFA"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <Button
-        android:id="@+id/rfid_dialog_text_button_CANCEL"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:text="@string/cancel" />
-
-    <Button
-        android:id="@+id/rfid_dialog_text_button_OK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="@string/ok" />
-
     <TextView
+        android:id="@+id/rfid_dialog_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:text="@string/choose_tag"
+        android:layout_marginTop="20dp"
+        android:textColor="#457445"
+        android:textSize="18sp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <Spinner
-        android:id="@+id/rfid_dialog_text_spinner_lables"
+    <RelativeLayout
+        android:id="@+id/rfid_dialog_spinner_layout"
+        android:layout_below="@+id/rfid_dialog_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/back_spinner"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/rfid_dialog_text_spinner_lables"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="#457445"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="5dp"
+            android:spinnerMode="dropdown"
+            android:layout_alignParentLeft="false" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_drop" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/rfid_dialog_buttons_layout"
+        android:layout_below="@+id/rfid_dialog_spinner_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/rfid_dialog_text_button_CANCEL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+        android:height="35dp"
+        android:layout_weight="1"
+        android:minHeight="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="#4DD0E1"
+        android:textColor="#FAFAFA"
+        android:text="@string/cancel" />
+
+    <TextView
+            android:id="@+id/rfid_divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text=""
+            android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/rfid_dialog_text_button_OK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:height="35dp"
+        android:layout_weight="1"
+        android:minHeight="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="#4DD0E1"
+        android:textColor="#FAFAFA"
+        android:text="@string/ok" />
+
+    </LinearLayout>
 
 </RelativeLayout>

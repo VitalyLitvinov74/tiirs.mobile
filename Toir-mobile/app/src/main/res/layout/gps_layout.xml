@@ -3,13 +3,12 @@
     android:id="@+id/LinearLayout_gps_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray"
     android:orientation="vertical" >
 
     <org.osmdroid.views.MapView
         android:id="@+id/gps_mapview"
         android:layout_width="wrap_content"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:clickable="true" >
 
@@ -18,17 +17,20 @@
     <ListView
         android:id="@+id/gps_listView"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:layout_weight="0.5"
+        android:divider="#333333"
+        android:dividerHeight="1px"
         android:scrollbarAlwaysDrawVerticalTrack="true" >
 
     </ListView>
-    
+
     <TextView
         android:id="@+id/gps_TextView"
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         android:layout_weight="0.25"
+        android:visibility="gone"
         android:background="@color/white"
         android:lines="10"
         android:scrollbars="vertical"
@@ -37,5 +39,5 @@
         android:layout_height="150dp"
         android:textSize="12sp"
         android:typeface="normal" />
-    
+
 </LinearLayout>

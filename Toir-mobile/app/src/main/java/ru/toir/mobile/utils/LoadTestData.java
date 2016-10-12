@@ -16,9 +16,12 @@ import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
+import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.TaskStageList;
+import ru.toir.mobile.db.realm.TaskStageOperationList;
 import ru.toir.mobile.db.realm.TaskStageStatus;
 import ru.toir.mobile.db.realm.TaskStageTemplate;
 import ru.toir.mobile.db.realm.TaskStageType;
@@ -55,8 +58,13 @@ public class LoadTestData {
 
     static OrderStatus orderStatus;
     static OrderStatus orderStatus2;
+    static OrderStatus orderStatus3;
 
-    static Orders order;
+    static OrderLevel orderLevel;
+    static OrderLevel orderLevel2;
+    static OrderLevel orderLevel3;
+
+    static Orders order,order2,order3;
 
     static OrderVerdict orderVerdict;
 
@@ -87,6 +95,9 @@ public class LoadTestData {
     static TaskStageType taskStageType2;
     static TaskStageType taskStageType3;
 
+    static TaskStageList taskStageList;
+    static TaskStageOperationList taskStageOperationList;
+
     static TaskStageTemplate taskStageTemplate;
     static TaskStageTemplate taskStageTemplate2;
 
@@ -114,14 +125,18 @@ public class LoadTestData {
 
         final String equipmentTypeUuid="1dd8d4f8-5c98-4444-86ed-97dddde";
         final String equipmentTypeUuid2="1dd8d4f8-5c98-4444-86ed-97ddddf";
+        final String equipmentTypeUuid_nd="00000000-5c98-4444-86ed-97dddde";
 
         final String equipmentStatusUuid="1dd8d4f8-5c98-4124-86ed-9722222";
         final String equipmentStatusUuid2="1dd8d4f8-5c98-4124-86ed-9722332";
 
         final String documentationTypeUuid="1dd8d4f8-5c98-4124-86ed-3722222";
         final String documentationTypeUuid2="1dd8d4f8-5c98-4124-86ed-4722222";
+        final String documentationTypeUuid_nd="00000000-5c98-4124-86ed-4722222";
 
         final String criticalTypeUuid="1dd8d4f8-5c98-4444-86ed-823923832933";
+        final String criticalTypeUuid2="1dd8d4f8-5c98-4444-86ed-823923832987";
+        final String criticalTypeUuid3="1dd8d4f8-5c98-4444-86ed-823923832965";
 
         final String equipmentModelUuid="6dd8a4f8-5c98-4444-86ed-823923832933";
         final String equipmentModelUuid2="6dd8a4f8-5c98-4444-86ed-823923832955";
@@ -130,10 +145,19 @@ public class LoadTestData {
         final String documentationUuid2="8ee8a4f8-5c98-4444-86ed-823923132922";
 
         final String orderStatusUuid="8ee8a4f8-5c98-4444-86ed-243923132922";
+        final String orderStatusUuid2="8ee8a4f8-5c98-4444-86ed-243923132422";
+        final String orderStatusUuid3="8ee8a4f8-5c98-4444-86ed-243923332922";
 
         final String orderUuid="8ee8a4f8-5c98-4444-86ed-888923188922";
+        final String orderUuid2="8ee8a4f8-5c98-4444-86ed-888923188933";
+        final String orderUuid3="8ee8a4f8-5c98-4444-86ed-888923188944";
+
         final String orderVerdictUuid="8ee8a4f8-5c98-5555-86ed-888923188922";
         final String operationStatusUuid="8ee8a4f8-5c98-4444-86ed-243923132922";
+
+        final String orderLevelUuid1="8ee8a4f8-5c98-4444-86ed-421232123325";
+        final String orderLevelUuid2="8ee8a4f8-5c98-4444-86ed-421232123324";
+        final String orderLevelUuid3="8ee8a4f8-5c98-4444-86ed-421232123323";
 
         final String operationUuid="8ee8a4f8-5c98-4444-86ed-888923188922";
         final String operationUuid2="8ee8a4f8-5c98-4444-86ed-888923188924";
@@ -151,6 +175,11 @@ public class LoadTestData {
 
         final String taskStageStatusUuid="8ee8a4f8-5c98-4444-86ed-133923132922";
         final String taskStageVerdictUuid="8ee8a4f8-5c98-1255-86ed-888923188922";
+
+        final String taskStageListUuid="8ee8a4f8-ff98-4444-86ed-133923132922";
+        final String taskStageListUuid2="8ee8a6f8-ff98-4444-86ed-133923132922";
+        final String taskStageOperationListUuid="8ee8a4f8-5c98-1255-8764-888923188922";
+        final String taskStageOperationListUuid2="8ee8a4f8-5c98-1255-8764-888923188922";
 
         final String taskStageUuid="8ee8a4f8-5c98-4444-86ed-777923188922";
         final String taskStageUuid2="8ee8a4f8-5c98-4444-86ed-888532188924";
@@ -174,7 +203,7 @@ public class LoadTestData {
         final String taskTemplateUuid="8ee8a4f8-5b98-5555-86ed-888911188922";
         final String taskTemplateUuid2="8ee8a4f8-5a98-5555-86ed-888922288911";
 
-/*
+
     // User --------------------
     realmDB.executeTransaction(new Realm.Transaction() {
         @Override
@@ -190,6 +219,7 @@ public class LoadTestData {
             profile.setTagId("01234567");
             profile.setWhoIs("бугорчик");
             profile.setActive(true);
+            profile.setContact("+79227000285 Иван");
             profile.setImage("");
         }
     });
@@ -201,16 +231,43 @@ public class LoadTestData {
             criticalType = realmDB.createObject(CriticalType.class);
             criticalType.set_id(1);
             criticalType.setUuid(criticalTypeUuid);
-            criticalType.setTitle("Критичный");
+            criticalType.setTitle("Не критичный");
         }
-    });
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                criticalType = realmDB.createObject(CriticalType.class);
+                criticalType.set_id(2);
+                criticalType.setUuid(criticalTypeUuid2);
+                criticalType.setTitle("Средний");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                criticalType = realmDB.createObject(CriticalType.class);
+                criticalType.set_id(3);
+                criticalType.setUuid(criticalTypeUuid3);
+                criticalType.setTitle("Критичный");
+            }
+        });
 
     // EquipmentType -----------------
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            equipmentType = realmDB.createObject(EquipmentType.class);
+            equipmentType.set_id(1);
+            equipmentType.setUuid(equipmentTypeUuid_nd);
+            equipmentType.setTitle("Неизвестен");
+            }
+        });
     realmDB.executeTransaction(new Realm.Transaction() {
         @Override
         public void execute(Realm realm) {
             equipmentType = realmDB.createObject(EquipmentType.class);
-            equipmentType.set_id(1);
+            equipmentType.set_id(2);
             equipmentType.setUuid(equipmentTypeUuid);
             equipmentType.setTitle("Теплогенератор");
         }
@@ -219,7 +276,7 @@ public class LoadTestData {
         @Override
         public void execute(Realm realm) {
             equipmentType2 = realmDB.createObject(EquipmentType.class);
-            equipmentType2.set_id(2);
+            equipmentType2.set_id(3);
             equipmentType2.setUuid(equipmentTypeUuid2);
             equipmentType2.setTitle("Котел газовый");
         }
@@ -247,10 +304,19 @@ public class LoadTestData {
 
     // DocumentationType -----------------
     realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            documentationType = realmDB.createObject(DocumentationType.class);
+            documentationType.set_id(1);
+            documentationType.setUuid(documentationTypeUuid_nd);
+            documentationType.setTitle("Неопределен");
+            }
+        });
+    realmDB.executeTransaction(new Realm.Transaction() {
         @Override
         public void execute(Realm realm) {
             documentationType = realmDB.createObject(DocumentationType.class);
-            documentationType.set_id(1);
+            documentationType.set_id(2);
             documentationType.setUuid(documentationTypeUuid);
             documentationType.setTitle("Руководство");
         }
@@ -259,7 +325,7 @@ public class LoadTestData {
         @Override
         public void execute(Realm realm) {
             documentationType2 = realmDB.createObject(DocumentationType.class);
-            documentationType2.set_id(2);
+            documentationType2.set_id(3);
             documentationType2.setUuid(documentationTypeUuid2);
             documentationType2.setTitle("Паспорт");
         }
@@ -282,7 +348,7 @@ public class LoadTestData {
         public void execute(Realm realm) {
             equipmentModel = realmDB.createObject(EquipmentModel.class);
             equipmentModel.set_id(1);
-            equipmentModel.setEquipmentTypeUuid(equipmentTypeUuid);
+            equipmentModel.setEquipmentTypeUuid(equipmentModelUuid);
             equipmentModel.setEquipmentType(equipmentType);
             equipmentModel.setUuid(equipmentModelUuid);
             equipmentModel.setTitle("Тепловей 250А");
@@ -294,7 +360,7 @@ public class LoadTestData {
         public void execute(Realm realm) {
             equipmentModel2 = realmDB.createObject(EquipmentModel.class);
             equipmentModel2.set_id(2);
-            equipmentModel2.setEquipmentTypeUuid(equipmentTypeUuid2);
+            equipmentModel2.setEquipmentTypeUuid(equipmentModelUuid2);
             equipmentModel2.setEquipmentType(equipmentType2);
             equipmentModel2.setUuid(equipmentModelUuid2);
             equipmentModel2.setTitle("Unical-8800");
@@ -357,9 +423,11 @@ public class LoadTestData {
             documentation = realmDB.createObject(Documentation.class);
             documentation.set_id(1);
             documentation.setDocumentationTypeUuid(documentationTypeUuid);
+            documentation.setDocumentationType(documentationType);
             documentation.setEquipmentUuid(equipmentUuid);
             documentation.setUuid(documentationUuid);
             documentation.setTitle("Паспорт на Тепловей-250/251");
+            documentation.setFileName("1.pdf");
         }
     });
 
@@ -369,9 +437,11 @@ public class LoadTestData {
             documentation2 = realmDB.createObject(Documentation.class);
             documentation2.set_id(2);
             documentation2.setDocumentationTypeUuid(documentationTypeUuid2);
+            documentation2.setDocumentationType(documentationType2);
             documentation2.setEquipmentUuid(equipmentUuid2);
             documentation2.setUuid(documentationUuid2);
             documentation2.setTitle("Руководство на котел GTV-40");
+            documentation2.setFileName("2.pdf");
         }
     });
 
@@ -383,6 +453,7 @@ public class LoadTestData {
             orderStatus.set_id(1);
             orderStatus.setUuid(orderStatusUuid);
             orderStatus.setTitle("В работе");
+            orderStatus.setIcon("status_easy_work.png");
         }
     });
 
@@ -391,8 +462,20 @@ public class LoadTestData {
          public void execute(Realm realm) {
              orderStatus2 = realmDB.createObject(OrderStatus.class);
              orderStatus2.set_id(2);
-             orderStatus2.setUuid(orderStatusUuid);
+             orderStatus2.setUuid(orderStatusUuid2);
              orderStatus2.setTitle("Выполнен");
+             orderStatus2.setIcon("status_easy_ready.png");
+            }
+        });
+
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+             orderStatus3 = realmDB.createObject(OrderStatus.class);
+             orderStatus3.set_id(3);
+             orderStatus3.setUuid(orderStatusUuid3);
+             orderStatus3.setTitle("Получен");
+             orderStatus3.setIcon("status_easy_received.png");
             }
         });
 
@@ -407,7 +490,41 @@ public class LoadTestData {
         }
     });
 
-    // ---------------------------------------------------------------------------------------------
+    // OrderLevel -----------------
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            orderLevel = realmDB.createObject(OrderLevel.class);
+            orderLevel.set_id(1);
+            orderLevel.setUuid(orderLevelUuid1);
+            orderLevel.setTitle("Низкий");
+            orderLevel.setIcon("status_easy_receive.png");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                orderLevel2 = realmDB.createObject(OrderLevel.class);
+                orderLevel2.set_id(2);
+                orderLevel2.setUuid(orderLevelUuid2);
+                orderLevel2.setTitle("Средний");
+                orderLevel2.setIcon("status_mid_receive.png");
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                orderLevel3 = realmDB.createObject(OrderLevel.class);
+                orderLevel3.set_id(3);
+                orderLevel3.setUuid(orderLevelUuid3);
+                orderLevel3.setTitle("Высокий");
+                orderLevel3.setIcon("status_high_receive.png");
+            }
+        });
+
+        // ---------------------------------------------------------------------------------------------
     // OperationVerdict -----------------
     realmDB.executeTransaction(new Realm.Transaction() {
         @Override
@@ -708,6 +825,30 @@ public class LoadTestData {
             taskStage2.setTaskUuid(taskUuid);
         }
     });
+
+    // TaskStageList -----------------
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            taskStageList = realmDB.createObject(TaskStageList.class);
+            taskStageList.set_id(1);
+            taskStageList.setUuid(taskStageListUuid);
+            taskStageList.setFlowOrder(1);
+            taskStageList.setTaskTemplate(taskTemplate);
+            taskStageList.setTaskStageTemplate(taskStageTemplate);
+            }
+        });
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                taskStageList = realmDB.createObject(TaskStageList.class);
+                taskStageList.set_id(2);
+                taskStageList.setUuid(taskStageListUuid2);
+                taskStageList.setFlowOrder(2);
+                taskStageList.setTaskTemplate(taskTemplate);
+                taskStageList.setTaskStageTemplate(taskStageTemplate2);
+            }
+        });
     // ---------------------------------------------------------------------------------------------
     // TaskVerdict -----------------
     realmDB.executeTransaction(new Realm.Transaction() {
@@ -788,6 +929,29 @@ public class LoadTestData {
             taskTemplate2.setTaskTypeUuid(taskTypeUuid2);
         }
     });
+    // TaskStageOperationList -----------------
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                taskStageOperationList = realmDB.createObject(TaskStageOperationList.class);
+                taskStageOperationList.set_id(1);
+                taskStageOperationList.setUuid(taskStageOperationListUuid);
+                taskStageOperationList.setFlowOrder(1);
+                taskStageOperationList.setTaskStageTemplate(taskStageTemplate);
+                taskStageOperationList.setOperationTemplate(operationTemplate);
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                taskStageOperationList = realmDB.createObject(TaskStageOperationList.class);
+                taskStageOperationList.set_id(2);
+                taskStageOperationList.setUuid(taskStageOperationListUuid2);
+                taskStageOperationList.setFlowOrder(2);
+                taskStageOperationList.setTaskStageTemplate(taskStageTemplate);
+                taskStageOperationList.setOperationTemplate(operationTemplate2);
+            }
+        });
 
     // Task -----------------
     realmDB.executeTransaction(new Realm.Transaction() {
@@ -845,6 +1009,8 @@ public class LoadTestData {
             order = realmDB.createObject(Orders.class);
             order.set_id(1);
             order.setUuid(orderUuid);
+            order.setUserUuid(userTestUuid);
+            order.setOrderLevel(orderLevel);
             order.setAttemptCount(0);
             order.setAttemptSendDate(new Date());
             order.setAuthorUuid(userTestUuid);
@@ -854,12 +1020,57 @@ public class LoadTestData {
             order.setOrderStatus(orderStatus);
             order.setOrderVerdictUuid(orderVerdictUuid);
             order.setOrderVerdict(orderVerdict);
-            order.setTitle("Ремонтные работы на 17.09.2016");
+            order.setTitle("Осмотр камер наблюдения");
             order.addTask(task);
             order.addTask(task2);
         }
     });
-*/
+
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            order2 = realmDB.createObject(Orders.class);
+            order2.set_id(2);
+            order2.setUserUuid(userTestUuid);
+            order2.setUuid(orderUuid2);
+            order2.setOrderLevel(orderLevel2);
+            order2.setAttemptCount(0);
+            order2.setAttemptSendDate(new Date());
+            order2.setAuthorUuid(userTestUuid);
+            order2.setCloseDate(new Date());
+            order2.setOpenDate(new Date());
+            order2.setOrderStatusUuid(orderStatusUuid2);
+            order2.setOrderStatus(orderStatus2);
+            order2.setOrderVerdictUuid(orderVerdictUuid);
+            order2.setOrderVerdict(orderVerdict);
+            order2.setTitle("Ремонтные работы по котельным");
+            order2.addTask(task);
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                order = realmDB.createObject(Orders.class);
+                order.set_id(3);
+                order.setUuid(orderUuid3);
+                order.setUserUuid(userTestUuid);
+                order.setOrderLevel(orderLevel3);
+                order.setAttemptCount(0);
+                order.setAttemptSendDate(new Date());
+                order.setAuthorUuid(userTestUuid);
+                order.setCloseDate(new Date());
+                order.setReceiveDate(new Date());
+                order.setOpenDate(new Date());
+                order.setOrderStatusUuid(orderStatusUuid3);
+                order.setOrderStatus(orderStatus3);
+                order.setOrderVerdictUuid(orderVerdictUuid);
+                order.setOrderVerdict(orderVerdict);
+                order.setTitle("Демонтаж устаревшего оборудования");
+                order.addTask(task);
+            }
+        });
+
  }
 
 }

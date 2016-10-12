@@ -1,9 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -28,9 +26,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<DocumentationType> rows = realm.where(DocumentationType.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     public RealmResults<DocumentationType> getAllItems() {
@@ -82,9 +78,8 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
             if (adapterData != null) {
                 documentationType = adapterData.get(position);
                 textView.setText(documentationType.getTitle());
-                textView.setPadding(10, 20, 10, 20);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                textView.setTextColor(Color.WHITE);
+                //textView.setPadding(10, 20, 10, 20);
+                //textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             }
             return textView;
         }

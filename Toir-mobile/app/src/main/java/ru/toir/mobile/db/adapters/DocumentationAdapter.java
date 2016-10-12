@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -26,9 +25,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
 
     @Override
     public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Documentation> rows = realm.where(Documentation.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override
@@ -53,7 +50,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.listview, parent, false);
+            convertView = inflater.inflate(R.layout.listview_wb, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.information = (TextView) convertView.findViewById(R.id.lv_secondLine);
             viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
@@ -65,8 +62,10 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         Documentation Documentation;
         if (adapterData != null) {
             Documentation = adapterData.get(position);
-            viewHolder.title.setText(Documentation.getTitle());
-            viewHolder.information.setText(Documentation.getUuid());
+            if (Documentation != null) {
+                viewHolder.title.setText(Documentation.getTitle());
+                viewHolder.information.setText(Documentation.getUuid());
+            }
             //TODO добавить запрос на расшифровку типа документации и на название оборудования
             //viewHolder.information.setText(DocumentationType.get Documentation.getDocumentationTypeUuid());
         }

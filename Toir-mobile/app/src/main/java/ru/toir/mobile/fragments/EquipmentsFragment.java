@@ -4,27 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
-
-//import ru.toir.mobile.db.tables.EquipmentType;
 
 public class EquipmentsFragment extends Fragment {
     private Realm realmDB;
@@ -34,7 +29,7 @@ public class EquipmentsFragment extends Fragment {
 	private Spinner typeSpinner;
 	private ListView equipmentListView;
 
-	private ArrayAdapter<SortField> sortSpinnerAdapter;
+	//private ArrayAdapter<SortField> sortSpinnerAdapter;
     private EquipmentTypeAdapter typeSpinnerAdapter;
     //private ArrayAdapter<String> typeSpinnerAdapter;
 
@@ -51,12 +46,15 @@ public class EquipmentsFragment extends Fragment {
 
 		View rootView = inflater.inflate(R.layout.equipment_reference_layout,
 				container, false);
+        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+        toolbar.setSubtitle("Оборудование");
         realmDB = Realm.getDefaultInstance();
 
 		// обработчик для выпадающих списков у нас один
 		spinnerListener = new SpinnerListener();
 
 		// настраиваем сортировку по полям
+        /*
 		sortSpinner = (Spinner) rootView
 				.findViewById(R.id.erl_sort_field_spinner);
 		sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
@@ -64,7 +62,7 @@ public class EquipmentsFragment extends Fragment {
 				new ArrayList<SortField>());
 		sortSpinner.setAdapter(sortSpinnerAdapter);
 		sortSpinner.setOnItemSelectedListener(spinnerListener);
-
+*/
 		equipmentListView = (ListView) rootView
 				.findViewById(R.id.erl_equipment_listView);
 
@@ -119,11 +117,10 @@ public class EquipmentsFragment extends Fragment {
 
 	private void initView() {
 
-		FillListViewEquipments(null, null);
-        //fillTypeSpinner();
-        fillSortFieldSpinner();
+		FillListViewEquipments(null);
+//        fillSortFieldSpinner();
     }
-
+/*
 	private void fillSortFieldSpinner() {
 
 		sortSpinnerAdapter.clear();
@@ -136,24 +133,14 @@ public class EquipmentsFragment extends Fragment {
 				"startDate"));
 
 	}
-
-	private void FillListViewEquipments(String equipmentModelUuid,  String sort) {
+*/
+	private void FillListViewEquipments(String equipmentModelUuid) {
         RealmResults<Equipment> equipments;
         if (equipmentModelUuid != null) {
-            if (sort!=null) {
-                equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAllSorted(sort);
-            }
-            else {
-                equipments = realmDB.where(Equipment.class).equalTo("equipmentModelUuid", equipmentModelUuid).findAll();
-            }
+            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.uuid", equipmentModelUuid).findAll();
         }
         else {
-            if (sort!=null) {
-                equipments = realmDB.where(Equipment.class).findAllSorted(sort);
-            }
-            else {
-                equipments = realmDB.where(Equipment.class).findAll();
-            }
+            equipments = realmDB.where(Equipment.class).findAll();
         }
         equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
         equipmentListView.setAdapter(equipmentAdapter);
@@ -175,18 +162,16 @@ public class EquipmentsFragment extends Fragment {
         public void onItemClick(AdapterView<?> parentView,
                                 View selectedItemView, int position, long id) {
             // TODO разобраться как вернуть объект при клике
-            Equipment equipment;// (Equipment)parentView.getItemAtPosition(position);
-            equipment = (Equipment) parentView.getSelectedItem();
-
-            String equipment_uuid = equipment.getUuid();
-
-            Intent equipmentInfo = new Intent(getActivity(),
-                    EquipmentInfoActivity.class);
-
-            Bundle bundle = new Bundle();
-            bundle.putString("equipment_uuid", equipment_uuid);
-            equipmentInfo.putExtras(bundle);
-            getActivity().startActivity(equipmentInfo);
+            Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
+            if (equipment != null) {
+                String equipment_uuid = equipment.getUuid();
+                Intent equipmentInfo = new Intent(getActivity(),
+                        EquipmentInfoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("equipment_uuid", equipment_uuid);
+                equipmentInfo.putExtras(bundle);
+                getActivity().startActivity(equipmentInfo);
+            }
         }
     }
 
@@ -207,13 +192,10 @@ public class EquipmentsFragment extends Fragment {
             EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
             if (typeSelected != null) {
                 type = typeSelected.getUuid();
+                if (typeSelected.get_id() == 1) type = null;
             }
 
-            SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
-            if (fieldSelected != null) {
-                orderBy = fieldSelected.getField();
-            }
-            //FillListViewEquipments(type, orderBy);
+            FillListViewEquipments(type);
         }
     }
 }

@@ -13,8 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,11 +20,8 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,32 +35,23 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentOperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
-import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
-import ru.toir.mobile.db.tables.Equipment;
-import ru.toir.mobile.db.tables.EquipmentDocumentation;
-import ru.toir.mobile.db.tables.EquipmentOperation;
-import ru.toir.mobile.db.tables.EquipmentOperationResult;
-import ru.toir.mobile.db.tables.OperationResult;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import ru.toir.mobile.db.adapters.DocumentationAdapter;
+import ru.toir.mobile.db.adapters.TaskAdapter;
+import ru.toir.mobile.db.realm.Documentation;
+import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
-import ru.toir.mobile.rfid.RfidDriverBase;
-import ru.toir.mobile.utils.DataUtils;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
+    private Realm realmDB;
 
 	private final static String TAG = "EquipmentInfoActivity";
 
@@ -75,27 +61,25 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private AccountHeader headerResult = null;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
-    private Drawer result = null;
 
     private TextView tv_equipment_name;
+    private TextView tv_equipment_inventory;
+    private TextView tv_equipment_uuid;
 	private TextView tv_equipment_type;
 	private TextView tv_equipment_position;
 	private TextView tv_equipment_tasks;
 	private TextView tv_equipment_critical;
 	private ImageView tv_equipment_image;
 	private TextView tv_equipment_task_date;
-	private Button read_rfid_button;
-	private Button write_rfid_button;
-	private Button write_button;
 
-	// диалог для работы с rfid считывателем
+    // диалог для работы с rfid считывателем
 	private RfidDialog rfidDialog;
-	// адаптер для listview с документацией
-	private ArrayAdapter<EquipmentDocumentation> documentationArrayAdapter;
 	// диалог при загрузке файла документации
 	private ProgressDialog loadDocumentationDialog;
 
-	// фильтр для получения сообщений при получении файлов документации с
+    DocumentationAdapter documentationAdapter;
+
+    // фильтр для получения сообщений при получении файлов документации с
 	// сервера
 	private IntentFilter mFilterGetDocumentationFile = new IntentFilter(
 			ReferenceServiceProvider.Actions.ACTION_GET_DOCUMENTATION_FILE);
@@ -116,16 +100,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 					Log.d(TAG, "boolean result" + result);
 
-					if (result == true) {
+					if (result) {
 						Toast.makeText(getApplicationContext(),
 								"Файл загружен успешно и готов к просмотру.",
 								Toast.LENGTH_LONG).show();
-						EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
-								new ToirDatabaseContext(getApplicationContext()));
-						documentationArrayAdapter.clear();
-						documentationArrayAdapter.addAll(documentationDBAdapter
-								.getItems(equipment_uuid));
-
+                        //Documentation<Documentation> documentation = realmDB.where(Documentation.class).equalTo("equipmentUuid",);
 						// показываем только первый файл, по идее он один и
 						// должен быть
 						String[] uuids = bundle
@@ -154,25 +133,29 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	/**
 	 * Показываем документ из базы во внешнем приложении.
 	 * 
-	 * @param uuid
+	 * @param uuid - идентификатор документа
 	 */
 	private void showDocument(String uuid) {
 
-		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
+        RealmResults<Documentation> documentation;
+        documentation = realmDB.where(Documentation.class).findAll();
+        documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
 
 		if (uuid != null) {
-			EquipmentDocumentation item = documentationDBAdapter.getItem(uuid);
+			Documentation item = realmDB.where(Documentation.class).equalTo("uuid",uuid).findFirst();
 			MimeTypeMap mt = MimeTypeMap.getSingleton();
-			File file = new File(item.getPath());
+            File file = new File(item.getUuid());
+			//File file = new File(item.getPath());
 			String[] patternList = file.getName().split("\\.");
 			String extension = patternList[patternList.length - 1];
 
 			if (mt.hasExtension(extension)) {
 				String mimeType = mt.getMimeTypeFromExtension(extension);
 				Intent target = new Intent(Intent.ACTION_VIEW);
-				target.setDataAndType(Uri.fromFile(new File(item.getPath())),
-						mimeType);
+                target.setDataAndType(Uri.fromFile(new File(item.getUuid())),
+                		mimeType);
+				//target.setDataAndType(Uri.fromFile(new File(item.getPath())),
+				//		mimeType);
 				target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
 				Intent viewFileIntent = Intent.createChooser(target,
@@ -198,6 +181,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        realmDB = Realm.getDefaultInstance();
 		Bundle b = getIntent().getExtras();
 		equipment_uuid = b.getString("equipment_uuid");
 		//setContentView(R.layout.equipment_layout);
@@ -206,144 +190,145 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
 		// tv_equipment_id = (TextView) findViewById(R.id.equipment_text_name);
 		tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
-		tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
-		tv_equipment_position = (TextView) findViewById(R.id.equipment_position);
-		tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
+        tv_equipment_inventory = (TextView) findViewById(R.id.equipment_text_inventory);
+        tv_equipment_uuid = (TextView) findViewById(R.id.equipment_text_uuid);
+		//tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
+		tv_equipment_position = (TextView) findViewById(R.id.equipment_text_location);
+		//tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
 		tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
-		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_tasks);
+		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_status);
 		tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
-		lv = (ListView) findViewById(R.id.equipment_info_operation_list);
-		FillListViewOperations();
+		//lv = (ListView) findViewById(R.id.equipment_info_operation_list);
+		//FillListViewOperations();
 
-		read_rfid_button = (Button) findViewById(R.id.button_read);
-		write_rfid_button = (Button) findViewById(R.id.button_write);
+        //Button read_rfid_button = (Button) findViewById(R.id.button_read);
+        //Button write_rfid_button = (Button) findViewById(R.id.button_write);
 		// временная кнопка записи в метку пользователей
-		write_button = (Button) findViewById(R.id.button_write_user);
-
+        //Button write_button = (Button) findViewById(R.id.button_write_user);
+        /*
 		read_rfid_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-				Log.d(TAG, "Считываем память метки.");
-				EquipmentDBAdapter adapter = new EquipmentDBAdapter(
-						new ToirDatabaseContext(getApplicationContext()));
-				Equipment equipment = adapter.getItem(equipment_uuid);
-				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+                Log.d(TAG, "Считываем память метки.");
+                Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
+                if (equipment != null) {
+                    Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
+                }
 
-				Handler handler = new Handler(new Handler.Callback() {
+                Handler handler = new Handler(new Handler.Callback() {
 
-					@Override
-					public boolean handleMessage(Message msg) {
+                    @Override
+                    public boolean handleMessage(Message msg) {
 
-						Log.d(TAG, "Получили сообщение из драйвера.");
+                        Log.d(TAG, "Получили сообщение из драйвера.");
 
-						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-							String tagData = (String) msg.obj;
-							Log.d(TAG, tagData);
-							Toast.makeText(getApplicationContext(),
-									"Считывание метки успешно.\r\n" + tagData,
-									Toast.LENGTH_SHORT).show();
-						} else {
-							Log.d(TAG, "Ошибка чтения метки!");
-							Toast.makeText(getApplicationContext(),
-									"Ошибка чтения метки.", Toast.LENGTH_SHORT)
-									.show();
-						}
+                        if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                            String tagData = (String) msg.obj;
+                            Log.d(TAG, tagData);
+                            Toast.makeText(getApplicationContext(),
+                                    "Считывание метки успешно.\r\n" + tagData,
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d(TAG, "Ошибка чтения метки!");
+                            Toast.makeText(getApplicationContext(),
+                                    "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                                    .show();
+                        }
 
-						// закрываем диалог
-						rfidDialog.dismiss();
-						return true;
-					}
-				});
-				rfidDialog = new RfidDialog();
-				rfidDialog.setHandler(handler);
+                        // закрываем диалог
+                        rfidDialog.dismiss();
+                        return true;
+                    }
+                });
+                rfidDialog = new RfidDialog();
+                rfidDialog.setHandler(handler);
 
-				// читаем метку с конкретным id для теста
-				// rfidDialog.readTagData("0000000000",
-				// "3000E2004000860902332580112D",
-				// RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+                // читаем метку с конкретным id для теста
+                // rfidDialog.readTagData("0000000000",
+                // "3000E2004000860902332580112D",
+                // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
-				// читаем метку с id привязанным к оборудованию
-				// rfidDialog.readTagData("0000000000", equipment.getTag_id(),
-				// RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+                // читаем метку с id привязанным к оборудованию
+                // rfidDialog.readTagData("0000000000", equipment.getTag_id(),
+                // RfidDriverBase.MEMORY_BANK_USER, 0, 8);
 
-				// читаем "произовольную" метку, ту которую найдём первой
-				rfidDialog.readTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+                // читаем "произовольную" метку, ту которую найдём первой
+                rfidDialog.readTagData("0000000000",
+                        RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
-				rfidDialog.show(getFragmentManager(), TAG);
-			}
-		});
+                rfidDialog.show(getFragmentManager(), TAG);
+            }
+        });
 
 		write_rfid_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-				Log.d(TAG, "Пишем в метку оборудования.");
-				EquipmentDBAdapter adapter = new EquipmentDBAdapter(
-						new ToirDatabaseContext(getApplicationContext()));
-				Equipment equipment = adapter.getItem(equipment_uuid);
-				Log.d(TAG, "id метки оборудования: " + equipment.getTag_id());
+                Log.d(TAG, "Пишем в метку оборудования.");
+                Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
+                if (equipment != null) {
+                    Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
+                }
+                Handler handler = new Handler(new Handler.Callback() {
 
-				Handler handler = new Handler(new Handler.Callback() {
+                    @Override
+                    public boolean handleMessage(Message msg) {
 
-					@Override
-					public boolean handleMessage(Message msg) {
+                        Log.d(TAG, "Получили сообщение из драйвера.");
 
-						Log.d(TAG, "Получили сообщение из драйвера.");
+                        if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Запись метки удалась.", Toast.LENGTH_SHORT)
+                                    .show();
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Не удалось записать данные.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
 
-						if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-							Toast.makeText(getApplicationContext(),
-									"Запись метки удалась.", Toast.LENGTH_SHORT)
-									.show();
-						} else {
-							Toast.makeText(getApplicationContext(),
-									"Не удалось записать данные.",
-									Toast.LENGTH_SHORT).show();
-						}
+                        // закрываем диалог
+                        rfidDialog.dismiss();
+                        return true;
+                    }
+                });
+                rfidDialog = new RfidDialog();
+                rfidDialog.setHandler(handler);
+                // тестовые данные для примера
+                String data = "0a0a0a0a";
+                //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+                //data = "00000000000000000000000000000000";
+                // data = "FFFFFFFFFFFFFFFF";
+                data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 
-						// закрываем диалог
-						rfidDialog.dismiss();
-						return true;
-					}
-				});
-				rfidDialog = new RfidDialog();
-				rfidDialog.setHandler(handler);
-				// тестовые данные для примера
-				String data = "0a0a0a0a";
-				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-				data = "00000000000000000000000000000000";
-				// data = "FFFFFFFFFFFFFFFF";
-				data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+                // пишем в метку с id привязанным к оборудованию
+                // rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+                // RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
-				// пишем в метку с id привязанным к оборудованию
-				// rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
-				// RfidDriverBase.MEMORY_BANK_USER, 0, data);
+                // пишем в "известную" метку
+                // rfidDialog.writeTagData("0000000000",
+                // "3000E2004000860902332580112D",
+                // RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
-				// пишем в "известную" метку
-				// rfidDialog.writeTagData("0000000000",
-				// "3000E2004000860902332580112D",
-				// RfidDriverBase.MEMORY_BANK_USER, 0, data);
+                // пишем в "произовольную" метку, ту которую найдём первой
+                rfidDialog.writeTagData("0000000000",
+                        RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
-				// пишем в "произовольную" метку, ту которую найдём первой
-				rfidDialog.writeTagData("0000000000",
-						RfidDriverBase.MEMORY_BANK_USER, 0, data);
+                rfidDialog.show(getFragmentManager(), TAG);
 
-				rfidDialog.show(getFragmentManager(), TAG);
-
-			}
-		});
+            }
+        });
 
 		write_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-				Log.d(TAG, "Пишем в метку пользователя.");
-				// сюда нужно перенести код который отвечает за сохранение
-				// структуры данных в пользовательскую метку
-			}
-		});
-
+                Log.d(TAG, "Пишем в метку пользователя.");
+                // сюда нужно перенести код который отвечает за сохранение
+                // структуры данных в пользовательскую метку
+            }
+        });
+*/
 		initView();
 	}
 
@@ -354,12 +339,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 
-			EquipmentDocumentation item = documentationArrayAdapter
-					.getItem(position);
-
-			File file = new File(item.getPath());
+            Documentation documentation = (Documentation)parent.getItemAtPosition(position);
+			// TODO как все таки путик файлу формируем
+            File file = new File(documentation.getEquipment().getUuid());
 			if (file.exists()) {
-				showDocument(item.getUuid());
+				showDocument(documentation.getUuid());
 			} else {
 				// либо сказать что файла нет, либо предложить скачать с сервера
 				Log.d(TAG, "Получаем файл документации.");
@@ -370,7 +354,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 				registerReceiver(mReceiverGetDocumentationFile,
 						mFilterGetDocumentationFile);
 
-				rsh.getDocumentationFile(new String[] { item.getUuid() });
+				rsh.getDocumentationFile(new String[] { documentation.getUuid() });
 
 				// показываем диалог получения наряда
 				loadDocumentationDialog = new ProgressDialog(
@@ -400,165 +384,64 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	}
 
 	private void initView() {
+        Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
 
-		// TaskDBAdapter taskDBAdapter = new TaskDBAdapter(new
-		// TOiRDatabaseContext(getApplicationContext()));
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		EquipmentTypeDBAdapter eqTypeDBAdapter = new EquipmentTypeDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		EquipmentOperationResultDBAdapter eqOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
+        tv_equipment_name.setText(equipment.getTitle());
+        tv_equipment_inventory.setText("ИД: " + equipment.getInventoryNumber());
+        tv_equipment_uuid.setText(equipment.getUuid());
+		/*
+        tv_equipment_type.setText("Модель: "
+				+ equipment.getEquipmentModel().getTitle()); */
+        tv_equipment_position.setText(""
+                + String.valueOf(equipment.getLatitude()) + " / "
+                + String.valueOf(equipment.getLongitude()));
 
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		Equipment equipment = equipmentDBAdapter.getItem(equipment_uuid);
-		ArrayList<EquipmentOperation> equipmentOperationList = eqOperationDBAdapter
-				.getItemsByTaskAndEquipment("", equipment.getUuid());
-		// tv_equipment_id.setText("TAGID: " + equipment.getTag_id());
-		tv_equipment_name.setText("Название: " + equipment.getTitle());
-		tv_equipment_type.setText("Тип: "
-				+ eqTypeDBAdapter.getNameByUUID(equipment
-						.getEquipment_type_uuid()));
-
-		tv_equipment_position.setText(""
-				+ String.valueOf(equipment.getLatitude()) + " / "
-				+ String.valueOf(equipment.getLongitude()));
-		tv_equipment_task_date.setText(DataUtils.getDate(
-				equipment.getStart_date(), "dd.MM.yyyy HH:mm"));
+        tv_equipment_task_date.setText(equipment.getStartDate().toString());
+        /*
 		tv_equipment_critical.setText("Критичность: "
-				+ criticalTypeDBAdapter.getNameByUUID(equipment
-						.getCritical_type_uuid()));
+				+ equipment.getCriticalType().getTitle());
+*/
+        // if (equipmentOperationList != null &&
+        // equipmentOperationList.size()>0)
+        // tv_equipment_task_date.setText("" +
+        // taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
+        // else tv_equipment_task_date.setText("еще не обслуживалось");
 
-		// if (equipmentOperationList != null &&
-		// equipmentOperationList.size()>0)
-		// tv_equipment_task_date.setText("" +
-		// taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
-		// else tv_equipment_task_date.setText("еще не обслуживалось");
-		if (equipmentOperationList != null && equipmentOperationList.size() > 0) {
-			tv_equipment_tasks.setText(""
-					+ eqOperationResultDBAdapter
-							.getOperationResultByUUID(equipmentOperationList
-									.get(0).getOperation_status_uuid()));
-		} else {
-			tv_equipment_tasks.setText("еще не обслуживалось");
-		}
 
-		File imgFile = new File(equipment.getImage());
-		if (imgFile.exists() && imgFile.isFile()) {
-			Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
-					.getAbsolutePath());
-			tv_equipment_image.setImageBitmap(myBitmap);
-		}
+        Tasks task;
+        TaskStages taskStages;
+        task = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findFirst();
+        if (task != null) {
+            taskStages = task.getTaskStages().get(0);
+            tv_equipment_tasks.setText(""
+                    + taskStages.getTaskStageVerdict().getTitle());
+        } else {
+            tv_equipment_tasks.setText("еще не обслуживалось");
+        }
 
-		// адаптер для listview с документацией
-		ListView documentationListView = (ListView) findViewById(R.id.e_l_documentation_listView);
-		EquipmentDocumentationDBAdapter documentationDBAdapter = new EquipmentDocumentationDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		documentationArrayAdapter = new ArrayAdapter<EquipmentDocumentation>(
-				getApplicationContext(), R.layout.equipment_documentation_item,
-				R.id.documentation_item_title,
-				documentationDBAdapter.getItems(equipment_uuid));
+        File imgFile = new File(equipment.getImage());
+        if (imgFile.exists() && imgFile.isFile()) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
+                    .getAbsolutePath());
+            //tv_equipment_image.setImageBitmap(myBitmap);
+        }
 
-		documentationListView.setAdapter(documentationArrayAdapter);
-		documentationListView
-				.setOnItemClickListener(new ListViewClickListener());
-	}
+        RealmResults<Documentation> documentation;
+        ListView documentationListView = (ListView) findViewById(R.id.equipment_documentation_listView);
+        //documentation = realmDB.where(Documentation.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
+        documentation = realmDB.where(Documentation.class).findAll();
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
+        documentationListView.setAdapter(documentationAdapter);
+        documentationListView
+                .setOnItemClickListener(new ListViewClickListener());
+        }
 
 	private void FillListViewOperations() {
-
-		EquipmentOperationDBAdapter eqOperationDBAdapter = new EquipmentOperationDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		EquipmentOperationResultDBAdapter equipmentOperationResultDBAdapter = new EquipmentOperationResultDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		CriticalTypeDBAdapter criticalTypeDBAdapter = new CriticalTypeDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		EquipmentDBAdapter eqDBAdapter = new EquipmentDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		OperationTypeDBAdapter operationTypeDBAdapter = new OperationTypeDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-		OperationResultDBAdapter operationResultDBAdapter = new OperationResultDBAdapter(
-				new ToirDatabaseContext(getApplicationContext()));
-
-		ArrayList<EquipmentOperation> operationList = eqOperationDBAdapter
-				.getItemsByTaskAndEquipment("", equipment_uuid);
-		EquipmentOperationResult equipmentOperationResult;
-		OperationResult operationResult;
-		int operation_type;
-
-		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-		String[] from = { "name", "descr", "img" };
-		int[] to = { R.id.lv_firstLine, R.id.lv_secondLine, R.id.lv_icon };
-
-		if (operationList != null)
-			for (EquipmentOperation operation : operationList) {
-
-				HashMap<String, String> hm = new HashMap<String, String>();
-				equipmentOperationResult = equipmentOperationResultDBAdapter
-						.getItemByOperation(operation.getUuid());
-				String resultTitle;
-				String startDate;
-
-				if (equipmentOperationResult != null) {
-					startDate = DataUtils.getDate(
-							equipmentOperationResult.getStart_date(),
-							"dd.MM.yyyy HH:mm");
-				} else {
-					startDate = "не проводилась";
-				}
-
-				hm.put("name",
-						"Операция: "
-								+ operationTypeDBAdapter.getItem(
-										operation.getOperation_type_uuid())
-										.getTitle() + " [" + startDate + "]");
-
-				if (equipmentOperationResult != null) {
-					operationResult = operationResultDBAdapter
-							.getItem(equipmentOperationResult
-									.getOperation_result_uuid());
-					if (operationResult != null) {
-						resultTitle = operationResult.getTitle();
-					} else {
-						resultTitle = "---";
-					}
-				} else {
-					resultTitle = "---";
-				}
-
-				hm.put("descr",
-						"Критичность: "
-								+ criticalTypeDBAdapter.getItem(
-										eqDBAdapter.getItem(
-												operation.getEquipment_uuid())
-												.getCritical_type_uuid())
-										.getType() + " Результат: ["
-								+ resultTitle + "]");
-				// Creation row
-				operation_type = equipmentOperationResultDBAdapter
-						.getOperationResultTypeByUUID(operation
-								.getOperation_status_uuid());
-				switch (operation_type) {
-				case 1:
-					hm.put("img", Integer.toString(R.drawable.img_status_4));
-					break;
-				case 2:
-					hm.put("img", Integer.toString(R.drawable.img_status_3));
-					break;
-				case 3:
-					hm.put("img", Integer.toString(R.drawable.img_status_1));
-					break;
-				default:
-					hm.put("img", Integer.toString(R.drawable.img_status_1));
-				}
-				aList.add(hm);
-			}
-		SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(),
-				aList, R.layout.listview, from, to);
-		// Setting the adapter to the listView
-		lv.setAdapter(adapter);
+        TaskAdapter taskAdapter;
+        RealmResults<Tasks> tasks;
+        tasks = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
+        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        lv.setAdapter(taskAdapter);
 	}
 
     void setMainLayout(Bundle savedInstanceState) {
@@ -567,6 +450,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         // Handle Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        assert toolbar != null;
         toolbar.setBackgroundResource(R.drawable.header);
         toolbar.setSubtitle("Обслуживание и ремонт");
 
@@ -584,7 +468,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         //iprofilelist = new ArrayList<>();
         //users_id = new long[MAX_USER_PROFILE];
-        result = new DrawerBuilder()
+        Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)
@@ -599,8 +483,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 new AlertDialog.Builder(view.getContext())
-                                        .setTitle("Информация о программе")
-                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setTitle("О программе")
+                                        .setMessage("TOiR Mobile v2.0.5\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                             }

@@ -7,6 +7,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
@@ -35,12 +37,6 @@ import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
-
-//import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
-//import ru.toir.mobile.db.adapters.TaskDBAdapter;
-//import ru.toir.mobile.db.adapters.TaskStatusDBAdapter;
 
 public class GPSFragment extends Fragment {
 
@@ -59,7 +55,6 @@ public class GPSFragment extends Fragment {
     private Orders order;
     private RealmResults<Orders> orders;
     private RealmResults<Equipment> equipment;
-	// private SimpleCursorAdapter equipmentAdapter;
 	private int LastItemPosition = -1;
 
     public GPSFragment() {
@@ -80,25 +75,21 @@ public class GPSFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
-        realmDB = Realm.getDefaultInstance();
+        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         EquipmentAdapter equipmentAdapter;
-        Equipment equipment;
-        RealmResults<Equipment> equipments = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
         ListView equipmentListView;
+        RealmList<Equipment> equipments_all = new RealmList<>();
 
-		String tagId = AuthorizedUser.getInstance().getTagId();
-		// String equipmentUUID = "";
-		Float equipment_latitude = 0f, equipment_longitude = 0f;
-		//UsersDBAdapter users = new UsersDBAdapter(new ToirDatabaseContext(
-		//		getActivity().getApplicationContext()));
-		// запрашиваем данные текущего юзера, хотя нам нужен только его uuid
-		// (если он будет храниться глобально, то запрашивать постоянно уже не
-		// надо будет)
-		//Users user = users.getUserByTagId(tagId);
+        toolbar.setSubtitle("Карта");
+        realmDB = Realm.getDefaultInstance();
+        RealmResults<Equipment> equipments = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
+
+		//Float equipment_latitude = 0f, equipment_longitude = 0f;
         user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
 		LocationManager lm = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
-		if (lm != null) {
+
+        if (lm != null) {
 			TestGPSListener tgpsl = new TestGPSListener(
 					(TextView) rootView.findViewById(R.id.gps_TextView),
 					getActivity().getApplicationContext(), user.getUuid());
@@ -113,7 +104,7 @@ public class GPSFragment extends Fragment {
 						+ String.valueOf(location.getAltitude()) + "\n");
 				gpsLog.append("Latitude:"
 						+ String.valueOf(location.getLatitude()) + "\n");
-				gpsLog.append("Longtitude:"
+				gpsLog.append("Longitude:"
 						+ String.valueOf(location.getLongitude()) + "\n");
 			}
 		}
@@ -147,100 +138,28 @@ public class GPSFragment extends Fragment {
             tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
             //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
-                //equipments = realmDB.where(Equipment.class).equalTo("uuid", itemOrder.getTasks().get(0).getEquipment().getUuid()).findAll();
-                equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findAll();
-                equipment = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
-                //equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipmentUuid()).findFirst();
-                equipments.add(equipment);
-                curLatitude = curLatitude - 0.0001;
-                curLongitude = curLongitude - 0.0001;
-
-                EquipmentOverlayItem olItem = new EquipmentOverlayItem(
-                        equipment.getTitle(), "Device",
-                        new GeoPoint(equipment_latitude,
-                                equipment_longitude));
-                olItem.equipment = equipment;
-                Drawable newMarker = this.getResources()
-                        .getDrawable(R.drawable.marker_equip);
-                olItem.setMarker(newMarker);
-                overlayItemArray.add(olItem);
+                equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();
+                for (Equipment equipment : equipments) {
+                    equipments_all.add(equipment);
+                    curLatitude = curLatitude - 0.0001;
+                    curLongitude = curLongitude - 0.0001;
+                    EquipmentOverlayItem olItem = new EquipmentOverlayItem(
+                            equipment.getTitle(), "Device",
+                            new GeoPoint(curLatitude,
+                                    curLongitude));
+                    olItem.equipment = equipment;
+                    Drawable newMarker = this.getResources()
+                            .getDrawable(R.drawable.marker_equip);
+                    olItem.setMarker(newMarker);
+                    overlayItemArray.add(olItem);
+                }
             }
         }
-        if (equipments!=null) {
-			equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
+        if (equipments_all!=null && equipments_all.size()>0) {
+			equipmentAdapter = new EquipmentAdapter(getContext(), equipments_all);
 			equipmentListView.setAdapter(equipmentAdapter);
 		}
-
         /*
-		TaskDBAdapter taskDBAdapter = new TaskDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-        ArrayList<Task> taskList = taskDBAdapter.getOrdersByUser(
-				user.getUuid(), TaskStatusDBAdapter.Status.IN_WORK, "");
-		List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
-		String[] equipmentFrom = { "name", "location" };
-		int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine };
-
-		lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);
-
-		EquipmentOperationDBAdapter operationDBAdapter = new EquipmentOperationDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-		EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-				new ToirDatabaseContext(getActivity().getApplicationContext()));
-
-		for (Task task : taskList) {
-			ArrayList<EquipmentOperation> operationList = operationDBAdapter
-					.getItems(task.getUuid());
-			// запрашиваем перечень оборудования
-			if (operationList != null) {
-				for (EquipmentOperation operation : operationList) {
-
-					if (operation.getEquipment_uuid() != null) {
-						HashMap<String, String> hm = new HashMap<String, String>();
-						Equipment equipment = equipmentDBAdapter
-								.getItem(operation.getEquipment_uuid());
-						if (equipment != null) {
-
-							hm.put("name", equipment.getTitle()
-							// + " ["
-							// +
-							// eqDBAdapter.getInventoryNumberByUUID(equipmentUUID)
-							// + "]"
-							);
-							// default
-							hm.put("location", equipment.getLocation());
-							aList.add(hm);
-							// String coordinates[] = location.split("[NSWE]");
-							// equipment_latitude=equipmentDBAdapter.getLatitudeByUUID(equipmentUUID);
-							// equipment_longitude=equipmentDBAdapter.getLongitudeByUUID(equipmentUUID);
-							curLatitude = curLatitude - 0.0001;
-							curLongitude = curLongitude - 0.0001;
-
-							// EquipmentOverlayItem olItem = new
-							// EquipmentOverlayItem(
-							// equipment.getTitle(), "Device", new GeoPoint(
-							// curLatitude, curLongitude));
-							EquipmentOverlayItem olItem = new EquipmentOverlayItem(
-									equipment.getTitle(), "Device",
-									new GeoPoint(equipment_latitude,
-											equipment_longitude));
-							olItem.equipment = equipment;
-							Drawable newMarker = this.getResources()
-									.getDrawable(R.drawable.marker_equip);
-							olItem.setMarker(newMarker);
-							overlayItemArray.add(olItem);
-							// aOverlayItemArray.add(olItem);
-						}
-					}
-				}
-			}
-		}
-
-		SimpleAdapter adapter = new SimpleAdapter(getActivity()
-				.getApplicationContext(), aList, R.layout.listview,
-				equipmentFrom, equipmentTo);
-		// Setting the adapter to the listView
-		lv_equipment.setAdapter(adapter);
-		// lv_equipment.setOnItemClickListener(clickListener);
 		lv_equipment.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -260,8 +179,9 @@ public class GPSFragment extends Fragment {
 				LastItemPosition = position;
 			}
 		});
-        */
-		TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
+	        */
+
+        TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
 			@Override
 			protected boolean onLongPressHelper(int index, OverlayItem item) {
