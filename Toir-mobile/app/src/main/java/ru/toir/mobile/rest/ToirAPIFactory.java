@@ -2,14 +2,25 @@ package ru.toir.mobile.rest;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
+import ru.toir.mobile.rest.interfaces.IDocumentationType;
+import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
+import ru.toir.mobile.rest.interfaces.IEquipmentType;
+import ru.toir.mobile.rest.interfaces.IMeasureType;
+import ru.toir.mobile.rest.interfaces.IOperationStatus;
+import ru.toir.mobile.rest.interfaces.IOperationType;
+import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
 
@@ -46,10 +57,48 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static IDocumentationType getDocumentationTypeService() {
+        return getRetrofit().create(IDocumentationType.class);
+    }
+
+    @NonNull
+    public static IEquipmentStatus getEquipmentStatusService() {
+        return getRetrofit().create(IEquipmentStatus.class);
+    }
+
+    @NonNull
+    public static IEquipmentType getEquipmentTypeService() {
+        return getRetrofit().create(IEquipmentType.class);
+    }
+
+    @NonNull
+    public static IMeasureType getMeasureTypeService() {
+        return getRetrofit().create(IMeasureType.class);
+    }
+
+    @NonNull
+    public static IOperationStatus getOperationStatus() {
+        return getRetrofit().create(IOperationStatus.class);
+    }
+
+    @NonNull
+    public static IOperationType getOperationType() {
+        return getRetrofit().create(IOperationType.class);
+    }
+
+    @NonNull
+    public static ITaskStatus getTaskStatus() {
+        return getRetrofit().create(ITaskStatus.class);
+    }
+
+    @NonNull
     private static Retrofit getRetrofit() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                .create();
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(CLIENT)
                 .build();
     }
