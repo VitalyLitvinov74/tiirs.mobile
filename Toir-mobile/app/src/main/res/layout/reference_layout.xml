@@ -26,7 +26,9 @@
         <ListView
             android:id="@+id/reference_listView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:divider="#333333"
+            android:dividerHeight="1px">
         </ListView>
 
     </LinearLayout>

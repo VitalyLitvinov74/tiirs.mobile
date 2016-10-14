@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,13 +27,12 @@ import org.osmdroid.views.overlay.OverlayItem;
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import io.realm.RealmList;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
@@ -78,7 +79,6 @@ public class GPSFragment extends Fragment {
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         EquipmentAdapter equipmentAdapter;
         ListView equipmentListView;
-        RealmList<Equipment> equipments_all = new RealmList<>();
 
         toolbar.setSubtitle("Карта");
         realmDB = Realm.getDefaultInstance();
@@ -123,9 +123,9 @@ public class GPSFragment extends Fragment {
 		// aOverlayItemArray = new ArrayList<OverlayItem>();
 		OverlayItem overlayItem = new OverlayItem("We are here", "WAH",
 				new GeoPoint(curLatitude, curLongitude));
-		aOverlayItemArray = new ArrayList<OverlayItem>();
+		aOverlayItemArray = new ArrayList<>();
 		aOverlayItemArray.add(overlayItem);
-		ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(
+		ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<>(
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
 		mapView.getOverlays().add(aItemizedIconOverlay);
 
@@ -133,34 +133,44 @@ public class GPSFragment extends Fragment {
         equipmentListView = (ListView) rootView
                 .findViewById(R.id.gps_listView);
 
-        orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
+        //orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
+        RealmQuery<Equipment> q = realmDB.where(Equipment.class);
+
+        orders = realmDB.where(Orders.class).findAll();
         for (Orders itemOrder : orders) {
             tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
             //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();
                 for (Equipment equipment : equipments) {
-                    equipments_all.add(equipment);
-                    curLatitude = curLatitude - 0.0001;
-                    curLongitude = curLongitude - 0.0001;
+                    q = q.or().equalTo("_id", equipment.get_id());
+                    curLatitude = curLatitude - 0.0002;
+                    curLongitude = curLongitude - 0.0002;
                     EquipmentOverlayItem olItem = new EquipmentOverlayItem(
                             equipment.getTitle(), "Device",
                             new GeoPoint(curLatitude,
                                     curLongitude));
                     olItem.equipment = equipment;
-                    Drawable newMarker = this.getResources()
-                            .getDrawable(R.drawable.marker_equip);
+                    //TODO реальные уровни критичности в качестве маркеров
+                    Drawable newMarker;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        newMarker = this.getResources().getDrawable(R.drawable.critical_level_3, getActivity().getApplicationContext().getTheme());
+                    } else {
+                        newMarker = this.getResources().getDrawable(R.drawable.critical_level_3);
+                    }
                     olItem.setMarker(newMarker);
                     overlayItemArray.add(olItem);
                 }
             }
         }
-        if (equipments_all!=null && equipments_all.size()>0) {
-			equipmentAdapter = new EquipmentAdapter(getContext(), equipments_all);
+        equipments = q.findAll();
+
+        if (equipments!=null) {
+			equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
 			equipmentListView.setAdapter(equipmentAdapter);
 		}
-        /*
-		lv_equipment.setOnItemClickListener(new OnItemClickListener() {
+
+        equipmentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO связать нажатие в списке с картой: изменить цвет маркера
@@ -179,7 +189,6 @@ public class GPSFragment extends Fragment {
 				LastItemPosition = position;
 			}
 		});
-	        */
 
         TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
@@ -192,36 +201,13 @@ public class GPSFragment extends Fragment {
 								+ equipment.getUuid(), Toast.LENGTH_SHORT)
 						.show();
 
-				// пример тупой, но полагю это почти то что тебе было нужно
-				//ViewPager pager = (ViewPager) getActivity().findViewById(
-				//		R.id.pager);
-				//pager.setCurrentItem(PageAdapter.TASK_FRAGMENT);
-
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
 				return super.onLongPressHelper(index, item);
 			}
 		};
 		mapView.getOverlays().add(overlay);
 
-		// String[] equipmentFrom = { "", "equipment_uuid" };
-		// int[] equipmentTo = { R.id.lv_firstLine, R.id.lv_secondLine};
-		// EquipmentOperationDBAdapter equipmentOperationDBAdapter = new
-		// EquipmentOperationDBAdapter(
-		// new TOiRDatabaseContext(getActivity()
-		// .getApplicationContext()));
-		// EquipmentDBAdapter equipmentDBAdapter = new EquipmentDBAdapter(
-		// new TOiRDatabaseContext(getActivity()
-		// .getApplicationContext()));
-		//
-		// lv_equipment = (ListView) rootView.findViewById(R.id.gps_listView);
-		// equipmentAdapter = new SimpleCursorAdapter(getActivity(),
-		// R.layout.listview, null, equipmentFrom, equipmentTo,
-		// CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-		// // Setting the adapter to the listView
-		// lv_equipment.setAdapter(equipmentAdapter);
-		// lv_equipment.setOnItemClickListener(clickListener);
-		// equipmentAdapter.changeCursor(equipmentOperationDBAdapter.getOperationWithInfo());
-
-		onInit(rootView);
+		//onInit(rootView);
 
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
@@ -229,9 +215,6 @@ public class GPSFragment extends Fragment {
 		return rootView;
 	}
 
-	public void onInit(View view) {
-
-	}
 
 	/**
 	 * Класс объекта оборудования для отображения на крате

@@ -18,6 +18,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -227,28 +229,13 @@ public class OrderFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
         } else {
             RealmList<Orders> orders_all = new RealmList<>();
+            ArrayList<Orders> orders_all2 = new ArrayList<>();
+
             RealmResults<Orders> orders;
-            /*
             int cnt = 0;
-            orders = realmDB.where(Orders.class).equalTo("uuid","").findAll();
-            orderAdapter = new OrderAdapter(getContext(), orders);
             orders = realmDB.where(Orders.class).findAll();
-            for (Orders item : orders) {
-                if (cnt == 0) {
-                    orderAdapter.addSeparatorItem(item);
-                }
-                orderAdapter.addItem(item);
-                orders_all.add(item);
-                if (lDate != null) {
-                    current_date = new SimpleDateFormat("dd MMMM").format(lDate);
-                    if (!init_date.equals(current_date)) {
-                        orderAdapter.addSeparatorItem(item);
-                        orders_list.add(order);
-                        init_date = current_date;
-                    }
-                cnt++;
-            }*/
-            orders = realmDB.where(Orders.class).findAll();
+            /*
+            orders = realmDB.where(Orders.class).findAll();*/
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }

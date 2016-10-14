@@ -382,9 +382,9 @@ public class LoadTestData {
             equipment.setTitle("Теплогенератор Тепловей-250А");
             equipment.setTagId("1234-5678-9101112");
             equipment.setUserUuid(userTestUuid);
-            equipment.setLocation("55.34453,45.234234");
-            equipment.setLatitude(55);
-            equipment.setLongitude(55);
+            equipment.setLocation("Цех изоляторов ПФИ");
+            equipment.setLatitude((float)55.343);
+            equipment.setLongitude((float)55.234);
             equipment.setStartDate(new Date());
             equipment.setEquipmentModel(equipmentModel);
             equipment.setCriticalType(criticalType);
@@ -406,9 +406,9 @@ public class LoadTestData {
             equipment2.setTitle("Газовый котел Unical");
             equipment2.setTagId("02345567");
             equipment2.setUserUuid(userTestUuid);
-            equipment2.setLocation("55.34453,45.234234");
-            equipment2.setLatitude(55);
-            equipment2.setLongitude(55);
+            equipment2.setLocation("Котельная №3");
+            equipment2.setLatitude((float)55.5311);
+            equipment2.setLongitude((float)55.1222);
             equipment2.setStartDate(new Date());
             equipment2.setEquipmentModel(equipmentModel2);
             equipment2.setCriticalType(criticalType);
@@ -1015,6 +1015,7 @@ public class LoadTestData {
             order.setAttemptSendDate(new Date());
             order.setAuthorUuid(userTestUuid);
             order.setCloseDate(new Date());
+            order.setStartDate(new Date());
             order.setOpenDate(new Date());
             order.setOrderStatusUuid(orderStatusUuid);
             order.setOrderStatus(orderStatus);
@@ -1038,6 +1039,7 @@ public class LoadTestData {
             order2.setAttemptSendDate(new Date());
             order2.setAuthorUuid(userTestUuid);
             order2.setCloseDate(new Date());
+            order2.setStartDate(new Date());
             order2.setOpenDate(new Date());
             order2.setOrderStatusUuid(orderStatusUuid2);
             order2.setOrderStatus(orderStatus2);
@@ -1061,6 +1063,7 @@ public class LoadTestData {
                 order.setAuthorUuid(userTestUuid);
                 order.setCloseDate(new Date());
                 order.setReceiveDate(new Date());
+                order.setStartDate(new Date());
                 order.setOpenDate(new Date());
                 order.setOrderStatusUuid(orderStatusUuid3);
                 order.setOrderStatus(orderStatus3);

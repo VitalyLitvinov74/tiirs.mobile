@@ -12,11 +12,9 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TreeSet;
+import java.util.List;
 
 import io.realm.RealmBaseAdapter;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Orders;
@@ -27,112 +25,97 @@ import ru.toir.mobile.db.realm.Orders;
  */
 public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
+    private List<Long> separates = new ArrayList<>();
     private static final int TYPE_ITEM = 0;
-    private static final int TYPE_SEPARATOR = 1;
+    private static final int TYPE_SEPARATOR = -1;
 
-    private ArrayList mData = new ArrayList();
-    private TreeSet mSeparatorsSet = new TreeSet();
-    /*
-    private LayoutInflater mInflater;
-    public OrderAdapter() {
-        mInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }*/
+    @Override
+    public void notifyDataSetChanged() {
+        makeSeparates();
+        super.notifyDataSetChanged();
+    }
+
+    private void makeSeparates() {
+        int i = 0;
+        int j = 0;
+        Date currentDate = new Date();
+        Date orderCloseDate;
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        separates.clear();
+
+
+        for(Orders order : adapterData) {
+            orderCloseDate = order.getCloseDate();
+            if (!fmt.format(orderCloseDate).equals(fmt.format(currentDate))) {
+                currentDate = order.getCloseDate();
+                separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
+                j++;
+                separates.add(i + j, Long.valueOf(i));
+            } else {
+                separates.add(i + j, Long.valueOf(i));
+            }
+            i++;
+        }
+    }
 
     public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
         super(context, data);
-    }
-
-    public OrderAdapter(@NonNull Context context, RealmList<Orders> data) {
-        super(context, data);
+        makeSeparates();
     }
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        return separates.size();
     }
 
     @Override
     public Orders getItem(int position) {
-        if (adapterData != null) {
-            return adapterData.get(position);
+        Orders order;
+        long realId = separates.get(position);
+        if(realId == TYPE_SEPARATOR) {
+            order = null;
+        } else {
+            order = adapterData.get((int)realId);
         }
-        return null;
+        return order;
     }
 
-    public int getItemType(int position) {
-            if (adapterData != null) {
-                if (adapterData.get(position).getTitle().equals("---")) return TYPE_SEPARATOR;
-                else return TYPE_ITEM;
-            }
-            return -1;
-        }
 
-    public void addItem(final Orders item) {
-            mData.add(item);
-            notifyDataSetChanged();
-        }
-
-    public void addSeparatorItem(final Orders item) {
-            mData.add(item);
-            // save separator position
-            mSeparatorsSet.add(mData.size() - 1);
-            notifyDataSetChanged();
-        }
-
-    @Override
-    public int getItemViewType(int position) {
-        return mSeparatorsSet.contains(position) ? TYPE_SEPARATOR : TYPE_ITEM;
-    }
     @Override
     public long getItemId(int position) {
-        Orders order;
-        if (adapterData != null) {
-            order = adapterData.get(position);
-            return order.get_id();
-        }
-        return 0;
+        return separates.get(position);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+        Date lDate;
+        String sDate;
         viewHolder = new ViewHolder();
-        int type = getItemViewType(position);
-        if (convertView == null) {
-            switch (type) {
-                case TYPE_ITEM:
-                    convertView = inflater.inflate(R.layout.order_item, parent, false);
-                    viewHolder.created = (TextView) convertView.findViewById(R.id.order_Create);
-                    viewHolder.title = (TextView) convertView.findViewById(R.id.order_Name);
-                    viewHolder.status = (TextView) convertView.findViewById(R.id.order_status);
-                    viewHolder.icon = (ImageView) convertView.findViewById(R.id.order_ImageStatus);
-                    convertView.setTag(viewHolder);
-                    break;
-                case TYPE_SEPARATOR:
-                    convertView = inflater.inflate(R.layout.order_item_divider, null);
-                    viewHolder.title = (TextView) convertView.findViewById(R.id.order_date_divider);
-                    break;
+        long type = separates.get(position);
+        switch ((int)type) {
+            case TYPE_SEPARATOR:
+                convertView = inflater.inflate(R.layout.order_item_divider, null);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.order_date_divider);
+                convertView.setTag(viewHolder);
+                long id = separates.get(position + 1);
+                lDate = adapterData.get((int)id).getCloseDate();
+                if (lDate != null) {
+                    sDate = new SimpleDateFormat("dd MMMM yyyy", myDateFormatSymbols).format(lDate);
+                    viewHolder.title.setText(sDate);
                 }
-            }
-       else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
-       if (type == TYPE_SEPARATOR) {
-           Date lDate = new Date();
-           String sDate;
-           if (lDate != null) {
-               sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
-               viewHolder.title.setText(sDate);
-           }
-       }
-
-       if (adapterData != null && type == TYPE_ITEM) {
-            Orders order = adapterData.get(position);
-            Date lDate = order.getOpenDate();
-            String sDate;
-            if (lDate != null) {
-                    sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
+                break;
+            default:
+                convertView = inflater.inflate(R.layout.order_item, parent, false);
+                viewHolder.created = (TextView) convertView.findViewById(R.id.order_Create);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.order_Name);
+                viewHolder.status = (TextView) convertView.findViewById(R.id.order_status);
+                viewHolder.icon = (ImageView) convertView.findViewById(R.id.order_ImageStatus);
+                convertView.setTag(viewHolder);
+                Orders order = getItem(position);
+                lDate = order.getCloseDate();
+                if (lDate != null) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
                     viewHolder.created.setText(sDate);
                 } else {
                     sDate = "неизвестно";
@@ -175,7 +158,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
                     viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]");
                 }
-    }
+        }
         return convertView;
     }
 
@@ -191,7 +174,6 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         TextView created;
         TextView title;
         TextView status;
-        //TextView separator;
         ImageView icon;
     }
 }

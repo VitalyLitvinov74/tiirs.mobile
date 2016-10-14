@@ -53,28 +53,39 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (parent.getId() == R.id.reference_listView) {
-            if (convertView == null) {
-                convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+        if (convertView == null) {
+          viewHolder = new ViewHolder();
+          if (parent.getId() == R.id.reference_listView) {
+              convertView = inflater.inflate(R.layout.listview, parent, false);
+              viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+              convertView.setTag(viewHolder);
             }
-            EquipmentType equipmentType;
-            if (adapterData != null) {
+          if (parent.getId() == R.id.simple_spinner) {
+              //convertView = inflater.inflate(R.layout.simple_spinner_item, parent, false);
+              convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+              //viewHolder.title = (TextView) convertView.findViewById(R.id.spinner_item);
+              viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+              convertView.setTag(viewHolder);
+            }
+         } else {
+         viewHolder = (ViewHolder) convertView.getTag();
+       }
+
+        EquipmentType equipmentType;
+        if (adapterData != null && viewHolder.title !=null) {
                 equipmentType = adapterData.get(position);
-                viewHolder.title.setText(equipmentType.getTitle());
+                if (equipmentType != null)
+                    viewHolder.title.setText(equipmentType.getTitle());
             }
-            return convertView;
-        }
-        if (parent.getId() == R.id.simple_spinner || convertView == null) {
+
+        if (convertView == null) {
             TextView textView = new TextView(context);
-            EquipmentType equipmentType;
             if (adapterData != null) {
                 equipmentType = adapterData.get(position);
-                textView.setText(equipmentType.getTitle());
+                if (equipmentType != null)
+                    textView.setText(equipmentType.getTitle());
+                textView.setTextSize(16);
+                textView.setPadding(5,5,5,5);
             }
             return textView;
         }

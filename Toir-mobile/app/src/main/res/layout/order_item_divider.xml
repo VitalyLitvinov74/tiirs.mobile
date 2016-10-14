@@ -10,8 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="#555555"
-        android:textColor="#fafafa"
+        android:background="#1565c0"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="10dip"
+        android:paddingLeft="5dip"
         android:gravity="center_vertical"
         android:text="@string/description"
         android:textSize="14sp" />

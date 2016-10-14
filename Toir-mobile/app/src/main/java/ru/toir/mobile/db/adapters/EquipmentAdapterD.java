@@ -21,14 +21,14 @@ import ru.toir.mobile.db.realm.Equipment;
  * @author koputo
  * Created by koputo on 08.09.16.
  */
-public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements ListAdapter {
+public class EquipmentAdapterD extends RealmBaseAdapter<Equipment> implements ListAdapter {
 
     public static final String TABLE_NAME = "Equipment";
 
-    public EquipmentAdapter(@NonNull Context context, RealmResults<Equipment> data) {
+    public EquipmentAdapterD(@NonNull Context context, RealmResults<Equipment> data) {
         super(context, data);
     }
-    public EquipmentAdapter(@NonNull Context context, RealmList<Equipment> data) {
+    public EquipmentAdapterD(@NonNull Context context, RealmList<Equipment> data) {
         super(context, data);
     }
 
@@ -62,11 +62,11 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
             if (parent.getId() == R.id.gps_listView) {
                 convertView = inflater.inflate(R.layout.equipment_gps_item, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image_critical);
+                viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image);
                 viewHolder.equipmentStatus = (TextView) convertView.findViewById(R.id.eril_status);
-                viewHolder.criticalLevel = (TextView) convertView.findViewById(R.id.eril_critical_level);
-                viewHolder.location = (TextView) convertView.findViewById(R.id.eril_place);
+                viewHolder.criticalTypeUuid = (TextView) convertView.findViewById(R.id.eril_critical);
                 viewHolder.inventoryNumber = (TextView) convertView.findViewById(R.id.eril_inventory_number);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
                 viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
                 convertView.setTag(viewHolder);
             }
@@ -99,15 +99,9 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         viewHolder.icon.setImageResource(R.drawable.critical_level_3);
                     if (equipment.getCriticalType().get_id() ==  2)
                         viewHolder.icon.setImageResource(R.drawable.critical_level_5);
-                    //viewHolder.location.setText(equipment.getLocation());
-                    if (equipment.get_id()==1)
-                        viewHolder.location.setText("Цех изоляторов ПФИ");
-                    if (equipment.get_id()==2)
-                        viewHolder.location.setText("Котельная №3");
-
-                    viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
-                    viewHolder.criticalLevel.setText(equipment.getCriticalType().getTitle());
+                    viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
+                    viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
                 }
                 else {
                     // временные фото иконки
@@ -137,7 +131,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         TextView location;
         TextView inventoryNumber;
         TextView criticalTypeUuid;
-        TextView criticalLevel;
         TextView startDate;
     }
 }

@@ -5,9 +5,8 @@
 
     <TextView
         android:id="@+id/eril_title"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="5dp"
         android:background="#FAFAFA"
@@ -34,22 +33,23 @@
         android:background="#FAFAFA"
         android:textColor="#454545"
         android:textSize="14sp"
-        android:layout_alignParentRight="true"
         android:layout_marginLeft="3dp"
-        android:layout_marginRight="5dp"
         android:layout_toRightOf="@+id/eril_inventory_number"
-        android:text="0" />
+        android:text="0"
+        android:gravity="right"
+        android:layout_toLeftOf="@+id/eril_image_critical" />
 
     <ImageView
         android:id="@+id/eril_image_critical"
+        android:background="#FAFAFA"
         android:layout_width="23dp"
         android:layout_height="23dp"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/eril_critical_level"
         android:contentDescription="изображение статуса оборудования"
         android:src="@drawable/critical_level_3" />
 
@@ -59,6 +59,7 @@
         android:layout_height="wrap_content"
         android:background="#FAFAFA"
         android:textColor="#222222"
+        android:layout_marginLeft="5dp"
         android:textSize="14sp"
         android:layout_below="@+id/eril_title"
         android:text="Статус:" />
@@ -67,13 +68,14 @@
         android:id="@+id/eril_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/eril_title"
+        android:layout_below="@+id/eril_inventory_number"
         android:background="#FAFAFA"
         android:textColor="#454545"
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
-        android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/eril_place"
-        android:text="Новое" />
+        android:text="Новое"
+        android:gravity="right"
+        android:layout_toLeftOf="@+id/eril_image_critical" />
 
 </RelativeLayout>
