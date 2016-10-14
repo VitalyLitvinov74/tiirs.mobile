@@ -94,10 +94,10 @@ public class TaskProcessor {
 
 	/**
 	 * Получение нарядов
-	 * 
-	 * @param bundle
-	 * @return
-	 */
+	 *
+     * @param bundle Параметры
+     * @return Bundle
+     */
 	public Bundle GetTask(Bundle bundle) {
 
 		Bundle result = new Bundle();
@@ -142,8 +142,8 @@ public class TaskProcessor {
 		}
 
 		// получаем шаблоны
-		ArrayList<String> operationPatternUuids = new ArrayList<String>(
-				patternUuids);
+        ArrayList<String> operationPatternUuids = new ArrayList<>(
+                patternUuids);
 		Bundle patternResult = getPatterns(operationPatternUuids);
 		success = patternResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
@@ -156,8 +156,8 @@ public class TaskProcessor {
 
 		// получаем возможные результаты выполнения операций
 		Bundle operationResultsResult = getOperationResults(operationTypeUuids
-				.toArray(new String[] {}));
-		success = operationResultsResult.getBoolean(IServiceProvider.RESULT);
+                .toArray(new String[]{""}));
+        success = operationResultsResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
 			db.endTransaction();
 			return operationResultsResult;
@@ -201,8 +201,8 @@ public class TaskProcessor {
 
 		// получаем изображение результата измерения
 		Bundle measureImageFileResult = getMeasureValueImages(measureValuesImages
-				.toArray(new String[] {}));
-		success = measureImageFileResult.getBoolean(IServiceProvider.RESULT);
+                .toArray(new String[]{""}));
+        success = measureImageFileResult.getBoolean(IServiceProvider.RESULT);
 		if (!success) {
 			db.endTransaction();
 			return measureImageFileResult;
@@ -226,7 +226,7 @@ public class TaskProcessor {
 			Bundle extra = new Bundle();
 			extra.putStringArray(
 					ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE_PARAMETER_UUID,
-					requiredDocuments.toArray(new String[] {}));
+                    requiredDocuments.toArray(new String[]{""}));
 
 			return referenceProcessor.getDocumentationFile(extra);
 		} catch (Exception e) {
@@ -246,7 +246,7 @@ public class TaskProcessor {
 			Bundle extra = new Bundle();
 			extra.putStringArray(
 					ReferenceServiceProvider.Methods.GET_IMAGE_FILE_PARAMETER_UUID,
-					equipmentImages.toArray(new String[] {}));
+                    equipmentImages.toArray(new String[]{""}));
 
 			return referenceProcessor.getEquipmentFile(extra);
 		} catch (Exception e) {
@@ -260,23 +260,23 @@ public class TaskProcessor {
 
 	/**
 	 * Получаем данные по нарядам
-	 * 
-	 * @return
-	 */
+	 *
+     * @return Bundle
+     */
 	private Bundle getTasks(String url) {
 
-		URI requestUri = null;
-		String token = AuthorizedUser.getInstance().getToken();
-		String jsonString = null;
-		Bundle result = new Bundle();
+        URI requestUri;
+        String token = AuthorizedUser.getInstance().getToken();
+        String jsonString;
+        Bundle result = new Bundle();
 
 		try {
 			requestUri = new URI(url);
 			Log.d("test", "requestUri = " + requestUri.toString());
 
-			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
-			List<String> tList = new ArrayList<String>();
-			tList.add("bearer " + token);
+            Map<String, List<String>> headers = new ArrayMap<>();
+            List<String> tList = new ArrayList<>();
+            tList.add("bearer " + token);
 			headers.put("Authorization", tList);
 
 			Request request = new Request(Method.GET, requestUri, headers, null);
@@ -290,7 +290,6 @@ public class TaskProcessor {
 
 				ArrayList<TaskSrv> serverTasks = gson.fromJson(jsonString,
 						new TypeToken<ArrayList<TaskSrv>>() {
-							private static final long serialVersionUID = 1l;
 						}.getType());
 				if (serverTasks != null) {
 					// разбираем и сохраняем полученные данные
@@ -320,8 +319,8 @@ public class TaskProcessor {
 	 * 
 	 * @param uuids
 	 *            список uuid шаблонов которые нужно получить
-	 * @return
-	 */
+     * @return Bundle
+     */
 	private Bundle getPatterns(ArrayList<String> uuids) {
 
 		try {
@@ -348,8 +347,8 @@ public class TaskProcessor {
 	 * 
 	 * @param uuids
 	 *            список uuid типов операций для которых нужно получить данные
-	 * @return
-	 */
+     * @return Bundle
+     */
 	private Bundle getOperationResults(String[] uuids) {
 
 		try {
@@ -371,9 +370,9 @@ public class TaskProcessor {
 
 	/**
 	 * Получаем все возможные статусы операций
-	 * 
-	 * @return
-	 */
+	 *
+     * @return Bundle
+     */
 	private Bundle getOperationStatuses() {
 
 		try {
@@ -391,9 +390,9 @@ public class TaskProcessor {
 
 	/**
 	 * Получаем изображения к результатам измерений
-	 * 
-	 * @return
-	 */
+	 *
+     * @return Bundle
+     */
 	private Bundle getMeasureValueImages(String[] uuids) {
 
 		try {
@@ -414,9 +413,9 @@ public class TaskProcessor {
 
 	/**
 	 * Получаем статусы нарядов
-	 * 
-	 * @return
-	 */
+	 *
+     * @return Bundle
+     */
 	private Bundle getTaskStatuses() {
 
 		try {
@@ -561,8 +560,8 @@ public class TaskProcessor {
 				.getEquipmentSrvs(operations);
 
 		// список полученного оборудования для загрузки позже изображений
-		Map<String, String> tmpEquipmentImages = new HashMap<String, String>();
-		for (EquipmentSrv equipment : equipments) {
+        Map<String, String> tmpEquipmentImages = new HashMap<>();
+        for (EquipmentSrv equipment : equipments) {
 			tmpEquipmentImages.put(equipment.getId(), null);
 		}
 
@@ -604,7 +603,7 @@ public class TaskProcessor {
 		// получаем список документов для обязательной загрузки, позже загрузить
 		ArrayList<EquipmentDocumentation> doclist = EquipmentSrv
 				.getEquipmentDocumentations(equipments);
-		Map<String, String> tmpRequiredDocuments = new HashMap<String, String>();
+        Map<String, String> tmpRequiredDocuments = new HashMap<>();
 
 		for (EquipmentDocumentation doc : doclist) {
 			if (doc.isRequired()) {
@@ -681,8 +680,8 @@ public class TaskProcessor {
 		}
 
 		// строим список изображений результатов измерений
-		Map<String, String> tmpMeasureValuesImages = new HashMap<String, String>();
-		for (MeasureValue measureValue : measureValues) {
+        Map<String, String> tmpMeasureValuesImages = new HashMap<>();
+        for (MeasureValue measureValue : measureValues) {
 			if (measureValue.getValue().startsWith("api/")) {
 				tmpMeasureValuesImages.put(measureValue.getUuid(), null);
 			}
@@ -697,9 +696,9 @@ public class TaskProcessor {
 
 	/**
 	 * Отправка результата выполнения наряда.
-	 * 
-	 * @param bundle
-	 * @return {@link Bundle}
+	 *
+     * @param bundle Параметры
+     * @return {@link Bundle}
 	 */
 	public Bundle TaskSendResult(Bundle bundle) {
 
@@ -716,21 +715,23 @@ public class TaskProcessor {
 		String[] taskUuids = bundle
 				.getStringArray(TaskServiceProvider.Methods.PARAMETER_TASK_UUID);
 
-		ArrayList<TaskRes> taskResults = new ArrayList<TaskRes>();
+        ArrayList<TaskRes> taskResults = new ArrayList<>();
 
-		// загружаем данные в формат понятный серверу
-		for (String taskUuid : taskUuids) {
-			TaskRes taskResult = TaskRes.load(mContext, taskUuid);
-			if (taskResult != null) {
-				taskResults.add(taskResult);
-			} else {
-				result = new Bundle();
-				result.putBoolean(IServiceProvider.RESULT, false);
-				result.putString(IServiceProvider.MESSAGE,
-						"Ошибка при чтении результатов выполнения наряда.");
-				return result;
-			}
-		}
+        if (taskUuids != null) {
+            // загружаем данные в формат понятный серверу
+            for (String taskUuid : taskUuids) {
+                TaskRes taskResult = TaskRes.load(mContext, taskUuid);
+                if (taskResult != null) {
+                    taskResults.add(taskResult);
+                } else {
+                    result = new Bundle();
+                    result.putBoolean(IServiceProvider.RESULT, false);
+                    result.putString(IServiceProvider.MESSAGE,
+                            "Ошибка при чтении результатов выполнения наряда.");
+                    return result;
+                }
+            }
+        }
 
 		return TasksSendResults(taskResults);
 	}
@@ -738,24 +739,25 @@ public class TaskProcessor {
 	/**
 	 * Вспомогательный метод для отправки результатов выполнения нарядов на
 	 * сервер
-	 * 
-	 * @return {@link Bundle}
+     *
+     * @param results Результаты выполнения наряда
+     * @return {@link Bundle}
 	 */
 	private Bundle TasksSendResults(ArrayList<TaskRes> results) {
 
-		URI requestUri = null;
-		Bundle result;
+        URI requestUri;
+        Bundle result;
 
 		try {
 			requestUri = new URI(mServerUrl + TASK_SEND_RESULT_URL);
 			Log.d("test", "requestUri = " + requestUri.toString());
 
-			Map<String, List<String>> headers = new ArrayMap<String, List<String>>();
-			List<String> aList = new ArrayList<String>();
-			aList.add("Bearer " + AuthorizedUser.getInstance().getToken());
+            Map<String, List<String>> headers = new ArrayMap<>();
+            List<String> aList = new ArrayList<>();
+            aList.add("Bearer " + AuthorizedUser.getInstance().getToken());
 			headers.put("Authorization", aList);
-			List<String> cList = new ArrayList<String>();
-			cList.add("application/json");
+            List<String> cList = new ArrayList<>();
+            cList.add("application/json");
 			headers.put("Content-Type", cList);
 
 			if (results != null) {
@@ -830,9 +832,9 @@ public class TaskProcessor {
 
 	/**
 	 * Увеличиваем счётчик попыток отправки результатов
-	 * 
-	 * @param resultsList
-	 */
+	 *
+     * @param resultsList Список результатов выполнения нарядов
+     */
 	private void riseUpdated(ArrayList<TaskRes> resultsList) {
 		TaskDBAdapter taskAdapter = new TaskDBAdapter(new ToirDatabaseContext(
 				mContext));
@@ -875,9 +877,9 @@ public class TaskProcessor {
 
 	/**
 	 * Сбрасываем флаг изменнённого состояния(данные отправленны на сервер)
-	 * 
-	 * @param resultsList
-	 */
+     *
+     * @param resultsList Список результатов выполнения нарядов
+     */
 	private void clearUpdated(ArrayList<TaskRes> resultsList) {
 
 		TaskDBAdapter taskAdapter = new TaskDBAdapter(new ToirDatabaseContext(
