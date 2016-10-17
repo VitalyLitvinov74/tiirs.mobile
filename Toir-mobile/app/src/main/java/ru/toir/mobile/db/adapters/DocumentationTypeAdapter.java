@@ -54,36 +54,42 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (parent.getId() == R.id.reference_listView) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            if (parent.getId() == R.id.reference_listView) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder = new ViewHolder();
                 viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
                 convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
             }
-            DocumentationType documentationType;
-            if (adapterData != null) {
-                documentationType = adapterData.get(position);
-                viewHolder.title.setText(documentationType.getTitle());
+            if (parent.getId() == R.id.simple_spinner) {
+                convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+                convertView.setTag(viewHolder);
             }
-            return convertView;
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (parent.getId() == R.id.simple_spinner || convertView == null) {
+        DocumentationType documentationType;
+        if (adapterData != null && viewHolder.title !=null) {
+            documentationType = adapterData.get(position);
+            if (documentationType != null)
+                viewHolder.title.setText(documentationType.getTitle());
+        }
+
+        if (convertView == null) {
             TextView textView = new TextView(context);
-            DocumentationType documentationType;
             if (adapterData != null) {
                 documentationType = adapterData.get(position);
-                textView.setText(documentationType.getTitle());
-                //textView.setPadding(10, 20, 10, 20);
-                //textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                if (documentationType != null)
+                    textView.setText(documentationType.getTitle());
+                textView.setTextSize(16);
+                textView.setPadding(5,5,5,5);
             }
             return textView;
         }
-        return null;
+        return convertView;
     }
 
     @Override

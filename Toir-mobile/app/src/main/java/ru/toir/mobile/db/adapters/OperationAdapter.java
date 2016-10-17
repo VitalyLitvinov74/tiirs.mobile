@@ -1,18 +1,14 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -64,18 +60,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        String pathToImages;
+        //String pathToImages;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.operation_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.op_Name);
-            viewHolder.title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            viewHolder.status = (TextView) convertView.findViewById(R.id.op_Status);
-            viewHolder.status.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            viewHolder.verdict = (TextView) convertView.findViewById(R.id.op_Verdict);
-            viewHolder.verdict.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            viewHolder.startdate = (TextView) convertView.findViewById(R.id.op_StartDate);
-            viewHolder.startdate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
+            viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
+            viewHolder.verdict = (ImageView) convertView.findViewById(R.id.operation_verdict);
+            viewHolder.start_date = (TextView) convertView.findViewById(R.id.operation_startDate);
+            viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -83,42 +76,47 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
         if (adapterData!=null) {
             Operation operation = adapterData.get(position);
-            viewHolder.title.setText(operation.getOperationTemplate().getTitle());
-            Date lDate = operation.getStartDate();
-            String sDate = new SimpleDateFormat("dd.MM.YYYY HH:ss", Locale.US).format(lDate);
-            viewHolder.startdate.setText(sDate);
-            viewHolder.verdict.setText(operation.getOperationVerdict().getTitle());
-            viewHolder.status.setText(operation.getOperationStatus().getTitle());
-            // TODO может вынести это на глобальный уровень?
-            pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
+            if (operation != null) {
+                String sDate;
+                viewHolder.title.setText(operation.getOperationTemplate().getTitle());
+                Date lDate = operation.getStartDate();
+                if (lDate != null) {
+                    sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
+                    viewHolder.start_date.setText(sDate);
+                }
+                lDate = operation.getEndDate();
+                if (lDate != null) {
+                    sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
+                    viewHolder.end_date.setText(sDate);
+                }
+                if (operation.getOperationStatus().getTitle().equals("Выполнена")) {
+                    viewHolder.status.setChecked(true);
+                }
+                // TODO может вынести это на глобальный уровень?
+                // тут берем изображение или из иконки или из ресурсов по заранее выстроенной логике
+                //viewHolder.verdict.setImageResource();
+                /*
+                pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator + "Android"
                     + File.separator + "data"
                     + File.separator + "ru.toir.mobile"
                     + File.separator + "img"
                     + File.separator;
-            File imgFile = new File(pathToImages + operation.getOperationStatus().getIcon());
-            if (imgFile.exists() && imgFile.isFile()) {
-                Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
-                        .getAbsolutePath());
-                viewHolder.icon.setImageBitmap(mBitmap);
-            }
-            else {
-                imgFile = new File(pathToImages + "help_32.png");
+                File imgFile = new File(pathToImages + operation.getOperationStatus().getIcon());
                 if (imgFile.exists() && imgFile.isFile()) {
                     Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
                             .getAbsolutePath());
-                    viewHolder.icon.setImageBitmap(mBitmap);
+                    viewHolder.icon.setImageBitmap(mBitmap);*/
                 }
             }
-        }
         return convertView;
     }
 
     private static class ViewHolder {
         TextView title;
-        TextView status;
-        TextView verdict;
-        TextView startdate;
-        ImageView icon;
+        CheckBox status;
+        ImageView verdict;
+        TextView start_date;
+        TextView end_date;
     }
 }

@@ -26,6 +26,18 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
+        <TextView
+            android:id="@+id/tl_Header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#1565c0"
+            android:textColor="#ffffff"
+            android:layout_marginLeft="10dip"
+            android:paddingLeft="5dip"
+            android:gravity="center_vertical"
+            android:text="@string/description"
+            android:textSize="16sp" />
+
         <ListView
             android:id="@+id/tl_tasks_list_view"
             android:layout_width="match_parent"

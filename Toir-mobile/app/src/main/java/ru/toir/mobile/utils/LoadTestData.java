@@ -154,6 +154,7 @@ public class LoadTestData {
 
         final String orderVerdictUuid="8ee8a4f8-5c98-5555-86ed-888923188922";
         final String operationStatusUuid="8ee8a4f8-5c98-4444-86ed-243923132922";
+        final String operationStatusUuid2="8ee8a4f8-5c98-4444-86ed-243923132348";
 
         final String orderLevelUuid1="8ee8a4f8-5c98-4444-86ed-421232123325";
         final String orderLevelUuid2="8ee8a4f8-5c98-4444-86ed-421232123324";
@@ -577,6 +578,16 @@ public class LoadTestData {
             operationStatus.setTitle("Не выполнена");
         }
     });
+
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                operationStatus = realmDB.createObject(OperationStatus.class);
+                operationStatus.set_id(2);
+                operationStatus.setUuid(operationStatusUuid2);
+                operationStatus.setTitle("Выполнена");
+            }
+        });
 
     // OperationTemplate -----------------
     realmDB.executeTransaction(new Realm.Transaction() {

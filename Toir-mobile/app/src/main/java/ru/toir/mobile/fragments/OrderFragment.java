@@ -16,12 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
@@ -228,45 +226,50 @@ public class OrderFragment extends Fragment {
             Toast.makeText(getActivity(), "Нет такого пользователя!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            RealmList<Orders> orders_all = new RealmList<>();
-            ArrayList<Orders> orders_all2 = new ArrayList<>();
-
             RealmResults<Orders> orders;
-            int cnt = 0;
             orders = realmDB.where(Orders.class).findAll();
-            /*
-            orders = realmDB.where(Orders.class).findAll();*/
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
-            /*
-            RealmResults<Orders> orders;
-            orders = realmDB.where(Orders.class).findAll();
-            orderAdapter = new OrderAdapter(getContext(), orders);*/
     }
 
     // Tasks----------------------------------------------------------------------------------------
-    private void fillListViewTasks(String orderUuid) {
+    private void fillListViewTasks(String orderUuid, String orderTitle) {
         RealmResults<Tasks> tasks;
         tasks = realmDB.where(Tasks.class).equalTo("orderUuid", orderUuid).findAllSorted("startDate");
         taskAdapter = new TaskAdapter(getContext(), tasks);
         mainListView.setAdapter(taskAdapter);
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.VISIBLE);
+            tl_Header.setText(orderTitle);
+        }
     }
 
     // Orders----------------------------------------------------------------------------------------
-    private void fillListViewTaskStage(String taskUuid) {
+    private void fillListViewTaskStage(String taskUuid, String taskTitle) {
         RealmResults<TaskStages> taskStages;
         taskStages = realmDB.where(TaskStages.class).equalTo("taskUuid", taskUuid).findAllSorted("startDate");
         taskStageAdapter = new TaskStageAdapter(getContext(), taskStages);
         mainListView.setAdapter(taskStageAdapter);
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.VISIBLE);
+            tl_Header.setText(taskTitle);
+        }
     }
 
     // Operations----------------------------------------------------------------------------------------
-    private void fillListViewOperations(String taskStageUuid) {
+    private void fillListViewOperations(String taskStageUuid, String taskStageTitle) {
         RealmResults<Operation> operations;
         operations = realmDB.where(Operation.class).equalTo("taskStageUuid", taskStageUuid).findAllSorted("startDate");
         operationAdapter = new OperationAdapter(getContext(), operations);
         mainListView.setAdapter(operationAdapter);
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.VISIBLE);
+            tl_Header.setText(taskStageTitle);
+        }
     }
 
     public class ListViewClickListener implements
@@ -275,31 +278,43 @@ public class OrderFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View selectedItemView,
                                 int position, long id) {
 
+            Tasks task;
+            Orders order;
+            TaskStages taskStage;
             // находимся на "экране" нарядов
             if (Level == 0) {
                 if (orderAdapter != null) {
-                    currentOrderUuid = orderAdapter.getItem(position).getUuid();
+                    order = orderAdapter.getItem(position);
+                    if (order != null) {
+                        currentOrderUuid = order.getUuid();
+                        fillListViewTasks(currentOrderUuid, order.getTitle());
+                        Level = 1;
+                    }
                 }
-                fillListViewTasks(currentOrderUuid);
-                Level = 1;
                 return;
             }
             // Tasks
             if (Level == 1) {
                 if (taskAdapter != null) {
-                    currentTaskUuid = taskAdapter.getItem(position).getUuid();
+                    task = taskAdapter.getItem(position);
+                    if (task != null) {
+                        currentTaskUuid = task.getUuid();
+                        fillListViewTaskStage(currentTaskUuid, task.getTaskTemplate().getTitle());
+                        Level = 2;
+                    }
                 }
-                fillListViewTaskStage(currentTaskUuid);
-                Level = 2;
                 return;
             }
             // TaskStage
             if (Level == 2) {
                 if (taskStageAdapter != null) {
-                    currentTaskStageUuid = taskStageAdapter.getItem(position).getUuid();
+                    taskStage = taskStageAdapter.getItem(position);
+                    if (taskStage != null) {
+                        currentTaskStageUuid = taskStage.getUuid();
+                        fillListViewOperations(currentTaskStageUuid, taskStage.getTaskStageTemplate().getTitle());
+                        Level = 3;
+                    }
                 }
-                fillListViewOperations(currentTaskStageUuid);
-                Level = 3;
                 return;
             }
             // Operation

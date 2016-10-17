@@ -2,7 +2,6 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
-    android:background="#666666"
 	android:stretchColumns="*">
 	
 	<TableRow>
@@ -36,6 +35,6 @@
             android:textStyle="italic"
 			android:layout_span="2"
 			android:layout_margin="8dip"
-			android:textColor="#cccccc" />
+			android:textColor="#333333" />
 	</TableRow>
 </TableLayout>
