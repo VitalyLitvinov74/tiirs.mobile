@@ -19,6 +19,7 @@
         android:layout_width="fill_parent"
         android:layout_height="250dp"
         android:layout_weight="0.5"
+        android:background="#FFFFFF"
         android:divider="#333333"
         android:dividerHeight="1px"
         android:scrollbarAlwaysDrawVerticalTrack="true" >
@@ -28,16 +29,16 @@
     <TextView
         android:id="@+id/gps_TextView"
         android:layout_width="match_parent"
+        android:layout_height="150dp"
         android:layout_gravity="bottom"
         android:layout_weight="0.25"
-        android:visibility="gone"
         android:background="@color/white"
         android:lines="10"
         android:scrollbars="vertical"
         android:textColor="@color/black"
         android:textColorLink="@color/black"
-        android:layout_height="150dp"
         android:textSize="12sp"
-        android:typeface="normal" />
+        android:typeface="normal"
+        android:visibility="gone" />
 
 </LinearLayout>

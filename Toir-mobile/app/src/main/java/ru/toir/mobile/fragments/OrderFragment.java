@@ -21,13 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import retrofit.Call;
@@ -240,21 +237,11 @@ public class OrderFragment extends Fragment {
             Toast.makeText(getActivity(), "Нет такого пользователя!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            RealmList<Orders> orders_all = new RealmList<>();
-            ArrayList<Orders> orders_all2 = new ArrayList<>();
-
             RealmResults<Orders> orders;
-            int cnt = 0;
             orders = realmDB.where(Orders.class).findAll();
-            /*
-            orders = realmDB.where(Orders.class).findAll();*/
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
-            /*
-            RealmResults<Orders> orders;
-            orders = realmDB.where(Orders.class).findAll();
-            orderAdapter = new OrderAdapter(getContext(), orders);*/
     }
 
     // Tasks----------------------------------------------------------------------------------------
@@ -276,6 +263,11 @@ public class OrderFragment extends Fragment {
 
         taskAdapter = new TaskAdapter(getContext(), tasks);
         mainListView.setAdapter(taskAdapter);
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.VISIBLE);
+            tl_Header.setText(order.getTitle());
+        }
     }
 
     // Orders----------------------------------------------------------------------------------------
@@ -297,9 +289,15 @@ public class OrderFragment extends Fragment {
 
         taskStageAdapter = new TaskStageAdapter(getContext(), stages);
         mainListView.setAdapter(taskStageAdapter);
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.VISIBLE);
+            tl_Header.setText(task.getTaskTemplate().getTitle());
+        }
     }
 
     // Operations----------------------------------------------------------------------------------------
+
     private void fillListViewOperations(TaskStages stage) {
         RealmResults<Operation> operations;
         RealmQuery<Operation> q = realmDB.where(Operation.class);
@@ -318,6 +316,11 @@ public class OrderFragment extends Fragment {
 
         operationAdapter = new OperationAdapter(getContext(), operations);
         mainListView.setAdapter(operationAdapter);
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.VISIBLE);
+            tl_Header.setText(stage.getTaskStageTemplate().getTitle());
+        }
     }
 
     @Override
@@ -558,11 +561,19 @@ public class OrderFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View selectedItemView,
                                 int position, long id) {
 
+            Orders order;
+            Tasks task;
+            TaskStages stage;
+
             // находимся на "экране" нарядов
             if (Level == 0) {
                 if (orderAdapter != null) {
-                    fillListViewTasks(orderAdapter.getItem(position));
-                    Level = 1;
+                    order = orderAdapter.getItem(position);
+                    if (order != null) {
+                        currentOrderUuid = order.getUuid();
+                        fillListViewTasks(order);
+                        Level = 1;
+                    }
                 }
 
                 return;
@@ -570,8 +581,12 @@ public class OrderFragment extends Fragment {
             // Tasks
             if (Level == 1) {
                 if (taskAdapter != null) {
-                    fillListViewTaskStage(taskAdapter.getItem(position));
-                    Level = 2;
+                    task = taskAdapter.getItem(position);
+                    if (task != null) {
+                        currentTaskUuid = task.getUuid();
+                        fillListViewTaskStage(task);
+                        Level = 2;
+                    }
                 }
 
                 return;
@@ -579,8 +594,12 @@ public class OrderFragment extends Fragment {
             // TaskStage
             if (Level == 2) {
                 if (taskStageAdapter != null) {
-                    fillListViewOperations(taskStageAdapter.getItem(position));
-                    Level = 3;
+                    stage = taskStageAdapter.getItem(position);
+                    if (stage != null) {
+                        currentTaskStageUuid = stage.getUuid();
+                        fillListViewOperations(stage);
+                        Level = 3;
+                    }
                 }
 
                 return;

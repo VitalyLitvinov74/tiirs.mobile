@@ -25,7 +25,6 @@ import ru.toir.mobile.db.realm.Orders;
  */
 public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
-    private static final int TYPE_ITEM = 0;
     private static final int TYPE_SEPARATOR = -1;
     private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
         @Override
@@ -55,7 +54,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         separates.clear();
 
-
+        if (adapterData != null)
         for(Orders order : adapterData) {
             separateDate = order.getOpenDate();
             if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
@@ -77,12 +76,12 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
     @Override
     public Orders getItem(int position) {
-        Orders order;
+        Orders order = null;
         long realId = separates.get(position);
-        if(realId == TYPE_SEPARATOR) {
-            order = null;
-        } else {
-            order = adapterData.get((int)realId);
+        if (realId != TYPE_SEPARATOR) {
+            if (adapterData != null) {
+                order = adapterData.get((int) realId);
+            }
         }
         return order;
     }
@@ -96,7 +95,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         Date lDate;
-        String sDate;
+        String sDate = "неизвестно";
         viewHolder = new ViewHolder();
         long type = separates.get(position);
         switch ((int)type) {
@@ -105,6 +104,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.title = (TextView) convertView.findViewById(R.id.order_date_divider);
                 convertView.setTag(viewHolder);
                 long id = separates.get(position + 1);
+                if (adapterData == null) break;
                 lDate = adapterData.get((int)id).getCloseDate();
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MMMM yyyy", myDateFormatSymbols).format(lDate);
@@ -119,12 +119,11 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.icon = (ImageView) convertView.findViewById(R.id.order_ImageStatus);
                 convertView.setTag(viewHolder);
                 Orders order = getItem(position);
+                if (order == null) break;
                 lDate = order.getCloseDate();
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
                     viewHolder.created.setText(sDate);
-                } else {
-                    sDate = "неизвестно";
                 }
                 viewHolder.title.setText(order.getTitle());
                 viewHolder.status.setText(order.getOrderStatus().getTitle());

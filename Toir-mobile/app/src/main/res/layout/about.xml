@@ -2,27 +2,26 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
-    android:background="#666666"
 	android:stretchColumns="*">
 	
 	<TableRow>
 	<ImageView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:src="@drawable/service_medium"
-        android:padding="5dip"
+		android:layout_gravity="left|center"
         android:contentDescription="@string/image_description"
-		android:layout_gravity="left|center"/>
+		android:padding="5dip"
+		android:src="@drawable/service_medium" />
 
 	<TextView
 	    android:id="@+id/info_text"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
-        android:padding="5dip"
         android:layout_gravity="center"
-	    android:gravity="center"
+		android:gravity="center"
 	    android:minHeight="220dp"
-	    android:minLines="10" />
+		android:minLines="10"
+		android:padding="5dip" />
 
 	</TableRow>
 
@@ -31,11 +30,11 @@
 			android:id="@+id/legal_text"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textSize="14sp"
-            android:padding="5dip"
-            android:textStyle="italic"
-			android:layout_span="2"
 			android:layout_margin="8dip"
-			android:textColor="#cccccc" />
+			android:layout_span="2"
+			android:padding="5dip"
+			android:textColor="#333333"
+			android:textSize="14sp"
+			android:textStyle="italic" />
 	</TableRow>
 </TableLayout>

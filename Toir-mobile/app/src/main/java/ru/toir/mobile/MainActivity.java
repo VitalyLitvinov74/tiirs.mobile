@@ -1,6 +1,5 @@
 package ru.toir.mobile;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -503,6 +502,8 @@ public class MainActivity extends AppCompatActivity {
                                 currentFragment = FRAGMENT_USERS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
+                                startAboutDialog();
+                                /*
                                 new AlertDialog.Builder(view.getContext())
                                         .setTitle("О программе")
                                         .setMessage("ToiR Mobile v2.0.3\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
@@ -511,7 +512,7 @@ public class MainActivity extends AppCompatActivity {
                                             }
                                         })
                                         .setIcon(android.R.drawable.ic_dialog_info)
-                                        .show();
+                                        .show();*/
                             } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
                                 System.exit(0);
                             }
@@ -611,6 +612,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onActionAbout(MenuItem menuItem) {
         Log.d(TAG, "onActionAbout");
+        startAboutDialog();
+    }
+
+    public void startAboutDialog() {
         AboutDialog about = new AboutDialog(this);
         about.setTitle("О программе");
         about.show();
