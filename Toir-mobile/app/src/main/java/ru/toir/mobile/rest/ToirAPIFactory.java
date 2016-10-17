@@ -20,6 +20,7 @@ import ru.toir.mobile.rest.interfaces.IEquipmentType;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
 import ru.toir.mobile.rest.interfaces.IOperationStatus;
 import ru.toir.mobile.rest.interfaces.IOperationType;
+import ru.toir.mobile.rest.interfaces.IOrder;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
@@ -89,6 +90,11 @@ public class ToirAPIFactory {
     @NonNull
     public static ITaskStatus getTaskStatus() {
         return getRetrofit().create(ITaskStatus.class);
+    }
+
+    @NonNull
+    public static IOrder getOrderService() {
+        return getRetrofit().create(IOrder.class);
     }
 
     @NonNull

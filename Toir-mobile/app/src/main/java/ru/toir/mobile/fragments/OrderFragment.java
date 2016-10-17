@@ -1,8 +1,10 @@
 package ru.toir.mobile.fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -12,6 +14,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,10 +24,16 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.OperationAdapter;
@@ -37,6 +48,7 @@ import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceProvider;
+import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 
 public class OrderFragment extends Fragment {
@@ -246,27 +258,298 @@ public class OrderFragment extends Fragment {
     }
 
     // Tasks----------------------------------------------------------------------------------------
-    private void fillListViewTasks(String orderUuid) {
+    private void fillListViewTasks(Orders order) {
         RealmResults<Tasks> tasks;
-        tasks = realmDB.where(Tasks.class).equalTo("orderUuid", orderUuid).findAllSorted("startDate");
+        RealmQuery<Tasks> q = realmDB.where(Tasks.class);
+        boolean first = true;
+        for (Tasks task : order.getTasks()) {
+            long id = task.get_id();
+            if (first) {
+                q = q.equalTo("_id", id);
+                first = false;
+            } else {
+                q = q.or().equalTo("_id", id);
+            }
+        }
+
+        tasks = q.findAll();
+
         taskAdapter = new TaskAdapter(getContext(), tasks);
         mainListView.setAdapter(taskAdapter);
     }
 
     // Orders----------------------------------------------------------------------------------------
-    private void fillListViewTaskStage(String taskUuid) {
-        RealmResults<TaskStages> taskStages;
-        taskStages = realmDB.where(TaskStages.class).equalTo("taskUuid", taskUuid).findAllSorted("startDate");
-        taskStageAdapter = new TaskStageAdapter(getContext(), taskStages);
+    private void fillListViewTaskStage(Tasks task) {
+        RealmResults<TaskStages> stages;
+        RealmQuery<TaskStages> q = realmDB.where(TaskStages.class);
+        boolean first = true;
+        for (TaskStages stage : task.getTaskStages()) {
+            long id = stage.get_id();
+            if (first) {
+                q = q.equalTo("_id", id);
+                first = false;
+            } else {
+                q = q.or().equalTo("_id", id);
+            }
+        }
+
+        stages = q.findAll();
+
+        taskStageAdapter = new TaskStageAdapter(getContext(), stages);
         mainListView.setAdapter(taskStageAdapter);
     }
 
     // Operations----------------------------------------------------------------------------------------
-    private void fillListViewOperations(String taskStageUuid) {
+    private void fillListViewOperations(TaskStages stage) {
         RealmResults<Operation> operations;
-        operations = realmDB.where(Operation.class).equalTo("taskStageUuid", taskStageUuid).findAllSorted("startDate");
+        RealmQuery<Operation> q = realmDB.where(Operation.class);
+        boolean first = true;
+        for (Operation operation : stage.getOperations()) {
+            long id = operation.get_id();
+            if (first) {
+                q = q.equalTo("_id", id);
+                first = false;
+            } else {
+                q = q.or().equalTo("_id", id);
+            }
+        }
+
+        operations = q.findAll();
+
         operationAdapter = new OperationAdapter(getContext(), operations);
         mainListView.setAdapter(operationAdapter);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // добавляем элемент меню для получения новых нарядов
+        MenuItem getTaskNew = menu.add("Получить новые наряды");
+        getTaskNew
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Log.d(TAG, "Получаем новые наряды.");
+//                        TaskServiceHelper tsh = new TaskServiceHelper(
+//                                getActivity().getApplicationContext(),
+//                                TaskServiceProvider.Actions.ACTION_GET_TASK);
+//
+//                        getActivity().registerReceiver(mReceiverGetTask,
+//                                mFilterGetTask);
+//
+//                        tsh.GetTaskNew();
+
+                        AuthorizedUser user = AuthorizedUser.getInstance();
+                        Call<List<Orders>> call = ToirAPIFactory.getOrderService()
+                                .order("bearer " + user.getToken(), user.getUuid(), "");
+                        call.enqueue(new Callback<List<Orders>>() {
+                            @Override
+                            public void onResponse(Response<List<Orders>> response, Retrofit retrofit) {
+                                // ообщаем количество полученных нарядов
+                                List<Orders> orders = response.body();
+                                int count = orders.size();
+                                if (count > 0) {
+                                    Realm realm = Realm.getDefaultInstance();
+                                    realm.beginTransaction();
+                                    realm.copyToRealmOrUpdate(orders);
+                                    realm.commitTransaction();
+                                    Toast.makeText(getActivity(),
+                                            "Количество нарядов " + count,
+                                            Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "Нарядов нет.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                                processDialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                // сообщаем описание неудачи
+                                Toast.makeText(getActivity(),
+                                        "Ошибка при получении нарядов.",
+                                        Toast.LENGTH_LONG).show();
+                                processDialog.dismiss();
+                            }
+                        });
+
+                        // показываем диалог получения наряда
+                        processDialog = new ProgressDialog(getActivity());
+                        processDialog.setMessage("Получаем наряды");
+                        processDialog.setIndeterminate(true);
+                        processDialog
+                                .setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                        processDialog.setCancelable(false);
+                        processDialog.setButton(
+                                DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int which) {
+//                                        getActivity().unregisterReceiver(mReceiverGetTask);
+                                        Toast.makeText(getActivity(),
+                                                "Получение нарядов отменено",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        processDialog.show();
+                        return true;
+                    }
+                });
+
+        // добавляем элемент меню для получения "архивных" нарядов
+        MenuItem getTaskDone = menu.add("Получить сделанные наряды");
+        getTaskDone
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Log.d(TAG, "Получаем сделанные наряды.");
+//                        TaskServiceHelper tsh = new TaskServiceHelper(
+//                                getActivity().getApplicationContext(),
+//                                TaskServiceProvider.Actions.ACTION_GET_TASK);
+//
+//                        getActivity().registerReceiver(mReceiverGetTask,
+//                                mFilterGetTask);
+//
+//                        tsh.GetTaskDone();
+
+                        // показываем диалог получения наряда
+                        processDialog = new ProgressDialog(getActivity());
+                        processDialog.setMessage("Получаем наряды");
+                        processDialog.setIndeterminate(true);
+                        processDialog
+                                .setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                        processDialog.setCancelable(false);
+                        processDialog.setButton(
+                                DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int which) {
+//                                        getActivity().unregisterReceiver(mReceiverGetTask);
+                                        Toast.makeText(getActivity(),
+                                                "Получение нарядов отменено",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        processDialog.show();
+                        return true;
+                    }
+                });
+
+        // добавляем элемент меню для отправки результатов выполнения нарядов
+        MenuItem sendTaskResultMenu = menu.add("Отправить результаты");
+        sendTaskResultMenu
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+//                        TaskDBAdapter adapter = new TaskDBAdapter(
+//                                new ToirDatabaseContext(getActivity()));
+//                        List<Task> tasks;
+//                        String currentUserUuid = AuthorizedUser.getInstance()
+//                                .getUuid();
+//
+//                        // проверяем наличие не законченных нарядов
+//                        tasks = adapter.getOrdersByUser(currentUserUuid,
+//                                TaskStatusDBAdapter.Status.IN_WORK, "");
+//                        if (tasks.size() > 0) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(
+                                getContext());
+
+                        dialog.setTitle("Внимание!");
+                        dialog.setMessage("Есть "/* + tasks.size()*/
+                                + " наряда в процессе выполнения.\n"
+                                + "Отправить выполненные наряды?");
+                        dialog.setPositiveButton(android.R.string.ok,
+                                new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(
+                                            DialogInterface dialog,
+                                            int which) {
+
+                                        sendCompleteTask();
+                                        dialog.dismiss();
+                                    }
+                                });
+                        dialog.setNegativeButton(android.R.string.cancel,
+                                new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(
+                                            DialogInterface dialog,
+                                            int which) {
+
+                                        dialog.dismiss();
+                                    }
+                                });
+                        dialog.show();
+//                        }
+
+                        return true;
+                    }
+                });
+    }
+
+    /**
+     * Отправка всех выполненных нарядов на сервер
+     */
+    private void sendCompleteTask() {
+
+//        TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext(
+//                getActivity()));
+//        List<Task> tasks;
+//        String currentUserUuid = AuthorizedUser.getInstance().getUuid();
+//
+//        tasks = adapter.getTaskByUserAndUpdated(currentUserUuid);
+//
+//        if (tasks == null) {
+//            Toast.makeText(getActivity(), "Нет результатов для отправки.",
+//                    Toast.LENGTH_SHORT);
+//            return;
+//        }
+//
+//        String[] sendTaskUuids = new String[tasks.size()];
+//        int i = 0;
+//        for (Task task : tasks) {
+//            sendTaskUuids[i] = task.getUuid();
+//            // устанавливаем дату попытки отправки
+//            // (пока только для наряда)
+//            task.setAttempt_send_date(Calendar.getInstance().getTime()
+//                    .getTime());
+//            adapter.replace(task);
+//            i++;
+//        }
+//
+//        getActivity()
+//                .registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
+//
+//        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(),
+//                TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+//        tsh.SendTaskResult(sendTaskUuids);
+
+        // показываем диалог отправки результатов
+        processDialog = new ProgressDialog(getActivity());
+        processDialog.setMessage("Отправляем результаты");
+        processDialog.setIndeterminate(true);
+        processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        processDialog.setCancelable(false);
+        processDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        getActivity().unregisterReceiver(mReceiverGetTask);
+                        Toast.makeText(getActivity(),
+                                "Отправка результатов отменена",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        processDialog.show();
     }
 
     public class ListViewClickListener implements
@@ -278,28 +561,28 @@ public class OrderFragment extends Fragment {
             // находимся на "экране" нарядов
             if (Level == 0) {
                 if (orderAdapter != null) {
-                    currentOrderUuid = orderAdapter.getItem(position).getUuid();
+                    fillListViewTasks(orderAdapter.getItem(position));
+                    Level = 1;
                 }
-                fillListViewTasks(currentOrderUuid);
-                Level = 1;
+
                 return;
             }
             // Tasks
             if (Level == 1) {
                 if (taskAdapter != null) {
-                    currentTaskUuid = taskAdapter.getItem(position).getUuid();
+                    fillListViewTaskStage(taskAdapter.getItem(position));
+                    Level = 2;
                 }
-                fillListViewTaskStage(currentTaskUuid);
-                Level = 2;
+
                 return;
             }
             // TaskStage
             if (Level == 2) {
                 if (taskStageAdapter != null) {
-                    currentTaskStageUuid = taskStageAdapter.getItem(position).getUuid();
+                    fillListViewOperations(taskStageAdapter.getItem(position));
+                    Level = 3;
                 }
-                fillListViewOperations(currentTaskStageUuid);
-                Level = 3;
+
                 return;
             }
             // Operation

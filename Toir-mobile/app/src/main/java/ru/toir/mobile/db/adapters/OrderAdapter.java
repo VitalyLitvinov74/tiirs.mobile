@@ -25,9 +25,21 @@ import ru.toir.mobile.db.realm.Orders;
  */
 public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
-    private List<Long> separates = new ArrayList<>();
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_SEPARATOR = -1;
+    private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
+        @Override
+        public String[] getMonths() {
+            return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
+                    "июля", "августа", "сентября", "октября", "ноября", "декабря"};
+        }
+    };
+    private List<Long> separates = new ArrayList<>();
+
+    public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
+        super(context, data);
+        makeSeparates();
+    }
 
     @Override
     public void notifyDataSetChanged() {
@@ -39,14 +51,14 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         int i = 0;
         int j = 0;
         Date currentDate = new Date();
-        Date orderCloseDate;
+        Date separateDate;
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         separates.clear();
 
 
         for(Orders order : adapterData) {
-            orderCloseDate = order.getCloseDate();
-            if (!fmt.format(orderCloseDate).equals(fmt.format(currentDate))) {
+            separateDate = order.getOpenDate();
+            if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
                 currentDate = order.getCloseDate();
                 separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
                 j++;
@@ -56,11 +68,6 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
             }
             i++;
         }
-    }
-
-    public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
-        super(context, data);
-        makeSeparates();
     }
 
     @Override
@@ -79,7 +86,6 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         }
         return order;
     }
-
 
     @Override
     public long getItemId(int position) {
@@ -161,14 +167,6 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         }
         return convertView;
     }
-
-    private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols(){
-        @Override
-        public String[] getMonths() {
-            return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
-                    "июля", "августа", "сентября", "октября", "ноября", "декабря"};
-        }
-    };
 
     private static class ViewHolder {
         TextView created;
