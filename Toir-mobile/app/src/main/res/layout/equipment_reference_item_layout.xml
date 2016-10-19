@@ -12,7 +12,7 @@
         android:layout_marginBottom="5dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:contentDescription="изображение статуса оборудования"
+        android:contentDescription="@string/status"
         android:src="@drawable/equipment_model_teplogenerator" />
 
     <TextView
@@ -26,7 +26,6 @@
         android:textSize="16sp"
         android:gravity="center_vertical"
         android:layout_toRightOf="@+id/eril_image"
-        android:text="название"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -38,7 +37,7 @@
         android:textColor="#222222"
         android:textSize="14sp"
         android:layout_toRightOf="@+id/eril_image"
-        android:text="Тип:" />
+        android:text="@string/type" />
 
     <TextView
         android:id="@+id/eril_type"
@@ -48,8 +47,7 @@
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eril_type_label"
-        android:layout_below="@+id/eril_title"
-        android:text="тип" />
+        android:layout_below="@+id/eril_title" />
 
     <TextView
         android:id="@+id/eril_inventory_number"
@@ -60,8 +58,7 @@
         android:textSize="14sp"
         android:gravity="center_vertical"
         android:layout_toRightOf="@+id/eril_type"
-        android:layout_below="@+id/eril_title"
-        android:text="инв. номер" />
+        android:layout_below="@+id/eril_title" />
 
     <TextView
         android:id="@+id/eril_last_operation_date_label"
@@ -72,7 +69,7 @@
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eril_image"
-        android:text="Обслуживалось:" />
+        android:text="@string/service" />
 
     <TextView
         android:id="@+id/eril_last_operation_date"
@@ -82,8 +79,7 @@
         android:textColor="#454545"
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/eril_last_operation_date_label"
-        android:text="дата" />
+        android:layout_toRightOf="@+id/eril_last_operation_date_label" />
 
     <TextView
         android:id="@+id/eril_critical_label"
@@ -93,6 +89,7 @@
         android:textColor="#454545"
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp"
         android:layout_toRightOf="@+id/eril_image"
         android:text="" />
 
@@ -106,8 +103,8 @@
         android:textSize="14sp"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="5dp"
-        android:layout_toRightOf="@+id/eril_critical_label"
-        android:text="0" />
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/eril_critical_label" />
 
     <TextView
         android:id="@+id/eril_status_label"
@@ -117,7 +114,7 @@
         android:textColor="#222222"
         android:textSize="14sp"
         android:layout_toRightOf="@+id/eril_critical"
-        android:text="Статус:" />
+        android:text="@string/status" />
 
     <TextView
         android:id="@+id/eril_status"
@@ -127,7 +124,7 @@
         android:textColor="#454545"
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/eril_status_label"
-        android:text="Новое" />
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/eril_status_label" />
 
 </RelativeLayout>

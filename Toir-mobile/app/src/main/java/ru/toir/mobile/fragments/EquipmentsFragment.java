@@ -25,16 +25,8 @@ public class EquipmentsFragment extends Fragment {
     private Realm realmDB;
 	private boolean isInit;
 
-	private Spinner sortSpinner;
 	private Spinner typeSpinner;
 	private ListView equipmentListView;
-
-	//private ArrayAdapter<SortField> sortSpinnerAdapter;
-    private EquipmentTypeAdapter typeSpinnerAdapter;
-    //private ArrayAdapter<String> typeSpinnerAdapter;
-
-	private SpinnerListener spinnerListener;
-    private EquipmentAdapter equipmentAdapter;
 
     public static EquipmentsFragment newInstance() {
 		return new EquipmentsFragment();
@@ -51,7 +43,7 @@ public class EquipmentsFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
 
 		// обработчик для выпадающих списков у нас один
-		spinnerListener = new SpinnerListener();
+        SpinnerListener spinnerListener = new SpinnerListener();
 
 		// настраиваем сортировку по полям
         /*
@@ -69,7 +61,7 @@ public class EquipmentsFragment extends Fragment {
 
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
         typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(), equipmentType);
+        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(), equipmentType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -142,7 +134,7 @@ public class EquipmentsFragment extends Fragment {
         else {
             equipments = realmDB.where(Equipment.class).findAll();
         }
-        equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
+        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
         equipmentListView.setAdapter(equipmentAdapter);
 	}
 
@@ -161,7 +153,6 @@ public class EquipmentsFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parentView,
                                 View selectedItemView, int position, long id) {
-            // TODO разобраться как вернуть объект при клике
             Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
             if (equipment != null) {
                 String equipment_uuid = equipment.getUuid();
@@ -187,7 +178,6 @@ public class EquipmentsFragment extends Fragment {
                                    View selectedItemView, int position, long id) {
 
             String type = null;
-            String orderBy = null;
 
             EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
             if (typeSelected != null) {

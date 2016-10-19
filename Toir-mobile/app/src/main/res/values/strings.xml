@@ -50,6 +50,7 @@
     <string name="tasks_quantity">Статистика нарядов:</string>
     <string name="boss_contact">Контакт начальника:</string>
     <string name="type">Тип:</string>
+    <string name="service">Сервис:</string>
     <string name="critical">Критичность:</string>
     <string name="last_date">Дата обслуживания</string>
     <string name="last_result">Результат обслуживания:</string>
@@ -108,4 +109,6 @@
     <string name="profile_type_engeneer">Пользователь</string>
     <string name="profile_whois_shef">Начальник</string>
     <string name="profile_whois_engeneer">Инженер</string>
+
+    <string name="image_status_equipment">изображение статуса оборудования</string>    >
 </resources>
