@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -25,16 +25,20 @@ import ru.toir.mobile.db.realm.Operation;
  */
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     public static final String TABLE_NAME = "Operation";
+    private boolean[] visibility = new boolean[50];
 
     public OperationAdapter(@NonNull Context context, RealmResults<Operation> data) {
         super(context, data);
     }
 
     @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
+
+    @Override
     public int getCount() {
-        Realm realmDB = Realm.getDefaultInstance();
-        RealmResults<Operation> rows = realmDB.where(Operation.class).findAll();
-        return rows.size();
+        return adapterData.size();
     }
 
     @Override
@@ -49,33 +53,52 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     @Override
     public long getItemId(int position) {
-        Operation operations;
-        if (adapterData != null) {
-            operations = adapterData.get(position);
-            return operations.get_id();
-        }
-        return 0;
+        return adapterData.get(position).get_id();
+    }
+
+    public void setItemVisibility(int position) {
+        visibility[position]=!visibility[position];
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        //String pathToImages;
+        Operation operation;
+        viewHolder = new ViewHolder();
+        if (adapterData==null) return convertView;
+        operation = adapterData.get(position);
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.operation_item, parent, false);
-            viewHolder = new ViewHolder();
             viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
             viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
             viewHolder.verdict = (ImageView) convertView.findViewById(R.id.operation_verdict);
             viewHolder.start_date = (TextView) convertView.findViewById(R.id.operation_startDate);
             viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
+            viewHolder.description = (TextView) convertView.findViewById(R.id.op_description);
+            viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
+            viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
+            viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
             convertView.setTag(viewHolder);
-        } else {
+        }
+        else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (adapterData!=null) {
-            Operation operation = adapterData.get(position);
+        if (!visibility[position]) {
+            viewHolder.description_layout.setVisibility(View.VISIBLE);
+            convertView.setTag(viewHolder);
+            viewHolder = (ViewHolder) convertView.getTag();
+            notifyDataSetChanged();
+           }
+        else {
+            //viewHolder.description_layout.setVisibility(View.VISIBLE);
+            viewHolder.description_layout.setVisibility(View.GONE);
+            convertView.setTag(viewHolder);
+            viewHolder = (ViewHolder) convertView.getTag();
+            notifyDataSetChanged();
+        }
+
+        if (adapterData != null) {
             if (operation != null) {
                 String sDate;
                 viewHolder.title.setText(operation.getOperationTemplate().getTitle());
@@ -92,24 +115,11 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 if (operation.getOperationStatus().getTitle().equals("Выполнена")) {
                     viewHolder.status.setChecked(true);
                 }
-                // TODO может вынести это на глобальный уровень?
-                // тут берем изображение или из иконки или из ресурсов по заранее выстроенной логике
-                //viewHolder.verdict.setImageResource();
-                /*
-                pathToImages = Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + File.separator + "Android"
-                    + File.separator + "data"
-                    + File.separator + "ru.toir.mobile"
-                    + File.separator + "img"
-                    + File.separator;
-                File imgFile = new File(pathToImages + operation.getOperationStatus().getIcon());
-                if (imgFile.exists() && imgFile.isFile()) {
-                    Bitmap mBitmap = BitmapFactory.decodeFile(imgFile
-                            .getAbsolutePath());
-                    viewHolder.icon.setImageBitmap(mBitmap);*/
-                }
+                viewHolder.description.setText(operation.getOperationTemplate().getDescription());
+                viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
             }
-        return convertView;
+        }
+      return convertView;
     }
 
     private static class ViewHolder {
@@ -118,5 +128,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         ImageView verdict;
         TextView start_date;
         TextView end_date;
+        TextView description;
+        TextView normative;
+        ImageView image;
+        RelativeLayout description_layout;
     }
 }

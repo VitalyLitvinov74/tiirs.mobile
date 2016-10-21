@@ -110,5 +110,6 @@
     <string name="profile_whois_shef">Начальник</string>
     <string name="profile_whois_engeneer">Инженер</string>
 
-    <string name="image_status_equipment">изображение статуса оборудования</string>    >
+    <string name="image_status_equipment">изображение статуса оборудования</string>
+    <string name="normative">Норматив: </string>
 </resources>

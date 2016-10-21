@@ -61,7 +61,7 @@ public class OrderFragment extends Fragment {
     private String currentOrderUuid = "";
     private String currentTaskUuid = "";
     private String currentTaskStageUuid = "";
-
+    private String currentOperationUuid = "";
     //private Spinner sortSpinner;
     //private Spinner statusSpinner;
 
@@ -321,6 +321,7 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(stage.getTaskStageTemplate().getTitle());
         }
+        //mainListView.setOnItemClickListener(mainListViewClickListener);
     }
 
     @Override
@@ -564,6 +565,7 @@ public class OrderFragment extends Fragment {
             Orders order;
             Tasks task;
             TaskStages stage;
+            Operation operation;
 
             // находимся на "экране" нарядов
             if (Level == 0) {
@@ -601,11 +603,20 @@ public class OrderFragment extends Fragment {
                         Level = 3;
                     }
                 }
-
                 return;
             }
             // Operation
             if (Level == 3) {
+                if (operationAdapter != null) {
+                    operation = operationAdapter.getItem(position);
+                    if (operation != null) {
+                        currentOperationUuid = operation.getUuid();
+                        operationAdapter.setItemVisibility(position);
+                        operationAdapter.notifyDataSetChanged();
+                        //mainListView.invalidateViews();
+                    }
+                }
+
                 //if (operationAdapter != null)
                 //    currentOperationUuid = operationAdapter.getItem(position).getUuid();
                 // TODO отмечаем операцию как завершенную ?

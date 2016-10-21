@@ -429,9 +429,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         //documentation = realmDB.where(Documentation.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
         documentation = realmDB.where(Documentation.class).findAll();
         documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
-        documentationListView.setAdapter(documentationAdapter);
-        documentationListView
-                .setOnItemClickListener(new ListViewClickListener());
+        if (documentationListView != null) {
+             documentationListView.setAdapter(documentationAdapter);
+             documentationListView
+                    .setOnItemClickListener(new ListViewClickListener());
+            }
         }
 /*
 	private void FillListViewOperations() {
