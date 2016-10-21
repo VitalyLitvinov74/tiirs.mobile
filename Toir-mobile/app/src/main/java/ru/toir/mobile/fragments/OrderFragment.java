@@ -20,10 +20,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.List;
+
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -38,7 +42,10 @@ import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OperationStatus;
+import ru.toir.mobile.db.realm.OperationVerdict;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.TaskStageStatus;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
@@ -48,11 +55,17 @@ import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 
-public class OrderFragment extends Fragment {
+public class OrderFragment extends Fragment implements View.OnClickListener {
+    private Orders selectedOrder;
+    private Tasks selectedTask;
+    private TaskStages selectedStage;
+    private Operation selectedOperation;
+
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
     private TaskStageAdapter taskStageAdapter;
     private OperationAdapter operationAdapter;
+    private Button submit;
 
     private String TAG = "OrderFragment";
     private Realm realmDB;
@@ -189,6 +202,9 @@ public class OrderFragment extends Fragment {
 
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
+        submit = (Button)rootView.findViewById(R.id.finishButton);
+        submit.setOnClickListener(this);
+        submit.setVisibility(View.GONE);
 
         realmDB = Realm.getDefaultInstance();
 
@@ -242,6 +258,11 @@ public class OrderFragment extends Fragment {
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
+        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        if (tl_Header != null) {
+            tl_Header.setVisibility(View.GONE);
+        }
+
     }
 
     // Tasks----------------------------------------------------------------------------------------
@@ -268,6 +289,7 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
         }
+        submit.setVisibility(View.GONE);
     }
 
     // Orders----------------------------------------------------------------------------------------
@@ -294,6 +316,7 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(task.getTaskTemplate().getTitle());
         }
+        submit.setVisibility(View.GONE);
     }
 
     // Operations----------------------------------------------------------------------------------------
@@ -562,18 +585,13 @@ public class OrderFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View selectedItemView,
                                 int position, long id) {
 
-            Orders order;
-            Tasks task;
-            TaskStages stage;
-            Operation operation;
-
             // находимся на "экране" нарядов
             if (Level == 0) {
                 if (orderAdapter != null) {
-                    order = orderAdapter.getItem(position);
-                    if (order != null) {
-                        currentOrderUuid = order.getUuid();
-                        fillListViewTasks(order);
+                    selectedOrder = orderAdapter.getItem(position);
+                    if (selectedOrder != null) {
+                        currentOrderUuid = selectedOrder.getUuid();
+                        fillListViewTasks(selectedOrder);
                         Level = 1;
                     }
                 }
@@ -583,10 +601,10 @@ public class OrderFragment extends Fragment {
             // Tasks
             if (Level == 1) {
                 if (taskAdapter != null) {
-                    task = taskAdapter.getItem(position);
-                    if (task != null) {
-                        currentTaskUuid = task.getUuid();
-                        fillListViewTaskStage(task);
+                    selectedTask = taskAdapter.getItem(position);
+                    if (selectedTask != null) {
+                        currentTaskUuid = selectedTask.getUuid();
+                        fillListViewTaskStage(selectedTask);
                         Level = 2;
                     }
                 }
@@ -596,34 +614,85 @@ public class OrderFragment extends Fragment {
             // TaskStage
             if (Level == 2) {
                 if (taskStageAdapter != null) {
-                    stage = taskStageAdapter.getItem(position);
-                    if (stage != null) {
-                        currentTaskStageUuid = stage.getUuid();
-                        fillListViewOperations(stage);
+                    selectedStage = taskStageAdapter.getItem(position);
+                    if (selectedStage != null) {
+                        currentTaskStageUuid = selectedStage.getUuid();
+                        fillListViewOperations(selectedStage);
+                        submit.setVisibility(View.VISIBLE);
                         Level = 3;
                     }
                 }
                 return;
             }
+
             // Operation
             if (Level == 3) {
                 if (operationAdapter != null) {
-                    operation = operationAdapter.getItem(position);
-                    if (operation != null) {
-                        currentOperationUuid = operation.getUuid();
+                    selectedOperation = operationAdapter.getItem(position);
+                    if (selectedOperation != null) {
+                        currentOperationUuid = selectedOperation.getUuid();
                         operationAdapter.setItemVisibility(position);
                         operationAdapter.notifyDataSetChanged();
                         //mainListView.invalidateViews();
                     }
                 }
-
-                //if (operationAdapter != null)
-                //    currentOperationUuid = operationAdapter.getItem(position).getUuid();
-                // TODO отмечаем операцию как завершенную ?
-                //if (operationStatus.equals(OperationStatusDBAdapter.Status.NEW)	|| operationStatus.equals(OperationStatusDBAdapter.Status.IN_WORK))
-                // else dialog.setMessage("Операция уже выполнена. Повторное выполнение невозможно!");
-                //initOperationPattern(operationUuid, taskUuid, equipmentUuid);
             }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        int totalOperationCount = 0, completedOperationCount = 0;
+        CheckBox checkBox;
+        final OperationStatus operationStatusCompleted;
+        final OperationVerdict operationVerdictCompleted;
+        final TaskStageStatus taskStageCompleted;
+        operationStatusCompleted = realmDB.where(OperationStatus.class).findFirst();
+        operationVerdictCompleted = realmDB.where(OperationVerdict.class).findFirst();
+        taskStageCompleted = realmDB.where(TaskStageStatus.class).findFirst();
+        if (operationStatusCompleted == null)
+            Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
+        if (operationVerdictCompleted == null)
+            Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
+        if (operationAdapter != null)
+            totalOperationCount = operationAdapter.getCount();
+
+        for (int i = 0; i < totalOperationCount; i++) {
+            checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
+            if (checkBox.isChecked()) {
+                final Operation operation = operationAdapter.getItem(i);
+                if (operation != null) {
+                    completedOperationCount++;
+                    realmDB.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            operation.setOperationStatus(operationStatusCompleted);
+                            operation.setOperationVerdict(operationVerdictCompleted);
+                        }
+                    });
+                } else
+                    Log.d(TAG, "Операция под индексом " + i + " не найдена");
+            }
+        }
+        // все операции выполнены
+        if (totalOperationCount == completedOperationCount) {
+            final TaskStages taskStage = realmDB.where(TaskStages.class).equalTo("uuid", currentTaskStageUuid).findFirst();
+            if (taskStage != null) {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        taskStage.setTaskStageStatus(taskStageCompleted);
+                    }
+                });
+            }
+        }
+
+        if (selectedTask != null) {
+            currentTaskStageUuid = selectedStage.getUuid();
+            currentTaskUuid = selectedTask.getUuid();
+            fillListViewTaskStage(selectedTask);
+            submit.setVisibility(View.GONE);
+            Level = 2;
         }
     }
 }

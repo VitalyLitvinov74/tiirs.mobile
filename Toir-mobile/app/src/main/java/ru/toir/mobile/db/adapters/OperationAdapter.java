@@ -84,14 +84,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (!visibility[position]) {
+        if (visibility[position]) {
             viewHolder.description_layout.setVisibility(View.VISIBLE);
             convertView.setTag(viewHolder);
             viewHolder = (ViewHolder) convertView.getTag();
             notifyDataSetChanged();
            }
         else {
-            //viewHolder.description_layout.setVisibility(View.VISIBLE);
             viewHolder.description_layout.setVisibility(View.GONE);
             convertView.setTag(viewHolder);
             viewHolder = (ViewHolder) convertView.getTag();

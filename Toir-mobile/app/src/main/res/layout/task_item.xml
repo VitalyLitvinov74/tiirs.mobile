@@ -24,7 +24,7 @@
         android:textColor="#454545"
         android:gravity="center_vertical"
         android:text="@string/description"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/ti_Equipment"
@@ -38,7 +38,7 @@
         android:layout_below="@+id/ti_Name"
         android:ellipsize="marquee"
         android:text="@string/description"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/ti_Status"
@@ -53,6 +53,6 @@
         android:layout_below="@+id/ti_Equipment"
         android:ellipsize="marquee"
         android:text="@string/description"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
 </RelativeLayout>

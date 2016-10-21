@@ -29,4 +29,18 @@
             android:dividerHeight="1px">
         </ListView>
 
+    <Button
+        android:id="@+id/finishButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:height="35dp"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:minHeight="0dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="#4DD0E1"
+        android:textColor="#FAFAFA"
+        android:text="@string/finish_stage" />
+
 </LinearLayout>

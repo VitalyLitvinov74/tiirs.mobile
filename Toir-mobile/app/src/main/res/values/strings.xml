@@ -112,4 +112,5 @@
 
     <string name="image_status_equipment">изображение статуса оборудования</string>
     <string name="normative">Норматив: </string>
+    <string name="finish_stage">Закончить этап</string>
 </resources>
