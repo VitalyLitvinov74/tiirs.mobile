@@ -42,7 +42,7 @@
                 android:paddingTop="10dp"
                 android:layout_below="@+id/equipment_image"
                 android:textColor="#ffffff"
-                android:background="#1565C0"
+                android:background="@color/larisaBlueColor"
                 android:textSize="20sp" />
         <TextView
                 android:id="@+id/equipment_text_inventory"
@@ -54,7 +54,7 @@
                 android:paddingBottom="10dp"
                 android:textColor="#ffffff"
                 android:layout_below="@+id/equipment_text_name"
-                android:background="#1565C0"
+                android:background="@color/larisaBlueColor"
                 android:textSize="16sp" />
 
         <TextView

@@ -117,6 +117,27 @@
             android:layout_toRightOf="@+id/op_normative_label"
             android:layout_below="@+id/op_description" />
 
+        <TextView
+            android:id="@+id/op_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textColor="#222222"
+            android:textSize="12sp"
+            android:layout_toRightOf="@+id/op_image"
+            android:layout_below="@+id/op_normative_label"
+            android:text="@string/operation_time" />
+
+        <TextView
+            android:id="@+id/op_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#454545"
+            android:textSize="12sp"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/op_time_label"
+            android:layout_below="@+id/op_normative" />
+
     </RelativeLayout>
 
 </LinearLayout>

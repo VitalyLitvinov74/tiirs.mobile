@@ -26,6 +26,14 @@ import ru.toir.mobile.db.realm.Operation;
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     public static final String TABLE_NAME = "Operation";
     private boolean[] visibility = new boolean[50];
+    private boolean[] completed = new boolean[50];
+
+    public class Status {
+        public static final String NEW = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
+        public static final String IN_WORK = "9f980db5-934c-4ddb-999a-04c6c3daca59";
+        public static final String COMPLETE = "dc6dca37-2cc9-44da-aff9-19bf143e611a";
+        public static final String UN_COMPLETE = "363c08ec-89d9-47df-b7cf-63a05d56594c";
+    }
 
     public OperationAdapter(@NonNull Context context, RealmResults<Operation> data) {
         super(context, data);
@@ -60,6 +68,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         visibility[position]=!visibility[position];
     }
 
+    public void setItemEnable(int position, boolean enable)
+    {
+        completed[position]=enable;
+    }
+    public boolean getItemEnable(int position)
+    {
+        return completed[position];
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
@@ -83,6 +100,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
+        viewHolder.status.setEnabled(completed[position]);
 
         if (visibility[position]) {
             viewHolder.description_layout.setVisibility(View.VISIBLE);
@@ -132,4 +151,5 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         ImageView image;
         RelativeLayout description_layout;
     }
+
 }

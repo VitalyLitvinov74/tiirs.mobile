@@ -56,9 +56,9 @@ public class LoadTestData {
 
     static AlertType alertType;
 
-    static OrderStatus orderStatus;
-    static OrderStatus orderStatus2;
-    static OrderStatus orderStatus3;
+    public static OrderStatus orderStatus;
+    public static OrderStatus orderStatus2;
+    public static OrderStatus orderStatusUncomplete;
 
     static OrderLevel orderLevel;
     static OrderLevel orderLevel2;
@@ -68,7 +68,8 @@ public class LoadTestData {
 
     static OrderVerdict orderVerdict;
 
-    static OperationStatus operationStatus;
+    public static OperationStatus operationStatusUncomplete;
+    public static OperationStatus operationStatusComplete;
 
     static Operation operation;
     static Operation operation2;
@@ -84,7 +85,7 @@ public class LoadTestData {
     static OperationTemplate operationTemplate2;
     static OperationTemplate operationTemplate3;
 
-    static TaskStageStatus taskStageStatus;
+    public static TaskStageStatus taskStageStatusUncomplete;
 
     static TaskStageVerdict taskStageVerdict;
 
@@ -101,8 +102,8 @@ public class LoadTestData {
     static TaskStageTemplate taskStageTemplate;
     static TaskStageTemplate taskStageTemplate2;
 
-    static TaskStatus taskStatus;
-
+    public static TaskStatus taskStatus;
+    public static TaskStatus taskStatusUncomplete;
     static TaskVerdict taskVerdict;
 
     static Tasks task;
@@ -472,11 +473,11 @@ public class LoadTestData {
     realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-             orderStatus3 = realmDB.createObject(OrderStatus.class);
-             orderStatus3.set_id(3);
-             orderStatus3.setUuid(orderStatusUuid3);
-             orderStatus3.setTitle("Получен");
-             orderStatus3.setIcon("status_easy_received.png");
+             orderStatusUncomplete = realmDB.createObject(OrderStatus.class);
+             orderStatusUncomplete.set_id(3);
+             orderStatusUncomplete.setUuid(orderStatusUuid3);
+             orderStatusUncomplete.setTitle("Получен");
+             orderStatusUncomplete.setIcon("status_easy_received.png");
             }
         });
 
@@ -572,20 +573,20 @@ public class LoadTestData {
     realmDB.executeTransaction(new Realm.Transaction() {
         @Override
         public void execute(Realm realm) {
-            operationStatus = realmDB.createObject(OperationStatus.class);
-            operationStatus.set_id(1);
-            operationStatus.setUuid(operationStatusUuid);
-            operationStatus.setTitle("Не выполнена");
+            operationStatusUncomplete = realmDB.createObject(OperationStatus.class);
+            operationStatusUncomplete.set_id(1);
+            operationStatusUncomplete.setUuid(operationStatusUuid);
+            operationStatusUncomplete.setTitle("Не выполнена");
         }
     });
 
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                operationStatus = realmDB.createObject(OperationStatus.class);
-                operationStatus.set_id(2);
-                operationStatus.setUuid(operationStatusUuid2);
-                operationStatus.setTitle("Выполнена");
+                operationStatusComplete = realmDB.createObject(OperationStatus.class);
+                operationStatusComplete.set_id(2);
+                operationStatusComplete.setUuid(operationStatusUuid2);
+                operationStatusComplete.setTitle("Выполнена");
             }
         });
 
@@ -657,7 +658,7 @@ public class LoadTestData {
             operation = realmDB.createObject(Operation.class);
             operation.set_id(1);
             operation.setUuid(operationUuid);
-            operation.setOperationStatus(operationStatus);
+            operation.setOperationStatus(operationStatusUncomplete);
             operation.setOperationStatusUuid(operationStatusUuid);
             operation.setEndDate(new Date());
             operation.setFlowOrder(1);
@@ -675,7 +676,7 @@ public class LoadTestData {
             operation2 = realmDB.createObject(Operation.class);
             operation2.set_id(2);
             operation2.setUuid(operationUuid2);
-            operation2.setOperationStatus(operationStatus);
+            operation2.setOperationStatus(operationStatusUncomplete);
             operation2.setOperationStatusUuid(operationStatusUuid);
             operation2.setEndDate(new Date());
             operation2.setFlowOrder(2);
@@ -693,7 +694,7 @@ public class LoadTestData {
             operation3 = realmDB.createObject(Operation.class);
             operation3.set_id(3);
             operation3.setUuid(operationUuid3);
-            operation3.setOperationStatus(operationStatus);
+            operation3.setOperationStatus(operationStatusUncomplete);
             operation3.setOperationStatusUuid(operationStatusUuid);
             operation3.setEndDate(new Date());
             operation3.setFlowOrder(3);
@@ -751,10 +752,10 @@ public class LoadTestData {
     realmDB.executeTransaction(new Realm.Transaction() {
         @Override
         public void execute(Realm realm) {
-            taskStageStatus = realmDB.createObject(TaskStageStatus.class);
-            taskStageStatus.set_id(1);
-            taskStageStatus.setUuid(taskStageStatusUuid);
-            taskStageStatus.setTitle("Не выполнен");
+            taskStageStatusUncomplete = realmDB.createObject(TaskStageStatus.class);
+            taskStageStatusUncomplete.set_id(1);
+            taskStageStatusUncomplete.setUuid(taskStageStatusUuid);
+            taskStageStatusUncomplete.setTitle("Не выполнен");
         }
     });
 
@@ -802,7 +803,7 @@ public class LoadTestData {
             taskStage = realmDB.createObject(TaskStages.class);
             taskStage.set_id(1);
             taskStage.setUuid(taskStageUuid);
-            taskStage.setTaskStageStatus(taskStageStatus);
+            taskStage.setTaskStageStatus(taskStageStatusUncomplete);
             taskStage.setTaskStageStatusUuid(taskStageStatusUuid);
             taskStage.setEndDate(new Date());
             taskStage.setFlowOrder(1);
@@ -824,7 +825,7 @@ public class LoadTestData {
             taskStage2 = realmDB.createObject(TaskStages.class);
             taskStage2.set_id(2);
             taskStage2.setUuid(taskStageUuid2);
-            taskStage2.setTaskStageStatus(taskStageStatus);
+            taskStage2.setTaskStageStatus(taskStageStatusUncomplete);
             taskStage2.setTaskStageStatusUuid(taskStageStatusUuid);
             taskStage2.setEndDate(new Date());
             taskStage2.setFlowOrder(2);
@@ -1077,7 +1078,7 @@ public class LoadTestData {
                 order.setStartDate(new Date());
                 order.setOpenDate(new Date());
                 order.setOrderStatusUuid(orderStatusUuid3);
-                order.setOrderStatus(orderStatus3);
+                order.setOrderStatus(orderStatusUncomplete);
                 order.setOrderVerdictUuid(orderVerdictUuid);
                 order.setOrderVerdict(orderVerdict);
                 order.setTitle("Демонтаж устаревшего оборудования");
