@@ -3,12 +3,6 @@
 //
 #include "reader.h"
 
-const char *unk_27F4 = "some message"; // weak
-const char *unk_2830 = "some text format"; // weak
-char *_data_start; // weak
-char buffer[1024]; // weak
-
-
 /**
  *
  */
@@ -18,52 +12,58 @@ jint Java_jni_Linuxc_openUart(JNIEnv *env, jclass jc, jstring jPath) {
     const char *path = e->GetStringUTFChars(env, jPath, &copy);;
     int32_t result;
 
-    __android_log_print(ANDROID_LOG_INFO, TAG, "openUart: %p, %p", env, jc);
+    __android_log_print(ANDROID_LOG_INFO, TAG, "openUart: env=%p, jc=%p, jPath=%p", env, jc, jPath);
 
     result = open(path, O_RDWR, 438);
-
     e->ReleaseStringUTFChars(env, jPath, path);
-
     return result;
 }
 
 /**
  *
  */
-jint Java_jni_Linuxc_closeUart(JNIEnv *env, jclass jc, jint handler) {
-    __android_log_print(ANDROID_LOG_INFO, TAG, "closeUart: %p, %p", env, jc);
-
-    return close(handler);
+jint Java_jni_Linuxc_closeUart(JNIEnv *env, jclass jc, jint descriptor) {
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "closeUart: env=%p, jc=%p, descriptor=%d",
+                        env, jc, descriptor);
+    return close(descriptor);
 }
 
 /**
  *
  */
-jint Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, int descriptor, int a4) {
-    int v5; // r8@1
-    int v6; // r3@1
-    signed int v10; // [sp+0h] [bp-40h]@1
+jint Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint descriptor,
+                             jint baudRate, jint timeOut, jint minLen) {
+    int v5;
+    int v6;
+    signed int v10;
 
     struct termios oldcfg;
     struct termios newcfg;
     int32_t FLUSH_BOTH = 2;
 
-    __android_log_print(ANDROID_LOG_INFO, TAG, "setUart: %p, %p", env, jc);
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+            "setUart: env=%p, jc=%p, descriptor=%d, baudRate=%d, timeOut=%d, minLen=%d",
+            env, jc, descriptor, baudRate, timeOut, minLen);
 
-    v5 = a4;
+    v5 = baudRate;
     v10 = 9;
 
     ioctl(descriptor, TCGETS, &oldcfg);
     ioctl(descriptor, TCGETS, &newcfg);
 
     v6 = *(&v10 + v5);
-//    unk_4B1C = 0;
-//    unk_4B18 = ((unk_4B18 & 0xFFFFEFF0 | v6 & 0x100F) & 0xFFFFEFF0 | v6 & 0x100F | 0x30) & 0xFFFFFEBF;
-//    newtio &= 0xFFFFE2CD;
 //    unk_4B14 &= 0xFFFFFFFE;
-    ioctl(descriptor, TCFLSH, FLUSH_BOTH);
+    newcfg.c_iflag &= 0xFFFFFFFE;
+//    unk_4B18 = ((unk_4B18 & 0xFFFFEFF0 | v6 & 0x100F) & 0xFFFFEFF0 | v6 & 0x100F | 0x30) & 0xFFFFFEBF;
+    newcfg.c_oflag = ((newcfg.c_oflag & 0xFFFFEFF0 | v6 & 0x100F) & 0xFFFFEFF0 | v6 & 0x100F | 0x30) & 0xFFFFFEBF;
+//    unk_4B1C = 0;
+    newcfg.c_cflag = 0;
 //    unk_4B26 = 0;
 //    unk_4B27 = 0;
+//    newtio &= 0xFFFFE2CD;
+
+    ioctl(descriptor, TCFLSH, FLUSH_BOTH);
 
     if ( ioctl(descriptor, TCSETS, &newcfg) ) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "setUart: fail");
@@ -76,36 +76,41 @@ jint Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, int descriptor, int a4) {
 /**
  *
  */
-jint Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc, jint descriptor) {
-    int v3; // r10@1
-    char *v4; // r5@1
-    int v5; // r6@1
-    char *v6; // r7@1
-    ssize_t v7; // r0@1
-    ssize_t v8; // r2@1
-    char v9; // r3@2
-    int result; // r0@3
+jstring Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc,
+                                          jint descriptor) {
+    JNIEnv e = *env;
+    jstring result;
+    const jchar *_data_start;
+    char buffer[1024];
 
-    v3 = descriptor;
+    char *v4;
+    char *v6;
+    ssize_t v7;
+    ssize_t v8;
+    char v9;
+
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "receiveMsgUartHex: env=%p, jc=%p, descriptor=%d",
+                        env, jc, descriptor);
+
     v4 = buffer;
-    v5 = env;
     memset(&buffer, 0, 0x400u);
-    v6 = _data_start;
+    v6 = (char *)&_data_start;
     memset(&_data_start, 0, 0x1000u);
-    v7 = read(v3, &buffer, 0x400u);
+    v7 = read(descriptor, &buffer, 0x400u);
     v8 = v7;
     if ( 2 * v7 > 0 ) {
         do {
-            v9 = *(char *)v4;
-            v4 = (char *)v4 + 1;
-            *(char *)v6 = v9;
-            v6 = (char *)v6 + 2;
-        } while ( v4 != (char *)((char *)&buffer + 2 * v7) );
+            v9 = *v4;
+            v4 = v4 + 1;
+            *v6 = v9;
+            v6 = v6 + 2;
+        } while ( v4 != ((char *)&buffer + 2 * v7) );
     }
 
-    result = 0;
-    if ( v8 > 0 ) {
-        result = (*(int (**)(int, char *)) (*(int32_t *) v5 + 652))(v5, &_data_start);
+    result = NULL;
+    if (v8 > 0) {
+        result = e->NewString(env, _data_start, v8);
     }
 
     return result;
@@ -114,58 +119,61 @@ jint Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc, jint descriptor) 
 /**
  *
  */
-jint Java_jni_Linuxc_sendMsgUart(JNIEnv *env, jclass jc, int descriptor, int a4) {
-    int v5; // r5@1
-    int v6; // r4@1
-    const void *v7; // r6@1
-    size_t v8; // r0@1
-
-    v5 = a4;
-    v6 = env;
-    v7 = (const void *)(*(int (**)(void))(*(int32_t *)env + 676))();
-    v8 = (*(int (**)(int, int))(*(int32_t *)v6 + 656))(v6, v5);
-    write(descriptor, v7, v8);
-    return (*(int (**)(int, int, const void *))(*(int32_t *)v6 + 680))(v6, v5, v7);
-}
-
-/**
- *
- */
-void Java_jni_Linuxc_sendMsgUartByte(JNIEnv *env, jclass jc, jint descriptor, int a4, size_t na) {
-
-    const void *v6; // r4@1
-    v6 = (const void *)(*(int (**)(void))(*(int32_t *)env + 736))();
-    write(descriptor, v6, na);
-    free((void *)v6);
-}
-
-/**
- *
- */
-void Java_jni_Linuxc_sendMsgUartHex(JNIEnv *env, jclass jc, jint descriptor, int a4, size_t a5) {
+void Java_jni_Linuxc_sendMsgUart(JNIEnv *env, jclass jc, jint descriptor,
+                                 jstring array) {
     JNIEnv e = *env;
-    int v5; // r9@1
-    int v6; // r11@1
-    const void *v7; // r6@1
-    int v8; // r7@1
-    signed int v9; // r4@2
+    jsize dataSize = e->GetStringLength(env, array);
+    const char *data =  e->GetStringUTFChars(env, array, NULL);
 
-    v5 = env;
-    v6 = a4;
-    v7 = malloc(2 * a5);
-    v8 = (*(int (**)(int, int, int32_t))(*(int32_t *)v5 + 660))(v5, v6, 0);
-    if ( (signed int)a5 > 0 ) {
-        v9 = 0;
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "sendMsgUart: env=%p, jc=%p, array=%p", env, jc, array);
+
+    write(descriptor, data, (size_t)dataSize);
+    e->ReleaseStringUTFChars(env, array, data);
+}
+
+/**
+ *
+ */
+void Java_jni_Linuxc_sendMsgUartByte(JNIEnv *env, jclass jc, jint descriptor,
+                                     jbyteArray *array, jsize arraySize) {
+    JNIEnv e = *env;
+    jsize arrayLen = e->GetArrayLength(env, array);
+    jbyte *data = e->GetByteArrayElements(env, array, NULL);
+
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "sendMsgUartByte: env=%p, jc=%p, array=%p, arryaSize=%d",
+                        env, jc, array, arraySize);
+
+    write(descriptor, data, (size_t)arrayLen);
+    e->ReleaseByteArrayElements(env, array, data, JNI_ABORT);
+}
+
+/**
+ *
+ */
+void Java_jni_Linuxc_sendMsgUartHex(JNIEnv *env, jclass jc, jint descriptor,
+                                    jbyte *array, jsize arraySize) {
+    JNIEnv e = *env;
+    const jchar *data = e->GetStringChars(env, array, NULL);
+    const void *v7;
+    signed int index;
+
+    __android_log_print(ANDROID_LOG_INFO, TAG,
+                        "sendMsgUartHex: env=%p, jc=%p, array=%p, arraySize=%d",
+                        env, jc, array, arraySize);
+
+    v7 = malloc(2 * (size_t)arraySize);
+    if (arraySize > 0) {
+        index = 0;
         do {
-            *((char *)v7 + v9) = *(char *)(v8 + 2 * v9);
-            ++v9;
-            __android_log_print(4, &unk_27F4, &unk_2830, a5);
-        } while ( (signed int)a5 > v9 );
+            *((char *)v7 + index) = *(char *)(data + 2 * index);
+            ++index;
+        } while (arraySize > index);
     }
 
-    write(descriptor, v7, a5);
-
-    (*(void (**)(int, int, int))(*(int32_t *)v5 + 664))(v5, v6, v8);
+    write(descriptor, v7, (size_t)arraySize);
+    e->ReleaseStringChars(env, array, data);
 
     free((void *)v7);
 }

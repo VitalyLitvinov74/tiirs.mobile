@@ -12,11 +12,11 @@
 
 const char *TAG = "P6300Scanner";
 
-jint Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc, jint descriptor);
-jint Java_jni_Linuxc_sendMsgUart(JNIEnv *env, jclass jc, int a3, int a4);
-void Java_jni_Linuxc_sendMsgUartByte(JNIEnv *env, jclass jc, int a3, int a4, size_t na);
-void Java_jni_Linuxc_sendMsgUartHex(JNIEnv *env, jclass jc, int a3, int a4, size_t a5);
-jint Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint descriptor, int a4);
+jstring Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc, jint descriptor);
+void Java_jni_Linuxc_sendMsgUart(JNIEnv *env, jclass jc, jint descriptor, jstring array);
+void Java_jni_Linuxc_sendMsgUartByte(JNIEnv *env, jclass jc, jint descriptor, jbyteArray *array, jsize arraySize);
+void Java_jni_Linuxc_sendMsgUartHex(JNIEnv *env, jclass jc, jint descriptor, jbyte *array, jsize arraySize);
+jint Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint descriptor, jint baudRate, jint timeOut, jint minLen);
 jint Java_jni_Linuxc_closeUart(JNIEnv *env, jclass jc, jint descriptor);
 jint Java_jni_Linuxc_openUart(JNIEnv *env, jclass jc, jstring jPath);
 
