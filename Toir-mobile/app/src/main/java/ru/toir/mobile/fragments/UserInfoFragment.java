@@ -15,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,31 +24,15 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
-import ru.toir.mobile.db.adapters.OrderAdapter;
-import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.GpsTrack;
 
 public class UserInfoFragment extends Fragment {
     private Realm realmDB;
-
-	private TextView tv_user_name;
-	private TextView tv_user_id;
-	private TextView tv_user_type;
-	private TextView tv_user_gps;
-	private TextView tv_user_status;
-	private ImageView user_image;
-    private ImageView user_status_gps;
-    private ImageView user_status_gprs;
-
-	private TextView tv_user_date;
-	private TextView tv_user_tasks;
-	private TextView tv_user_boss;
 
     public static UserInfoFragment newInstance() {
         return (new UserInfoFragment());
@@ -70,7 +54,6 @@ public class UserInfoFragment extends Fragment {
         toolbar.setSubtitle("Пользователь");
 
         realmDB = Realm.getDefaultInstance();
-		FillListViewTasks(rootView);
 		initView(rootView);
 
 		rootView.setFocusableInTouchMode(true);
@@ -80,21 +63,29 @@ public class UserInfoFragment extends Fragment {
 	}
 
 	private void initView(View view) {
-		tv_user_id = (TextView) view.findViewById(R.id.user_text_id);
+        TextView tv_user_name;
+        TextView tv_user_id;
+        TextView tv_user_type;
+        TextView tv_user_gps;
+        ImageView user_image;
+        ImageView edit_image;
+        Switch user_status_gps;
+        Switch user_status_gprs;
+
+        TextView tv_user_date;
+        TextView tv_user_boss;
+
+		tv_user_id = (TextView) view.findViewById(R.id.user_text_uuid);
 		tv_user_name = (TextView) view.findViewById(R.id.user_text_name);
 		tv_user_type = (TextView) view.findViewById(R.id.user_text_type);
-		tv_user_gps = (TextView) view.findViewById(R.id.user_position);
-		tv_user_status = (TextView) view.findViewById(R.id.user_status);
-		user_image = (ImageView) view.findViewById(R.id.user_image);
-		tv_user_date = (TextView) view.findViewById(R.id.user_text_date);
-		tv_user_tasks = (TextView) view.findViewById(R.id.user_text_tasks);
-		tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
+		tv_user_gps = (TextView) view.findViewById(R.id.user_text_location);
+        user_image = (ImageView) view.findViewById(R.id.user_image);
+        edit_image = (ImageView) view.findViewById(R.id.user_edit_image);
+        tv_user_date = (TextView) view.findViewById(R.id.user_text_date);
+        tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
+        user_status_gps = (Switch) view.findViewById(R.id.user_status_gps_switch);
+        user_status_gprs = (Switch) view.findViewById(R.id.user_status_gprs_switch);
 
-        user_status_gps = (ImageView) view.findViewById(R.id.user_status_gps);
-        user_status_gprs = (ImageView) view.findViewById(R.id.user_status_gprs);
-
-        user_status_gprs.setImageResource(R.drawable.ic_stat_name);
-        user_status_gps.setImageResource(R.drawable.ic_action_name);
         User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
@@ -104,38 +95,33 @@ public class UserInfoFragment extends Fragment {
 				tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
 			else
 				tv_user_id.setText("ID: " + user.getTagId());
-			tv_user_name.setText("ФИО: " + user.getName());
+			tv_user_name.setText(user.getName());
 			tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
-			tv_user_tasks.setText("2/2");
 			tv_user_boss.setText(user.getContact());
-
-			tv_user_type.setText("Должность: " + user.getWhoIs());
-			tv_user_status.setText("Статус: задание");
+			tv_user_type.setText(user.getWhoIs());
 			GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
 					getActivity().getApplicationContext()));
 			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
-			// Toast.makeText(getActivity(), user.getUuid(),
-			// Toast.LENGTH_SHORT).show();
 
             LocationManager manager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (statusOfGPS)
-                user_status_gps.setImageResource(R.drawable.checkmark_32);
+                user_status_gps.setChecked(true);
             else
-                user_status_gps.setImageResource(R.drawable.forbidden_32);
+                user_status_gps.setChecked(false);
 
             ConnectivityManager cm = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
             if (activeNetwork != null) { // connected to the internet
                 if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
                     // connected to wifi
-                    user_status_gprs.setImageResource(R.drawable.wifi_32);
+                    user_status_gprs.setChecked(true);
                 } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
                     // connected to the mobile provider's data plan
-                    user_status_gprs.setImageResource(R.drawable.gprs_32);
+                    user_status_gprs.setChecked(false);
                 }
             } else {
-                user_status_gprs.setImageResource(R.drawable.forbidden_32);
+                user_status_gprs.setChecked(false);
             }
 
 			if (gpstrack != null) {
@@ -167,20 +153,4 @@ public class UserInfoFragment extends Fragment {
 			}
 		}
 	}
-
-	private void FillListViewTasks(View view) {
-        OrderAdapter orderAdapter;
-        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
-		if (user == null) {
-			Toast.makeText(getActivity(), "Нет такого пользователя!",
-					Toast.LENGTH_SHORT).show();
-		} else {
-            RealmResults<Orders> orders;
-            orders = realmDB.where(Orders.class).findAll();
-            orderAdapter = new OrderAdapter(getContext(), orders);
-            ListView mainListView = (ListView) view.findViewById(R.id.user_listView_main);
-            mainListView.setAdapter(orderAdapter);
-		}
-	}
-
 }

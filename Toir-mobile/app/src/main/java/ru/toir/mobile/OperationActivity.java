@@ -580,11 +580,11 @@ public class OperationActivity extends AppCompatActivity {
                 equipmentOperationResultDBAdapter.update(operationResult);
 
                 // обновление статуса операции по результату выполнения
-                CheckBox altOperationStausCheckbox = (CheckBox) findViewById
+                CheckBox altOperationStatusCheckbox = (CheckBox) findViewById
 						(R.id.twf_showAltOperationStatusCheckbox);
                 Spinner operationStatusSpinner = (Spinner) findViewById(R.id
 						.twf_altOperationStatusSpinner);
-                String operationStatusUuid = altOperationStausCheckbox
+                String operationStatusUuid = altOperationStatusCheckbox
 						.isChecked() ? ((OperationStatus)
 						operationStatusSpinner.getSelectedItem()).getUuid() :
 						OperationStatusDBAdapter.Status.COMPLETE;

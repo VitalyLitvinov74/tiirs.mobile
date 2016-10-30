@@ -38,7 +38,7 @@ public class UserTagStructure {
 	}
 
 	/**
-	 * @param user name the user name to set
+	 * @param name name the user name to set
 	 */
 	public void set_name(String name) {
 		this.name = name;

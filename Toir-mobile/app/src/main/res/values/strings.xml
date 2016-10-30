@@ -44,12 +44,13 @@
     <string name="no_gps_data">Нет данных GPS</string>
     <string name="current_status">Текущий статус</string>
     <string name="operation_list">Список операций</string>
-    <string name="gpsstatus">Состояние GPS</string>
-    <string name="gprsstatus">Связь GPRS</string>
-    <string name="server_date_connect">Дата связи с сервером:</string>
-    <string name="tasks_quantity">Статистика нарядов:</string>
-    <string name="boss_contact">Контакт начальника:</string>
+    <string name="gps_status">Состояние GPS</string>
+    <string name="gprs_status">Связь GPRS</string>
+    <string name="server_date_connect">Дата связи с сервером</string>
+    <string name="tasks_quantity">Статистика нарядов</string>
+    <string name="boss_contact">Контакт начальника</string>
     <string name="type">Тип:</string>
+    <string name="service">Сервис:</string>
     <string name="critical">Критичность:</string>
     <string name="last_date">Дата обслуживания</string>
     <string name="last_result">Результат обслуживания:</string>
@@ -108,4 +109,9 @@
     <string name="profile_type_engeneer">Пользователь</string>
     <string name="profile_whois_shef">Начальник</string>
     <string name="profile_whois_engeneer">Инженер</string>
+
+    <string name="image_status_equipment">изображение статуса оборудования</string>
+    <string name="normative">Норматив: </string>
+    <string name="finish_stage">Закончить этап</string>
+    <string name="operation_time">Время операции:</string>
 </resources>

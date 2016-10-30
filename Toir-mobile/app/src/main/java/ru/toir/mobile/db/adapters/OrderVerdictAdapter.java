@@ -11,34 +11,33 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.realm.OrderVerdict;
 
 /**
  * @author koputo
  *         Created by koputo on 08.09.16.
  */
-public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements ListAdapter {
-    public static final String TABLE_NAME = "OrderStatus";
+public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implements ListAdapter {
+    public static final String TABLE_NAME = "OrderVerdict";
     public class Status {
-        public static final String NEW = "789b4d73-044c-471b-a08d-26f36ebb22ba";
-        public static final String IN_WORK = "78980db5-934c-4ddb-999a-04c6c3daca59";
-        public static final String COMPLETE = "786dca37-2cc9-44da-aff9-19bf143e611a";
-        public static final String UN_COMPLETE = "783c08ec-89d9-47df-b7cf-63a05d56594c";
+        public static final String COMPLETE = "886dca37-2cc9-44da-aff9-19bf143e611a";
+        public static final String UN_COMPLETE = "883c08ec-89d9-47df-b7cf-63a05d56594c";
+        public static final String CANNOT_COMPLETE = "893c08ec-89d9-47df-b7cf-63a05d56594c";
     }
 
-    public OrderStatusAdapter(@NonNull Context context, RealmResults<OrderStatus> data) {
+    public OrderVerdictAdapter(@NonNull Context context, RealmResults<OrderVerdict> data) {
         super(context, data);
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<OrderStatus> rows = realm.where(OrderStatus.class).findAll();
+        RealmResults<OrderVerdict> rows = realm.where(OrderVerdict.class).findAll();
         return rows.size();
     }
 
     @Override
-    public OrderStatus getItem(int position) {
+    public OrderVerdict getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);
         } else return null;
@@ -46,10 +45,10 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
 
     @Override
     public long getItemId(int position) {
-        OrderStatus orderStatus;
+        OrderVerdict orderVerdict;
         if (adapterData != null) {
-            orderStatus = adapterData.get(position);
-            return orderStatus.get_id();
+            orderVerdict = adapterData.get(position);
+            return orderVerdict.get_id();
         }
         return 0;
     }
@@ -67,20 +66,20 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            OrderStatus orderStatus;
+            OrderVerdict orderVerdict;
             if (adapterData != null) {
-                orderStatus = adapterData.get(position);
-                viewHolder.title.setText(orderStatus.getTitle());
-                viewHolder.uuid.setText(orderStatus.getUuid());
+                orderVerdict = adapterData.get(position);
+                viewHolder.title.setText(orderVerdict.getTitle());
+                viewHolder.uuid.setText(orderVerdict.getUuid());
             }
             return convertView;
         }
         if (parent.getId() == R.id.simple_spinner || convertView == null) {
             TextView textView = new TextView(context);
-            OrderStatus orderStatus;
+            OrderVerdict orderVerdict;
             if (adapterData != null) {
-                orderStatus = adapterData.get(position);
-                textView.setText(orderStatus.getTitle());
+                orderVerdict = adapterData.get(position);
+                textView.setText(orderVerdict.getTitle());
             }
             return textView;
         }

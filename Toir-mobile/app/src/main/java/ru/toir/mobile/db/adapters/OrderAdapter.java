@@ -17,6 +17,7 @@ import java.util.List;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 
 /**
@@ -120,48 +121,52 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 convertView.setTag(viewHolder);
                 Orders order = getItem(position);
                 if (order == null) break;
+                OrderStatus orderStatus;
+                orderStatus = order.getOrderStatus();
                 lDate = order.getCloseDate();
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
                     viewHolder.created.setText(sDate);
                 }
                 viewHolder.title.setText(order.getTitle());
-                viewHolder.status.setText(order.getOrderStatus().getTitle());
-                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Низкий")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                    viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Средний")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                    viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Высокий")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                    viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Низкий")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                    viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Средний")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                    viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Высокий")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                    viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Низкий"))  {
-                    viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                    viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Средний")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                    viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]");
-                }
-                if (order.getOrderStatus().getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Высокий")) {
-                    viewHolder.icon.setImageResource(R.drawable.status_high_ready);
-                    viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]");
+                if (orderStatus != null) {
+                    viewHolder.status.setText(order.getOrderStatus().getTitle());
+                    if (orderStatus.getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Низкий")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
+                        viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Средний")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
+                        viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("Получен") && order.getOrderLevel().getTitle().equals("Высокий")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_high_receive);
+                        viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Низкий")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_easy_work);
+                        viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Средний")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_mod_work);
+                        viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("В работе") && order.getOrderLevel().getTitle().equals("Высокий")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_high_work);
+                        viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Низкий")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
+                        viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Средний")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
+                        viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]");
+                    }
+                    if (orderStatus.getTitle().equals("Выполнен") && order.getOrderLevel().getTitle().equals("Высокий")) {
+                        viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+                        viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]");
+                    }
                 }
         }
         return convertView;

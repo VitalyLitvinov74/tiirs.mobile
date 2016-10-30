@@ -10,6 +10,7 @@ import io.realm.annotations.PrimaryKey;
  *         Created on 07.09.16.
  */
 public class OperationStatus extends RealmObject {
+
     @PrimaryKey
     private long _id;
     private String uuid;
