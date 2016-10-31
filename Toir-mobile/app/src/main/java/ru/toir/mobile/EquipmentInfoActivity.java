@@ -36,6 +36,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
+import java.text.DateFormat;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -394,7 +395,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 + String.valueOf(equipment.getLatitude()) + " / "
                 + String.valueOf(equipment.getLongitude()));
 
-        tv_equipment_task_date.setText(equipment.getStartDate().toString());
+        tv_equipment_task_date.setText(DateFormat.getDateTimeInstance().format(equipment.getStartDate()));
         /*
 		tv_equipment_critical.setText("Критичность: "
 				+ equipment.getCriticalType().getTitle());

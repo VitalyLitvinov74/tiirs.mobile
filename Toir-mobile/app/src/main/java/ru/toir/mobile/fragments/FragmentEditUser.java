@@ -32,7 +32,6 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
     private EditText name,login,pass;
     private String image_name;
     private Realm realmDB;
-    private User user;
 
     public FragmentEditUser() {
         // Required empty public constructor
@@ -64,7 +63,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         //user = users.getActiveUser();
         if (user==null) {
             Toast.makeText(getActivity().getApplicationContext(), "Пользователь не выбран, пожалуйста выберите или содайте профиль", Toast.LENGTH_LONG).show();
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("")).commit();
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance()).commit();
         }
 
         if (user!=null) {
@@ -139,22 +138,22 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                user = realmDB.where(User.class).equalTo("active", true).findFirst();
+                User user = realmDB.where(User.class).equalTo("active", true).findFirst();
                 realmDB.beginTransaction();
                 user.setName(name.getText().toString());
                 user.setLogin(login.getText().toString());
                 user.setPass(pass.getText().toString());
                 realmDB.commitTransaction();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("Welcome")).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance()).commit();
                 break;
 
             case R.id.profile_button_delete:
                 user = realmDB.where(User.class).equalTo("active", true).findFirst();
-                ((MainActivity)getActivity()).deleteProfile((int)user.get_id());
+                ((MainActivity)getActivity()).deleteProfile((int) user.get_id());
                 realmDB.beginTransaction();
                 user.deleteFromRealm();
                 realmDB.commitTransaction();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance("Welcome")).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance()).commit();
                 break;
 
             default:

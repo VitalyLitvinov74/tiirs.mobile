@@ -155,7 +155,7 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
                     {
                        ((MainActivity)getActivity()).addProfile(profile);
                         ((MainActivity)getActivity()).refreshProfileList();
-                       Fragment f = FragmentWelcome.newInstance("Welcome");
+                       Fragment f = FragmentWelcome.newInstance();
                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
                     }
                 break;

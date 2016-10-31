@@ -71,7 +71,6 @@ public class UserInfoFragment extends Fragment {
         ImageView edit_image;
         Switch user_status_gps;
         Switch user_status_gprs;
-
         TextView tv_user_date;
         TextView tv_user_boss;
 
@@ -86,12 +85,27 @@ public class UserInfoFragment extends Fragment {
         user_status_gps = (Switch) view.findViewById(R.id.user_status_gps_switch);
         user_status_gprs = (Switch) view.findViewById(R.id.user_status_gprs_switch);
 
-        User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+        edit_image.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile")).commit();
+            }
+        });
+
+        final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			if (user.getTagId().length() > 20)
+
+            realmDB.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                     user.setContact("+79227000285 Курнаков И.И.");
+                     user.setWhoIs("Ведущий инженер");
+                     user.setConnectionDate(new Date());
+                    }
+                });
+            if (user.getTagId().length() > 20)
 				tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
 			else
 				tv_user_id.setText("ID: " + user.getTagId());

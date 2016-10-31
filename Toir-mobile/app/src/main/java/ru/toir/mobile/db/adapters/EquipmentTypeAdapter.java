@@ -62,7 +62,8 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
             }
           if (parent.getId() == R.id.simple_spinner) {
               //convertView = inflater.inflate(R.layout.simple_spinner_item, parent, false);
-              convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+              //convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+              convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
               //viewHolder.title = (TextView) convertView.findViewById(R.id.spinner_item);
               viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
               convertView.setTag(viewHolder);

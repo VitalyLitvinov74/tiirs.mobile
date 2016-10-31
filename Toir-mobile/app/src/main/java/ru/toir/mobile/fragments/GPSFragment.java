@@ -41,21 +41,15 @@ import ru.toir.mobile.gps.TestGPSListener;
 
 public class GPSFragment extends Fragment {
 
-	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<>();
 	Location location;
 	TextView gpsLog;
 	ArrayList<OverlayItem> aOverlayItemArray;
-	private IMapController mapController;
-	private MapView mapView;
-	private double curLatitude, curLongitude;
-	private ListView lv_equipment;
-    private Realm realmDB;
-    private User user;
-    private Tasks task;
-    private RealmResults<Tasks> tasks;
-    private Orders order;
-    private RealmResults<Orders> orders;
-    private RealmResults<Equipment> equipment;
+    private double curLatitude, curLongitude;
+	//private ListView lv_equipment;
+    //private Tasks task;
+    //private Orders order;
+    //private RealmResults<Equipment> equipment;
 	private int LastItemPosition = -1;
 
     public GPSFragment() {
@@ -76,16 +70,17 @@ public class GPSFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
+
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         EquipmentAdapter equipmentAdapter;
         ListView equipmentListView;
 
         toolbar.setSubtitle("Карта");
-        realmDB = Realm.getDefaultInstance();
-        RealmResults<Equipment> equipments = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
+        Realm realmDB = Realm.getDefaultInstance();
+        RealmResults<Equipment> equipments; // = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
 
 		//Float equipment_latitude = 0f, equipment_longitude = 0f;
-        user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
 		LocationManager lm = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
 
@@ -109,12 +104,12 @@ public class GPSFragment extends Fragment {
 			}
 		}
 
-		mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
+        MapView mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
 		// mapView.setTileSource(TileSourceFactory.MAPNIK);
 		mapView.setUseDataConnection(false);
 		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mapView.setBuiltInZoomControls(true);
-		mapController = mapView.getController();
+        IMapController mapController = mapView.getController();
 		mapController.setZoom(17);
 		GeoPoint point2 = new GeoPoint(curLatitude, curLongitude);
 		mapController.setCenter(point2);
@@ -136,9 +131,9 @@ public class GPSFragment extends Fragment {
         //orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         RealmQuery<Equipment> q = realmDB.where(Equipment.class);
 
-        orders = realmDB.where(Orders.class).findAll();
+        RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         for (Orders itemOrder : orders) {
-            tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
+            RealmResults<Tasks> tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
             //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();

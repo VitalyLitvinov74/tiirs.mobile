@@ -15,8 +15,8 @@ public class FragmentWelcome extends Fragment {
         // Required empty public constructor
     }
 
-    public static FragmentWelcome newInstance(String title) {
-        String gTitle = title;
+    public static FragmentWelcome newInstance() {
+        //String gTitle = title;
         return (new FragmentWelcome());
     }
 

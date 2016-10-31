@@ -113,6 +113,8 @@
         android:layout_below="@+id/eril_last_operation_date_label"
         android:textColor="#222222"
         android:textSize="14sp"
+        android:layout_marginBottom="5dp"
+        android:paddingBottom="5dp"
         android:layout_toRightOf="@+id/eril_critical"
         android:text="@string/status" />
 
@@ -125,6 +127,7 @@
         android:textSize="14sp"
         android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
+        android:paddingBottom="5dp"
         android:layout_toRightOf="@+id/eril_status_label" />
 
 </RelativeLayout>
