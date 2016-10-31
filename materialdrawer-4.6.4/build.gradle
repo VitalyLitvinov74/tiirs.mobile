@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('materialdrawer-4.6.4.aar'))
