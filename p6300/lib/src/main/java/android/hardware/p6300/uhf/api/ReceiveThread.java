@@ -4,18 +4,18 @@
  * Could not load the following classes:
  *  android.os.AsyncTask
  *  android.util.Log
- *  jni.Linuxc
- *  uhf.api.Tags_data
- *  uhf.api.Temperature
- *  uhf.api.UHF
- *  uhf.api.Ware
+ *  android.hardware.p6300.jni.Linuxc
+ *  android.hardware.p6300.uhf.api.Tags_data
+ *  android.hardware.p6300.uhf.api.Temperature
+ *  android.hardware.p6300.uhf.api.UHF
+ *  android.hardware.p6300.uhf.api.Ware
  */
-package uhf.api;
+package android.hardware.p6300.uhf.api;
 
 import android.os.AsyncTask;
 import android.util.Log;
 import java.util.Calendar;
-import jni.Linuxc;
+import android.hardware.p6300.jni.Linuxc;
 
 public class ReceiveThread
 extends AsyncTask<Integer, String, Integer> {

@@ -4,7 +4,7 @@
  * Could not load the following classes:
  *  android.util.Log
  */
-package jni;
+package android.hardware.p6300.jni;
 
 import android.util.Log;
 
@@ -22,11 +22,11 @@ public class Linuxc {
 
     static {
         try {
-            System.loadLibrary("uart");
-            Log.i((String)"JIN", (String)"Trying to load libuart.so");
+            System.loadLibrary("p6300uart");
+            Log.i("JIN", "Trying to load libp6300uart.so");
         }
         catch (UnsatisfiedLinkError ule) {
-            Log.e((String)"JIN", (String)"WARNING:could not load libuart.so");
+            Log.e("JIN", "WARNING:could not load libp6300uart.so");
         }
         BAUD_RATE_1200 = 0;
         BAUD_RATE_2400 = 1;
@@ -40,15 +40,16 @@ public class Linuxc {
         BAUD_RATE_921600 = 9;
     }
 
-    public static native int openUart(String var0);
+    public static native int openUart(String path);
 
-    public static native void closeUart(int var0);
+    public static native void closeUart(int descriptor);
 
-    public static native int setUart(int var0, int var1, int var2, int var3);
+    public static native int setUart(int descriptor, int baudRate, int timeOut, int minLen);
 
-    public static native int sendMsgUartHex(int var0, String var1, int var2);
+    public static native int sendMsgUartHex(int descriptor, String command, int commandSize);
 
-    public static native String receiveMsgUartHex(int var0);
+    public static native String receiveMsgUartHex(int descriptor);
 
-    public static native int sendMsgUartByte(int var0, byte[] var1, int var2);
+//    public static native int sendMsgUartByte(int descriptor, byte[] var1, int var2);
+
 }

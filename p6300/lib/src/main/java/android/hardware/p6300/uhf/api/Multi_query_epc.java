@@ -2,11 +2,9 @@
  * Decompiled with CFR 0_118.
  * 
  * Could not load the following classes:
- *  uhf.api.Query_epc
+ *  android.hardware.p6300.uhf.api.Query_epc
  */
-package uhf.api;
-
-import uhf.api.Query_epc;
+package android.hardware.p6300.uhf.api;
 
 public class Multi_query_epc {
     public int com_type;

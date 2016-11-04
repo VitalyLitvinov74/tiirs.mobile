@@ -4,28 +4,12 @@
  * Could not load the following classes:
  *  android.os.AsyncTask
  *  android.util.Log
- *  jni.Linuxc
+ *  android.hardware.p6300.jni.Linuxc
  */
-package uhf.api;
+package android.hardware.p6300.uhf.api;
 
-import android.os.AsyncTask;
 import android.util.Log;
-import jni.Linuxc;
-import uhf.api.Baud_rate;
-import uhf.api.CommandType;
-import uhf.api.Fastid;
-import uhf.api.Frequency_region;
-import uhf.api.Gen2;
-import uhf.api.Kill;
-import uhf.api.Lock;
-import uhf.api.MultiLableCallBack;
-import uhf.api.Multi_interval;
-import uhf.api.Multi_query_epc;
-import uhf.api.Output_frequency;
-import uhf.api.Power;
-import uhf.api.ReceiveThread;
-import uhf.api.ShareData;
-import uhf.api.Tags_data;
+import android.hardware.p6300.jni.Linuxc;
 
 public class UHF {
     public int com_fd;

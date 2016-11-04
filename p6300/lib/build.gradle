@@ -2,19 +2,19 @@ apply plugin: 'com.android.model.library'
 
 model {
     android {
-        compileSdkVersion = 23
-        buildToolsVersion = "23.0.3"
+        compileSdkVersion = 25
+        buildToolsVersion = "25.0.0"
 
         defaultConfig.with {
             minSdkVersion.apiLevel = 15
-            targetSdkVersion.apiLevel = 23
+            targetSdkVersion.apiLevel = 25
             versionCode = 1
             versionName = "1.0"
         }
     }
 
     android.ndk {
-        moduleName = "uart"
+        moduleName = "p6300uart"
         ldLibs.add("log")
         CFlags.add("-std=c99");
     }
@@ -50,7 +50,7 @@ uploadArchives {
             properties.load(new FileInputStream("${rootDir}/local.properties"))
 
             repository(url: "file://${properties.getProperty('localRepo')}")
-            pom.groupId = 'jni'
+            pom.groupId = 'android.hardware.p6300'
             pom.artifactId = 'uart'
             pom.version = '1.0'
         }

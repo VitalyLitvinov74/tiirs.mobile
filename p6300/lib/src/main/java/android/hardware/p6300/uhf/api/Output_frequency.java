@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0_118.
  */
-package uhf.api;
+package android.hardware.p6300.uhf.api;
 
 public class Output_frequency {
     public static final char OUTPUT_FREQUENCY_NUM = '';

@@ -9,15 +9,20 @@
 #include <fcntl.h>
 #include <android/log.h>
 #include <termios.h>
+#include <sys/stat.h>
 
 const char *TAG = "P6300Scanner";
 
-jstring Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc, jint descriptor);
-void Java_jni_Linuxc_sendMsgUart(JNIEnv *env, jclass jc, jint descriptor, jstring array);
-void Java_jni_Linuxc_sendMsgUartByte(JNIEnv *env, jclass jc, jint descriptor, jbyteArray *array, jsize arraySize);
-void Java_jni_Linuxc_sendMsgUartHex(JNIEnv *env, jclass jc, jint descriptor, jbyte *array, jsize arraySize);
-jint Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint descriptor, jint baudRate, jint timeOut, jint minLen);
-jint Java_jni_Linuxc_closeUart(JNIEnv *env, jclass jc, jint descriptor);
-jint Java_jni_Linuxc_openUart(JNIEnv *env, jclass jc, jstring jPath);
+JNIEXPORT jint JNICALL
+        Java_jni_Linuxc_openUart(JNIEnv *env, jclass jc, jstring jPath);
+JNIEXPORT jint JNICALL
+        Java_jni_Linuxc_closeUart(JNIEnv *env, jclass jc, jint descriptor);
+JNIEXPORT jint JNICALL
+        Java_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint descriptor, jint baudRate, jint timeOut, jint minLen);
+
+JNIEXPORT jstring JNICALL
+        Java_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc, jint descriptor);
+JNIEXPORT void JNICALL
+        Java_jni_Linuxc_sendMsgUartHex(JNIEnv *env, jclass jc, jint descriptor, jstring command, jsize commandSize);
 
 #endif //P6300LIB_READER_H
