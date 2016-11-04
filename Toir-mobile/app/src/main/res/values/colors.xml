@@ -157,4 +157,5 @@
     <color name="larisaBlueColor">#1565c0</color>
     <color name="larisaTextColor">#575757</color>
     <color name="larisaTextColorABlack">#212121</color>
+    <color name="larisaBackColor">#00BFA5</color>
 </resources>

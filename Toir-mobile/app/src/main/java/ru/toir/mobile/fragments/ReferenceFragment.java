@@ -54,14 +54,9 @@ import ru.toir.mobile.rest.ToirAPIFactory;
 public class ReferenceFragment extends Fragment {
     private Realm realmDB;
 
-	private Spinner referenceSpinner;
-	private ListView contentListView;
+    private ListView contentListView;
 
-	private ArrayList<SortField> referenceList;
-	private ArrayAdapter<SortField> referenceSpinnerAdapter;
-	private ReferenceSpinnerListener referenceSpinnerListener;
-
-	private ProgressDialog getReferencesDialog;
+    private ProgressDialog getReferencesDialog;
 
 	private IntentFilter mFilterGetReference = new IntentFilter(
 			ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
@@ -105,7 +100,7 @@ public class ReferenceFragment extends Fragment {
 				false);
         realmDB = Realm.getDefaultInstance();
 
-		referenceSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
+        Spinner referenceSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
 		contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
 
 		// получаем список справочников, разбиваем его на ключ:значение
@@ -113,18 +108,18 @@ public class ReferenceFragment extends Fragment {
 				R.array.references_array);
 		String[] tmpValue;
 		SortField item;
-		referenceList = new ArrayList<>();
+        ArrayList<SortField> referenceList = new ArrayList<>();
 		for (String value : referenceArray) {
 			tmpValue = value.split(":");
 			item = new SortField(tmpValue[0], tmpValue[1]);
 			referenceList.add(item);
 		}
 
-		referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(),
-				android.R.layout.simple_spinner_dropdown_item, referenceList);
+        ArrayAdapter<SortField> referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item, referenceList);
 
 		referenceSpinner.setAdapter(referenceSpinnerAdapter);
-		referenceSpinnerListener = new ReferenceSpinnerListener();
+        ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
 		referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
 
 		setHasOptionsMenu(true);

@@ -26,7 +26,10 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        }
+        return 0;
     }
 
     public RealmResults<DocumentationType> getAllItems() {
@@ -63,7 +66,8 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
                 convertView.setTag(viewHolder);
             }
             if (parent.getId() == R.id.simple_spinner) {
-                convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                //convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
                 viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
                 convertView.setTag(viewHolder);
             }

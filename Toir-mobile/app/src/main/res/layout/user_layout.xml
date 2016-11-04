@@ -51,7 +51,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:paddingLeft="48dp"
-                android:paddingTop="40dp"
                 android:layout_below="@+id/user_text_uuid"
                 android:background="#FAFAFA"
                 android:textColor="@color/larisaTextColorABlack"
@@ -141,7 +140,7 @@
                 android:layout_toRightOf="@+id/user_date_icon"
                 android:background="#FAFAFA"
                 android:textColor="@color/larisaTextColor"
-                android:text="@string/last_date"
+                android:text="@string/server_date_connect"
                 android:textSize="14sp" />
 
             <View
@@ -207,7 +206,7 @@
                 android:id="@+id/user_text_boss"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
+                android:paddingLeft="45dp"
                 android:layout_below="@+id/user_divider2"
                 android:background="#FAFAFA"
                 android:textColor="@color/larisaTextColorABlack"
