@@ -51,7 +51,7 @@ uploadArchives {
 
             repository(url: "file://${properties.getProperty('localRepo')}")
             pom.groupId = 'android.hardware.p6300'
-            pom.artifactId = 'uart'
+            pom.artifactId = 'p6300uart'
             pom.version = '1.0'
         }
     }

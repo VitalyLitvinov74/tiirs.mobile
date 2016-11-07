@@ -4,8 +4,8 @@
 package android.hardware.p6300.uhf.api;
 
 public class Power {
-    public static char LOOP_OPEN = '\u0000';
-    public static char LOOP_CLOSE = '\u0001';
+    public static char LOOP_OPEN = 0x00;
+    public static char LOOP_CLOSE = 0x01;
     public int com_type;
     public int loop;
     public int read;

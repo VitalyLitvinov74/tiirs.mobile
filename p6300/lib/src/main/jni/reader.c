@@ -41,22 +41,56 @@ Java_android_hardware_p6300_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint desc
     struct termios oldcfg;
     struct termios newcfg;
     int32_t FLUSH_BOTH = 2;
+    tcflag_t realBaud;
 
     __android_log_print(ANDROID_LOG_INFO, TAG,
             "setUart: env=%p, jc=%p, descriptor=%d, baudRate=%d, timeOut=%d, minLen=%d",
             env, jc, descriptor, baudRate, timeOut, minLen);
 
+    switch (baudRate) {
+        case 0 :
+            realBaud = 000011;
+            break;
+        case 1 :
+            realBaud = 000013;
+            break;
+        case 2 :
+            realBaud = 000014;
+            break;
+        case 3 :
+            realBaud = 000015;
+            break;
+        case 4 :
+            realBaud = 000016;
+            break;
+        case 5 :
+            realBaud = 000017;
+            break;
+        case 6 :
+            realBaud = 010001;
+            break;
+        case 7 :
+            realBaud = 010002;
+            break;
+        case 8 :
+            realBaud = 010003;
+            break;
+        case 9 :
+            realBaud = 010007;
+            break;
+        default:
+            realBaud = 010002;
+            break;
+    }
+
     ioctl(descriptor, TCGETS, &oldcfg);
     ioctl(descriptor, TCGETS, &newcfg);
 
-    // эмпирические данные
     newcfg.c_iflag = 0;
     newcfg.c_oflag = ONLCR;
-    newcfg.c_cflag = HUPCL | CLOCAL | B115200 | CS8 | CREAD;
+    newcfg.c_cflag = HUPCL | CLOCAL | realBaud | CS8 | CREAD;
     newcfg.c_lflag = 0;
     newcfg.c_line = 0;
-    // конец эмпирических данных
-
     newcfg.c_cc[VMIN] = (cc_t)minLen;
     newcfg.c_cc[VTIME] = (cc_t)timeOut;
 
@@ -64,10 +98,10 @@ Java_android_hardware_p6300_jni_Linuxc_setUart(JNIEnv *env, jclass jc, jint desc
 
     if ( ioctl(descriptor, TCSETS, &newcfg) ) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "setUart: fail");
-        return 0;
+        return 1;
     } else {
         __android_log_print(ANDROID_LOG_INFO, TAG, "setUart: success");
-        return 1;
+        return 0;
     }
 }
 
@@ -84,9 +118,9 @@ Java_android_hardware_p6300_jni_Linuxc_receiveMsgUartHex(JNIEnv *env, jclass jc,
     char buffer[bufferSize];
     ssize_t countChars;
 
-    __android_log_print(ANDROID_LOG_INFO, TAG,
-                        "receiveMsgUartHex: env=%p, jc=%p, descriptor=%d",
-                        env, jc, descriptor);
+//    __android_log_print(ANDROID_LOG_INFO, TAG,
+//                        "receiveMsgUartHex: env=%p, jc=%p, descriptor=%d",
+//                        env, jc, descriptor);
 
     memset(&buffer, 0, bufferSize);
     countChars = read(descriptor, &buffer, bufferSize);
