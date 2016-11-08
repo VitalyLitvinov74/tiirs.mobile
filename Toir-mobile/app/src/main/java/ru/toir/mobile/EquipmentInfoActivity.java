@@ -39,6 +39,7 @@ import java.io.File;
 import java.text.DateFormat;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.realm.Documentation;
@@ -408,15 +409,24 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
 
         Tasks task;
-        TaskStages taskStages;
+        RealmList<TaskStages> taskStages;
         task = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findFirst();
         if (task != null) {
-            taskStages = task.getTaskStages().get(0);
-            tv_equipment_tasks.setText(""
-                    + taskStages.getTaskStageVerdict().getTitle());
+            taskStages = task.getTaskStages();
+            if (taskStages.size()>0) {
+                 taskStages.get(0);
+                 tv_equipment_tasks.setText(""
+                    + taskStages.get(0).getTaskStageVerdict().getTitle());
+                }
         } else {
             tv_equipment_tasks.setText("еще не обслуживалось");
         }
+
+        // TODO временно пока изображения не загружены
+        if (equipment.get_id() == 1) tv_equipment_image.setImageResource(R.drawable.kotel);
+        if (equipment.get_id() == 2) tv_equipment_image.setImageResource(R.drawable.kotel);
+        if (equipment.get_id() == 3) tv_equipment_image.setImageResource(R.drawable.pressure);
+        if (equipment.get_id() == 4) tv_equipment_image.setImageResource(R.drawable.gas_counter);
 
         File imgFile = new File(equipment.getImage());
         if (imgFile.exists() && imgFile.isFile()) {
@@ -452,7 +462,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
-        toolbar.setBackgroundResource(R.drawable.header);
+        //toolbar.setBackgroundResource(R.drawable.header);
+        toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
         toolbar.setSubtitle("Обслуживание и ремонт");
 
         ActionBar ab = getSupportActionBar();

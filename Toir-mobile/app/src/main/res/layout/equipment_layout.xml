@@ -75,7 +75,6 @@
                 android:layout_alignParentRight="true"
                 android:paddingRight="10dp"
                 android:layout_above="@id/equipment_text_uuid"
-                android:layout_marginBottom="-30dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/circle" />
@@ -88,7 +87,7 @@
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/circle2"
-                android:layout_above="@+id/equipment_text_location"
+                android:layout_above="@+id/equipment_text_uuid"
                 android:layout_toLeftOf="@+id/overlapImage" />
 
 

@@ -1,6 +1,8 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,8 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
+
+import static ru.toir.mobile.utils.RoundedImageView.getCroppedBitmap;
 
 /**
  * @author koputo
@@ -115,6 +119,16 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_teplogenerator);
                     if (equipment.get_id() == 2)
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_kotelgas);
+                    if (equipment.get_id() == 3) {
+                        Bitmap myBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gas_counter);
+                        Bitmap crop = getCroppedBitmap(myBitmap, 70);
+                        viewHolder.icon.setImageBitmap(crop);
+                    }
+                    if (equipment.get_id() == 4) {
+                         Bitmap myBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pressure);
+                         Bitmap crop = getCroppedBitmap(myBitmap, 80);
+                         viewHolder.icon.setImageBitmap(crop);
+                        }
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
                     //viewHolder.location.setText(equipment.getLocation());

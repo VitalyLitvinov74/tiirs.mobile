@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -366,6 +367,9 @@ public class MainActivity extends AppCompatActivity {
         //toolbar.setBackgroundResource(R.drawable.header);
         toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
         toolbar.setSubtitle("Обслуживание и ремонт");
+        toolbar.setTitleTextColor(Color.WHITE);
+
+        //toolbar.
 
         //set the back arrow in the toolbar
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
