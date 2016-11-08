@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0_118.
  */
-package uhf.api;
+package android.hardware.p6300.uhf.api;
 
 public class Lock {
     public static final char MASK_AND_OPERATION_LEN = '\u0003';

@@ -1,9 +1,7 @@
 /*
  * Decompiled with CFR 0_118.
  */
-package uhf.api;
-
-import java.io.PrintStream;
+package android.hardware.p6300.uhf.api;
 
 public class ShareData {
     public static final char Mark_Head = '\u00bb';

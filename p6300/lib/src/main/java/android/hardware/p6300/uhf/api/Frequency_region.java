@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0_118.
  */
-package uhf.api;
+package android.hardware.p6300.uhf.api;
 
 public class Frequency_region {
     public static final char Region_China1 = '\u0001';

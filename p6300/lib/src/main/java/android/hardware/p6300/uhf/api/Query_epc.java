@@ -1,9 +1,7 @@
 /*
  * Decompiled with CFR 0_118.
  */
-package uhf.api;
-
-import uhf.api.EPC;
+package android.hardware.p6300.uhf.api;
 
 public class Query_epc {
     public int com_type;
