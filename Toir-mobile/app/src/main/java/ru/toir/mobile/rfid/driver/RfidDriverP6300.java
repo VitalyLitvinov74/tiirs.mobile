@@ -2,8 +2,8 @@ package ru.toir.mobile.rfid.driver;
 
 import android.hardware.p6300.jni.Linuxc;
 import android.hardware.p6300.uhf.api.CommandType;
-import android.hardware.p6300.uhf.api.EPC;
 import android.hardware.p6300.uhf.api.Query_epc;
+import android.hardware.p6300.uhf.api.ShareData;
 import android.hardware.p6300.uhf.api.Tags_data;
 import android.hardware.p6300.uhf.api.UHF;
 import android.hardware.p6300.uhf.api.Ware;
@@ -89,32 +89,36 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
     @Override
     public void readTagData(String password, String tagId, int memoryBank, int address, int count) {
-        Tags_data tags_data = new Tags_data();
-//         TODO: разобраться как указывается id метки которую читаем
-//        String[] strArray=str_filter.split(" ");
-//        char[] data = new char[strArray.length];
-//        if(!ShareData.StringToChar(str_filter, data,strArray.length)) {
-//            this.setTitle("handleAccRead1 00 11 22 33 44");
-//            return;
-//        }
-//
-//        if(count_filter%2!=0) {
-//            this.setTitle("Filter Hex number must be multiples of 4");
-//            return;
-//        }
-//        mTags_data.filterData_len=data.length;
-//        mTags_data.filterData=data;
+        int filterLength = tagId.length() / 2;
+        if (filterLength % 2 != 0) {
+            // Filter Hex number must be multiples of 4
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+            return;
+        }
 
-//         TODO: уточнить в каком виде передаётся пароль к метке и остальные параметры
+        Tags_data tags_data = new Tags_data();
+        char[] tmpTagId = new char[filterLength];
+        boolean result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
+        if (result) {
+            tags_data.filterData_len = filterLength;
+            tags_data.filterData = tmpTagId;
+        } else {
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+            return;
+        }
+
         tags_data.password = password;
-//        tags_data.FMB = int_filter;
+        // TODO: разобраться это стандарт или частный случай
+        // FMB: 0 = EPC, 1 = TID
+        tags_data.FMB = 0;
         tags_data.start_addr = address;
         tags_data.data_len = count;
         tags_data.mem_bank = memoryBank;
 
-        boolean result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
+        result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
         if (result) {
-            sHandler.obtainMessage(RESULT_RFID_SUCCESS, tags_data.data).sendToTarget();
+            String content = ShareData.CharToString(tags_data.data, tags_data.data.length);
+            sHandler.obtainMessage(RESULT_RFID_SUCCESS, content).sendToTarget();
         } else {
             sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
         }
@@ -127,31 +131,41 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
     @Override
     public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
-        Tags_data tags_data = new Tags_data();
-//         TODO: разобраться как указывается id метки которую пишем
-//        String[] strArray=str_filter.split(" ");
-//        char[] data = new char[strArray.length];
-//        if(!ShareData.StringToChar(str_filter, data,strArray.length)) {
-//            this.setTitle("handleAccRead1 00 11 22 33 44");
-//            return;
-//        }
-//
-//        if(count_filter%2!=0) {
-//            this.setTitle("Filter Hex number must be multiples of 4");
-//            return;
-//        }
-//        mTags_data.filterData_len=data.length;
-//        mTags_data.filterData=data;
+        int filterLength = tagId.length() / 2;
+        if (filterLength % 2 != 0) {
+            // Filter Hex number must be multiples of 4
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+            return;
+        }
 
-//         TODO: уточнить в каком виде передаётся пароль к метке и остальные параметры
+        Tags_data tags_data = new Tags_data();
+        char[] tmpTagId = new char[filterLength];
+        boolean result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
+        if (result) {
+            tags_data.filterData_len = filterLength;
+            tags_data.filterData = tmpTagId;
+        } else {
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+            return;
+        }
+
         tags_data.password = password;
-//        tags_data.FMB = int_filter;
+        // TODO: разобраться это стандарт или частный случай
+        // FMB: 0 = EPC, 1 = TID
+        tags_data.FMB = 0;
         tags_data.start_addr = address;
         tags_data.mem_bank = memoryBank;
-        tags_data.data_len = data.length();
-        tags_data.data = data.toCharArray();
+        int dataLength = data.length() / 2;
+        char dataToWrite[] = new char[dataLength];
+        result = ShareData.StringToChar(data, dataToWrite, dataLength);
+        if (!result) {
+            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+            return;
+        }
 
-        boolean result = mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data);
+        tags_data.data_len = dataLength;
+        tags_data.data = dataToWrite;
+        result = mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data);
         if (result) {
             sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
         } else {
