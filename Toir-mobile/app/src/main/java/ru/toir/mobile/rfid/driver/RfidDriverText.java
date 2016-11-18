@@ -3,6 +3,11 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+
+import android.content.SharedPreferences;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -21,13 +26,19 @@ import android.widget.SpinnerAdapter;
  *         текстового файла.
  *         </p>
  */
+@SuppressWarnings("unused")
 public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
+    @SuppressWarnings("unused")
 	public static final String DRIVER_NAME = "Текстовый драйвер";
 	private String TAG = "RfidDriverText";
+	private static final String TEXTDRV_MODE_PREF_KEY = "textDrvMode";
+    private static boolean mMode; // false - простой режим, true - расшириный режим
 
 	@Override
 	public boolean init() {
-		// Для этого драйвера ни какой специальной инициализации не нужно.
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(mContext);
+        mMode = preferences.getBoolean(TEXTDRV_MODE_PREF_KEY, false);
 		return true;
 	}
 
@@ -39,29 +50,49 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void readTagData(String password, int memoryBank, int address,
 			int count) {
-		// В данном драйвере реального считывания не происходит.
-		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+        if (mMode) {
+            // TODO: реализовать чтение содержимого метки из файла
+            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+        } else {
+            // В данном режиме реального считывания не происходит.
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+        }
 	}
 
 	@Override
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
-		// В данном драйвере реального считывания не происходит.
-		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+        if (mMode) {
+            // TODO: реализовать чтение содержимого метки из файла
+            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+        } else {
+            // В данном режиме реального считывания не происходит.
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+        }
 	}
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
-		// В данном драйвере реальной записи не происходит.
-		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+        if (mMode) {
+            // TODO: реализовать запись содержимого метки в файл
+            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+        } else {
+            // В данном режиме реальной записи не происходит.
+            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+        }
 	}
 
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
-		// В данном драйвере реальной записи не происходит.
-		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+        if (mMode) {
+            // TODO: реализовать запись содержимого метки в файл
+            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+        } else {
+            // В данном режиме реальной записи не происходит.
+            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+        }
 	}
 
 	@Override
@@ -118,4 +149,21 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 		return view;
 	}
+
+    /**
+     * <p>
+     * Интерфейс настроек драйвера
+     * </p>
+     *
+     * @return PreferenceScreen Если настроек нет должен вернуть null
+     */
+    @Override
+    public PreferenceScreen getSettingsScreen(PreferenceScreen screen) {
+        // строим интерфейс с настройками драйвера
+        CheckBoxPreference modePreference = new CheckBoxPreference(screen.getContext());
+        modePreference.setKey(TEXTDRV_MODE_PREF_KEY);
+        modePreference.setTitle("Чтение/запись");
+        screen.addPreference(modePreference);
+        return screen;
+    }
 }
