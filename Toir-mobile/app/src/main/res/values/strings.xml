@@ -91,6 +91,7 @@
     <string name="profile_login">Логин</string>
     <string name="profile_password">Пароль</string>
     <string name="profile_submit_button">Добавить</string>
+    <string name="profile_edit_button">Изменить</string>
     <string name="profile_submit_delete">Удалить пользователя</string>
     <string name="driver">Драйвер</string>
     <string name="update_server">Сервер обновления</string>
@@ -114,4 +115,5 @@
     <string name="normative">Норматив: </string>
     <string name="finish_stage">Закончить этап</string>
     <string name="operation_time">Время операции:</string>
+    <string name="tire"> - </string>
 </resources>

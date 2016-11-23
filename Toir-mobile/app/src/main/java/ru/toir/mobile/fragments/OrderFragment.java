@@ -354,7 +354,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
     // Start Operations----------------------------------------------------------------------------------------
     void startOperations() {
-        int totalOperationCount = 0;
+        int totalOperationCount;
         // запрещаем все операции кроме первой
         if (operationAdapter != null) {
             totalOperationCount = operationAdapter.getCount();
@@ -671,7 +671,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         //long totalTimeElapsed = currentTime - startTime;
         CheckBox checkBox;
         final TaskStageStatus taskStageCompleted;
-        taskStageCompleted = realmDB.where(TaskStageStatus.class).findFirst();
+        taskStageCompleted = realmDB.where(TaskStageStatus.class).equalTo("title","Выполнен").findFirst();
         if (operationAdapter != null)
             totalOperationCount = operationAdapter.getCount();
 

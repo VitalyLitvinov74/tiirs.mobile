@@ -67,7 +67,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             convertView = inflater.inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
-            //viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
+            viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
             viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);
             viewHolder.end_date = (TextView) convertView.findViewById(R.id.ts_EndDate);
             convertView.setTag(viewHolder);
@@ -78,7 +78,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
         if (adapterData!=null) {
             TaskStages taskStage = adapterData.get(position);
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
-            //viewHolder.status.setText(taskStage.getTaskStageStatus().getTitle());
+            viewHolder.status.setText("Статус: " + taskStage.getTaskStageStatus().getTitle());
             if (taskStage.getStartDate()!=null) {
                 Date lDate = taskStage.getStartDate();
                 if (lDate != null) {

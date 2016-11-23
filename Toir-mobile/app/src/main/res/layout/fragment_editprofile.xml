@@ -52,14 +52,33 @@
 
         <Button
             android:id="@+id/profile_button_submit"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/profile_submit_button"
-            android:layout_width="fill_parent"/>
+            android:height="35dp"
+            android:minHeight="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@color/larisaBackColor"
+            android:textColor="#FAFAFA"
+            android:onClick="mOnClickMethod"
+            android:text="@string/profile_edit_button" />
+
         <Button
             android:id="@+id/profile_button_delete"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/profile_submit_delete"
-            android:layout_width="fill_parent"/>
+            android:height="35dp"
+            android:minHeight="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@color/larisaBackColor"
+            android:textColor="#FAFAFA"
+            android:onClick="mOnClickMethod"
+            android:text="@string/profile_submit_delete" />
 
     </LinearLayout>
 </ScrollView>
