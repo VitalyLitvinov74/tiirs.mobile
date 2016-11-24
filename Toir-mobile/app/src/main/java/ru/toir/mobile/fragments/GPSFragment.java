@@ -1,6 +1,6 @@
 package ru.toir.mobile.fragments;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -19,29 +19,37 @@ import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
+import ru.toir.mobile.db.adapters.GPSDBAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
+import ru.toir.mobile.db.tables.GpsTrack;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 import ru.toir.mobile.gps.TestGPSListener;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 public class GPSFragment extends Fragment {
 
@@ -86,7 +94,7 @@ public class GPSFragment extends Fragment {
 		//Float equipment_latitude = 0f, equipment_longitude = 0f;
         User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
 		LocationManager lm = (LocationManager) getActivity().getSystemService(
-				Context.LOCATION_SERVICE);
+				LOCATION_SERVICE);
 
         if (lm != null) {
 			TestGPSListener tgpsl = new TestGPSListener(
@@ -94,8 +102,11 @@ public class GPSFragment extends Fragment {
 					getActivity().getApplicationContext(), user.getUuid());
 			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1,
 					tgpsl);
-			location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			gpsLog = (TextView) rootView.findViewById(R.id.gps_TextView);
+            // последняя попытка
+            if (location == null) location = getLastKnownLocation();
 			if (location != null) {
 				curLatitude = location.getLatitude();
 				curLongitude = location.getLongitude();
@@ -106,12 +117,20 @@ public class GPSFragment extends Fragment {
 				gpsLog.append("Longitude:"
 						+ String.valueOf(location.getLongitude()) + "\n");
 			}
+            else {
+                // нет не последняя, еще так можно
+                GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
+                        getActivity().getApplicationContext()));
+                GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
+                if (gpstrack != null) {
+                    curLatitude = Float.parseFloat(gpstrack.getLatitude());
+                    curLongitude = Float.parseFloat(gpstrack.getLongitude());
+                }
+            }
 		}
 
-        MapView mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
+        final MapView mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
 		mapView.setTileSource(TileSourceFactory.MAPNIK);
-		mapView.setUseDataConnection(false);
-		//mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mapView.setBuiltInZoomControls(true);
         IMapController mapController = mapView.getController();
 		mapController.setZoom(17);
@@ -135,7 +154,7 @@ public class GPSFragment extends Fragment {
         //orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         RealmQuery<Equipment> q = realmDB.where(Equipment.class);
 
-        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+        final ArrayList<GeoPoint> waypoints = new ArrayList<>();
         GeoPoint currentPoint = new GeoPoint(curLatitude, curLongitude);
         waypoints.add(currentPoint);
 
@@ -147,8 +166,8 @@ public class GPSFragment extends Fragment {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();
                 for (Equipment equipment : equipments) {
                     q = q.or().equalTo("_id", equipment.get_id());
-                    curLatitude = curLatitude - 0.0002;
-                    curLongitude = curLongitude - 0.0002;
+                    curLatitude = curLatitude - 0.002;
+                    curLongitude = curLongitude - 0.006;
 
                     GeoPoint endPoint = new GeoPoint(curLatitude, curLongitude);
                     waypoints.add(endPoint);
@@ -230,20 +249,30 @@ public class GPSFragment extends Fragment {
         mScaleBarOverlay.setScaleBarOffset(200, 10);
         mapView.getOverlays().add(mScaleBarOverlay);
 
-        RoadManager roadManager = new OSRMRoadManager(getActivity()
-                .getApplicationContext());
-/*
-        Road road = roadManager.getRoad(waypoints);
-        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-        mapView.getOverlays().add(roadOverlay);
-        mapView.invalidate();
-*/
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
+                Road road;
+                RoadManager roadManager = new OSRMRoadManager(getActivity()
+                        .getApplicationContext());
+                try {
+                    road = roadManager.getRoad(waypoints);
+                    Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Color.RED, 8);
+                    mapView.getOverlays().add(roadOverlay);
+                    mapView.invalidate();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
 
 		return rootView;
 	}
-
 
 	/**
 	 * Класс объекта оборудования для отображения на крате
@@ -257,4 +286,22 @@ public class GPSFragment extends Fragment {
 			super(a, b, p);
 		}
 	}
+
+
+    private Location getLastKnownLocation() {
+        LocationManager mLocationManager;
+        mLocationManager = (LocationManager)getActivity().getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
 }
