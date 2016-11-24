@@ -5,40 +5,52 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/gps_mapview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:clickable="true" >
-
-    </org.osmdroid.views.MapView>
-
-    <ListView
-        android:id="@+id/gps_listView"
-        android:layout_width="fill_parent"
-        android:layout_height="250dp"
-        android:layout_weight="0.5"
-        android:background="#FFFFFF"
-        android:divider="#333333"
-        android:dividerHeight="1px"
-        android:scrollbarAlwaysDrawVerticalTrack="true" >
-
-    </ListView>
-
-    <TextView
-        android:id="@+id/gps_TextView"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_gravity="bottom"
-        android:layout_weight="0.25"
-        android:background="@color/white"
-        android:lines="10"
-        android:scrollbars="vertical"
-        android:textColor="@color/black"
-        android:textColorLink="@color/black"
-        android:textSize="12sp"
-        android:typeface="normal"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        sothree:umanoPanelHeight="168dp"
+        sothree:umanoShadowHeight="14dp"
+        android:gravity="bottom">
 
+        <org.osmdroid.views.MapView
+            android:id="@+id/gps_mapview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true" >
+        </org.osmdroid.views.MapView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/gps_listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF"
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:scrollbarAlwaysDrawVerticalTrack="true" >
+
+            </ListView>
+
+            <TextView
+                android:id="@+id/gps_TextView"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_gravity="bottom"
+                android:layout_weight="0.25"
+                android:background="@color/white"
+                android:lines="10"
+                android:scrollbars="vertical"
+                android:textColor="@color/black"
+                android:textColorLink="@color/black"
+                android:textSize="12sp"
+                android:typeface="normal"
+                android:visibility="gone" />
+        </LinearLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </LinearLayout>

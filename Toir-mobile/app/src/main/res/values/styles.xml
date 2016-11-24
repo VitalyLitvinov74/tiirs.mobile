@@ -23,7 +23,8 @@
 
     <style name="CustomTheme" parent="MaterialDrawerTheme.Light">
         <item name="windowActionModeOverlay">true</item>
-	    <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
+	<item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
+	<item name="android:windowActionBarOverlay">true</item>
     </style>
 
 	<style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">

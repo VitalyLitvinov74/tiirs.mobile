@@ -105,4 +105,5 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.roughike:bottom-bar:2.0.2'
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
 }

@@ -19,7 +19,7 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
 
-import static ru.toir.mobile.utils.RoundedImageView.getCroppedBitmap;
+import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
 /**
  * @author koputo
@@ -121,12 +121,14 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_kotelgas);
                     if (equipment.get_id() == 3) {
                         Bitmap myBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.gas_counter);
-                        Bitmap crop = getCroppedBitmap(myBitmap, 70);
+                        //Bitmap crop = getCroppedBitmap(myBitmap, 70);
+                        Bitmap crop = getRoundedBitmap(myBitmap, 70);
                         viewHolder.icon.setImageBitmap(crop);
                     }
                     if (equipment.get_id() == 4) {
                          Bitmap myBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pressure);
-                         Bitmap crop = getCroppedBitmap(myBitmap, 80);
+                         //Bitmap crop = getCroppedBitmap(myBitmap, 80);
+                         Bitmap crop = getRoundedBitmap(myBitmap, 70);
                          viewHolder.icon.setImageBitmap(crop);
                         }
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
