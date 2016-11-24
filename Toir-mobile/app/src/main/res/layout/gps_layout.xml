@@ -10,8 +10,8 @@
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        sothree:umanoPanelHeight="168dp"
-        sothree:umanoShadowHeight="14dp"
+        sothree:umanoPanelHeight="128dp"
+        sothree:umanoShadowHeight="4dp"
         android:gravity="bottom">
 
         <org.osmdroid.views.MapView
