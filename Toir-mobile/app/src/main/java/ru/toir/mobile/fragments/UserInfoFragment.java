@@ -96,7 +96,7 @@ public class UserInfoFragment extends Fragment {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-
+            /*
             realmDB.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -104,7 +104,7 @@ public class UserInfoFragment extends Fragment {
                      user.setWhoIs("Ведущий инженер");
                      user.setConnectionDate(new Date());
                     }
-                });
+                });*/
             if (user.getTagId().length() > 20)
 				tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
 			else

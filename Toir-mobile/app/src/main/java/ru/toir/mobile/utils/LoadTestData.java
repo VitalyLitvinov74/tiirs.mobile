@@ -36,92 +36,93 @@ import ru.toir.mobile.db.realm.User;
 
 public class LoadTestData {
     public static Equipment equipment;
-    public static Equipment equipment2;
-    public static Equipment equipment3;
-    public static Equipment equipment4;
+    private static Equipment equipment2;
+    private static Equipment equipment3;
+    private static Equipment equipment4;
     public static EquipmentType equipmentType;
-    public static EquipmentType equipmentType2;
-    public static EquipmentType equipmentType3;
-    public static EquipmentType equipmentType4;
-    public static OrderStatus orderStatus;
-    public static OrderStatus orderStatus2;
-    public static OrderStatus orderStatusUncomplete;
-    public static OperationStatus operationStatusUncomplete;
-    public static OperationStatus operationStatusComplete;
-    public static TaskStageStatus taskStageStatusUncomplete;
-    public static TaskStatus taskStatus;
+    private static EquipmentType equipmentType2;
+    private static EquipmentType equipmentType3;
+    private static EquipmentType equipmentType4;
+    private static OrderStatus orderStatus;
+    private static OrderStatus orderStatus2;
+    private static OrderStatus orderStatusUncomplete;
+    private static OperationStatus operationStatusUncomplete;
+    private static OperationStatus operationStatusComplete;
+    private static TaskStageStatus taskStageStatusComplete;
+    private static TaskStageStatus taskStageStatusUncomplete;
+    private static TaskStatus taskStatus;
     public static TaskStatus taskStatusUncomplete;
-    static User profile;
-    static EquipmentStatus equipmentStatus;
-    static EquipmentStatus equipmentStatus2;
-    static EquipmentStatus equipmentStatus3;
-    static EquipmentStatus equipmentStatus4;
-    static CriticalType criticalType;
-    static EquipmentModel equipmentModel;
-    static EquipmentModel equipmentModel2;
-    static EquipmentModel equipmentModel3;
-    static EquipmentModel equipmentModel4;
+    private static User profile;
+    private static EquipmentStatus equipmentStatus;
+    private static EquipmentStatus equipmentStatus2;
+    private static EquipmentStatus equipmentStatus3;
+    private static EquipmentStatus equipmentStatus4;
+    private static CriticalType criticalType;
+    private static EquipmentModel equipmentModel;
+    private static EquipmentModel equipmentModel2;
+    private static EquipmentModel equipmentModel3;
+    private static EquipmentModel equipmentModel4;
 
-    static Documentation documentation;
-    static Documentation documentation2;
-    static Documentation documentation3;
-    static Documentation documentation4;
+    private static Documentation documentation;
+    private static Documentation documentation2;
+    private static Documentation documentation3;
+    private static Documentation documentation4;
 
-    static DocumentationType documentationType;
-    static DocumentationType documentationType2;
-    static DocumentationType documentationType3;
-    static DocumentationType documentationType4;
+    private static DocumentationType documentationType;
+    private static DocumentationType documentationType2;
+    private static DocumentationType documentationType3;
+    private static DocumentationType documentationType4;
 
-    static AlertType alertType;
-    static OrderLevel orderLevel;
-    static OrderLevel orderLevel2;
-    static OrderLevel orderLevel3;
-    static Orders order,order2,order3,order4;
+    private static AlertType alertType;
+    private static OrderLevel orderLevel;
+    private static OrderLevel orderLevel2;
+    private static OrderLevel orderLevel3;
+    private static Orders order,order2,order3,order4;
 
-    static OrderVerdict orderVerdict;
-    static OrderVerdict orderVerdict2;
-    static OrderVerdict orderVerdict3;
+    private static OrderVerdict orderVerdict;
+    private static OrderVerdict orderVerdict2;
+    private static OrderVerdict orderVerdict3;
 
-    static Operation operation;
-    static Operation operation2;
-    static Operation operation3;
-    static OperationType operationType;
-    static OperationType operationType2;
-    static OperationType operationType3;
+    private static Operation operation;
+    private static Operation operation2;
+    private static Operation operation3;
+    private static OperationType operationType;
+    private static OperationType operationType2;
+    private static OperationType operationType3;
 
-    static OperationVerdict operationVerdict;
-    static OperationVerdict operationVerdict2;
-    static OperationVerdict operationVerdict3;
+    private static OperationVerdict operationVerdict;
+    private static OperationVerdict operationVerdict2;
+    private static OperationVerdict operationVerdict3;
 
-    static OperationTemplate operationTemplate;
-    static OperationTemplate operationTemplate2;
-    static OperationTemplate operationTemplate3;
-    static TaskStageVerdict taskStageVerdict;
-    static TaskStages taskStage;
-    static TaskStages taskStage2;
-    static TaskStageType taskStageType;
-    static TaskStageType taskStageType2;
-    static TaskStageType taskStageType3;
-    static TaskStageList taskStageList;
-    static TaskStageOperationList taskStageOperationList;
-    static TaskStageTemplate taskStageTemplate;
-    static TaskStageTemplate taskStageTemplate2;
-    static TaskVerdict taskVerdict;
+    private static OperationTemplate operationTemplate;
+    private static OperationTemplate operationTemplate2;
+    private static OperationTemplate operationTemplate3;
+    private static TaskStageVerdict taskStageVerdict;
+    private static TaskStages taskStage;
+    private static TaskStages taskStage2;
+    private static TaskStageType taskStageType;
+    private static TaskStageType taskStageType2;
+    private static TaskStageType taskStageType3;
+    private static TaskStageList taskStageList;
+    private static TaskStageOperationList taskStageOperationList;
+    private static TaskStageTemplate taskStageTemplate;
+    private static TaskStageTemplate taskStageTemplate2;
+    private static TaskVerdict taskVerdict;
 
-    static Tasks task;
-    static Tasks task2;
-    static Tasks task3;
-    static Tasks task4;
+    private static Tasks task;
+    private static Tasks task2;
+    private static Tasks task3;
+    private static Tasks task4;
 
-    static TaskType taskType;
-    static TaskType taskType2;
-    static TaskType taskType3;
-    static TaskType taskType4;
+    private static TaskType taskType;
+    private static TaskType taskType2;
+    private static TaskType taskType3;
+    private static TaskType taskType4;
 
-    static TaskTemplate taskTemplate;
-    static TaskTemplate taskTemplate2;
-    static TaskTemplate taskTemplate3;
-    static TaskTemplate taskTemplate4;
+    private static TaskTemplate taskTemplate;
+    private static TaskTemplate taskTemplate2;
+    private static TaskTemplate taskTemplate3;
+    private static TaskTemplate taskTemplate4;
 
     public static void LoadAllTestData(){
 
@@ -205,6 +206,7 @@ public class LoadTestData {
         final String operationTemplateUuid3="8ee9a4f8-5c98-5555-86ed-888911188911";
 
         final String taskStageStatusUuid="8ee8a4f8-5c98-4444-86ed-133923132922";
+        final String taskStageStatusUuid2="8ee8a4f8-5c98-4444-86ed-133923132322";
         final String taskStageVerdictUuid="8ee8a4f8-5c98-1255-86ed-888923188922";
 
         final String taskStageListUuid="8ee8a4f8-ff98-4444-86ed-133923132922";
@@ -1002,6 +1004,16 @@ public class LoadTestData {
             taskStageStatusUncomplete.setTitle("Не выполнен");
         }
     });
+
+    realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            taskStageStatusComplete = realmDB.createObject(TaskStageStatus.class);
+            taskStageStatusComplete.set_id(2);
+            taskStageStatusComplete.setUuid(taskStageStatusUuid2);
+            taskStageStatusComplete.setTitle("Выполнен");
+        }
+        });
 
     // TaskStageTemplate -----------------
     realmDB.executeTransaction(new Realm.Transaction() {

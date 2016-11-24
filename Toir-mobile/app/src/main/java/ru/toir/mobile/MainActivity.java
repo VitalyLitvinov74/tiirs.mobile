@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -98,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
     private RfidDialog rfidDialog;
     private AccountHeader headerResult = null;
     private ArrayList<IProfile> iprofilelist;
-    //private List<Users> profilesList;
     private RealmResults<User> profilesList;
     private long users_id[];
     private int cnt = 0;
@@ -335,7 +335,6 @@ public class MainActivity extends AppCompatActivity {
     //@SuppressWarnings("deprecation")
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
-
         BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         assert bottomBar != null;
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
@@ -414,10 +413,13 @@ public class MainActivity extends AppCompatActivity {
                                 users.get(i).setActive(false);
                             User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
                             if (user != null) user.setActive(true);
+                            if (profilesList != null && profilesList.get(profile_pos)!=null)
+                                profilesList.get(profile_pos).setActive(true);
+                            else
+                                Toast.makeText(getApplicationContext(),
+                                        "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
                             realmDB.commitTransaction();
-
                             //profileDBAdapter.setActiveUser(profilesList.get(profile_pos).get_id());
-                            profilesList.get(profile_pos).setActive(true);
                             currentFragment = FRAGMENT_USER;
                             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
                         }
@@ -435,20 +437,20 @@ public class MainActivity extends AppCompatActivity {
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false).withIconColor(R.color.larisaBlueColor),
+                        new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
                         //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
-                        new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
-                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
-                        new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
-                        new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
+                        new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new DividerDrawerItem(),
                         //new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         //new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
-                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor)
+                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor))
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -706,7 +708,7 @@ public class MainActivity extends AppCompatActivity {
         //UsersDBAdapter users = new UsersDBAdapter(
         //        new ToirDatabaseContext(getApplicationContext()));
         //User users = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findAll();
-        RealmResults<User> profilesList = realmDB.where(User.class).findAll();
+        profilesList = realmDB.where(User.class).findAll();
         cnt = 0;
         for (User item : profilesList) {
             addProfile(item);

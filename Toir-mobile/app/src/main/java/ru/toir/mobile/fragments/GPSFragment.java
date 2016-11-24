@@ -201,7 +201,6 @@ public class GPSFragment extends Fragment {
 			}
 		};
 		mapView.getOverlays().add(overlay);
-
 		//onInit(rootView);
 
 		rootView.setFocusableInTouchMode(true);

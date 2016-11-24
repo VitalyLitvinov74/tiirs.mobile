@@ -27,32 +27,59 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/ts_StartDate"
+        android:id="@+id/ts_Status"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:layout_alignParentBottom="true"
+        android:layout_marginTop="0dip"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/ts_ImageStatus"
         android:background="#FAFAFA"
         android:textColor="#454545"
         android:layout_below="@+id/ts_Name"
         android:ellipsize="marquee"
         android:text="@string/description"
+        android:textSize="12sp"
+        android:layout_toRightOf="@+id/ts_ImageStatus" />
+
+    <TextView
+        android:id="@+id/ts_StartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dip"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/ts_ImageStatus"
+        android:background="#FAFAFA"
+        android:textColor="#454545"
+        android:layout_below="@+id/ts_Status"
+        android:ellipsize="marquee"
+        android:text="@string/description"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/ts_divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dip"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/ts_StartDate"
+        android:background="#FAFAFA"
+        android:textColor="#454545"
+        android:layout_below="@+id/ts_Status"
+        android:ellipsize="marquee"
+        android:text="@string/tire"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/ts_EndDate"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/ts_StartDate"
+        android:layout_toRightOf="@id/ts_divider"
         android:background="#FAFAFA"
         android:textColor="#454545"
-        android:layout_marginTop="5dip"
+        android:layout_marginTop="0dip"
         android:layout_marginLeft="10dip"
-        android:layout_below="@+id/ts_Name"
+        android:layout_below="@+id/ts_Status"
         android:ellipsize="marquee"
         android:text="@string/description"
         android:textSize="12sp" />

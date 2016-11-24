@@ -105,6 +105,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.roughike:bottom-bar:2.0.2'
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
     testCompile 'junit:junit:4.12'
     testCompile "org.powermock:powermock-module-junit4:1.6.2"
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"

@@ -68,30 +68,8 @@
                 android:textColor="#000000"
                 android:textSize="14sp" />
 
-        <ImageView
-                android:id="@+id/overlapImage"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_alignParentRight="true"
-                android:paddingRight="10dp"
-                android:layout_above="@id/equipment_text_uuid"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/circle" />
 
-        <ImageView
-                android:id="@+id/overlapImage2"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:paddingRight="10dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/circle2"
-                android:layout_above="@+id/equipment_text_uuid"
-                android:layout_toLeftOf="@+id/overlapImage" />
-
-
-        <ImageView
+            <ImageView
                 android:id="@+id/equipment_location_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
@@ -244,6 +222,28 @@
                 android:layout_below="@+id/equipment_text_documentation"
                 android:layout_height="wrap_content" >
             </ListView>
+
+            <ImageView
+                    android:id="@+id/overlapImage2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:paddingRight="10dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/image_description"
+                    android:src="@drawable/circle2"
+                android:layout_below="@+id/equipment_text_name"
+                android:layout_toLeftOf="@+id/overlapImage" />
+
+            <ImageView
+                    android:id="@+id/overlapImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                android:paddingRight="10dp"
+                android:adjustViewBounds="true"
+                    android:contentDescription="@string/image_description"
+                    android:src="@drawable/circle"
+                android:layout_below="@+id/equipment_text_name"
+                android:layout_alignParentRight="true" />
 
         </RelativeLayout>
 </ScrollView>
