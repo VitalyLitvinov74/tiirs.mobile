@@ -18,11 +18,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
 
 import java.util.ArrayList;
 
@@ -105,9 +109,9 @@ public class GPSFragment extends Fragment {
 		}
 
         MapView mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
-		// mapView.setTileSource(TileSourceFactory.MAPNIK);
+		mapView.setTileSource(TileSourceFactory.MAPNIK);
 		mapView.setUseDataConnection(false);
-		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+		//mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mapView.setBuiltInZoomControls(true);
         IMapController mapController = mapView.getController();
 		mapController.setZoom(17);
@@ -131,6 +135,10 @@ public class GPSFragment extends Fragment {
         //orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         RealmQuery<Equipment> q = realmDB.where(Equipment.class);
 
+        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+        GeoPoint currentPoint = new GeoPoint(curLatitude, curLongitude);
+        waypoints.add(currentPoint);
+
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         for (Orders itemOrder : orders) {
             RealmResults<Tasks> tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
@@ -141,6 +149,10 @@ public class GPSFragment extends Fragment {
                     q = q.or().equalTo("_id", equipment.get_id());
                     curLatitude = curLatitude - 0.0002;
                     curLongitude = curLongitude - 0.0002;
+
+                    GeoPoint endPoint = new GeoPoint(curLatitude, curLongitude);
+                    waypoints.add(endPoint);
+
                     EquipmentOverlayItem olItem = new EquipmentOverlayItem(
                             equipment.getTitle(), "Device",
                             new GeoPoint(curLatitude,
@@ -201,8 +213,31 @@ public class GPSFragment extends Fragment {
 			}
 		};
 		mapView.getOverlays().add(overlay);
-		//onInit(rootView);
 
+        // Добавляем несколько слоев
+        CompassOverlay compassOverlay = new CompassOverlay(getActivity()
+                .getApplicationContext(), mapView);
+        compassOverlay.enableCompass();
+        mapView.getOverlays().add(compassOverlay);
+        /*
+        MyLocationNewOverlay mLocationOverlay = new MyLocationNewOverlay(getActivity()
+                .getApplicationContext(), mapView);
+        mLocationOverlay.enableMyLocation();
+        mapView.getOverlays().add(mLocationOverlay); */
+        ScaleBarOverlay mScaleBarOverlay = new ScaleBarOverlay(mapView);
+        mScaleBarOverlay.setCentred(true);
+        //play around with these values to get the location on screen in the right place for your applicatio
+        mScaleBarOverlay.setScaleBarOffset(200, 10);
+        mapView.getOverlays().add(mScaleBarOverlay);
+
+        RoadManager roadManager = new OSRMRoadManager(getActivity()
+                .getApplicationContext());
+/*
+        Road road = roadManager.getRoad(waypoints);
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        mapView.getOverlays().add(roadOverlay);
+        mapView.invalidate();
+*/
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
 

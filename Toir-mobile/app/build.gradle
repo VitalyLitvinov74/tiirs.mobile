@@ -79,7 +79,7 @@ dependencies {
     compile 'com.google.zxing:android-integration:3.2.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
-    compile 'org.osmdroid:osmdroid-android:4.2'
+    compile 'org.osmdroid:osmdroid-android:5.5:release@aar'
     compile 'me.dm7.barcodescanner:zbar:1.8.3'
     compile 'android.hardware:uhf-tools:1.0@aar'
     compile 'android.hardware.p6300:p6300uart:1.0@aar'
@@ -106,9 +106,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.roughike:bottom-bar:2.0.2'
     compile 'com.sothree.slidinguppanel:library:3.3.1'
+    compile 'com.github.MKergall:osmbonuspack:6.0'
     testCompile 'junit:junit:4.12'
     testCompile "org.powermock:powermock-module-junit4:1.6.2"
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
     testCompile "org.powermock:powermock-api-mockito:1.6.2"
     testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
+
 }
