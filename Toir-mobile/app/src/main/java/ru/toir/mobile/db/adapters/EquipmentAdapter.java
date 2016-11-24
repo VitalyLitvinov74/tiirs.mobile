@@ -63,7 +63,8 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            if (parent.getId() == R.id.gps_listView) {
+            //if (parent.getId() == R.id.gps_listView) {
+            if (parent.getId() == R.id.eril_status_label) {
                 convertView = inflater.inflate(R.layout.equipment_gps_item, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image_critical);
@@ -81,7 +82,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder.equipmentStatus = (TextView) convertView.findViewById(R.id.eril_status);
                 viewHolder.criticalTypeUuid = (TextView) convertView.findViewById(R.id.eril_critical);
                 viewHolder.startDate = (TextView) convertView.findViewById(R.id.eril_last_operation_date);
-                //viewHolder.location = (TextView) convertView.findViewById(R.id.eril_location);
+                viewHolder.location = (TextView) convertView.findViewById(R.id.eril_location);
                 viewHolder.equipmentModelUuid = (TextView) convertView.findViewById(R.id.eril_type);
                 viewHolder.inventoryNumber = (TextView) convertView.findViewById(R.id.eril_inventory_number);
                 viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
@@ -96,7 +97,8 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
             equipment = adapterData.get(position);
             if (equipment != null) {
                 viewHolder.title.setText(equipment.getTitle());
-                if (parent.getId() == R.id.gps_listView) {
+                //if (parent.getId() == R.id.gps_listView) {
+                if (parent.getId() == R.id.eril_status_label) {
                     if (equipment.getCriticalType().get_id() == 1)
                         viewHolder.icon.setImageResource(R.drawable.critical_level_1);
                     if (equipment.getCriticalType().get_id() ==  2)
@@ -133,7 +135,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         }
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
-                    //viewHolder.location.setText(equipment.getLocation());
+                    viewHolder.location.setText(equipment.getLocation());
                     viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
                     viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
                     String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(equipment.getStartDate());
