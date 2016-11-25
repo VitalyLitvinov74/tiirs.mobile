@@ -3,7 +3,9 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.utils.DataUtils;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
@@ -18,6 +20,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 
 /**
  * @author Dmitriy Logachov
@@ -64,7 +70,21 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 			int address, int count) {
         if (mMode) {
             // TODO: реализовать чтение содержимого метки из файла
-            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+//            File tagFile = new File(mContext.getFilesDir(), tagId);
+//            Stream<byte> inStream = new
+            String hexData;
+            byte[] rawData = new byte[64];
+            FileInputStream in;
+            try {
+                in = mContext.openFileInput(tagId);
+                int rc = in.read(rawData);
+            } catch (Exception e) {
+                Log.e(TAG, e.getLocalizedMessage());
+                sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+            }
+
+            hexData = DataUtils.toHexString(rawData);
+            sHandler.obtainMessage(RESULT_RFID_SUCCESS, hexData).sendToTarget();
         } else {
             // В данном режиме реального считывания не происходит.
             sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
@@ -88,6 +108,18 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 			int address, String data) {
         if (mMode) {
             // TODO: реализовать запись содержимого метки в файл
+            FileOutputStream out;
+            try {
+                out = mContext.openFileOutput(tagId, Context.MODE_PRIVATE);
+                byte[] rawData = DataUtils.hexStringTobyte(data);
+                if (rawData == null) {
+                    rawData = new byte[64];
+                }
+
+                out.write(rawData);
+            } catch (Exception e) {
+                Log.e(TAG, e.getLocalizedMessage());
+            }
             sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
         } else {
             // В данном режиме реальной записи не происходит.
