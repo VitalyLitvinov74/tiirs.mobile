@@ -102,6 +102,7 @@ public class DataUtils {
             bit = tmpByte & 0x0f;
             sb.append(chars[bit]);
         }
+
         return sb.toString();
     }
 

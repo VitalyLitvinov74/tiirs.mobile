@@ -153,6 +153,42 @@ public class TagStructure {
     }
 
     public boolean parse(byte[] data) {
-        return false;
+        byte[] tmpUuid = new byte[TagStructure.SIZE_UUID];
+        System.arraycopy(data, TagStructure.OFFSET_UUID, tmpUuid, 0, TagStructure.SIZE_UUID);
+        uuid = DataUtils.StringToUUID(DataUtils.toHexString(tmpUuid)).toUpperCase();
+        byte[] tmpInt = new byte[4];
+        System.arraycopy(data, TagStructure.OFFSET_TASKID, tmpInt, 0, TagStructure.SIZE_TASKID);
+        taskId = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_TASKTYPEID, tmpInt, 0, TagStructure.SIZE_TASKTYPEID);
+        taskTypeId = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_START, tmpInt, 0, TagStructure.SIZE_START);
+        start = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_END, tmpInt, 0, TagStructure.SIZE_END);
+        end = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_STATUS, tmpInt, 0, TagStructure.SIZE_STATUS);
+        status = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_VERDICTID, tmpInt, 0, TagStructure.SIZE_VERDICTID);
+        verdictId = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_USERID, tmpInt, 0, TagStructure.SIZE_USERID);
+        userId = getInt(tmpInt);
+        System.arraycopy(data, TagStructure.OFFSET_EQUIPMENTSTATUSID, tmpInt, 0, TagStructure.SIZE_EQUIPMENTSTATUSID);
+        equipmentStatusId = getInt(tmpInt);
+        byte[] tmpPhone = new byte[TagStructure.SIZE_PHONE];
+        System.arraycopy(data, TagStructure.OFFSET_PHONE, tmpPhone, 0, TagStructure.SIZE_PHONE);
+        StringBuilder phoneBuilder = new StringBuilder();
+        for (byte tmpByte: tmpPhone) {
+            phoneBuilder.append((char) tmpByte);
+        }
+
+        phone = phoneBuilder.toString();
+
+        System.arraycopy(data, TagStructure.OFFSET_CONTROLCODE, tmpInt, 0, TagStructure.SIZE_CONTROLCODE);
+        controlCode = getInt(tmpInt);
+
+        return true;
+    }
+
+    private int getInt(byte[] data) {
+        return (int)data[0] << 24 | (int)data[1] << 16 | (int)data[2] << 8 | (int)data[3];
     }
 }

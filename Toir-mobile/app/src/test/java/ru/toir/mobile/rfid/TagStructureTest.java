@@ -33,7 +33,7 @@ public class TagStructureTest {
     }
 
     @Test
-    public void test1() throws Exception {
+    public void testPack() throws Exception {
         TagStructure tag = new TagStructure();
         tag.uuid = "00010203-0405-0607-0809-0a0b0c0d0e0f";
         tag.taskId = 0x10111213;
@@ -63,4 +63,36 @@ public class TagStructureTest {
         }
 
     }
+
+    @Test
+    public void testUnPack() throws Exception {
+        byte[] tagData = new byte[64];
+        for(int i = 0; i < tagData.length; i++) {
+            tagData[i] = (byte)i;
+        }
+
+//         +73519008475
+//        byte[] phone = new byte[]{43, 55, 51, 53, 49, 57, 48, 48, 56, 52, 55, 53};
+        byte[] phone = "+73519008475".getBytes();
+        for (int i = TagStructure.OFFSET_PHONE, j = 0; i < TagStructure.OFFSET_PHONE + TagStructure.SIZE_PHONE; i++, j++) {
+            tagData[i] = phone[j];
+        }
+
+        TagStructure tag = new TagStructure();
+        boolean result = tag.parse(tagData);
+        assertTrue(result);
+        assertEquals("00010203-0405-0607-0809-0a0b0c0d0e0f".toUpperCase(), tag.uuid);
+        assertEquals(0x10111213, tag.taskId);
+        assertEquals(0x14151617, tag.taskTypeId);
+        assertEquals(0x18191a1b, tag.start);
+        assertEquals(0x1c1d1e1f, tag.end);
+        assertEquals(0x20212223, tag.status);
+        assertEquals(0x24252627, tag.verdictId);
+        assertEquals(0x28292a2b, tag.userId);
+        assertEquals(0x2c2d2e2f, tag.equipmentStatusId);
+        assertEquals("+73519008475", tag.phone);
+        assertEquals(0x3c3d3e3f, tag.controlCode);
+
+    }
+
 }
