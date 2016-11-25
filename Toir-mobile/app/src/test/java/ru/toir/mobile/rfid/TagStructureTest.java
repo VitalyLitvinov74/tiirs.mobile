@@ -44,17 +44,23 @@ public class TagStructureTest {
         tag.verdictId = 0x24252627;
         tag.userId = 0x28292a2b;
         tag.equipmentStatusId = 0x2c2d2e2f;
-        //byte[] tmpPhone = new byte[]{0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b};
-        //tag.phone = tmpPhone.toString();
         tag.phone = "+73519008475";
         tag.controlCode = 0x3c3d3e3f;
 
         byte[] data = tag.getBinary();
         assertNotNull(data);
-//        if (data != null) {
-//            for (int i = 0; i < data.length; i++) {
-//                assertEquals(i, data[i]);
-//            }
-//        }
+
+        for (int i = 0; i < TagStructure.OFFSET_PHONE; i++) {
+            assertEquals(i, data[i]);
+        }
+
+        for (int i = TagStructure.OFFSET_PHONE, j = 0; i < TagStructure.OFFSET_PHONE + TagStructure.SIZE_PHONE; i++, j++) {
+            assertEquals((byte)tag.phone.charAt(j), data[i]);
+        }
+
+        for (int i = TagStructure.OFFSET_CONTROLCODE; i < TagStructure.OFFSET_CONTROLCODE + TagStructure.SIZE_CONTROLCODE; i++) {
+            assertEquals(i, data[i]);
+        }
+
     }
 }

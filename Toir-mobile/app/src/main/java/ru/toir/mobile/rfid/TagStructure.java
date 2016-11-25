@@ -9,38 +9,38 @@ import ru.toir.mobile.utils.DataUtils;
 
 public class TagStructure {
 
-    private static final int OFFSET_UUID = 0;
-    private static final int SIZE_UUID = 16;
+    public static final int OFFSET_UUID = 0;
+    public static final int SIZE_UUID = 16;
 
-    private static final int OFFSET_TASKID = OFFSET_UUID + SIZE_UUID;
-    private static final int SIZE_TASKID = 4;
+    public static final int OFFSET_TASKID = OFFSET_UUID + SIZE_UUID;
+    public static final int SIZE_TASKID = 4;
 
-    private static final int OFFSET_TASKTYPEID = OFFSET_TASKID + SIZE_TASKID;
-    private static final int SIZE_TASKTYPEID = 4;
+    public static final int OFFSET_TASKTYPEID = OFFSET_TASKID + SIZE_TASKID;
+    public static final int SIZE_TASKTYPEID = 4;
 
-    private static final int OFFSET_START = OFFSET_TASKTYPEID + SIZE_TASKTYPEID;
-    private static final int SIZE_START = 4;
+    public static final int OFFSET_START = OFFSET_TASKTYPEID + SIZE_TASKTYPEID;
+    public static final int SIZE_START = 4;
 
-    private static final int OFFSET_END = OFFSET_START + SIZE_START;
-    private static final int SIZE_END = 4;
+    public static final int OFFSET_END = OFFSET_START + SIZE_START;
+    public static final int SIZE_END = 4;
 
-    private static final int OFFSET_STATUS = OFFSET_END + SIZE_END;
-    private static final int SIZE_STATUS = 4;
+    public static final int OFFSET_STATUS = OFFSET_END + SIZE_END;
+    public static final int SIZE_STATUS = 4;
 
-    private static final int OFFSET_VERDICTID = OFFSET_STATUS + SIZE_STATUS;
-    private static final int SIZE_VERDICTID = 4;
+    public static final int OFFSET_VERDICTID = OFFSET_STATUS + SIZE_STATUS;
+    public static final int SIZE_VERDICTID = 4;
 
-    private static final int OFFSET_USERID = OFFSET_VERDICTID + SIZE_VERDICTID;
-    private static final int SIZE_USERID = 4;
+    public static final int OFFSET_USERID = OFFSET_VERDICTID + SIZE_VERDICTID;
+    public static final int SIZE_USERID = 4;
 
-    private static final int OFFSET_EQUIPMENTSTATUSID = OFFSET_USERID + SIZE_USERID;
-    private static final int SIZE_EQUIPMENTSTATUSID = 4;
+    public static final int OFFSET_EQUIPMENTSTATUSID = OFFSET_USERID + SIZE_USERID;
+    public static final int SIZE_EQUIPMENTSTATUSID = 4;
 
-    private static final int OFFSET_PHONE = OFFSET_EQUIPMENTSTATUSID + SIZE_EQUIPMENTSTATUSID;
-    private static final int SIZE_PHONE = 12;
+    public static final int OFFSET_PHONE = OFFSET_EQUIPMENTSTATUSID + SIZE_EQUIPMENTSTATUSID;
+    public static final int SIZE_PHONE = 12;
 
-    private static final int OFFSET_CONTROLCODE = OFFSET_PHONE + SIZE_PHONE;
-    private static final int SIZE_CONTROLCODE = 4;
+    public static final int OFFSET_CONTROLCODE = OFFSET_PHONE + SIZE_PHONE;
+    public static final int SIZE_CONTROLCODE = 4;
 
     // uuid оборудования?
     public String uuid;
@@ -77,7 +77,7 @@ public class TagStructure {
             return null;
         }
 
-        if (!copyHexBytes(String.format("%08x", taskTypeId), SIZE_TASKTYPEID, data, OFFSET_TASKID)) {
+        if (!copyHexBytes(String.format("%08x", taskTypeId), SIZE_TASKTYPEID, data, OFFSET_TASKTYPEID)) {
             return null;
         }
 
