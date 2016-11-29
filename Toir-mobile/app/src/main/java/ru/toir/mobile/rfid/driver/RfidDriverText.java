@@ -21,8 +21,11 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
 
 
 /**
@@ -69,19 +72,32 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
         if (mMode) {
-            String hexData;
             byte[] rawData = new byte[64];
+            File tagFile = new File(mContext.getFilesDir() + "/" + tagId);
+            if (!tagFile.exists()) {
+                OutputStream outputStream;
+                try {
+                    outputStream = mContext.openFileOutput(tagId, Context.MODE_PRIVATE);
+                    outputStream.write(rawData);
+                    outputStream.close();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                }
+            }
+
+            String hexData;
             FileInputStream in;
             try {
                 in = mContext.openFileInput(tagId);
-                // TODO: реализовать чтение по указанному адресу(address) и количество байт
-                int rc = in.read(rawData);
+                int rc = in.read(rawData, address, count);
             } catch (Exception e) {
                 Log.e(TAG, e.getLocalizedMessage());
                 sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
             }
 
-            hexData = DataUtils.toHexString(rawData);
+            byte[] tmpData = Arrays.copyOf(rawData, count);
+            hexData = DataUtils.toHexString(tmpData);
             sHandler.obtainMessage(RESULT_RFID_SUCCESS, hexData).sendToTarget();
         } else {
             // В данном режиме реального считывания не происходит.
@@ -113,8 +129,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
                     rawData = new byte[64];
                 }
 
-				// TODO: реализовать запись по указанному адресу(address)
-                out.write(rawData);
+                out.write(rawData, address, rawData.length);
             } catch (Exception e) {
                 Log.e(TAG, e.getLocalizedMessage());
             }
