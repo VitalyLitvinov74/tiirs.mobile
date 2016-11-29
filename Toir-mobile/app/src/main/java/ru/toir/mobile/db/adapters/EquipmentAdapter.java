@@ -11,6 +11,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
@@ -138,7 +139,14 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     viewHolder.location.setText(equipment.getLocation());
                     viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
                     viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
-                    String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(equipment.getStartDate());
+                    Date date = equipment.getStartDate();
+                    String sDate;
+                    if (date != null) {
+                        sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
+                    } else {
+                        sDate = "none";
+                    }
+
                     viewHolder.startDate.setText(sDate);
                 }
             }

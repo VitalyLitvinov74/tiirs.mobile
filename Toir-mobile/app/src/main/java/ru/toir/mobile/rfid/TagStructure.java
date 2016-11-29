@@ -43,7 +43,7 @@ public class TagStructure {
     public static final int SIZE_CONTROLCODE = 4;
 
     // uuid оборудования?
-    public String uuid;
+    public String uuid = "00000000-0000-0000-0000-000000000000";
     // ид задачи
     public int taskId;
     // ид типа задачи
@@ -61,7 +61,7 @@ public class TagStructure {
     // статус оборудования
     public int equipmentStatusId;
     // телефон пользователя выполнявшего задачу
-    public String phone;
+    public String phone = "+70000000000";
     // "секретный" код
     public int controlCode;
 
@@ -125,6 +125,10 @@ public class TagStructure {
      * @return boolean
      */
     private boolean copyBytes(String value, int size, byte[] target, int offset) {
+        if (value == null) {
+            return false;
+        }
+
         byte[] tmpValue = value.getBytes();
         if (tmpValue.length < size) {
             return false;

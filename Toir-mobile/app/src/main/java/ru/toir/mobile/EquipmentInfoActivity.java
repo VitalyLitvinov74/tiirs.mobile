@@ -37,6 +37,7 @@ import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -52,6 +53,8 @@ import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.rfid.TagStructure;
+import ru.toir.mobile.utils.DataUtils;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
     private Realm realmDB;
@@ -191,8 +194,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         setMainLayout(savedInstanceState);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        ImageView read_rfid_button = (ImageView) findViewById(R.id.overlapImage);
-        ImageView write_rfid_button = (ImageView) findViewById(R.id.overlapImage2);
+        ImageView read_rfid_button = (ImageView) findViewById(R.id.overlapImageReadTag);
+        ImageView write_rfid_button = (ImageView) findViewById(R.id.overlapImageWriteTag);
 
 		tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
         tv_equipment_inventory = (TextView) findViewById(R.id.equipment_text_inventory);
@@ -218,103 +221,116 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
                     if (equipment != null) {
                         Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
-                    }
 
-                    Handler handler = new Handler(new Handler.Callback() {
+                        Handler handler = new Handler(new Handler.Callback() {
 
-                        @Override
-                        public boolean handleMessage(Message msg) {
-                            Log.d(TAG, "Получили сообщение из драйвера.");
+                            @Override
+                            public boolean handleMessage(Message msg) {
+                                Log.d(TAG, "Получили сообщение из драйвера.");
 
-                            if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                                String tagData = (String) msg.obj;
-                                Log.d(TAG, tagData);
-                                Toast.makeText(getApplicationContext(),
-                                        "Считывание метки успешно.\r\n" + tagData,
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                Log.d(TAG, "Ошибка чтения метки!");
-                                Toast.makeText(getApplicationContext(),
-                                        "Ошибка чтения метки.", Toast.LENGTH_SHORT)
-                                        .show();
+                                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                                    String tagData = (String) msg.obj;
+                                    Log.d(TAG, tagData);
+                                    Toast.makeText(getApplicationContext(),
+                                            "Считывание метки успешно.\r\n" + tagData,
+                                            Toast.LENGTH_SHORT).show();
+                                    TagStructure tag = new TagStructure();
+                                    tag.parse(DataUtils.hexStringToByteArray(tagData));
+                                    Log.d(TAG, "uuid = " + tag.uuid);
+                                    Log.d(TAG, "phone = " + tag.phone);
+                                } else {
+                                    Log.d(TAG, "Ошибка чтения метки!");
+                                    Toast.makeText(getApplicationContext(),
+                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+
+                                // закрываем диалог
+                                rfidDialog.dismiss();
+                                return true;
                             }
+                        });
 
-                            // закрываем диалог
-                            rfidDialog.dismiss();
-                            return true;
-                        }
-                    });
-                    rfidDialog = new RfidDialog();
-                    rfidDialog.setHandler(handler);
+                        rfidDialog = new RfidDialog();
+                        rfidDialog.setHandler(handler);
 
-                    // читаем метку с конкретным id для теста
-                    // rfidDialog.readTagData("0000000000", "3000E2004000860902332580112D",
-                    // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+                        // читаем метку с конкретным id для теста
+                        // rfidDialog.readTagData("0000000000", "3000E2004000860902332580112D",
+                        // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
-                    // читаем метку с id привязанным к оборудованию
-                    // rfidDialog.readTagData("0000000000", equipment.getTag_id(),
-                    // RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+                        // читаем метку с id привязанным к оборудованию
+                        // rfidDialog.readTagData("0000000000", equipment.getTag_id(),
+                        // RfidDriverBase.MEMORY_BANK_USER, 0, 8);
 
-                    // читаем "произовольную" метку, ту которую найдём первой
-                    rfidDialog.readTagData("0000000000",
-                            RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+                        // читаем "произовольную" метку, ту которую найдём первой
+                        rfidDialog.readTagData("0000000000", equipment.getTagId(),
+                                RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
-                    rfidDialog.show(getFragmentManager(), TAG);
+                        rfidDialog.show(getFragmentManager(), TAG);
+                    }
                 }
             });
         }
 
         if (write_rfid_button != null) {
             write_rfid_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
                     Log.d(TAG, "Пишем в метку оборудования.");
+                    Log.d(TAG, "uuid оборудования = " + equipment_uuid);
                     Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
                     if (equipment != null) {
                         Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
+                        TagStructure tag = new TagStructure();
+                        tag.uuid = equipment.getUuid();
+
+                        Handler handler = new Handler(new Handler.Callback() {
+
+                            @Override
+                            public boolean handleMessage(Message msg) {
+                                Log.d(TAG, "Получили сообщение из драйвера.");
+
+                                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Запись метки удалась.", Toast.LENGTH_SHORT)
+                                            .show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Не удалось записать данные.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                                // закрываем диалог
+                                rfidDialog.dismiss();
+                                return true;
+                            }
+                        });
+
+                        rfidDialog = new RfidDialog();
+                        rfidDialog.setHandler(handler);
+                        // тестовые данные для примера
+                        String data = "0a0a0a0a";
+                        //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+                        //data = "00000000000000000000000000000000";
+                        // data = "FFFFFFFFFFFFFFFF";
+                        data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+                        byte[] byteData = tag.getBinary();
+                        data = DataUtils.toHexString(byteData);
+                        // пишем в метку с id привязанным к оборудованию
+                        // rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+                        // RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+                        // пишем в "известную" метку
+                        // rfidDialog.writeTagData("0000000000",
+                        // "3000E2004000860902332580112D",
+                        // RfidDriverBase.MEMORY_BANK_USER, 0, data);
+                        // пишем в "произовольную" метку, ту которую найдём первой
+                        rfidDialog.writeTagData("0000000000", equipment.getTagId(),
+                                RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+                        rfidDialog.show(getFragmentManager(), TAG);
+
                     }
-                    Handler handler = new Handler(new Handler.Callback() {
-
-                    @Override
-                    public boolean handleMessage(Message msg) {
-                    Log.d(TAG, "Получили сообщение из драйвера.");
-
-                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                        Toast.makeText(getApplicationContext(),
-                        "Запись метки удалась.", Toast.LENGTH_SHORT)
-                        .show();
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                        "Не удалось записать данные.",
-                        Toast.LENGTH_SHORT).show();
-                    }
-
-                    // закрываем диалог
-                    rfidDialog.dismiss();
-                    return true;
-                    }
-                });
-                rfidDialog = new RfidDialog();
-                rfidDialog.setHandler(handler);
-                // тестовые данные для примера
-                String data = "0a0a0a0a";
-                //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-                //data = "00000000000000000000000000000000";
-                // data = "FFFFFFFFFFFFFFFF";
-                data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-                // пишем в метку с id привязанным к оборудованию
-                // rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
-                // RfidDriverBase.MEMORY_BANK_USER, 0, data);
-
-                // пишем в "известную" метку
-                // rfidDialog.writeTagData("0000000000",
-                // "3000E2004000860902332580112D",
-                // RfidDriverBase.MEMORY_BANK_USER, 0, data);
-                // пишем в "произовольную" метку, ту которую найдём первой
-                rfidDialog.writeTagData("0000000000",
-                RfidDriverBase.MEMORY_BANK_USER, 0, data);
-
-                rfidDialog.show(getFragmentManager(), TAG);
                 }
             });
         }
@@ -396,7 +412,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 + String.valueOf(equipment.getLatitude()) + " / "
                 + String.valueOf(equipment.getLongitude()));
 
-        tv_equipment_task_date.setText(DateFormat.getDateTimeInstance().format(equipment.getStartDate()));
+        Date date = equipment.getStartDate();
+        String startDate;
+        if (date != null) {
+            startDate = DateFormat.getDateTimeInstance().format(date);
+        } else {
+            startDate = "none";
+        }
+
+        tv_equipment_task_date.setText(startDate);
         /*
 		tv_equipment_critical.setText("Критичность: "
 				+ equipment.getCriticalType().getTitle());

@@ -224,24 +224,25 @@
             </ListView>
 
             <ImageView
-                    android:id="@+id/overlapImage2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60dp"
-                    android:paddingRight="10dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/image_description"
-                    android:src="@drawable/circle2"
-                android:layout_below="@+id/equipment_text_name"
-                android:layout_toLeftOf="@+id/overlapImage" />
-
-            <ImageView
-                    android:id="@+id/overlapImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60dp"
+                android:id="@+id/overlapImageWriteTag"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
                 android:paddingRight="10dp"
                 android:adjustViewBounds="true"
-                    android:contentDescription="@string/image_description"
-                    android:src="@drawable/circle"
+                android:contentDescription="@string/image_description"
+                android:src="@drawable/circle2"
+                android:layout_below="@+id/equipment_text_name"
+                android:layout_toLeftOf="@+id/overlapImageReadTag"
+                android:clickable="false" />
+
+            <ImageView
+                android:id="@+id/overlapImageReadTag"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:paddingRight="10dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/image_description"
+                android:src="@drawable/circle"
                 android:layout_below="@+id/equipment_text_name"
                 android:layout_alignParentRight="true" />
 

@@ -69,14 +69,12 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 	public void readTagData(String password, String tagId, int memoryBank,
 			int address, int count) {
         if (mMode) {
-            // TODO: реализовать чтение содержимого метки из файла
-//            File tagFile = new File(mContext.getFilesDir(), tagId);
-//            Stream<byte> inStream = new
             String hexData;
             byte[] rawData = new byte[64];
             FileInputStream in;
             try {
                 in = mContext.openFileInput(tagId);
+                // TODO: реализовать чтение по указанному адресу(address) и количество байт
                 int rc = in.read(rawData);
             } catch (Exception e) {
                 Log.e(TAG, e.getLocalizedMessage());
@@ -107,7 +105,6 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
         if (mMode) {
-            // TODO: реализовать запись содержимого метки в файл
             FileOutputStream out;
             try {
                 out = mContext.openFileOutput(tagId, Context.MODE_PRIVATE);
@@ -116,6 +113,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
                     rawData = new byte[64];
                 }
 
+				// TODO: реализовать запись по указанному адресу(address)
                 out.write(rawData);
             } catch (Exception e) {
                 Log.e(TAG, e.getLocalizedMessage());
