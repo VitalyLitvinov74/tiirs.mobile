@@ -29,6 +29,9 @@ public class RfidDriverP6300 extends RfidDriverBase {
     private static final String TAG = "RfidDriverP6300";
     private UHF mUhf;
 
+    private static final int EPC = 0;
+    private static final int TID = 1;
+
     @Override
     public boolean init() {
         if (powerOn()) {
@@ -46,8 +49,16 @@ public class RfidDriverP6300 extends RfidDriverBase {
         }
 
         Ware ware = new Ware(CommandType.GET_FIRMWARE_VERSION, 0, 0, 0);
+
+        // тупая форма инициализации считывателя, как есть в примерах SDK
         boolean result = mUhf.command(CommandType.GET_FIRMWARE_VERSION, ware);
-        result = mUhf.command(CommandType.GET_FIRMWARE_VERSION, ware);
+        if (!result) {
+            result = mUhf.command(CommandType.GET_FIRMWARE_VERSION, ware);
+            if (!result) {
+                result = mUhf.command(CommandType.GET_FIRMWARE_VERSION, ware);
+            }
+        }
+
         if (result) {
             Log.d(TAG, "FW Ver." + ware.major_version + "." + ware.minor_version + "." + ware.revision_version);
             if (checkVersion(ware)) {
@@ -123,9 +134,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         }
 
         tags_data.password = password;
-        // TODO: разобраться это стандарт или частный случай
-        // FMB: 0 = EPC, 1 = TID
-        tags_data.FMB = 0;
+        tags_data.FMB = EPC;
         tags_data.start_addr = address;
         tags_data.data_len = count;
         tags_data.mem_bank = memoryBank;
@@ -160,9 +169,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         }
 
         tags_data.password = password;
-        // TODO: разобраться это стандарт или частный случай
-        // FMB: 0 = EPC, 1 = TID
-        tags_data.FMB = 0;
+        tags_data.FMB = EPC;
         tags_data.start_addr = address;
         tags_data.data_len = count;
         tags_data.mem_bank = memoryBank;
@@ -216,9 +223,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         }
 
         tags_data.password = password;
-        // TODO: разобраться это стандарт или частный случай
-        // FMB: 0 = EPC, 1 = TID
-        tags_data.FMB = 0;
+        tags_data.FMB = EPC;
         tags_data.start_addr = address;
         tags_data.mem_bank = memoryBank;
         int dataLength = data.length() / 2;
@@ -260,9 +265,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         }
 
         tags_data.password = password;
-        // TODO: разобраться это стандарт или частный случай
-        // FMB: 0 = EPC, 1 = TID
-        tags_data.FMB = 0;
+        tags_data.FMB = EPC;
         tags_data.start_addr = address;
         tags_data.mem_bank = memoryBank;
         int dataLength = data.length() / 2;
@@ -298,13 +301,13 @@ public class RfidDriverP6300 extends RfidDriverBase {
     private boolean powerOn() {
         String cmdPowerOff = "echo 1 > /sys/devices/soc.0/xt_dev.68/xt_dc_in_en";
         CommandResult tt = ShellUtils.execCommand(cmdPowerOff, false);
-        return tt.result == 0 ? true : false;
+        return tt.result == 0;
     }
 
     private boolean powerOff() {
         String cmdPowerOn = "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_dc_in_en";
         CommandResult tt = ShellUtils.execCommand(cmdPowerOn, false);
-        return tt.result == 0 ? true : false;
+        return tt.result == 0;
     }
 
     /**
