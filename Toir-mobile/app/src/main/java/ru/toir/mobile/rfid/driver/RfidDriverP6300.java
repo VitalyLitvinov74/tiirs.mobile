@@ -178,7 +178,9 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
         result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
         if (result) {
+            // TODO: заменить всю эту херобору на простые функциональные методы!
             String content = ShareData.CharToString(tags_data.data, tags_data.data.length);
+            content = content.replaceAll("\\s", "");
             sHandler.obtainMessage(RESULT_RFID_SUCCESS, content).sendToTarget();
         } else {
             sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
@@ -284,25 +286,25 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 return;
             }
 
-            tags_data.data_len = 32;
+            tags_data.data_len = 16; // 32 bytes = 16 words
             tags_data.data = dataToWrite;
-            if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
-                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
-            } else {
+            if (!mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
                 sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                return;
             }
 
             // пишем остатки
             dataLength -= 32;
             dataToWrite = new char[dataLength];
-            String restData = data.substring(32);
+            String restData = data.substring(64);
             result = ShareData.StringToChar(restData, dataToWrite, dataLength);
             if (!result) {
                 sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
                 return;
             }
 
-            tags_data.data_len = dataLength;
+            tags_data.start_addr = address + 16;
+            tags_data.data_len = dataLength / 2;
             tags_data.data = dataToWrite;
             if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
                 sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
@@ -319,7 +321,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 return;
             }
 
-            tags_data.data_len = dataLength;
+            tags_data.data_len = dataLength / 2;
             tags_data.data = dataToWrite;
             if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
                 sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
