@@ -670,8 +670,21 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         final long currentTime = System.currentTimeMillis();
         //long totalTimeElapsed = currentTime - startTime;
         CheckBox checkBox;
-        final TaskStageStatus taskStageCompleted;
-        taskStageCompleted = realmDB.where(TaskStageStatus.class).equalTo("title","Выполнен").findFirst();
+        /*
+        final String taskStageStatusUuid2="8ee8a4f8-5c98-4444-86ed-133923132322";
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                TaskStageStatus taskStageStatusComplete;
+                taskStageStatusComplete = realmDB.createObject(TaskStageStatus.class);
+                taskStageStatusComplete.set_id(2);
+                taskStageStatusComplete.setUuid(taskStageStatusUuid2);
+                taskStageStatusComplete.setTitle("Выполнен");
+            }
+        });*/
+        final TaskStageStatus taskStageComplete;
+        taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("title","Выполнен").findFirst();
+
         if (operationAdapter != null)
             totalOperationCount = operationAdapter.getCount();
 
@@ -693,7 +706,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        taskStage.setTaskStageStatus(taskStageCompleted);
+                        taskStage.setTaskStageStatus(taskStageComplete);
                         //taskStage.setEndDate();
                         taskStage.setEndDate(new Date(currentTime));
                     }

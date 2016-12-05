@@ -49,6 +49,7 @@
         android:layout_toRightOf="@id/ts_ImageStatus"
         android:background="#FAFAFA"
         android:textColor="#454545"
+        android:layout_marginRight="10dip"
         android:layout_below="@+id/ts_Status"
         android:ellipsize="marquee"
         android:text="@string/description"

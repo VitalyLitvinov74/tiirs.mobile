@@ -78,7 +78,8 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
         if (adapterData!=null) {
             TaskStages taskStage = adapterData.get(position);
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
-            viewHolder.status.setText("Статус: " + taskStage.getTaskStageStatus().getTitle());
+            if (taskStage.getTaskStageStatus() != null)
+                viewHolder.status.setText("Статус: " + taskStage.getTaskStageStatus().getTitle());
             if (taskStage.getStartDate()!=null) {
                 Date lDate = taskStage.getStartDate();
                 if (lDate != null) {
@@ -95,25 +96,29 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
                     viewHolder.end_date.setText("не выполнялся");
                 }
             }
-
-            if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-            if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-            if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-            if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
-                viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-            if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
-                viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-            if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
-                viewHolder.icon.setImageResource(R.drawable.status_high_work);
-            if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-            if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-            if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+            else {
+                viewHolder.end_date.setText("не закончен");
+            }
+            if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null) {
+                if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                    viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
+                if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                    viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
+                if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                    viewHolder.icon.setImageResource(R.drawable.status_high_receive);
+                if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                    viewHolder.icon.setImageResource(R.drawable.status_easy_work);
+                if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                    viewHolder.icon.setImageResource(R.drawable.status_mod_work);
+                if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                    viewHolder.icon.setImageResource(R.drawable.status_high_work);
+                if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                    viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
+                if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                    viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
+                if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                    viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+            }
         }
         return convertView;
     }
