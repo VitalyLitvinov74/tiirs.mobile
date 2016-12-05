@@ -226,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                     String tagId = (String) msg.obj;
+                    tagId = tagId.substring(4);
                     Log.d(TAG, tagId);
 
                     AuthorizedUser.getInstance().setTagId(tagId);

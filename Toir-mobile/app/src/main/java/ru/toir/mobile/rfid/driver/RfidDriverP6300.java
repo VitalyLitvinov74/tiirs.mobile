@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.ShellUtils;
 import ru.toir.mobile.utils.ShellUtils.CommandResult;
@@ -136,7 +137,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         tags_data.password = password;
         tags_data.FMB = EPC;
         tags_data.start_addr = address;
-        tags_data.data_len = count;
+        tags_data.data_len = count / 2;
         tags_data.mem_bank = memoryBank;
 
         result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
@@ -159,7 +160,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
         Tags_data tags_data = new Tags_data();
         char[] tmpTagId = new char[filterLength];
-        boolean result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
+        boolean result;
+        result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
         if (result) {
             tags_data.filterData_len = filterLength;
             tags_data.filterData = tmpTagId;
@@ -171,7 +173,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         tags_data.password = password;
         tags_data.FMB = EPC;
         tags_data.start_addr = address;
-        tags_data.data_len = count;
+        tags_data.data_len = count / 2;
         tags_data.mem_bank = memoryBank;
 
         result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
@@ -247,7 +249,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
     @Override
     public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
-        // TODO: реализовать запись в метку если объём данных для записи более 32 байт в два шага
+
         int filterLength = tagId.length() / 2;
         if (filterLength % 2 != 0) {
             // Filter Hex number must be multiples of 4
@@ -271,20 +273,59 @@ public class RfidDriverP6300 extends RfidDriverBase {
         tags_data.start_addr = address;
         tags_data.mem_bank = memoryBank;
         int dataLength = data.length() / 2;
-        char dataToWrite[] = new char[dataLength];
-        result = ShareData.StringToChar(data, dataToWrite, dataLength);
-        if (!result) {
-            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-            return;
-        }
+        char dataToWrite[];
 
-        tags_data.data_len = dataLength;
-        tags_data.data = dataToWrite;
-        result = mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data);
-        if (result) {
-            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+        if (dataLength > 32) {
+            // пишем только первыве 32 байта
+            dataToWrite = new char[32];
+            result = ShareData.StringToChar(data, dataToWrite, 32);
+            if (!result) {
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                return;
+            }
+
+            tags_data.data_len = 32;
+            tags_data.data = dataToWrite;
+            if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+            } else {
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+            }
+
+            // пишем остатки
+            dataLength -= 32;
+            dataToWrite = new char[dataLength];
+            String restData = data.substring(32);
+            result = ShareData.StringToChar(restData, dataToWrite, dataLength);
+            if (!result) {
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                return;
+            }
+
+            tags_data.data_len = dataLength;
+            tags_data.data = dataToWrite;
+            if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+            } else {
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+            }
+
         } else {
-            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+            // пишем то что передали
+            dataToWrite = new char[dataLength];
+            result = ShareData.StringToChar(data, dataToWrite, dataLength);
+            if (!result) {
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                return;
+            }
+
+            tags_data.data_len = dataLength;
+            tags_data.data = dataToWrite;
+            if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+            } else {
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+            }
         }
     }
 
@@ -297,7 +338,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
     @Override
     public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-        return null;
+        return inflater.inflate(R.layout.rfid_read, viewGroup);
     }
 
     private boolean powerOn() {
