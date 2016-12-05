@@ -12,10 +12,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachev
  *         <p>
- *         Драйвер считывателя RFID который "считывает" содержимое меток из
- *         текстового файла.
+ *             Драйвер считывателя RFID в устройстве С5.
+ *         </p>
+ *         <p>
+ *             В прошивке считывателя содержится ошибка, в результате которой при записи данных
+ *             в метку пишется N+1 байт. Это приводит к порче данных следующих за последним байтом
+ *             записываемых данных. Так же при записи данных по границе памяти метки,
+ *             данные записываются успешно, но прошивка возвращает ошибку записи. Для "комфортной"
+ *             работы реализована запись в несколько приёмов. То есть, считать данные
+ *             следующие за предполагаемыми к записи данными до конца памяти метки. Записать данные
+ *             в метку. Записать ранее считаные данные в метку по границе памяти метки.
+ *             Получить ошибку записи. Считать для проверки данные из метки и сравнить с с ранее
+ *             считанными.
  *         </p>
  */
 @SuppressWarnings("unused")
@@ -177,6 +187,12 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, int memoryBank, int address,
 			String data) {
+		// TODO: реализовать запись в метку в три шага
+        // TODO: 1) считать данные сразу за данными для записм до конца метки
+        // TODO: 2) записать переданные данные
+        // TODO: 3) записать данные считанные ранее (в ответ будет ошибка)
+        // TODO: возможно счтитать "контрольные" данные для проверки записи в метку
+
 		final String lPassword = password;
 		final int lMemoryBank = memoryBank;
 		final int lAddress = address;
@@ -229,6 +245,11 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	@Override
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
+        // TODO: реализовать запись в метку в три шага
+        // TODO: 1) считать данные сразу за данными для записм до конца метки
+        // TODO: 2) записать переданные данные
+        // TODO: 3) записать данные считанные ранее (в ответ будет ошибка)
+        // TODO: возможно счтитать "контрольные" данные для проверки записи в метку
 
         reader.m_handler = new Handler(new Handler.Callback() {
 

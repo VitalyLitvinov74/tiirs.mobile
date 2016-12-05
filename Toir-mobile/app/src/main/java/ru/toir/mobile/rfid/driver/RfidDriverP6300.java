@@ -185,6 +185,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
     @Override
     public void writeTagData(String password, int memoryBank, int address, String data) {
+        // TODO: реализовать запись в метку если объём данных для записи более 32 байт в два шага
         // ищем первую попавшуюся метку
         Query_epc query_epc = new Query_epc();
         String tagId;
@@ -246,6 +247,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
     @Override
     public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
+        // TODO: реализовать запись в метку если объём данных для записи более 32 байт в два шага
         int filterLength = tagId.length() / 2;
         if (filterLength % 2 != 0) {
             // Filter Hex number must be multiples of 4
