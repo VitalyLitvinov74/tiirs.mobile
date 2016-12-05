@@ -21,10 +21,10 @@ public class TokenSrv {
     private Integer expiresIn;
     @Expose
     private String userName;
-    @SerializedName(".issued")
+    @SerializedName("issued")
     @Expose
     private String Issued;
-    @SerializedName(".expires")
+    @SerializedName("expires")
     @Expose
     private String Expires;
 
