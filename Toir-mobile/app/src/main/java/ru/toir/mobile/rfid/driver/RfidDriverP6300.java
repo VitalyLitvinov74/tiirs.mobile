@@ -24,6 +24,12 @@ import ru.toir.mobile.utils.ShellUtils.CommandResult;
  */
 @SuppressWarnings("unused")
 public class RfidDriverP6300 extends RfidDriverBase {
+    // TODO: в переспективе нужно переписать код из "SDK"
+    // Один из недостатков SDK это то что разбор данных из считывателя происходит в том же потоке
+    // который отправляет команду в считыватель. В частности это приводит к тому, что диалог с
+    // указанием поднести метку пользователю не показывается.
+    // Помимо этого нестабильно работает отправка двух команд подряд. В частности при записи
+    // в два шага данных размером более 32 байт.
     @SuppressWarnings("unused")
     // к этому свойству обращаемся не на прямую
     public static final String DRIVER_NAME = "Драйвер UHF P6300";
@@ -301,6 +307,14 @@ public class RfidDriverP6300 extends RfidDriverBase {
             if (!result) {
                 sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
                 return;
+            }
+
+            // пытаемся завершить поток разбора предыдущей команды, для отправки следующей
+            mUhf.mReceiveThread.cancel(true);
+            try {
+                mUhf.mReceiveThread.get();
+            } catch (Exception e) {
+//                Log.d(TAG, e.getLocalizedMessage());
             }
 
             tags_data.start_addr = address + 16;

@@ -237,6 +237,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                                     TagStructure tag = new TagStructure();
                                     tag.parse(DataUtils.hexStringToByteArray(tagData));
                                     Log.d(TAG, "uuid = " + tag.uuid);
+                                    Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
+                                    Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
+                                    Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
+                                    Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
                                     Log.d(TAG, "phone = " + tag.phone);
                                 } else {
                                     Log.d(TAG, "Ошибка чтения метки!");
@@ -283,6 +287,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
                         TagStructure tag = new TagStructure();
                         tag.uuid = equipment.getUuid();
+                        tag.taskId = 0x10111213;
+                        tag.taskTypeId = 0x14151617;
+                        tag.start = 0x18191a1b;
+                        tag.end = 0x1c1d1e1f;
 
                         Handler handler = new Handler(new Handler.Callback() {
 
