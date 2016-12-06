@@ -58,10 +58,6 @@ public class GPSFragment extends Fragment {
 	TextView gpsLog;
 	ArrayList<OverlayItem> aOverlayItemArray;
     private double curLatitude, curLongitude;
-	//private ListView lv_equipment;
-    //private Tasks task;
-    //private Orders order;
-    //private RealmResults<Equipment> equipment;
 	private int LastItemPosition = -1;
 
     public GPSFragment() {
@@ -258,6 +254,7 @@ public class GPSFragment extends Fragment {
                         .getApplicationContext());
                 try {
                     road = roadManager.getRoad(waypoints);
+                    roadManager.addRequestOption("routeType=pedestrian");
                     Polyline roadOverlay = RoadManager.buildRoadOverlay(road, Color.RED, 8);
                     mapView.getOverlays().add(roadOverlay);
                     mapView.invalidate();

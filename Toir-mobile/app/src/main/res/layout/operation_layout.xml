@@ -24,6 +24,7 @@
         <ListView
             android:id="@+id/op_operation_list_view"
             android:layout_width="match_parent"
+            android:fadeScrollbars="false"
             android:layout_height="wrap_content" >
         </ListView>
 

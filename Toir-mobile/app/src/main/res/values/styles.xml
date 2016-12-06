@@ -23,13 +23,24 @@
 
     <style name="CustomTheme" parent="MaterialDrawerTheme.Light">
         <item name="windowActionModeOverlay">true</item>
-	<item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
-	<item name="android:windowActionBarOverlay">true</item>
-    <item name="colorControlNormal">@color/white</item>
-    <item name="android:textColorSecondary">@color/white</item>
+	    <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
+	    <item name="android:windowActionBarOverlay">true</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
     </style>
 
-	<style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+    <style name="PreferenceScreen" parent="CustomTheme">
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
+        <item name="android:titleTextStyle">@style/PreferenceTitleStyle</item>
+        <item name="android:textColorSecondary">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
+    </style>
+
+    <style name="PreferenceTitleStyle">
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
+    </style>
+
+    <style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
 	     <item name="android:popupBackground">#ffffff</item>
 	</style>
 
