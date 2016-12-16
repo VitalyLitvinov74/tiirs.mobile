@@ -154,73 +154,73 @@ public class ParseThread extends Thread {
 												// выполняем постобработку
 												// полученных данных
 												switch (command) {
-												case READ_TAG_ID_COMMAND:
-													Log.d(TAG,
-															"Id карты прочитан успешно!");
-													message.what = reader.RESULT_SUCCESS;
-													message.obj = reader
-															.BytesToString(
-																	data,
-																	1,
-																	payloadLength - 3);
-													break;
-												case READ_TAG_DATA_COMMAND:
-													Log.d(TAG,
-															"Данные карты прочитаны успешно!");
-													message.what = reader.RESULT_SUCCESS;
-													message.obj = reader
-															.BytesToString(
-																	data, 0,
-																	payloadLength);
-													break;
-												case WRITE_TAG_DATA_COMMAND:
-													rc = reader.byteToInt(data,
-															0, 1);
-													Log.d(TAG,
-															"код возврата после записи = "
-																	+ rc);
-													if (rc == 0) {
-														Log.d(TAG,
-																"Данные записаны успешно!");
-														message.what = reader.RESULT_SUCCESS;
-													} else {
-														Log.d(TAG,
-																"Не удалось записать данные!");
-														message.what = reader.RESULT_WRITE_ERROR;
-													}
-													break;
-												case LOCK_TAG_COMMAND:
-													rc = reader.byteToInt(data,
-															0, 1);
-													Log.d(TAG,
-															"код возврата после блокировки = "
-																	+ rc);
-													if (rc == 0) {
-														Log.d(TAG,
-																"Блокировка выполненна успешно!");
-														message.what = reader.RESULT_SUCCESS;
-													} else {
-														Log.d(TAG,
-																"Не удалось выполнить блокировку!");
-														message.what = reader.RESULT_WRITE_ERROR;
-													}
-													break;
-												case KILL_TAG_COMMAND:
-													rc = reader.byteToInt(data,
-															0, 1);
-													Log.d(TAG,
-															"код возврата после деактивации = "
-																	+ rc);
-													if (rc == 0) {
-														Log.d(TAG,
-																"Деактивация выполненна успешно!");
-														message.what = reader.RESULT_SUCCESS;
-													} else {
-														Log.d(TAG,
-																"Не удалось выполнить деактивацию!");
-														message.what = reader.RESULT_WRITE_ERROR;
-													}
-													break;
+                                                    case READ_TAG_ID_COMMAND:
+                                                        Log.d(TAG,
+                                                                "Id карты прочитан успешно!");
+                                                        message.what = reader.RESULT_SUCCESS;
+                                                        message.obj = reader
+                                                                .BytesToString(
+                                                                        data,
+                                                                        1,
+                                                                        payloadLength - 3);
+                                                        break;
+                                                    case READ_TAG_DATA_COMMAND:
+                                                        Log.d(TAG,
+                                                                "Данные карты прочитаны успешно!");
+                                                        message.what = reader.RESULT_SUCCESS;
+                                                        message.obj = reader
+                                                                .BytesToString(
+                                                                        data, 0,
+                                                                        payloadLength);
+                                                        break;
+                                                    case WRITE_TAG_DATA_COMMAND:
+                                                        rc = reader.byteToInt(data,
+                                                                0, 1);
+                                                        Log.d(TAG,
+                                                                "код возврата после записи = "
+                                                                        + rc);
+                                                        if (rc == 0) {
+                                                            Log.d(TAG,
+                                                                    "Данные записаны успешно!");
+                                                            message.what = reader.RESULT_SUCCESS;
+                                                        } else {
+                                                            Log.d(TAG,
+                                                                    "Не удалось записать данные!");
+                                                            message.what = reader.RESULT_WRITE_ERROR;
+                                                        }
+                                                        break;
+                                                    case LOCK_TAG_COMMAND:
+                                                        rc = reader.byteToInt(data,
+                                                                0, 1);
+                                                        Log.d(TAG,
+                                                                "код возврата после блокировки = "
+                                                                        + rc);
+                                                        if (rc == 0) {
+                                                            Log.d(TAG,
+                                                                    "Блокировка выполненна успешно!");
+                                                            message.what = reader.RESULT_SUCCESS;
+                                                        } else {
+                                                            Log.d(TAG,
+                                                                    "Не удалось выполнить блокировку!");
+                                                            message.what = reader.RESULT_WRITE_ERROR;
+                                                        }
+                                                        break;
+                                                    case KILL_TAG_COMMAND:
+                                                        rc = reader.byteToInt(data,
+                                                                0, 1);
+                                                        Log.d(TAG,
+                                                                "код возврата после деактивации = "
+                                                                        + rc);
+                                                        if (rc == 0) {
+                                                            Log.d(TAG,
+                                                                    "Деактивация выполненна успешно!");
+                                                            message.what = reader.RESULT_SUCCESS;
+                                                        } else {
+                                                            Log.d(TAG,
+                                                                    "Не удалось выполнить деактивацию!");
+                                                            message.what = reader.RESULT_WRITE_ERROR;
+                                                        }
+                                                        break;
 												}
 												resendCommandHandler
 														.sendMessage(message);

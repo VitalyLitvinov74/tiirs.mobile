@@ -65,6 +65,9 @@ int32_t MagicSetChannel(uint8_t channel);
 
 int32_t MagicSetFrequency(uint8_t region);
 
+int32_t MagicSelect(int16_t nPL, uint8_t selPa, int32_t nPTR, uint8_t nMaskLen, uint8_t turncate, uint8_t *pMask);
+
+int32_t MagicSetSelect(int32_t nPL, uint8_t data);
 
 
 jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
@@ -122,5 +125,11 @@ jint Java_android_hardware_uhf_magic_reader_GetChannel(JNIEnv *env, jclass jc);
 jint Java_android_hardware_uhf_magic_reader_SetChannel(JNIEnv *env, jclass jc, jbyte channel);
 
 jint Java_android_hardware_uhf_magic_reader_SetFrequency(JNIEnv *env, jclass jc, jbyte region);
+
+jint Java_android_hardware_uhf_magic_reader_Select(JNIEnv *env, jclass jc,
+                                                   jbyte selPa, jint nPTR, jbyte nMaskLen,
+                                                   jbyte turncate, jbyteArray jpMask);
+
+jint Java_android_hardware_uhf_magic_reader_SetSelect(JNIEnv *env, jclass jc, jbyte data);
 
 #endif //C5TOOLAS_READER_H

@@ -41,6 +41,9 @@ public class reader {
 
     private static ParseThread readThread;
 
+    public static final byte SELECT_ENABLE = 0;
+    public static final byte SELECT_DISABLE = 1;
+
     static {
         System.loadLibrary("uhf-tools");
     }
@@ -255,6 +258,21 @@ public class reader {
 
         // отправляем команду чтения Id метки
         Inventory();
+
+    }
+
+    /**
+     * Установка параметров команды Select
+     *
+     */
+    static public boolean select(final byte selPa, final int nPTR, final byte nMaskLen,
+                              final byte turncate, final byte[] jpMask) {
+
+        if (Select(selPa, nPTR, nMaskLen, turncate, jpMask) == 0) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -605,11 +623,10 @@ public class reader {
      *            Mask length
      * @param turncate
      *            (0x00 is Disable truncation, 0x80 is Enable truncation)
-     * @param mask
+     * @param mask mask
      * @return return 0x00, error is returned not 0
      */
-    // static public native int Select(byte selPa, int nPTR, byte nMaskLen, byte
-    // turncate, byte[] mask);
+     static public native int Select(byte selPa, int nPTR, byte nMaskLen, byte turncate, byte[] mask);
 
     /**
      * set to send Select commands
@@ -620,7 +637,7 @@ public class reader {
      *
      * @return return 0x00, error is returned not 0
      */
-    // static public native int SetSelect(byte data);
+     static public native int SetSelect(byte data);
 
     /**
      * read tag data storage area
