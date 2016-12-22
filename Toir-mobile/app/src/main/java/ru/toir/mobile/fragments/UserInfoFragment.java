@@ -91,7 +91,9 @@ public class UserInfoFragment extends Fragment {
             }
         });
 
+		// !!!!!
         final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+		//final User user = realmDB.where(User.class).findFirst();
         if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
