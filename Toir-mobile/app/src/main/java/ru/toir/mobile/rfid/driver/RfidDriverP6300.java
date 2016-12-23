@@ -167,10 +167,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
                 result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
                 if (result) {
-                    // TODO: заменить всю эту херобору на простые функциональные методы!
-                    String content = ShareData.CharToString(tags_data.data, tags_data.data.length);
-                    content = content.replaceAll("\\s", "");
-                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, content).sendToTarget();
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, charsToString(tags_data.data))
+                            .sendToTarget();
                 } else {
                     sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                 }
@@ -213,10 +211,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
                 result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
                 if (result) {
-                    // TODO: заменить всю эту херобору на простые функциональные методы!
-                    String content = ShareData.CharToString(tags_data.data, tags_data.data.length);
-                    content = content.replaceAll("\\s", "");
-                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, content).sendToTarget();
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, charsToString(tags_data.data))
+                            .sendToTarget();
                 } else {
                     sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                 }
@@ -422,5 +418,14 @@ public class RfidDriverP6300 extends RfidDriverBase {
         }
 
         return false;
+    }
+
+    private String charsToString(char[] chars) {
+        StringBuilder sb = new StringBuilder();
+        for (char elem : chars) {
+            sb.append(String.format("%02X", (int)elem));
+        }
+
+        return sb.toString();
     }
 }
