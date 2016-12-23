@@ -10,6 +10,8 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -64,6 +66,7 @@ import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class OrderFragment extends Fragment implements View.OnClickListener {
     private Orders selectedOrder;
@@ -627,9 +630,43 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);
                     if (selectedTask != null) {
-                        currentTaskUuid = selectedTask.getUuid();
-                        fillListViewTaskStage(selectedTask);
-                        Level = 2;
+                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+                        final String expectedTagId = selectedTask.getEquipment().getTagId();
+                        Log.d(TAG, "Ожидаемаея метка: " + expectedTagId);
+                        Handler handler = new Handler(new Handler.Callback() {
+                            @Override
+                            public boolean handleMessage(Message message) {
+                                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                                    String tagId = ((String) message.obj).substring(4);
+                                    Log.d(TAG, "Ид метки получили: " + tagId);
+                                    if (expectedTagId.equals(tagId)) {
+                                        currentTaskUuid = selectedTask.getUuid();
+                                        fillListViewTaskStage(selectedTask);
+                                        Level = 2;
+                                    } else {
+                                        Toast.makeText(getContext(),
+                                                "Не верное оборудование!", Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                } else {
+                                    Log.d(TAG, "Ошибка чтения метки!");
+                                    Toast.makeText(getContext(),
+                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                                            .show();
+
+                                }
+
+                                // закрываем диалог
+                                rfidDialog.dismiss();
+                                return true;
+                            }
+                        });
+
+                        rfidDialog = new RfidDialog();
+                        rfidDialog.setHandler(handler);
+                        rfidDialog.readTagId();
+                        rfidDialog.show(getActivity().getFragmentManager(), TAG);
+
                     }
                 }
 
