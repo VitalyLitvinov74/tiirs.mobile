@@ -24,12 +24,6 @@ import ru.toir.mobile.utils.ShellUtils.CommandResult;
  */
 @SuppressWarnings("unused")
 public class RfidDriverP6300 extends RfidDriverBase {
-    // TODO: в переспективе нужно переписать код из "SDK"
-    // Один из недостатков SDK это то что разбор данных из считывателя происходит в том же потоке
-    // который отправляет команду в считыватель. В частности это приводит к тому, что диалог с
-    // указанием поднести метку пользователю не показывается.
-    // Помимо этого нестабильно работает отправка двух команд подряд. В частности при записи
-    // в два шага данных размером более 32 байт.
     @SuppressWarnings("unused")
     // к этому свойству обращаемся не на прямую
     public static final String DRIVER_NAME = "Драйвер UHF P6300";
@@ -223,155 +217,197 @@ public class RfidDriverP6300 extends RfidDriverBase {
     }
 
     @Override
-    public void writeTagData(String password, int memoryBank, int address, String data) {
-        // TODO: реализовать запись в метку если объём данных для записи более 32 байт в два шага
-        // ищем первую попавшуюся метку
-        Query_epc query_epc = new Query_epc();
-        String tagId;
-        boolean result = mUhf.command(CommandType.SINGLE_QUERY_TAGS_EPC, query_epc);
-        if (result) {
-            Log.d(TAG, "EPC readed...");
-            Log.d(TAG, "len = " + query_epc.epc.epc_len);
-            StringBuilder sb = new StringBuilder();
-            for(char c : query_epc.epc.epc) {
-                sb.append(String.format("%02X", (int)c));
+    public void writeTagData(final String password, final int memoryBank, final int address,
+                             final String data) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // ищем первую попавшуюся метку
+                Query_epc query_epc = new Query_epc();
+                String tagId;
+                boolean result = mUhf.command(CommandType.SINGLE_QUERY_TAGS_EPC, query_epc);
+                if (result) {
+                    StringBuilder sb = new StringBuilder();
+                    for(char c : query_epc.epc.epc) {
+                        sb.append(String.format("%02X", (int)c));
+                    }
+
+                    Log.d(TAG, "EPC len = " + query_epc.epc.epc_len + ", tagId = " + sb.toString());
+                    tagId = sb.toString();
+                } else {
+                    Log.d(TAG, "EPC not readed...");
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
+
+                int filterLength = tagId.length() / 2;
+                if (filterLength % 2 != 0) {
+                    // Filter Hex number must be multiples of 4
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
+
+                Tags_data tags_data = new Tags_data();
+                char[] tmpTagId = new char[filterLength];
+                result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
+                if (result) {
+                    tags_data.filterData_len = filterLength;
+                    tags_data.filterData = tmpTagId;
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
+
+                tags_data.password = password;
+                tags_data.FMB = EPC;
+                tags_data.start_addr = address;
+                tags_data.mem_bank = memoryBank;
+                int dataLength = data.length() / 2;
+                char dataToWrite[];
+
+                if (dataLength > 32) {
+                    // пишем только первыве 32 байта
+                    dataToWrite = new char[32];
+                    result = ShareData.StringToChar(data, dataToWrite, 32);
+                    if (!result) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    tags_data.data_len = 16; // 32 bytes = 16 words
+                    tags_data.data = dataToWrite;
+                    if (!mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    // пишем остатки
+                    dataLength -= 32;
+                    dataToWrite = new char[dataLength];
+                    String restData = data.substring(64);
+                    result = ShareData.StringToChar(restData, dataToWrite, dataLength);
+                    if (!result) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    tags_data.start_addr = address + 16;
+                    tags_data.data_len = dataLength / 2;
+                    tags_data.data = dataToWrite;
+                    if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    }
+
+                } else {
+                    // пишем то что передали
+                    dataToWrite = new char[dataLength];
+                    result = ShareData.StringToChar(data, dataToWrite, dataLength);
+                    if (!result) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    tags_data.data_len = dataLength / 2;
+                    tags_data.data = dataToWrite;
+                    if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    }
+                }
             }
-
-            tagId = sb.toString();
-        } else {
-            Log.d(TAG, "EPC not readed...");
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
-
-        int filterLength = tagId.length() / 2;
-        if (filterLength % 2 != 0) {
-            // Filter Hex number must be multiples of 4
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
-
-        Tags_data tags_data = new Tags_data();
-        char[] tmpTagId = new char[filterLength];
-        result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
-        if (result) {
-            tags_data.filterData_len = filterLength;
-            tags_data.filterData = tmpTagId;
-        } else {
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
-
-        tags_data.password = password;
-        tags_data.FMB = EPC;
-        tags_data.start_addr = address;
-        tags_data.mem_bank = memoryBank;
-        int dataLength = data.length() / 2;
-        char dataToWrite[] = new char[dataLength];
-        result = ShareData.StringToChar(data, dataToWrite, dataLength);
-        if (!result) {
-            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-            return;
-        }
-
-        tags_data.data_len = dataLength;
-        tags_data.data = dataToWrite;
-        result = mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data);
-        if (result) {
-            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
-        } else {
-            sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-        }
+        });
+        thread.start();
     }
 
     @Override
-    public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
+    public void writeTagData(final String password, final String tagId, final int memoryBank,
+                             final int address, final String data) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int filterLength = tagId.length() / 2;
+                if (filterLength % 2 != 0) {
+                    // Filter Hex number must be multiples of 4
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
 
-        int filterLength = tagId.length() / 2;
-        if (filterLength % 2 != 0) {
-            // Filter Hex number must be multiples of 4
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
+                Tags_data tags_data = new Tags_data();
+                char[] tmpTagId = new char[filterLength];
+                boolean result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
+                if (result) {
+                    tags_data.filterData_len = filterLength;
+                    tags_data.filterData = tmpTagId;
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
 
-        Tags_data tags_data = new Tags_data();
-        char[] tmpTagId = new char[filterLength];
-        boolean result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
-        if (result) {
-            tags_data.filterData_len = filterLength;
-            tags_data.filterData = tmpTagId;
-        } else {
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
+                tags_data.password = password;
+                tags_data.FMB = EPC;
+                tags_data.start_addr = address;
+                tags_data.mem_bank = memoryBank;
+                int dataLength = data.length() / 2;
+                char dataToWrite[];
 
-        tags_data.password = password;
-        tags_data.FMB = EPC;
-        tags_data.start_addr = address;
-        tags_data.mem_bank = memoryBank;
-        int dataLength = data.length() / 2;
-        char dataToWrite[];
+                if (dataLength > 32) {
+                    // пишем только первыве 32 байта
+                    dataToWrite = new char[32];
+                    result = ShareData.StringToChar(data, dataToWrite, 32);
+                    if (!result) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
 
-        if (dataLength > 32) {
-            // пишем только первыве 32 байта
-            dataToWrite = new char[32];
-            result = ShareData.StringToChar(data, dataToWrite, 32);
-            if (!result) {
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-                return;
+                    tags_data.data_len = 16; // 32 bytes = 16 words
+                    tags_data.data = dataToWrite;
+                    if (!mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    // пишем остатки
+                    dataLength -= 32;
+                    dataToWrite = new char[dataLength];
+                    String restData = data.substring(64);
+                    result = ShareData.StringToChar(restData, dataToWrite, dataLength);
+                    if (!result) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    tags_data.start_addr = address + 16;
+                    tags_data.data_len = dataLength / 2;
+                    tags_data.data = dataToWrite;
+                    if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    }
+
+                } else {
+                    // пишем то что передали
+                    dataToWrite = new char[dataLength];
+                    result = ShareData.StringToChar(data, dataToWrite, dataLength);
+                    if (!result) {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+
+                    tags_data.data_len = dataLength / 2;
+                    tags_data.data = dataToWrite;
+                    if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    }
+                }
             }
-
-            tags_data.data_len = 16; // 32 bytes = 16 words
-            tags_data.data = dataToWrite;
-            if (!mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-                return;
-            }
-
-            // пишем остатки
-            dataLength -= 32;
-            dataToWrite = new char[dataLength];
-            String restData = data.substring(64);
-            result = ShareData.StringToChar(restData, dataToWrite, dataLength);
-            if (!result) {
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-                return;
-            }
-
-            // пытаемся завершить поток разбора предыдущей команды, для отправки следующей
-            mUhf.mReceiveThread.cancel(true);
-            try {
-                mUhf.mReceiveThread.get();
-            } catch (Exception e) {
-//                Log.d(TAG, e.getLocalizedMessage());
-            }
-
-            tags_data.start_addr = address + 16;
-            tags_data.data_len = dataLength / 2;
-            tags_data.data = dataToWrite;
-            if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
-                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
-            } else {
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-            }
-
-        } else {
-            // пишем то что передали
-            dataToWrite = new char[dataLength];
-            result = ShareData.StringToChar(data, dataToWrite, dataLength);
-            if (!result) {
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-                return;
-            }
-
-            tags_data.data_len = dataLength / 2;
-            tags_data.data = dataToWrite;
-            if (mUhf.command(CommandType.WRITE_TAGS_DATA, tags_data)) {
-                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
-            } else {
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-            }
-        }
+        });
+        thread.start();
     }
 
     @Override

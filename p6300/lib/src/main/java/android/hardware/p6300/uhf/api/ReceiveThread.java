@@ -119,6 +119,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                     case CommandType.SET_MODULE_BAUD_RATE: {
                         if (data[mark_head + 3] == 0x01) {
                             CommandType.CommandOK = true;
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
