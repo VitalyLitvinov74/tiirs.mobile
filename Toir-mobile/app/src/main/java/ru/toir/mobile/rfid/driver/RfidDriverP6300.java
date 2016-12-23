@@ -117,58 +117,66 @@ public class RfidDriverP6300 extends RfidDriverBase {
     }
 
     @Override
-    public void readTagData(String password, int memoryBank, int address, int count) {
-        // ищем первую попавшуюся метку
-        Query_epc query_epc = new Query_epc();
-        String tagId;
-        boolean result = mUhf.command(CommandType.SINGLE_QUERY_TAGS_EPC, query_epc);
-        if (result) {
-            Log.d(TAG, "EPC readed...");
-            Log.d(TAG, "len = " + query_epc.epc.epc_len);
-            StringBuilder sb = new StringBuilder();
-            for(char c : query_epc.epc.epc) {
-                sb.append(String.format("%02X", (int)c));
+    public void readTagData(final String password, final int memoryBank, final int address,
+                            final int count) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // ищем первую попавшуюся метку
+                Query_epc query_epc = new Query_epc();
+                String tagId;
+                boolean result = mUhf.command(CommandType.SINGLE_QUERY_TAGS_EPC, query_epc);
+                if (result) {
+                    StringBuilder sb = new StringBuilder();
+                    for(char c : query_epc.epc.epc) {
+                        sb.append(String.format("%02X", (int)c));
+                    }
+
+                    Log.d(TAG, "EPC len = " + query_epc.epc.epc_len + ", tagId = " + sb.toString());
+                    tagId = sb.toString();
+                } else {
+                    Log.d(TAG, "EPC not readed...");
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
+
+                // читаем данные из найденной метки
+                int filterLength = tagId.length() / 2;
+                if (filterLength % 2 != 0) {
+                    // Filter Hex number must be multiples of 4
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
+
+                Tags_data tags_data = new Tags_data();
+                char[] tmpTagId = new char[filterLength];
+                result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
+                if (result) {
+                    tags_data.filterData_len = filterLength;
+                    tags_data.filterData = tmpTagId;
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    return;
+                }
+
+                tags_data.password = password;
+                tags_data.FMB = EPC;
+                tags_data.start_addr = address;
+                tags_data.data_len = count / 2;
+                tags_data.mem_bank = memoryBank;
+
+                result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
+                if (result) {
+                    // TODO: заменить всю эту херобору на простые функциональные методы!
+                    String content = ShareData.CharToString(tags_data.data, tags_data.data.length);
+                    content = content.replaceAll("\\s", "");
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, content).sendToTarget();
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                }
             }
-
-            tagId = sb.toString();
-        } else {
-            Log.d(TAG, "EPC not readed...");
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
-
-        // читаем данные из найденной метки
-        int filterLength = tagId.length() / 2;
-        if (filterLength % 2 != 0) {
-            // Filter Hex number must be multiples of 4
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
-
-        Tags_data tags_data = new Tags_data();
-        char[] tmpTagId = new char[filterLength];
-        result = ShareData.StringToChar(tagId, tmpTagId, filterLength);
-        if (result) {
-            tags_data.filterData_len = filterLength;
-            tags_data.filterData = tmpTagId;
-        } else {
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-            return;
-        }
-
-        tags_data.password = password;
-        tags_data.FMB = EPC;
-        tags_data.start_addr = address;
-        tags_data.data_len = count / 2;
-        tags_data.mem_bank = memoryBank;
-
-        result = mUhf.command(CommandType.READ_TAGS_DATA, tags_data);
-        if (result) {
-            String content = ShareData.CharToString(tags_data.data, tags_data.data.length);
-            sHandler.obtainMessage(RESULT_RFID_SUCCESS, content).sendToTarget();
-        } else {
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-        }
+        });
+        thread.start();
     }
 
     @Override
