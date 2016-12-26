@@ -130,6 +130,8 @@ ssize_t readSerial(void *buffer, int32_t size) {
 
     if (deviceHandler >= 0) {
         rc = read(deviceHandler, buffer, (size_t) size);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "readed %d byte, %s", (int)rc,
+                            (char *)makeHexString(buffer, 0, (int32_t)rc));
     }
 
     return rc;
@@ -524,11 +526,7 @@ bool MagicIsCheckSum(void *pBuffer, uint32_t nLen) {
         }
     }
 
-    if ((buffer[nLen] - checkSum) <= 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return (buffer[nLen] - checkSum) <= 0;
 }
 
 /**
@@ -1078,7 +1076,7 @@ jint Java_android_hardware_uhf_magic_reader_SetTransmissionPower(JNIEnv *env,
     MagicSetTransmissionPower(nPower);
 
     while (1) {
-        count += readSerial(&Magicbuf[count], 8);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if (count > 7) {
             break;
@@ -1114,7 +1112,7 @@ jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env,
     MagicGetTransmissionPower();
 
     while (1) {
-        count += readSerial(&Magicbuf[count], 9);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if (count > 8) {
             break;
@@ -1163,6 +1161,7 @@ jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc,
                       (uint32_t) nLD) != nUL + 16)) {
         result = 17;
     }
+
     e->ReleaseByteArrayElements(env, jAPassword, password, 0);
     e->ReleaseByteArrayElements(env, jEPC, PCEPC, 0);
     return result;
@@ -1205,6 +1204,7 @@ jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
 }
 
 int32_t MagicGetChannel() {
+
     int32_t packetLen;
     uint8_t arybuf[5];
     int32_t result;
@@ -1218,17 +1218,17 @@ int32_t MagicGetChannel() {
 }
 
 jint Java_android_hardware_uhf_magic_reader_GetChannel(JNIEnv *env, jclass jc) {
+
     int32_t watchDog = 0;
     int32_t count = 0;
     uint8_t Magicbuf[32];
 
-    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicGetChannel: %p, %p",
-                        env, jc);
+    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicGetChannel: %p, %p", env, jc);
 
     MagicGetChannel();
 
     while (1) {
-        count += readSerial(&Magicbuf[count], 9);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if (count > 7) {
             break;
@@ -1247,6 +1247,7 @@ jint Java_android_hardware_uhf_magic_reader_GetChannel(JNIEnv *env, jclass jc) {
 }
 
 int32_t MagicSetChannel(uint8_t channel) {
+
     int32_t packetLen;
     uint8_t arybuf[5];
     int32_t result;
@@ -1262,18 +1263,18 @@ int32_t MagicSetChannel(uint8_t channel) {
 }
 
 jint Java_android_hardware_uhf_magic_reader_SetChannel(JNIEnv *env, jclass jc, jbyte channel) {
+
     jint result;
     int32_t watchDog = 0;
     int32_t count = 0;
     uint8_t Magicbuf[32];
 
-    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicSetChannel: %p, %p, %d",
-                        env, jc, channel);
+    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicSetChannel: %p, %p, %d", env, jc, channel);
 
     result = 17 - ((uint32_t)(MagicSetChannel((uint8_t)channel) - 8) <= 0);
 
     while (1) {
-        count += readSerial(&Magicbuf[count], 8);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if (count > 7) {
             break;
@@ -1292,6 +1293,7 @@ jint Java_android_hardware_uhf_magic_reader_SetChannel(JNIEnv *env, jclass jc, j
 }
 
 int32_t MagicSetFrequency(uint8_t region) {
+
     int32_t packetLen;
     uint8_t arybuf[5];
     int32_t result;
@@ -1307,18 +1309,18 @@ int32_t MagicSetFrequency(uint8_t region) {
 }
 
 jint Java_android_hardware_uhf_magic_reader_SetFrequency(JNIEnv *env, jclass jc, jbyte region) {
+
     jint result;
     int32_t watchDog = 0;
     int32_t count = 0;
     uint8_t Magicbuf[32];
 
-    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicSetFrequency: %p, %p, %d",
-                        env, jc, region);
+    __android_log_print(ANDROID_LOG_INFO, TAG, "MagicSetFrequency: %p, %p, %d", env, jc, region);
 
     result = 17 - ((uint32_t )(MagicSetFrequency((uint8_t)region) - 8) <= 0);
 
     while (1) {
-        count += readSerial(&Magicbuf[count], 8);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if (count > 7) {
             break;
@@ -1346,6 +1348,7 @@ jint Java_android_hardware_uhf_magic_reader_SetFrequency(JNIEnv *env, jclass jc,
  *
  */
 int32_t MagicSelect(int16_t nPL, uint8_t selPa, int32_t nPTR, uint8_t nMaskLen, uint8_t turncate, uint8_t *pMask) {
+
     int32_t pktlen;
     int32_t result;
     uint8_t arybuf[50];
@@ -1404,7 +1407,7 @@ jint Java_android_hardware_uhf_magic_reader_Select(JNIEnv *env, jclass jc,
     watchDog = 0;
     count = 0;
     while (1) {
-        count += readSerial(&Magicbuf[count], 8);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if ( count > 7 ) {
             break;
@@ -1428,6 +1431,7 @@ jint Java_android_hardware_uhf_magic_reader_Select(JNIEnv *env, jclass jc,
 }
 
 int32_t MagicSetSelect(int32_t nPL, uint8_t data) {
+
     int32_t size;
     uint8_t arybuf[5];
 
@@ -1440,13 +1444,16 @@ int32_t MagicSetSelect(int32_t nPL, uint8_t data) {
 }
 
 jint Java_android_hardware_uhf_magic_reader_SetSelect(JNIEnv *env, jclass jc, jbyte data) {
+
     uint8_t Magicbuf[32];
     int32_t watchDog = 0;
     int32_t count = 0;
 
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Select: %p, %p", env, jc);
+
     MagicSetSelect(1, (uint8_t)data);
     while (1) {
-        count += readSerial(&Magicbuf[count], 8);
+        count += readSerial(&Magicbuf[count], 1);
         ++watchDog;
         if (count > 7) {
             break;

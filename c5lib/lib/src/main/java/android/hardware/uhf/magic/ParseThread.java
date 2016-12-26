@@ -95,7 +95,7 @@ public class ParseThread extends Thread {
 		while (true) {
 
 			if (isInterrupted()) {
-				Log.d(TAG, "Tag data read interrupted.");
+				Log.d(TAG, "Tag data read interrupted. expect cmd = " + String.format("%x", expectCommand));
 				break;
 			}
 
@@ -140,8 +140,7 @@ public class ParseThread extends Thread {
 												// комманду снова
 												Message message = new Message();
 												message.what = reader.RESULT_READ_ERROR;
-												resendCommandHandler
-														.sendMessage(message);
+												resendCommandHandler.sendMessage(message);
 											} else {
 												tagOperationSuccess = true;
 												// стопорим поток чтения и
@@ -222,8 +221,8 @@ public class ParseThread extends Thread {
                                                         }
                                                         break;
 												}
-												resendCommandHandler
-														.sendMessage(message);
+
+												resendCommandHandler.sendMessage(message);
 											}
 
 											// сбрасываем всё
@@ -240,6 +239,7 @@ public class ParseThread extends Thread {
 											data[dataIndex] = buff[parseIndex];
 											dataIndex++;
 										}
+
 										parseIndex++;
 									}
 								} else {
@@ -284,9 +284,10 @@ public class ParseThread extends Thread {
 					buffIndex = 0;
 					parseIndex = 0;
 				}
-
 			}
 		}
+
+        Log.d(TAG, "exit readThread, expected cmd = " + String.format("%x", expectCommand));
 	}
 
 	public Handler getResendCommandHandler() {

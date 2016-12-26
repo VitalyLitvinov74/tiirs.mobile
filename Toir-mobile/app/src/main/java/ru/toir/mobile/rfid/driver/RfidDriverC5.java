@@ -3,6 +3,7 @@ package ru.toir.mobile.rfid.driver;
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.utils.DataUtils;
 import android.hardware.uhf.magic.reader;
 import android.os.Handler;
 import android.os.Message;
@@ -66,13 +67,11 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 				if (msg.what == reader.RESULT_SUCCESS) {
 					String data = (String) msg.obj;
 					Log.d(TAG, data);
-					sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj)
-							.sendToTarget();
+					sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj).sendToTarget();
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
 					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
-							.sendToTarget();
+					sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 				}
 				return true;
 			}
@@ -98,12 +97,8 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	 * Читаем произвольную метку.
 	 */
 	@Override
-	public void readTagData(String password, int memoryBank, int address,
-			int count) {
-		final String lPassword = password;
-		final int lMemoryBank = memoryBank;
-		final int lAddress = address;
-		final int lCount = count;
+	public void readTagData(final String password, final int memoryBank, final int address,
+							final int count) {
 
         reader.m_handler = new Handler(new Handler.Callback() {
 
@@ -120,30 +115,27 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 							if (msg.what == reader.RESULT_SUCCESS) {
 								String data = (String) msg.obj;
 								Log.d(TAG, data);
-								sHandler.obtainMessage(RESULT_RFID_SUCCESS,
-										msg.obj).sendToTarget();
+								sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj).sendToTarget();
 							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								sHandler.obtainMessage(RESULT_RFID_TIMEOUT)
-										.sendToTarget();
+								sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 							} else {
-								sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
-										.sendToTarget();
+								sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 							}
+
 							return true;
 						}
 					});
 
 					// читаем данные из памяти метки
-					reader.readTagData(lPassword, pcepc, lMemoryBank, lAddress,
-							lCount, timeOut);
+					reader.readTagData(password, pcepc, memoryBank, address, count, timeOut);
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
 					Log.d("TAG", "вышел таймаут.");
 					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
 				} else {
 					Log.d("TAG", "что-то пошло не так.");
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
-							.sendToTarget();
+					sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
 				}
+
 				return true;
 			}
 		});
@@ -157,31 +149,67 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	 * Читаем метку с известным Id
 	 */
 	@Override
-	public void readTagData(String password, String tagId, int memoryBank,
-			int address, int count) {
+	public void readTagData(final String password, String tagId, final int memoryBank,
+                            final int address, final int count) {
 
-        reader.m_handler = new Handler(new Handler.Callback() {
+        Handler findTagIdHandler = new Handler(new Handler.Callback() {
 
-			@Override
-			public boolean handleMessage(Message msg) {
-				if (msg.what == reader.RESULT_SUCCESS) {
-					// данные успешно прочитаны
-					sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj)
-							.sendToTarget();
+            @Override
+            public boolean handleMessage(Message msg) {
+
+                if (msg.what == reader.RESULT_SUCCESS) {
+                    String data = (String) msg.obj;
+                    Log.d(TAG, "tagId within readTagData - " + data);
+
+                    if (reader.SetSelect(reader.SELECT_DISABLE) == 0) {
+                        Log.d(TAG, "маска как бы сборошена после чтения tagId!!!");
+                    }
+
+					reader.m_handler = new Handler(new Handler.Callback() {
+
+						@Override
+						public boolean handleMessage(Message msg) {
+							if (msg.what == reader.RESULT_SUCCESS) {
+								Log.d("TAG", "данные успешно прочитаны.");
+								sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj).sendToTarget();
+							} else if (msg.what == reader.RESULT_TIMEOUT) {
+								Log.d("TAG", "вышел таймаут.");
+								sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+							} else {
+								Log.d("TAG", "что-то пошло не так.");
+								sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+							}
+
+							return true;
+						}
+					});
+
+                    // запускаем чтение данных из метки
+                    reader.readTagData(password, data, memoryBank, address, count, timeOut);
+
 				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					Log.d("TAG", "вышел таймаут.");
-					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-				} else {
-					Log.d("TAG", "что-то пошло не так.");
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
-							.sendToTarget();
-				}
-				return true;
-			}
-		});
+                    sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                }
 
-		// запускаем чтение данных из метки
-		reader.readTagData(password, tagId, memoryBank, address, count, timeOut);
+                reader.SetSelect(reader.SELECT_DISABLE);
+                return true;
+            }
+        });
+
+        // устанавливаем "фильтр" по tagId для поиска метки
+        boolean result;
+        result = reader.select((byte)0x01, 0x20, (byte)(tagId.length() / 2 * 8), (byte)0x00, DataUtils.hexStringTobyte(tagId));
+        if (result) {
+            // обработчик сообщений на команду поиска определённой метки
+            reader.m_handler = findTagIdHandler;
+            // запускаем поиск метки
+            reader.readTagId(timeOut);
+        } else {
+            Log.d(TAG, "не смогли установить маску для фильтра по tagId");
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+        }
 	}
 
 	@Override

@@ -41,21 +41,17 @@ int32_t MagicGetParameter();
 
 int32_t MagicInventory();
 
-int32_t MagicWriteTagMemory(int32_t pwdLen, uint8_t *pwd, int32_t pcepcLen,
-                            uint8_t *pcepc, uint8_t membank, int32_t offset,
-                            int32_t dataLen,
-                            uint8_t *data);
+int32_t MagicWriteTagMemory(int32_t pwdLen, uint8_t *pwd, int32_t pcepcLen, uint8_t *pcepc,
+                            uint8_t membank, int32_t offset, int32_t dataLen, uint8_t *data);
 
-int32_t MagicReadTagMemory(int32_t pwdLen, uint8_t *pwd, uint32_t pcepcLen,
-                           uint8_t *pcepc, uint8_t membank, int32_t offset,
-                           int32_t dataLen);
+int32_t MagicReadTagMemory(int32_t pwdLen, uint8_t *pwd, uint32_t pcepcLen, uint8_t *pcepc,
+                           uint8_t membank, int32_t offset, int32_t dataLen);
 
 int32_t MagicSetTransmissionPower(int32_t nPower);
 
 int32_t MagicGetTransmissionPower();
 
-int32_t MagicLock(uint32_t nPL, uint8_t *aPassword, uint32_t nUL, uint8_t *EPC,
-                  uint32_t nLD);
+int32_t MagicLock(uint32_t nPL, uint8_t *aPassword, uint32_t nUL, uint8_t *EPC, uint32_t nLD);
 
 int32_t MagicKill(uint32_t nPL, uint8_t *KPassword, uint32_t nUL, uint8_t *EPC);
 
@@ -65,59 +61,46 @@ int32_t MagicSetChannel(uint8_t channel);
 
 int32_t MagicSetFrequency(uint8_t region);
 
-int32_t MagicSelect(int16_t nPL, uint8_t selPa, int32_t nPTR, uint8_t nMaskLen, uint8_t turncate, uint8_t *pMask);
+int32_t MagicSelect(int16_t nPL, uint8_t selPa, int32_t nPTR, uint8_t nMaskLen, uint8_t turncate,
+                    uint8_t *pMask);
 
 int32_t MagicSetSelect(int32_t nPL, uint8_t data);
 
+int8_t *makeHexString(void *buffer, int32_t start, int32_t count);
 
-jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc,
-                                                 jstring jPath);
 
-jint Java_android_hardware_uhf_magic_reader_Open(JNIEnv *env, jclass jc,
-                                                 jstring devicePath);
+jint Java_android_hardware_uhf_magic_reader_Init(JNIEnv *env, jclass jc, jstring jPath);
+
+jint Java_android_hardware_uhf_magic_reader_Open(JNIEnv *env, jclass jc, jstring devicePath);
 
 void Java_android_hardware_uhf_magic_reader_Close(JNIEnv *env, jclass jc);
 
 void Java_android_hardware_uhf_magic_reader_Clean(JNIEnv *env, jclass jc);
 
-jint Java_android_hardware_uhf_magic_reader_Read(JNIEnv *env, jclass jc,
-                                                 jbyteArray buffer, jint start,
-                                                 jint count);
+jint Java_android_hardware_uhf_magic_reader_Read(JNIEnv *env, jclass jc, jbyteArray buffer,
+                                                 jint start, jint count);
 
-jint Java_android_hardware_uhf_magic_reader_Write(JNIEnv *env, jclass jc,
-                                                  jbyteArray jpout, jint nStart,
-                                                  jint nwrite);
+jint Java_android_hardware_uhf_magic_reader_Write(JNIEnv *env, jclass jc, jbyteArray jpout,
+                                                  jint nStart, jint nwrite);
 
-jint Java_android_hardware_uhf_magic_reader_WriteTag(JNIEnv *env, jclass jc,
-                                                     jbyteArray jAPassword,
-                                                     jint nUL,
-                                                     jbyteArray jPCEPC,
-                                                     jbyte membank,
-                                                     jint nSA, jint nDL,
-                                                     jbyteArray jDT);
+jint Java_android_hardware_uhf_magic_reader_WriteTag(JNIEnv *env, jclass jc, jbyteArray jAPassword,
+                                                     jint nUL, jbyteArray jPCEPC, jbyte membank,
+                                                     jint nSA, jint nDL, jbyteArray jDT);
 
-jint Java_android_hardware_uhf_magic_reader_ReadTag(JNIEnv *env, jclass jc,
-                                                    jbyteArray jAPassword,
-                                                    jint nUL, jbyteArray jEPC,
-                                                    jbyte membank,
+jint Java_android_hardware_uhf_magic_reader_ReadTag(JNIEnv *env, jclass jc, jbyteArray jAPassword,
+                                                    jint nUL, jbyteArray jEPC, jbyte membank,
                                                     jint nSA, jint nDL);
 
 jint Java_android_hardware_uhf_magic_reader_Inventory(JNIEnv *env, jclass jc);
 
-jint Java_android_hardware_uhf_magic_reader_SetTransmissionPower(JNIEnv *env,
-                                                                 jclass jc,
-                                                                 jint nPower);
+jint Java_android_hardware_uhf_magic_reader_SetTransmissionPower(JNIEnv *env, jclass jc, jint nPower);
 
-jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env,
-                                                                 jclass jc);
+jint Java_android_hardware_uhf_magic_reader_GetTransmissionPower(JNIEnv *env, jclass jc);
 
-jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc,
-                                                 jbyteArray jAPassword,
-                                                 jint nUL, jbyteArray jEPC,
-                                                 jint nLD);
+jint Java_android_hardware_uhf_magic_reader_Lock(JNIEnv *env, jclass jc, jbyteArray jAPassword,
+                                                 jint nUL, jbyteArray jEPC, jint nLD);
 
-jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc,
-                                                 jbyteArray jKPassword,
+jint Java_android_hardware_uhf_magic_reader_Kill(JNIEnv *env, jclass jc, jbyteArray jKPassword,
                                                  jint nUL, jbyteArray jEPC);
 
 jint Java_android_hardware_uhf_magic_reader_GetChannel(JNIEnv *env, jclass jc);
@@ -126,9 +109,8 @@ jint Java_android_hardware_uhf_magic_reader_SetChannel(JNIEnv *env, jclass jc, j
 
 jint Java_android_hardware_uhf_magic_reader_SetFrequency(JNIEnv *env, jclass jc, jbyte region);
 
-jint Java_android_hardware_uhf_magic_reader_Select(JNIEnv *env, jclass jc,
-                                                   jbyte selPa, jint nPTR, jbyte nMaskLen,
-                                                   jbyte turncate, jbyteArray jpMask);
+jint Java_android_hardware_uhf_magic_reader_Select(JNIEnv *env, jclass jc, jbyte selPa, jint nPTR,
+                                                   jbyte nMaskLen, jbyte turncate, jbyteArray jpMask);
 
 jint Java_android_hardware_uhf_magic_reader_SetSelect(JNIEnv *env, jclass jc, jbyte data);
 
