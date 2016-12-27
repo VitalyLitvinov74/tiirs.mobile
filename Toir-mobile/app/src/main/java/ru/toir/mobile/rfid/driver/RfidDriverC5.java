@@ -157,13 +157,15 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
             @Override
             public boolean handleMessage(Message msg) {
 
-                if (msg.what == reader.RESULT_SUCCESS) {
+				if (reader.SetSelect(reader.SELECT_DISABLE) == 0) {
+					Log.d(TAG, "Маска сборошена.");
+				} else {
+                    Log.e(TAG, "Маска не сборошена!!!");
+                }
+
+				if (msg.what == reader.RESULT_SUCCESS) {
                     String data = (String) msg.obj;
                     Log.d(TAG, "tagId within readTagData - " + data);
-
-                    if (reader.SetSelect(reader.SELECT_DISABLE) == 0) {
-                        Log.d(TAG, "маска как бы сборошена после чтения tagId!!!");
-                    }
 
 					reader.m_handler = new Handler(new Handler.Callback() {
 
@@ -193,7 +195,6 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
                     sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                 }
 
-                reader.SetSelect(reader.SELECT_DISABLE);
                 return true;
             }
         });

@@ -300,11 +300,9 @@ int8_t *makeHexString(void *buffer, int32_t start, int32_t count) {
 
 bool readerIsInited() {
 
-    int32_t readCount = 0;
-    size_t bufferLen = 11;
-    uint8_t *inBuffer;
-
-    inBuffer = calloc(bufferLen, 1);
+    uint8_t Magicbuf[32] = {0};
+    int32_t count = 0;
+    int32_t watchDog = 0;
 
     // не ясно какие параметры мы получим,
     // но сам факт их наличия говорит о том, что считыватель инициализирован
@@ -312,26 +310,23 @@ bool readerIsInited() {
 
     // пытаемся получить ответ от считывателя
     // вообще ответ целиком занимает 11 байт в частном случае
-    for (int32_t index = 0; index < bufferLen; index++) {
-        readCount += readSerial(&inBuffer[index], 1);
-    }
 
-    int8_t *resultHexStr = makeHexString(inBuffer, 0, (int32_t)bufferLen);
-    __android_log_print(ANDROID_LOG_INFO, TAG,
-                        "На запрос параметров прочитали %d байт.", readCount);
-    __android_log_print(ANDROID_LOG_INFO, TAG,
-                        "На запрос параметров получили ответ: %s",
-                        (char *) resultHexStr);
+    while (1) {
+        count += readSerial(&Magicbuf[count], 1);
+        ++watchDog;
+        if (count > 10) {
+            // предположительно считыватель ответил как надо, всё путём
+            __android_log_print(ANDROID_LOG_INFO, TAG, "На запрос параметров получили ответ: %s",
+                                (char *)makeHexString(Magicbuf, 0, count));
+            __android_log_print(ANDROID_LOG_INFO, TAG, "Cчитыватель инициализирован.");
+            return true;
+        }
 
-    if (readCount >= 4) {
-        // предположительно считыватель ответил как надо, всё путём
-        __android_log_print(ANDROID_LOG_INFO, TAG,
-                            "Cчитыватель инициализирован.");
-        return true;
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, TAG,
-                            "Cчитыватель не инициализирован.");
-        return false;
+        // если не было прочитано 11 символов, 20 раз подряд, возвращаем ошибку
+        if (watchDog > 19) {
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "Cчитыватель не инициализирован.");
+            return false;
+        }
     }
 }
 
