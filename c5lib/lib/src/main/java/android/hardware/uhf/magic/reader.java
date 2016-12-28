@@ -214,6 +214,26 @@ public class reader {
 
     }
 
+// ------------------------------
+static public UHFCommandResult readTagIdNew(int timeOut) {
+
+    ParseTask parseTask = new ParseTask();
+    UHFCommand command = new UHFCommand(UHFCommand.Command.READ_TAG_ID);
+    parseTask.execute(command);
+    // отправляем команду чтения Id метки
+    Inventory();
+    UHFCommandResult result = null;
+    try {
+        result = parseTask.get();
+        Log.d(TAG, "Результат: " + result.data);
+    } catch (Exception e) {
+        Log.e(TAG, e.getLocalizedMessage());
+    }
+
+    return result;
+}
+// ------------------------------
+
     /**
      * Запуск процесса чтения Id доступных меток. Новый вариант, с правильным
      * разбором данных поступающих из считывателя.
@@ -265,7 +285,6 @@ public class reader {
 
         // отправляем команду чтения Id метки
         Inventory();
-
     }
 
     /**
