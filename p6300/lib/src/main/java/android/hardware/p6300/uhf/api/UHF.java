@@ -8,6 +8,7 @@
  */
 package android.hardware.p6300.uhf.api;
 
+import android.hardware.p6300.BuildConfig;
 import android.util.Log;
 import android.hardware.p6300.jni.Linuxc;
 
@@ -19,6 +20,8 @@ public class UHF {
     public int returnminlen;
     public ReceiveThread mReceiveThread;
     public Object mObject;
+
+    char[] cmd = new char[128];
 
     public UHF() {
     }
@@ -48,11 +51,14 @@ public class UHF {
     public void transfer_send(int fd, char[] data, int len) {
         char[] cmd = new char[len];
         System.arraycopy(data, 0, cmd, 0, len);
-        int i = 0;
-        while (i < cmd[2] + 6) {
-            Log.e("", (UHF.change(Integer.toHexString(cmd[i])) + " "));
-            ++i;
+        if (BuildConfig.DEBUG) {
+            int i = 0;
+            while (i < cmd[2] + 6) {
+                Log.e("", (UHF.change(Integer.toHexString(cmd[i])) + " "));
+                ++i;
+            }
         }
+
         String strcmd = String.valueOf(cmd);
         Linuxc.sendMsgUartHex(fd, strcmd, strcmd.length());
     }
@@ -65,11 +71,12 @@ public class UHF {
         this.mObject = param;
         CommandType.LastCommand = command_type;
         CommandType.CommandOK = false;
-        char[] cmd = new char[128];
+        CommandType.CommandResend = false;
+
         cmd[0] = 187;
         cmd[1] = command_type;
         switch (command_type) {
-            case '\u0000': {
+            case CommandType.SET_POWER: {
                 cmd[2] = 3;
                 cmd[3] = (char)((Power)param).loop;
                 cmd[4] = (char)((Power)param).read;
@@ -80,7 +87,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u0002': {
+            case CommandType.SET_OUTPUT_FREQUENCY: {
                 cmd[2] = (char)(((Output_frequency)param).frequency_num * 3 + 1);
                 cmd[3] = (char)((Output_frequency)param).frequency_num;
                 int index = 0;
@@ -97,7 +104,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u0007': {
+            case CommandType.SET_GEN2_PARAM: {
                 cmd[2] = 4;
                 cmd[3] = (char)((Gen2)param).Q;
                 cmd[4] = (char)(((Gen2)param).startQ << 4 | ((Gen2)param).MinQ);
@@ -109,7 +116,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\t': {
+            case CommandType.SET_WORK_ANTANNE: {
                 cmd[2] = 2;
                 cmd[3] = (char)((Frequency_region)param).save_setting;
                 cmd[4] = (char)((Frequency_region)param).region;
@@ -119,17 +126,17 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\n': 
-            case '\u000b': 
-            case '\f': 
-            case '\r': 
-            case '\u0011': 
-            case '\u0012': 
-            case '\u0014': 
-            case '\u0016': 
-            case '\u0018': 
-            case '\u001e': 
-            case '\"': {
+            case CommandType.GET_HARDWARE_VERSION:
+            case CommandType.GET_FIRMWARE_VERSION:
+            case CommandType.GET_ANTENNA_CARRIER:
+            case CommandType.GET_FREQUENCY_STATE:
+            case CommandType.GET_FREQUENCY_REGION:
+            case CommandType.GET_MODULE_TEMPERATURE:
+            case CommandType.GET_GEN2_PARAM:
+            case CommandType.SINGLE_QUERY_TAGS_EPC:
+            case CommandType.STOP_MULTI_QUERY_TAGS_EPC:
+            case CommandType.GET_MULTI_QUERY_TAGS_INTERVAL:
+            case CommandType.GET_FASTID: {
                 cmd[2] = '\u0000';
                 this.CheckSum(1, cmd, cmd[2] + 2);
                 cmd[4] = 13;
@@ -137,7 +144,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u001d': {
+            case CommandType.SET_MULTI_QUERY_TAGS_INTERVAL: {
                 ((Multi_interval)param).work_time_msb = (((Multi_interval)param).work_time & 65280) >> 8;
                 ((Multi_interval)param).work_time_lsb = ((Multi_interval)param).work_time & 255;
                 ((Multi_interval)param).interval_msb = (((Multi_interval)param).interval & 65280) >> 8;
@@ -153,7 +160,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '!': {
+            case CommandType.SET_FASTID: {
                 cmd[2] = '\u0001';
                 cmd[3] = (char)((Fastid)param).fastid_switch;
                 this.CheckSum(1, cmd, cmd[2] + 2);
@@ -162,7 +169,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '#': {
+            case CommandType.SET_MODULE_BAUD_RATE: {
                 cmd[2] = '\u0001';
                 cmd[3] = (char)((Baud_rate)param).rate_type;
                 this.CheckSum(1, cmd, cmd[2] + 2);
@@ -171,7 +178,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u0019': {
+            case CommandType.READ_TAGS_DATA: {
                 ((Tags_data)param).filterData_len_msb = (((Tags_data)param).filterData_len & 65280) >> 8;
                 ((Tags_data)param).filterData_len_lsb = ((Tags_data)param).filterData_len & 255;
                 ((Tags_data)param).start_addr_msb = (((Tags_data)param).start_addr & 65280) >> 8;
@@ -204,7 +211,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u001a': {
+            case CommandType.WRITE_TAGS_DATA: {
                 ((Tags_data)param).filterData_len_msb = (((Tags_data)param).filterData_len & 65280) >> 8;
                 ((Tags_data)param).filterData_len_lsb = ((Tags_data)param).filterData_len & 255;
                 ((Tags_data)param).start_addr_msb = (((Tags_data)param).start_addr & 65280) >> 8;
@@ -242,7 +249,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u001b': {
+            case CommandType.LOCK_TAGS: {
                 ((Lock)param).lData_a = new char[3];
                 ((Lock)param).lData_a[0] = (char)(((Lock)param).lData_Mask >> 6 & 15);
                 ((Lock)param).lData_a[1] = (char)(((((Lock)param).lData_Mask & 63) << 2) + (((Lock)param).lData_Action >> 8) & 3);
@@ -273,7 +280,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u001c': {
+            case CommandType.KILL_TAGS: {
                 ((Kill)param).filterData_len_msb = (((Kill)param).filterData_len & 65280) >> 8;
                 ((Kill)param).filterData_len_lsb = ((Kill)param).filterData_len & 255;
                 cmd[2] = (char)(7 + ((Kill)param).filterData_len);
@@ -297,7 +304,7 @@ public class UHF {
                 this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
                 break;
             }
-            case '\u0017': {
+            case CommandType.MULTI_QUERY_TAGS_EPC: {
                 ((Multi_query_epc)param).query_total_msb = (((Multi_query_epc)param).query_total & 65280) >> 8;
                 ((Multi_query_epc)param).query_total_lsb = ((Multi_query_epc)param).query_total & 255;
                 cmd[2] = 2;
@@ -327,13 +334,19 @@ public class UHF {
             catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             if (CommandType.CommandOK) {
-                CommandType.LastCommand = 254;
+                CommandType.LastCommand = CommandType.CMD_NULL;
                 return true;
+            } else if (CommandType.CommandResend) {
+                CommandType.CommandResend = false;
+                this.transfer_send(this.com_fd, cmd, cmd[2] + 6);
             }
+
             ++i;
         }
-        CommandType.LastCommand = 254;
+
+        CommandType.LastCommand = CommandType.CMD_NULL;
         return false;
     }
 

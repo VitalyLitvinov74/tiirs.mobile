@@ -41,6 +41,9 @@ public class reader {
 
     private static ParseThread readThread;
 
+    public static final byte SELECT_ENABLE = 0;
+    public static final byte SELECT_DISABLE = 1;
+
     static {
         System.loadLibrary("uhf-tools");
     }
@@ -83,6 +86,7 @@ public class reader {
                     // отправляем повторно команду деактивации
                     Kill(fPassword, fPcEpc.length, fPcEpc);
                 }
+
                 return true;
             }
         });
@@ -136,6 +140,7 @@ public class reader {
                     // отправляем повторно команду блокировки
                     Lock(fPassword, fPcEpc.length, fPcEpc, fMask);
                 }
+
                 return true;
             }
         });
@@ -160,9 +165,8 @@ public class reader {
      * @param data       данные для записи
      * @param timeOut    время на выполнение операции
      */
-    static public void writeTagData(String password, String PCEPC,
-                                    int memoryBank, int offset, String data,
-                                    int timeOut) {
+    static public void writeTagData(String password, String PCEPC, int memoryBank, int offset,
+                                    String data, int timeOut) {
 
         final byte[] fPassword = string2Bytes(password);
         final byte[] fPcEpc = string2Bytes(PCEPC);
@@ -196,18 +200,17 @@ public class reader {
                     WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank,
                             fOffset, fData.length, fData);
                 }
+
                 return true;
             }
         });
 
-        readThread = new ParseThread(ParseThread.WRITE_TAG_DATA_COMMAND,
-                timeOut);
+        readThread = new ParseThread(ParseThread.WRITE_TAG_DATA_COMMAND, timeOut);
         readThread.setResendCommandHandler(handler);
         readThread.start();
 
         // отправляем команду записи
-        WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset,
-                fData.length, fData);
+        WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fData.length, fData);
 
     }
 
@@ -234,17 +237,24 @@ public class reader {
                     if (m_handler != null) {
                         m_handler.sendMessage(message);
                     }
+
+                    reader.readThread.interrupt();
+                    reader.readThread = null;
                 } else if (msg.what == RESULT_TIMEOUT) {
                     Message message = new Message();
                     message.what = RESULT_TIMEOUT;
                     if (m_handler != null) {
                         m_handler.sendMessage(message);
                     }
+
+                    reader.readThread.interrupt();
+                    reader.readThread = null;
                 } else {
                     // чтение не удалось, отправляем повторно команду
                     // чтения Id
                     Inventory();
                 }
+
                 return true;
             }
         });
@@ -259,6 +269,14 @@ public class reader {
     }
 
     /**
+     * Установка параметров команды Select
+     *
+     */
+    static public boolean select(byte selPa, int nPTR, byte nMaskLen, byte turncate, byte[] jpMask) {
+        return Select(selPa, nPTR, nMaskLen, turncate, jpMask) == 0;
+    }
+
+    /**
      * Запуск процесса чтения области памяти метки. Новый вариант, с правильным
      * разбором данных поступающих из считывателя.
      *
@@ -269,9 +287,8 @@ public class reader {
      * @param count      количество данных для чтения
      * @param timeOut    время на выполнение операции
      */
-    static public void readTagData(String password, String PCEPC,
-                                   int memoryBank, int offset, int count, int
-                                           timeOut) {
+    static public void readTagData(String password, String PCEPC, int memoryBank, int offset,
+                                   int count, int timeOut) {
 
         final byte[] fPassword = string2Bytes(password);
         final byte[] fPcEpc = string2Bytes(PCEPC);
@@ -300,17 +317,26 @@ public class reader {
                         m_handler.sendMessage(message);
                     }
                 } else {
-                    // чтение данных не удалось, отправляем повторно команду
-                    // чтения данных
-                    ReadTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank,
-                            fOffset, fCount);
+                    // чтение данных не удалось, отправляем повторно команду чтения данных
+                    ReadTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fCount);
                 }
+
                 return true;
             }
         });
 
-        readThread = new ParseThread(ParseThread.READ_TAG_DATA_COMMAND,
-                timeOut);
+        if (readThread != null) {
+            readThread.interrupt();
+            try {
+                readThread.join();
+            } catch (Exception e) {
+                Log.d(TAG, e.getLocalizedMessage());
+            } finally {
+                readThread = null;
+            }
+        }
+
+        readThread = new ParseThread(ParseThread.READ_TAG_DATA_COMMAND, timeOut);
         readThread.setResendCommandHandler(handler);
         readThread.start();
 
@@ -383,6 +409,7 @@ public class reader {
         if (hexString == null || hexString.equals("")) {
             return null;
         }
+
         hexString = hexString.toUpperCase(Locale.ENGLISH);
         int length = hexString.length() / 2;
         char[] hexChars = hexString.toCharArray();
@@ -441,11 +468,11 @@ public class reader {
             if (temp < 0) {
                 temp += 256;
             }
+
             t2 = t2 + temp;
-
         }
-        return t2;
 
+        return t2;
     }
 
     /**
@@ -465,11 +492,11 @@ public class reader {
             if (temp < 0) {
                 temp += 256;
             }
+
             t2 = t2 + temp;
-
         }
-        return t2;
 
+        return t2;
     }
 
     /**
@@ -480,7 +507,6 @@ public class reader {
      * @return -
      */
     public static byte[] intToByte(int content, int offset) {
-
         byte result[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (int j = offset; j < result.length; j += 4) {
             result[j + 3] = (byte) (content & 0xff);
@@ -488,6 +514,7 @@ public class reader {
             result[j + 1] = (byte) ((content >> 16) & 0xff);
             result[j] = (byte) ((content >> 24) & 0xff);
         }
+
         return result;
     }
 
@@ -504,6 +531,7 @@ public class reader {
             String bStr = string.substring(2 * i, 2 * (i + 1));
             data[i] = (byte) Integer.parseInt(bStr, 16);
         }
+
         return data;
     }
 
@@ -605,11 +633,10 @@ public class reader {
      *            Mask length
      * @param turncate
      *            (0x00 is Disable truncation, 0x80 is Enable truncation)
-     * @param mask
+     * @param mask mask
      * @return return 0x00, error is returned not 0
      */
-    // static public native int Select(byte selPa, int nPTR, byte nMaskLen, byte
-    // turncate, byte[] mask);
+     static public native int Select(byte selPa, int nPTR, byte nMaskLen, byte turncate, byte[] mask);
 
     /**
      * set to send Select commands
@@ -620,7 +647,7 @@ public class reader {
      *
      * @return return 0x00, error is returned not 0
      */
-    // static public native int SetSelect(byte data);
+     static public native int SetSelect(byte data);
 
     /**
      * read tag data storage area
@@ -662,8 +689,7 @@ public class reader {
      * @return -
      */
 
-    static public native int Lock(byte[] password, int PCEPCLength, byte[]
-            PCEPC, int mask);
+    static public native int Lock(byte[] password, int PCEPCLength, byte[] PCEPC, int mask);
 
     /**
      * the inactivation of Kill Tags
@@ -673,8 +699,7 @@ public class reader {
      * @param PCEPC       PC+EPC content
      * @return -
      */
-    static public native int Kill(byte[] password, int PCEPCLength, byte[]
-            PCEPC);
+    static public native int Kill(byte[] password, int PCEPCLength, byte[] PCEPC);
 
     /**
      * To obtain the parameters
@@ -707,7 +732,7 @@ public class reader {
      * @param region
      *            Region Parameter 01 900MHz 04 800MHz 02 China Chinese American
      *            03 Europe 06 of South Korea
-     * @return
+     * @return int integer
      */
      static public native int SetFrequency(byte region);
 
@@ -729,7 +754,7 @@ public class reader {
      *
      *            formula of Korea channel parameters, Freq_CH channel
      *            frequency: CH_Index = (Freq_CH-917.1M) /0.2M
-     * @return
+     * @return int integer
      */
      static public native int SetChannel(byte channel);
 

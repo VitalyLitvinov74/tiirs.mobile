@@ -12,6 +12,7 @@
  */
 package android.hardware.p6300.uhf.api;
 
+import android.hardware.p6300.BuildConfig;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -44,8 +45,23 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
         block16 : while (isFlag) {
             str_receive = Linuxc.receiveMsgUartHex(mUHF.com_fd);
-            if (str_receive == null || (len = str_receive.length()) == 0) continue;
+            if (str_receive == null || (len = str_receive.length()) == 0) {
+                continue;
+            }
+
             recvBuff = str_receive.toCharArray();
+
+            if (BuildConfig.DEBUG) {
+                StringBuilder sb = new StringBuilder();
+                String tmpStr;
+                for (char c : recvBuff) {
+                    tmpStr = Integer.toHexString(c);
+                    sb.append(tmpStr.length() == 1 ? "0" + tmpStr : tmpStr);
+                }
+
+                Log.d("UHF", "Считано: " + sb.toString());
+            }
+
             System.arraycopy(recvBuff, 0, data, datalen, len);
             datalen += len;
             block17 : while (datalen >= 6) {
@@ -103,6 +119,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                     case CommandType.SET_MODULE_BAUD_RATE: {
                         if (data[mark_head + 3] == 0x01) {
                             CommandType.CommandOK = true;
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -218,6 +237,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                                 ++i;
                             }
                             ((Tags_data)mUHF.mObject).ant_id = data[mark_head + 6 + reveive_len];
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -246,7 +268,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                     }
                     case CommandType.SINGLE_QUERY_TAGS_EPC: {
                         if (data[mark_head + 1] == 0xFF) {
+                            Log.e("UHF", "Reseive COMMAND_ERROR_RESPOND");
                             CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                             datalen = 0;
                             Arrays.fill(data, (char)0);
                             continue block17;
@@ -271,6 +295,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         ((Query_epc)mUHF.mObject).rssi_msb = data[mark_head + 5 + mTemp.epc_len + 1];
                         ((Query_epc)mUHF.mObject).ant_id = data[mark_head + 5 + mTemp.epc_len + 2];
                         CommandType.CommandOK = true;
+                        CommandType.CommandResend = false;
                         datalen = 0;
                         Arrays.fill(data, (char)0);
                         continue block17;

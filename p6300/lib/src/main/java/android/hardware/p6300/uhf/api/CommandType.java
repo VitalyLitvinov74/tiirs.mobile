@@ -47,5 +47,6 @@ public class CommandType {
     public static final char CMD_NULL = 0xFE;
     public static char LastCommand = 0xFE;
     public static Boolean CommandOK = false;
-    public static long TimeOut = 600;
+    public static Boolean CommandResend = false;
+    public static long TimeOut = 5000;
 }

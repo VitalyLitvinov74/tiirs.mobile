@@ -231,23 +231,26 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                                 if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                                     String tagData = (String) msg.obj;
                                     Log.d(TAG, tagData);
-                                    Toast.makeText(getApplicationContext(),
-                                            "Считывание метки успешно.\r\n" + tagData,
-                                            Toast.LENGTH_SHORT).show();
-                                    TagStructure tag = new TagStructure();
-                                    tag.parse(DataUtils.hexStringToByteArray(tagData));
-                                    Log.d(TAG, "uuid = " + tag.uuid);
-                                    Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
-                                    Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
-                                    Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
-                                    Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
-                                    Log.d(TAG, "phone = " + tag.phone);
+                                    if (tagData.length() / 2 == 64) {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Считывание метки успешно.\r\n" + tagData,
+                                                Toast.LENGTH_SHORT).show();
+                                        TagStructure tag = new TagStructure();
+                                        tag.parse(DataUtils.hexStringToByteArray(tagData));
+                                        Log.d(TAG, "uuid = " + tag.uuid);
+                                        Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
+                                        Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
+                                        Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
+                                        Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
+                                        Log.d(TAG, "phone = " + tag.phone);
+                                    }
                                 } else {
                                     Log.d(TAG, "Ошибка чтения метки!");
                                     Toast.makeText(getApplicationContext(),
                                             "Ошибка чтения метки.", Toast.LENGTH_SHORT)
                                             .show();
                                 }
+
 
                                 // закрываем диалог
                                 rfidDialog.dismiss();
@@ -263,12 +266,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
                         // читаем метку с id привязанным к оборудованию
-                        // rfidDialog.readTagData("0000000000", equipment.getTag_id(),
-                        // RfidDriverBase.MEMORY_BANK_USER, 0, 8);
+                         rfidDialog.readTagData("00000000", equipment.getTagId(),
+                                 RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
                         // читаем "произовольную" метку, ту которую найдём первой
-                        rfidDialog.readTagData("0000000000", equipment.getTagId(),
-                                RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+//                        rfidDialog.readTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
                         rfidDialog.show(getFragmentManager(), TAG);
                     }
@@ -325,15 +327,19 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         byte[] byteData = tag.getBinary();
                         data = DataUtils.toHexString(byteData);
                         // пишем в метку с id привязанным к оборудованию
-                        // rfidDialog.writeTagData("0000000000", equipment.getTag_id(),
+                        // rfidDialog.writeTagData("00000000", equipment.getTag_id(),
                         // RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
                         // пишем в "известную" метку
-                        // rfidDialog.writeTagData("0000000000",
+                        // rfidDialog.writeTagData("00000000",
                         // "3000E2004000860902332580112D",
                         // RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
                         // пишем в "произовольную" метку, ту которую найдём первой
-                        rfidDialog.writeTagData("0000000000", equipment.getTagId(),
+//                        rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+                        // пишем в "известную" метку
+                        rfidDialog.writeTagData("00000000", equipment.getTagId(),
                                 RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
                         rfidDialog.show(getFragmentManager(), TAG);

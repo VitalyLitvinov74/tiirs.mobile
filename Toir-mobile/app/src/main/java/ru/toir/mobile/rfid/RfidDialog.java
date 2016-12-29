@@ -34,7 +34,6 @@ public class RfidDialog extends DialogFragment {
 	public static final int READER_COMMAND_WRITE_DATA_ID = 5;
 
 	public static final String TAG = "RfidDialog";
-	private String driverClassName;
 	private Class<?> driverClass;
 	private RfidDriverBase driver;
 
@@ -68,6 +67,8 @@ public class RfidDialog extends DialogFragment {
 			Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+
+		String driverClassName;
 
 		getDialog().setTitle("Считайте метку");
 
@@ -148,20 +149,16 @@ public class RfidDialog extends DialogFragment {
 			driver.readTagId();
 			break;
 		case READER_COMMAND_READ_DATA:
-			driver.readTagData(tagPassword, tagMemoryBank, tagAddress,
-					tagReadCount);
+			driver.readTagData(tagPassword, tagMemoryBank, tagAddress, tagReadCount);
 			break;
 		case READER_COMMAND_READ_DATA_ID:
-			driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress,
-					tagReadCount);
+			driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagReadCount);
 			break;
 		case READER_COMMAND_WRITE_DATA:
-			driver.writeTagData(tagPassword, tagMemoryBank, tagAddress,
-					tagWriteData);
+			driver.writeTagData(tagPassword, tagMemoryBank, tagAddress, tagWriteData);
 			break;
 		case READER_COMMAND_WRITE_DATA_ID:
-			driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress,
-					tagWriteData);
+			driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagWriteData);
 			break;
 		default:
 			driver.readTagId();
@@ -215,14 +212,13 @@ public class RfidDialog extends DialogFragment {
 	 * </p>
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
-	 * @param password
-	 * @param id
-	 * @param memoryBank
-	 * @param address
-	 * @param count
+	 * @param password      password
+	 * @param id            tagId
+	 * @param memoryBank	memoryBank
+	 * @param address	    address
+	 * @param count	        count
 	 */
-	public void readTagData(String password, String id, int memoryBank,
-			int address, int count) {
+	public void readTagData(String password, String id, int memoryBank, int address, int count) {
 
 		tagPassword = password;
 		tagId = id;
@@ -239,13 +235,12 @@ public class RfidDialog extends DialogFragment {
 	 * </p>
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
-	 * @param password
-	 * @param memoryBank
-	 * @param address
-	 * @param count
+	 * @param password	    password
+	 * @param memoryBank    memoryBank
+	 * @param address       address
+	 * @param count         count
 	 */
-	public void readTagData(String password, int memoryBank, int address,
-			int count) {
+	public void readTagData(String password, int memoryBank, int address, int count) {
 
 		tagPassword = password;
 		tagMemoryBank = memoryBank;
@@ -261,14 +256,13 @@ public class RfidDialog extends DialogFragment {
 	 * </p>
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
-	 * @param password
-	 * @param id
-	 * @param memoryBank
-	 * @param address
-	 * @param data
+	 * @param password      password
+	 * @param id            id
+	 * @param memoryBank    memoryBank
+	 * @param address       address
+	 * @param data          data
 	 */
-	public void writeTagData(String password, String id, int memoryBank,
-			int address, String data) {
+	public void writeTagData(String password, String id, int memoryBank, int address, String data) {
 
 		tagPassword = password;
 		tagId = id;
@@ -285,13 +279,12 @@ public class RfidDialog extends DialogFragment {
 	 * </p>
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
 	 * 
-	 * @param password
-	 * @param memoryBank
-	 * @param address
-	 * @param data
+	 * @param password      password
+	 * @param memoryBank    memoryBank
+	 * @param address       address
+	 * @param data          data
 	 */
-	public void writeTagData(String password, int memoryBank, int address,
-			String data) {
+	public void writeTagData(String password, int memoryBank, int address, String data) {
 
 		tagPassword = password;
 		tagMemoryBank = memoryBank;

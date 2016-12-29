@@ -1,6 +1,5 @@
 package ru.toir.mobile.fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -14,6 +13,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -79,6 +80,7 @@ import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class OrderFragment extends Fragment implements View.OnClickListener {
     private Tasks selectedTask;
@@ -301,7 +303,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private void fillListViewOrders(String orderStatus, String orderByField) {
         // !!!!!
         User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-        //User user = realmDB.where(User.class).findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!",
                     Toast.LENGTH_SHORT).show();
@@ -347,7 +348,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setText(order.getTitle());
         }
         submit.setVisibility(View.GONE);
-        //bottomBar.setVisibility(View.GONE);
     }
 
     // TaskStages----------------------------------------------------------------------------------------
@@ -682,9 +682,43 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);
                     if (selectedTask != null) {
-                        currentTaskUuid = selectedTask.getUuid();
-                        fillListViewTaskStage(selectedTask);
-                        Level = 2;
+                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+                        final String expectedTagId = selectedTask.getEquipment().getTagId();
+                        Log.d(TAG, "Ожидаемаея метка: " + expectedTagId);
+                        Handler handler = new Handler(new Handler.Callback() {
+                            @Override
+                            public boolean handleMessage(Message message) {
+                                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                                    String tagId = ((String) message.obj).substring(4);
+                                    Log.d(TAG, "Ид метки получили: " + tagId);
+                                    if (expectedTagId.equals(tagId)) {
+                                        currentTaskUuid = selectedTask.getUuid();
+                                        fillListViewTaskStage(selectedTask);
+                                        Level = 2;
+                                    } else {
+                                        Toast.makeText(getContext(),
+                                                "Не верное оборудование!", Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                } else {
+                                    Log.d(TAG, "Ошибка чтения метки!");
+                                    Toast.makeText(getContext(),
+                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                                            .show();
+
+                                }
+
+                                // закрываем диалог
+                                rfidDialog.dismiss();
+                                return true;
+                            }
+                        });
+
+                        rfidDialog = new RfidDialog();
+                        rfidDialog.setHandler(handler);
+                        rfidDialog.readTagId();
+                        rfidDialog.show(getActivity().getFragmentManager(), TAG);
+
                     }
                 }
 
@@ -700,7 +734,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         submit.setVisibility(View.VISIBLE);
                         Level = 3;
                         startOperations();
-                        //clearPhotoContainer();
                     }
                 }
                 return;
