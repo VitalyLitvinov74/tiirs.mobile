@@ -2,6 +2,9 @@ package android.hardware.uhf.magic;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 //import ru.toir.mobile.rfid.RfidDriverBase;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +16,9 @@ public class reader {
 
     // обработчик через который класс общается с внешним миром
     static public Handler m_handler = null;
+
+    // интервал времени в течении которого мы пытаемся получить ответ от считывателя, мс
+    private static final int READ_TIME_INTERVAL = 100;
 
     // маски доступа к областям памяти
     public static final int UNLOCK = 0;
@@ -154,6 +160,41 @@ public class reader {
 
     }
 
+// --------------------------
+static public UHFCommandResult writeTagDataNew(String password, String PCEPC, int memoryBank, int offset,
+                                String data, int timeOut) {
+
+    byte[] fPassword = string2Bytes(password);
+    byte[] fPcEpc = string2Bytes(PCEPC);
+    byte fMemoryBank = (byte) memoryBank;
+    int fOffset = offset / 2;
+    byte[] fData = string2Bytes(data);
+
+    ParseTask parseTask = new ParseTask();
+    UHFCommand command = new UHFCommand(UHFCommand.Command.WRITE_TAG_DATA);
+    UHFCommandResult result = null;
+
+    // запускаем поток разбора ответа от считывателя
+    parseTask.execute(command);
+    for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
+        // отправляем команду записи
+        WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fData.length, fData);
+        try {
+            result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+            if (result != null) {
+                Log.d(TAG, "Результат: " + result.data);
+                break;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    parseTask.cancel(true);
+
+    return result;
+}
+// --------------------------
     /**
      * Запуск процесса записи данных в метку. Новый вариант, с правильным
      * разбором данных поступающих из считывателя.
@@ -165,70 +206,79 @@ public class reader {
      * @param data       данные для записи
      * @param timeOut    время на выполнение операции
      */
-    static public void writeTagData(String password, String PCEPC, int memoryBank, int offset,
-                                    String data, int timeOut) {
-
-        final byte[] fPassword = string2Bytes(password);
-        final byte[] fPcEpc = string2Bytes(PCEPC);
-        final byte fMemoryBank = (byte) memoryBank;
-        final int fOffset = offset / 2;
-        final byte[] fData = string2Bytes(data);
-
-        // обработчик для повторной отправки команды в считыватель или отправки
-        // сообщения о успешном выполнении
-        Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-                if (msg.what == RESULT_SUCCESS) {
-                    // отправляем сообщение о успешном чтении данных
-                    Message message = new Message();
-                    message.what = RESULT_SUCCESS;
-                    if (m_handler != null) {
-                        m_handler.sendMessage(message);
-                    }
-                } else if (msg.what == RESULT_TIMEOUT) {
-                    // отправляем сообщение о таймауте
-                    Message message = new Message();
-                    message.what = RESULT_TIMEOUT;
-                    if (m_handler != null) {
-                        m_handler.sendMessage(message);
-                    }
-                } else {
-                    // запись не удалась
-                    // отправляем повторно команду записи
-                    WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank,
-                            fOffset, fData.length, fData);
-                }
-
-                return true;
-            }
-        });
-
-        readThread = new ParseThread(ParseThread.WRITE_TAG_DATA_COMMAND, timeOut);
-        readThread.setResendCommandHandler(handler);
-        readThread.start();
-
-        // отправляем команду записи
-        WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fData.length, fData);
-
-    }
+//    static public void writeTagData(String password, String PCEPC, int memoryBank, int offset,
+//                                    String data, int timeOut) {
+//
+//        final byte[] fPassword = string2Bytes(password);
+//        final byte[] fPcEpc = string2Bytes(PCEPC);
+//        final byte fMemoryBank = (byte) memoryBank;
+//        final int fOffset = offset / 2;
+//        final byte[] fData = string2Bytes(data);
+//
+//        // обработчик для повторной отправки команды в считыватель или отправки
+//        // сообщения о успешном выполнении
+//        Handler handler = new Handler(new Handler.Callback() {
+//
+//            @Override
+//            public boolean handleMessage(Message msg) {
+//                if (msg.what == RESULT_SUCCESS) {
+//                    // отправляем сообщение о успешном чтении данных
+//                    Message message = new Message();
+//                    message.what = RESULT_SUCCESS;
+//                    if (m_handler != null) {
+//                        m_handler.sendMessage(message);
+//                    }
+//                } else if (msg.what == RESULT_TIMEOUT) {
+//                    // отправляем сообщение о таймауте
+//                    Message message = new Message();
+//                    message.what = RESULT_TIMEOUT;
+//                    if (m_handler != null) {
+//                        m_handler.sendMessage(message);
+//                    }
+//                } else {
+//                    // запись не удалась
+//                    // отправляем повторно команду записи
+//                    WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank,
+//                            fOffset, fData.length, fData);
+//                }
+//
+//                return true;
+//            }
+//        });
+//
+//        readThread = new ParseThread(ParseThread.WRITE_TAG_DATA_COMMAND, timeOut);
+//        readThread.setResendCommandHandler(handler);
+//        readThread.start();
+//
+//        // отправляем команду записи
+//        WriteTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fData.length, fData);
+//
+//    }
 
 // ------------------------------
-static public UHFCommandResult readTagIdNew(int timeOut) {
+static public UHFCommandResult readTagId(int timeOut) {
 
     ParseTask parseTask = new ParseTask();
     UHFCommand command = new UHFCommand(UHFCommand.Command.READ_TAG_ID);
-    parseTask.execute(command);
-    // отправляем команду чтения Id метки
-    Inventory();
     UHFCommandResult result = null;
-    try {
-        result = parseTask.get();
-        Log.d(TAG, "Результат: " + result.data);
-    } catch (Exception e) {
-        Log.e(TAG, e.getLocalizedMessage());
+
+    // запускаем поток разбора ответа от считывателя
+    parseTask.execute(command);
+    for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
+        // отправляем команду чтения Id метки
+        Inventory();
+        try {
+            result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+            if (result != null) {
+                Log.d(TAG, "Результат: " + result.data);
+                break;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
     }
+
+    parseTask.cancel(true);
 
     return result;
 }
@@ -240,52 +290,52 @@ static public UHFCommandResult readTagIdNew(int timeOut) {
      *
      * @param timeOut время на выполнение операции
      */
-    static public void readTagId(int timeOut) {
-
-        // обработчик для повторной отправки команды в считыватель или отправки
-        // сообщения о успешном выполнении
-        Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "readTagId: msg.what=" + msg.what);
-                if (msg.what == RESULT_SUCCESS) {
-                    // отправляем сообщение о успешном чтении данных
-                    Message message = new Message();
-                    message.what = RESULT_SUCCESS;
-                    message.obj = msg.obj;
-                    if (m_handler != null) {
-                        m_handler.sendMessage(message);
-                    }
-
-                    reader.readThread.interrupt();
-                    reader.readThread = null;
-                } else if (msg.what == RESULT_TIMEOUT) {
-                    Message message = new Message();
-                    message.what = RESULT_TIMEOUT;
-                    if (m_handler != null) {
-                        m_handler.sendMessage(message);
-                    }
-
-                    reader.readThread.interrupt();
-                    reader.readThread = null;
-                } else {
-                    // чтение не удалось, отправляем повторно команду
-                    // чтения Id
-                    Inventory();
-                }
-
-                return true;
-            }
-        });
-
-        readThread = new ParseThread(ParseThread.READ_TAG_ID_COMMAND, timeOut);
-        readThread.setResendCommandHandler(handler);
-        readThread.start();
-
-        // отправляем команду чтения Id метки
-        Inventory();
-    }
+//    static public void readTagId(int timeOut) {
+//
+//        // обработчик для повторной отправки команды в считыватель или отправки
+//        // сообщения о успешном выполнении
+//        Handler handler = new Handler(new Handler.Callback() {
+//
+//            @Override
+//            public boolean handleMessage(Message msg) {
+//                Log.d(TAG, "readTagId: msg.what=" + msg.what);
+//                if (msg.what == RESULT_SUCCESS) {
+//                    // отправляем сообщение о успешном чтении данных
+//                    Message message = new Message();
+//                    message.what = RESULT_SUCCESS;
+//                    message.obj = msg.obj;
+//                    if (m_handler != null) {
+//                        m_handler.sendMessage(message);
+//                    }
+//
+//                    reader.readThread.interrupt();
+//                    reader.readThread = null;
+//                } else if (msg.what == RESULT_TIMEOUT) {
+//                    Message message = new Message();
+//                    message.what = RESULT_TIMEOUT;
+//                    if (m_handler != null) {
+//                        m_handler.sendMessage(message);
+//                    }
+//
+//                    reader.readThread.interrupt();
+//                    reader.readThread = null;
+//                } else {
+//                    // чтение не удалось, отправляем повторно команду
+//                    // чтения Id
+//                    Inventory();
+//                }
+//
+//                return true;
+//            }
+//        });
+//
+//        readThread = new ParseThread(ParseThread.READ_TAG_ID_COMMAND, timeOut);
+//        readThread.setResendCommandHandler(handler);
+//        readThread.start();
+//
+//        // отправляем команду чтения Id метки
+//        Inventory();
+//    }
 
     /**
      * Установка параметров команды Select
@@ -295,6 +345,41 @@ static public UHFCommandResult readTagIdNew(int timeOut) {
         return Select(selPa, nPTR, nMaskLen, turncate, jpMask) == 0;
     }
 
+// ------------------------------------
+static public UHFCommandResult readTagDataNew(String password, String PCEPC, int memoryBank, int offset,
+                               int count, int timeOut) {
+
+    byte[] fPassword = string2Bytes(password);
+    byte[] fPcEpc = string2Bytes(PCEPC);
+    byte fMemoryBank = (byte) memoryBank;
+    int fOffset = offset / 2;
+    int fCount = count / 2;
+
+    ParseTask parseTask = new ParseTask();
+    UHFCommand command = new UHFCommand(UHFCommand.Command.READ_TAG_DATA);
+    UHFCommandResult result = null;
+
+    // запускаем поток разбора ответа от считывателя
+    parseTask.execute(command);
+    for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
+        // отправляем команду чтения памяти метки
+        ReadTag(fPassword, fPcEpc.length, fPcEpc, fMemoryBank, fOffset, fCount);
+        try {
+            result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+            if (result != null) {
+                Log.d(TAG, "Результат: " + result.data);
+                break;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    parseTask.cancel(true);
+
+    return result;
+}
+// ------------------------------------
     /**
      * Запуск процесса чтения области памяти метки. Новый вариант, с правильным
      * разбором данных поступающих из считывателя.

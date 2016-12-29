@@ -1,18 +1,33 @@
 package android.hardware.uhf.magic;
 
-import android.hardware.BuildConfig;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
-
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Dmitriy Logachev
  * Created by koputo on 28.12.16.
  */
-// TODO: нужно добавить таймаут, нужно добавить повторную посылку команды в случае ошибки до истечения таймаута
-public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
+class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
     private static final String TAG = "ParseTask";
+//    public boolean mIsResend = false;
+
+    public ParseTask() {
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected void onPostExecute(UHFCommandResult uhfCommandResult) {
+        super.onPostExecute(uhfCommandResult);
+    }
 
     @Override
     protected UHFCommandResult doInBackground(UHFCommand... commands) {
@@ -39,9 +54,7 @@ public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                 }
 
                 pktStart = -1;
-                for (int i = 0; i < buffIndex; i++) {
-                    // TODO: плохое решение, если будет валится мусор, то по достижению i=buffSize будет исключение bound of range
-                    // TODO: нужно добавить buff[i + 2] == expectCommand
+                for (int i = 0; i < buffIndex - 4; i++) {
                     if (buff[i] == (byte)0xBB && (buff[i + 1] == (byte)0x01 || buff[i + 1] == (byte)0x02) && buff[i + 3] == (byte)0x00) {
                         pktStart = i;
                         break;
@@ -69,9 +82,9 @@ public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                             Log.e(TAG, "Разобран ответ на другую команду.");
                         }
 
-                        // TODO: возможно здесь нужно повторно послать команду и обнулить индекс и буфер для чтения
-                        result.result = reader.RESULT_READ_ERROR;
-                        return result;
+                        Arrays.fill(buff, (byte)0);
+                        buffIndex = 0;
+                        continue;
                     }
 
                     // разбираем и возвращаем полученные данные
@@ -83,10 +96,10 @@ public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                         case UHFCommand.Command.READ_TAG_DATA :
                             Log.d(TAG, "Данные карты прочитаны успешно!");
                             result.result = reader.RESULT_SUCCESS;
-                            result.data = reader.BytesToString(buff, pktStart + 5 + 1, dataSize);
+                            result.data = reader.BytesToString(buff, pktStart + 5, dataSize);
                             return result;
                         case UHFCommand.Command.WRITE_TAG_DATA :
-                            rc = reader.byteToInt(buff, pktStart + 5 + 1, 1);
+                            rc = reader.byteToInt(buff, pktStart + 5, 1);
                             Log.d(TAG, "код возврата после записи = " + rc);
                             if (rc == 0) {
                                 Log.d(TAG, "Данные записаны успешно!");
@@ -95,9 +108,10 @@ public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 Log.d(TAG, "Не удалось записать данные!");
                                 result.result = reader.RESULT_WRITE_ERROR;
                             }
+
                             return result;
                         case UHFCommand.Command.LOCK_TAG :
-                            rc = reader.byteToInt(buff, pktStart + 5 + 1, 1);
+                            rc = reader.byteToInt(buff, pktStart + 5, 1);
                             Log.d(TAG, "код возврата после блокировки = " + rc);
                             if (rc == 0) {
                                 Log.d(TAG, "Блокировка выполненна успешно!");
@@ -106,9 +120,10 @@ public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 Log.d(TAG, "Не удалось выполнить блокировку!");
                                 result.result = reader.RESULT_WRITE_ERROR;
                             }
+
                             return result;
                         case UHFCommand.Command.KILL_TAG :
-                            rc = reader.byteToInt(buff, pktStart + 5 + 1, 1);
+                            rc = reader.byteToInt(buff, pktStart + 5, 1);
                             Log.d(TAG, "код возврата после деактивации = " + rc);
                             if (rc == 0) {
                                 Log.d(TAG, "Деактивация выполненна успешно!");
@@ -117,6 +132,7 @@ public class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 Log.d(TAG, "Не удалось выполнить деактивацию!");
                                 result.result = reader.RESULT_WRITE_ERROR;
                             }
+
                             return result;
                     }
                 }

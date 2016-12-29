@@ -18,7 +18,21 @@ public class UHFCommand {
     public byte command;
     public Object data;
 
+    /**
+     *
+     * @param command    byte
+     */
     public UHFCommand(byte command) {
         this.command = command;
+    }
+
+    /**
+     *
+     * @param command    byte
+     * @param data       Object
+     */
+    public UHFCommand(byte command, Object data) {
+        this.command = command;
+        this.data = data;
     }
 }
