@@ -1,12 +1,8 @@
 package android.hardware.uhf.magic;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Dmitriy Logachev
@@ -14,20 +10,7 @@ import java.util.concurrent.ExecutionException;
  */
 class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
     private static final String TAG = "ParseTask";
-//    public boolean mIsResend = false;
-
-    public ParseTask() {
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-
-    @Override
-    protected void onPostExecute(UHFCommandResult uhfCommandResult) {
-        super.onPostExecute(uhfCommandResult);
-    }
+    public boolean resend = false;
 
     @Override
     protected UHFCommandResult doInBackground(UHFCommand... commands) {
@@ -73,32 +56,58 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                 // ожидаем когда будет прочитан весь ответ
                 if (buffIndex >= pktEnd) {
                     byte parsedCommand = buff[pktStart + 2];
+                    Log.d(TAG, "Ответ на команду: " + String.format("%02X", parsedCommand));
                     int rc;
                     UHFCommandResult result = new UHFCommandResult();
 
                     // проверяем ответ на какую команду мы получили
-                    if (parsedCommand != commands[0].command) {
-                        if (parsedCommand != UHFCommand.Command.ERROR) {
-                            Log.e(TAG, "Разобран ответ на другую команду.");
+//                    if (parsedCommand != commands[0].command) {
+//                        if (parsedCommand != UHFCommand.Command.ERROR) {
+//                            Log.e(TAG, "Разобран ответ на другую команду.");
+//                        }
+//
+//                        Arrays.fill(buff, (byte)0);
+//                        buffIndex = 0;
+//                        resend = true;
+//                        continue;
+//                    }
+
+                    if (parsedCommand == UHFCommand.Command.ERROR) {
+                        // пробуем в случае записи в метку как-то обработать ситуацию когда пишем в конец метки и получаем ошибку записи
+                        int errCode = reader.byteToInt(buff, pktStart + 5, 1);
+                        Log.d(TAG, "Код ошибки: " + String.format("%02X", errCode));
+                        if (errCode == 0xB3 && commands[0].command == UHFCommand.Command.WRITE_TAG_DATA) {
+                            result.result = reader.RESULT_WRITE_ERROR;
+                            return result;
+                        } else {
+                            Arrays.fill(buff, (byte)0);
+                            buffIndex = 0;
+                            resend = true;
+                            continue;
                         }
+                    }
+
+                    if (parsedCommand != commands[0].command) {
+                        Log.e(TAG, "Разобран ответ на другую команду.");
 
                         Arrays.fill(buff, (byte)0);
                         buffIndex = 0;
+                        resend = true;
                         continue;
                     }
 
                     // разбираем и возвращаем полученные данные
                     switch (parsedCommand) {
-                        case UHFCommand.Command.READ_TAG_ID :
+                        case UHFCommand.Command.READ_TAG_ID:
                             result.result = reader.RESULT_SUCCESS;
                             result.data = reader.BytesToString(buff, pktStart + 5 + 1, dataSize - 3);
-                            return result;
-                        case UHFCommand.Command.READ_TAG_DATA :
+                            break;
+                        case UHFCommand.Command.READ_TAG_DATA:
                             Log.d(TAG, "Данные карты прочитаны успешно!");
                             result.result = reader.RESULT_SUCCESS;
                             result.data = reader.BytesToString(buff, pktStart + 5, dataSize);
-                            return result;
-                        case UHFCommand.Command.WRITE_TAG_DATA :
+                            break;
+                        case UHFCommand.Command.WRITE_TAG_DATA:
                             rc = reader.byteToInt(buff, pktStart + 5, 1);
                             Log.d(TAG, "код возврата после записи = " + rc);
                             if (rc == 0) {
@@ -109,8 +118,8 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 result.result = reader.RESULT_WRITE_ERROR;
                             }
 
-                            return result;
-                        case UHFCommand.Command.LOCK_TAG :
+                            break;
+                        case UHFCommand.Command.LOCK_TAG:
                             rc = reader.byteToInt(buff, pktStart + 5, 1);
                             Log.d(TAG, "код возврата после блокировки = " + rc);
                             if (rc == 0) {
@@ -121,8 +130,8 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 result.result = reader.RESULT_WRITE_ERROR;
                             }
 
-                            return result;
-                        case UHFCommand.Command.KILL_TAG :
+                            break;
+                        case UHFCommand.Command.KILL_TAG:
                             rc = reader.byteToInt(buff, pktStart + 5, 1);
                             Log.d(TAG, "код возврата после деактивации = " + rc);
                             if (rc == 0) {
@@ -133,8 +142,13 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 result.result = reader.RESULT_WRITE_ERROR;
                             }
 
-                            return result;
+                            break;
+                        default:
+                            result = null;
+                            break;
                     }
+
+                    return result;
                 }
             }
         }
