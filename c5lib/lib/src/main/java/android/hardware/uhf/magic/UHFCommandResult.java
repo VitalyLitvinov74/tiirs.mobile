@@ -9,4 +9,12 @@ public class UHFCommandResult {
     public int result;
     public String data;
 
+    public UHFCommandResult() {
+    }
+
+    public UHFCommandResult(int result, String data) {
+        this.result = result;
+        this.data = data;
+    }
+
 }
