@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -13,9 +14,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -96,6 +97,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private LinearLayout tlButtonLayout;
     private LinearLayout resultLayout;
     private LinearLayout photoContainer;
+    private LinearLayout listLayout;
     private RelativeLayout globalLayout;
     private BottomBar bottomBar;
 
@@ -248,6 +250,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         realmDB = Realm.getDefaultInstance();
         //tlButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_button_layout);
         resultLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultsLayout);
+        listLayout = (LinearLayout) rootView.findViewById(R.id.tl_listLayout);
         //photoContainer = (LinearLayout) rootView.findViewById(R.id.tl_photoContainer);
         globalLayout = (RelativeLayout) rootView.findViewById(R.id.tl_global_layout);
         bottomBar = (BottomBar) (getActivity()).findViewById(R.id.bottomBar);
@@ -258,7 +261,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 measureUI(MeasureTypeDBAdapter.Type.PHOTO);
             }
         });
-
 
         mainListView = (ListView) rootView
                 .findViewById(R.id.list_view);
@@ -319,6 +321,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         resultButtonLayout.setVisibility(View.INVISIBLE);
         makePhotoButton.setVisibility(View.INVISIBLE);
+        ViewGroup.LayoutParams params = listLayout.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        listLayout.setLayoutParams(params);
+
         //bottomBar.setVisibility(View.VISIBLE);
         //bottomBar.setEnabled(false);
     }
@@ -376,6 +382,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
         submit.setVisibility(View.GONE);
         makePhotoButton.setVisibility(View.GONE);
+        ViewGroup.LayoutParams params = listLayout.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        listLayout.setLayoutParams(params);
     }
 
     // Operations----------------------------------------------------------------------------------------
@@ -399,6 +408,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         mainListView.setAdapter(operationAdapter);
         resultButtonLayout.setVisibility(View.VISIBLE);
         makePhotoButton.setVisibility(View.VISIBLE);
+        ViewGroup.LayoutParams params = listLayout.getLayoutParams();
+        params.height = 1000;
+        listLayout.setLayoutParams(params);
+
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
@@ -684,14 +697,15 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     if (selectedTask != null) {
                         Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
                         final String expectedTagId = selectedTask.getEquipment().getTagId();
-                        Log.d(TAG, "Ожидаемаея метка: " + expectedTagId);
+                        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
                         Handler handler = new Handler(new Handler.Callback() {
                             @Override
                             public boolean handleMessage(Message message) {
                                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                                     String tagId = ((String) message.obj).substring(4);
                                     Log.d(TAG, "Ид метки получили: " + tagId);
-                                    if (expectedTagId.equals(tagId)) {
+                                    //if (expectedTagId.equals(tagId)) {
+                                    if (true) {
                                         currentTaskUuid = selectedTask.getUuid();
                                         fillListViewTaskStage(selectedTask);
                                         Level = 2;

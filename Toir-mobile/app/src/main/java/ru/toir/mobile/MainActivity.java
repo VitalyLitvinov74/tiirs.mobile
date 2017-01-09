@@ -370,8 +370,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setSubtitle("Обслуживание и ремонт");
         toolbar.setTitleTextColor(Color.WHITE);
 
-        //toolbar.
-
         //set the back arrow in the toolbar
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar ab = getSupportActionBar();

@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -37,6 +38,7 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
@@ -213,6 +215,13 @@ public class GPSFragment extends Fragment {
 				LastItemPosition = position;
 			}
 		});
+        equipmentListView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                //equipmentListView.getItemAtPosition();
+                return false;
+            }
+        });
 
         TaskItemizedOverlay overlay = new TaskItemizedOverlay(getActivity()
 				.getApplicationContext(), overlayItemArray) {
@@ -225,10 +234,19 @@ public class GPSFragment extends Fragment {
 								+ equipment.getUuid(), Toast.LENGTH_SHORT)
 						.show();
 
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
-				return super.onLongPressHelper(index, item);
+                if (equipment != null) {
+                    String equipment_uuid = equipment.getUuid();
+                    Intent equipmentInfo = new Intent(getActivity(),
+                            EquipmentInfoActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("equipment_uuid", equipment_uuid);
+                    equipmentInfo.putExtras(bundle);
+                    getActivity().startActivity(equipmentInfo);
+                }
+
+                return super.onLongPressHelper(index, item);
 			}
-		};
+        };
 		mapView.getOverlays().add(overlay);
 
         // Добавляем несколько слоев
