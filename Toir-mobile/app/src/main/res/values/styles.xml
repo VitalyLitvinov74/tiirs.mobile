@@ -51,4 +51,8 @@
     <style name="FullscreenTheme" parent="MaterialDrawerTheme.Light.TranslucentStatus">
     </style>
 
+    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
+        <item name="colorAccent">@color/larisaBlueColor</item>
+        <item name="android:textColorSecondary">@color/larisaBlueColor</item>
+    </style>
 </resources>

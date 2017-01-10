@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -139,6 +140,9 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     viewHolder.location.setText(equipment.getLocation());
                     viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
                     viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
+                    if (equipment.getCriticalType().getTitle().equals("Критичный")) viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context,R.color.red));
+                    if (equipment.getCriticalType().getTitle().equals("Не критичный")) viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context,R.color.green));
+                    if (equipment.getCriticalType().getTitle().equals("Средний")) viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context,R.color.blue));
                     Date date = equipment.getStartDate();
                     String sDate;
                     if (date != null) {
@@ -146,7 +150,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     } else {
                         sDate = "none";
                     }
-
                     viewHolder.startDate.setText(sDate);
                 }
             }

@@ -23,29 +23,31 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
         >
     <FrameLayout
         android:id="@+id/camera_preview"
-        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        />
+        android:layout_centerHorizontal="true"
+        android:layout_width="fill_parent" >
+
+        <RelativeLayout
+            android:id="@+id/innerRelativeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" >
+            <Button
+                android:id="@+id/button_capture"
+                android:text="@string/make_photo"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                android:layout_gravity="bottom"
+                />
+        </RelativeLayout>
+    </FrameLayout>
 
 
-    <RelativeLayout
-        android:id="@+id/innerRelativeLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-        <Button
-            android:id="@+id/button_capture"
-            android:text="@string/make_photo"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:layout_gravity="bottom"
-            />
-    </RelativeLayout>
 </RelativeLayout>

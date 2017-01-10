@@ -4,7 +4,7 @@
 
     <header
         android:fragment="ru.toir.mobile.fragments.ToirPreferenceFragment"
-        android:icon="@drawable/ic_info_black_24dp"
+        android:icon="@drawable/information_32"
         android:title="Супер основные настройки" >
         <!--<intent-->
             <!--android:action="android.settings.DISPLAY_SETTINGS" />-->

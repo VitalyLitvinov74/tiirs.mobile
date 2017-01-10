@@ -10,9 +10,11 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-    <CheckBox
+
+        <CheckBox
         android:id="@+id/operation_status"
         android:layout_width="wrap_content"
+        android:theme="@style/checkBoxStyle"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical" />
 
@@ -150,6 +152,13 @@
             android:layout_toRightOf="@+id/op_time_label"
             android:layout_below="@+id/op_normative" />
 
+        <LinearLayout
+                android:id="@+id/twf_resultButtonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical" >
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

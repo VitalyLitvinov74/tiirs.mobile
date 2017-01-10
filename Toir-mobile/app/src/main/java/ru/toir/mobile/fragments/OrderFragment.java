@@ -1,17 +1,23 @@
 package ru.toir.mobile.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -24,13 +30,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.roughike.bottombar.BottomBar;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +57,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
@@ -69,7 +84,6 @@ import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class OrderFragment extends Fragment implements View.OnClickListener {
-    private Orders selectedOrder;
     private Tasks selectedTask;
     private TaskStages selectedStage;
     private Operation selectedOperation;
@@ -80,21 +94,41 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private OperationAdapter operationAdapter;
     private Button submit;
 
+    private LinearLayout tlButtonLayout;
+    private LinearLayout resultLayout;
+    private LinearLayout photoContainer;
+    private LinearLayout listLayout;
+    private RelativeLayout globalLayout;
+    private BottomBar bottomBar;
+
     private String TAG = "OrderFragment";
     private Realm realmDB;
     private View rootView;
     private int Level = 0;
     private String currentOrderUuid = "";
     private String currentTaskUuid = "";
+    private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
 
     private int     currentOperationId = 0;
     private long    startTime = 0;
     private boolean firstLaunch = true;
+    private boolean cameraInit = false;
+
     ListView mainListView;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
     //private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
+
+    private NumberPicker numberPicker;
+    private Spinner spinnerSuffix;
+    private ArrayAdapter<OrderFragment.Suffixes> spinnerSuffixAdapter;
+    private ArrayList<OrderFragment.Suffixes> suffixList;
+    private String lastPhotoFile;
+    //Preview mPreview;
+
+    private LinearLayout resultButtonLayout;
+    private Button makePhotoButton;
 
     private ProgressDialog processDialog;
     private RfidDialog rfidDialog;
@@ -205,10 +239,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         rootView = inflater.inflate(R.layout.orders_layout, container,
                 false);
-
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
         submit = (Button)rootView.findViewById(R.id.finishButton);
@@ -216,6 +248,19 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         submit.setVisibility(View.GONE);
 
         realmDB = Realm.getDefaultInstance();
+        //tlButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_button_layout);
+        resultLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultsLayout);
+        listLayout = (LinearLayout) rootView.findViewById(R.id.tl_listLayout);
+        //photoContainer = (LinearLayout) rootView.findViewById(R.id.tl_photoContainer);
+        globalLayout = (RelativeLayout) rootView.findViewById(R.id.tl_global_layout);
+        bottomBar = (BottomBar) (getActivity()).findViewById(R.id.bottomBar);
+        resultButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultButtonLayout);
+        makePhotoButton = (Button) rootView.findViewById(R.id.tl_photoButton);
+        makePhotoButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                measureUI(MeasureTypeDBAdapter.Type.PHOTO);
+            }
+        });
 
         mainListView = (ListView) rootView
                 .findViewById(R.id.list_view);
@@ -258,6 +303,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
     // Orders----------------------------------------------------------------------------------------
     private void fillListViewOrders(String orderStatus, String orderByField) {
+        // !!!!!
         User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!",
@@ -272,6 +318,15 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         if (tl_Header != null) {
             tl_Header.setVisibility(View.GONE);
         }
+
+        resultButtonLayout.setVisibility(View.INVISIBLE);
+        makePhotoButton.setVisibility(View.INVISIBLE);
+        ViewGroup.LayoutParams params = listLayout.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        listLayout.setLayoutParams(params);
+
+        //bottomBar.setVisibility(View.VISIBLE);
+        //bottomBar.setEnabled(false);
     }
 
     // Tasks----------------------------------------------------------------------------------------
@@ -326,6 +381,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setText(task.getTaskTemplate().getTitle());
         }
         submit.setVisibility(View.GONE);
+        makePhotoButton.setVisibility(View.GONE);
+        ViewGroup.LayoutParams params = listLayout.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        listLayout.setLayoutParams(params);
     }
 
     // Operations----------------------------------------------------------------------------------------
@@ -347,6 +406,12 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         operationAdapter = new OperationAdapter(getContext(), operations);
         mainListView.setAdapter(operationAdapter);
+        resultButtonLayout.setVisibility(View.VISIBLE);
+        makePhotoButton.setVisibility(View.VISIBLE);
+        ViewGroup.LayoutParams params = listLayout.getLayoutParams();
+        params.height = 1000;
+        listLayout.setLayoutParams(params);
+
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
@@ -615,7 +680,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             // находимся на "экране" нарядов
             if (Level == 0) {
                 if (orderAdapter != null) {
-                    selectedOrder = orderAdapter.getItem(position);
+                    Orders selectedOrder = orderAdapter.getItem(position);
                     if (selectedOrder != null) {
                         currentOrderUuid = selectedOrder.getUuid();
                         fillListViewTasks(selectedOrder);
@@ -632,14 +697,15 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     if (selectedTask != null) {
                         Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
                         final String expectedTagId = selectedTask.getEquipment().getTagId();
-                        Log.d(TAG, "Ожидаемаея метка: " + expectedTagId);
+                        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
                         Handler handler = new Handler(new Handler.Callback() {
                             @Override
                             public boolean handleMessage(Message message) {
                                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                                     String tagId = ((String) message.obj).substring(4);
                                     Log.d(TAG, "Ид метки получили: " + tagId);
-                                    if (expectedTagId.equals(tagId)) {
+                                    //if (expectedTagId.equals(tagId)) {
+                                    if (true) {
                                         currentTaskUuid = selectedTask.getUuid();
                                         fillListViewTaskStage(selectedTask);
                                         Level = 2;
@@ -701,6 +767,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+
     @Override
     public void onClick(View v) {
         int totalOperationCount = 0, completedOperationCount = 0;
@@ -752,6 +819,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
         else {
             // TODO показать диалог с коментарием и выбором вердикта
+            Log.d("order","dialog");
         }
 
         taskTimer.cancel();
@@ -775,16 +843,18 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
                 textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
                 textTime.setText((int)(currentTime-startTime)/1000 + "сек.");
+                currentOperationUuid=operationAdapter.getItem(currentOperationId).getUuid();
                 if (firstLaunch)
                     onStart();
             }
         }
-        public void onStart() {
+        void onStart() {
             int totalOperationCount;
             CheckBox checkBox;
-            if (operationAdapter != null) {
+            if (operationAdapter != null && mainListView !=null) {
                 totalOperationCount = operationAdapter.getCount();
-                for (int i = 0; i < totalOperationCount; i++) {
+                for (int i = 0; i < totalOperationCount; i++)
+                if (mainListView.getChildAt(i)!=null) {
                     checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
                     checkBox.setOnClickListener(new onCheckBoxClickListener(i));
                 }
@@ -798,7 +868,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     public class onCheckBoxClickListener implements View.OnClickListener {
         int position;
 
-        public onCheckBoxClickListener(int pos) {
+        onCheckBoxClickListener(int pos) {
             this.position = pos;
         }
 
@@ -881,7 +951,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 if (!operation.getOperationStatus().getUuid().equals(OperationAdapter.Status.NEW) ||
                         !operation.getOperationStatus().getUuid().equals(OperationAdapter.Status.IN_WORK)) {
                     // показываем диалог изменения статуса
-                    closeOperationManual(operation);
+                    closeOperationManual(operation, parent);
                 } else {
                     // операция уже выполнена, изменить статус нельзя
                     // сообщаем об этом
@@ -889,7 +959,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                             getContext());
                     dialog.setTitle("Внимание!");
                     dialog.setMessage("Изменить статус операции нельзя!");
-                    dialog.setPositiveButton(android.R.string.ok,
+                    AlertDialog.Builder builder = dialog.setPositiveButton(android.R.string.ok,
                             new DialogInterface.OnClickListener() {
 
                                 @Override
@@ -947,14 +1017,14 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
      *
      * @param operation - операция для отмены
      */
-    private void closeOperationManual(final Operation operation) {
+    private void closeOperationManual(final Operation operation, AdapterView<?> parent) {
         final OperationStatus operationStatusUnComplete;
         operationStatusUnComplete = realmDB.where(OperationStatus.class).findFirst();
 
         // диалог для отмены операции
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View myView = inflater.inflate(R.layout.operation_cancel_dialog, null);
+        View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
         final Spinner operationVerdictSpinner;
         // список статусов операций в выпадающем списке для выбора
         RealmResults<OperationVerdict> operationVerdict = realmDB.where(OperationVerdict.class).findAll();
@@ -1000,7 +1070,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     /**
      * Диалог ручного закрытия наряда
      *
-     * @param order
+     * @param order - наряд для закрытия
      */
     private void closeOrderManual(final Orders order) {
         final Spinner orderVerdictSpinner;
@@ -1040,7 +1110,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 						 * закрываем наряд, в зависимости от статуса выполнения
 						 * операции выставляем статус наряда
 						 */
-
                         for (final Tasks task : order.getTasks()) {
                             // TODO заменить на реальный статус "не закончена"
                             realmDB.executeTransaction(new Realm.Transaction() {
@@ -1093,6 +1162,161 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
+
+    /**
+     * Класс для представления множителей (частоты, напряжения, тока...)
+     *
+     * @author Dmitriy Logachov
+     */
+    protected class Suffixes {
+        String title;
+        long multiplier;
+
+        Suffixes(String t, int m) {
+            title = t;
+            multiplier = m;
+        }
+
+        public String toString() {
+            return title;
+        }
+    }
+
+    /**
+     * Создание элементов интерфейса для шагов операции с измерениями значений
+     *
+     * @param measureType - тип осуществляемого измерения
+     */
+    private void measureUI(String measureType) {
+        // выбор значения
+        if (numberPicker == null) {
+            numberPicker = new NumberPicker(getActivity().getApplicationContext());
+        }
+        numberPicker.setOrientation(NumberPicker.VERTICAL);
+        numberPicker.setMinValue(1);
+        numberPicker.setMaxValue(999);
+
+        // перечень множителей
+        if (suffixList == null) {
+            suffixList = new ArrayList<>();
+        } else {
+            suffixList.clear();
+        }
+
+        if (measureType.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
+            resultButtonLayout.addView(numberPicker);
+
+            suffixList.add(new Suffixes("Гц", 1));
+            suffixList.add(new Suffixes("кГц", 1000));
+            suffixList.add(new Suffixes("МГц", 1000000));
+            suffixList.add(new Suffixes("ГГц", 1000000000));
+
+            // адаптер для множителей
+            spinnerSuffixAdapter = new ArrayAdapter<>(
+                    getActivity().getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+            // выпадающий список с множителями
+            if (spinnerSuffix == null) {
+                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+            }
+            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+            resultButtonLayout.addView(spinnerSuffix);
+        } else if (measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
+            resultButtonLayout.addView(numberPicker);
+
+            suffixList.add(new Suffixes("В", 1));
+            suffixList.add(new Suffixes("кВ", 1000));
+            suffixList.add(new Suffixes("МВ", 1000000));
+            suffixList.add(new Suffixes("ГВ", 1000000000));
+
+            // адаптер для множителей
+            spinnerSuffixAdapter = new ArrayAdapter<>(
+                    getActivity().getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+            // выпадающий список с множителями
+            if (spinnerSuffix == null) {
+                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+            }
+            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+            resultButtonLayout.addView(spinnerSuffix);
+        } else if (measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
+            resultButtonLayout.addView(numberPicker);
+
+            suffixList.add(new Suffixes("Па", 1));
+            suffixList.add(new Suffixes("кПа", 1000));
+            suffixList.add(new Suffixes("МПа", 1000000));
+            suffixList.add(new Suffixes("ГПа", 1000000000));
+
+            // адаптер для множителей
+            spinnerSuffixAdapter = new ArrayAdapter<>(
+                    getActivity().getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+            // выпадающий список с множителями
+            if (spinnerSuffix == null) {
+                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+            }
+            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+            resultButtonLayout.addView(spinnerSuffix);
+        } else if (measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+            File photo = getOutputMediaFile();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                    Uri.fromFile(photo));
+            startActivityForResult(intent, 100);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 100:
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.d("test", "onPictureTaken - jpeg");
+                    File selectedImage=getOutputMediaFile();
+                    Uri fileUri = Uri.fromFile(selectedImage);
+                    //getActivity().getContentResolver().notifyChange(selectedImage, null);
+                    ContentResolver cr = getActivity().getContentResolver();
+                    Bitmap bitmap;
+                    try {
+                        bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
+                    } catch (Exception e) {
+                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT)
+                                .show();
+                        Log.e("Camera", e.toString());
+                    }
+                }
+        }
+    }
+
+    private File getOutputMediaFile() {
+
+        File mediaStorageDir = new File(getActivity().getApplicationContext()
+                .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                .getAbsolutePath());
+
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("Camera Guide", "Required media storage does not exist");
+                return null;
+            }
+        }
+
+        String fileName;
+        // оригинальное имя файла
+        fileName = currentOperationUuid + ".jpg";
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + fileName);
+        return mediaFile;
+    }
 }
 
 

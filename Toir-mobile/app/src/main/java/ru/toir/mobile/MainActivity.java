@@ -294,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // проверяем наличие пользователя в локальной базе
                             User user = realmDB.where(User.class)
+                                    // !!!!!
                                     .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
                                     .findFirst();
 
@@ -369,8 +370,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setSubtitle("Обслуживание и ремонт");
         toolbar.setTitleTextColor(Color.WHITE);
 
-        //toolbar.
-
         //set the back arrow in the toolbar
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar ab = getSupportActionBar();
@@ -412,7 +411,9 @@ public class MainActivity extends AppCompatActivity {
                             RealmResults<User> users = realmDB.where(User.class).findAll();
                             for (int i = 0; i < users.size(); i++)
                                 users.get(i).setActive(false);
+                            // !!!!!
                             User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+                            //User user = realmDB.where(User.class).findFirst();
                             if (user != null) user.setActive(true);
                             if (profilesList != null && profilesList.get(profile_pos)!=null)
                                 profilesList.get(profile_pos).setActive(true);

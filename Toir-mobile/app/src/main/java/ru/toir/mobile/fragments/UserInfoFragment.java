@@ -91,20 +91,13 @@ public class UserInfoFragment extends Fragment {
             }
         });
 
+		// !!!!!
         final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
+		//final User user = realmDB.where(User.class).findFirst();
         if (user == null) {
 			Toast.makeText(getActivity(), "Нет такого пользователя!",
 					Toast.LENGTH_SHORT).show();
 		} else {
-            /*
-            realmDB.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                     user.setContact("+79227000285 Курнаков И.И.");
-                     user.setWhoIs("Ведущий инженер");
-                     user.setConnectionDate(new Date());
-                    }
-                });*/
             if (user.getTagId().length() > 20)
 				tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
 			else
@@ -142,6 +135,8 @@ public class UserInfoFragment extends Fragment {
 				tv_user_gps.setText(Float.parseFloat(gpstrack.getLatitude())
 						+ " / " + Float.parseFloat(gpstrack.getLongitude()));
 			}
+			else
+				tv_user_gps.setText("нет данных");
 
 			if (AuthorizedUser.getInstance().getTagId()
 					.equals("3000E2004000860902332580112D")) {

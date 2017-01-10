@@ -1,7 +1,11 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -10,6 +14,7 @@ import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -25,6 +30,7 @@ import ru.toir.mobile.db.realm.Operation;
  */
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     public static final String TABLE_NAME = "Operation";
+    private Context context;
     private boolean[] visibility = new boolean[50];
     private boolean[] completed = new boolean[50];
 
@@ -37,6 +43,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     public OperationAdapter(@NonNull Context context, RealmResults<Operation> data) {
         super(context, data);
+        this.context = context;
     }
 
     @Override
@@ -80,6 +87,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+        File image;
         Operation operation;
         viewHolder = new ViewHolder();
         if (adapterData==null) return convertView;
@@ -135,9 +143,40 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 }
                 viewHolder.description.setText(operation.getOperationTemplate().getDescription());
                 viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
+                image=getOutputMediaFile(operation.getUuid());
+                    Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+                if (imageBitmap!=null) {
+                    int width = imageBitmap.getWidth();
+                    int height = imageBitmap.getHeight();
+                    int newWidth = 300;
+                    float scaleWidth = (float)newWidth / (float)width;
+                    int newHeight = (int)(height * scaleWidth);
+                    viewHolder.image.setImageBitmap(Bitmap.createScaledBitmap (imageBitmap, newWidth, newHeight, false));
+                    //viewHolder.image.setImageBitmap(imageBitmap);
+
+                }
             }
         }
       return convertView;
+    }
+
+    private File getOutputMediaFile(String operationUuid) {
+        File mediaStorageDir = new File(context
+                .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                .getAbsolutePath());
+
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("Camera", "Required media storage does not exist");
+                return null;
+            }
+        }
+        String fileName;
+        fileName = operationUuid + ".jpg";
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + fileName);
+        return mediaFile;
     }
 
     private static class ViewHolder {
