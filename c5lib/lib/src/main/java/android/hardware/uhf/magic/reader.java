@@ -49,6 +49,9 @@ public class reader {
     public static final byte SELECT_ENABLE = 0;
     public static final byte SELECT_DISABLE = 1;
 
+    public static final byte TRUNCATE_ENABLE = (byte)0x80;
+    public static final byte TRUNCATE_DISABLE = 0x00;
+
     static {
         System.loadLibrary("uhf-tools");
     }
