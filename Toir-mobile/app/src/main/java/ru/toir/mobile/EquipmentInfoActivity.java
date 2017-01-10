@@ -339,12 +339,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 //                        rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
                         // пишем в "известную" метку
-                        data =  "EE0102030405060708090A0B0C0D0E0F";
+                        data =  "000102030405060708090A0B0C0D0E0F";
                         data += "101112131415161718191A1B1C1D1E1F";
                         data += "202122232425262728292A2B2C2D2E2F";
                         data += "303132333435363738393A3B3C3D3E3F";
-                        rfidDialog.writeTagData("00000000", equipment.getTagId(),
-                                RfidDriverBase.MEMORY_BANK_USER, 0, data);
+                        data = "FF050403020100FF";
+//                        data = "EFFE";
+//                        rfidDialog.writeTagData("00000000", equipment.getTagId(),
+//                                RfidDriverBase.MEMORY_BANK_USER, 0, data);
+                        rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
                         rfidDialog.show(getFragmentManager(), TAG);
 

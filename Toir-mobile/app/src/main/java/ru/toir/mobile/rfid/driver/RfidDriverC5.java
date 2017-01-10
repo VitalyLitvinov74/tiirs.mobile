@@ -176,18 +176,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void writeTagData(String password, int memoryBank, int address, String data) {
-        UHFCommandResult result = reader.readTagId(timeOut);
-        if (result.result == reader.RESULT_SUCCESS) {
-            String tagId = result.data.substring(4);
-            Log.d("TAG", "tagId = " + tagId);
-            writeTagData(password, tagId, memoryBank, address, data);
-        } else if (result.result == reader.RESULT_TIMEOUT) {
-            Log.d("TAG", "вышел таймаут.");
-            sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-        } else {
-            Log.d("TAG", "что-то пошло не так.");
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-        }
+            writeTagData(password, null, memoryBank, address, data);
 	}
 
 	@Override
@@ -219,26 +208,37 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
             UHFCommandResult result;
             String realTagId;
 
-            // пытаемся найти подходящую метку установив фильтр
-            boolean success;
-            success = reader.select(reader.SELECT_ENABLE, 0x20, (byte)(tagId.length() / 2 * 8),
-                    reader.TRUNCATE_DISABLE, DataUtils.hexStringTobyte(tagId));
-
-            if (success) {
-                Log.d(TAG, "маска установленна!!!");
+            if (tagId == null) {
                 result = reader.readTagId(5000);
                 if (result.result == reader.RESULT_SUCCESS) {
+                    tagId = result.data.substring(4);
                     realTagId = result.data;
-                    reader.SetSelect(reader.SELECT_DISABLE);
                 } else {
-                    reader.SetSelect(reader.SELECT_DISABLE);
                     sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
                     return;
                 }
             } else {
-                Log.d(TAG, "не удалось установить маску!!!");
-                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-                return;
+                // пытаемся найти подходящую метку установив фильтр
+                boolean success;
+                success = reader.select(reader.SELECT_ENABLE, 0x20, (byte)(tagId.length() / 2 * 8),
+                        reader.TRUNCATE_DISABLE, DataUtils.hexStringTobyte(tagId));
+
+                if (success) {
+                    Log.d(TAG, "маска установленна!!!");
+                    result = reader.readTagId(5000);
+                    if (result.result == reader.RESULT_SUCCESS) {
+                        realTagId = result.data;
+                        reader.SetSelect(reader.SELECT_DISABLE);
+                    } else {
+                        reader.SetSelect(reader.SELECT_DISABLE);
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+                } else {
+                    Log.d(TAG, "не удалось установить маску!!!");
+                    sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    return;
+                }
             }
 
             boolean changePC = address == 0;
