@@ -7,8 +7,6 @@ import ru.toir.mobile.utils.DataUtils;
 
 import android.hardware.uhf.magic.UHFCommandResult;
 import android.hardware.uhf.magic.reader;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -177,61 +175,38 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public void writeTagData(String password, int memoryBank, int address,
-			String data) {
-		// TODO: реализовать запись в метку в три шага
-        // TODO: 1) считать данные сразу за данными для записм до конца метки
-        // TODO: 2) записать переданные данные
-        // TODO: 3) записать данные считанные ранее (в ответ будет ошибка)
-        // TODO: возможно счтитать "контрольные" данные для проверки записи в метку
+	public void writeTagData(final String password, final int memoryBank, final int address,
+			final String data) {
 
-		final String lPassword = password;
-		final int lMemoryBank = memoryBank;
-		final int lAddress = address;
-		final String lData = data;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                UHFCommandResult result;
 
-        reader.m_handler = new Handler(new Handler.Callback() {
-
-			@Override
-			public boolean handleMessage(Message msg) {
-				if (msg.what == reader.RESULT_SUCCESS) {
-					String pcepc = (String) msg.obj;
-					Log.d("TAG", "tagId = " + pcepc);
-					reader.m_handler = new Handler(new Handler.Callback() {
-
-						@Override
-						public boolean handleMessage(Message msg) {
-							if (msg.what == reader.RESULT_SUCCESS) {
-								sHandler.obtainMessage(RESULT_RFID_SUCCESS)
-										.sendToTarget();
-							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								sHandler.obtainMessage(RESULT_RFID_TIMEOUT)
-										.sendToTarget();
-							} else {
-								sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR)
-										.sendToTarget();
-							}
-							return true;
-						}
-					});
-
-					// пишем данные в метку
-					reader.writeTagData(lPassword, pcepc, lMemoryBank,
-							lAddress, lData, timeOut);
-				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					Log.d("TAG", "вышел таймаут.");
-					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-				} else {
-					Log.d("TAG", "что-то пошло не так.");
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
-							.sendToTarget();
-				}
-				return true;
-			}
-		});
-
-		// запускаем поиск метки
-		reader.readTagId(timeOut);
+                // запускаем поиск метки
+                result = reader.readTagId(timeOut);
+                if (result.result == reader.RESULT_SUCCESS) {
+                    String tagId = result.data;
+                    Log.d("TAG", "tagId = " + tagId);
+                    // пишем данные в метку
+                    result = reader.writeTagData(password, tagId, memoryBank, address, data, timeOut);
+                    if (result.result == reader.RESULT_SUCCESS) {
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+                    } else if (result.result == reader.RESULT_TIMEOUT) {
+                        sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    }
+                } else if (result.result == reader.RESULT_TIMEOUT) {
+                    Log.d("TAG", "вышел таймаут.");
+                    sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                } else {
+                    Log.d("TAG", "что-то пошло не так.");
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                }
+            }
+        });
+        thread.start();
 	}
 
 	@Override
@@ -267,6 +242,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
                     return;
                 }
 
+                boolean changePC = address == 0;
 
                 int endWriteData = address + data.length() / 2;
                 String dataToWrite = data;
@@ -274,7 +250,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
                 if (endWriteData < 64) {
                     // читаем данные которые при записи будут затёрты, чтоб записать их по новой
                     result = reader.readTagData(password, realTagId, memoryBank,
-                            endWriteData / 2, (64 - endWriteData) / 2, 5000);
+                            endWriteData, (64 - endWriteData), 5000);
 
                     if (result.result == reader.RESULT_SUCCESS) {
                         // данные успешно прочитаны
@@ -291,17 +267,18 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
                 }
 
                 // TODO: вся поганка в том что если в "середине" процесса произойдёт ошибка, в метке будет "мусор"
-                result = null;
                 boolean prevCommandSuccess = true;
-                int iter = (dataToWrite.length() / 2) / 16;
                 int addressToWrite;
                 int startData;
                 int endData;
                 String portion;
-                for (int i = 0; i < iter; i++) {
-                    addressToWrite = (address + i * 16) / 2;
-                    startData = i * 32;
-                    endData = startData + 32;
+                int lenToWrite = dataToWrite.length() / 2;
+                int index = 0;
+
+                do {
+                    addressToWrite = (address + index * 16);
+                    startData = index * 32;
+                    endData = startData + (lenToWrite >= 16 ? 32 : lenToWrite * 2);
                     portion = dataToWrite.substring(startData, endData);
                     result = reader.writeTagData(password, realTagId, memoryBank, addressToWrite, portion, timeOut);
                     if (result.result != reader.RESULT_SUCCESS) {
@@ -309,7 +286,19 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
                         prevCommandSuccess = false;
                         break;
                     }
-                }
+
+                    if (changePC) {
+                        changePC = false;
+                        if (data.substring(0, 2).equals("00")) {
+                            realTagId = "3000" + tagId;
+                        } else {
+                            realTagId = "3400" + tagId;
+                        }
+                    }
+
+                    lenToWrite -= 16;
+                    index++;
+                } while(lenToWrite > 0);
 
                 if (prevCommandSuccess) {
                     Log.d("TAG", "Данные успешно записаны.");
