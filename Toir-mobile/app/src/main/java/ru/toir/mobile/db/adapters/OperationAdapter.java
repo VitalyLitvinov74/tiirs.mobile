@@ -101,6 +101,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
             viewHolder.description = (TextView) convertView.findViewById(R.id.op_description);
             viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
+            viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_value);
             viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
             viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
             convertView.setTag(viewHolder);
@@ -153,7 +154,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     int newHeight = (int)(height * scaleWidth);
                     viewHolder.image.setImageBitmap(Bitmap.createScaledBitmap (imageBitmap, newWidth, newHeight, false));
                     //viewHolder.image.setImageBitmap(imageBitmap);
-
                 }
             }
         }
@@ -187,6 +187,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         TextView end_date;
         TextView description;
         TextView normative;
+        TextView measure;
         ImageView image;
         RelativeLayout description_layout;
     }

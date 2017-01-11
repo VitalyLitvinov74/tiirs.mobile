@@ -48,7 +48,7 @@ public class NativeCameraFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		rootView = inflater.inflate(R.layout.fragment_native_camera, container,
+		rootView = inflater.inflate(R.layout.measure, container,
 				false);
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();

@@ -118,14 +118,12 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     ListView mainListView;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
-    //private ReferenceSpinnerListener filterSpinnerListener = new ReferenceSpinnerListener();
 
     private NumberPicker numberPicker;
     private Spinner spinnerSuffix;
     private ArrayAdapter<OrderFragment.Suffixes> spinnerSuffixAdapter;
     private ArrayList<OrderFragment.Suffixes> suffixList;
     private String lastPhotoFile;
-    //Preview mPreview;
 
     private LinearLayout resultButtonLayout;
     private Button makePhotoButton;
@@ -251,7 +249,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         //tlButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_button_layout);
         resultLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultsLayout);
         listLayout = (LinearLayout) rootView.findViewById(R.id.tl_listLayout);
-        //photoContainer = (LinearLayout) rootView.findViewById(R.id.tl_photoContainer);
         globalLayout = (RelativeLayout) rootView.findViewById(R.id.tl_global_layout);
         bottomBar = (BottomBar) (getActivity()).findViewById(R.id.bottomBar);
         resultButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultButtonLayout);
@@ -774,18 +771,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         final long currentTime = System.currentTimeMillis();
         //long totalTimeElapsed = currentTime - startTime;
         CheckBox checkBox;
-        /*
-        final String taskStageStatusUuid2="8ee8a4f8-5c98-4444-86ed-133923132322";
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                TaskStageStatus taskStageStatusComplete;
-                taskStageStatusComplete = realmDB.createObject(TaskStageStatus.class);
-                taskStageStatusComplete.set_id(2);
-                taskStageStatusComplete.setUuid(taskStageStatusUuid2);
-                taskStageStatusComplete.setTitle("Выполнен");
-            }
-        });*/
         final TaskStageStatus taskStageComplete;
         taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("title","Выполнен").findFirst();
 
@@ -1318,6 +1303,3 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         return mediaFile;
     }
 }
-
-
-

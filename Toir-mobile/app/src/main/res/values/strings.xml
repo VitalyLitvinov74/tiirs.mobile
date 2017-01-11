@@ -113,7 +113,10 @@
 
     <string name="image_status_equipment">изображение статуса оборудования</string>
     <string name="normative">Норматив: </string>
-    <string name="finish_stage">Закончить этап</string>
+    <string name="finish_stage">Закончить</string>
+    <string name="measure">Измерить</string>
+    <string name="measure_label">Последнее измерение:</string>
+    <string name="measure_description">Проведите измерение необходимой величины и внесите показания в форму ниже. Также вы можете просмотреть динамику изменения за последние несколько обследований.</string>
     <string name="operation_time">Время операции:</string>
     <string name="tire"> - </string>
     <string name="sec">сек.</string>

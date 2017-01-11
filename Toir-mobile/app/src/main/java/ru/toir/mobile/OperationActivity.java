@@ -466,7 +466,7 @@ public class OperationActivity extends AppCompatActivity {
 
             // инициализировать интерфейс для фотографии
             View cameraView = View.inflate(getApplicationContext(),
-                    R.layout.fragment_native_camera, photoContainer);
+                    R.layout.measure, photoContainer);
 
             ViewGroup.LayoutParams photoParams = cameraView.getLayoutParams();
             // пропорции предпросмотра с камеры 4:3
