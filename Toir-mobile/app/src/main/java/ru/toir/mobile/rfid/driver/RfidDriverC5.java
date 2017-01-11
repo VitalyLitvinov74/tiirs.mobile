@@ -4,9 +4,9 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.DataUtils;
+
+import android.hardware.uhf.magic.UHFCommandResult;
 import android.hardware.uhf.magic.reader;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,26 +59,25 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-		reader.m_handler = new Handler(new Handler.Callback() {
 
-			@Override
-			public boolean handleMessage(Message msg) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                UHFCommandResult result;
 
-				if (msg.what == reader.RESULT_SUCCESS) {
-					String data = (String) msg.obj;
-					Log.d(TAG, data);
-					sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj).sendToTarget();
-				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-				} else {
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-				}
-				return true;
-			}
-		});
-
-		// запускаем поиск метки
-		reader.readTagId(timeOut);
+                // запускаем поиск метки
+                result = reader.readTagId(timeOut);
+                if (result.result == reader.RESULT_SUCCESS) {
+                    Log.d(TAG, result.data);
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, result.data).sendToTarget();
+                } else if (result.result == reader.RESULT_TIMEOUT) {
+                    sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                }
+            }
+        });
+        thread.start();
 	}
 
 	@Override
@@ -97,208 +96,216 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 	 * Читаем произвольную метку.
 	 */
 	@Override
-	public void readTagData(final String password, final int memoryBank, final int address,
-							final int count) {
-
-        reader.m_handler = new Handler(new Handler.Callback() {
-
-			@Override
-			public boolean handleMessage(Message msg) {
-				if (msg.what == reader.RESULT_SUCCESS) {
-					String pcepc = (String) msg.obj;
-					Log.d("TAG", "tagId = " + pcepc);
-					reader.m_handler = new Handler(new Handler.Callback() {
-
-						@Override
-						public boolean handleMessage(Message msg) {
-
-							if (msg.what == reader.RESULT_SUCCESS) {
-								String data = (String) msg.obj;
-								Log.d(TAG, data);
-								sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj).sendToTarget();
-							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-							} else {
-								sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-							}
-
-							return true;
-						}
-					});
-
-					// читаем данные из памяти метки
-					reader.readTagData(password, pcepc, memoryBank, address, count, timeOut);
-				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					Log.d("TAG", "вышел таймаут.");
-					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-				} else {
-					Log.d("TAG", "что-то пошло не так.");
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-				}
-
-				return true;
-			}
-		});
-
+	public void readTagData(String password, int memoryBank, int address, int count) {
 		// запускаем поиск метки
-		reader.readTagId(timeOut);
-
+		UHFCommandResult result = reader.readTagId(timeOut);
+        if (result.result == reader.RESULT_SUCCESS) {
+            String pcepc = result.data;
+            Log.d("TAG", "tagId = " + pcepc);
+            // читаем данные из памяти метки
+            result = reader.readTagData(password, pcepc, memoryBank, address, count, timeOut);
+            if (result.result == reader.RESULT_SUCCESS) {
+                Log.d(TAG, result.data);
+                sHandler.obtainMessage(RESULT_RFID_SUCCESS, result.data).sendToTarget();
+            } else if (result.result == reader.RESULT_TIMEOUT) {
+                sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+            } else {
+                sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+            }
+        } else if (result.result == reader.RESULT_TIMEOUT) {
+            Log.d("TAG", "вышел таймаут.");
+            sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+        } else {
+            Log.d("TAG", "что-то пошло не так.");
+            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+        }
 	}
 
 	/**
 	 * Читаем метку с известным Id
 	 */
 	@Override
-	public void readTagData(final String password, String tagId, final int memoryBank,
+	public void readTagData(final String password, final String tagId, final int memoryBank,
                             final int address, final int count) {
 
-        Handler findTagIdHandler = new Handler(new Handler.Callback() {
-
+        Thread thread = new Thread(new Runnable() {
             @Override
-            public boolean handleMessage(Message msg) {
+            public void run() {
+                // устанавливаем "фильтр" по tagId для поиска метки
+                boolean success;
+                success = reader.select(reader.SELECT_ENABLE, 0x20, (byte)(tagId.length() / 2 * 8),
+                        (byte)0x00, DataUtils.hexStringTobyte(tagId));
 
-				if (reader.SetSelect(reader.SELECT_DISABLE) == 0) {
-					Log.d(TAG, "Маска сборошена.");
-				} else {
-                    Log.e(TAG, "Маска не сборошена!!!");
-                }
+                if (success) {
+                    // запускаем поиск метки
+                    UHFCommandResult result = reader.readTagId(timeOut);
+                    if (reader.SetSelect(reader.SELECT_DISABLE) == 0) {
+                        Log.d(TAG, "Маска сборошена.");
+                    } else {
+                        Log.e(TAG, "Маска не сборошена!!!");
+                    }
 
-				if (msg.what == reader.RESULT_SUCCESS) {
-                    String data = (String) msg.obj;
-                    Log.d(TAG, "tagId within readTagData - " + data);
-
-					reader.m_handler = new Handler(new Handler.Callback() {
-
-						@Override
-						public boolean handleMessage(Message msg) {
-							if (msg.what == reader.RESULT_SUCCESS) {
-								Log.d("TAG", "данные успешно прочитаны.");
-								sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg.obj).sendToTarget();
-							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								Log.d("TAG", "вышел таймаут.");
-								sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-							} else {
-								Log.d("TAG", "что-то пошло не так.");
-								sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-							}
-
-							return true;
-						}
-					});
-
-                    // запускаем чтение данных из метки
-                    reader.readTagData(password, data, memoryBank, address, count, timeOut);
-
-				} else if (msg.what == reader.RESULT_TIMEOUT) {
-                    sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                    if (result.result == reader.RESULT_SUCCESS) {
+                        String pcepc = result.data;
+                        Log.d(TAG, "tagId within readTagData - " + pcepc);
+                        // запускаем чтение данных из метки
+                        result = reader.readTagData(password, pcepc, memoryBank, address, count, timeOut);
+                        if (result.result == reader.RESULT_SUCCESS) {
+                            Log.d("TAG", "данные успешно прочитаны.");
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, result.data).sendToTarget();
+                        } else if (result.result == reader.RESULT_TIMEOUT) {
+                            Log.d("TAG", "вышел таймаут.");
+                            sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                        } else {
+                            Log.d("TAG", "что-то пошло не так.");
+                            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                        }
+                    } else if (result.result == reader.RESULT_TIMEOUT) {
+                        sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    }
                 } else {
+                    Log.d(TAG, "не смогли установить маску для фильтра по tagId");
                     sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                 }
-
-                return true;
             }
         });
+        thread.start();
+	}
 
-        // устанавливаем "фильтр" по tagId для поиска метки
-        boolean result;
-        result = reader.select((byte)0x01, 0x20, (byte)(tagId.length() / 2 * 8), (byte)0x00, DataUtils.hexStringTobyte(tagId));
-        if (result) {
-            // обработчик сообщений на команду поиска определённой метки
-            reader.m_handler = findTagIdHandler;
-            // запускаем поиск метки
-            reader.readTagId(timeOut);
-        } else {
-            Log.d(TAG, "не смогли установить маску для фильтра по tagId");
-            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+	@Override
+	public void writeTagData(String password, int memoryBank, int address, String data) {
+            writeTagData(password, null, memoryBank, address, data);
+	}
+
+	@Override
+	public void writeTagData(String password, String tagId, int memoryBank, int address,
+                             String data) {
+
+        WriteDataToTAG runnable = new WriteDataToTAG(password, tagId, memoryBank, address, data);
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private class WriteDataToTAG implements Runnable {
+        private String password;
+        private String tagId;
+        private int memoryBank;
+        private int address;
+        private String data;
+
+        WriteDataToTAG(String password, String tagId, int memoryBank, int address, String data) {
+            this.password = password;
+            this.tagId = tagId;
+            this.memoryBank = memoryBank;
+            this.address = address;
+            this.data = data;
         }
-	}
 
-	@Override
-	public void writeTagData(String password, int memoryBank, int address,
-			String data) {
-		// TODO: реализовать запись в метку в три шага
-        // TODO: 1) считать данные сразу за данными для записм до конца метки
-        // TODO: 2) записать переданные данные
-        // TODO: 3) записать данные считанные ранее (в ответ будет ошибка)
-        // TODO: возможно счтитать "контрольные" данные для проверки записи в метку
+        @Override
+        public void run() {
+            UHFCommandResult result;
+            String realTagId;
 
-		final String lPassword = password;
-		final int lMemoryBank = memoryBank;
-		final int lAddress = address;
-		final String lData = data;
+            if (tagId == null) {
+                result = reader.readTagId(5000);
+                if (result.result == reader.RESULT_SUCCESS) {
+                    tagId = result.data.substring(4);
+                    realTagId = result.data;
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    return;
+                }
+            } else {
+                // пытаемся найти подходящую метку установив фильтр
+                boolean success;
+                success = reader.select(reader.SELECT_ENABLE, 0x20, (byte)(tagId.length() / 2 * 8),
+                        reader.TRUNCATE_DISABLE, DataUtils.hexStringTobyte(tagId));
 
-        reader.m_handler = new Handler(new Handler.Callback() {
+                if (success) {
+                    Log.d(TAG, "маска установленна!!!");
+                    result = reader.readTagId(5000);
+                    if (result.result == reader.RESULT_SUCCESS) {
+                        realTagId = result.data;
+                        reader.SetSelect(reader.SELECT_DISABLE);
+                    } else {
+                        reader.SetSelect(reader.SELECT_DISABLE);
+                        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                        return;
+                    }
+                } else {
+                    Log.d(TAG, "не удалось установить маску!!!");
+                    sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    return;
+                }
+            }
 
-			@Override
-			public boolean handleMessage(Message msg) {
-				if (msg.what == reader.RESULT_SUCCESS) {
-					String pcepc = (String) msg.obj;
-					Log.d("TAG", "tagId = " + pcepc);
-					reader.m_handler = new Handler(new Handler.Callback() {
+            boolean changePC = address == 0;
 
-						@Override
-						public boolean handleMessage(Message msg) {
-							if (msg.what == reader.RESULT_SUCCESS) {
-								sHandler.obtainMessage(RESULT_RFID_SUCCESS)
-										.sendToTarget();
-							} else if (msg.what == reader.RESULT_TIMEOUT) {
-								sHandler.obtainMessage(RESULT_RFID_TIMEOUT)
-										.sendToTarget();
-							} else {
-								sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR)
-										.sendToTarget();
-							}
-							return true;
-						}
-					});
+            int endWriteData = address + data.length() / 2;
+            String dataToWrite = data;
 
-					// пишем данные в метку
-					reader.writeTagData(lPassword, pcepc, lMemoryBank,
-							lAddress, lData, timeOut);
-				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					Log.d("TAG", "вышел таймаут.");
-					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-				} else {
-					Log.d("TAG", "что-то пошло не так.");
-					sHandler.obtainMessage(RESULT_RFID_READ_ERROR)
-							.sendToTarget();
-				}
-				return true;
-			}
-		});
+            if (endWriteData < 64) {
+                // читаем данные которые при записи будут затёрты, чтоб записать их по новой
+                result = reader.readTagData(password, realTagId, memoryBank,
+                        endWriteData, (64 - endWriteData), 5000);
 
-		// запускаем поиск метки
-		reader.readTagId(timeOut);
-	}
+                if (result.result == reader.RESULT_SUCCESS) {
+                    // данные успешно прочитаны
+                    dataToWrite += result.data;
+                } else if (result.result == reader.RESULT_TIMEOUT) {
+                    Log.d("TAG", "вышел таймаут.");
+                    sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                    return;
+                } else {
+                    Log.d("TAG", "что-то пошло не так.");
+                    sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+                    return;
+                }
+            }
 
-	@Override
-	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, String data) {
-        // TODO: реализовать запись в метку в три шага
-        // TODO: 1) считать данные сразу за данными для записм до конца метки
-        // TODO: 2) записать переданные данные
-        // TODO: 3) записать данные считанные ранее (в ответ будет ошибка)
-        // TODO: возможно счтитать "контрольные" данные для проверки записи в метку
+            // TODO: вся поганка в том что если в "середине" процесса произойдёт ошибка, в метке будет "мусор"
+            boolean prevCommandSuccess = true;
+            int addressToWrite;
+            int startData;
+            int endData;
+            String portion;
+            int lenToWrite = dataToWrite.length() / 2;
+            int index = 0;
 
-        reader.m_handler = new Handler(new Handler.Callback() {
+            do {
+                addressToWrite = (address + index * 16);
+                startData = index * 32;
+                endData = startData + (lenToWrite >= 16 ? 32 : lenToWrite * 2);
+                portion = dataToWrite.substring(startData, endData);
+                result = reader.writeTagData(password, realTagId, memoryBank, addressToWrite, portion, timeOut);
+                if (result.result != reader.RESULT_SUCCESS) {
+                    // произошла ошибка
+                    prevCommandSuccess = false;
+                    break;
+                }
 
-			@Override
-			public boolean handleMessage(Message msg) {
-				if (msg.what == reader.RESULT_SUCCESS) {
-					// данные успешно записаны
-					sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
-				} else if (msg.what == reader.RESULT_TIMEOUT) {
-					Log.d("TAG", "вышел таймаут.");
-					sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-				} else {
-					Log.d("TAG", "что-то пошло не так.");
-					sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR)
-							.sendToTarget();
-				}
-				return true;
-			}
-		});
+                if (changePC) {
+                    changePC = false;
+                    if (data.substring(0, 2).equals("00")) {
+                        realTagId = "3000" + tagId;
+                    } else {
+                        realTagId = "3400" + tagId;
+                    }
+                }
 
-		reader.writeTagData(password, tagId, memoryBank, address, data, timeOut);
-	}
+                lenToWrite -= 16;
+                index++;
+            } while(lenToWrite > 0);
+
+            if (prevCommandSuccess) {
+                Log.d("TAG", "Данные успешно записаны.");
+                sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+            } else {
+                Log.e("TAG", "Не удалось записать данные в метку!");
+                sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+            }
+        }
+    }
 }

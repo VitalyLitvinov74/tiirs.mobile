@@ -174,6 +174,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         if (data[mark_head + 3] == 0x01) {
                             CommandType.CommandOK = true;
                             ((Frequency_region)mUHF.mObject).region = data[mark_head + 4];
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -185,6 +188,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                             CommandType.CommandOK = true;
                             ((Temperature)mUHF.mObject).temp_msb = data[mark_head + 4];
                             ((Temperature)mUHF.mObject).temp_lsb = data[mark_head + 5];
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -210,6 +216,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                             ((Multi_interval)mUHF.mObject).interval_lsb = data[mark_head + 7];
                             ((Multi_interval)mUHF.mObject).work_time = ((Multi_interval)mUHF.mObject).work_time_msb << 8 | ((Multi_interval)mUHF.mObject).work_time_lsb;
                             ((Multi_interval)mUHF.mObject).interval = ((Multi_interval)mUHF.mObject).interval_msb << 8 | ((Multi_interval)mUHF.mObject).interval_lsb;
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -220,6 +229,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         if (data[mark_head + 3] == '\u0001') {
                             CommandType.CommandOK = true;
                             ((Fastid)mUHF.mObject).fastid_switch = data[mark_head + 4];
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -250,6 +262,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         if (data[mark_head + 3] == 0x01) {
                             CommandType.CommandOK = true;
                             ((Lock)mUHF.mObject).ant_id = data[mark_head + 4];
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;
@@ -260,6 +275,9 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         if (data[mark_head + 3] == 0x01) {
                             CommandType.CommandOK = true;
                             ((Kill)mUHF.mObject).ant_id = data[mark_head + 4];
+                        } else {
+                            CommandType.CommandOK = false;
+                            CommandType.CommandResend = true;
                         }
 
                         datalen = 0;

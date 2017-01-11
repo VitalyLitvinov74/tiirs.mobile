@@ -158,7 +158,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 				Spinner spinner = (Spinner) v.getRootView().findViewById(
 						R.id.rfid_dialog_text_spinner_lables);
 				sHandler.obtainMessage(RESULT_RFID_SUCCESS,
-						spinner.getSelectedItem()).sendToTarget();
+						"0000" + spinner.getSelectedItem()).sendToTarget();
 			}
 		});
 
@@ -207,7 +207,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
         // строим интерфейс с настройками драйвера
         CheckBoxPreference modePreference = new CheckBoxPreference(screen.getContext());
         modePreference.setKey(TEXTDRV_MODE_PREF_KEY);
-        modePreference.setTitle("Чтение/запись");
+        modePreference.setTitle("Чтение / запись");
         screen.addPreference(modePreference);
         return screen;
     }
