@@ -58,7 +58,6 @@ import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.FragmentAddUser;
 import ru.toir.mobile.fragments.FragmentEditUser;
 import ru.toir.mobile.fragments.GPSFragment;
-import ru.toir.mobile.fragments.NativeCameraFragment;
 import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
@@ -441,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
-                        //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
@@ -458,10 +457,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem != null) {
-                            if (drawerItem.getIdentifier() == FRAGMENT_CAMERA) {
-                                currentFragment = FRAGMENT_CAMERA;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, NativeCameraFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
+                            if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
                                 currentFragment = FRAGMENT_CHARTS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_DOWNLOAD) {

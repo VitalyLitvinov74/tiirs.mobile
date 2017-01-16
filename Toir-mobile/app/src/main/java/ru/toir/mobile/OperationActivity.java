@@ -480,6 +480,7 @@ public class OperationActivity extends AppCompatActivity {
             FrameLayout frame = ((FrameLayout) cameraView
                     .findViewById(R.id.camera_preview));
             frame.addView(mPreview);
+            /*
             Button captureButton = (Button) cameraView
                     .findViewById(R.id.button_capture);
             captureButton.setOnClickListener(new View.OnClickListener() {
@@ -487,7 +488,7 @@ public class OperationActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     mPreview.mCamera.takePicture(null, null, pictureCallback);
                 }
-            });
+            });*/
 
         }
     }
@@ -946,7 +947,7 @@ public class OperationActivity extends AppCompatActivity {
                             if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 new AlertDialog.Builder(view.getContext())
                                         .setTitle("Информация о программе")
-                                        .setMessage("TOiR Mobile v1.0.1\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
+                                        .setMessage(R.string.program_version)
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                             }

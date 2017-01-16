@@ -56,6 +56,7 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
@@ -93,6 +94,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private TaskStageAdapter taskStageAdapter;
     private OperationAdapter operationAdapter;
     private Button submit;
+    private Button measure;
 
     private LinearLayout tlButtonLayout;
     private LinearLayout resultLayout;
@@ -241,9 +243,12 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 false);
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
-        submit = (Button)rootView.findViewById(R.id.finishButton);
+        submit = (Button)rootView.findViewById(R.id.tl_finishButton);
         submit.setOnClickListener(this);
         submit.setVisibility(View.GONE);
+
+        measure = (Button)rootView.findViewById(R.id.tl_measureButton);
+        measure.setVisibility(View.GONE);
 
         realmDB = Realm.getDefaultInstance();
         //tlButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_button_layout);
@@ -255,7 +260,22 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         makePhotoButton = (Button) rootView.findViewById(R.id.tl_photoButton);
         makePhotoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                measureUI(MeasureTypeDBAdapter.Type.PHOTO);
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                File photo = getOutputMediaFile();
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photo));
+                startActivityForResult(intent, 100);
+            }
+        });
+        measure.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent measure = new Intent(getActivity(),
+                        MeasureActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("operationUuid", currentOperationUuid);
+                measure.putExtras(bundle);
+                getActivity().startActivity(measure);
+
             }
         });
 
@@ -351,6 +371,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setText(order.getTitle());
         }
         submit.setVisibility(View.GONE);
+        measure.setVisibility(View.GONE);
     }
 
     // TaskStages----------------------------------------------------------------------------------------
@@ -378,6 +399,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setText(task.getTaskTemplate().getTitle());
         }
         submit.setVisibility(View.GONE);
+        measure.setVisibility(View.GONE);
         makePhotoButton.setVisibility(View.GONE);
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -743,6 +765,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         currentTaskStageUuid = selectedStage.getUuid();
                         fillListViewOperations(selectedStage);
                         submit.setVisibility(View.VISIBLE);
+                        measure.setVisibility(View.VISIBLE);
                         Level = 3;
                         startOperations();
                     }
@@ -816,6 +839,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             currentTaskUuid = selectedTask.getUuid();
             fillListViewTaskStage(selectedTask);
             submit.setVisibility(View.GONE);
+            measure.setVisibility(View.GONE);
             Level = 2;
         }
     }

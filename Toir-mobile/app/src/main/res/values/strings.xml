@@ -120,4 +120,6 @@
     <string name="operation_time">Время операции:</string>
     <string name="tire"> - </string>
     <string name="sec">сек.</string>
+    <string name="input_value">введите данные</string>
+    <string name="program_version">TOiR Mobile v1.0.3\n ООО Технологии Энергосбережения (technosber.ru) (c)2016</string>
 </resources>

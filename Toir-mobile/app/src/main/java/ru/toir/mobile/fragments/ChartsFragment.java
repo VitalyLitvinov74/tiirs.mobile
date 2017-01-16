@@ -66,11 +66,11 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.activity_barchart, container, false);
-        tvX = (TextView) rootView.findViewById(R.id.tvXMax);
-        tvY = (TextView) rootView.findViewById(R.id.tvYMax);
+        //tvX = (TextView) rootView.findViewById(R.id.tvXMax);
+        //tvY = (TextView) rootView.findViewById(R.id.tvYMax);
 
-        mSeekBarX = (SeekBar) rootView.findViewById(R.id.seekBar1);
-        mSeekBarY = (SeekBar) rootView.findViewById(R.id.seekBar2);
+        //mSeekBarX = (SeekBar) rootView.findViewById(R.id.seekBar1);
+        //mSeekBarY = (SeekBar) rootView.findViewById(R.id.seekBar2);
 
         mChart = (BarChart) rootView.findViewById(R.id.chart1);
         mChart.setOnChartValueSelectedListener(this);
@@ -128,11 +128,11 @@ public class ChartsFragment extends Fragment implements OnSeekBarChangeListener,
         setData(12, 50);
 
         // setting data
-        mSeekBarY.setProgress(50);
-        mSeekBarX.setProgress(12);
+        //mSeekBarY.setProgress(50);
+        //mSeekBarX.setProgress(12);
 
-        mSeekBarY.setOnSeekBarChangeListener(this);
-        mSeekBarX.setOnSeekBarChangeListener(this);
+        //mSeekBarY.setOnSeekBarChangeListener(this);
+        //mSeekBarX.setOnSeekBarChangeListener(this);
         setHasOptionsMenu(true);
         // mChart.setDrawLegend(false);
 

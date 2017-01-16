@@ -2,42 +2,84 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <TextView
+        android:id="@+id/meas_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_margin="5dp"
+        android:background="#FAFAFA"
+        android:text="@string/measure_description"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/meas_header"
+    <LinearLayout
+        android:id="@+id/meas_linearLayout"
+        android:layout_width="fill_parent"
+        android:background="#FAFAFA"
+        android:layout_height="wrap_content" >
+
+        <Spinner
+            android:id="@+id/simple_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
-            android:background="#1565c0"
-            android:gravity="center_vertical"
-            android:paddingLeft="5dip"
-            android:text="@string/measure"
-            android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:layout_weight="1"
+            android:background="@color/white" />
 
-        <TextView
-            android:id="@+id/meas_description"
-            android:layout_width="wrap_content"
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/meas_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/meas_value"
+            android:layout_width="155dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="@string/measure_description"
-            android:textSize="16sp" />
-
-
+            android:inputType="number"
+            android:hint="@string/input_value" />
 
         <Button
-                android:id="@+id/button_capture"
-                android:text="@string/make_photo"
-                android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:layout_margin="10dp"
-                android:layout_gravity="bottom"
-                />
+            android:id="@+id/meas_Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/measure"
+            android:background="#4DD0E1"
+            android:drawableLeft="@drawable/measureicon"
+            android:textColor="#FAFAFA"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:layout_gravity="right" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/meas_content2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:orientation="horizontal">
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/chart1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
     </LinearLayout>
 </LinearLayout>

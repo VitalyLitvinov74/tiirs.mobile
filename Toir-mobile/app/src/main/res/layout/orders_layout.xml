@@ -64,15 +64,17 @@
             android:gravity="center_vertical|center_horizontal">
 
             <Button
-                android:id="@+id/finishButton"
+                android:id="@+id/tl_finishButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:background="#4DD0E1"
                 android:textColor="#FAFAFA"
                 android:text="@string/finish_stage"
                 android:textAlignment="center"
-                android:paddingRight="10dp"
-                android:paddingLeft="10dp" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp" />
 
             <Button
                 android:id="@+id/tl_photoButton"
@@ -90,7 +92,7 @@
                 android:paddingTop="10dp" />
 
             <Button
-                android:id="@+id/measureButton"
+                android:id="@+id/tl_measureButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/measure"
