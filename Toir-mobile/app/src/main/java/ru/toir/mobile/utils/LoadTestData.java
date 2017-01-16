@@ -11,6 +11,7 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.EquipmentType;
+import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
@@ -43,6 +44,9 @@ public class LoadTestData {
     private static EquipmentType equipmentType2;
     private static EquipmentType equipmentType3;
     private static EquipmentType equipmentType4;
+    private static MeasureType measureType1;
+    private static MeasureType measureType2;
+    private static MeasureType measureType3;
     private static OrderStatus orderStatus;
     private static OrderStatus orderStatus2;
     private static OrderStatus orderStatusUncomplete;
@@ -143,6 +147,10 @@ public class LoadTestData {
         final String equipmentTypeUuid3="1dd4d4f8-5c98-4444-86ed-97ddddf";
         final String equipmentTypeUuid4="1dd2d4f8-5c98-4444-86ed-97ddddf";
         final String equipmentTypeUuid5="1dd1d4f8-5c98-4444-86ed-97ddddf";
+
+        final String measureTypeUuid1="1dd4d4f8-5c98-4444-86ed-97debdf";
+        final String measureTypeUuid2="1dd2d4f8-5c98-4444-86ed-97dbedf";
+        final String measureTypeUuid3="1dd1d4f8-5c98-4444-86ed-97dbbdf";
 
         final String equipmentStatusUuid="1dd8d4f8-5c98-4124-86ed-9722222";
         final String equipmentStatusUuid2="1dd8d4f8-5c98-4124-86ed-9722332";
@@ -270,6 +278,35 @@ public class LoadTestData {
                 profile.setWhoIs("Ведущий специалист");
                 profile.setActive(true);
                 profile.setContact("+79227000285 Иван");
+            }
+        });
+
+        // MeasureType -----------------
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                measureType1 = realmDB.createObject(MeasureType.class);
+                measureType1.set_id(1);
+                measureType1.setUuid(measureTypeUuid1);
+                measureType1.setTitle("Температура");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                measureType2 = realmDB.createObject(MeasureType.class);
+                measureType2.set_id(2);
+                measureType2.setUuid(measureTypeUuid1);
+                measureType2.setTitle("Давление");
+            }
+        });
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                measureType3 = realmDB.createObject(MeasureType.class);
+                measureType3.set_id(3);
+                measureType3.setUuid(measureTypeUuid1);
+                measureType3.setTitle("Частота");
             }
         });
 
