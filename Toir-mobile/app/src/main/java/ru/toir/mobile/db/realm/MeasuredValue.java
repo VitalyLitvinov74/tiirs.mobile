@@ -14,7 +14,7 @@ public class MeasuredValue extends RealmObject {
     private long _id;
     private String uuid;
     private Equipment equipment;
-    private OperationTemplate operationTemplate;
+    private Operation operation;
     private MeasureType measureType;
     private Date date;
     private String value;
@@ -45,12 +45,12 @@ public class MeasuredValue extends RealmObject {
         this.equipment = equipment;
     }
 
-    public OperationTemplate getOperationTemplate() {
-        return operationTemplate;
+    public Operation getOperation() {
+        return operation;
     }
 
-    public void setOperationTemplate(OperationTemplate operationTemplate) {
-        this.operationTemplate = operationTemplate;
+    public void setOperation(Operation operation) {
+        this.operation = operation;
     }
 
     public MeasureType getMeasureType() {

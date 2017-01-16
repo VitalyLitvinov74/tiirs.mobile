@@ -66,6 +66,7 @@ import ru.toir.mobile.db.adapters.OrderStatusAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
+import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -111,6 +112,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private String currentTaskUuid = "";
     private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
+
+    private Equipment currentEquipment;
+    private Operation currentOperation;
 
     private int     currentOperationId = 0;
     private long    startTime = 0;
@@ -272,7 +276,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 Intent measure = new Intent(getActivity(),
                         MeasureActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("operationUuid", currentOperationUuid);
+                bundle.putString("operationUuid", currentOperation.getUuid());
+                bundle.putString("equipmentUuid", currentEquipment.getUuid());
                 measure.putExtras(bundle);
                 getActivity().startActivity(measure);
 
@@ -716,6 +721,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     if (selectedTask != null) {
                         Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
                         final String expectedTagId = selectedTask.getEquipment().getTagId();
+                        currentEquipment = selectedTask.getEquipment();
                         Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
                         Handler handler = new Handler(new Handler.Callback() {
                             @Override
@@ -853,6 +859,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
                 textTime.setText((int)(currentTime-startTime)/1000 + "сек.");
                 currentOperationUuid=operationAdapter.getItem(currentOperationId).getUuid();
+                currentOperation = operationAdapter.getItem(currentOperationId);
                 if (firstLaunch)
                     onStart();
             }

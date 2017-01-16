@@ -40,11 +40,16 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.db.adapters.MeasureTypeAdapter;
+import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.MeasureType;
+import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.Operation;
 
 public class MeasureActivity extends AppCompatActivity implements OnChartValueSelectedListener {
     private Realm realmDB;
@@ -60,11 +65,18 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     private Button meas_submit;
     private Spinner meas_typeSpinner;
 
+    private MeasuredValue measuredValue;
+
     protected BarChart mChart;
     private SeekBar mSeekBarX, mSeekBarY;
     private TextView tvX, tvY;
     private Typeface mTf;
     private static MeasureType measureType1;
+
+    private String operationUuid = "";
+    private String equipmentUuid = "";
+    private Equipment currentEquipment;
+    private Operation currentOperation;
 
         @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +85,20 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setMainLayout(savedInstanceState);
 
-        //meas_header = (TextView) findViewById(R.id.meas_header);
+        Bundle b = getIntent().getExtras();
+            operationUuid = b.getString("operationUuid");
+            equipmentUuid = b.getString("equipmentUuid");
+
+            final RealmResults<Equipment> equipment = realmDB.where(Equipment.class).equalTo("uuid", equipmentUuid).findAll();
+            if(equipment.size()>0) {
+                currentEquipment = equipment.first();
+            }
+            RealmResults<Operation> operations = realmDB.where(Operation.class).equalTo("uuid", operationUuid).findAll();
+            if(operations.size()>0) {
+                currentOperation = operations.first();
+            }
+
+            //meas_header = (TextView) findViewById(R.id.meas_header);
         meas_description = (TextView) findViewById(R.id.meas_description);
         meas_value = (EditText) findViewById(R.id.meas_value);
         meas_submit = (Button) findViewById(R.id.meas_Button);
@@ -84,7 +109,29 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         typeSpinnerAdapter.notifyDataSetChanged();
         meas_typeSpinner.setAdapter(typeSpinnerAdapter);
 
-        //meas_header.setText("");
+            meas_submit.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    realmDB.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            measuredValue = realmDB.createObject(MeasuredValue.class);
+                            UUID uuid = UUID.randomUUID();
+                            long next_id = realm.where(MeasuredValue.class).max("_id").intValue() + 1;
+                            final MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
+                            measuredValue.set_id(next_id);
+                            measuredValue.setUuid(uuid.toString());
+                            measuredValue.setMeasureType(measureType);
+                            measuredValue.setDate(new Date());
+                            if (currentEquipment!=null) measuredValue.setEquipment(currentEquipment);
+                            if (currentOperation!=null) measuredValue.setOperation(currentOperation);
+                        }
+                    });
+
+                }
+            });
+
+
+            //meas_header.setText("");
         //tvX = (TextView) findViewById(R.id.meas_tvXMax);
         //tvY = (TextView) findViewById(R.id.meas_tvYMax);
         //mSeekBarX = (SeekBar) findViewById(R.id.meas_seekBar1);
@@ -127,7 +174,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         rightAxis.setSpaceTop(15f);
 
         // setting data
-        setData(12, 50);
+        setData(50);
 
         //mSeekBarY.setProgress(50);
         //mSeekBarX.setProgress(12);
@@ -217,19 +264,31 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     }
 
 
-    private void setData(int count, float range) {
+    private void setData(float range) {
+        int count;
         ArrayList<String> xVals = new ArrayList<>();
+        // TODO сделать выбор только нужных значений по оборудованию и шаблону операции
+        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class).findAll();
+        count = measuredValues.size();
         for (int i = 0; i < count; i++) {
             // add measured value
-            xVals.add("m"+i);
+            if (measuredValues.get(i)!=null) {
+                xVals.add(measuredValues.get(i).getDate().toString());
+            }
+        }
+        RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
+        for (Operation operation : operations) {
+            //if (operation.getOperationTemplate().getUuid().equals(currentOperation.getOperationTemplateUuid()))
         }
 
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
-
         for (int i = 0; i < count; i++) {
-            float mult = (range + 1);
-            float val = (float) (Math.random() * mult);
-            yVals1.add(new BarEntry(val, i));
+            //float mult = (range + 1);
+            //float val = (float) (Math.random() * mult);
+            //yVals1.add(new BarEntry(val, i));
+            if (measuredValues.get(i)!=null) {
+                yVals1.add(new BarEntry(Float.parseFloat(measuredValues.get(i).getValue()), i));
+            }
         }
 
         BarDataSet set1 = new BarDataSet(yVals1, "DataSet");
