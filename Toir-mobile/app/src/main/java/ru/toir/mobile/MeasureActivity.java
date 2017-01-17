@@ -122,6 +122,11 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                             measuredValue.setUuid(uuid.toString());
                             measuredValue.setMeasureType(measureType);
                             measuredValue.setDate(new Date());
+                            measuredValue.setChangedAt(new Date());
+                            measuredValue.setCreatedAt(new Date());
+                            if (meas_value.getText().toString().equals(""))
+                                measuredValue.setValue("0");
+                            else measuredValue.setValue(meas_value.getText().toString());
                             if (currentEquipment!=null) measuredValue.setEquipment(currentEquipment);
                             if (currentOperation!=null) measuredValue.setOperation(currentOperation);
                         }
@@ -267,8 +272,9 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     private void setData(float range) {
         int count;
         ArrayList<String> xVals = new ArrayList<>();
-        // TODO сделать выбор только нужных значений по оборудованию и шаблону операции
-        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class).findAll();
+        // TODO сделать выбор нужных значений по шаблону операции
+        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class).equalTo("equipment.uuid",equipmentUuid).findAll();
+
         count = measuredValues.size();
         for (int i = 0; i < count; i++) {
             // add measured value
@@ -283,10 +289,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
 
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            //float mult = (range + 1);
-            //float val = (float) (Math.random() * mult);
-            //yVals1.add(new BarEntry(val, i));
-            if (measuredValues.get(i)!=null) {
+            if (measuredValues.get(i).getValue()!=null) {
                 yVals1.add(new BarEntry(Float.parseFloat(measuredValues.get(i).getValue()), i));
             }
         }

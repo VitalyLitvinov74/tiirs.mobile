@@ -48,7 +48,7 @@
             android:id="@+id/meas_value"
             android:layout_width="155dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:inputType="number|numberSigned|numberDecimal"
             android:hint="@string/input_value" />
 
         <Button
