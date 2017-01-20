@@ -40,12 +40,11 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
+import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
@@ -77,6 +76,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	private TextView tv_equipment_critical;
 	private ImageView tv_equipment_image;
 	private TextView tv_equipment_task_date;
+    private ListView tv_equipment_listview;
+    private TextView tv_equipment_status;
+
+    private TaskAdapter taskAdapter;
 
     // диалог для работы с rfid считывателем
 	private RfidDialog rfidDialog;
@@ -202,8 +205,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_uuid = (TextView) findViewById(R.id.equipment_text_uuid);
 		tv_equipment_position = (TextView) findViewById(R.id.equipment_text_location);
 		tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
-		tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_status);
+		//tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_status);
 		tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
+        tv_equipment_listview = (ListView) findViewById(R.id.list_view);
+        tv_equipment_status = (TextView) findViewById(R.id.equipment_text_status);
         //tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
 		//lv = (ListView) findViewById(R.id.equipment_info_operation_list);
         //tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
@@ -446,26 +451,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 		tv_equipment_critical.setText("Критичность: "
 				+ equipment.getCriticalType().getTitle());
 */
-        // if (equipmentOperationList != null &&
-        // equipmentOperationList.size()>0)
-        // tv_equipment_task_date.setText("" +
-        // taskDBAdapter.getCompleteTimeByUUID(equipmentOperationList.get(0).getTask_uuid()));
-        // else tv_equipment_task_date.setText("еще не обслуживалось");
 
-
-        Tasks task;
-        RealmList<TaskStages> taskStages;
-        task = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findFirst();
-        if (task != null) {
-            taskStages = task.getTaskStages();
-            if (taskStages.size()>0) {
-                 taskStages.get(0);
-                 tv_equipment_tasks.setText(""
-                    + taskStages.get(0).getTaskStageVerdict().getTitle());
-                }
+        if (equipment.getEquipmentStatus()!=null) {
+                 tv_equipment_status.setText(equipment.getEquipmentStatus().getTitle());
         } else {
-            tv_equipment_tasks.setText("еще не обслуживалось");
+            tv_equipment_status.setText("неизвестен");
         }
+
+        RealmResults<Tasks> tasks = realmDB.where(Tasks.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
+        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        tv_equipment_listview.setAdapter(taskAdapter);
 
         // TODO временно пока изображения не загружены
         if (equipment.get_id() == 1) tv_equipment_image.setImageResource(R.drawable.kotel);
@@ -491,7 +486,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     .setOnItemClickListener(new ListViewClickListener());
             }
         }
-/*
+
+    /*
 	private void FillListViewOperations() {
         TaskAdapter taskAdapter;
         RealmResults<Tasks> tasks;

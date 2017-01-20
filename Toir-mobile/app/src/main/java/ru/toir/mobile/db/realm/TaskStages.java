@@ -148,7 +148,7 @@ public class TaskStages extends RealmObject {
     }
 
     public void setEndDate(Date closeDate) {
-        this.endDate = endDate;
+        this.endDate = closeDate;
     }
 
     public Date getCreatedAt() {

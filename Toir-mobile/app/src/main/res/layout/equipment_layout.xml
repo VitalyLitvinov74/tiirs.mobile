@@ -197,10 +197,21 @@
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/information_32" />
 
+            <ListView
+                    android:id="@+id/list_view"
+                    android:layout_width="match_parent"
+                    android:divider="#333333"
+                    android:dividerHeight="1px"
+                    android:layout_below="@+id/equipment_text_operation_list"
+                    android:scrollbarAlwaysDrawVerticalTrack="true"
+                    android:layout_height="wrap_content"
+                android:paddingBottom="10dp">
+            </ListView>
+
             <View
                 android:id="@+id/equipment_divider2"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/equipment_text_operation_list"
+                android:layout_below="@+id/list_view"
                 android:layout_height="1dp"
                 android:background="#777777" />
 
@@ -214,7 +225,7 @@
                 android:background="#FAFAFA"
                 android:textColor="#757575"
                 android:text="@string/documentation"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/equipment_documentation_listView"

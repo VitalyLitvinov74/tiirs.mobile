@@ -66,6 +66,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
+            viewHolder.icon = (ImageView) convertView.findViewById(R.id.ts_ImageStatus);
             viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
             viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
             viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);

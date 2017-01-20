@@ -1101,6 +1101,8 @@ public class LoadTestData {
             taskStage.setEndDate(new Date());
             taskStage.setFlowOrder(1);
             taskStage.setStartDate(new Date());
+            taskStage.setEquipment(equipment);
+            taskStage.setEquipmentUuid(equipmentUuid);
             taskStage.setTaskStageVerdict(taskStageVerdict);
             taskStage.setTaskStageVerdictUuid(taskStageVerdictUuid);
             taskStage.setTaskStageTemplate(taskStageTemplate);
@@ -1123,6 +1125,8 @@ public class LoadTestData {
             taskStage2.setEndDate(new Date());
             taskStage2.setFlowOrder(2);
             taskStage2.setStartDate(new Date());
+            taskStage2.setEquipment(equipment2);
+            taskStage2.setEquipmentUuid(equipmentUuid2);
             taskStage2.setTaskStageVerdict(taskStageVerdict);
             taskStage2.setTaskStageVerdictUuid(taskStageVerdictUuid);
             taskStage2.setTaskStageTemplate(taskStageTemplate2);

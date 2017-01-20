@@ -36,7 +36,6 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,7 +100,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private LinearLayout resultLayout;
     private LinearLayout photoContainer;
     private LinearLayout listLayout;
-    private RelativeLayout globalLayout;
+    private LinearLayout globalLayout;
     private BottomBar bottomBar;
 
     private String TAG = "OrderFragment";
@@ -131,7 +130,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private ArrayList<OrderFragment.Suffixes> suffixList;
     private String lastPhotoFile;
 
-    private LinearLayout resultButtonLayout;
+    //private LinearLayout resultButtonLayout;
     private Button makePhotoButton;
 
     private ProgressDialog processDialog;
@@ -256,11 +255,11 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         realmDB = Realm.getDefaultInstance();
         //tlButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_button_layout);
-        resultLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultsLayout);
-        listLayout = (LinearLayout) rootView.findViewById(R.id.tl_listLayout);
-        globalLayout = (RelativeLayout) rootView.findViewById(R.id.tl_global_layout);
+        //resultLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultsLayout);
+        listLayout = (LinearLayout) rootView.findViewById(R.id.tl_listview_layout);
+        globalLayout = (LinearLayout) rootView.findViewById(R.id.tl_global_layout);
         bottomBar = (BottomBar) (getActivity()).findViewById(R.id.bottomBar);
-        resultButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultButtonLayout);
+        //resultButtonLayout = (LinearLayout) rootView.findViewById(R.id.tl_resultButtonLayout);
         makePhotoButton = (Button) rootView.findViewById(R.id.tl_photoButton);
         makePhotoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -341,7 +340,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setVisibility(View.GONE);
         }
 
-        resultButtonLayout.setVisibility(View.INVISIBLE);
+        //resultButtonLayout.setVisibility(View.INVISIBLE);
         makePhotoButton.setVisibility(View.INVISIBLE);
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -430,7 +429,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         operationAdapter = new OperationAdapter(getContext(), operations);
         mainListView.setAdapter(operationAdapter);
-        resultButtonLayout.setVisibility(View.VISIBLE);
+        //resultButtonLayout.setVisibility(View.VISIBLE);
         makePhotoButton.setVisibility(View.VISIBLE);
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = 1000;
@@ -826,9 +825,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     public void execute(Realm realm) {
                         taskStage.setTaskStageStatus(taskStageComplete);
                         //taskStage.setEndDate();
-                        taskStage.setEndDate(new Date(currentTime));
+                        taskStage.setEndDate(new Date());
                     }
                 });
+                taskStage.getEquipment();
             }
         }
         else {
@@ -896,8 +896,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             final long currentTime = System.currentTimeMillis();
             final OperationStatus operationStatusCompleted;
             final OperationVerdict operationVerdictCompleted;
-            operationStatusCompleted = realmDB.where(OperationStatus.class).findFirst();
-            operationVerdictCompleted = realmDB.where(OperationVerdict.class).findFirst();
+            operationStatusCompleted = realmDB.where(OperationStatus.class).equalTo("title","Выполнена").findFirst();
+            operationVerdictCompleted = realmDB.where(OperationVerdict.class).equalTo("title","Выполнена").findFirst();
             if (operationStatusCompleted == null)
                 Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
             if (operationVerdictCompleted == null)
@@ -1220,7 +1220,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
 
         if (measureType.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
-            resultButtonLayout.addView(numberPicker);
+            //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("Гц", 1));
             suffixList.add(new Suffixes("кГц", 1000));
@@ -1238,9 +1238,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             }
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
-            resultButtonLayout.addView(spinnerSuffix);
+            //resultButtonLayout.addView(spinnerSuffix);
         } else if (measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
-            resultButtonLayout.addView(numberPicker);
+            //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("В", 1));
             suffixList.add(new Suffixes("кВ", 1000));
@@ -1258,9 +1258,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             }
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
-            resultButtonLayout.addView(spinnerSuffix);
+            //resultButtonLayout.addView(spinnerSuffix);
         } else if (measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
-            resultButtonLayout.addView(numberPicker);
+            //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("Па", 1));
             suffixList.add(new Suffixes("кПа", 1000));
@@ -1278,7 +1278,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             }
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
-            resultButtonLayout.addView(spinnerSuffix);
+            //resultButtonLayout.addView(spinnerSuffix);
         } else if (measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
 
             Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
