@@ -142,6 +142,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 if (operation.getOperationStatus().getTitle().equals("Выполнена")) {
                     viewHolder.status.setChecked(true);
                 }
+
                 viewHolder.description.setText(operation.getOperationTemplate().getDescription());
                 viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
                 image=getOutputMediaFile(operation.getUuid());
