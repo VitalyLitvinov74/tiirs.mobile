@@ -20,7 +20,7 @@ public class ToirRealm {
     public static void init(Context context, String dbName) {
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
                 .name(dbName)
-                .schemaVersion(0)
+                .schemaVersion(1)
                 .build();
         try {
             Realm.migrateRealm(realmConfig, new ToirRealmMigration());
