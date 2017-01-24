@@ -49,7 +49,7 @@ import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.db.tables.GpsTrack;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
-import ru.toir.mobile.gps.TestGPSListener;
+import ru.toir.mobile.gps.GPSListener;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -97,7 +97,7 @@ public class GPSFragment extends Fragment {
 				LOCATION_SERVICE);
 
         if (lm != null) {
-			TestGPSListener tgpsl = new TestGPSListener(
+			GPSListener tgpsl = new GPSListener(
 					(TextView) rootView.findViewById(R.id.gps_TextView),
 					getActivity().getApplicationContext(), user.getUuid());
 			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1,

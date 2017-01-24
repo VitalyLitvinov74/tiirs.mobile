@@ -497,7 +497,7 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipmentModel = realmDB.createObject(EquipmentModel.class);
                 equipmentModel.set_id(1);
-                equipmentModel.setEquipmentTypeUuid(equipmentModelUuid);
+                //equipmentModel.setEquipmentTypeUuid(equipmentModelUuid);
                 equipmentModel.setEquipmentType(equipmentType);
                 equipmentModel.setUuid(equipmentModelUuid);
                 equipmentModel.setTitle("Тепловей 250А");
@@ -509,7 +509,7 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipmentModel2 = realmDB.createObject(EquipmentModel.class);
                 equipmentModel2.set_id(2);
-                equipmentModel2.setEquipmentTypeUuid(equipmentModelUuid2);
+                //equipmentModel2.setEquipmentTypeUuid(equipmentModelUuid2);
                 equipmentModel2.setEquipmentType(equipmentType2);
                 equipmentModel2.setUuid(equipmentModelUuid2);
                 equipmentModel2.setTitle("Unical-8800");
@@ -521,7 +521,7 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipmentModel3 = realmDB.createObject(EquipmentModel.class);
                 equipmentModel3.set_id(3);
-                equipmentModel3.setEquipmentTypeUuid(equipmentModelUuid3);
+                //equipmentModel3.setEquipmentTypeUuid(equipmentModelUuid3);
                 equipmentModel3.setEquipmentType(equipmentType);
                 equipmentModel3.setUuid(equipmentModelUuid3);
                 equipmentModel3.setTitle("Эмис РГС-245");
@@ -533,7 +533,7 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipmentModel4 = realmDB.createObject(EquipmentModel.class);
                 equipmentModel4.set_id(4);
-                equipmentModel4.setEquipmentTypeUuid(equipmentModelUuid4);
+                //equipmentModel4.setEquipmentTypeUuid(equipmentModelUuid4);
                 equipmentModel4.setEquipmentType(equipmentType2);
                 equipmentModel4.setUuid(equipmentModelUuid4);
                 equipmentModel4.setTitle("Эмис АИР-10");
@@ -546,15 +546,15 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipment = realmDB.createObject(Equipment.class);
                 equipment.set_id(1);
-                equipment.setCriticalTypeUuid(criticalTypeUuid);
-                equipment.setEquipmentModelUuid(equipmentModelUuid);
-                equipment.setEquipmentStatusUuid(equipmentStatusUuid);
+                //equipment.setCriticalTypeUuid(criticalTypeUuid);
+                //equipment.setEquipmentModelUuid(equipmentModelUuid);
+                //equipment.setEquipmentStatusUuid(equipmentStatusUuid);
                 equipment.setImage("teplovey.jpg");
                 equipment.setInventoryNumber("IN:001212");
                 equipment.setUuid(equipmentUuid);
                 equipment.setTitle("Теплогенератор Тепловей-250А");
                 equipment.setTagId("1234-5678-9101112");
-                equipment.setUserUuid(userTestUuid);
+                //equipment.setUserUuid(userTestUuid);
                 equipment.setLocation("Цех изоляторов ПФИ");
                 equipment.setLatitude((float) 55.343);
                 equipment.setLongitude((float) 55.234);
@@ -570,15 +570,15 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipment2 = realmDB.createObject(Equipment.class);
                 equipment2.set_id(2);
-                equipment2.setCriticalTypeUuid(criticalTypeUuid);
-                equipment2.setEquipmentModelUuid(equipmentModelUuid2);
-                equipment2.setEquipmentStatusUuid(equipmentStatusUuid);
+                //equipment2.setCriticalTypeUuid(criticalTypeUuid);
+                //equipment2.setEquipmentModelUuid(equipmentModelUuid2);
+                //equipment2.setEquipmentStatusUuid(equipmentStatusUuid);
                 equipment2.setImage("kotel.jpg");
                 equipment2.setInventoryNumber("IN:001213");
                 equipment2.setUuid(equipmentUuid2);
                 equipment2.setTitle("Газовый котел Unical");
                 equipment2.setTagId("02345567");
-                equipment2.setUserUuid(userTestUuid);
+                //equipment2.setUserUuid(userTestUuid);
                 equipment2.setLocation("Котельная №3");
                 equipment2.setLatitude((float) 55.5311);
                 equipment2.setLongitude((float) 55.1222);
@@ -594,15 +594,15 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipment3 = realmDB.createObject(Equipment.class);
                 equipment3.set_id(3);
-                equipment3.setCriticalTypeUuid(criticalTypeUuid2);
-                equipment3.setEquipmentModelUuid(equipmentModelUuid3);
-                equipment3.setEquipmentStatusUuid(equipmentStatusUuid3);
+                //equipment3.setCriticalTypeUuid(criticalTypeUuid2);
+                //equipment3.setEquipmentModelUuid(equipmentModelUuid3);
+                //equipment3.setEquipmentStatusUuid(equipmentStatusUuid3);
                 equipment3.setImage("gas_counter.jpg");
                 equipment3.setInventoryNumber("IN:62211252");
                 equipment3.setUuid(equipmentUuid3);
                 equipment3.setTitle("Счетчик газа ВК-G10T");
                 equipment3.setTagId("2321232-22322-74341");
-                equipment3.setUserUuid(userTestUuid2);
+                //equipment3.setUserUuid(userTestUuid2);
                 equipment3.setLocation("Теплопункт");
                 equipment3.setLatitude((float) 55.222143);
                 equipment3.setLongitude((float) 55.212134);
@@ -618,15 +618,15 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 equipment4 = realmDB.createObject(Equipment.class);
                 equipment4.set_id(4);
-                equipment4.setCriticalTypeUuid(criticalTypeUuid);
-                equipment4.setEquipmentModelUuid(equipmentModelUuid4);
-                equipment4.setEquipmentStatusUuid(equipmentStatusUuid3);
+                //equipment4.setCriticalTypeUuid(criticalTypeUuid);
+                //equipment4.setEquipmentModelUuid(equipmentModelUuid4);
+                //equipment4.setEquipmentStatusUuid(equipmentStatusUuid3);
                 equipment4.setImage("pressure.jpg");
                 equipment4.setInventoryNumber("IN:78921213");
                 equipment4.setUuid(equipmentUuid4);
                 equipment4.setTitle("Датчик давления YSO-04");
                 equipment4.setTagId("19532-09021123-2562293");
-                equipment4.setUserUuid(userTestUuid);
+                //equipment4.setUserUuid(userTestUuid);
                 equipment4.setLocation("Котельная №2");
                 equipment4.setLatitude((float) 55.53121);
                 equipment4.setLongitude((float) 55.12222);
@@ -643,12 +643,12 @@ public class LoadTestData {
         public void execute(Realm realm) {
             documentation = realmDB.createObject(Documentation.class);
             documentation.set_id(1);
-            documentation.setDocumentationTypeUuid(documentationTypeUuid);
+            //documentation.setDocumentationTypeUuid(documentationTypeUuid);
             documentation.setDocumentationType(documentationType);
-            documentation.setEquipmentUuid(equipmentUuid);
+            //documentation.setEquipmentUuid(equipmentUuid);
             documentation.setUuid(documentationUuid);
             documentation.setTitle("Паспорт на Тепловей-250/251");
-            documentation.setFileName("1.pdf");
+            documentation.setPath("1.pdf");
         }
     });
 
@@ -657,12 +657,12 @@ public class LoadTestData {
         public void execute(Realm realm) {
             documentation2 = realmDB.createObject(Documentation.class);
             documentation2.set_id(2);
-            documentation2.setDocumentationTypeUuid(documentationTypeUuid2);
+            //documentation2.setDocumentationTypeUuid(documentationTypeUuid2);
             documentation2.setDocumentationType(documentationType2);
-            documentation2.setEquipmentUuid(equipmentUuid2);
+            //documentation2.setEquipmentUuid(equipmentUuid2);
             documentation2.setUuid(documentationUuid2);
             documentation2.setTitle("Руководство на котел GTV-40");
-            documentation2.setFileName("2.pdf");
+            documentation2.setPath("2.pdf");
         }
     });
 
@@ -671,12 +671,12 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 documentation3 = realmDB.createObject(Documentation.class);
                 documentation3.set_id(3);
-                documentation3.setDocumentationTypeUuid(documentationTypeUuid3);
+                //documentation3.setDocumentationTypeUuid(documentationTypeUuid3);
                 documentation3.setDocumentationType(documentationType4);
-                documentation3.setEquipmentUuid(equipmentUuid3);
+                //documentation3.setEquipmentUuid(equipmentUuid3);
                 documentation3.setUuid(documentationUuid4);
                 documentation3.setTitle("Инструкция по эксплуатации счетчика ВК");
-                documentation3.setFileName("3.pdf");
+                documentation3.setPath("3.pdf");
             }
         });
 
@@ -685,12 +685,12 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 documentation4 = realmDB.createObject(Documentation.class);
                 documentation4.set_id(4);
-                documentation4.setDocumentationTypeUuid(documentationTypeUuid4);
+                //documentation4.setDocumentationTypeUuid(documentationTypeUuid4);
                 documentation4.setDocumentationType(documentationType3);
-                documentation4.setEquipmentUuid(equipmentUuid4);
+                //documentation4.setEquipmentUuid(equipmentUuid4);
                 documentation4.setUuid(documentationUuid3);
                 documentation4.setTitle("Протокол обмена с датчиком давления");
-                documentation4.setFileName("4.pdf");
+                documentation4.setPath("4.pdf");
             }
         });
 
@@ -885,12 +885,12 @@ public class LoadTestData {
             operationTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
             operationTemplate.setFirst_step(1);
             operationTemplate.setImage("");
-            operationTemplate.setEquipmentModelUuid(equipmentModelUuid);
+            //operationTemplate.setEquipmentModelUuid(equipmentModelUuid);
             operationTemplate.setEquipmentModel(equipmentModel);
             operationTemplate.setNormative(180);
             operationTemplate.setLast_step(0);
             operationTemplate.setOperationType(operationType);
-            operationTemplate.setOperationTypeUuid(operationTypeUuid);
+            //operationTemplate.setOperationTypeUuid(operationTypeUuid);
         }
     });
     realmDB.executeTransaction(new Realm.Transaction() {
@@ -904,12 +904,12 @@ public class LoadTestData {
             operationTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
             operationTemplate2.setFirst_step(0);
             operationTemplate2.setImage("");
-            operationTemplate2.setEquipmentModelUuid(equipmentModelUuid);
+            //operationTemplate2.setEquipmentModelUuid(equipmentModelUuid);
             operationTemplate2.setEquipmentModel(equipmentModel);
             operationTemplate2.setNormative(100);
             operationTemplate2.setLast_step(0);
             operationTemplate2.setOperationType(operationType2);
-            operationTemplate2.setOperationTypeUuid(operationTypeUuid2);
+            //operationTemplate2.setOperationTypeUuid(operationTypeUuid2);
         }
     });
 
@@ -925,12 +925,12 @@ public class LoadTestData {
             operationTemplate3.setDescription("Осмотреть накопитель на предмет утечек");
             operationTemplate3.setFirst_step(0);
             operationTemplate3.setImage("");
-            operationTemplate3.setEquipmentModelUuid(equipmentModelUuid);
+            //operationTemplate3.setEquipmentModelUuid(equipmentModelUuid);
             operationTemplate3.setEquipmentModel(equipmentModel);
             operationTemplate3.setNormative(110);
             operationTemplate3.setLast_step(0);
             operationTemplate3.setOperationType(operationType3);
-            operationTemplate3.setOperationTypeUuid(operationTypeUuid3);
+            //operationTemplate3.setOperationTypeUuid(operationTypeUuid3);
         }
     });
 
@@ -942,14 +942,14 @@ public class LoadTestData {
             operation.set_id(1);
             operation.setUuid(operationUuid);
             operation.setOperationStatus(operationStatusUncomplete);
-            operation.setOperationStatusUuid(operationStatusUuid);
+            //operation.setOperationStatusUuid(operationStatusUuid);
             operation.setEndDate(new Date());
             operation.setFlowOrder(1);
             operation.setStartDate(new Date());
             operation.setOperationVerdict(operationVerdict);
-            operation.setOperationVerdictUuid(operationVerdictUuid);
+            //operation.setOperationVerdictUuid(operationVerdictUuid);
             operation.setOperationTemplate(operationTemplate);
-            operation.setTaskStageUuid(taskStageUuid);
+            //operation.setTaskStageUuid(taskStageUuid);
         }
     });
 
@@ -960,14 +960,14 @@ public class LoadTestData {
             operation2.set_id(2);
             operation2.setUuid(operationUuid2);
             operation2.setOperationStatus(operationStatusUncomplete);
-            operation2.setOperationStatusUuid(operationStatusUuid);
+            //operation2.setOperationStatusUuid(operationStatusUuid);
             operation2.setEndDate(new Date());
             operation2.setFlowOrder(2);
             operation2.setStartDate(new Date());
             operation2.setOperationVerdict(operationVerdict);
-            operation2.setOperationVerdictUuid(operationVerdictUuid);
+            //operation2.setOperationVerdictUuid(operationVerdictUuid);
             operation2.setOperationTemplate(operationTemplate2);
-            operation2.setTaskStageUuid(taskStageUuid);
+            //operation2.setTaskStageUuid(taskStageUuid);
         }
     });
 
@@ -978,14 +978,14 @@ public class LoadTestData {
             operation3.set_id(3);
             operation3.setUuid(operationUuid3);
             operation3.setOperationStatus(operationStatusUncomplete);
-            operation3.setOperationStatusUuid(operationStatusUuid);
+            //operation3.setOperationStatusUuid(operationStatusUuid);
             operation3.setEndDate(new Date());
             operation3.setFlowOrder(3);
             operation3.setStartDate(new Date());
             operation3.setOperationVerdict(operationVerdict);
-            operation3.setOperationVerdictUuid(operationVerdictUuid);
+            //operation3.setOperationVerdictUuid(operationVerdictUuid);
             operation3.setOperationTemplate(operationTemplate3);
-            operation3.setTaskStageUuid(taskStageUuid);
+            //operation3.setTaskStageUuid(taskStageUuid);
         }
     });
     // ---------------------------------------------------------------------------------------------
@@ -1063,11 +1063,11 @@ public class LoadTestData {
             taskStageTemplate.setTitle("Снять заднюю крышку");
             taskStageTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
             taskStageTemplate.setImage("");
-            taskStageTemplate.setEquipmentModelUuid(equipmentModelUuid);
+            //taskStageTemplate.setEquipmentModelUuid(equipmentModelUuid);
             taskStageTemplate.setEquipmentModel(equipmentModel);
             taskStageTemplate.setNormative(480);
             taskStageTemplate.setTaskStageType(taskStageType);
-            taskStageTemplate.setTaskStageTypeUuid(taskStageTypeUuid);
+            //taskStageTemplate.setTaskStageTypeUuid(taskStageTypeUuid);
         }
     });
 
@@ -1081,11 +1081,11 @@ public class LoadTestData {
             taskStageTemplate2.setTitle("Убрать заднюю крышку");
             taskStageTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
             taskStageTemplate2.setImage("");
-            taskStageTemplate2.setEquipmentModelUuid(equipmentModelUuid);
+            //taskStageTemplate2.setEquipmentModelUuid(equipmentModelUuid);
             taskStageTemplate2.setEquipmentModel(equipmentModel);
             taskStageTemplate2.setNormative(300);
             taskStageTemplate2.setTaskStageType(taskStageType2);
-            taskStageTemplate2.setTaskStageTypeUuid(taskStageTypeUuid2);
+            //taskStageTemplate2.setTaskStageTypeUuid(taskStageTypeUuid2);
         }
     });
 
@@ -1213,11 +1213,11 @@ public class LoadTestData {
             taskTemplate.setTitle("Осмотр генератора Тепловея");
             taskTemplate.setDescription("Проверка на работоспособность и утечки");
             taskTemplate.setImage("");
-            taskTemplate.setEquipmentModelUuid(equipmentModelUuid);
+            //taskTemplate.setEquipmentModelUuid(equipmentModelUuid);
             taskTemplate.setEquipmentModel(equipmentModel);
             taskTemplate.setNormative(1480);
             taskTemplate.setTaskType(taskType);
-            taskTemplate.setTaskTypeUuid(taskTypeUuid);
+            //taskTemplate.setTaskTypeUuid(taskTypeUuid);
         }
     });
 
@@ -1231,11 +1231,11 @@ public class LoadTestData {
             taskTemplate2.setTitle("Ремонт генератора Тепловей-250");
             taskTemplate2.setDescription("Ремонт компрессора теплогенератора");
             taskTemplate2.setImage("");
-            taskTemplate2.setEquipmentModelUuid(equipmentModelUuid);
+            //taskTemplate2.setEquipmentModelUuid(equipmentModelUuid);
             taskTemplate2.setEquipmentModel(equipmentModel);
             taskTemplate2.setNormative(7300);
             taskTemplate2.setTaskType(taskType2);
-            taskTemplate2.setTaskTypeUuid(taskTypeUuid2);
+            //taskTemplate2.setTaskTypeUuid(taskTypeUuid2);
         }
     });
     // TaskStageOperationList -----------------
@@ -1284,7 +1284,7 @@ public class LoadTestData {
             task.setNextCode(2);
             task.addTaskStage(taskStage);
             task.addTaskStage(taskStage2);
-            task.setOrderUuid(orderUuid);
+            task.setOrder(order);
         }
     });
 
@@ -1307,7 +1307,7 @@ public class LoadTestData {
             task2.setComment("Горелка котла в котельной не горит. Требуется починить.");
             task2.setPrevCode(0);
             task2.setNextCode(1);
-            task2.setOrderUuid(orderUuid2);
+            task2.setOrder(order);
         }
     });
 
@@ -1326,9 +1326,9 @@ public class LoadTestData {
             order.setCloseDate(new Date());
             order.setStartDate(new Date());
             order.setOpenDate(new Date());
-            order.setOrderStatusUuid(orderStatusUuid);
+            //order.setOrderStatusUuid(orderStatusUuid);
             order.setOrderStatus(orderStatus);
-            order.setOrderVerdictUuid(orderVerdictUuid);
+            //order.setOrderVerdictUuid(orderVerdictUuid);
             order.setOrderVerdict(orderVerdict);
             order.setTitle("Осмотр камер наблюдения");
             order.addTask(task);
@@ -1350,9 +1350,9 @@ public class LoadTestData {
             order2.setCloseDate(new Date());
             order2.setStartDate(new Date());
             order2.setOpenDate(new Date());
-            order2.setOrderStatusUuid(orderStatusUuid2);
+            //order2.setOrderStatusUuid(orderStatusUuid2);
             order2.setOrderStatus(orderStatus2);
-            order2.setOrderVerdictUuid(orderVerdictUuid);
+            //order2.setOrderVerdictUuid(orderVerdictUuid);
             order2.setOrderVerdict(orderVerdict);
             order2.setTitle("Ремонтные работы по котельным");
             order2.addTask(task);
@@ -1374,9 +1374,9 @@ public class LoadTestData {
                 order3.setReceiveDate(new Date());
                 order3.setStartDate(new Date());
                 order3.setOpenDate(new Date());
-                order3.setOrderStatusUuid(orderStatusUuid3);
+                //order3.setOrderStatusUuid(orderStatusUuid3);
                 order3.setOrderStatus(orderStatusUncomplete);
-                order3.setOrderVerdictUuid(orderVerdictUuid2);
+                //order3.setOrderVerdictUuid(orderVerdictUuid2);
                 order3.setOrderVerdict(orderVerdict2);
                 order3.setTitle("Демонтаж устаревшего оборудования");
                 order3.addTask(task);
@@ -1397,9 +1397,9 @@ public class LoadTestData {
                 order4.setCloseDate(new Date());
                 order4.setStartDate(new Date());
                 order4.setOpenDate(new Date());
-                order4.setOrderStatusUuid(orderStatusUuid2);
+                //order4.setOrderStatusUuid(orderStatusUuid2);
                 order4.setOrderStatus(orderStatus2);
-                order4.setOrderVerdictUuid(orderVerdictUuid2);
+                //order4.setOrderVerdictUuid(orderVerdictUuid2);
                 order4.setOrderVerdict(orderVerdict2);
                 order4.setTitle("Демонтаж датчиков давления и счетчиков газа");
                 order4.addTask(task2);

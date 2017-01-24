@@ -1,12 +1,14 @@
 package ru.toir.mobile;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -61,10 +63,13 @@ import ru.toir.mobile.fragments.GPSFragment;
 import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
+import ru.toir.mobile.gps.GPSListener;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.serverapi.TokenSrv;
+
+import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PROFILE_ADD = 1;
@@ -145,6 +150,10 @@ public class MainActivity extends AppCompatActivity {
 
                     if (isLogged) {
                         setMainLayout(savedInstance);
+                        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+                        if (user!=null) {
+                            startGpsTracker(user.getUuid());
+                        }
                     } else {
                         setContentView(R.layout.login_layout);
                         ShowSettings();
@@ -561,6 +570,17 @@ public class MainActivity extends AppCompatActivity {
         //tabs.setViewPager(pager);
     }
 
+    void startGpsTracker(String user_uuid)
+        {
+         LocationManager lm = (LocationManager) getSystemService(
+            Context.LOCATION_SERVICE);
+            if (lm != null) {
+                GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, tgpsl);
+            }
+    }
+
+
     /**
      * Обработчик клика кнопки "Войти"
      *
@@ -601,7 +621,7 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
             return;
         }
-
+        addToJournal("Запущено обновление с сервера " + updateUrl);
         String path = Environment.getExternalStorageDirectory() + "/Download/";
         File file = new File(path);
         if (file.mkdirs()) {

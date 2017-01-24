@@ -15,7 +15,8 @@ public class Tasks extends RealmObject {
     private long _id;
     private String uuid;
     private String comment;
-    private String orderUuid;
+    //private String orderUuid;
+    private Orders order;
     private String equipmentUuid;
     private Equipment equipment;
     private String taskVerdictUuid;
@@ -56,12 +57,12 @@ public class Tasks extends RealmObject {
         this.comment = comment;
     }
 
-    public String getOrderUuid() {
-        return orderUuid;
+    public Orders getOrder() {
+        return order;
     }
 
-    public void setOrderUuid(String orderUuid) {
-        this.orderUuid = orderUuid;
+    public void setOrder(Orders order) {
+        this.order = order;
     }
 
     public String getEquipmentUuid() {

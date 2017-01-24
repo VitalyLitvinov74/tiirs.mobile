@@ -14,7 +14,7 @@ public class TaskType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String icon;
+    //private String icon;
     private Date createdAt;
     private Date changedAt;
 
@@ -40,14 +40,6 @@ public class TaskType extends RealmObject {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
     }
 
     public Date getCreatedAt() {

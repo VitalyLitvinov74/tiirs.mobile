@@ -16,6 +16,7 @@ public class RepairPart extends RealmObject {
     private String title;
     private EquipmentModel equipmentModel;
     private RepairPartType repairPartType;
+    private int commonRepairPartFlag;
     private Date createdAt;
     private Date changedAt;
 
@@ -57,6 +58,14 @@ public class RepairPart extends RealmObject {
 
     public void setRepairPartType(RepairPartType repairPartType) {
         this.repairPartType = repairPartType;
+    }
+
+    public int getCommonRepairPartFlag() {
+        return commonRepairPartFlag;
+    }
+
+    public void setCommonRepairPartFlag(int commonRepairPartFlag) {
+        this.commonRepairPartFlag = commonRepairPartFlag;
     }
 
     public Date getCreatedAt() {

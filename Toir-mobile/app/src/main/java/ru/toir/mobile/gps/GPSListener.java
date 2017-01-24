@@ -1,23 +1,23 @@
 package ru.toir.mobile.gps;
 
-import java.util.Iterator;
-import java.util.UUID;
-
+import android.content.Context;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.GpsStatus;
-import android.location.GpsSatellite;
 import android.os.Bundle;
-import android.widget.TextView;
+
+import java.util.Date;
+import java.util.Iterator;
+
+import io.realm.Realm;
 import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.GPSDBAdapter;
-//import ru.toir.mobile.db.tables.Users;
-import android.content.Context;
+import ru.toir.mobile.db.realm.GpsTrack;
 
-public class TestGPSListener implements LocationListener, GpsStatus.Listener {
+public class GPSListener implements LocationListener, GpsStatus.Listener {
 
-	TextView gpsLog;
 	String ls;
 	String strGpsStats;
 	private Context context;
@@ -38,19 +38,12 @@ public class TestGPSListener implements LocationListener, GpsStatus.Listener {
 						+ "," + satellite.getAzimuth() + ","
 						+ satellite.getElevation() + "\n\n";
 			}
-			gpsLog.append(strGpsStats);
 		}
 	}
 
-	public void SetUserUUID(String uuid) {
+	public GPSListener(Context context, String uuid) {
+		this.context = context;
 		this.user_uuid = uuid;
-	}
-
-	public TestGPSListener(TextView tv, Context contex, String uuid) {
-		gpsLog = tv;
-		this.context = contex;
-		this.user_uuid = uuid;
-		ls = System.getProperty("line.separator");
 	}
 
 	public Location getLastLocation() {
@@ -61,42 +54,39 @@ public class TestGPSListener implements LocationListener, GpsStatus.Listener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		gpsLog.append("GPS locatiton changed" + ls + "Latitude: "
-				+ location.getLatitude() + ls + "Longitude: "
-				+ location.getLongitude() + ls);
-		// System.out.println("GPS locatiton changed");
 		if (location != null)
 			RecordGPSData(location.getLatitude(), location.getLongitude());
 	}
 
 	@Override
 	public void onProviderDisabled(String arg0) {
-		gpsLog.append("GPS disabled" + ls);
 		System.out.println("GPS disabled");
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-		gpsLog.append("GPS enabled" + ls);
 		System.out.println("GPS enabled");
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle boundle) {
-		gpsLog.append("GPS status changed, arg: " + provider + ls);
 		System.out.println("GPS status changed, arg: " + provider);
 	}
 
 	public void RecordGPSData(Double Latitude, Double Longitude) {
-		gpsLog.append("Latitude:" + String.valueOf(Latitude) + "\n");
-		gpsLog.append("Longitude:" + String.valueOf(Longitude) + "\n");
 		GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(context));
-		String gpsuuid = UUID.randomUUID().toString();
-		// String user_uuid = UUID.randomUUID().toString();
-		// GpsTrack gpstracker = gps.getGPSByUuid(user_uuid);
-		gpsLog.append(gpsuuid + " " + user_uuid + String.valueOf(Latitude)
-				+ " " + String.valueOf(Longitude));
-		gps.addItem(gpsuuid, user_uuid, String.valueOf(Latitude),
-				String.valueOf(Longitude));
+		final Realm realmDB = Realm.getDefaultInstance();
+		final Double latitude=Latitude;
+		final Double longitude=Longitude;
+		realmDB.executeTransaction(new Realm.Transaction() {
+			@Override
+			public void execute(Realm realm) {
+				GpsTrack gpstrack = realmDB.createObject(GpsTrack.class);
+				gpstrack.setDate(new Date());
+				gpstrack.setUserUuid(user_uuid);
+				gpstrack.setLatitude(latitude);
+				gpstrack.setLongitude(longitude);
+			}
+		});
 	}
 }
