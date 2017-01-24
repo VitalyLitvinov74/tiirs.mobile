@@ -150,10 +150,6 @@ public class MainActivity extends AppCompatActivity {
 
                     if (isLogged) {
                         setMainLayout(savedInstance);
-                        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-                        if (user!=null) {
-                            startGpsTracker(user.getUuid());
-                        }
                     } else {
                         setContentView(R.layout.login_layout);
                         ShowSettings();
@@ -274,6 +270,9 @@ public class MainActivity extends AppCompatActivity {
                                     realm.commitTransaction();
                                     isLogged = true;
                                     AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                    addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
+                                    startGpsTracker(user.getUuid());
+
                                     setMainLayout(savedInstance);
                                     authorizationDialog.dismiss();
                                 }
@@ -311,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
                             if (user != null && user.isActive()) {
                                 isLogged = true;
                                 AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
+                                startGpsTracker(user.getUuid());
                                 setMainLayout(savedInstance);
                             } else {
                                 Toast.makeText(getApplicationContext(),

@@ -82,6 +82,8 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 			@Override
 			public void execute(Realm realm) {
 				GpsTrack gpstrack = realmDB.createObject(GpsTrack.class);
+				long next_id = realm.where(GpsTrack.class).max("_id").intValue() + 1;
+				gpstrack.set_id(next_id);
 				gpstrack.setDate(new Date());
 				gpstrack.setUserUuid(user_uuid);
 				gpstrack.setLatitude(latitude);

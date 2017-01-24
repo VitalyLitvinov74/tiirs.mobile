@@ -1270,21 +1270,21 @@ public class LoadTestData {
             task.set_id(1);
             task.setUuid(taskUuid);
             task.setTaskStatus(taskStatus);
-            task.setTaskStatusUuid(taskStatusUuid);
+            //task.setTaskStatusUuid(taskStatusUuid);
             task.setEndDate(new Date());
             task.setStartDate(new Date());
             task.setTaskVerdict(taskVerdict);
-            task.setTaskVerdictUuid(taskVerdictUuid);
+            //task.setTaskVerdictUuid(taskVerdictUuid);
             task.setTaskTemplate(taskTemplate);
-            task.setTaskTemplateUuid(taskTemplateUuid);
+            //task.setTaskTemplateUuid(taskTemplateUuid);
             task.setEquipment(equipment);
-            task.setEquipmentUuid(equipmentUuid);
+            //task.setEquipmentUuid(equipmentUuid);
             task.setComment("Там тепловей шумит сильно, из под него бежит и тепла нет. Следует разобраться.");
             task.setPrevCode(0);
             task.setNextCode(2);
             task.addTaskStage(taskStage);
             task.addTaskStage(taskStage2);
-            task.setOrder(order);
+            //task.setOrder(order);
         }
     });
 
@@ -1295,19 +1295,19 @@ public class LoadTestData {
             task2.set_id(2);
             task2.setUuid(taskUuid2);
             task2.setTaskStatus(taskStatus);
-            task2.setTaskStatusUuid(taskStatusUuid);
+            //task2.setTaskStatusUuid(taskStatusUuid);
             task2.setEndDate(new Date());
             task2.setStartDate(new Date());
             task2.setTaskVerdict(taskVerdict);
-            task2.setTaskVerdictUuid(taskVerdictUuid);
+            //task2.setTaskVerdictUuid(taskVerdictUuid);
             task2.setTaskTemplate(taskTemplate2);
-            task2.setTaskTemplateUuid(taskTemplateUuid2);
+            //task2.setTaskTemplateUuid(taskTemplateUuid2);
             task2.setEquipment(equipment2);
-            task2.setEquipmentUuid(equipmentUuid2);
+            //task2.setEquipmentUuid(equipmentUuid2);
             task2.setComment("Горелка котла в котельной не горит. Требуется починить.");
             task2.setPrevCode(0);
             task2.setNextCode(1);
-            task2.setOrder(order);
+            //task2.setOrder(order);
         }
     });
 

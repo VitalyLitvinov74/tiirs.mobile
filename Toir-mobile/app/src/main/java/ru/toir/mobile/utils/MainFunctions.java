@@ -27,6 +27,8 @@ public static void addToJournal(final String description){
             @Override
             public void execute(Realm realm) {
                 Journal record = realmDB.createObject(Journal.class);
+                long next_id = realm.where(Journal.class).max("_id").intValue() + 1;
+                record.set_id(next_id);
                 record.setDate(new Date());
                 record.setDescription(description);
                 record.setUserUuid(user.getUuid());
