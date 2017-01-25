@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.Iterator;
 
 import io.realm.Realm;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.GPSDBAdapter;
 import ru.toir.mobile.db.realm.GpsTrack;
 
 public class GPSListener implements LocationListener, GpsStatus.Listener {
@@ -74,10 +72,10 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 	}
 
 	public void RecordGPSData(Double Latitude, Double Longitude) {
-		GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(context));
 		final Realm realmDB = Realm.getDefaultInstance();
 		final Double latitude=Latitude;
 		final Double longitude=Longitude;
+
 		realmDB.executeTransaction(new Realm.Transaction() {
 			@Override
 			public void execute(Realm realm) {

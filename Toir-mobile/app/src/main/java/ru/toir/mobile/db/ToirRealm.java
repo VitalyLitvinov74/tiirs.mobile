@@ -13,6 +13,9 @@ import io.realm.RealmConfiguration;
  *
  */
 public class ToirRealm {
+    // версия схемы базы данных приложения
+    public static final int VERSION = 2;
+
     public static void init(Context context) {
         init(context, "toir.realm");
     }
@@ -20,7 +23,7 @@ public class ToirRealm {
     public static void init(Context context, String dbName) {
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
                 .name(dbName)
-                .schemaVersion(1)
+                .schemaVersion(VERSION)
                 .build();
         try {
             Realm.migrateRealm(realmConfig, new ToirRealmMigration());
