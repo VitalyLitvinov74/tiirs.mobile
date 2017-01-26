@@ -15,14 +15,15 @@ public class Tasks extends RealmObject {
     private long _id;
     private String uuid;
     private String comment;
-    private String orderUuid;
-    private String equipmentUuid;
+    //private String orderUuid;
+    //private Orders order;
+    //private String equipmentUuid;
     private Equipment equipment;
-    private String taskVerdictUuid;
+    //private String taskVerdictUuid;
     private TaskVerdict taskVerdict;
-    private String taskStatusUuid;
+    //private String taskStatusUuid;
     private TaskStatus taskStatus;
-    private String taskTemplateUuid;
+    //private String taskTemplateUuid;
     private TaskTemplate taskTemplate;
     private int prevCode;
     private int nextCode;
@@ -56,36 +57,12 @@ public class Tasks extends RealmObject {
         this.comment = comment;
     }
 
-    public String getOrderUuid() {
-        return orderUuid;
-    }
-
-    public void setOrderUuid(String orderUuid) {
-        this.orderUuid = orderUuid;
-    }
-
-    public String getEquipmentUuid() {
-        return equipmentUuid;
-    }
-
-    public void setEquipmentUuid(String equipmentUuid) {
-        this.equipmentUuid = equipmentUuid;
-    }
-
     public Equipment getEquipment() {
         return equipment;
     }
 
     public void setEquipment(Equipment equipment) {
         this.equipment = equipment;
-    }
-
-    public String getTaskVerdictUuid() {
-        return taskVerdictUuid;
-    }
-
-    public void setTaskVerdictUuid(String taskVerdictUuid) {
-        this.taskVerdictUuid = taskVerdictUuid;
     }
 
     public TaskVerdict getTaskVerdict() {
@@ -96,28 +73,12 @@ public class Tasks extends RealmObject {
         this.taskVerdict = taskVerdict;
     }
 
-    public String getTaskStatusUuid() {
-        return taskStatusUuid;
-    }
-
-    public void setTaskStatusUuid(String taskStatusUuid) {
-        this.taskStatusUuid = taskStatusUuid;
-    }
-
     public TaskStatus getTaskStatus() {
         return taskStatus;
     }
 
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
-    }
-
-    public String getTaskTemplateUuid() {
-        return taskTemplateUuid;
-    }
-
-    public void setTaskTemplateUuid(String taskTemplateUuid) {
-        this.taskTemplateUuid = taskTemplateUuid;
     }
 
     public TaskTemplate getTaskTemplate() {

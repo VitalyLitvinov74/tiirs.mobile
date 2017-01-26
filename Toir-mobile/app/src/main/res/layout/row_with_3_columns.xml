@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/row3_date"
+        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/row3_latitude"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/row3_longitude"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

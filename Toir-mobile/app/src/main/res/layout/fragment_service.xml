@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/service_global_layout"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/material_drawer_background"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/service_header1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginTop="5dip"
+        android:background="#1565c0"
+        android:gravity="center_vertical"
+        android:paddingLeft="5dip"
+        android:text="@string/journal"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/service_listview_journal_layout"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/service_list_view_journal"
+            android:layout_width="match_parent"
+            android:divider="#333333"
+            android:dividerHeight="1px"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:layout_height="wrap_content">
+        </ListView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/service_header2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginTop="5dip"
+        android:background="#1565c0"
+        android:gravity="center_vertical"
+        android:paddingLeft="5dip"
+        android:text="@string/gps_track"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/service_listview_gps_layout"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/service_list_view_gps"
+            android:layout_width="match_parent"
+            android:divider="#333333"
+            android:dividerHeight="1px"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:layout_height="wrap_content">
+        </ListView>
+    </LinearLayout>
+
+</LinearLayout>

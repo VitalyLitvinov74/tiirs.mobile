@@ -17,9 +17,9 @@ public class TaskTemplate extends RealmObject {
     private String description;
     private String image;
     private int normative;
-    private String equipmentModelUuid;
+    //private String equipmentModelUuid;
     private EquipmentModel equipmentModel;
-    private String taskTypeUuid;
+    //private String taskTypeUuid;
     private TaskType taskType;
     private Date createdAt;
     private Date changedAt;
@@ -65,28 +65,12 @@ public class TaskTemplate extends RealmObject {
         this.image = image;
     }
 
-    public String getEquipmentModelUuid() {
-        return equipmentModelUuid;
-    }
-
-    public void setEquipmentModelUuid(String equipmentModelUuid) {
-        this.equipmentModelUuid = equipmentModelUuid;
-    }
-
     public EquipmentModel getEquipmentModel() {
         return equipmentModel;
     }
 
     public void setEquipmentModel(EquipmentModel equipmentModel) {
         this.equipmentModel = equipmentModel;
-    }
-
-    public String getTaskTypeUuid() {
-        return taskTypeUuid;
-    }
-
-    public void setTaskTypeUuid(String taskTypeUuid) {
-        this.taskTypeUuid = taskTypeUuid;
     }
 
     public TaskType getTaskType() {

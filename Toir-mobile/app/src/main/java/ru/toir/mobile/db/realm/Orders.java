@@ -24,9 +24,9 @@ public class Orders extends RealmObject {
     private Date openDate;
     private Date closeDate;
     private OrderLevel orderLevel;
-    private String orderStatusUuid;
+    //private String orderStatusUuid;
     private OrderStatus orderStatus;
-    private String orderVerdictUuid;
+    //private String orderVerdictUuid;
     private OrderVerdict orderVerdict;
     private Date attemptSendDate;
     private int attemptCount;
@@ -105,28 +105,12 @@ public class Orders extends RealmObject {
         this.closeDate = closeDate;
     }
 
-    public String getOrderStatusUuid() {
-        return orderStatusUuid;
-    }
-
-    public void setOrderStatusUuid(String orderStatusUuid) {
-        this.orderStatusUuid = orderStatusUuid;
-    }
-
     public OrderStatus getOrderStatus() {
         return orderStatus;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
-    }
-
-    public String getOrderVerdictUuid() {
-        return orderVerdictUuid;
-    }
-
-    public void setOrderVerdictUuid(String orderVerdictUuid) {
-        this.orderVerdictUuid = orderVerdictUuid;
     }
 
     public OrderVerdict getOrderVerdict() {

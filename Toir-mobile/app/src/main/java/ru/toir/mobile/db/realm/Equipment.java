@@ -13,16 +13,17 @@ public class Equipment extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private String equipmentModelUuid;
+    //private String equipmentModelUuid;
     private EquipmentModel equipmentModel;
-    private String equipmentStatusUuid;
+    //private String equipmentStatusUuid;
     private EquipmentStatus equipmentStatus;
+    private Equipment parentEquipment;
     private String title;
     private String inventoryNumber;
     private String location;
-    private String criticalTypeUuid;
+    //private String criticalTypeUuid;
     private CriticalType criticalType;
-    private String userUuid;
+    //private String userUuid;
     private Date startDate;
     private float latitude;
     private float longitude;
@@ -55,28 +56,12 @@ public class Equipment extends RealmObject {
         this.title = title;
     }
 
-    public String getEquipmentModelUuid() {
-        return equipmentModelUuid;
-    }
-
-    public void setEquipmentModelUuid(String equipmentModelUuid) {
-        this.equipmentModelUuid = equipmentModelUuid;
-    }
-
     public EquipmentModel getEquipmentModel() {
         return equipmentModel;
     }
 
     public void setEquipmentModel(EquipmentModel equipmentModel) {
         this.equipmentModel = equipmentModel;
-    }
-
-    public String getEquipmentStatusUuid() {
-        return equipmentStatusUuid;
-    }
-
-    public void setEquipmentStatusUuid(String equipmentStatusUuid) {
-        this.equipmentStatusUuid = equipmentStatusUuid;
     }
 
     public EquipmentStatus getEquipmentStatus() {
@@ -103,14 +88,6 @@ public class Equipment extends RealmObject {
         this.location = location;
     }
 
-    public String getCriticalTypeUuid() {
-        return criticalTypeUuid;
-    }
-
-    public void setCriticalTypeUuid(String criticalTypeUuid) {
-        this.criticalTypeUuid = criticalTypeUuid;
-    }
-
     public CriticalType getCriticalType() {
         return criticalType;
     }
@@ -119,13 +96,14 @@ public class Equipment extends RealmObject {
         this.criticalType = criticalType;
     }
 
+    /*
     public String getUserUuid() {
         return userUuid;
     }
-
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
     }
+*/
 
     public Date getStartDate() {
         return startDate;

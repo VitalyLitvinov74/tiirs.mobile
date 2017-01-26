@@ -7,15 +7,15 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- *         Created on 15.09.16.
+ *         Created on 24.01.17.
  */
-public class TaskVerdict extends RealmObject {
+public class Clients extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private String title;
-    private TaskType taskType;
-    private String icon;
+    private String name;
+    private String description;
+    private String phone;
     private Date createdAt;
     private Date changedAt;
 
@@ -35,28 +35,28 @@ public class TaskVerdict extends RealmObject {
         this.uuid = uuid;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public TaskType getTaskType() {
-        return taskType;
+    public String getDescription() {
+        return description;
     }
 
-    public void setTaskType(TaskType taskType) {
-        this.taskType = taskType;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getIcon() {
-        return icon;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Date getCreatedAt() {
@@ -74,5 +74,4 @@ public class TaskVerdict extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

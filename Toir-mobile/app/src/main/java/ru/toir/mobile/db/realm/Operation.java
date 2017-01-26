@@ -13,18 +13,19 @@ public class Operation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private String taskStageUuid;
-    private String operationVerdictUuid;
+    //private String taskStageUuid;
+    private TaskStages taskStage;
+    //private String operationVerdictUuid;
     private OperationVerdict operationVerdict;
-    private String operationStatusUuid;
+    //private String operationStatusUuid;
     private OperationStatus operationStatus;
-    private String operationTemplateUuid;
+    //private String operationTemplateUuid;
     private OperationTemplate operationTemplate;
     private Date startDate;
     private Date endDate;
+    private int flowOrder;
     private Date createdAt;
     private Date changedAt;
-    private int flowOrder;
 
     public long get_id() {
         return _id;
@@ -42,20 +43,12 @@ public class Operation extends RealmObject {
         this.uuid = uuid;
     }
 
-    public String getTaskStageUuid() {
-        return taskStageUuid;
+    public TaskStages getTaskStage() {
+        return taskStage;
     }
 
-    public void setTaskStageUuid(String taskStageUuid) {
-        this.taskStageUuid = taskStageUuid;
-    }
-
-    public String getOperationVerdictUuid() {
-        return operationVerdictUuid;
-    }
-
-    public void setOperationVerdictUuid(String operationVerdictUuid) {
-        this.operationVerdictUuid = operationVerdictUuid;
+    public void setTaskStage(TaskStages taskStage) {
+        this.taskStage = taskStage;
     }
 
     public OperationVerdict getOperationVerdict() {
@@ -66,28 +59,12 @@ public class Operation extends RealmObject {
         this.operationVerdict = operationVerdict;
     }
 
-    public String getOperationStatusUuid() {
-        return operationStatusUuid;
-    }
-
-    public void setOperationStatusUuid(String operationStatusUuid) {
-        this.operationVerdictUuid = operationVerdictUuid;
-    }
-
     public OperationStatus getOperationStatus() {
         return operationStatus;
     }
 
     public void setOperationStatus(OperationStatus operationStatus) {
         this.operationStatus = operationStatus;
-    }
-
-    public String getOperationTemplateUuid() {
-        return operationTemplateUuid;
-    }
-
-    public void setOperationTemplateUuid(String operationTemplateUuid) {
-        this.operationTemplateUuid = operationTemplateUuid;
     }
 
     public OperationTemplate getOperationTemplate() {

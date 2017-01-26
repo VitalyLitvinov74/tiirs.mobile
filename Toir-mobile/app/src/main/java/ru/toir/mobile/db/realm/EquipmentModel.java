@@ -13,7 +13,7 @@ public class EquipmentModel extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private String equipmentTypeUuid;
+    //private String equipmentTypeUuid;
     private EquipmentType equipmentType;
     private String title;
     private Date createdAt;
@@ -41,14 +41,6 @@ public class EquipmentModel extends RealmObject {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getEquipmentTypeUuid() {
-        return title;
-    }
-
-    public void setEquipmentTypeUuid(String equipmentTypeUuid) {
-        this.equipmentTypeUuid = equipmentTypeUuid;
     }
 
     public EquipmentType getEquipmentType() {

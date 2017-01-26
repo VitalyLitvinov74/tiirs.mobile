@@ -121,5 +121,8 @@
     <string name="tire"> - </string>
     <string name="sec">сек.</string>
     <string name="input_value">введите данные</string>
-    <string name="program_version">TOiR Mobile v1.0.3\n ООО Технологии Энергосбережения (technosber.ru) (c)2016</string>
+    <string name="program_version">TOiR Mobile v1.0.4\n ООО Технологии Энергосбережения (technosber.ru) (c)2016</string>
+
+    <string name="gps_track">GPS трек</string>
+    <string name="journal">Журнал</string>
 </resources>

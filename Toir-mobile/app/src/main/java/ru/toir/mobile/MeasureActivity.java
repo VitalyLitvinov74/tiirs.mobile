@@ -178,14 +178,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         //rightAxis.setValueFormatter(custom);
         rightAxis.setSpaceTop(15f);
 
-        // setting data
         setData(50);
-
-        //mSeekBarY.setProgress(50);
-        //mSeekBarX.setProgress(12);
-
-        //mSeekBarY.setOnSeekBarChangeListener(this);
-        //mSeekBarX.setOnSeekBarChangeListener(this);
     }
 
     @Override

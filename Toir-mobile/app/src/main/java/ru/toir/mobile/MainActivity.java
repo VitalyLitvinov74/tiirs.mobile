@@ -1,12 +1,14 @@
 package ru.toir.mobile;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -52,7 +54,6 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.fragments.ChartsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.FragmentAddUser;
@@ -60,11 +61,15 @@ import ru.toir.mobile.fragments.FragmentEditUser;
 import ru.toir.mobile.fragments.GPSFragment;
 import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
+import ru.toir.mobile.fragments.ServiceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
+import ru.toir.mobile.gps.GPSListener;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.serverapi.TokenSrv;
+
+import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PROFILE_ADD = 1;
@@ -87,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DRAWER_DOWNLOAD = 12;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
+    private static final int FRAGMENT_SERVICE = 15;
     //private static final int DRAWER_ONLINE = 15;
 
     private static final String TAG = "MainActivity";
@@ -265,6 +271,9 @@ public class MainActivity extends AppCompatActivity {
                                     realm.commitTransaction();
                                     isLogged = true;
                                     AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                    addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
+                                    startGpsTracker(user.getUuid());
+
                                     setMainLayout(savedInstance);
                                     authorizationDialog.dismiss();
                                 }
@@ -302,6 +311,8 @@ public class MainActivity extends AppCompatActivity {
                             if (user != null && user.isActive()) {
                                 isLogged = true;
                                 AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
+                                startGpsTracker(user.getUuid());
                                 setMainLayout(savedInstance);
                             } else {
                                 Toast.makeText(getApplicationContext(),
@@ -441,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
+                        //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
@@ -451,6 +462,7 @@ public class MainActivity extends AppCompatActivity {
                         //new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         //new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withName(R.string.service).withDescription("Журнал и gps трек").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(FRAGMENT_SERVICE).withSelectable(false),
                         new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor))
                 )
@@ -460,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
                                 currentFragment = FRAGMENT_CHARTS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ChartsFragment.newInstance()).commit();
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ServiceFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
                                 mProgressDialog = new ProgressDialog(MainActivity.this);
@@ -508,6 +520,9 @@ public class MainActivity extends AppCompatActivity {
                             } else if (drawerItem.getIdentifier() == FRAGMENT_USERS) {
                                 currentFragment = FRAGMENT_USERS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_SERVICE) {
+                                currentFragment = FRAGMENT_SERVICE;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ServiceFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 startAboutDialog();
                                 /*
@@ -561,6 +576,17 @@ public class MainActivity extends AppCompatActivity {
         //tabs.setViewPager(pager);
     }
 
+    void startGpsTracker(String user_uuid)
+        {
+         LocationManager lm = (LocationManager) getSystemService(
+            Context.LOCATION_SERVICE);
+            if (lm != null) {
+                GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
+            }
+    }
+
+
     /**
      * Обработчик клика кнопки "Войти"
      *
@@ -601,7 +627,7 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
             return;
         }
-
+        addToJournal("Запущено обновление с сервера " + updateUrl);
         String path = Environment.getExternalStorageDirectory() + "/Download/";
         File file = new File(path);
         if (file.mkdirs()) {

@@ -35,21 +35,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
-import ru.toir.mobile.db.adapters.GPSDBAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.db.tables.GpsTrack;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
-import ru.toir.mobile.gps.TestGPSListener;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -97,26 +94,24 @@ public class GPSFragment extends Fragment {
 				LOCATION_SERVICE);
 
         if (lm != null) {
-			TestGPSListener tgpsl = new TestGPSListener(
-					(TextView) rootView.findViewById(R.id.gps_TextView),
-					getActivity().getApplicationContext(), user.getUuid());
-			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1,
-					tgpsl);
-
+			//GPSListener tgpsl = new GPSListener(getActivity().getApplicationContext(), user.getUuid());
+			//lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, tgpsl);
             location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			gpsLog = (TextView) rootView.findViewById(R.id.gps_TextView);
+			//gpsLog = (TextView) rootView.findViewById(R.id.gps_TextView);
             // последняя попытка
             if (location == null) location = getLastKnownLocation();
 			if (location != null) {
 				curLatitude = location.getLatitude();
 				curLongitude = location.getLongitude();
+                /*
 				gpsLog.append("Altitude:"
 						+ String.valueOf(location.getAltitude()) + "\n");
 				gpsLog.append("Latitude:"
 						+ String.valueOf(location.getLatitude()) + "\n");
 				gpsLog.append("Longitude:"
-						+ String.valueOf(location.getLongitude()) + "\n");
+						+ String.valueOf(location.getLongitude()) + "\n");*/
 			}
+            /*
             else {
                 // нет не последняя, еще так можно
                 GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
@@ -126,7 +121,7 @@ public class GPSFragment extends Fragment {
                     curLatitude = Float.parseFloat(gpstrack.getLatitude());
                     curLongitude = Float.parseFloat(gpstrack.getLongitude());
                 }
-            }
+            }*/
 		}
 
         final MapView mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
@@ -160,7 +155,7 @@ public class GPSFragment extends Fragment {
 
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         for (Orders itemOrder : orders) {
-            RealmResults<Tasks> tasks = realmDB.where(Tasks.class).equalTo("orderUuid", itemOrder.getUuid()).findAll();
+            RealmList<Tasks> tasks = itemOrder.getTasks();
             //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();

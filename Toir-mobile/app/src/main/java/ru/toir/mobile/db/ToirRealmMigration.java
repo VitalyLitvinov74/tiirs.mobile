@@ -68,5 +68,90 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 1) {
+            Log.d(TAG, "from version 1");
+            schema.create("Clients")
+                    .addField("_id", long.class)
+                    .addField("uuid", String.class)
+                    .addField("name", String.class)
+                    .addField("description", String.class)
+                    .addField("photo", String.class)
+                    .addField("createdAt", Date.class)
+                    .addField("changedAt", Date.class)
+                    .addPrimaryKey("_id");
+
+            schema.get("Documentation").renameField("filename","path");
+            schema.get("Equipment").removeField("equipmentModelUuid");
+            schema.get("Equipment").removeField("equipmentStatusUuid");
+            schema.get("Equipment").removeField("criticalTypeUuid");
+            schema.get("Equipment").removeField("userUuid");
+            schema.get("Equipment").addRealmObjectField("parentEquipment",schema.get("Equipment"));
+
+            schema.get("EquipmentModel").removeField("equipmentTypeUuid");
+
+            schema.create("GpsTrack")
+                    .addField("_id", long.class)
+                    .addField("userUuid", String.class)
+                    .addField("date", Date.class)
+                    .addField("longitude", Double.class)
+                    .addField("latitude", Double.class)
+                    .addPrimaryKey("_id");
+
+            schema.create("Journal")
+                    .addField("_id", long.class)
+                    .addField("description", String.class)
+                    .addField("userUuid", String.class)
+                    .addField("date", Date.class)
+                    .addPrimaryKey("_id");
+
+            schema.get("Operation")
+                    .removeField("taskStageUuid")
+                    .removeField("operationVerdictUuid")
+                    .removeField("operationStatusUuid")
+                    .removeField("operationTemplateUuid");
+
+            schema.get("OperationTemplate").removeField("equipmentModelUuid");
+            schema.get("OperationTemplate").removeField("operationTypeUuid");
+
+            schema.create("OperationTool")
+                    .addField("_id", long.class)
+                    .addField("uuid", String.class)
+                    .addRealmObjectField("operationTemplate",schema.get("OperationTemplate"))
+                    .addRealmObjectField("tool",schema.get("Tool"))
+                    .addField("createdAt", Date.class)
+                    .addField("changedAt", Date.class)
+                    .addPrimaryKey("_id");
+
+            schema.get("Orders")
+                    .removeField("orderStatusUuid")
+                    .removeField("orderVerdictUuid");
+
+            schema.get("RepairPart")
+                    .addField("commonRepairPartFlag",Integer.class);
+
+            schema.get("TaskStageTemplate")
+                    .removeField("equipmentModelUuid")
+                    .removeField("taskStageTypeUuid");
+
+            schema.get("TaskTemplate")
+                    .removeField("equipmentModelUuid")
+                    .removeField("taskTypeUuid");
+
+            schema.get("TaskType")
+                    .removeField("icon");
+
+            schema.get("TaskVerdict")
+                    .addRealmObjectField("taskType",schema.get("TaskType"));
+
+            schema.get("Tasks")
+                    .removeField("orderUuid")
+                    .removeField("equipmentUuid")
+                    .removeField("taskVerdictUuid")
+                    .removeField("taskStatusUuid")
+                    .removeField("taskTemplateUuid");
+
+            oldVersion++;
+        }
+
     }
 }

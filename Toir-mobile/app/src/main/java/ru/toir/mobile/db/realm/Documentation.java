@@ -13,12 +13,12 @@ public class Documentation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private String documentationTypeUuid;
+    //private String documentationTypeUuid;
     private DocumentationType documentationType;
-    private String equipmentUuid;
+    //private String equipmentUuid;
     private Equipment equipment;
     private String title;
-    private String filename;
+    private String path;
     private Date createdAt;
     private Date changedAt;
 
@@ -46,20 +46,12 @@ public class Documentation extends RealmObject {
         this.title = title;
     }
 
-    public String getFileName() {
-        return filename;
+    public String getPath() {
+        return path;
     }
 
-    public void setFileName(String filename) {
-        this.filename = filename;
-    }
-
-    public String getDocumentationTypeUuid() {
-        return documentationTypeUuid;
-    }
-
-    public void setDocumentationTypeUuid(String documentationTypeUuid) {
-        this.documentationTypeUuid = documentationTypeUuid;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public DocumentationType getDocumentationType() {
@@ -76,14 +68,6 @@ public class Documentation extends RealmObject {
 
     public void setEquipment(Equipment equipment) {
         this.equipment = equipment;
-    }
-
-    public String getEquipmentUuid() {
-        return equipmentUuid;
-    }
-
-    public void setEquipmentUuid(String equipmentUuid) {
-        this.equipmentUuid = equipmentUuid;
     }
 
     public Date getCreatedAt() {

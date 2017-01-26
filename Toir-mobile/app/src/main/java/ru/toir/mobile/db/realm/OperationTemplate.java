@@ -19,9 +19,9 @@ public class OperationTemplate extends RealmObject {
     private int normative;
     private int first_step;
     private int last_step;
-    private String equipmentModelUuid;
+    //private String equipmentModelUuid;
     private EquipmentModel equipmentModel;
-    private String operationTypeUuid;
+    //private String operationTypeUuid;
     private OperationType operationType;
     private Date createdAt;
     private Date changedAt;
@@ -90,28 +90,12 @@ public class OperationTemplate extends RealmObject {
         this.last_step = last_step;
     }
 
-    public String getEquipmentModelUuid() {
-        return equipmentModelUuid;
-    }
-
-    public void setEquipmentModelUuid(String equipmentModelUuid) {
-        this.equipmentModelUuid = equipmentModelUuid;
-    }
-
     public EquipmentModel getEquipmentModel() {
         return equipmentModel;
     }
 
     public void setEquipmentModel(EquipmentModel equipmentModel) {
         this.equipmentModel = equipmentModel;
-    }
-
-    public String getOperationTypeUuid() {
-        return operationTypeUuid;
-    }
-
-    public void setOperationTypeUuid(String operationTypeUuid) {
-        this.operationTypeUuid = operationTypeUuid;
     }
 
     public OperationType getOperationType() {
