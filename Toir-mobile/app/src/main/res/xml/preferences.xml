@@ -12,7 +12,9 @@
             android:key="@string/serverUrl"
             android:textColor="@color/larisaTextColorABlack"
             android:title="@string/pref_server_url" />
+    </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/pref_cat_rfid" >
         <ListPreference
             android:key="@string/rfidDriverListPrefKey"
             android:textColor="@color/larisaTextColorABlack"

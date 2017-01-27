@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package ru.toir.mobile.fragments;
 
@@ -32,7 +32,7 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 
 /**
  * @author koputo
- * 
+ *
  */
 public class ToirPreferenceFragment extends PreferenceFragment {
 
@@ -41,13 +41,13 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 	private PreferenceScreen drvSettingScr;
 	private PreferenceCategory drvSettingCategory;
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
@@ -56,47 +56,47 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 				.getDefaultSharedPreferences(getActivity()
 						.getApplicationContext());
 
-        findPreference(getString(R.string.serverUrl))
-                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(final Preference preference) {
-                        final EditTextPreference URLPreference = (EditTextPreference) findPreference(getString(R.string.serverUrl));
-                        final AlertDialog dialog = (AlertDialog) URLPreference.getDialog();
-                        URLPreference.getEditText().setError(null);
-                        dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                                .setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        String errorMessage;
-                                        String text = URLPreference.getEditText().getText().toString();
+		findPreference(getString(R.string.serverUrl))
+				.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(final Preference preference) {
+						final EditTextPreference URLPreference = (EditTextPreference) findPreference(getString(R.string.serverUrl));
+						final AlertDialog dialog = (AlertDialog) URLPreference.getDialog();
+						URLPreference.getEditText().setError(null);
+						dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+								.setOnClickListener(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										String errorMessage;
+										String text = URLPreference.getEditText().getText().toString();
 
-                                        try {
-                                            URL tURL = new URL(text);
-                                            URLPreference.getEditText().setText(tURL.toString().replaceAll("/+$", ""));
-                                            errorMessage = null;
-                                        } catch (MalformedURLException e) {
-                                            if (!text.isEmpty()) {
-                                                errorMessage = "Не верный URL!";
-                                            } else {
-                                                errorMessage = null;
-                                            }
-                                        }
+										try {
+											URL tURL = new URL(text);
+											URLPreference.getEditText().setText(tURL.toString().replaceAll("/+$", ""));
+											errorMessage = null;
+										} catch (MalformedURLException e) {
+											if (!text.isEmpty()) {
+												errorMessage = "Не верный URL!";
+											} else {
+												errorMessage = null;
+											}
+										}
 
-                                        EditText edit = URLPreference.getEditText();
-                                        if (errorMessage == null) {
-                                            edit.setError(null);
-                                            URLPreference.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
-                                            dialog.dismiss();
-                                            ToirApplication.serverUrl = edit.getText().toString();
-                                        } else {
-                                            edit.setError(errorMessage);
-                                        }
-                                    }
-                                });
+										EditText edit = URLPreference.getEditText();
+										if (errorMessage == null) {
+											edit.setError(null);
+											URLPreference.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
+											dialog.dismiss();
+											ToirApplication.serverUrl = edit.getText().toString();
+										} else {
+											edit.setError(errorMessage);
+										}
+									}
+								});
 
-                        return true;
-                    }
-                });
+						return true;
+					}
+				});
 
 		// получаем список драйверов по имени класса
 		List<String> driverClassList = new ArrayList<>();
@@ -116,27 +116,27 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		}
 
 		// строим список драйверов с именами и классами
-        List<String> drvNames = new ArrayList<>();
-        List<String> drvKeys = new ArrayList<>();
-        String name;
-        for (String classPath : driverClassList) {
-            name = RfidDriverBase.getDriverName(classPath);
-            if (name != null) {
-                drvNames.add(name);
-                drvKeys.add(classPath);
-            }
-        }
+		List<String> drvNames = new ArrayList<>();
+		List<String> drvKeys = new ArrayList<>();
+		String name;
+		for (String classPath : driverClassList) {
+			name = RfidDriverBase.getDriverName(classPath);
+			if (name != null) {
+				drvNames.add(name);
+				drvKeys.add(classPath);
+			}
+		}
 
 		// категория с экраном настроек драйвера
 		drvSettingCategory = (PreferenceCategory) findPreference("drvSettingsCategory");
 
 		// элемент интерфейса со списком драйверов считывателей
-        ListPreference drvList = (ListPreference) findPreference(getResources().getString(
-                R.string.rfidDriverListPrefKey));
+		ListPreference drvList = (ListPreference) findPreference(getResources().getString(
+				R.string.rfidDriverListPrefKey));
 
 		// указываем названия и значения для элементов списка
-        drvList.setEntries(drvNames.toArray(new String[]{""}));
-        drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
+		drvList.setEntries(drvNames.toArray(new String[]{""}));
+		drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
 
 		// при изменении драйвера, включаем дополнительный экран с
 		// настройками драйвера
@@ -144,7 +144,7 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 
 			@Override
 			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
+											  Object newValue) {
 
 				String value = (String) newValue;
 				PreferenceScreen screen = getDrvSettingsSreen(value,
@@ -178,8 +178,8 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		}
 	}
 
-    private PreferenceScreen getDrvSettingsSreen(String classPath,
-                                                 PreferenceScreen rootScreen) {
+	private PreferenceScreen getDrvSettingsSreen(String classPath,
+												 PreferenceScreen rootScreen) {
 
 		Class<?> driverClass;
 		PreferenceScreen screen;
@@ -206,13 +206,13 @@ public class ToirPreferenceFragment extends PreferenceFragment {
 		}
 	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            getActivity().onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == android.R.id.home) {
+			getActivity().onBackPressed();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 }
