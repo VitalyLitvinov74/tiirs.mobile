@@ -85,6 +85,7 @@
     <string name="num500">500</string>
     <string name="application_full_name">Мобильный ТОиР</string>
     <string name="open_documentation">Открыть документацию</string>
+    <string name="bluetooth_server">Bluetooth сервер</string>
     <string name="title_activity_btserver">BTServerActivity</string>
 
     <string name="profile_tagid">Метка карточки</string>
@@ -126,7 +127,7 @@
     <string name="tire"> - </string>
     <string name="sec">сек.</string>
     <string name="input_value">введите данные</string>
-    <string name="program_version">TOiR Mobile v1.0.4\n ООО Технологии Энергосбережения (technosber.ru) (c)2016</string>
+    <string name="program_version">TOiR Mobile v1.0.5\n ООО Технологии Энергосбережения (tourus.ru) (&#169;)2017</string>
 
     <string name="gps_track">GPS трек</string>
     <string name="journal">Журнал</string>

@@ -22,7 +22,7 @@ public interface IRfidDriver {
 	 * 
 	 * @return
 	 */
-	public boolean init();
+	boolean init();
 
 	/**
 	 * <p>
@@ -31,7 +31,7 @@ public interface IRfidDriver {
 	 * 
 	 * @return
 	 */
-	public void readTagId();
+	void readTagId();
 
 	/**
 	 * Читаем данные с метки в два этапа, сначала находим метку(получаем Id),
@@ -48,8 +48,8 @@ public interface IRfidDriver {
 	 *            Количество байт для чтения (кратен 2, 1 = 2, 2 = 4, 3 = 6 и
 	 *            т.д.)
 	 */
-	public void readTagData(String password, int memoryBank, int address,
-			int count);
+	void readTagData(String password, int memoryBank, int address,
+					 int count);
 
 	/**
 	 * Читаем данные с метки в один этап.
@@ -67,8 +67,8 @@ public interface IRfidDriver {
 	 *            Количество байт для чтения (кратен 2, 1 = 2, 2 = 4, 3 = 6 и
 	 *            т.д.)
 	 */
-	public void readTagData(String password, String tagId, int memoryBank,
-			int address, int count);
+	void readTagData(String password, String tagId, int memoryBank,
+					 int address, int count);
 
 	/**
 	 * Пишем в метку в два этапа, сначала находим метку(получаем Id), потом
@@ -84,8 +84,8 @@ public interface IRfidDriver {
 	 * @param data
 	 *            Данные для записи
 	 */
-	public void writeTagData(String password, int memoryBank, int address,
-			String data);
+	void writeTagData(String password, int memoryBank, int address,
+					  String data);
 
 	/**
 	 * Пишем в метку в один этап.
@@ -102,15 +102,15 @@ public interface IRfidDriver {
 	 * @param data
 	 *            Данные для записи
 	 */
-	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, String data);
+	void writeTagData(String password, String tagId, int memoryBank,
+					  int address, String data);
 
 	/**
 	 * <p>
 	 * Завершение работы драйвера
 	 * </p>
 	 */
-	public void close();
+	void close();
 
 	/**
 	 * <p>
@@ -119,7 +119,7 @@ public interface IRfidDriver {
 	 * Здесь создаётся весь необходимый интерфейс для взаимодействия с
 	 * пользователем необходимый драйверу.
 	 */
-	public View getView(LayoutInflater inflater, ViewGroup viewGroup);
+	View getView(LayoutInflater inflater, ViewGroup viewGroup);
 
 	/**
 	 * Передаём в драйвер активити в которую при необходимости драйвер может
@@ -128,7 +128,7 @@ public interface IRfidDriver {
 	 * @param activity
 	 *            Активити в которой будет обрабатываться onActivityResult
 	 */
-	public void setIntegration(Activity activity);
+	void setIntegration(Activity activity);
 
 	/**
 	 * Передаём в драйвер фрагмент в который при необходимости драйвер может
@@ -137,7 +137,7 @@ public interface IRfidDriver {
 	 * @param fragment
 	 *            Фрагмент в котором будет обрабатываться onActivityResult
 	 */
-	public void setIntegration(Fragment fragment);
+	void setIntegration(Fragment fragment);
 
 	/**
 	 * Интерфейс индивидуальных настроек драйвера.
@@ -147,5 +147,5 @@ public interface IRfidDriver {
 	 * @return Если настроек нет, должен вернуть null, в противном случае
 	 *         переданный раннее screen.
 	 */
-	public PreferenceScreen getSettingsScreen(PreferenceScreen screen);
+	PreferenceScreen getSettingsScreen(PreferenceScreen screen);
 }

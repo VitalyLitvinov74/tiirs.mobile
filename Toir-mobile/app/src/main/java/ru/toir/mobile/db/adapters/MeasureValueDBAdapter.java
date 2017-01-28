@@ -142,8 +142,7 @@ public class MeasureValueDBAdapter extends BaseDBAdapter {
 				.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));
 		item.setAttempt_count(cursor.getInt(cursor
 				.getColumnIndex(FIELD_ATTEMPT_COUNT)));
-		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 1 ? true
-				: false);
+		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 1);
 		return item;
 	}
 

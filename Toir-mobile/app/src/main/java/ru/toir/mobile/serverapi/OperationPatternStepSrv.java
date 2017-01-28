@@ -148,8 +148,8 @@ public class OperationPatternStepSrv extends BaseObjectSrv {
 		} else {
 			item.setImage(null);
 		}
-		item.setFirst_step(getIsFirstStep() == 1 ? true : false);
-		item.setLast_step(getIsLastStep() == 1 ? true : false);
+		item.setFirst_step(getIsFirstStep() == 1);
+		item.setLast_step(getIsLastStep() == 1);
 		item.setTitle(Title);
 		item.setCreatedAt(getCreatedAtTime());
 		item.setChangedAt(getChangedAtTime());

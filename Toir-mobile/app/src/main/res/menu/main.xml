@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="#FAFAFA"
-    tools:context="com.example.toir_mobile.MainActivity" >
+    tools:context="ru.toir_mobile.MainActivity" >
 
     <item
         android:id="@+id/action_settings"
@@ -21,6 +21,6 @@
     <item
         android:id="@+id/btServer"
         android:onClick="onActionBTServer"
-        android:title="Bluetooth сервер"/>
+        android:title="@string/bluetooth_server"/>
 </menu>
 

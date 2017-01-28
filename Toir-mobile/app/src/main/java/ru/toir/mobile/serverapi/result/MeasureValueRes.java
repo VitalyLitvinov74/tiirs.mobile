@@ -40,7 +40,7 @@ public class MeasureValueRes extends ru.toir.mobile.db.tables.MeasureValue {
 				item.CreatedAt = value.getCreatedAt();
 				item.ChangedAt = value.getChangedAt();
 
-				returnList.add((MeasureValueRes) item);
+				returnList.add(item);
 			}
 			return returnList;
 			

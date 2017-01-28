@@ -357,8 +357,7 @@ public class EquipmentOperationDBAdapter extends BaseDBAdapter {
 		operation.setAttempt_count(cursor.getInt(cursor
 				.getColumnIndex(FIELD_ATTEMPT_COUNT)));
 		operation
-				.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 0 ? false
-						: true);
+				.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) != 0);
 		return operation;
 	}
 

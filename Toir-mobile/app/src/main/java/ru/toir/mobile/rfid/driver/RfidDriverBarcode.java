@@ -21,11 +21,7 @@ public class RfidDriverBarcode extends RfidDriverBase implements IRfidDriver {
 	
 	@Override
 	public boolean init() {
-		if (mActivity == null && mFragment == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return !(mActivity == null && mFragment == null);
 	}
 
 	@Override

@@ -46,7 +46,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
 	static {
 		System.loadLibrary("iconv");
-	};
+	}
 
 	@Override
 	public boolean init() {

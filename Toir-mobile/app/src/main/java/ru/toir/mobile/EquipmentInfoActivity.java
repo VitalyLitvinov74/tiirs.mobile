@@ -63,17 +63,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	private String equipment_uuid;
 	//private ListView lv;
 
-    private AccountHeader headerResult = null;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
 
     private TextView tv_equipment_name;
     private TextView tv_equipment_inventory;
     private TextView tv_equipment_uuid;
-	private TextView tv_equipment_type;
+	//private TextView tv_equipment_type;
 	private TextView tv_equipment_position;
-	private TextView tv_equipment_tasks;
-	private TextView tv_equipment_critical;
+	//private TextView tv_equipment_tasks;
+	//private TextView tv_equipment_critical;
 	private ImageView tv_equipment_image;
 	private TextView tv_equipment_task_date;
     private ListView tv_equipment_listview;
@@ -86,7 +85,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	// диалог при загрузке файла документации
 	private ProgressDialog loadDocumentationDialog;
 
-    static DocumentationAdapter documentationAdapter;
+    private DocumentationAdapter documentationAdapter;
 
     // фильтр для получения сообщений при получении файлов документации с
 	// сервера
@@ -498,13 +497,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.equipment_layout);
-
-        // Handle Toolbar
+        AccountHeader headerResult = null;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
-        //toolbar.setBackgroundResource(R.drawable.header);
-        toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
         toolbar.setSubtitle("Обслуживание и ремонт");
 
         ActionBar ab = getSupportActionBar();
@@ -515,7 +511,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         // Create the AccountHeader
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.header)
+                .withHeaderBackground(R.drawable.login_header)
                 .withSavedInstance(savedInstanceState)
                 .build();
 

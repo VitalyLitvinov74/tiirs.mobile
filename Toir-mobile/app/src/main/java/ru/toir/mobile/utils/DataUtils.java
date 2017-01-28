@@ -249,7 +249,7 @@ public class DataUtils {
         for (cur = 0; cur < tagrecords.size(); cur++) {
             temp_buffer = longToBytes(tagrecords.get(0).operation_date);
             outputStream.write(temp_buffer);
-            temp_buffer = shortToBytes((short) tagrecords.get(0).operation_length);
+            temp_buffer = shortToBytes(tagrecords.get(0).operation_length);
             outputStream.write(temp_buffer);
             temp = tagrecords.get(0).operation_type;
             temp_buffer = hexStringToByteArray(temp);

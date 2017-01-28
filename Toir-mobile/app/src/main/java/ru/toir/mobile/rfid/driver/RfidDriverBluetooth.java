@@ -639,13 +639,13 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 										} else {
 											payloadLenBuff[payloadLenBuffIndex++] = buffer[parseIndex++];
 											if (payloadLenBuffIndex >= 2) {
-												payloadLength = ((int) (0xFF & payloadLenBuff[0]) << 8)
-														+ (int) (0xFF & payloadLenBuff[1]);
+												payloadLength = ((0xFF & payloadLenBuff[0]) << 8)
+														+ (0xFF & payloadLenBuff[1]);
 												payloadLengthExists = true;
 											}
 										}
 									} else {
-										command = (int) (buffer[parseIndex++] & 0xFF);
+										command = buffer[parseIndex++] & 0xFF;
 										int[] commands = new int[] {
 												RfidDialog.READER_COMMAND_READ_ID,
 												RfidDialog.READER_COMMAND_READ_DATA,

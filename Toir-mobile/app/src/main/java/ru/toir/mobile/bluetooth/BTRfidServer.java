@@ -3,12 +3,6 @@
  */
 package ru.toir.mobile.bluetooth;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.UUID;
-import ru.toir.mobile.rfid.RfidDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -17,6 +11,14 @@ import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.UUID;
+
+import ru.toir.mobile.rfid.RfidDialog;
 
 /**
  * @author Dmitriy Logachov
@@ -505,13 +507,13 @@ public class BTRfidServer {
 										} else {
 											payloadLenBuff[payloadLenBuffIndex++] = buffer[parseIndex++];
 											if (payloadLenBuffIndex >= 2) {
-												payloadLength = ((int) (0xFF & payloadLenBuff[0]) << 8)
-														+ (int) (0xFF & payloadLenBuff[1]);
+												payloadLength = ((0xFF & payloadLenBuff[0]) << 8)
+														+ (0xFF & payloadLenBuff[1]);
 												payloadLengthExists = true;
 											}
 										}
 									} else {
-										command = (int) (buffer[parseIndex++] & 0xFF);
+										command = buffer[parseIndex++] & 0xFF;
 										int[] commands = new int[] {
 												RfidDialog.READER_COMMAND_READ_ID,
 												RfidDialog.READER_COMMAND_READ_DATA,

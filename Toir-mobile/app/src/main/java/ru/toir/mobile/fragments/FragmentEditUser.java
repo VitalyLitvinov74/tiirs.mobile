@@ -101,7 +101,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
                 InputStream inputStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
                 Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
                 if (myBitmap!=null) {
-                    int height = (int) (200 * (float) ((float) myBitmap.getHeight() / (float) myBitmap.getWidth()));
+                    int height = (int) (200 * (float) myBitmap.getHeight() / (float) myBitmap.getWidth());
                     if (height > 0) {
                         Bitmap myBitmap2 = Bitmap.createScaledBitmap(myBitmap, 200, height, false);
                         iView.setImageBitmap(myBitmap2);

@@ -21,7 +21,9 @@
 		android:gravity="center"
 	    android:minHeight="220dp"
 		android:minLines="10"
-		android:padding="5dip" />
+		android:padding="5dip"
+		android:layout_marginBottom="10dp"
+		android:paddingBottom="10dp" />
 
 	</TableRow>
 

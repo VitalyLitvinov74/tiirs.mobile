@@ -11,8 +11,8 @@ import android.os.Bundle;
  */
 public interface IServiceProvider {
 
-	public static final String RESULT = "result";
-	public static final String MESSAGE = "message";
+	String RESULT = "result";
+	String MESSAGE = "message";
 
 	/**
 	 * 

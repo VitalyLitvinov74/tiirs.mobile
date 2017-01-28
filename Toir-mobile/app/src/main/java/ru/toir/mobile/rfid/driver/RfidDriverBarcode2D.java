@@ -38,7 +38,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 			switch (msg.what) {
 			case Scanner.BARCODE_READ: {
 				String tagId;
-				if (!((String) msg.obj).equals("")) {
+				if (!msg.obj.equals("")) {
 					tagId = (String) msg.obj;
 				} else {
 					if (driverView != null) {
@@ -67,7 +67,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 				break;
 			}
 		}
-	};
+	}
 
 	@Override
 	public boolean init() {

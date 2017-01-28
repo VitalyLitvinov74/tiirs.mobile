@@ -213,7 +213,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
-            toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
+            //toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
             //toolbar.setSubtitle("Обслуживание и ремонт");
             toolbar.setTitleTextColor(Color.WHITE);
         }
@@ -346,7 +346,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         // do what ever you want with this key
-        if (key.equals(R.string.serverUrl)) {
+        if (key.equals(getString(R.string.serverUrl))) {
             final EditTextPreference URLPreference = (EditTextPreference) findPreference(getString(R.string.serverUrl));
             final AlertDialog dialog = (AlertDialog) URLPreference.getDialog();
             URLPreference.getEditText().setError(null);

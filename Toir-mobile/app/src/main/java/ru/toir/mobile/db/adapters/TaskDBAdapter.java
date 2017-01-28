@@ -261,8 +261,7 @@ public class TaskDBAdapter extends BaseDBAdapter {
 				.getColumnIndex(FIELD_ATTEMPT_SEND_DATE)));
 		item.setAttempt_count(cursor.getInt(cursor
 				.getColumnIndex(FIELD_ATTEMPT_COUNT)));
-		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) == 0 ? false
-				: true);
+		item.setUpdated(cursor.getInt(cursor.getColumnIndex(FIELD_UPDATED)) != 0);
 		item.setTask_name(cursor.getString(cursor
 				.getColumnIndex(FIELD_TASK_NAME)));
 		return item;

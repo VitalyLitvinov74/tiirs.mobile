@@ -3,13 +3,15 @@
  */
 package ru.toir.mobile.db.adapters;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import ru.toir.mobile.db.tables.EquipmentDocumentation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import ru.toir.mobile.db.tables.EquipmentDocumentation;
 
 /**
  * @author olejek
@@ -115,8 +117,7 @@ public class EquipmentDocumentationDBAdapter extends BaseDBAdapter {
 				.getColumnIndex(FIELD_DOCUMENTATION_TYPE_UUID)));
 		item.setTitle(cursor.getString(cursor.getColumnIndex(FIELD_TITLE)));
 		item.setPath(cursor.getString(cursor.getColumnIndex(FIELD_PATH)));
-		item.setRequired(cursor.getInt(cursor.getColumnIndex(FIELD_REQUIRED)) == 0 ? false
-				: true);
+		item.setRequired(cursor.getInt(cursor.getColumnIndex(FIELD_REQUIRED)) != 0);
 		return item;
 	}
 

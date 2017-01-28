@@ -164,7 +164,7 @@ public class UsersDBAdapter {
 		item.setTag_id(cursor.getString(cursor.getColumnIndex(FIELD_TAGID_NAME)));
 		item.setWhois(cursor.getString(cursor.getColumnIndex(FIELD_WHOIS_NAME)));
         item.setImage(cursor.getString(cursor.getColumnIndex(FIELD_IMAGE_NAME)));
-		item.setActive((cursor.getInt(cursor.getColumnIndex(FIELD_ACTIVE_NAME)) == 0 ? false : true));
+		item.setActive((cursor.getInt(cursor.getColumnIndex(FIELD_ACTIVE_NAME)) != 0));
 
 		return item;
 	}

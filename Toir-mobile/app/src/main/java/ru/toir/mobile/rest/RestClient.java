@@ -88,7 +88,7 @@ public class RestClient {
 		return out.toByteArray();
 	}
 
-	public static enum Method {
+	public enum Method {
 		GET, POST, PUT, DELETE
 	}
 }

@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MAX_USER_PROFILE = 10;
 
     private static final int NO_FRAGMENT = 0;
-    private static final int FRAGMENT_CAMERA = 1;
+    //private static final int FRAGMENT_CAMERA = 1;
     private static final int FRAGMENT_CHARTS = 2;
     private static final int FRAGMENT_EQUIPMENT = 3;
     private static final int FRAGMENT_GPS = 4;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_DOCS = 9;
     //private static final int FRAGMENT_OTHER = 10;
 
-    private static final int DRAWER_TASKS = 11;
+    //private static final int DRAWER_TASKS = 11;
     private static final int DRAWER_DOWNLOAD = 12;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
@@ -386,8 +386,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(toolbar);
-        //toolbar.setBackgroundResource(R.drawable.header);
-        toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
         toolbar.setSubtitle("Обслуживание и ремонт");
         toolbar.setTitleTextColor(Color.WHITE);
 
@@ -406,6 +404,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.white))
                 .addProfiles(
                         new ProfileSettingDrawerItem().withName("Добавить пользователя").withDescription("Добавить пользователя").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_plus)).withIdentifier(PROFILE_ADD),
                         new ProfileSettingDrawerItem().withName("Редактировать пользователей").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings)).withIdentifier(PROFILE_SETTINGS)
@@ -491,25 +490,22 @@ public class MainActivity extends AppCompatActivity {
                                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 mProgressDialog.setCancelable(true);
                                 final Downloader downloaderTask = new Downloader(MainActivity.this);
-                                if (downloaderTask != null) {
-                                    SharedPreferences sp = PreferenceManager
-                                            .getDefaultSharedPreferences(getApplicationContext());
-                                    String updateUrl = sp.getString(getString(R.string.updateUrl), "");
+                                SharedPreferences sp = PreferenceManager
+                                        .getDefaultSharedPreferences(getApplicationContext());
+                                String updateUrl = sp.getString(getString(R.string.updateUrl), "");
 
-                                    if (!updateUrl.equals("")) {
-                                        String path = Environment.getExternalStorageDirectory() + "/Download/";
-                                        File file = new File(path);
-                                        if (file.mkdirs()) {
-                                            File outputFile = new File(path, "Toir-mobile.apk");
-
-                                            downloaderTask.execute(updateUrl, outputFile.toString());
-                                            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                                @Override
-                                                public void onCancel(DialogInterface dialog) {
-                                                    downloaderTask.cancel(true);
-                                                }
-                                            });
-                                        }
+                                if (!updateUrl.equals("")) {
+                                    String path = Environment.getExternalStorageDirectory() + "/Download/";
+                                    File file = new File(path);
+                                    if (file.mkdirs()) {
+                                        File outputFile = new File(path, "Toir-mobile.apk");
+                                        downloaderTask.execute(updateUrl, outputFile.toString());
+                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                downloaderTask.cancel(true);
+                                            }
+                                        });
                                     }
                                 }
                             } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {

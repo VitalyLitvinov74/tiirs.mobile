@@ -5,8 +5,6 @@ package ru.toir.mobile.rfid;
 
 import java.util.ArrayList;
 
-import ru.toir.mobile.rfid.TagRecordStructure;
-
 /**
  * @author olejek
  *

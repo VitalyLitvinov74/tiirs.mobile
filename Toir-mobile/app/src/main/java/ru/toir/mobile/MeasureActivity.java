@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.graphics.PointF;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -15,9 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -25,9 +21,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.filter.Approximator;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Highlight;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -54,26 +48,18 @@ import ru.toir.mobile.db.realm.Operation;
 public class MeasureActivity extends AppCompatActivity implements OnChartValueSelectedListener {
     private Realm realmDB;
 
-    private final static String TAG = "MeasureActivity";
-    private AccountHeader headerResult = null;
+    AccountHeader headerResult = null;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
 
-    private TextView meas_header;
-    private TextView meas_description;
     private EditText meas_value;
-    private Button meas_submit;
     private Spinner meas_typeSpinner;
 
     private MeasuredValue measuredValue;
 
     protected BarChart mChart;
-    private SeekBar mSeekBarX, mSeekBarY;
-    private TextView tvX, tvY;
     private Typeface mTf;
-    private static MeasureType measureType1;
 
-    private String operationUuid = "";
     private String equipmentUuid = "";
     private Equipment currentEquipment;
     private Operation currentOperation;
@@ -82,26 +68,25 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realmDB = Realm.getDefaultInstance();
+        Button meas_submit = (Button) findViewById(R.id.meas_Button);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setMainLayout(savedInstanceState);
 
         Bundle b = getIntent().getExtras();
-            operationUuid = b.getString("operationUuid");
-            equipmentUuid = b.getString("equipmentUuid");
+            String operationUuid = b.getString("operationUuid");
+        equipmentUuid = b.getString("equipmentUuid");
 
-            final RealmResults<Equipment> equipment = realmDB.where(Equipment.class).equalTo("uuid", equipmentUuid).findAll();
-            if(equipment.size()>0) {
+        final RealmResults<Equipment> equipment = realmDB.where(Equipment.class).equalTo("uuid", equipmentUuid).findAll();
+        if(equipment.size()>0) {
                 currentEquipment = equipment.first();
             }
-            RealmResults<Operation> operations = realmDB.where(Operation.class).equalTo("uuid", operationUuid).findAll();
-            if(operations.size()>0) {
+        RealmResults<Operation> operations = realmDB.where(Operation.class).equalTo("uuid", operationUuid).findAll();
+        if(operations.size()>0) {
                 currentOperation = operations.first();
-            }
+        }
 
-            //meas_header = (TextView) findViewById(R.id.meas_header);
-        meas_description = (TextView) findViewById(R.id.meas_description);
+        //meas_header = (TextView) findViewById(R.id.meas_header);
         meas_value = (EditText) findViewById(R.id.meas_value);
-        meas_submit = (Button) findViewById(R.id.meas_Button);
         meas_typeSpinner= (Spinner) findViewById(R.id.simple_spinner);
 
         RealmResults<MeasureType> measureType = realmDB.where(MeasureType.class).findAll();
@@ -173,96 +158,20 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         rightAxis.setDrawGridLines(false);
         rightAxis.setTypeface(mTf);
         rightAxis.setLabelCount(8);
-        rightAxis.setTextColor(getResources().getColor(R.color.black));
         rightAxis.setTextColor(Color.WHITE);
         //rightAxis.setValueFormatter(custom);
         rightAxis.setSpaceTop(15f);
 
-        setData(50);
+        setData();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.actionToggleValues: {
-                for (DataSet<?> set : mChart.getData().getDataSets())
-                    set.setDrawValues(!set.isDrawValuesEnabled());
-
-                mChart.invalidate();
-                break;
-            }
-            case R.id.actionToggleHighlight: {
-                if (mChart.isHighlightEnabled())
-                    mChart.setHighlightEnabled(false);
-                else
-                    mChart.setHighlightEnabled(true);
-                mChart.invalidate();
-                break;
-            }
-            case R.id.actionTogglePinch: {
-                if (mChart.isPinchZoomEnabled())
-                    mChart.setPinchZoom(false);
-                else
-                    mChart.setPinchZoom(true);
-
-                mChart.invalidate();
-                break;
-            }
-            case R.id.actionToggleAutoScaleMinMax: {
-                //mChart.setAutoScaleMinMaxEnabled(!mChart.isAutoScaleMinMaxEnabled());
-                mChart.notifyDataSetChanged();
-                break;
-            }
-            case R.id.actionToggleHighlightArrow: {
-                if (mChart.isDrawHighlightArrowEnabled())
-                    mChart.setDrawHighlightArrow(false);
-                else
-                    mChart.setDrawHighlightArrow(true);
-                mChart.invalidate();
-                break;
-            }
-            case R.id.actionToggleStartzero: {
-                mChart.getAxisLeft().setStartAtZero(!mChart.getAxisLeft().isStartAtZeroEnabled());
-                mChart.getAxisRight().setStartAtZero(!mChart.getAxisRight().isStartAtZeroEnabled());
-                mChart.notifyDataSetChanged();
-                mChart.invalidate();
-                break;
-            }
-            case R.id.animateX: {
-                mChart.animateX(3000);
-                break;
-            }
-            case R.id.animateY: {
-                mChart.animateY(3000);
-                break;
-            }
-            case R.id.animateXY: {
-
-                mChart.animateXY(3000, 3000);
-                break;
-            }
-            case R.id.actionToggleFilter: {
-
-                Approximator a = new Approximator(Approximator.ApproximatorType.DOUGLAS_PEUCKER, 25);
-
-                if (!mChart.isFilteringEnabled()) {
-                    mChart.enableFiltering(a);
-                } else {
-                    mChart.disableFiltering();
-                }
-                mChart.invalidate();
-                break;
-            }
-            case R.id.actionSave: {
-                break;
-            }
-        }
         return true;
     }
 
 
-    private void setData(float range) {
+    private void setData() {
         int count;
         ArrayList<String> xVals = new ArrayList<>();
         // TODO сделать выбор нужных значений по шаблону операции
@@ -275,10 +184,10 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                 xVals.add(measuredValues.get(i).getDate().toString());
             }
         }
-        RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
-        for (Operation operation : operations) {
+        //RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
+        //for (Operation operation : operations) {
             //if (operation.getOperationTemplate().getUuid().equals(currentOperation.getOperationTemplateUuid()))
-        }
+        //}
 
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -303,12 +212,6 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
 
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-
-        if (e == null)
-            return;
-
-        RectF bounds = mChart.getBarBounds((BarEntry) e);
-        PointF position = mChart.getPosition(e, YAxis.AxisDependency.LEFT);
     }
 
     public void onNothingSelected() {
@@ -323,7 +226,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
+        //toolbar.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
         toolbar.setSubtitle("Измерение параметров");
 
         ActionBar ab = getSupportActionBar();
@@ -372,15 +275,10 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                 .withShowDrawerOnFirstLaunch(true)
                 .build();
 
-        //if you have many different types of DrawerItems you can magically pre-cache those items to get a better scroll performance
-        //make sure to init the cache after the DrawerBuilder was created as this will first clear the cache to make sure no old elements are in
         RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
-        //only set the active selection or active profile if we do not recreate the activity
         if (savedInstanceState == null) {
-            // set the selection to the item with the identifier 11
             result.setSelection(21, false);
         }
-        //getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
     }
 
 }
