@@ -86,7 +86,7 @@ public class ToirRealmMigration implements RealmMigration {
                     .addField("uuid", String.class)
                     .addField("name", String.class)
                     .addField("description", String.class)
-                    .addField("photo", String.class)
+                    .addField("phone", String.class)
                     .addField("createdAt", Date.class)
                     .addField("changedAt", Date.class)
                     .addPrimaryKey("_id");

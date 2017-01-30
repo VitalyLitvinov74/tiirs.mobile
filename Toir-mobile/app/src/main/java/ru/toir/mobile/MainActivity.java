@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
     private int cnt = 0;
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
+    private boolean service_mode = false;
+
     private Realm realmDB;
     private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
         @Override
@@ -348,6 +350,14 @@ public class MainActivity extends AppCompatActivity {
     //@SuppressWarnings("deprecation")
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        service_mode = sp.getBoolean("pref_debug_mode",false);
+        Toast.makeText(getApplicationContext(),
+                "Debug="+service_mode, Toast.LENGTH_LONG).show();
+        //FragmentTransaction ft = getFragmentManager().beginTransaction();
+        //ft.detach(this).attach(this).commit();
+
         BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         assert bottomBar != null;
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
@@ -453,17 +463,17 @@ public class MainActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
                         //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new DividerDrawerItem(),
                         //new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         //new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName(R.string.service).withDescription("Журнал и gps трек").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(FRAGMENT_SERVICE).withSelectable(false),
-                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.service).withDescription("Журнал и gps трек").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(FRAGMENT_SERVICE).withSelectable(false).withEnabled(service_mode),
+                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor))
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -639,7 +649,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onActionSettings(MenuItem menuItem) {
         Log.d(TAG, "onActionSettings");
-        Intent i = new Intent(MainActivity.this, ToirPreferences.class);
+        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(i);
     }
 
@@ -784,7 +794,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void mOnClickMethod(View view) {
         //openOptionsMenu();
-        Intent i = new Intent(MainActivity.this, ToirPreferences.class);
+        //Intent i = new Intent(MainActivity.this, ToirPreferences.class);
+        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(i);
     }
 
