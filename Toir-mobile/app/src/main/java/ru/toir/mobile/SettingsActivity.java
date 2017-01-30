@@ -104,7 +104,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         } catch (PackageManager.NameNotFoundException e) {
             appVersion = "unknown";
         }
-
         setupSimplePreferencesScreen();
 
         SharedPreferences preferences = PreferenceManager
@@ -299,13 +298,57 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         Toolbar Tbar = (Toolbar) appBar.getChildAt(0);
 
         Tbar.setTitle(preferenceScreen.getTitle());
-
+        Tbar.setTitleTextColor(Color.WHITE);
         Tbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
+
+        this.findPreference(getResources().getString(R.string.serverUrl))
+                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(final Preference preference) {
+                        final EditTextPreference URLPreference = (EditTextPreference) findPreference(getString(R.string.serverUrl));
+                        final AlertDialog dialog = (AlertDialog) URLPreference.getDialog();
+                        URLPreference.getEditText().setError(null);
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                                .setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String errorMessage;
+                                        String text = URLPreference.getEditText().getText().toString();
+
+                                        try {
+                                            URL tURL = new URL(text);
+                                            //String tURL2 = tURL.toString().replaceAll("/+$", "");
+                                            URLPreference.getEditText().setText(tURL.toString().replaceAll("/+$", ""));
+                                            errorMessage = null;
+                                        } catch (MalformedURLException e) {
+                                            if (!text.isEmpty()) {
+                                                errorMessage = "Не верный URL!";
+                                            } else {
+                                                errorMessage = null;
+                                            }
+                                        }
+
+                                        EditText edit = URLPreference.getEditText();
+                                        if (errorMessage == null) {
+                                            edit.setError(null);
+                                            URLPreference.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
+                                            dialog.dismiss();
+                                            ToirApplication.serverUrl = edit.getText().toString();
+                                        } else {
+                                            edit.setError(errorMessage);
+                                        }
+                                    }
+                                });
+
+                        return true;
+                    }
+                });
+
     }
 
 
@@ -341,6 +384,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             return null;
         }
     }
+
 
     @Override
     public boolean onPreferenceClick(Preference preference) {

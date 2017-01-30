@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
     <PreferenceScreen
-        android:theme="@style/AppTheme.NoActionBar"
         android:icon="@drawable/pref_basic"
+        android:theme="@style/PreferenceScreen"
         android:title="@string/pref_cat_main">
 
         <EditTextPreference
             android:dialogTitle="@string/pref_update_url_dialog_title"
             android:key="@string/updateUrl"
-            android:textColor="@color/larisaTextColorABlack"
             android:icon="@drawable/pref_server"
             android:defaultValue="http://toir.server.loc"
             android:title="@string/pref_update_url" />
@@ -18,20 +18,17 @@
             android:key="@string/serverUrl"
             android:defaultValue="http://toir.server.loc"
             android:icon="@drawable/pref_server"
-            android:textColor="@color/larisaTextColorABlack"
             android:title="@string/pref_server_url" />
 
         <ListPreference
             android:key="@string/rfidDriverListPrefKey"
-            android:textColor="@color/larisaTextColorABlack"
             android:icon="@drawable/pref_rfid"
             android:title="@string/pref_rfid_driver" />
 
     </PreferenceScreen>
     <PreferenceScreen
         android:title="Отображение и данные"
-        android:icon="@drawable/pref_check"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:icon="@drawable/pref_check">
         <PreferenceCategory android:title="@string/pref_cat_show" >
             <CheckBoxPreference
                 android:defaultValue="false"
@@ -47,18 +44,15 @@
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
-        android:theme="@style/AppTheme.NoActionBar"
         android:icon="@drawable/pref_rfid"
         android:title="Настройки считывателя">
 
         <PreferenceCategory
             android:key="drvSettingsCategory"
-            android:textColor="@color/larisaTextColorABlack"
             android:title="Настройки драйверов" >
 
             <PreferenceScreen
                 android:key="@string/rfidDrvSettingKey"
-                android:textColor="@color/larisaTextColorABlack"
                 android:title="Настройки драйвера RFID" >
             </PreferenceScreen>
         </PreferenceCategory>

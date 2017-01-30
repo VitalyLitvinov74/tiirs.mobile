@@ -17,7 +17,7 @@
                 android:layout_height="200dp"
                 android:layout_gravity="top"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/profile_logachev"
+                android:src="@drawable/profile_ivanov"
                 android:scaleType="center" />
 
             <TextView

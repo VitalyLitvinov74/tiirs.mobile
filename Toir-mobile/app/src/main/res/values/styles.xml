@@ -31,9 +31,10 @@
 
     <style name="PreferenceScreen" parent="CustomTheme">
         <item name="android:textColor">@color/larisaTextColorABlack</item>
-        <item name="android:titleTextStyle">@style/PreferenceTitleStyle</item>
-        <item name="android:textColorSecondary">@color/black</item>
-        <item name="colorControlNormal">@color/black</item>
+    </style>
+
+    <style name="PreferenceCategory" parent="CustomTheme">
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
     </style>
 
     <style name="PreferenceTitleStyle">
