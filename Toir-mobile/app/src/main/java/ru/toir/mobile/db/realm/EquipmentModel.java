@@ -13,7 +13,6 @@ public class EquipmentModel extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    //private String equipmentTypeUuid;
     private EquipmentType equipmentType;
     private String title;
     private Date createdAt;

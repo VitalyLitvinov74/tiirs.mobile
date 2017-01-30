@@ -24,9 +24,7 @@ public class Orders extends RealmObject {
     private Date openDate;
     private Date closeDate;
     private OrderLevel orderLevel;
-    //private String orderStatusUuid;
     private OrderStatus orderStatus;
-    //private String orderVerdictUuid;
     private OrderVerdict orderVerdict;
     private Date attemptSendDate;
     private int attemptCount;

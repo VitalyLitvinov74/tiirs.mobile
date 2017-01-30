@@ -15,15 +15,9 @@ public class Tasks extends RealmObject {
     private long _id;
     private String uuid;
     private String comment;
-    //private String orderUuid;
-    //private Orders order;
-    //private String equipmentUuid;
     private Equipment equipment;
-    //private String taskVerdictUuid;
     private TaskVerdict taskVerdict;
-    //private String taskStatusUuid;
     private TaskStatus taskStatus;
-    //private String taskTemplateUuid;
     private TaskTemplate taskTemplate;
     private int prevCode;
     private int nextCode;
