@@ -63,4 +63,10 @@ public class AuthorizedUser {
 		this.mToken = Token;
 	}
 
+	/**
+	 * @return The bearer
+	 */
+	public String getBearer() {
+		return "bearer " + mToken;
+	}
 }

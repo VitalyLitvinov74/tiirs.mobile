@@ -112,7 +112,7 @@ public class ReferenceProcessor {
 
             Map<String, List<String>> headers = new ArrayMap<>();
             List<String> tList = new ArrayList<>();
-            tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+            tList.add(AuthorizedUser.getInstance().getBearer());
             headers.put("Authorization", tList);
 
             Request request = new Request(Method.GET, requestUri, headers, null);
@@ -223,12 +223,9 @@ public class ReferenceProcessor {
 
                     Map<String, List<String>> headers = new ArrayMap<>();
                     List<String> tList = new ArrayList<>();
-                    tList.add("bearer "
-                            + AuthorizedUser.getInstance().getToken());
+                    tList.add(AuthorizedUser.getInstance().getBearer());
                     headers.put("Authorization", tList);
-
-                    Request request = new Request(Method.GET, requestUri,
-                            headers, null);
+                    Request request = new Request(Method.GET, requestUri, headers, null);
                     Response response = new RestClient().execute(request);
 
                     if (response.mStatus == 200) {
@@ -379,8 +376,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(DocumentationType.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
         Call<List<DocumentationType>> call = ToirAPIFactory.getDocumentationTypeService()
-                .documentationType("bearer " + AuthorizedUser.getInstance().getToken(),
-                        lastChangedAt);
+                .documentationType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<DocumentationType>> response = call.execute();
             realm.beginTransaction();
@@ -445,7 +441,7 @@ public class ReferenceProcessor {
 
                 Map<String, List<String>> headers = new ArrayMap<>();
                 List<String> tList = new ArrayList<>();
-                tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+                tList.add(AuthorizedUser.getInstance().getBearer());
                 headers.put("Authorization", tList);
 
                 Request request = new Request(Method.GET, requestUri, headers,
@@ -546,7 +542,7 @@ public class ReferenceProcessor {
 
                 Map<String, List<String>> headers = new ArrayMap<>();
                 List<String> tList = new ArrayList<>();
-                tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+                tList.add(AuthorizedUser.getInstance().getBearer());
                 headers.put("Authorization", tList);
 
                 Request request = new Request(Method.GET, requestUri, headers,
@@ -645,7 +641,7 @@ public class ReferenceProcessor {
 
                 Map<String, List<String>> headers = new ArrayMap<>();
                 List<String> tList = new ArrayList<>();
-                tList.add("bearer " + AuthorizedUser.getInstance().getToken());
+                tList.add(AuthorizedUser.getInstance().getBearer());
                 headers.put("Authorization", tList);
 
                 Request request = new Request(Method.GET, requestUri, headers,
@@ -715,8 +711,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(EquipmentStatus.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
         Call<List<EquipmentStatus>> call = ToirAPIFactory.getEquipmentStatusService()
-                .equipmentStatus("bearer " + AuthorizedUser.getInstance().getToken(),
-                        lastChangedAt);
+                .equipmentStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<EquipmentStatus>> response = call.execute();
             realm.beginTransaction();
@@ -757,7 +752,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(EquipmentType.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
         Call<List<EquipmentType>> call = ToirAPIFactory.getEquipmentTypeService()
-                .equipmentType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+                .equipmentType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<EquipmentType>> response = call.execute();
             realm.beginTransaction();
@@ -798,7 +793,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(MeasureType.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
         Call<List<MeasureType>> call = ToirAPIFactory.getMeasureTypeService()
-                .measureType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+                .measureType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<MeasureType>> response = call.execute();
             realm.beginTransaction();
@@ -839,8 +834,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(OperationStatus.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
         Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatus()
-                .operationStatus("bearer " + AuthorizedUser.getInstance().getToken(),
-                        lastChangedAt);
+                .operationStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<OperationStatus>> response = call.execute();
             realm.beginTransaction();
@@ -880,7 +874,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(OperationType.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
         Call<List<OperationType>> call = ToirAPIFactory.getOperationType()
-                .operationType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+                .operationType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<OperationType>> response = call.execute();
             realm.beginTransaction();
@@ -921,7 +915,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(TaskStatus.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
         Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatus()
-                .taskStatus("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+                .taskStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<TaskStatus>> response = call.execute();
             realm.beginTransaction();
@@ -1035,7 +1029,7 @@ public class ReferenceProcessor {
         Date changed = realm.where(CriticalType.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
         Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService()
-                .criticalType("bearer " + AuthorizedUser.getInstance().getToken(), lastChangedAt);
+                .criticalType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<CriticalType>> response = call.execute();
             realm.beginTransaction();

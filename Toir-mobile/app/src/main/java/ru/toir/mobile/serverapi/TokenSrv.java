@@ -10,23 +10,23 @@ import com.google.gson.annotations.SerializedName;
  */
 public class TokenSrv {
 
-    @SerializedName("access_token")
     @Expose
     private String accessToken;
-    @SerializedName("token_type")
     @Expose
     private String tokenType;
-    @SerializedName("expires_in")
     @Expose
     private Integer expiresIn;
     @Expose
     private String userName;
-    @SerializedName("issued")
     @Expose
-    private String Issued;
-    @SerializedName("expires")
+    private String issued;
     @Expose
-    private String Expires;
+    private String expires;
+
+    public class Type {
+        public static final String LABEL = "label";
+        public static final String PASSWORD = "password";
+    }
 
     /**
      * @return The accessToken
@@ -88,32 +88,32 @@ public class TokenSrv {
      * @return The Issued
      */
     public String getIssued() {
-        return Issued;
+        return issued;
     }
 
     /**
-     * @param Issued The .issued
+     * @param issued The issued
      */
-    public void setIssued(String Issued) {
-        this.Issued = Issued;
+    public void setIssued(String issued) {
+        this.issued = issued;
     }
 
     /**
      * @return The Expires
      */
     public String getExpires() {
-        return Expires;
+        return expires;
     }
 
     /**
-     * @param Expires The .expires
+     * @param expires The expires
      */
-    public void setExpires(String Expires) {
-        this.Expires = Expires;
+    public void setExpires(String expires) {
+        this.expires = expires;
     }
 
     @Override
     public String toString() {
-        return accessToken + ", " + tokenType + ", " + expiresIn + ", " + userName + ", " + Issued + ", " + Expires;
+        return accessToken + ", " + tokenType + ", " + expiresIn + ", " + userName + ", " + issued + ", " + expires;
     }
 }

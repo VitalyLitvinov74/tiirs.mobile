@@ -266,7 +266,6 @@ public class TaskProcessor {
 	private Bundle getTasks(String url) {
 
         URI requestUri;
-        String token = AuthorizedUser.getInstance().getToken();
         String jsonString;
         Bundle result = new Bundle();
 
@@ -276,7 +275,7 @@ public class TaskProcessor {
 
             Map<String, List<String>> headers = new ArrayMap<>();
             List<String> tList = new ArrayList<>();
-            tList.add("bearer " + token);
+            tList.add(AuthorizedUser.getInstance().getBearer());
 			headers.put("Authorization", tList);
 
 			Request request = new Request(Method.GET, requestUri, headers, null);
@@ -754,7 +753,7 @@ public class TaskProcessor {
 
             Map<String, List<String>> headers = new ArrayMap<>();
             List<String> aList = new ArrayList<>();
-            aList.add("Bearer " + AuthorizedUser.getInstance().getToken());
+            aList.add(AuthorizedUser.getInstance().getBearer());
 			headers.put("Authorization", aList);
             List<String> cList = new ArrayList<>();
             cList.add("application/json");
