@@ -23,9 +23,16 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.AlertTypeAdapter;
@@ -45,6 +52,7 @@ import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
+import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
@@ -52,34 +60,32 @@ import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ToirAPIFactory;
 
 public class ReferenceFragment extends Fragment {
+	private static final String TAG = "ReferenceFragment";
     private Realm realmDB;
 
     private ListView contentListView;
 
-    private ProgressDialog getReferencesDialog;
-
-	private IntentFilter mFilterGetReference = new IntentFilter(
-			ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
-	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			getReferencesDialog.dismiss();
-			context.unregisterReceiver(mReceiverGetReference);
-			boolean result = intent.getBooleanExtra(
-					ProcessorService.Extras.RESULT_EXTRA, false);
-			Bundle bundle = intent
-					.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-			if (result) {
-				Toast.makeText(context, "Справочники обновлены",
-						Toast.LENGTH_SHORT).show();
-			} else {
-				// сообщаем описание неудачи
-				String message = bundle.getString(IServiceProvider.MESSAGE);
-				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-			}
-		}
-	};
+//	private IntentFilter mFilterGetReference = new IntentFilter(ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
+//	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
+//
+//		@Override
+//		public void onReceive(Context context, Intent intent) {
+//			getReferencesDialog.dismiss();
+//			context.unregisterReceiver(mReceiverGetReference);
+//			boolean result = intent.getBooleanExtra(
+//					ProcessorService.Extras.RESULT_EXTRA, false);
+//			Bundle bundle = intent
+//					.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
+//			if (result) {
+//				Toast.makeText(context, "Справочники обновлены",
+//						Toast.LENGTH_SHORT).show();
+//			} else {
+//				// сообщаем описание неудачи
+//				String message = bundle.getString(IServiceProvider.MESSAGE);
+//				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+//			}
+//		}
+//	};
 
     public static ReferenceFragment newInstance() {
         return (new ReferenceFragment());
@@ -93,19 +99,16 @@ public class ReferenceFragment extends Fragment {
 	 * android.view.ViewGroup, android.os.Bundle)
 	 */
 	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.reference_layout, container,
-				false);
+		View rootView = inflater.inflate(R.layout.reference_layout, container, false);
         realmDB = Realm.getDefaultInstance();
 
         Spinner referenceSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
 		contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
 
 		// получаем список справочников, разбиваем его на ключ:значение
-		String[] referenceArray = getResources().getStringArray(
-				R.array.references_array);
+		String[] referenceArray = getResources().getStringArray(R.array.references_array);
 		String[] tmpValue;
 		SortField item;
         ArrayList<SortField> referenceList = new ArrayList<>();
@@ -115,8 +118,7 @@ public class ReferenceFragment extends Fragment {
 			referenceList.add(item);
 		}
 
-        ArrayAdapter<SortField> referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item, referenceList);
+        ArrayAdapter<SortField> referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, referenceList);
 
 		referenceSpinner.setAdapter(referenceSpinnerAdapter);
         ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
@@ -210,37 +212,110 @@ public class ReferenceFragment extends Fragment {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				Log.d("test", "Обновляем справочники.");
+				Log.d(TAG, "Обновляем справочники.");
+                String bearer = AuthorizedUser.getInstance().getBearer();
+                final ProgressDialog dialog = new ProgressDialog(getActivity());
 
-				ReferenceServiceHelper rsh = new ReferenceServiceHelper(
-						getActivity().getApplicationContext(),
-						ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
 
-				getActivity().registerReceiver(mReceiverGetReference,
-						mFilterGetReference);
+//				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity().getApplicationContext(), ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
+//				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
+//				rsh.getAll();
 
-				rsh.getAll();
+                // получаем справочники, обновляем всё несмотря на то что часть данных будет дублироваться
+                final Date currentDate = new Date();
+                String changedDate;
+                //
+                // AlertType
+                // Clients
 
-				// показываем диалог обновления справочников
-				getReferencesDialog = new ProgressDialog(getActivity());
-				getReferencesDialog.setMessage("Получаем справочники");
-				getReferencesDialog.setIndeterminate(true);
-				getReferencesDialog
-						.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				getReferencesDialog.setCancelable(false);
-				getReferencesDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+                // CriticalType
+                // получаем дату последнего обновления справочника
+                changedDate = ReferenceUpdate.lastChangedAsStr(CriticalType.class.getSimpleName());
+                Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService().criticalType(bearer, changedDate);
+                call.enqueue(new Callback<List<CriticalType>>() {
+                    @Override
+                    public void onResponse(Response<List<CriticalType>> response, Retrofit retrofit) {
+                        // обновляем записи
+                        List<CriticalType> list = response.body();
+                        ReferenceUpdate referenceUpdate = new ReferenceUpdate();
+                        referenceUpdate.setReferenceName(CriticalType.class.getSimpleName());
+                        referenceUpdate.setUpdateDate(currentDate);
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.copyToRealmOrUpdate(referenceUpdate);
+                        realm.commitTransaction();
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        dialog.dismiss();
+                    }
+                });
+
+                // Documentation
+                // DocumentationType
+                // Equipment
+                // EquipmentModel
+                // EquipmentStatus
+                // EquipmentType
+                // GpsTrack
+                // Journal
+                // MeasuredValue
+                // MeasureType
+                // Operation
+                // OperationStatus
+                // OperationTemplate
+                // OperationTool
+                // OperationType
+                // OperationVerdict
+                // OrderLevel
+                // Orders
+                // OrderStatus
+                // OrderVerdict
+                // ReferenceUpdate
+                // RepairPart
+                // RepairPartType
+                // Tasks
+                // TaskStageList
+                // TaskStageOperationList
+                // TaskStages
+                // TaskStageStatus
+                // TaskStageTemplate
+                // TaskStageType
+                // TaskStageVerdict
+                // TaskStatus
+                // TaskTemplate
+                // TaskType
+                // TaskVerdict
+                // Tool
+                // ToolType
+                // User
+
+
+
+                // показываем диалог обновления справочников
+				dialog.setMessage("Получаем справочники");
+				dialog.setIndeterminate(true);
+				dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				dialog.setCancelable(false);
+				dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
 						"Отмена", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								getActivity().unregisterReceiver(
-										mReceiverGetReference);
-								Toast.makeText(getActivity(),
-										"Обновление справочников отменено",
-										Toast.LENGTH_SHORT).show();
+//								getActivity().unregisterReceiver(mReceiverGetReference);
+								Toast.makeText(getActivity(), "Обновление справочников отменено", Toast.LENGTH_SHORT).show();
 							}
 						});
-				getReferencesDialog.show();
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        Toast.makeText(getContext(), "Справочники обновлены", Toast.LENGTH_SHORT).show();
+                    }
+                });
+				dialog.show();
 
 				return true;
 			}
@@ -254,15 +329,12 @@ public class ReferenceFragment extends Fragment {
 	 *         справочников.
 	 *         </p>
 	 */
-	private class ReferenceSpinnerListener implements
-			AdapterView.OnItemSelectedListener {
+	private class ReferenceSpinnerListener implements AdapterView.OnItemSelectedListener {
 
 		@Override
-		public void onItemSelected(AdapterView<?> parentView,
-								   View selectedItemView, int position, long id) {
+		public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-			SortField selectedItem = (SortField) parentView
-					.getItemAtPosition(position);
+			SortField selectedItem = (SortField) parentView.getItemAtPosition(position);
 			String selected = selectedItem.getField();
 
 			switch (selected) {
