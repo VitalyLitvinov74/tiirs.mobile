@@ -13,7 +13,10 @@ import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
+import ru.toir.mobile.rest.interfaces.IAlertType;
+import ru.toir.mobile.rest.interfaces.IClients;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
+import ru.toir.mobile.rest.interfaces.IDocumentation;
 import ru.toir.mobile.rest.interfaces.IDocumentationType;
 import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
 import ru.toir.mobile.rest.interfaces.IEquipmentType;
@@ -53,8 +56,23 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static IAlertType getAlertTypeService() {
+        return getRetrofit().create(IAlertType.class);
+    }
+
+    @NonNull
     public static ICriticalType getCriticalTypeService() {
         return getRetrofit().create(ICriticalType.class);
+    }
+
+    @NonNull
+    public static IClients getClientsService() {
+        return getRetrofit().create(IClients.class);
+    }
+
+    @NonNull
+    public static IDocumentation getDocumentationService() {
+        return getRetrofit().create(IDocumentation.class);
     }
 
     @NonNull

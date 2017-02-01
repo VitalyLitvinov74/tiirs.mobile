@@ -13,9 +13,9 @@ import ru.toir.mobile.serverapi.TokenSrv;
 public interface ITokenService {
     @FormUrlEncoded
     @POST("/token")
-    Call<TokenSrv> user(@Field("label") String tagId, @Field("grant_type") String garantType);
+    Call<TokenSrv> tokenByLabel(@Field("label") String tagId, @Field("grant_type") String garantType);
 
     @FormUrlEncoded
     @POST("/token")
-    Call<TokenSrv> user(@Field("label") String tagId);
+    Call<TokenSrv> tokenByPassword(@Field("password") String tagId, @Field("grant_type") String garantType);
 }

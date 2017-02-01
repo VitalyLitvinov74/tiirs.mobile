@@ -13,8 +13,15 @@ import ru.toir.mobile.db.realm.Orders;
  *         Created by koputo on 17.10.16.
  */
 public interface IOrder {
-    @GET("/api/order")
-    Call<List<Orders>> order(@Header("Authorization") String token,
-                             @Query("UserUuid") String userUuid,
-                             @Query("ChangedAfter") String changedAfter);
+    @GET("/references/orders")
+    Call<List<Orders>> orders(@Header("Authorization") String token,
+                             @Query("userUuid") String userUuid);
+    @GET("/references/orders")
+    Call<List<Orders>> orders(@Header("Authorization") String token,
+                              @Query("userUuid") String userUuid,
+                              @Query("changedAfter") String changedAfter);
+    @GET("/references/orders")
+    Call<List<Orders>> ordersById(@Header("Authorization") String token,
+                                  @Query("id") String id,
+                                  @Query("userUuid") String userUuid);
 }

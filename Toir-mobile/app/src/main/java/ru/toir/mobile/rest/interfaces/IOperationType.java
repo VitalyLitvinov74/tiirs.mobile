@@ -13,7 +13,13 @@ import ru.toir.mobile.db.realm.OperationType;
  *         Created by koputo on 05.10.16.
  */
 public interface IOperationType {
-    @GET("/api/references/operation_type")
+    @GET("/references/operation-type")
+    Call<List<OperationType>> operationType(@Header("Authorization") String token);
+    @GET("/references/operation-type")
     Call<List<OperationType>> operationType(@Header("Authorization") String token,
-                                            @Query("ChangedAfter") String changedAfter);
+                                            @Query("changedAfter") String changedAfter);
+    @GET("/references/operation-type")
+    Call<List<OperationType>> operationTypeById(@Header("Authorization") String token,
+                                                @Query("id") String id);
+
 }

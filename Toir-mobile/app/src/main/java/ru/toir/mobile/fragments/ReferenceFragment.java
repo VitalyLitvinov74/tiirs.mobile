@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 import retrofit.Call;
 import retrofit.Callback;
@@ -45,7 +46,9 @@ import ru.toir.mobile.db.adapters.OperationTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
+import ru.toir.mobile.db.realm.Clients;
 import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.EquipmentType;
@@ -224,37 +227,76 @@ public class ReferenceFragment extends Fragment {
                 // получаем справочники, обновляем всё несмотря на то что часть данных будет дублироваться
                 final Date currentDate = new Date();
                 String changedDate;
-                //
+
                 // AlertType
+                changedDate = ReferenceUpdate.lastChangedAsStr(AlertType.class.getSimpleName());
+                ToirAPIFactory.getAlertTypeService().alertType(bearer, changedDate)
+                        .enqueue(new Callback<List<AlertType>>() {
+                            @Override
+                            public void onResponse(Response<List<AlertType>> response, Retrofit retrofit) {
+                                List<AlertType> list = response.body();
+                                saveReferenceData(AlertType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                        dialog.dismiss();
+                    }
+                        });
+
                 // Clients
+                changedDate = ReferenceUpdate.lastChangedAsStr(Clients.class.getSimpleName());
+                ToirAPIFactory.getClientsService().clients(bearer, changedDate)
+                        .enqueue(new Callback<List<Clients>>() {
+                            @Override
+                            public void onResponse(Response<List<Clients>> response, Retrofit retrofit) {
+                                List<Clients> list = response.body();
+                                saveReferenceData(AlertType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
 
                 // CriticalType
-                // получаем дату последнего обновления справочника
                 changedDate = ReferenceUpdate.lastChangedAsStr(CriticalType.class.getSimpleName());
-                Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService().criticalType(bearer, changedDate);
-                call.enqueue(new Callback<List<CriticalType>>() {
-                    @Override
-                    public void onResponse(Response<List<CriticalType>> response, Retrofit retrofit) {
-                        // обновляем записи
-                        List<CriticalType> list = response.body();
-                        ReferenceUpdate referenceUpdate = new ReferenceUpdate();
-                        referenceUpdate.setReferenceName(CriticalType.class.getSimpleName());
-                        referenceUpdate.setUpdateDate(currentDate);
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.copyToRealmOrUpdate(referenceUpdate);
-                        realm.commitTransaction();
-                        dialog.dismiss();
-                    }
+                ToirAPIFactory.getCriticalTypeService().criticalType(bearer, changedDate)
+                        .enqueue(new Callback<List<CriticalType>>() {
+                            @Override
+                            public void onResponse(Response<List<CriticalType>> response, Retrofit retrofit) {
+                                List<CriticalType> list = response.body();
+                                saveReferenceData(CriticalType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        dialog.dismiss();
-                    }
-                });
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
 
                 // Documentation
+                // нужно ли вообще таким образом обновлять этот справочник???
+                changedDate = ReferenceUpdate.lastChangedAsStr(Documentation.class.getSimpleName());
+                ToirAPIFactory.getDocumentationService().documentation(bearer, changedDate)
+                        .enqueue(new Callback<List<Documentation>>() {
+                            @Override
+                            public void onResponse(Response<List<Documentation>> response, Retrofit retrofit) {
+                                List<Documentation> list = response.body();
+                                saveReferenceData(Documentation.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // DocumentationType
                 // Equipment
                 // EquipmentModel
@@ -375,4 +417,23 @@ public class ReferenceFragment extends Fragment {
 
 		}
 	}
+
+    /**
+     *
+     * @param referenceName
+     * @param list
+     * @param updateDate
+     */
+	private void saveReferenceData(String referenceName, List list, Date updateDate) {
+        Realm realm = Realm.getDefaultInstance();
+
+        ReferenceUpdate item = new ReferenceUpdate();
+        item.setReferenceName(referenceName);
+        item.setUpdateDate(updateDate);
+
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(list);
+        realm.copyToRealmOrUpdate(item);
+        realm.commitTransaction();
+    }
 }

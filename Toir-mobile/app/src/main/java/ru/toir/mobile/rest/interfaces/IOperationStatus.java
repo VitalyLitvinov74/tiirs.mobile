@@ -13,7 +13,12 @@ import ru.toir.mobile.db.realm.OperationStatus;
  *         Created by koputo on 05.10.16.
  */
 public interface IOperationStatus {
-    @GET("/api/references/operation_status")
+    @GET("/references/operation-status")
+    Call<List<OperationStatus>> operationStatus(@Header("Authorization") String token);
+    @GET("/references/operation-status")
     Call<List<OperationStatus>> operationStatus(@Header("Authorization") String token,
-                                                @Query("ChangedAfter") String changedAfter);
+                                                @Query("changedAfter") String changedAfter);
+    @GET("/references/operation-status")
+    Call<List<OperationStatus>> operationStatusById(@Header("Authorization") String token,
+                                                    @Query("id") String id);
 }

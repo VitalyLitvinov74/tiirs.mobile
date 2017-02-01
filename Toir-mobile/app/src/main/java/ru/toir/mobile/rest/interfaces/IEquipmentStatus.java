@@ -13,7 +13,12 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
  *         Created by koputo on 05.10.16.
  */
 public interface IEquipmentStatus {
-    @GET("/api/references/equipment-status")
+    @GET("/references/equipment-status")
+    Call<List<EquipmentStatus>> equipmentStatus(@Header("Authorization") String token);
+    @GET("/references/equipment-status")
     Call<List<EquipmentStatus>> equipmentStatus(@Header("Authorization") String token,
-                                                @Query("ChangedAfter") String changedAfter);
+                                                @Query("changedAfter") String changedAfter);
+    @GET("/references/equipment-status")
+    Call<List<EquipmentStatus>> equipmentStatusById(@Header("Authorization") String token,
+                                                    @Query("id") String id);
 }

@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                     authorizationDialog.show();
 
                     // запрашиваем токен
-                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().user(tagId, TokenSrv.Type.LABEL);
+                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(tagId, TokenSrv.Type.LABEL);
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
                         public void onResponse(Response<TokenSrv> response, Retrofit retrofit) {

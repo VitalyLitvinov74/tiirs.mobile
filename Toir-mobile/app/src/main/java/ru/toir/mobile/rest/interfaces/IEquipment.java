@@ -14,7 +14,12 @@ import ru.toir.mobile.db.realm.Equipment;
  */
 
 public interface IEquipment {
-    @GET("/api/references/equipment")
+    @GET("/references/equipment")
+    Call<List<Equipment>> equipment(@Header("Authorization") String token);
+    @GET("/references/equipment")
     Call<List<Equipment>> equipment(@Header("Authorization") String token,
                                     @Query("changedAfter") String changedAfter);
+    @GET("/references/equipment")
+    Call<List<Equipment>> equipmentById(@Header("Authorization") String token,
+                                        @Query("id") String id);
 }
