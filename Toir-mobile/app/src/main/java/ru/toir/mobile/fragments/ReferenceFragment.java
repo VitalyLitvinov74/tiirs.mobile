@@ -58,6 +58,8 @@ import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
+import ru.toir.mobile.db.realm.OperationTemplate;
+import ru.toir.mobile.db.realm.OperationTool;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
@@ -442,10 +444,90 @@ public class ReferenceFragment extends Fragment {
                 });
 
                 // OperationStatus
+                changedDate = ReferenceUpdate.lastChangedAsStr(OperationStatus.class.getSimpleName());
+                ToirAPIFactory.getOperationStatusService().operationStatus(bearer, changedDate)
+                        .enqueue(new Callback<List<OperationStatus>>() {
+                            @Override
+                            public void onResponse(Response<List<OperationStatus>> response, Retrofit retrofit) {
+                                List<OperationStatus> list = response.body();
+                                saveReferenceData(OperationStatus.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OperationTemplate
+                changedDate = ReferenceUpdate.lastChangedAsStr(OperationTemplate.class.getSimpleName());
+                ToirAPIFactory.getOperationTemplateService().operationTemplate(bearer, changedDate)
+                        .enqueue(new Callback<List<OperationTemplate>>() {
+                            @Override
+                            public void onResponse(Response<List<OperationTemplate>> response, Retrofit retrofit) {
+                                List<OperationTemplate> list = response.body();
+                                saveReferenceData(OperationTemplate.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OperationTool
+                changedDate = ReferenceUpdate.lastChangedAsStr(OperationTool.class.getSimpleName());
+                ToirAPIFactory.getOperationToolService().operationTool(bearer, changedDate)
+                        .enqueue(new Callback<List<OperationTool>>() {
+                            @Override
+                            public void onResponse(Response<List<OperationTool>> response, Retrofit retrofit) {
+                                List<OperationTool> list = response.body();
+                                saveReferenceData(OperationTool.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OperationType
+                changedDate = ReferenceUpdate.lastChangedAsStr(OperationType.class.getSimpleName());
+                ToirAPIFactory.getOperationTypeService().operationType(bearer, changedDate)
+                        .enqueue(new Callback<List<OperationType>>() {
+                            @Override
+                            public void onResponse(Response<List<OperationType>> response, Retrofit retrofit) {
+                                List<OperationType> list = response.body();
+                                saveReferenceData(OperationType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OperationVerdict
+                changedDate = ReferenceUpdate.lastChangedAsStr(OperationVerdict.class.getSimpleName());
+                ToirAPIFactory.getOperationVerdictService().operationVerdict(bearer, changedDate)
+                        .enqueue(new Callback<List<OperationVerdict>>() {
+                            @Override
+                            public void onResponse(Response<List<OperationVerdict>> response, Retrofit retrofit) {
+                                List<OperationVerdict> list = response.body();
+                                saveReferenceData(OperationVerdict.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OrderLevel
                 // Orders
                 // OrderStatus
@@ -497,6 +579,24 @@ public class ReferenceFragment extends Fragment {
 			}
 		});
 	}
+
+    /**
+     * @param referenceName
+     * @param list
+     * @param updateDate
+     */
+    private void saveReferenceData(String referenceName, List list, Date updateDate) {
+        Realm realm = Realm.getDefaultInstance();
+
+        ReferenceUpdate item = new ReferenceUpdate();
+        item.setReferenceName(referenceName);
+        item.setUpdateDate(updateDate);
+
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(list);
+        realm.copyToRealmOrUpdate(item);
+        realm.commitTransaction();
+    }
 
 	/**
 	 * @author Dmitriy Logachov
@@ -551,23 +651,4 @@ public class ReferenceFragment extends Fragment {
 
 		}
 	}
-
-    /**
-     *
-     * @param referenceName
-     * @param list
-     * @param updateDate
-     */
-	private void saveReferenceData(String referenceName, List list, Date updateDate) {
-        Realm realm = Realm.getDefaultInstance();
-
-        ReferenceUpdate item = new ReferenceUpdate();
-        item.setReferenceName(referenceName);
-        item.setUpdateDate(updateDate);
-
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(list);
-        realm.copyToRealmOrUpdate(item);
-        realm.commitTransaction();
-    }
 }
