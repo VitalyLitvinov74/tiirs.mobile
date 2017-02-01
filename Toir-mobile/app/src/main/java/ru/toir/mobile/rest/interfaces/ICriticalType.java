@@ -1,6 +1,5 @@
 package ru.toir.mobile.rest.interfaces;
 
-import java.util.Date;
 import java.util.List;
 
 import retrofit.Call;

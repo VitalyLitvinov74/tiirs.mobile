@@ -18,12 +18,16 @@ import ru.toir.mobile.rest.interfaces.IClients;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
 import ru.toir.mobile.rest.interfaces.IDocumentation;
 import ru.toir.mobile.rest.interfaces.IDocumentationType;
+import ru.toir.mobile.rest.interfaces.IEquipment;
+import ru.toir.mobile.rest.interfaces.IEquipmentModel;
 import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
 import ru.toir.mobile.rest.interfaces.IEquipmentType;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
+import ru.toir.mobile.rest.interfaces.IMeasuredValue;
+import ru.toir.mobile.rest.interfaces.IOperation;
 import ru.toir.mobile.rest.interfaces.IOperationStatus;
 import ru.toir.mobile.rest.interfaces.IOperationType;
-import ru.toir.mobile.rest.interfaces.IOrder;
+import ru.toir.mobile.rest.interfaces.IOrders;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
@@ -81,6 +85,16 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static IEquipment getEquipmentService() {
+        return getRetrofit().create(IEquipment.class);
+    }
+
+    @NonNull
+    public static IEquipmentModel getEquipmentModelService() {
+        return getRetrofit().create(IEquipmentModel.class);
+    }
+
+    @NonNull
     public static IEquipmentStatus getEquipmentStatusService() {
         return getRetrofit().create(IEquipmentStatus.class);
     }
@@ -91,8 +105,18 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static IMeasuredValue getMeasuredValueService() {
+        return getRetrofit().create(IMeasuredValue.class);
+    }
+
+    @NonNull
     public static IMeasureType getMeasureTypeService() {
         return getRetrofit().create(IMeasureType.class);
+    }
+
+    @NonNull
+    public static IOperation getOperationService() {
+        return getRetrofit().create(IOperation.class);
     }
 
     @NonNull
@@ -111,8 +135,8 @@ public class ToirAPIFactory {
     }
 
     @NonNull
-    public static IOrder getOrderService() {
-        return getRetrofit().create(IOrder.class);
+    public static IOrders getOrderService() {
+        return getRetrofit().create(IOrders.class);
     }
 
     @NonNull

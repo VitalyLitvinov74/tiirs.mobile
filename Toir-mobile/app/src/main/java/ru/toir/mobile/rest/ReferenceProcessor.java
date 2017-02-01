@@ -850,6 +850,7 @@ public class ReferenceProcessor {
             return result;
         }
     }
+
     /**
      * Получаем типы операций
      *
@@ -1509,7 +1510,7 @@ public class ReferenceProcessor {
 
         AuthorizedUser au = AuthorizedUser.getInstance();
         if (au.getToken() == null) {
-            Call<TokenSrv> call = ToirAPIFactory.getTokenService().user(au.getTagId());
+            Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(au.getTagId(), TokenSrv.Type.LABEL);
             try {
                 retrofit.Response<TokenSrv> response = call.execute();
                 TokenSrv token = response.body();

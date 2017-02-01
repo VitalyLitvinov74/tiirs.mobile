@@ -12,7 +12,7 @@ import ru.toir.mobile.db.realm.Orders;
  * @author Dmitriy Logachev
  *         Created by koputo on 17.10.16.
  */
-public interface IOrder {
+public interface IOrders {
     @GET("/references/orders")
     Call<List<Orders>> orders(@Header("Authorization") String token,
                              @Query("userUuid") String userUuid);

@@ -50,8 +50,13 @@ import ru.toir.mobile.db.realm.Clients;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
+import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.EquipmentType;
+import ru.toir.mobile.db.realm.MeasureType;
+import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -298,15 +303,144 @@ public class ReferenceFragment extends Fragment {
                         });
 
                 // DocumentationType
+                changedDate = ReferenceUpdate.lastChangedAsStr(DocumentationType.class.getSimpleName());
+                ToirAPIFactory.getDocumentationTypeService().documentationType(bearer, changedDate)
+                        .enqueue(new Callback<List<DocumentationType>>() {
+                            @Override
+                            public void onResponse(Response<List<DocumentationType>> response, Retrofit retrofit) {
+                                List<DocumentationType> list = response.body();
+                                saveReferenceData(DocumentationType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // Equipment
+                changedDate = ReferenceUpdate.lastChangedAsStr(Equipment.class.getSimpleName());
+                ToirAPIFactory.getEquipmentService().equipment(bearer, changedDate)
+                        .enqueue(new Callback<List<Equipment>>() {
+                            @Override
+                            public void onResponse(Response<List<Equipment>> response, Retrofit retrofit) {
+                                List<Equipment> list = response.body();
+                                saveReferenceData(Equipment.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // EquipmentModel
+                changedDate = ReferenceUpdate.lastChangedAsStr(EquipmentModel.class.getSimpleName());
+                ToirAPIFactory.getEquipmentModelService().equipmentModel(bearer, changedDate)
+                        .enqueue(new Callback<List<EquipmentModel>>() {
+                            @Override
+                            public void onResponse(Response<List<EquipmentModel>> response, Retrofit retrofit) {
+                                List<EquipmentModel> list = response.body();
+                                saveReferenceData(EquipmentModel.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // EquipmentStatus
+                changedDate = ReferenceUpdate.lastChangedAsStr(EquipmentStatus.class.getSimpleName());
+                ToirAPIFactory.getEquipmentStatusService().equipmentStatus(bearer, changedDate)
+                        .enqueue(new Callback<List<EquipmentStatus>>() {
+                            @Override
+                            public void onResponse(Response<List<EquipmentStatus>> response, Retrofit retrofit) {
+                                List<EquipmentStatus> list = response.body();
+                                saveReferenceData(EquipmentStatus.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // EquipmentType
-                // GpsTrack
-                // Journal
+                changedDate = ReferenceUpdate.lastChangedAsStr(EquipmentType.class.getSimpleName());
+                ToirAPIFactory.getEquipmentTypeService().equipmentType(bearer, changedDate)
+                        .enqueue(new Callback<List<EquipmentType>>() {
+                            @Override
+                            public void onResponse(Response<List<EquipmentType>> response, Retrofit retrofit) {
+                                List<EquipmentType> list = response.body();
+                                saveReferenceData(EquipmentType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                // GpdTrack ???
+                // Journal ???
+
                 // MeasuredValue
+                changedDate = ReferenceUpdate.lastChangedAsStr(MeasuredValue.class.getSimpleName());
+                ToirAPIFactory.getMeasuredValueService().measuredValue(bearer, changedDate)
+                        .enqueue(new Callback<List<MeasuredValue>>() {
+                            @Override
+                            public void onResponse(Response<List<MeasuredValue>> response, Retrofit retrofit) {
+                                List<MeasuredValue> list = response.body();
+                                saveReferenceData(MeasuredValue.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // MeasureType
+                changedDate = ReferenceUpdate.lastChangedAsStr(MeasureType.class.getSimpleName());
+                ToirAPIFactory.getMeasureTypeService().measureType(bearer, changedDate)
+                        .enqueue(new Callback<List<MeasureType>>() {
+                            @Override
+                            public void onResponse(Response<List<MeasureType>> response, Retrofit retrofit) {
+                                List<MeasureType> list = response.body();
+                                saveReferenceData(MeasureType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // Operation
+                changedDate = ReferenceUpdate.lastChangedAsStr(Operation.class.getSimpleName());
+                ToirAPIFactory.getOperationService().operation(bearer, changedDate)
+                .enqueue(new Callback<List<Operation>>() {
+                    @Override
+                    public void onResponse(Response<List<Operation>> response, Retrofit retrofit) {
+                        List<Operation> list = response.body();
+                        saveReferenceData(Operation.class.getSimpleName(), list, currentDate);
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        dialog.dismiss();
+                    }
+                });
+
                 // OperationStatus
                 // OperationTemplate
                 // OperationTool

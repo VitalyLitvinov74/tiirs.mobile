@@ -484,7 +484,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
                         AuthorizedUser user = AuthorizedUser.getInstance();
                         Call<List<Orders>> call = ToirAPIFactory.getOrderService()
-                                .order(user.getBearer(), user.getUuid(), "");
+                                .orders(user.getBearer(), user.getUuid());
                         call.enqueue(new Callback<List<Orders>>() {
                             @Override
                             public void onResponse(Response<List<Orders>> response, Retrofit retrofit) {
