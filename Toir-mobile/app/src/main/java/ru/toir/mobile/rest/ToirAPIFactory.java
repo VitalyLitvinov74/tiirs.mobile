@@ -30,6 +30,9 @@ import ru.toir.mobile.rest.interfaces.IOperationTemplate;
 import ru.toir.mobile.rest.interfaces.IOperationTool;
 import ru.toir.mobile.rest.interfaces.IOperationType;
 import ru.toir.mobile.rest.interfaces.IOperationVerdict;
+import ru.toir.mobile.rest.interfaces.IOrderLevel;
+import ru.toir.mobile.rest.interfaces.IOrderStatus;
+import ru.toir.mobile.rest.interfaces.IOrderVerdict;
 import ru.toir.mobile.rest.interfaces.IOrders;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITokenService;
@@ -148,13 +151,28 @@ public class ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStatus getTaskStatus() {
-        return getRetrofit().create(ITaskStatus.class);
+    public static IOrderLevel getOrderLevelService() {
+        return getRetrofit().create(IOrderLevel.class);
     }
 
     @NonNull
-    public static IOrders getOrderService() {
+    public static IOrders getOrdersService() {
         return getRetrofit().create(IOrders.class);
+    }
+
+    @NonNull
+    public static IOrderStatus getOrderStatusService() {
+        return getRetrofit().create(IOrderStatus.class);
+    }
+
+    @NonNull
+    public static IOrderVerdict getOrderVerdictService() {
+        return getRetrofit().create(IOrderVerdict.class);
+    }
+
+    @NonNull
+    public static ITaskStatus getTaskStatus() {
+        return getRetrofit().create(ITaskStatus.class);
     }
 
     @NonNull

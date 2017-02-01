@@ -62,6 +62,10 @@ import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationTool;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
+import ru.toir.mobile.db.realm.OrderLevel;
+import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.realm.OrderVerdict;
+import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.rest.IServiceProvider;
@@ -529,10 +533,73 @@ public class ReferenceFragment extends Fragment {
                         });
 
                 // OrderLevel
+                changedDate = ReferenceUpdate.lastChangedAsStr(OrderLevel.class.getSimpleName());
+                ToirAPIFactory.getOrderLevelService().orderLevel(bearer, changedDate)
+                        .enqueue(new Callback<List<OrderLevel>>() {
+                            @Override
+                            public void onResponse(Response<List<OrderLevel>> response, Retrofit retrofit) {
+                                List<OrderLevel> list = response.body();
+                                saveReferenceData(OrderLevel.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // Orders
+                changedDate = ReferenceUpdate.lastChangedAsStr(Orders.class.getSimpleName());
+                ToirAPIFactory.getOrdersService().orders(bearer, changedDate)
+                        .enqueue(new Callback<List<Orders>>() {
+                            @Override
+                            public void onResponse(Response<List<Orders>> response, Retrofit retrofit) {
+                                List<Orders> list = response.body();
+                                saveReferenceData(Orders.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OrderStatus
+                changedDate = ReferenceUpdate.lastChangedAsStr(OrderStatus.class.getSimpleName());
+                ToirAPIFactory.getOrderStatusService().orderStatus(bearer, changedDate)
+                        .enqueue(new Callback<List<OrderStatus>>() {
+                            @Override
+                            public void onResponse(Response<List<OrderStatus>> response, Retrofit retrofit) {
+                                List<OrderStatus> list = response.body();
+                                saveReferenceData(OrderStatus.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // OrderVerdict
-                // ReferenceUpdate
+                changedDate = ReferenceUpdate.lastChangedAsStr(OrderVerdict.class.getSimpleName());
+                ToirAPIFactory.getOrderVerdictService().orderVerdict(bearer, changedDate)
+                        .enqueue(new Callback<List<OrderVerdict>>() {
+                            @Override
+                            public void onResponse(Response<List<OrderVerdict>> response, Retrofit retrofit) {
+                                List<OrderVerdict> list = response.body();
+                                saveReferenceData(OrderVerdict.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // RepairPart
                 // RepairPartType
                 // Tasks
