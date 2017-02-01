@@ -69,7 +69,13 @@ import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.RepairPart;
 import ru.toir.mobile.db.realm.RepairPartType;
+import ru.toir.mobile.db.realm.TaskStageList;
+import ru.toir.mobile.db.realm.TaskStageOperationList;
+import ru.toir.mobile.db.realm.TaskStageStatus;
+import ru.toir.mobile.db.realm.TaskStageTemplate;
+import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.TaskStatus;
+import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
@@ -241,6 +247,7 @@ public class ReferenceFragment extends Fragment {
                 final Date currentDate = new Date();
                 String changedDate;
 
+                // TODO: нужен механизм проверки получения данных по всем справочникам для "отключения" диалога!!!
                 // AlertType
                 changedDate = ReferenceUpdate.lastChangedAsStr(AlertType.class.getSimpleName());
                 ToirAPIFactory.getAlertTypeService().alertType(bearer, changedDate)
@@ -637,20 +644,118 @@ public class ReferenceFragment extends Fragment {
                         });
 
                 // Tasks
+                changedDate = ReferenceUpdate.lastChangedAsStr(Tasks.class.getSimpleName());
+                ToirAPIFactory.getTasksService().tasks(bearer, changedDate)
+                        .enqueue(new Callback<List<Tasks>>() {
+                            @Override
+                            public void onResponse(Response<List<Tasks>> response, Retrofit retrofit) {
+                                List<Tasks> list = response.body();
+                                saveReferenceData(Tasks.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStageList
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageList.class.getSimpleName());
+                ToirAPIFactory.getTaskStageListService().taskStageList(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStageList>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStageList>> response, Retrofit retrofit) {
+                                List<TaskStageList> list = response.body();
+                                saveReferenceData(TaskStageList.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStageOperationList
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageOperationList.class.getSimpleName());
+                ToirAPIFactory.getTaskStageOperationListService().taskStageOperationList(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStageOperationList>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStageOperationList>> response, Retrofit retrofit) {
+                                List<TaskStageOperationList> list = response.body();
+                                saveReferenceData(TaskStageOperationList.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStages
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStages.class.getSimpleName());
+                ToirAPIFactory.getTaskStagesService().taskStages(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStages>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStages>> response, Retrofit retrofit) {
+                                List<TaskStages> list = response.body();
+                                saveReferenceData(TaskStages.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStageStatus
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageStatus.class.getSimpleName());
+                ToirAPIFactory.getTaskStageStatusService().taskStageStatus(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStageStatus>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStageStatus>> response, Retrofit retrofit) {
+                                List<TaskStageStatus> list = response.body();
+                                saveReferenceData(TaskStageStatus.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStageTemplate
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageTemplate.class.getSimpleName());
+                ToirAPIFactory.getTaskStageTemplateService().taskStageTemplate(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStageTemplate>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStageTemplate>> response, Retrofit retrofit) {
+                                List<TaskStageTemplate> list = response.body();
+                                saveReferenceData(TaskStageTemplate.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStageType
                 // TaskStageVerdict
                 // TaskStatus
                 // TaskTemplate
                 // TaskType
                 // TaskVerdict
+
                 // Tool
                 // ToolType
-                // User
+
+                // User ???
 
 
 

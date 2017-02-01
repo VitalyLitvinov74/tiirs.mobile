@@ -833,7 +833,7 @@ public class ReferenceProcessor {
         // TODO: реализовать выборку даты последней модификации и отправки её на сервер
         Date changed = realm.where(OperationStatus.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
-        Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatus()
+        Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatusService()
                 .operationStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<OperationStatus>> response = call.execute();
@@ -874,7 +874,7 @@ public class ReferenceProcessor {
         // TODO: реализовать выборку даты последней модификации и отправки её на сервер
         Date changed = realm.where(OperationType.class).findFirst().getChangedAt();
         String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
-        Call<List<OperationType>> call = ToirAPIFactory.getOperationType()
+        Call<List<OperationType>> call = ToirAPIFactory.getOperationTypeService()
                 .operationType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
         try {
             retrofit.Response<List<OperationType>> response = call.execute();

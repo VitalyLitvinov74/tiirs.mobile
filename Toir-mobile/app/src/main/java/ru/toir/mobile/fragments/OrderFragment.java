@@ -85,24 +85,22 @@ import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class OrderFragment extends Fragment implements View.OnClickListener {
+    ListView mainListView;
     private Tasks selectedTask;
     private TaskStages selectedStage;
     private Operation selectedOperation;
-
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
     private TaskStageAdapter taskStageAdapter;
     private OperationAdapter operationAdapter;
     private Button submit;
     private Button measure;
-
     private LinearLayout tlButtonLayout;
     private LinearLayout resultLayout;
     private LinearLayout photoContainer;
     private LinearLayout listLayout;
     private LinearLayout globalLayout;
     private BottomBar bottomBar;
-
     private String TAG = "OrderFragment";
     private Realm realmDB;
     private View rootView;
@@ -111,28 +109,53 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private String currentTaskUuid = "";
     private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
-
     private Equipment currentEquipment;
     private Operation currentOperation;
-
     private int     currentOperationId = 0;
     private long    startTime = 0;
     private boolean firstLaunch = true;
-    private boolean cameraInit = false;
+    CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
+        public void onTick(long millisUntilFinished) {
+            TextView textTime;
+            long currentTime = System.currentTimeMillis();
+            if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
+                //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
+                textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
+                textTime.setText((int) (currentTime - startTime) / 1000 + "сек.");
+                currentOperationUuid = operationAdapter.getItem(currentOperationId).getUuid();
+                currentOperation = operationAdapter.getItem(currentOperationId);
+                if (firstLaunch)
+                    onStart();
+            }
+        }
 
-    ListView mainListView;
+        void onStart() {
+            int totalOperationCount;
+            CheckBox checkBox;
+            if (operationAdapter != null && mainListView != null) {
+                totalOperationCount = operationAdapter.getCount();
+                for (int i = 0; i < totalOperationCount; i++)
+                    if (mainListView.getChildAt(i) != null) {
+                        checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
+                        checkBox.setOnClickListener(new onCheckBoxClickListener(i));
+                    }
+                firstLaunch = false;
+            }
+        }
+
+        public void onFinish() {
+        }
+    };
+    private boolean cameraInit = false;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
-
     private NumberPicker numberPicker;
     private Spinner spinnerSuffix;
     private ArrayAdapter<OrderFragment.Suffixes> spinnerSuffixAdapter;
     private ArrayList<OrderFragment.Suffixes> suffixList;
     private String lastPhotoFile;
-
     //private LinearLayout resultButtonLayout;
     private Button makePhotoButton;
-
     private ProgressDialog processDialog;
     private RfidDialog rfidDialog;
     // фильтр для получения сообщений при получении нарядов с сервера
@@ -483,7 +506,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                        tsh.GetTaskNew();
 
                         AuthorizedUser user = AuthorizedUser.getInstance();
-                        Call<List<Orders>> call = ToirAPIFactory.getOrderService()
+                        Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
                                 .orders(user.getBearer(), user.getUuid());
                         call.enqueue(new Callback<List<Orders>>() {
                             @Override
@@ -694,105 +717,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         processDialog.show();
     }
 
-    public class ListViewClickListener implements
-            AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View selectedItemView,
-                                int position, long id) {
-
-            // находимся на "экране" нарядов
-            if (Level == 0) {
-                if (orderAdapter != null) {
-                    Orders selectedOrder = orderAdapter.getItem(position);
-                    if (selectedOrder != null) {
-                        currentOrderUuid = selectedOrder.getUuid();
-                        fillListViewTasks(selectedOrder);
-                        Level = 1;
-                    }
-                }
-
-                return;
-            }
-            // Tasks
-            if (Level == 1) {
-                if (taskAdapter != null) {
-                    selectedTask = taskAdapter.getItem(position);
-                    if (selectedTask != null) {
-                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
-                        final String expectedTagId = selectedTask.getEquipment().getTagId();
-                        currentEquipment = selectedTask.getEquipment();
-                        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
-                        Handler handler = new Handler(new Handler.Callback() {
-                            @Override
-                            public boolean handleMessage(Message message) {
-                                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                                    String tagId = ((String) message.obj).substring(4);
-                                    Log.d(TAG, "Ид метки получили: " + tagId);
-                                    //if (expectedTagId.equals(tagId)) {
-                                    if (true) {
-                                        currentTaskUuid = selectedTask.getUuid();
-                                        fillListViewTaskStage(selectedTask);
-                                        Level = 2;
-                                    } else {
-                                        Toast.makeText(getContext(),
-                                                "Не верное оборудование!", Toast.LENGTH_SHORT)
-                                                .show();
-                                    }
-                                } else {
-                                    Log.d(TAG, "Ошибка чтения метки!");
-                                    Toast.makeText(getContext(),
-                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
-                                            .show();
-
-                                }
-
-                                // закрываем диалог
-                                rfidDialog.dismiss();
-                                return true;
-                            }
-                        });
-
-                        rfidDialog = new RfidDialog();
-                        rfidDialog.setHandler(handler);
-                        rfidDialog.readTagId();
-                        rfidDialog.show(getActivity().getFragmentManager(), TAG);
-
-                    }
-                }
-
-                return;
-            }
-            // TaskStage
-            if (Level == 2) {
-                if (taskStageAdapter != null) {
-                    selectedStage = taskStageAdapter.getItem(position);
-                    if (selectedStage != null) {
-                        currentTaskStageUuid = selectedStage.getUuid();
-                        fillListViewOperations(selectedStage);
-                        submit.setVisibility(View.VISIBLE);
-                        measure.setVisibility(View.VISIBLE);
-                        Level = 3;
-                        startOperations();
-                    }
-                }
-                return;
-            }
-
-            // Operation
-            if (Level == 3) {
-                if (operationAdapter != null) {
-                    selectedOperation = operationAdapter.getItem(position);
-                    if (selectedOperation != null) {
-                        operationAdapter.setItemVisibility(position);
-                        operationAdapter.notifyDataSetChanged();
-                        //mainListView.invalidateViews();
-                    }
-                }
-            }
-        }
-    }
-
-
     @Override
     public void onClick(View v) {
         int totalOperationCount = 0, completedOperationCount = 0;
@@ -850,94 +774,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
-        public void onTick(long millisUntilFinished) {
-            TextView textTime;
-            long currentTime = System.currentTimeMillis();
-            if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
-                //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
-                textTime.setText((int)(currentTime-startTime)/1000 + "сек.");
-                currentOperationUuid=operationAdapter.getItem(currentOperationId).getUuid();
-                currentOperation = operationAdapter.getItem(currentOperationId);
-                if (firstLaunch)
-                    onStart();
-            }
-        }
-        void onStart() {
-            int totalOperationCount;
-            CheckBox checkBox;
-            if (operationAdapter != null && mainListView !=null) {
-                totalOperationCount = operationAdapter.getCount();
-                for (int i = 0; i < totalOperationCount; i++)
-                if (mainListView.getChildAt(i)!=null) {
-                    checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
-                    checkBox.setOnClickListener(new onCheckBoxClickListener(i));
-                }
-                firstLaunch = false;
-            }
-        }
-        public void onFinish() {
-        }
-    };
-
-    public class onCheckBoxClickListener implements View.OnClickListener {
-        int position;
-
-        onCheckBoxClickListener(int pos) {
-            this.position = pos;
-        }
-
-        @Override
-        public void onClick(View arg) {
-            if (position!=currentOperationId) return;
-            if (!operationAdapter.getItemEnable(position)) return;
-            TextView textTime;
-            final long currentTime = System.currentTimeMillis();
-            final OperationStatus operationStatusCompleted;
-            final OperationVerdict operationVerdictCompleted;
-            operationStatusCompleted = realmDB.where(OperationStatus.class).equalTo("title","Выполнена").findFirst();
-            operationVerdictCompleted = realmDB.where(OperationVerdict.class).equalTo("title","Выполнена").findFirst();
-            if (operationStatusCompleted == null)
-                Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
-            if (operationVerdictCompleted == null)
-                Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
-
-            if (operationAdapter != null) {
-                textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                textTime.setText((int)(currentTime-startTime)/1000 + "сек.");
-
-                if (currentOperationId < operationAdapter.getCount()) {
-                    operationAdapter.setItemEnable(currentOperationId+1, true);
-                    operationAdapter.setItemVisibility(currentOperationId);
-                    operationAdapter.setItemVisibility(currentOperationId+1);
-                    startTime = System.currentTimeMillis();
-                    currentOperationId++;
-                }
-
-                final Operation operation = operationAdapter.getItem(position);
-                if (operation != null) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            operation.setEndDate(new Date(currentTime));
-                            operation.setStartDate(new Date(startTime));
-                            operation.setOperationStatus(operationStatusCompleted);
-                            operation.setOperationVerdict(operationVerdictCompleted);
-                        }
-                    });
-                    if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative())
-                         textTime.setBackgroundColor(Color.GREEN);
-                    else
-                         textTime.setBackgroundColor(Color.RED);
-                    // перезапоминаем таймер
-                    startTime = System.currentTimeMillis();
-                    operationAdapter.setItemEnable(position,false);
-                }
-            }
-        }
-    }
-
     public View getViewByPosition(int pos, ListView listView) {
         final int firstListItemPosition = listView.getFirstVisiblePosition();
         final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
@@ -947,84 +783,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         } else {
             final int childIndex = pos - firstListItemPosition;
             return listView.getChildAt(childIndex);
-        }
-    }
-
-
-    public class ListViewLongClickListener implements
-            AdapterView.OnItemLongClickListener {
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
-            // находимся на "экране" с операциями
-            if (Level == 3) {
-                //String operationStatus = operation.getOperation_status_uuid();
-                // менять произвольно статус операции позволяем только если
-                // статус операции "Новая" или "В работе"
-                Operation operation = (Operation) parent.getItemAtPosition(position);
-                if (!operation.getOperationStatus().getUuid().equals(OperationAdapter.Status.NEW) ||
-                        !operation.getOperationStatus().getUuid().equals(OperationAdapter.Status.IN_WORK)) {
-                    // показываем диалог изменения статуса
-                    closeOperationManual(operation, parent);
-                } else {
-                    // операция уже выполнена, изменить статус нельзя
-                    // сообщаем об этом
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(
-                            getContext());
-                    dialog.setTitle("Внимание!");
-                    dialog.setMessage("Изменить статус операции нельзя!");
-                    AlertDialog.Builder builder = dialog.setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    dialog.show();
-                }
-
-            } else if (Level == 0) {
-                // находимся на экране с нарядами
-                Orders order = orderAdapter.getItem(position);
-                OrderStatus orderStatus;
-                // проверяем статус наряда
-                if (order != null) {
-                    orderStatus = order.getOrderStatus();
-                    if (orderStatus != null) {
-                        if (orderStatus.getUuid().equals(OrderStatusAdapter.Status.COMPLETE)
-                                || order.getOrderStatus().getUuid()
-                                .equals(OrderStatusAdapter.Status.UN_COMPLETE)) {
-
-                            // наряд уже закрыт, изменить статус нельзя
-                            // сообщаем об этом
-                            AlertDialog.Builder dialog = new AlertDialog.Builder(
-                                    getContext());
-                            dialog.setTitle("Внимание!");
-                            dialog.setMessage("Изменить статус наряда уже нельзя!");
-                            dialog.setPositiveButton(android.R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog,
-                                                            int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            dialog.show();
-
-                        } else {
-                            // наряд можно закрыть принудительно
-                            closeOrderManual(order);
-                        }
-                    }
-                    else
-                        closeOrderManual(order);
-                }
-            }
-            return true;
         }
     }
 
@@ -1178,26 +936,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
-
-    /**
-     * Класс для представления множителей (частоты, напряжения, тока...)
-     *
-     * @author Dmitriy Logachov
-     */
-    protected class Suffixes {
-        String title;
-        long multiplier;
-
-        Suffixes(String t, int m) {
-            title = t;
-            multiplier = m;
-        }
-
-        public String toString() {
-            return title;
-        }
-    }
-
     /**
      * Создание элементов интерфейса для шагов операции с измерениями значений
      *
@@ -1332,5 +1070,255 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + fileName);
         return mediaFile;
+    }
+
+    public class ListViewClickListener implements
+            AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View selectedItemView,
+                                int position, long id) {
+
+            // находимся на "экране" нарядов
+            if (Level == 0) {
+                if (orderAdapter != null) {
+                    Orders selectedOrder = orderAdapter.getItem(position);
+                    if (selectedOrder != null) {
+                        currentOrderUuid = selectedOrder.getUuid();
+                        fillListViewTasks(selectedOrder);
+                        Level = 1;
+                    }
+                }
+
+                return;
+            }
+            // Tasks
+            if (Level == 1) {
+                if (taskAdapter != null) {
+                    selectedTask = taskAdapter.getItem(position);
+                    if (selectedTask != null) {
+                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+                        final String expectedTagId = selectedTask.getEquipment().getTagId();
+                        currentEquipment = selectedTask.getEquipment();
+                        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
+                        Handler handler = new Handler(new Handler.Callback() {
+                            @Override
+                            public boolean handleMessage(Message message) {
+                                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                                    String tagId = ((String) message.obj).substring(4);
+                                    Log.d(TAG, "Ид метки получили: " + tagId);
+                                    //if (expectedTagId.equals(tagId)) {
+                                    if (true) {
+                                        currentTaskUuid = selectedTask.getUuid();
+                                        fillListViewTaskStage(selectedTask);
+                                        Level = 2;
+                                    } else {
+                                        Toast.makeText(getContext(),
+                                                "Не верное оборудование!", Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                } else {
+                                    Log.d(TAG, "Ошибка чтения метки!");
+                                    Toast.makeText(getContext(),
+                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                                            .show();
+
+                                }
+
+                                // закрываем диалог
+                                rfidDialog.dismiss();
+                                return true;
+                            }
+                        });
+
+                        rfidDialog = new RfidDialog();
+                        rfidDialog.setHandler(handler);
+                        rfidDialog.readTagId();
+                        rfidDialog.show(getActivity().getFragmentManager(), TAG);
+
+                    }
+                }
+
+                return;
+            }
+            // TaskStage
+            if (Level == 2) {
+                if (taskStageAdapter != null) {
+                    selectedStage = taskStageAdapter.getItem(position);
+                    if (selectedStage != null) {
+                        currentTaskStageUuid = selectedStage.getUuid();
+                        fillListViewOperations(selectedStage);
+                        submit.setVisibility(View.VISIBLE);
+                        measure.setVisibility(View.VISIBLE);
+                        Level = 3;
+                        startOperations();
+                    }
+                }
+                return;
+            }
+
+            // Operation
+            if (Level == 3) {
+                if (operationAdapter != null) {
+                    selectedOperation = operationAdapter.getItem(position);
+                    if (selectedOperation != null) {
+                        operationAdapter.setItemVisibility(position);
+                        operationAdapter.notifyDataSetChanged();
+                        //mainListView.invalidateViews();
+                    }
+                }
+            }
+        }
+    }
+
+    public class onCheckBoxClickListener implements View.OnClickListener {
+        int position;
+
+        onCheckBoxClickListener(int pos) {
+            this.position = pos;
+        }
+
+        @Override
+        public void onClick(View arg) {
+            if (position != currentOperationId) return;
+            if (!operationAdapter.getItemEnable(position)) return;
+            TextView textTime;
+            final long currentTime = System.currentTimeMillis();
+            final OperationStatus operationStatusCompleted;
+            final OperationVerdict operationVerdictCompleted;
+            operationStatusCompleted = realmDB.where(OperationStatus.class).equalTo("title", "Выполнена").findFirst();
+            operationVerdictCompleted = realmDB.where(OperationVerdict.class).equalTo("title", "Выполнена").findFirst();
+            if (operationStatusCompleted == null)
+                Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
+            if (operationVerdictCompleted == null)
+                Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
+
+            if (operationAdapter != null) {
+                textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
+                textTime.setText((int) (currentTime - startTime) / 1000 + "сек.");
+
+                if (currentOperationId < operationAdapter.getCount()) {
+                    operationAdapter.setItemEnable(currentOperationId + 1, true);
+                    operationAdapter.setItemVisibility(currentOperationId);
+                    operationAdapter.setItemVisibility(currentOperationId + 1);
+                    startTime = System.currentTimeMillis();
+                    currentOperationId++;
+                }
+
+                final Operation operation = operationAdapter.getItem(position);
+                if (operation != null) {
+                    realmDB.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            operation.setEndDate(new Date(currentTime));
+                            operation.setStartDate(new Date(startTime));
+                            operation.setOperationStatus(operationStatusCompleted);
+                            operation.setOperationVerdict(operationVerdictCompleted);
+                        }
+                    });
+                    if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative())
+                        textTime.setBackgroundColor(Color.GREEN);
+                    else
+                        textTime.setBackgroundColor(Color.RED);
+                    // перезапоминаем таймер
+                    startTime = System.currentTimeMillis();
+                    operationAdapter.setItemEnable(position, false);
+                }
+            }
+        }
+    }
+
+    public class ListViewLongClickListener implements
+            AdapterView.OnItemLongClickListener {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                       int position, long id) {
+
+            // находимся на "экране" с операциями
+            if (Level == 3) {
+                //String operationStatus = operation.getOperation_status_uuid();
+                // менять произвольно статус операции позволяем только если
+                // статус операции "Новая" или "В работе"
+                Operation operation = (Operation) parent.getItemAtPosition(position);
+                if (!operation.getOperationStatus().getUuid().equals(OperationAdapter.Status.NEW) ||
+                        !operation.getOperationStatus().getUuid().equals(OperationAdapter.Status.IN_WORK)) {
+                    // показываем диалог изменения статуса
+                    closeOperationManual(operation, parent);
+                } else {
+                    // операция уже выполнена, изменить статус нельзя
+                    // сообщаем об этом
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(
+                            getContext());
+                    dialog.setTitle("Внимание!");
+                    dialog.setMessage("Изменить статус операции нельзя!");
+                    AlertDialog.Builder builder = dialog.setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialog.show();
+                }
+
+            } else if (Level == 0) {
+                // находимся на экране с нарядами
+                Orders order = orderAdapter.getItem(position);
+                OrderStatus orderStatus;
+                // проверяем статус наряда
+                if (order != null) {
+                    orderStatus = order.getOrderStatus();
+                    if (orderStatus != null) {
+                        if (orderStatus.getUuid().equals(OrderStatusAdapter.Status.COMPLETE)
+                                || order.getOrderStatus().getUuid()
+                                .equals(OrderStatusAdapter.Status.UN_COMPLETE)) {
+
+                            // наряд уже закрыт, изменить статус нельзя
+                            // сообщаем об этом
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(
+                                    getContext());
+                            dialog.setTitle("Внимание!");
+                            dialog.setMessage("Изменить статус наряда уже нельзя!");
+                            dialog.setPositiveButton(android.R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            dialog.show();
+
+                        } else {
+                            // наряд можно закрыть принудительно
+                            closeOrderManual(order);
+                        }
+                    } else
+                        closeOrderManual(order);
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
+     * Класс для представления множителей (частоты, напряжения, тока...)
+     *
+     * @author Dmitriy Logachov
+     */
+    protected class Suffixes {
+        String title;
+        long multiplier;
+
+        Suffixes(String t, int m) {
+            title = t;
+            multiplier = m;
+        }
+
+        public String toString() {
+            return title;
+        }
     }
 }
