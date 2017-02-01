@@ -73,8 +73,13 @@ import ru.toir.mobile.db.realm.TaskStageList;
 import ru.toir.mobile.db.realm.TaskStageOperationList;
 import ru.toir.mobile.db.realm.TaskStageStatus;
 import ru.toir.mobile.db.realm.TaskStageTemplate;
+import ru.toir.mobile.db.realm.TaskStageType;
+import ru.toir.mobile.db.realm.TaskStageVerdict;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.TaskStatus;
+import ru.toir.mobile.db.realm.TaskTemplate;
+import ru.toir.mobile.db.realm.TaskType;
+import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
@@ -746,11 +751,106 @@ public class ReferenceFragment extends Fragment {
                         });
 
                 // TaskStageType
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageType.class.getSimpleName());
+                ToirAPIFactory.getTaskStageTypeService().taskStageType(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStageType>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStageType>> response, Retrofit retrofit) {
+                                List<TaskStageType> list = response.body();
+                                saveReferenceData(TaskStageType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStageVerdict
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageVerdict.class.getSimpleName());
+                ToirAPIFactory.getTaskStageVerdictService().taskStageVerdict(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStageVerdict>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStageVerdict>> response, Retrofit retrofit) {
+                                List<TaskStageVerdict> list = response.body();
+                                saveReferenceData(TaskStageVerdict.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskStatus
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskStatus.class.getSimpleName());
+                ToirAPIFactory.getTaskStatusService().taskStatus(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskStatus>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskStatus>> response, Retrofit retrofit) {
+                                List<TaskStatus> list = response.body();
+                                saveReferenceData(TaskStatus.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskTemplate
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskTemplate.class.getSimpleName());
+                ToirAPIFactory.getTaskTemplateService().taskTemplate(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskTemplate>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskTemplate>> response, Retrofit retrofit) {
+                                List<TaskTemplate> list = response.body();
+                                saveReferenceData(TaskTemplate.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskType
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskType.class.getSimpleName());
+                ToirAPIFactory.getTaskTypeService().taskType(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskType>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskType>> response, Retrofit retrofit) {
+                                List<TaskType> list = response.body();
+                                saveReferenceData(TaskType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // TaskVerdict
+                changedDate = ReferenceUpdate.lastChangedAsStr(TaskVerdict.class.getSimpleName());
+                ToirAPIFactory.getTaskVerdictService().taskVerdict(bearer, changedDate)
+                        .enqueue(new Callback<List<TaskVerdict>>() {
+                            @Override
+                            public void onResponse(Response<List<TaskVerdict>> response, Retrofit retrofit) {
+                                List<TaskVerdict> list = response.body();
+                                saveReferenceData(TaskVerdict.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
 
                 // Tool
                 // ToolType

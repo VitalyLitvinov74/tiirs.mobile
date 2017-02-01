@@ -40,8 +40,13 @@ import ru.toir.mobile.rest.interfaces.ITaskStageList;
 import ru.toir.mobile.rest.interfaces.ITaskStageOperationList;
 import ru.toir.mobile.rest.interfaces.ITaskStageStatus;
 import ru.toir.mobile.rest.interfaces.ITaskStageTemplate;
+import ru.toir.mobile.rest.interfaces.ITaskStageType;
+import ru.toir.mobile.rest.interfaces.ITaskStageVerdict;
 import ru.toir.mobile.rest.interfaces.ITaskStages;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
+import ru.toir.mobile.rest.interfaces.ITaskTemplate;
+import ru.toir.mobile.rest.interfaces.ITaskType;
+import ru.toir.mobile.rest.interfaces.ITaskVerdict;
 import ru.toir.mobile.rest.interfaces.ITasks;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
@@ -219,8 +224,38 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static ITaskStageVerdict getTaskStageVerdictService() {
+        return getRetrofit().create(ITaskStageVerdict.class);
+    }
+
+    @NonNull
+    public static ITaskStatus getTaskStatusService() {
+        return getRetrofit().create(ITaskStatus.class);
+    }
+
+    @NonNull
+    public static ITaskStageType getTaskStageTypeService() {
+        return getRetrofit().create(ITaskStageType.class);
+    }
+
+    @NonNull
     public static ITaskStatus getTaskStatus() {
         return getRetrofit().create(ITaskStatus.class);
+    }
+
+    @NonNull
+    public static ITaskTemplate getTaskTemplateService() {
+        return getRetrofit().create(ITaskTemplate.class);
+    }
+
+    @NonNull
+    public static ITaskType getTaskTypeService() {
+        return getRetrofit().create(ITaskType.class);
+    }
+
+    @NonNull
+    public static ITaskVerdict getTaskVerdictService() {
+        return getRetrofit().create(ITaskVerdict.class);
     }
 
     @NonNull
