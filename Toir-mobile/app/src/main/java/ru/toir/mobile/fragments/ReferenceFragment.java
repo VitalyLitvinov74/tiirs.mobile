@@ -67,6 +67,8 @@ import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
+import ru.toir.mobile.db.realm.RepairPart;
+import ru.toir.mobile.db.realm.RepairPartType;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
@@ -601,7 +603,39 @@ public class ReferenceFragment extends Fragment {
                         });
 
                 // RepairPart
+                changedDate = ReferenceUpdate.lastChangedAsStr(RepairPart.class.getSimpleName());
+                ToirAPIFactory.getRepairPartService().repairPart(bearer, changedDate)
+                        .enqueue(new Callback<List<RepairPart>>() {
+                            @Override
+                            public void onResponse(Response<List<RepairPart>> response, Retrofit retrofit) {
+                                List<RepairPart> list = response.body();
+                                saveReferenceData(RepairPart.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // RepairPartType
+                changedDate = ReferenceUpdate.lastChangedAsStr(RepairPartType.class.getSimpleName());
+                ToirAPIFactory.getRepairPartTypeService().repairPartType(bearer, changedDate)
+                        .enqueue(new Callback<List<RepairPartType>>() {
+                            @Override
+                            public void onResponse(Response<List<RepairPartType>> response, Retrofit retrofit) {
+                                List<RepairPartType> list = response.body();
+                                saveReferenceData(RepairPartType.class.getSimpleName(), list, currentDate);
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                dialog.dismiss();
+                            }
+                        });
+
                 // Tasks
                 // TaskStageList
                 // TaskStageOperationList

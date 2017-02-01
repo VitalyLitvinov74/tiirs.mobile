@@ -34,6 +34,8 @@ import ru.toir.mobile.rest.interfaces.IOrderLevel;
 import ru.toir.mobile.rest.interfaces.IOrderStatus;
 import ru.toir.mobile.rest.interfaces.IOrderVerdict;
 import ru.toir.mobile.rest.interfaces.IOrders;
+import ru.toir.mobile.rest.interfaces.IRepairPart;
+import ru.toir.mobile.rest.interfaces.IRepairPartType;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITokenService;
 import ru.toir.mobile.rest.interfaces.IUserService;
@@ -168,6 +170,16 @@ public class ToirAPIFactory {
     @NonNull
     public static IOrderVerdict getOrderVerdictService() {
         return getRetrofit().create(IOrderVerdict.class);
+    }
+
+    @NonNull
+    public static IRepairPart getRepairPartService() {
+        return getRetrofit().create(IRepairPart.class);
+    }
+
+    @NonNull
+    public static IRepairPartType getRepairPartTypeService() {
+        return getRetrofit().create(IRepairPartType.class);
     }
 
     @NonNull
