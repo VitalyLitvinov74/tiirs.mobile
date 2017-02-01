@@ -49,6 +49,8 @@ import ru.toir.mobile.rest.interfaces.ITaskType;
 import ru.toir.mobile.rest.interfaces.ITaskVerdict;
 import ru.toir.mobile.rest.interfaces.ITasks;
 import ru.toir.mobile.rest.interfaces.ITokenService;
+import ru.toir.mobile.rest.interfaces.ITool;
+import ru.toir.mobile.rest.interfaces.IToolType;
 import ru.toir.mobile.rest.interfaces.IUserService;
 
 /**
@@ -256,6 +258,16 @@ public class ToirAPIFactory {
     @NonNull
     public static ITaskVerdict getTaskVerdictService() {
         return getRetrofit().create(ITaskVerdict.class);
+    }
+
+    @NonNull
+    public static ITool getToolService() {
+        return getRetrofit().create(ITool.class);
+    }
+
+    @NonNull
+    public static IToolType getToolTypeService() {
+        return getRetrofit().create(IToolType.class);
     }
 
     @NonNull

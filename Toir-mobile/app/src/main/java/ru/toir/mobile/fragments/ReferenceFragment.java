@@ -81,13 +81,15 @@ import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
 import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.Tasks;
+import ru.toir.mobile.db.realm.Tool;
+import ru.toir.mobile.db.realm.ToolType;
 import ru.toir.mobile.rest.IServiceProvider;
 import ru.toir.mobile.rest.ProcessorService;
 import ru.toir.mobile.rest.ReferenceServiceHelper;
 import ru.toir.mobile.rest.ToirAPIFactory;
 
 public class ReferenceFragment extends Fragment {
-	private static final String TAG = "ReferenceFragment";
+    private static final String TAG = "ReferenceFragment";
     private Realm realmDB;
 
     private ListView contentListView;
@@ -118,128 +120,128 @@ public class ReferenceFragment extends Fragment {
         return (new ReferenceFragment());
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
-	 * android.view.ViewGroup, android.os.Bundle)
-	 */
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
+     * android.view.ViewGroup, android.os.Bundle)
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.reference_layout, container, false);
+        View rootView = inflater.inflate(R.layout.reference_layout, container, false);
         realmDB = Realm.getDefaultInstance();
 
         Spinner referenceSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-		contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
+        contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
 
-		// получаем список справочников, разбиваем его на ключ:значение
-		String[] referenceArray = getResources().getStringArray(R.array.references_array);
-		String[] tmpValue;
-		SortField item;
+        // получаем список справочников, разбиваем его на ключ:значение
+        String[] referenceArray = getResources().getStringArray(R.array.references_array);
+        String[] tmpValue;
+        SortField item;
         ArrayList<SortField> referenceList = new ArrayList<>();
-		for (String value : referenceArray) {
-			tmpValue = value.split(":");
-			item = new SortField(tmpValue[0], tmpValue[1]);
-			referenceList.add(item);
-		}
+        for (String value : referenceArray) {
+            tmpValue = value.split(":");
+            item = new SortField(tmpValue[0], tmpValue[1]);
+            referenceList.add(item);
+        }
 
         ArrayAdapter<SortField> referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, referenceList);
 
-		referenceSpinner.setAdapter(referenceSpinnerAdapter);
+        referenceSpinner.setAdapter(referenceSpinnerAdapter);
         ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
-		referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
+        referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
 
-		setHasOptionsMenu(true);
-		rootView.setFocusableInTouchMode(true);
-		rootView.requestFocus();
+        setHasOptionsMenu(true);
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
 
-		return rootView;
-	}
+        return rootView;
+    }
 
-	private void fillListViewDocumentationType() {
+    private void fillListViewDocumentationType() {
         RealmResults<DocumentationType> documentationType;
         documentationType = realmDB.where(DocumentationType.class).findAll();
-		DocumentationTypeAdapter documentationTypeAdapter = new DocumentationTypeAdapter(getActivity().getApplicationContext(), documentationType);
-		contentListView.setAdapter(documentationTypeAdapter);
-	}
+        DocumentationTypeAdapter documentationTypeAdapter = new DocumentationTypeAdapter(getActivity().getApplicationContext(), documentationType);
+        contentListView.setAdapter(documentationTypeAdapter);
+    }
 
-	private void fillListViewEquipmentType() {
+    private void fillListViewEquipmentType() {
         RealmResults<EquipmentType> equipmentType;
         equipmentType = realmDB.where(EquipmentType.class).findAll();
-		EquipmentTypeAdapter equipmentTypeAdapter = new EquipmentTypeAdapter(getActivity().getApplicationContext(), equipmentType);
-		contentListView.setAdapter(equipmentTypeAdapter);
-	}
+        EquipmentTypeAdapter equipmentTypeAdapter = new EquipmentTypeAdapter(getActivity().getApplicationContext(), equipmentType);
+        contentListView.setAdapter(equipmentTypeAdapter);
+    }
 
-	private void fillListViewCriticalType() {
+    private void fillListViewCriticalType() {
         RealmResults<CriticalType> criticalType;
         criticalType = realmDB.where(CriticalType.class).findAll();
-        CriticalTypeAdapter criticalTypeAdapter = new CriticalTypeAdapter(getActivity().getApplicationContext(),R.id.reference_listView, criticalType);
+        CriticalTypeAdapter criticalTypeAdapter = new CriticalTypeAdapter(getActivity().getApplicationContext(), R.id.reference_listView, criticalType);
         contentListView.setAdapter(criticalTypeAdapter);
-	}
+    }
 
-	private void fillListViewAlertType() {
+    private void fillListViewAlertType() {
         RealmResults<AlertType> alertType;
         alertType = realmDB.where(AlertType.class).findAll();
-        AlertTypeAdapter alertTypeAdapter = new AlertTypeAdapter(getActivity().getApplicationContext(),R.id.reference_listView, alertType);
+        AlertTypeAdapter alertTypeAdapter = new AlertTypeAdapter(getActivity().getApplicationContext(), R.id.reference_listView, alertType);
         contentListView.setAdapter(alertTypeAdapter);
-	}
+    }
 
-	private void fillListViewOperationStatus() {
+    private void fillListViewOperationStatus() {
         RealmResults<OperationStatus> operationStatus;
         operationStatus = realmDB.where(OperationStatus.class).findAll();
-        OperationStatusAdapter operationAdapter = new OperationStatusAdapter(getActivity().getApplicationContext(),R.id.reference_listView, operationStatus);
+        OperationStatusAdapter operationAdapter = new OperationStatusAdapter(getActivity().getApplicationContext(), R.id.reference_listView, operationStatus);
         contentListView.setAdapter(operationAdapter);
-	}
+    }
 
     private void fillListViewOperationVerdict() {
         RealmResults<OperationVerdict> operationVerdict;
         operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-		OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity().getApplicationContext(), operationVerdict);
-		contentListView.setAdapter(operationVerdictAdapter);
-	}
+        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity().getApplicationContext(), operationVerdict);
+        contentListView.setAdapter(operationVerdictAdapter);
+    }
 
     private void fillListViewOperationType() {
         RealmResults<OperationType> operationType;
         operationType = realmDB.where(OperationType.class).findAll();
-        OperationTypeAdapter operationAdapter = new OperationTypeAdapter(getActivity().getApplicationContext(),R.id.reference_listView, operationType);
+        OperationTypeAdapter operationAdapter = new OperationTypeAdapter(getActivity().getApplicationContext(), R.id.reference_listView, operationType);
         contentListView.setAdapter(operationAdapter);
-	}
+    }
 
-	private void fillListViewTaskStatus() {
+    private void fillListViewTaskStatus() {
         RealmResults<TaskStatus> taskStatuses;
         taskStatuses = realmDB.where(TaskStatus.class).findAll();
-		TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(), taskStatuses);
-		contentListView.setAdapter(taskStatusAdapter);
-	}
+        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(), taskStatuses);
+        contentListView.setAdapter(taskStatusAdapter);
+    }
 
-	private void fillListViewEquipmentStatus() {
+    private void fillListViewEquipmentStatus() {
         RealmResults<EquipmentStatus> equipmentStatuses;
         equipmentStatuses = realmDB.where(EquipmentStatus.class).findAll();
-        EquipmentStatusAdapter equipmentAdapter = new EquipmentStatusAdapter(getActivity().getApplicationContext(),R.id.reference_listView, equipmentStatuses);
+        EquipmentStatusAdapter equipmentAdapter = new EquipmentStatusAdapter(getActivity().getApplicationContext(), R.id.reference_listView, equipmentStatuses);
         contentListView.setAdapter(equipmentAdapter);
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
-	 * android.view.MenuInflater)
-	 */
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu,
+     * android.view.MenuInflater)
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-		super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
 
-		// добавляем элемент меню для обновления справочников
-		MenuItem getTask = menu.add("Обновить справочники");
-		getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        // добавляем элемент меню для обновления справочников
+        MenuItem getTask = menu.add("Обновить справочники");
+        getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
-			@Override
-			public boolean onMenuItemClick(MenuItem item) {
-				Log.d(TAG, "Обновляем справочники.");
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.d(TAG, "Обновляем справочники.");
                 String bearer = AuthorizedUser.getInstance().getBearer();
                 final ProgressDialog dialog = new ProgressDialog(getActivity());
 
@@ -261,13 +263,13 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<AlertType>> response, Retrofit retrofit) {
                                 List<AlertType> list = response.body();
                                 saveReferenceData(AlertType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                        dialog.dismiss();
-                    }
+
+                            }
                         });
 
                 // Clients
@@ -278,12 +280,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<Clients>> response, Retrofit retrofit) {
                                 List<Clients> list = response.body();
                                 saveReferenceData(AlertType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -295,12 +297,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<CriticalType>> response, Retrofit retrofit) {
                                 List<CriticalType> list = response.body();
                                 saveReferenceData(CriticalType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -313,12 +315,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<Documentation>> response, Retrofit retrofit) {
                                 List<Documentation> list = response.body();
                                 saveReferenceData(Documentation.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -330,12 +332,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<DocumentationType>> response, Retrofit retrofit) {
                                 List<DocumentationType> list = response.body();
                                 saveReferenceData(DocumentationType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -347,12 +349,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<Equipment>> response, Retrofit retrofit) {
                                 List<Equipment> list = response.body();
                                 saveReferenceData(Equipment.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -364,12 +366,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<EquipmentModel>> response, Retrofit retrofit) {
                                 List<EquipmentModel> list = response.body();
                                 saveReferenceData(EquipmentModel.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -381,12 +383,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<EquipmentStatus>> response, Retrofit retrofit) {
                                 List<EquipmentStatus> list = response.body();
                                 saveReferenceData(EquipmentStatus.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -398,12 +400,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<EquipmentType>> response, Retrofit retrofit) {
                                 List<EquipmentType> list = response.body();
                                 saveReferenceData(EquipmentType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -418,12 +420,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<MeasuredValue>> response, Retrofit retrofit) {
                                 List<MeasuredValue> list = response.body();
                                 saveReferenceData(MeasuredValue.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -435,31 +437,31 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<MeasureType>> response, Retrofit retrofit) {
                                 List<MeasureType> list = response.body();
                                 saveReferenceData(MeasureType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
                 // Operation
                 changedDate = ReferenceUpdate.lastChangedAsStr(Operation.class.getSimpleName());
                 ToirAPIFactory.getOperationService().operation(bearer, changedDate)
-                .enqueue(new Callback<List<Operation>>() {
-                    @Override
-                    public void onResponse(Response<List<Operation>> response, Retrofit retrofit) {
-                        List<Operation> list = response.body();
-                        saveReferenceData(Operation.class.getSimpleName(), list, currentDate);
-                        dialog.dismiss();
-                    }
+                        .enqueue(new Callback<List<Operation>>() {
+                            @Override
+                            public void onResponse(Response<List<Operation>> response, Retrofit retrofit) {
+                                List<Operation> list = response.body();
+                                saveReferenceData(Operation.class.getSimpleName(), list, currentDate);
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        dialog.dismiss();
-                    }
-                });
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+
+                            }
+                        });
 
                 // OperationStatus
                 changedDate = ReferenceUpdate.lastChangedAsStr(OperationStatus.class.getSimpleName());
@@ -469,12 +471,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OperationStatus>> response, Retrofit retrofit) {
                                 List<OperationStatus> list = response.body();
                                 saveReferenceData(OperationStatus.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -486,12 +488,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OperationTemplate>> response, Retrofit retrofit) {
                                 List<OperationTemplate> list = response.body();
                                 saveReferenceData(OperationTemplate.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -503,12 +505,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OperationTool>> response, Retrofit retrofit) {
                                 List<OperationTool> list = response.body();
                                 saveReferenceData(OperationTool.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -520,12 +522,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OperationType>> response, Retrofit retrofit) {
                                 List<OperationType> list = response.body();
                                 saveReferenceData(OperationType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -537,12 +539,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OperationVerdict>> response, Retrofit retrofit) {
                                 List<OperationVerdict> list = response.body();
                                 saveReferenceData(OperationVerdict.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -554,12 +556,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OrderLevel>> response, Retrofit retrofit) {
                                 List<OrderLevel> list = response.body();
                                 saveReferenceData(OrderLevel.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -571,12 +573,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<Orders>> response, Retrofit retrofit) {
                                 List<Orders> list = response.body();
                                 saveReferenceData(Orders.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -588,12 +590,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OrderStatus>> response, Retrofit retrofit) {
                                 List<OrderStatus> list = response.body();
                                 saveReferenceData(OrderStatus.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -605,12 +607,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<OrderVerdict>> response, Retrofit retrofit) {
                                 List<OrderVerdict> list = response.body();
                                 saveReferenceData(OrderVerdict.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -622,12 +624,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<RepairPart>> response, Retrofit retrofit) {
                                 List<RepairPart> list = response.body();
                                 saveReferenceData(RepairPart.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -639,12 +641,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<RepairPartType>> response, Retrofit retrofit) {
                                 List<RepairPartType> list = response.body();
                                 saveReferenceData(RepairPartType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -656,12 +658,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<Tasks>> response, Retrofit retrofit) {
                                 List<Tasks> list = response.body();
                                 saveReferenceData(Tasks.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -673,12 +675,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStageList>> response, Retrofit retrofit) {
                                 List<TaskStageList> list = response.body();
                                 saveReferenceData(TaskStageList.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -690,12 +692,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStageOperationList>> response, Retrofit retrofit) {
                                 List<TaskStageOperationList> list = response.body();
                                 saveReferenceData(TaskStageOperationList.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -707,12 +709,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStages>> response, Retrofit retrofit) {
                                 List<TaskStages> list = response.body();
                                 saveReferenceData(TaskStages.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -724,12 +726,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStageStatus>> response, Retrofit retrofit) {
                                 List<TaskStageStatus> list = response.body();
                                 saveReferenceData(TaskStageStatus.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -741,12 +743,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStageTemplate>> response, Retrofit retrofit) {
                                 List<TaskStageTemplate> list = response.body();
                                 saveReferenceData(TaskStageTemplate.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -758,12 +760,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStageType>> response, Retrofit retrofit) {
                                 List<TaskStageType> list = response.body();
                                 saveReferenceData(TaskStageType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -775,12 +777,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStageVerdict>> response, Retrofit retrofit) {
                                 List<TaskStageVerdict> list = response.body();
                                 saveReferenceData(TaskStageVerdict.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -792,12 +794,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskStatus>> response, Retrofit retrofit) {
                                 List<TaskStatus> list = response.body();
                                 saveReferenceData(TaskStatus.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -809,12 +811,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskTemplate>> response, Retrofit retrofit) {
                                 List<TaskTemplate> list = response.body();
                                 saveReferenceData(TaskTemplate.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -826,12 +828,12 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskType>> response, Retrofit retrofit) {
                                 List<TaskType> list = response.body();
                                 saveReferenceData(TaskType.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
@@ -843,53 +845,83 @@ public class ReferenceFragment extends Fragment {
                             public void onResponse(Response<List<TaskVerdict>> response, Retrofit retrofit) {
                                 List<TaskVerdict> list = response.body();
                                 saveReferenceData(TaskVerdict.class.getSimpleName(), list, currentDate);
-                                dialog.dismiss();
+
                             }
 
                             @Override
                             public void onFailure(Throwable t) {
-                                dialog.dismiss();
+
                             }
                         });
 
                 // Tool
+                changedDate = ReferenceUpdate.lastChangedAsStr(Tool.class.getSimpleName());
+                ToirAPIFactory.getToolService().tool(bearer, changedDate)
+                        .enqueue(new Callback<List<Tool>>() {
+                            @Override
+                            public void onResponse(Response<List<Tool>> response, Retrofit retrofit) {
+                                List<Tool> list = response.body();
+                                saveReferenceData(Tool.class.getSimpleName(), list, currentDate);
+
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+
+                            }
+                        });
+
                 // ToolType
+                changedDate = ReferenceUpdate.lastChangedAsStr(ToolType.class.getSimpleName());
+                ToirAPIFactory.getToolTypeService().toolType(bearer, changedDate)
+                        .enqueue(new Callback<List<ToolType>>() {
+                            @Override
+                            public void onResponse(Response<List<ToolType>> response, Retrofit retrofit) {
+                                List<ToolType> list = response.body();
+                                saveReferenceData(ToolType.class.getSimpleName(), list, currentDate);
+
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+
+                            }
+                        });
 
                 // User ???
 
 
-
                 // показываем диалог обновления справочников
-				dialog.setMessage("Получаем справочники");
-				dialog.setIndeterminate(true);
-				dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				dialog.setCancelable(false);
-				dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-						"Отмена", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
+                dialog.setMessage("Получаем справочники");
+                dialog.setIndeterminate(true);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setCancelable(false);
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+                        "Отмена", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
 //								getActivity().unregisterReceiver(mReceiverGetReference);
-								Toast.makeText(getActivity(), "Обновление справочников отменено", Toast.LENGTH_SHORT).show();
-							}
-						});
+                                Toast.makeText(getActivity(), "Обновление справочников отменено", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
                         Toast.makeText(getContext(), "Справочники обновлены", Toast.LENGTH_SHORT).show();
                     }
                 });
-				dialog.show();
+                dialog.show();
 
-				return true;
-			}
-		});
-	}
+                return true;
+            }
+        });
+    }
 
     /**
-     * @param referenceName
-     * @param list
-     * @param updateDate
+     * @param referenceName Название справочника (используем имя класса).
+     * @param list          Список объектов для сохранения в базу.
+     * @param updateDate    Дата обновления содержимого справочника.
      */
     private void saveReferenceData(String referenceName, List list, Date updateDate) {
         Realm realm = Realm.getDefaultInstance();
@@ -904,57 +936,57 @@ public class ReferenceFragment extends Fragment {
         realm.commitTransaction();
     }
 
-	/**
-	 * @author Dmitriy Logachov
-	 *         <p>
-	 *         Класс реализует обработку выбора элемента выпадающего списка
-	 *         справочников.
-	 *         </p>
-	 */
-	private class ReferenceSpinnerListener implements AdapterView.OnItemSelectedListener {
+    /**
+     * @author Dmitriy Logachov
+     *         <p>
+     *         Класс реализует обработку выбора элемента выпадающего списка
+     *         справочников.
+     *         </p>
+     */
+    private class ReferenceSpinnerListener implements AdapterView.OnItemSelectedListener {
 
-		@Override
-		public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+        @Override
+        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-			SortField selectedItem = (SortField) parentView.getItemAtPosition(position);
-			String selected = selectedItem.getField();
+            SortField selectedItem = (SortField) parentView.getItemAtPosition(position);
+            String selected = selectedItem.getField();
 
-			switch (selected) {
-				case DocumentationTypeAdapter.TABLE_NAME:
-					fillListViewDocumentationType();
-					break;
-				case EquipmentTypeAdapter.TABLE_NAME:
-					fillListViewEquipmentType();
-					break;
-				case CriticalTypeAdapter.TABLE_NAME:
-					fillListViewCriticalType();
-					break;
-				case AlertTypeAdapter.TABLE_NAME:
-					fillListViewAlertType();
-					break;
-				case OperationVerdictAdapter.TABLE_NAME:
-					fillListViewOperationVerdict();
-					break;
-				case OperationTypeAdapter.TABLE_NAME:
-					fillListViewOperationType();
-					break;
-				case OperationStatusAdapter.TABLE_NAME:
-					fillListViewOperationStatus();
-					break;
-				case TaskStatusAdapter.TABLE_NAME:
-					fillListViewTaskStatus();
-					break;
-				case EquipmentStatusAdapter.TABLE_NAME:
-					fillListViewEquipmentStatus();
-					break;
-				default:
-					break;
-			}
-		}
+            switch (selected) {
+                case DocumentationTypeAdapter.TABLE_NAME:
+                    fillListViewDocumentationType();
+                    break;
+                case EquipmentTypeAdapter.TABLE_NAME:
+                    fillListViewEquipmentType();
+                    break;
+                case CriticalTypeAdapter.TABLE_NAME:
+                    fillListViewCriticalType();
+                    break;
+                case AlertTypeAdapter.TABLE_NAME:
+                    fillListViewAlertType();
+                    break;
+                case OperationVerdictAdapter.TABLE_NAME:
+                    fillListViewOperationVerdict();
+                    break;
+                case OperationTypeAdapter.TABLE_NAME:
+                    fillListViewOperationType();
+                    break;
+                case OperationStatusAdapter.TABLE_NAME:
+                    fillListViewOperationStatus();
+                    break;
+                case TaskStatusAdapter.TABLE_NAME:
+                    fillListViewTaskStatus();
+                    break;
+                case EquipmentStatusAdapter.TABLE_NAME:
+                    fillListViewEquipmentStatus();
+                    break;
+                default:
+                    break;
+            }
+        }
 
-		@Override
-		public void onNothingSelected(AdapterView<?> parentView) {
+        @Override
+        public void onNothingSelected(AdapterView<?> parentView) {
 
-		}
-	}
+        }
+    }
 }
