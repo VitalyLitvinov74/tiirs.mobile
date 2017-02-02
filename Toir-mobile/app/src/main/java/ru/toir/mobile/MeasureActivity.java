@@ -54,7 +54,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
 
     private EditText meas_value;
     private Spinner meas_typeSpinner;
-
+    private Button meas_submit;
     private MeasuredValue measuredValue;
 
     protected BarChart mChart;
@@ -68,7 +68,6 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realmDB = Realm.getDefaultInstance();
-        Button meas_submit = (Button) findViewById(R.id.meas_Button);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setMainLayout(savedInstanceState);
 
@@ -88,6 +87,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         //meas_header = (TextView) findViewById(R.id.meas_header);
         meas_value = (EditText) findViewById(R.id.meas_value);
         meas_typeSpinner= (Spinner) findViewById(R.id.simple_spinner);
+        meas_submit = (Button) findViewById(R.id.meas_Button);
 
         RealmResults<MeasureType> measureType = realmDB.where(MeasureType.class).findAll();
         MeasureTypeAdapter typeSpinnerAdapter = new MeasureTypeAdapter(this, measureType);
@@ -227,6 +227,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //toolbar.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
+        toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitle("Измерение параметров");
 
         ActionBar ab = getSupportActionBar();

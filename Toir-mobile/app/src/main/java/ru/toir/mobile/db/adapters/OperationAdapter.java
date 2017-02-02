@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -15,6 +14,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -31,6 +33,7 @@ import ru.toir.mobile.db.realm.Operation;
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     public static final String TABLE_NAME = "Operation";
     private Context context;
+    private int counter=0;
     private boolean[] visibility = new boolean[50];
     private boolean[] completed = new boolean[50];
 
@@ -88,6 +91,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         File image;
+        File image2;
         Operation operation;
         viewHolder = new ViewHolder();
         if (adapterData==null) return convertView;
@@ -116,13 +120,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.description_layout.setVisibility(View.VISIBLE);
             convertView.setTag(viewHolder);
             viewHolder = (ViewHolder) convertView.getTag();
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
            }
         else {
             viewHolder.description_layout.setVisibility(View.GONE);
             convertView.setTag(viewHolder);
             viewHolder = (ViewHolder) convertView.getTag();
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
         }
 
         if (adapterData != null) {
@@ -145,38 +149,61 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
                 viewHolder.description.setText(operation.getOperationTemplate().getDescription());
                 viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
-                image=getOutputMediaFile(operation.getUuid());
-                    Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
-                if (imageBitmap!=null) {
-                    int width = imageBitmap.getWidth();
-                    int height = imageBitmap.getHeight();
-                    int newWidth = 300;
-                    float scaleWidth = (float)newWidth / (float)width;
-                    int newHeight = (int)(height * scaleWidth);
-                    viewHolder.image.setImageBitmap(Bitmap.createScaledBitmap (imageBitmap, newWidth, newHeight, false));
-                    //viewHolder.image.setImageBitmap(imageBitmap);
+
+                image=getOutputMediaFile(operation.getUuid(),1);
+                Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+                //counter++;
+                //Toast toast = Toast.makeText(context,""+counter,Toast.LENGTH_SHORT);
+                //toast.show();
+
+                if (imageBitmap==null) {
+                    image2=getOutputMediaFile(operation.getUuid(),0);
+                    imageBitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
+                    if (imageBitmap!=null) {
+                        int width = imageBitmap.getWidth();
+                        int height = imageBitmap.getHeight();
+                        int newWidth = 300;
+                        float scaleWidth = (float) newWidth / (float) width;
+                        int newHeight = (int) (height * scaleWidth);
+
+                        Bitmap imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
+                        FileOutputStream fOut = null;
+                        try {
+                            fOut = new FileOutputStream(image);
+                            imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                            fOut.flush();
+                            fOut.close();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        viewHolder.image.setImageBitmap(imageBitmap2);
+                    }
                 }
+                else viewHolder.image.setImageBitmap(imageBitmap);
             }
         }
       return convertView;
     }
 
-    private File getOutputMediaFile(String operationUuid) {
+    private File getOutputMediaFile(String operationUuid, int mini) {
         File mediaStorageDir = new File(context
                 .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                 .getAbsolutePath());
-
+        /*
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("Camera", "Required media storage does not exist");
                 return null;
             }
-        }
-        String fileName;
-        fileName = operationUuid + ".jpg";
+        }*/
         File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + fileName);
+        if (mini==1)
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + operationUuid + "_m.jpg");
+        else mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + operationUuid + ".jpg");
         return mediaFile;
     }
 
