@@ -1,10 +1,17 @@
 package ru.toir.mobile.db;
 
 import android.util.Log;
+import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import io.realm.DynamicRealm;
 import io.realm.RealmMigration;
+import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
+import io.realm.exceptions.RealmException;
 
 /**
  * @author Dmitriy Logachev
@@ -20,6 +27,10 @@ public class ToirRealmMigration implements RealmMigration {
         Log.d(TAG, "newVersion = " + newVersion);
 
         if (oldVersion == newVersion) {
+            if (!testPropsFields(realm)) {
+                throw new RealmException("Классы и схема не идентичны!!!");
+            }
+
             return;
         }
 
@@ -93,8 +104,8 @@ public class ToirRealmMigration implements RealmMigration {
                     .addField("_id", long.class)
                     .addField("userUuid", String.class)
                     .addField("date", Date.class)
-                    .addField("longitude", Double.class)
-                    .addField("latitude", Double.class)
+                    .addField("longitude", double.class)
+                    .addField("latitude", double.class)
                     .addPrimaryKey("_id");
 
             schema.create("Journal")
@@ -127,7 +138,7 @@ public class ToirRealmMigration implements RealmMigration {
                     .removeField("orderVerdictUuid");
 
             schema.get("RepairPart")
-                    .addField("commonRepairPartFlag",Integer.class);
+                    .addField("commonRepairPartFlag", int.class);
 
             schema.get("TaskStageTemplate")
                     .removeField("equipmentModelUuid")
@@ -153,5 +164,107 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 2) {
+            Log.d(TAG, "from version 2");
+            schema.create("ReferenceUpdate")
+                    .addField("referenceName", String.class)
+                    .addField("updateDate", Date.class)
+                    .addPrimaryKey("referenceName");
+
+            oldVersion++;
+        }
+
+        if (oldVersion == 3) {
+            Log.d(TAG, "from version 3");
+            schema.get("Clients")
+                    .renameField("photo", "phone");
+
+            oldVersion++;
+        }
+
+        if (oldVersion == 4) {
+            Log.d(TAG, "from version 4");
+            schema.get("Documentation")
+                    .removeField("documentationTypeUuid")
+                    .removeField("equipmentUuid");
+            schema.get("Operation")
+                    .addRealmObjectField("taskStage", schema.get("TaskStages"));
+
+            oldVersion++;
+        }
+
+        testPropsFields(realm);
     }
+
+    private boolean testPropsFields(DynamicRealm realm) {
+        boolean result = true;
+        RealmSchema schema = realm.getSchema();
+        // проверяем соответствие схемы базы со свойствами классов
+        Set<RealmObjectSchema> realmObjects = schema.getAll();
+        for (RealmObjectSchema realmObject: realmObjects) {
+            Log.d(TAG, "Class name = " + realmObject.getClassName());
+            Field[] classProps = null;
+            Set<String> props= new HashSet<>();
+            Map<String, String> propsType = new HashMap<>();
+            try {
+                Class<?> c = Class.forName("ru.toir.mobile.db.realm." + realmObject.getClassName());
+                classProps = c.getDeclaredFields();
+                for (Field prop: classProps) {
+                    props.add(prop.getName());
+                    propsType.put(prop.getName(), prop.getType().getName());
+//                    propsType.put(prop.getName(), prop.getGenericType().toString());
+                }
+            } catch(Exception e) {
+                Log.e(TAG, e.getLocalizedMessage());
+            }
+
+            // проверяем количество и названия полей и свойств
+            Set<String> fieldNames = realmObject.getFieldNames();
+            if (fieldNames.containsAll(props)) {
+                Log.d(TAG, "Status: Идентичны!!!");
+            } else {
+                Log.d(TAG, "Status: Отличаются!!!");
+                result = false;
+                // TODO: реализовать поиск различий в списках
+            }
+
+            // сравниваем типы свойств и полей
+            for (String fieldName: fieldNames) {
+                String realmType = realmObject.getFieldType(fieldName).name();
+                String propType = propsType.get(fieldName);
+                if (!realmType.equals(getType(propType))) {
+                    Log.e(TAG, "Type not same (fName = " + fieldName + "): fType = " + realmType + ", pType = " + propType);
+                    result = false;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private String getType(String type) {
+        String[] array = type.split("\\.");
+        String result = array[array.length - 1].toUpperCase();
+
+        switch (result) {
+            case "INT":
+            case "LONG":
+                result = "INTEGER";
+                break;
+            case "STRING":
+            case "DOUBLE":
+            case "DATE":
+            case "FLOAT":
+            case "BOOLEAN":
+                break;
+            case "REALMLIST":
+                result = "LIST";
+                break;
+            default:
+                result = "OBJECT";
+        }
+
+        return result;
+    }
+
 }

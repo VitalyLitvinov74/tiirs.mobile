@@ -17,9 +17,7 @@ public class TaskStageTemplate extends RealmObject {
     private String description;
     private String image;
     private int normative;
-    //private String equipmentModelUuid;
     private EquipmentModel equipmentModel;
-    //private String taskStageTypeUuid;
     private TaskStageType taskStageType;
     private Date createdAt;
     private Date changedAt;

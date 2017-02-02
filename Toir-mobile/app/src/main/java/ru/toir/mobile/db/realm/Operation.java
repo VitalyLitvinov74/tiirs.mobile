@@ -13,13 +13,9 @@ public class Operation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    //private String taskStageUuid;
     private TaskStages taskStage;
-    //private String operationVerdictUuid;
     private OperationVerdict operationVerdict;
-    //private String operationStatusUuid;
     private OperationStatus operationStatus;
-    //private String operationTemplateUuid;
     private OperationTemplate operationTemplate;
     private Date startDate;
     private Date endDate;

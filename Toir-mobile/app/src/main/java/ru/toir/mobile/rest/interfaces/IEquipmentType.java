@@ -13,7 +13,7 @@ import ru.toir.mobile.db.realm.EquipmentType;
  *         Created by koputo on 05.10.16.
  */
 public interface IEquipmentType {
-    @GET("/api/references/equipment_type")
+    @GET("/api/references/equipment-type")
     Call<List<EquipmentType>> equipmentType(@Header("Authorization") String token,
                                             @Query("ChangedAfter") String changedAfter);
 

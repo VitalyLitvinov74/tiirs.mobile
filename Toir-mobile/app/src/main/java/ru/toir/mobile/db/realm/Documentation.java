@@ -13,9 +13,7 @@ public class Documentation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    //private String documentationTypeUuid;
     private DocumentationType documentationType;
-    //private String equipmentUuid;
     private Equipment equipment;
     private String title;
     private String path;

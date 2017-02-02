@@ -19,9 +19,7 @@ public class OperationTemplate extends RealmObject {
     private int normative;
     private int first_step;
     private int last_step;
-    //private String equipmentModelUuid;
     private EquipmentModel equipmentModel;
-    //private String operationTypeUuid;
     private OperationType operationType;
     private Date createdAt;
     private Date changedAt;

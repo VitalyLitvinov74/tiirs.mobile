@@ -14,7 +14,6 @@ public class TaskType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    //private String icon;
     private Date createdAt;
     private Date changedAt;
 

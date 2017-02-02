@@ -13,7 +13,7 @@ import ru.toir.mobile.db.realm.CriticalType;
  *         Created by koputo on 15.09.16.
  */
 public interface ICriticalType {
-    @GET("/api/references/critical_type")
+    @GET("/api/references/critical-type")
     Call<List<CriticalType>> criticalType(@Header("Authorization") String token,
-                                          @Query("ChangedAfter") String changedAfter);
+                                          @Query("changedAfter") String changedAfter);
 }

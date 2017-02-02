@@ -13,17 +13,13 @@ public class Equipment extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    //private String equipmentModelUuid;
     private EquipmentModel equipmentModel;
-    //private String equipmentStatusUuid;
     private EquipmentStatus equipmentStatus;
     private Equipment parentEquipment;
     private String title;
     private String inventoryNumber;
     private String location;
-    //private String criticalTypeUuid;
     private CriticalType criticalType;
-    //private String userUuid;
     private Date startDate;
     private float latitude;
     private float longitude;
