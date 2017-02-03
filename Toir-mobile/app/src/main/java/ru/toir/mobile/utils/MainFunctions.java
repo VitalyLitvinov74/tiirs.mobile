@@ -8,6 +8,7 @@ import java.util.Date;
 import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.db.realm.Journal;
+import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.User;
 
 public class MainFunctions {
@@ -36,4 +37,15 @@ public static void addToJournal(final String description){
         });
         }
     }
+
+    public static int getActiveOrdersCount(){
+        int count=0;
+        final Realm realmDB = Realm.getDefaultInstance();
+        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        if (user!=null) {
+            count = realmDB.where(Orders.class).equalTo("orderStatus.title","Получен").findAll().size();
+        }
+        return count;
+    }
 }
+

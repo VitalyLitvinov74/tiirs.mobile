@@ -116,7 +116,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                             if (currentOperation!=null) measuredValue.setOperation(currentOperation);
                         }
                     });
-
+                    setData();
                 }
             });
 

@@ -21,10 +21,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OperationStatus;
 
 /**
  * @author olejek
@@ -132,6 +135,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         if (adapterData != null) {
             if (operation != null) {
                 String sDate;
+                OperationStatus operationStatus;
+                operationStatus = operation.getOperationStatus();
                 viewHolder.title.setText(operation.getOperationTemplate().getTitle());
                 Date lDate = operation.getStartDate();
                 if (lDate != null) {
@@ -143,8 +148,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
                     viewHolder.end_date.setText(sDate);
                 }
-                if (operation.getOperationStatus().getTitle().equals("Выполнена")) {
-                    viewHolder.status.setChecked(true);
+
+                if (operationStatus != null) {
+                    if (operationStatus.getTitle().equals("Не выполнена")) {
+                        viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
+                    }
+                    if (operationStatus.getTitle().equals("Выполнена")) {
+                        viewHolder.status.setChecked(true);
+                        viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
+                    }
                 }
 
                 viewHolder.description.setText(operation.getOperationTemplate().getDescription());
@@ -155,6 +167,10 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 //counter++;
                 //Toast toast = Toast.makeText(context,""+counter,Toast.LENGTH_SHORT);
                 //toast.show();
+                Realm realmDB = Realm.getDefaultInstance();
+                MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid",operation.getUuid()).findFirst();
+                if (lastValue!=null)
+                    viewHolder.measure.setText(lastValue.getValue()+" ("+new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate())+")");
 
                 if (imageBitmap==null) {
                     image2=getOutputMediaFile(operation.getUuid(),0);

@@ -83,6 +83,7 @@ import ru.toir.mobile.rest.TaskServiceProvider;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.utils.MainFunctions;
 
 public class OrderFragment extends Fragment implements View.OnClickListener {
     private Tasks selectedTask;
@@ -345,6 +346,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         listLayout.setLayoutParams(params);
+
+        int new_orders= MainFunctions.getActiveOrdersCount();
+        if (new_orders>0)
+            bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
 
         //bottomBar.setVisibility(View.VISIBLE);
         //bottomBar.setEnabled(false);
