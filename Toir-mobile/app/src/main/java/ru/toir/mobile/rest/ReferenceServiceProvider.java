@@ -72,8 +72,9 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getOperationResult(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getOperationResult(extras);
-		} catch (Exception e) {
+//			return new ReferenceProcessor(mContext).getOperationResult(extras);
+            return null;
+        } catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -87,8 +88,9 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getOperationPattern(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getOperationPattern(extras);
-		} catch (Exception e) {
+//			return new ReferenceProcessor(mContext).getOperationPattern(extras);
+            return null;
+        } catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -207,8 +209,9 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getEquipment(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getEquipment(extras);
-		} catch (Exception e) {
+//			return new ReferenceProcessor(mContext).getEquipment(extras);
+            return null;
+        } catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -237,8 +240,9 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getDocumentation(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getDocumentation(extras);
-		} catch (Exception e) {
+//			return new ReferenceProcessor(mContext).getDocumentation(extras);
+            return null;
+        } catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -252,8 +256,9 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getAll(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getAll(extras);
-		} catch (Exception e) {
+//			return new ReferenceProcessor(mContext).getAll(extras);
+            return null;
+        } catch (Exception e) {
 			e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
@@ -267,9 +272,10 @@ public class ReferenceServiceProvider implements IServiceProvider {
 	 */
 	private Bundle getDocumentationFile(Bundle extras) {
 		try {
-			return new ReferenceProcessor(mContext).getDocumentationFile(extras);
-		} catch (Exception e) {
-			e.printStackTrace();
+//			return new ReferenceProcessor(mContext).getDocumentationFile(extras);
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
 			Bundle result = new Bundle();
 			result.putBoolean(IServiceProvider.RESULT, false);
 			result.putString(MESSAGE, e.getMessage());

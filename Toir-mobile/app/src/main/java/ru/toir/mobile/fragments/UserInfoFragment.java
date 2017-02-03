@@ -26,10 +26,7 @@ import java.util.Date;
 import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirDatabaseContext;
-import ru.toir.mobile.db.adapters.GPSDBAdapter;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.db.tables.GpsTrack;
 
 public class UserInfoFragment extends Fragment {
     private Realm realmDB;
@@ -95,27 +92,26 @@ public class UserInfoFragment extends Fragment {
         final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
 		//final User user = realmDB.where(User.class).findFirst();
         if (user == null) {
-			Toast.makeText(getActivity(), "Нет такого пользователя!",
-					Toast.LENGTH_SHORT).show();
-		} else {
-            if (user.getTagId().length() > 20)
-				tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
-			else
-				tv_user_id.setText("ID: " + user.getTagId());
+            Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
+        } else {
+            if (user.getTagId().length() > 20) {
+                tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
+            } else {
+                tv_user_id.setText("ID: " + user.getTagId());
+            }
+
 			tv_user_name.setText(user.getName());
 			tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
 			tv_user_boss.setText(user.getContact());
 			tv_user_type.setText(user.getWhoIs());
-			GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
-					getActivity().getApplicationContext()));
-			GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
 
             LocationManager manager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (statusOfGPS)
+            if (statusOfGPS) {
                 user_status_gps.setChecked(true);
-            else
+            } else {
                 user_status_gps.setChecked(false);
+            }
 
             ConnectivityManager cm = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -131,16 +127,8 @@ public class UserInfoFragment extends Fragment {
                 user_status_gprs.setChecked(false);
             }
 
-			if (gpstrack != null) {
-				tv_user_gps.setText(Float.parseFloat(gpstrack.getLatitude())
-						+ " / " + Float.parseFloat(gpstrack.getLongitude()));
-			}
-			else
-				tv_user_gps.setText("нет данных");
-
-			if (AuthorizedUser.getInstance().getTagId()
-					.equals("3000E2004000860902332580112D")) {
-				// ваще хардкодед для демонстрашки
+            if (AuthorizedUser.getInstance().getTagId().equals("3000E2004000860902332580112D")) {
+                // ваще хардкодед для демонстрашки
 				// TODO реальные фотки должны адресоваться из базы
 				File imgFile = new File(Environment
 						.getExternalStorageDirectory().getAbsolutePath()
