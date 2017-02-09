@@ -22,6 +22,7 @@ import ru.toir.mobile.rest.interfaces.IEquipment;
 import ru.toir.mobile.rest.interfaces.IEquipmentModel;
 import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
 import ru.toir.mobile.rest.interfaces.IEquipmentType;
+import ru.toir.mobile.rest.interfaces.IGpsTrack;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
 import ru.toir.mobile.rest.interfaces.IMeasuredValue;
 import ru.toir.mobile.rest.interfaces.IOperation;
@@ -36,6 +37,7 @@ import ru.toir.mobile.rest.interfaces.IOrderVerdict;
 import ru.toir.mobile.rest.interfaces.IOrders;
 import ru.toir.mobile.rest.interfaces.IRepairPart;
 import ru.toir.mobile.rest.interfaces.IRepairPartType;
+import ru.toir.mobile.rest.interfaces.IJournal;
 import ru.toir.mobile.rest.interfaces.ITaskStageList;
 import ru.toir.mobile.rest.interfaces.ITaskStageOperationList;
 import ru.toir.mobile.rest.interfaces.ITaskStageStatus;
@@ -271,9 +273,20 @@ public class ToirAPIFactory {
     }
 
     @NonNull
+    public static IJournal getJournalService() {
+        return getRetrofit().create(IJournal.class);
+    }
+
+    @NonNull
+    public static IGpsTrack getGpsTrackService() {
+        return getRetrofit().create(IGpsTrack.class);
+    }
+
+    @NonNull
     private static Retrofit getRetrofit() {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Date.class, new DateTypeDeserializer())
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .create();
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
