@@ -15,6 +15,7 @@ public class Journal extends RealmObject {
     private String description;
     private String userUuid;
     private Date date;
+    private boolean sent;
 
     public long get_id() {
         return _id;
@@ -48,4 +49,11 @@ public class Journal extends RealmObject {
         this.date = date;
     }
 
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
+    }
 }

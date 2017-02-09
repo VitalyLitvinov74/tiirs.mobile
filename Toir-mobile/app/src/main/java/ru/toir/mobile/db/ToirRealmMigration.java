@@ -193,6 +193,13 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 5) {
+            Log.d(TAG, "from version 5");
+            schema.get("Journal").addField("sent", boolean.class);
+            schema.get("GpsTrack").addField("sent", boolean.class);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
