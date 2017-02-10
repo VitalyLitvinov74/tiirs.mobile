@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -502,35 +503,47 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                tsh.GetTaskNew();
 
                 // запускаем поток получения новых нарядов с сервера
-                Thread thread = new Thread(new Runnable() {
+                AsyncTask<Void, Void, List<Orders>> aTask = new AsyncTask<Void, Void, List<Orders>>() {
                     @Override
-                    public void run() {
+                    protected List<Orders> doInBackground(Void... voids) {
                         AuthorizedUser user = AuthorizedUser.getInstance();
                         Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
                                 .ordersByStatus(user.getBearer(), OrderStatus.Status.NEW);
+                        List<Orders> result = null;
                         try {
                             Response<List<Orders>> response = call.execute();
-                            // собщаем количество полученных нарядов
-                            List<Orders> orders = response.body();
+                            result = response.body();
+                            return result;
+                        } catch (Exception e) {
+                            Log.d(TAG, e.getLocalizedMessage());
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    protected void onPostExecute(List<Orders> orders) {
+                        super.onPostExecute(orders);
+                        if (orders == null) {
+                            // сообщаем описание неудачи
+                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
+                        } else {
                             int count = orders.size();
+                            // собщаем количество полученных нарядов
                             if (count > 0) {
                                 Realm realm = Realm.getDefaultInstance();
                                 realm.beginTransaction();
                                 realm.copyToRealmOrUpdate(orders);
                                 realm.commitTransaction();
-//                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
                             } else {
-//                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
                             }
-                        } catch (Exception e) {
-                            // сообщаем описание неудачи
-//                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
-                        } finally {
-                            processDialog.dismiss();
                         }
+
+                        processDialog.dismiss();
                     }
-                });
-                thread.start();
+                };
+                aTask.execute();
 
                 // показываем диалог получения нарядов
                 processDialog = new ProgressDialog(getActivity());
