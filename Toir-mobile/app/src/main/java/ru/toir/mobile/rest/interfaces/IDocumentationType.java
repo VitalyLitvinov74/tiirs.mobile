@@ -13,7 +13,12 @@ import ru.toir.mobile.db.realm.DocumentationType;
  *         Created by koputo on 05.10.16.
  */
 public interface IDocumentationType {
-    @GET("/api/references/document_type")
+    @GET("/references/documentation-type")
+    Call<List<DocumentationType>> documentationType(@Header("Authorization") String token);
+    @GET("/references/documentation-type")
     Call<List<DocumentationType>> documentationType(@Header("Authorization") String token,
-                                                    @Query("ChangedAfter") String changedAfter);
+                                                    @Query("changedAfter") String changedAfter);
+    @GET("/references/documentation-type")
+    Call<List<DocumentationType>> documentationTypeById(@Header("Authorization") String token,
+                                                        @Query("id") String id);
 }

@@ -16,10 +16,10 @@
     <application
         android:name=".ToirApplication"
         android:allowBackup="true"
-        android:windowSoftInputMode="adjustPan"
         android:icon="@drawable/ic_toir_icon"
         android:label="@string/app_name"
-        android:theme="@style/CustomTheme" >
+        android:theme="@style/CustomTheme"
+        android:windowSoftInputMode="adjustPan">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -51,12 +51,6 @@
         <service android:name=".rest.ProcessorService" >
         </service>
 
-        <activity android:name=".OperationActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity android:name=".MeasureActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

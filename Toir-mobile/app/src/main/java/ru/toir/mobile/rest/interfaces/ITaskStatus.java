@@ -13,7 +13,13 @@ import ru.toir.mobile.db.realm.TaskStatus;
  *         Created by koputo on 05.10.16.
  */
 public interface ITaskStatus {
-    @GET("/api/references/task_status")
+    @GET("/references/task-status")
+    Call<List<TaskStatus>> taskStatus(@Header("Authorization") String token);
+
+    @GET("/references/task-status")
     Call<List<TaskStatus>> taskStatus(@Header("Authorization") String token,
-                                      @Query("ChangedAfter") String changedAfter);
+                                      @Query("changedAfter") String changedAfter);
+    @GET("/references/task-status")
+    Call<List<TaskStatus>> taskStatusById(@Header("Authorization") String token,
+                                          @Query("id") String id);
 }

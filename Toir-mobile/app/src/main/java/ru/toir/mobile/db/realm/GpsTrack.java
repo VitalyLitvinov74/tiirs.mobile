@@ -16,6 +16,7 @@ public class GpsTrack extends RealmObject {
     private double latitude;
     private double longitude;
     private Date date;
+    private boolean sent;
 
     public long get_id() {
         return _id;
@@ -57,4 +58,11 @@ public class GpsTrack extends RealmObject {
         this.longitude = longitude;
     }
 
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
+    }
 }

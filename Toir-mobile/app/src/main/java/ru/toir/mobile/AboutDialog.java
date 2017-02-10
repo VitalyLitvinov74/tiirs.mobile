@@ -14,8 +14,8 @@ import java.io.InputStreamReader;
 
 class AboutDialog extends Dialog {
 
-    private static Context mContext = null;
     private static final String TAG = "AboutDialog";
+    private Context mContext = null;
 
     AboutDialog(Context context) {
         super(context);
@@ -39,7 +39,7 @@ class AboutDialog extends Dialog {
         Linkify.addLinks(tv, Linkify.ALL);
     }
 
-    private static String readRawTextFile(int id) {
+    private String readRawTextFile(int id) {
         InputStream inputStream = mContext.getResources().openRawResource(id);
         InputStreamReader in = new InputStreamReader(inputStream);
         BufferedReader buf = new BufferedReader(in);
