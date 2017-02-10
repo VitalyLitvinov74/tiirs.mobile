@@ -1137,17 +1137,14 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         // оригинальное имя файла
         fileName = currentOperationUuid + ".jpg";
         File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + fileName);
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + fileName);
         return mediaFile;
     }
 
-    public class ListViewClickListener implements
-            AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View selectedItemView,
-                                int position, long id) {
+    public class ListViewClickListener implements AdapterView.OnItemClickListener {
 
+        @Override
+        public void onItemClick(AdapterView<?> parent, View selectedItemView, int position, long id) {
             // находимся на "экране" нарядов
             if (Level == 0) {
                 if (orderAdapter != null) {
@@ -1161,6 +1158,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
                 return;
             }
+
             // Tasks
             if (Level == 1) {
                 if (taskAdapter != null) {
@@ -1183,15 +1181,12 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                         Level = 2;
                                     } else {
                                         Toast.makeText(getContext(),
-                                                "Не верное оборудование!", Toast.LENGTH_SHORT)
-                                                .show();
+                                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
                                     Log.d(TAG, "Ошибка чтения метки!");
                                     Toast.makeText(getContext(),
-                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
-                                            .show();
-
+                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
                                 }
 
                                 // закрываем диалог
@@ -1210,6 +1205,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
                 return;
             }
+
             // TaskStage
             if (Level == 2) {
                 if (taskStageAdapter != null) {
@@ -1223,6 +1219,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         startOperations();
                     }
                 }
+
                 return;
             }
 
@@ -1249,18 +1246,27 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onClick(View arg) {
-            if (position != currentOperationId) return;
-            if (!operationAdapter.getItemEnable(position)) return;
+            if (position != currentOperationId) {
+                return;
+            }
+
+            if (!operationAdapter.getItemEnable(position)) {
+                return;
+            }
+
             TextView textTime;
             final long currentTime = System.currentTimeMillis();
             final OperationStatus operationStatusCompleted;
             final OperationVerdict operationVerdictCompleted;
             operationStatusCompleted = realmDB.where(OperationStatus.class).equalTo("title", "Выполнена").findFirst();
             operationVerdictCompleted = realmDB.where(OperationVerdict.class).equalTo("title", "Выполнена").findFirst();
-            if (operationStatusCompleted == null)
+            if (operationStatusCompleted == null) {
                 Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
-            if (operationVerdictCompleted == null)
+            }
+
+            if (operationVerdictCompleted == null) {
                 Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
+            }
 
             if (operationAdapter != null) {
                 textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
@@ -1287,8 +1293,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     });
                     if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative())
                         textTime.setBackgroundColor(Color.GREEN);
-                    else
+                    else {
                         textTime.setBackgroundColor(Color.RED);
+                    }
+
                     // перезапоминаем таймер
                     startTime = System.currentTimeMillis();
                     operationAdapter.setItemEnable(position, false);
@@ -1315,22 +1323,19 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 } else {
                     // операция уже выполнена, изменить статус нельзя
                     // сообщаем об этом
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(
-                            getContext());
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
                     dialog.setTitle("Внимание!");
                     dialog.setMessage("Изменить статус операции нельзя!");
                     AlertDialog.Builder builder = dialog.setPositiveButton(android.R.string.ok,
                             new DialogInterface.OnClickListener() {
 
                                 @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
+                                public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                 }
                             });
                     dialog.show();
                 }
-
             } else if (Level == 0) {
                 // находимся на экране с нарядами
                 Orders order = orderAdapter.getItem(position);
@@ -1341,7 +1346,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     if (orderStatus != null) {
                         if (orderStatus.getUuid().equals(OrderStatus.Status.COMPLETE)
                                 || order.getOrderStatus().getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
-
                             // наряд уже закрыт, изменить статус нельзя
                             // сообщаем об этом
                             AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -1349,13 +1353,11 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                             dialog.setMessage("Изменить статус наряда уже нельзя!");
                             dialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
+                                public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                 }
                             });
                             dialog.show();
-
                         } else {
                             // наряд можно закрыть принудительно
                             closeOrderManual(order);
