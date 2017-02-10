@@ -59,7 +59,7 @@ import retrofit.Retrofit;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
+import ru.toir.mobile.db.adapters.MeasureTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
@@ -1045,7 +1045,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             suffixList.clear();
         }
 
-        if (measureType.equals(MeasureTypeDBAdapter.Type.FREQUENCY)) {
+        if (measureType.equals(MeasureTypeAdapter.Type.FREQUENCY)) {
             //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("Гц", 1));
@@ -1065,7 +1065,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureTypeDBAdapter.Type.VOLTAGE)) {
+        } else if (measureType.equals(MeasureTypeAdapter.Type.VOLTAGE)) {
             //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("В", 1));
@@ -1085,7 +1085,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureTypeDBAdapter.Type.PRESSURE)) {
+        } else if (measureType.equals(MeasureTypeAdapter.Type.PRESSURE)) {
             //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("Па", 1));
@@ -1105,7 +1105,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureTypeDBAdapter.Type.PHOTO)) {
+        } else if (measureType.equals(MeasureTypeAdapter.Type.PHOTO)) {
 
             Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
             File photo = getOutputMediaFile();
