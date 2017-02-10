@@ -53,9 +53,7 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import retrofit.Call;
-import retrofit.Callback;
 import retrofit.Response;
-import retrofit.Retrofit;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
@@ -63,7 +61,6 @@ import ru.toir.mobile.db.adapters.MeasureTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
-import ru.toir.mobile.db.adapters.OrderStatusAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
@@ -130,8 +127,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 textTime.setText((int) (currentTime - startTime) / 1000 + "сек.");
                 currentOperationUuid = operationAdapter.getItem(currentOperationId).getUuid();
                 currentOperation = operationAdapter.getItem(currentOperationId);
-                if (firstLaunch)
+                if (firstLaunch) {
                     onStart();
+                }
             }
         }
 
@@ -140,11 +138,13 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             CheckBox checkBox;
             if (operationAdapter != null && mainListView != null) {
                 totalOperationCount = operationAdapter.getCount();
-                for (int i = 0; i < totalOperationCount; i++)
+                for (int i = 0; i < totalOperationCount; i++) {
                     if (mainListView.getChildAt(i) != null) {
                         checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
                         checkBox.setOnClickListener(new onCheckBoxClickListener(i));
                     }
+                }
+
                 firstLaunch = false;
             }
         }
@@ -152,6 +152,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         public void onFinish() {
         }
     };
+
     private boolean cameraInit = false;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
@@ -164,6 +165,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private Button makePhotoButton;
     private ProgressDialog processDialog;
     private RfidDialog rfidDialog;
+
     // фильтр для получения сообщений при получении нарядов с сервера
 //    private IntentFilter mFilterGetTask = new IntentFilter(TaskServiceProvider.Actions.ACTION_GET_TASK);
     // TODO решить нужны ли фильтры на все возможные варианты отправки состояния/результатов
@@ -243,17 +245,17 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     }
 
     /*
- * (non-Javadoc)
- *
- * @see
- * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
- * android.view.ViewGroup, android.os.Bundle)
- */
+     * (non-Javadoc)
+     *
+     * @see
+     * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
+     * android.view.ViewGroup, android.os.Bundle)
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.orders_layout, container,
-                false);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        rootView = inflater.inflate(R.layout.orders_layout, container, false);
         Toolbar toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
         submit = (Button) rootView.findViewById(R.id.tl_finishButton);
@@ -275,15 +277,14 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             public void onClick(View v) {
                 Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
                 File photo = getOutputMediaFile();
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(photo));
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+                // TODO: Олег, объяви константу
                 startActivityForResult(intent, 100);
             }
         });
         measure.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent measure = new Intent(getActivity(),
-                        MeasureActivity.class);
+                Intent measure = new Intent(getActivity(), MeasureActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("operationUuid", currentOperation.getUuid());
                 bundle.putString("equipmentUuid", currentEquipment.getUuid());
@@ -303,14 +304,15 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK
-                        && event.getAction() == KeyEvent.ACTION_UP) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "OrderFragment !!! back pressed!!!");
                     if (Level == 1) {
                         initView();
                     }
+
                     return true;
                 }
+
                 return false;
             }
         });
@@ -335,16 +337,18 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     // Orders----------------------------------------------------------------------------------------
     private void fillListViewOrders(String orderStatus, String orderByField) {
         // !!!!!
-        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        User user = realmDB.where(User.class)
+                .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                .findFirst();
         if (user == null) {
-            Toast.makeText(getActivity(), "Нет такого пользователя!",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
             RealmResults<Orders> orders;
             orders = realmDB.where(Orders.class).findAll();
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
+
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.GONE);
@@ -356,9 +360,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         listLayout.setLayoutParams(params);
 
-        int new_orders= MainFunctions.getActiveOrdersCount();
-        if (new_orders>0)
+        int new_orders = MainFunctions.getActiveOrdersCount();
+        if (new_orders > 0) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
+        }
 
         //bottomBar.setVisibility(View.VISIBLE);
         //bottomBar.setEnabled(false);
@@ -388,6 +393,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
         }
+
         submit.setVisibility(View.GONE);
         measure.setVisibility(View.GONE);
     }
@@ -416,6 +422,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(task.getTaskTemplate().getTitle());
         }
+
         submit.setVisibility(View.GONE);
         measure.setVisibility(View.GONE);
         makePhotoButton.setVisibility(View.GONE);
@@ -454,6 +461,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(stage.getTaskStageTemplate().getTitle());
         }
+
         //mainListView.setOnItemClickListener(mainListViewClickListener);
     }
 
@@ -471,6 +479,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 //checkBox.setOnClickListener(new onCheckBoxClickListener());
             }
         }
+
         // время начала работы (приступаем к первой операции и нехрен тормозить)
         startTime = System.currentTimeMillis();
         taskTimer.start();
@@ -481,273 +490,250 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         super.onCreateOptionsMenu(menu, inflater);
         // добавляем элемент меню для получения новых нарядов
         MenuItem getTaskNew = menu.add("Получить новые наряды");
-        getTaskNew
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        getTaskNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.d(TAG, "Получаем новые наряды.");
+//                TaskServiceHelper tsh = new TaskServiceHelper(
+//                        getActivity().getApplicationContext(),
+//                        TaskServiceProvider.Actions.ACTION_GET_TASK);
+//                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
+//                tsh.GetTaskNew();
+
+                // TODO: разобраться с серверной частью которая должна отдать только новые наряды!!!
+                // запускаем поток получения новых нарядов с сервера
+                Thread thread = new Thread(new Runnable() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Log.d(TAG, "Получаем новые наряды.");
-//                        TaskServiceHelper tsh = new TaskServiceHelper(
-//                                getActivity().getApplicationContext(),
-//                                TaskServiceProvider.Actions.ACTION_GET_TASK);
-//
-//                        getActivity().registerReceiver(mReceiverGetTask,
-//                                mFilterGetTask);
-//
-//                        tsh.GetTaskNew();
-
+                    public void run() {
                         AuthorizedUser user = AuthorizedUser.getInstance();
                         Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
                                 .orders(user.getBearer(), user.getUuid());
-                        call.enqueue(new Callback<List<Orders>>() {
-                            @Override
-                            public void onResponse(Response<List<Orders>> response, Retrofit retrofit) {
-                                // ообщаем количество полученных нарядов
-                                List<Orders> orders = response.body();
-                                int count = orders.size();
-                                if (count > 0) {
-                                    Realm realm = Realm.getDefaultInstance();
-                                    realm.beginTransaction();
-                                    realm.copyToRealmOrUpdate(orders);
-                                    realm.commitTransaction();
-                                    Toast.makeText(getActivity(),
-                                            "Количество нарядов " + count,
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(getActivity(), "Нарядов нет.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-
-                                processDialog.dismiss();
+                        try {
+                            Response<List<Orders>> response = call.execute();
+                            // собщаем количество полученных нарядов
+                            List<Orders> orders = response.body();
+                            int count = orders.size();
+                            if (count > 0) {
+                                Realm realm = Realm.getDefaultInstance();
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(orders);
+                                realm.commitTransaction();
+                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
                             }
+                        } catch (Exception e) {
+                            // сообщаем описание неудачи
+                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.",
+                                    Toast.LENGTH_LONG).show();
 
-                            @Override
-                            public void onFailure(Throwable t) {
-                                // сообщаем описание неудачи
-                                Toast.makeText(getActivity(),
-                                        "Ошибка при получении нарядов.",
-                                        Toast.LENGTH_LONG).show();
-                                processDialog.dismiss();
-                            }
-                        });
-
-                        // показываем диалог получения наряда
-                        processDialog = new ProgressDialog(getActivity());
-                        processDialog.setMessage("Получаем наряды");
-                        processDialog.setIndeterminate(true);
-                        processDialog
-                                .setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                        processDialog.setCancelable(false);
-                        processDialog.setButton(
-                                DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog,
-                                                        int which) {
-//                                        getActivity().unregisterReceiver(mReceiverGetTask);
-                                        Toast.makeText(getActivity(),
-                                                "Получение нарядов отменено",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                        processDialog.show();
-                        return true;
+                        } finally {
+                            processDialog.dismiss();
+                        }
                     }
                 });
+
+                // показываем диалог получения нарядов
+                processDialog = new ProgressDialog(getActivity());
+                processDialog.setMessage("Получаем наряды");
+                processDialog.setIndeterminate(true);
+                processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                processDialog.setCancelable(false);
+                processDialog.setButton(
+                        DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+//                                getActivity().unregisterReceiver(mReceiverGetTask);
+                                Toast.makeText(getActivity(), "Получение нарядов отменено",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                processDialog.show();
+                return true;
+            }
+        });
 
         // добавляем элемент меню для получения "архивных" нарядов
         MenuItem getTaskDone = menu.add("Получить сделанные наряды");
-        getTaskDone
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        getTaskDone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.d(TAG, "Получаем сделанные наряды.");
+//                TaskServiceHelper tsh = new TaskServiceHelper( getActivity().getApplicationContext(),
+//                        TaskServiceProvider.Actions.ACTION_GET_TASK);
+//                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
+//                tsh.GetTaskDone();
 
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Log.d(TAG, "Получаем сделанные наряды.");
-//                        TaskServiceHelper tsh = new TaskServiceHelper(
-//                                getActivity().getApplicationContext(),
-//                                TaskServiceProvider.Actions.ACTION_GET_TASK);
-//
-//                        getActivity().registerReceiver(mReceiverGetTask,
-//                                mFilterGetTask);
-//
-//                        tsh.GetTaskDone();
-
-                        // показываем диалог получения наряда
-                        processDialog = new ProgressDialog(getActivity());
-                        processDialog.setMessage("Получаем наряды");
-                        processDialog.setIndeterminate(true);
-                        processDialog
-                                .setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                        processDialog.setCancelable(false);
-                        processDialog.setButton(
-                                DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog,
-                                                        int which) {
+                // показываем диалог получения наряда
+                processDialog = new ProgressDialog(getActivity());
+                processDialog.setMessage("Получаем наряды");
+                processDialog.setIndeterminate(true);
+                processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                processDialog.setCancelable(false);
+                processDialog.setButton(
+                        DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 //                                        getActivity().unregisterReceiver(mReceiverGetTask);
-                                        Toast.makeText(getActivity(),
-                                                "Получение нарядов отменено",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                        processDialog.show();
-                        return true;
-                    }
-                });
+                                Toast.makeText(getActivity(), "Получение нарядов отменено",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                processDialog.show();
+                return true;
+            }
+        });
 
         // добавляем элемент меню для отправки результатов выполнения нарядов
         MenuItem sendTaskResultMenu = menu.add("Отправить результаты");
-        sendTaskResultMenu
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        sendTaskResultMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                AuthorizedUser user = AuthorizedUser.getInstance();
+//                TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext(getActivity()));
+//                List<Task> tasks;
+//                String currentUserUuid = AuthorizedUser.getInstance() .getUuid();
+//                // проверяем наличие не законченных нарядов
+//                tasks = adapter.getOrdersByUser(currentUserUuid, TaskStatusDBAdapter.Status.IN_WORK, "");
+                boolean isInWork = false;
+                int inWorkCount = 0;
+//                isInWork = tasks.size() > 0;
+//                inWorkCount = tasks.size();
+
+                if (isInWork) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+                    dialog.setTitle("Внимание!");
+                    dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
+                            + "Отправить выполненные наряды?");
+                    dialog.setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    sendCompleteTask();
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialog.setNegativeButton(android.R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialog.show();
+                }
+
+                // отправляем данные из журнала и лога GPS
+                Thread thread = new Thread(new Runnable() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item) {
+                    public void run() {
                         AuthorizedUser user = AuthorizedUser.getInstance();
-//                        TaskDBAdapter adapter = new TaskDBAdapter(
-//                                new ToirDatabaseContext(getActivity()));
-//                        List<Task> tasks;
-//                        String currentUserUuid = AuthorizedUser.getInstance()
-//                                .getUuid();
-//
-//                        // проверяем наличие не законченных нарядов
-//                        tasks = adapter.getOrdersByUser(currentUserUuid,
-//                                TaskStatusDBAdapter.Status.IN_WORK, "");
-                        boolean isInWork = false;
-                        int inWorkCount = 0;
-//                        isInWork = tasks.size() > 0;
-//                        inWorkCount = tasks.size();
+                        Call<ToirAPIResponse> call;
+                        Response<ToirAPIResponse> response;
+                        Realm realm = Realm.getDefaultInstance();
 
-                        if (isInWork) {
-                            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                        // выбираем все неотправленные данные из таблицы journal
+                        RealmResults<Journal> journals = realm.where(Journal.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
+                        call = ToirAPIFactory.getJournalService()
+                                .sendJournal(user.getBearer(), journalList);
+                        try {
+                            response = call.execute();
+                            ToirAPIResponse result = response.body();
+                            if (result.isSuccess()) {
+                                Log.d(TAG, "Журнал отправлен успешно.");
+                            } else {
+                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
+                                List<Long> ids = new ArrayList<>();
+                                List<String> data = (List<String>) result.getData();
 
-                            dialog.setTitle("Внимание!");
-                            dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
-                                    + "Отправить выполненные наряды?");
-                            dialog.setPositiveButton(android.R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            sendCompleteTask();
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            dialog.setNegativeButton(android.R.string.cancel,
-                                    new DialogInterface.OnClickListener() {
-
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            dialog.show();
-                        }
-
-                        // отправляем данные из журнала и лога GPS
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                AuthorizedUser user = AuthorizedUser.getInstance();
-                                Call<ToirAPIResponse> call;
-                                Response<ToirAPIResponse> response;
-                                Realm realm = Realm.getDefaultInstance();
-
-                                // выбираем все неотправленные данные из таблицы journal
-                                RealmResults<Journal> journals = realm.where(Journal.class)
-                                        .equalTo("sent", false)
-                                        .findAll();
-                                List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-                                call = ToirAPIFactory.getJournalService()
-                                        .sendJournal(user.getBearer(), journalList);
-                                try {
-                                    response = call.execute();
-                                    ToirAPIResponse result = response.body();
-                                    if (result.isSuccess()) {
-                                        Log.d(TAG, "Журнал отправлен успешно.");
-                                    } else {
-                                        Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-                                        List<Long> ids = new ArrayList<>();
-                                        List<String> data = (List<String>) result.getData();
-
-                                        for (String item : data) {
-                                            ids.add(Long.valueOf(item));
-                                        }
-
-                                        // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                                        Iterator<Journal> jIter = journalList.iterator();
-                                        while (jIter.hasNext()) {
-                                            Journal next = jIter.next();
-                                            if (ids.contains(next.get_id())) {
-                                                journalList.remove(next);
-                                            }
-                                        }
-                                    }
-
-                                    // меняем статус на "отправлено" для записей которые сохранены сервером
-                                    realm.beginTransaction();
-                                    for (Journal item : journalList) {
-                                        item.setSent(true);
-                                    }
-
-                                    realm.copyToRealmOrUpdate(journalList);
-                                    realm.commitTransaction();
-                                } catch (Exception e) {
-                                    Log.e(TAG, e.getLocalizedMessage());
-                                    Log.e(TAG, "Ошибка при отправке журнала.");
+                                for (String item : data) {
+                                    ids.add(Long.valueOf(item));
                                 }
 
-                                // выбираем все неотправленные данные из таблицы gpstrack
-                                RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
-                                        .equalTo("sent", false)
-                                        .findAll();
-                                List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-                                call = ToirAPIFactory.getGpsTrackService()
-                                        .sendGpsTrack(user.getBearer(), gpsTrackList);
-                                try {
-                                    response = call.execute();
-                                    ToirAPIResponse result = response.body();
-                                    if (result.isSuccess()) {
-                                        Log.d(TAG, "GPS лог отправлен успешно.");
-                                    } else {
-                                        Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-                                        List<Long> ids = new ArrayList<>();
-                                        List<String> data = (List<String>) result.getData();
-
-                                        for (String item : data) {
-                                            ids.add(Long.valueOf(item));
-                                        }
-
-                                        // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                                        Iterator<Journal> jIter = journalList.iterator();
-                                        while (jIter.hasNext()) {
-                                            Journal next = jIter.next();
-                                            if (ids.contains(next.get_id())) {
-                                                journalList.remove(next);
-                                            }
-                                        }
+                                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
+                                Iterator<Journal> jIter = journalList.iterator();
+                                while (jIter.hasNext()) {
+                                    Journal next = jIter.next();
+                                    if (ids.contains(next.get_id())) {
+                                        journalList.remove(next);
                                     }
-
-                                    // меняем статус на "отправлено" для записей которые сохранены сервером
-                                    realm.beginTransaction();
-                                    for (GpsTrack item : gpsTrackList) {
-                                        item.setSent(true);
-                                    }
-
-                                    realm.copyToRealmOrUpdate(gpsTrackList);
-                                    realm.commitTransaction();
-                                } catch (Exception e) {
-                                    Log.e(TAG, e.getLocalizedMessage());
-                                    Log.e(TAG, "Ошибка при отправке GPS лога.");
                                 }
                             }
-                        });
-                        thread.start();
 
+                            // меняем статус на "отправлено" для записей которые сохранены сервером
+                            realm.beginTransaction();
+                            for (Journal item : journalList) {
+                                item.setSent(true);
+                            }
 
-                        return true;
+                            realm.copyToRealmOrUpdate(journalList);
+                            realm.commitTransaction();
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                            Log.e(TAG, "Ошибка при отправке журнала.");
+                        }
+
+                        // выбираем все неотправленные данные из таблицы gpstrack
+                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
+                        call = ToirAPIFactory.getGpsTrackService()
+                                .sendGpsTrack(user.getBearer(), gpsTrackList);
+                        try {
+                            response = call.execute();
+                            ToirAPIResponse result = response.body();
+                            if (result.isSuccess()) {
+                                Log.d(TAG, "GPS лог отправлен успешно.");
+                            } else {
+                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
+                                List<Long> ids = new ArrayList<>();
+                                List<String> data = (List<String>) result.getData();
+
+                                for (String item : data) {
+                                    ids.add(Long.valueOf(item));
+                                }
+
+                                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
+                                Iterator<Journal> jIter = journalList.iterator();
+                                while (jIter.hasNext()) {
+                                    Journal next = jIter.next();
+                                    if (ids.contains(next.get_id())) {
+                                        journalList.remove(next);
+                                    }
+                                }
+                            }
+
+                            // меняем статус на "отправлено" для записей которые сохранены сервером
+                            realm.beginTransaction();
+                            for (GpsTrack item : gpsTrackList) {
+                                item.setSent(true);
+                            }
+
+                            realm.copyToRealmOrUpdate(gpsTrackList);
+                            realm.commitTransaction();
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                            Log.e(TAG, "Ошибка при отправке GPS лога.");
+                        }
                     }
                 });
+                thread.start();
+
+
+                return true;
+            }
+        });
     }
 
     /**
@@ -755,16 +741,14 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
      */
     private void sendCompleteTask() {
 
-//        TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext(
-//                getActivity()));
+//        TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext( getActivity()));
 //        List<Task> tasks;
 //        String currentUserUuid = AuthorizedUser.getInstance().getUuid();
 //
 //        tasks = adapter.getTaskByUserAndUpdated(currentUserUuid);
 //
 //        if (tasks == null) {
-//            Toast.makeText(getActivity(), "Нет результатов для отправки.",
-//                    Toast.LENGTH_SHORT);
+//            Toast.makeText(getActivity(), "Нет результатов для отправки.", Toast.LENGTH_SHORT);
 //            return;
 //        }
 //
@@ -774,17 +758,14 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //            sendTaskUuids[i] = task.getUuid();
 //            // устанавливаем дату попытки отправки
 //            // (пока только для наряда)
-//            task.setAttempt_send_date(Calendar.getInstance().getTime()
-//                    .getTime());
+//            task.setAttempt_send_date(Calendar.getInstance().getTime() .getTime());
 //            adapter.replace(task);
 //            i++;
 //        }
 //
-//        getActivity()
-//                .registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
+//        getActivity() .registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
 //
-//        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(),
-//                TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
+//        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
 //        tsh.SendTaskResult(sendTaskUuids);
 
         // показываем диалог отправки результатов
@@ -798,8 +779,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 //                        getActivity().unregisterReceiver(mReceiverGetTask);
-                        Toast.makeText(getActivity(),
-                                "Отправка результатов отменена",
+                        Toast.makeText(getActivity(), "Отправка результатов отменена",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -815,8 +795,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         final TaskStageStatus taskStageComplete;
         taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("title", "Выполнен").findFirst();
 
-        if (operationAdapter != null)
+        if (operationAdapter != null) {
             totalOperationCount = operationAdapter.getCount();
+        }
 
         for (int i = 0; i < totalOperationCount; i++) {
             checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
@@ -824,11 +805,12 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 final Operation operation = operationAdapter.getItem(i);
                 if (operation != null) {
                     completedOperationCount++;
-                } else
+                } else {
                     Log.d(TAG, "Операция под индексом " + i + " не найдена");
+                }
             }
-
         }
+
         // все операции выполнены
         if (totalOperationCount == completedOperationCount) {
             final TaskStages taskStage = realmDB.where(TaskStages.class).equalTo("uuid", currentTaskStageUuid).findFirst();
@@ -963,56 +945,56 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         dialog.setMessage("Всем не законченным задачам будет установлен статус \"Не выполнена\""
                 + "\n" + "Закрыть наряд?");
 
-        dialog.setPositiveButton(android.R.string.yes,
-                new DialogInterface.OnClickListener() {
+        dialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                         /*
                          * закрываем наряд, в зависимости от статуса выполнения
 						 * операции выставляем статус наряда
 						 */
-                        for (final Tasks task : order.getTasks()) {
+                for (final Tasks task : order.getTasks()) {
+                    // TODO заменить на реальный статус "не закончена"
+                    realmDB.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            task.setTaskStatus(taskStatusUnComplete);
+                        }
+                    });
+                    for (final TaskStages taskStages : task.getTaskStages()) {
+                        // TODO заменить на реальный статус "не закончена"
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                taskStages.setTaskStageStatus(taskStageStatusUnComplete);
+                            }
+                        });
+                        for (final Operation operation : taskStages.getOperations()) {
                             // TODO заменить на реальный статус "не закончена"
                             realmDB.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    task.setTaskStatus(taskStatusUnComplete);
+                                    operation.setOperationStatus(operationStatusUnComplete);
                                 }
                             });
-                            for (final TaskStages taskStages : task.getTaskStages()) {
-                                // TODO заменить на реальный статус "не закончена"
-                                realmDB.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        taskStages.setTaskStageStatus(taskStageStatusUnComplete);
-                                    }
-                                });
-                                for (final Operation operation : taskStages.getOperations()) {
-                                    // TODO заменить на реальный статус "не закончена"
-                                    realmDB.executeTransaction(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            operation.setOperationStatus(operationStatusUnComplete);
-                                        }
-                                    });
-                                }
-                            }
                         }
-                        final OrderVerdict verdict = (OrderVerdict) orderVerdictSpinner.getSelectedItem();
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                order.setCloseDate(new Date());
-                                order.setUpdate(1);
-                                order.setOrderStatus(orderStatusUnComplete);
-                                order.setOrderVerdict(verdict);
-                            }
-                        });
-                        //fillListViewTask(null, null);
-                        dialog.dismiss();
+                    }
+                }
+
+                final OrderVerdict verdict = (OrderVerdict) orderVerdictSpinner.getSelectedItem();
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        order.setCloseDate(new Date());
+                        order.setUpdate(1);
+                        order.setOrderStatus(orderStatusUnComplete);
+                        order.setOrderVerdict(verdict);
                     }
                 });
+                //fillListViewTask(null, null);
+                dialog.dismiss();
+            }
+        });
 
         dialog.setNegativeButton(android.R.string.cancel,
                 new DialogInterface.OnClickListener() {
@@ -1034,6 +1016,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         if (numberPicker == null) {
             numberPicker = new NumberPicker(getActivity().getApplicationContext());
         }
+
         numberPicker.setOrientation(NumberPicker.VERTICAL);
         numberPicker.setMinValue(1);
         numberPicker.setMaxValue(999);
@@ -1062,6 +1045,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             if (spinnerSuffix == null) {
                 spinnerSuffix = new Spinner(getActivity().getApplicationContext());
             }
+
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
@@ -1082,6 +1066,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             if (spinnerSuffix == null) {
                 spinnerSuffix = new Spinner(getActivity().getApplicationContext());
             }
+
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
@@ -1102,15 +1087,14 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             if (spinnerSuffix == null) {
                 spinnerSuffix = new Spinner(getActivity().getApplicationContext());
             }
+
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
         } else if (measureType.equals(MeasureTypeAdapter.Type.PHOTO)) {
-
             Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
             File photo = getOutputMediaFile();
-            intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                    Uri.fromFile(photo));
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
             startActivityForResult(intent, 100);
         }
     }
@@ -1315,12 +1299,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public class ListViewLongClickListener implements
-            AdapterView.OnItemLongClickListener {
+    public class ListViewLongClickListener implements AdapterView.OnItemLongClickListener {
 
         @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                       int position, long id) {
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
             // находимся на "экране" с операциями
             if (Level == 3) {
@@ -1359,34 +1341,33 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 if (order != null) {
                     orderStatus = order.getOrderStatus();
                     if (orderStatus != null) {
-                        if (orderStatus.getUuid().equals(OrderStatusAdapter.Status.COMPLETE)
-                                || order.getOrderStatus().getUuid()
-                                .equals(OrderStatusAdapter.Status.UN_COMPLETE)) {
+                        if (orderStatus.getUuid().equals(OrderStatus.Status.COMPLETE)
+                                || order.getOrderStatus().getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
 
                             // наряд уже закрыт, изменить статус нельзя
                             // сообщаем об этом
-                            AlertDialog.Builder dialog = new AlertDialog.Builder(
-                                    getContext());
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
                             dialog.setTitle("Внимание!");
                             dialog.setMessage("Изменить статус наряда уже нельзя!");
-                            dialog.setPositiveButton(android.R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog,
-                                                            int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
+                            dialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    dialog.dismiss();
+                                }
+                            });
                             dialog.show();
 
                         } else {
                             // наряд можно закрыть принудительно
                             closeOrderManual(order);
                         }
-                    } else
+                    } else {
                         closeOrderManual(order);
+                    }
                 }
             }
+
             return true;
         }
     }

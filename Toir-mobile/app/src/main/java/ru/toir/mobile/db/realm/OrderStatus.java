@@ -72,10 +72,11 @@ public class OrderStatus extends RealmObject {
      * @author Dmitriy Logachov
      */
     public class Status {
-        public static final String NEW = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
-        public static final String IN_WORK = "9f980db5-934c-4ddb-999a-04c6c3daca59";
-        public static final String COMPLETE = "dc6dca37-2cc9-44da-aff9-19bf143e611a";
-        public static final String UNCOMPLETE = "363c08ec-89d9-47df-b7cf-63a05d56594c";
+        public static final String NEW = "90DDA367-52FB-4D2F-8CA1-6281D0776C3C";
+        public static final String IN_WORK = "0F0C9C45-7D02-4206-823F-1202A7102598";
+        public static final String COMPLETE = "53238221-0EF7-4737-975E-FD49AFC92A05";
+        public static final String UN_COMPLETE = "3DF60C8B-4A61-43D9-B822-28504DD53C2F";
+        public static final String CANCELED = "3368F365-4587-47B6-B66B-043959E27B8D";
     }
 
 }
