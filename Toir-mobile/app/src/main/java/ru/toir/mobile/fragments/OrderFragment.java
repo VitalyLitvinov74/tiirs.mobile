@@ -501,14 +501,13 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
 //                tsh.GetTaskNew();
 
-                // TODO: разобраться с серверной частью которая должна отдать только новые наряды!!!
                 // запускаем поток получения новых нарядов с сервера
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         AuthorizedUser user = AuthorizedUser.getInstance();
                         Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
-                                .orders(user.getBearer(), user.getUuid());
+                                .ordersByStatus(user.getBearer(), OrderStatus.Status.NEW);
                         try {
                             Response<List<Orders>> response = call.execute();
                             // собщаем количество полученных нарядов
@@ -519,20 +518,19 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 realm.beginTransaction();
                                 realm.copyToRealmOrUpdate(orders);
                                 realm.commitTransaction();
-                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
                             // сообщаем описание неудачи
-                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.",
-                                    Toast.LENGTH_LONG).show();
-
+//                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
                         } finally {
                             processDialog.dismiss();
                         }
                     }
                 });
+                thread.start();
 
                 // показываем диалог получения нарядов
                 processDialog = new ProgressDialog(getActivity());
