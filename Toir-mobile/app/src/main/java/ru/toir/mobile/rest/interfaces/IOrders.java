@@ -14,22 +14,14 @@ import ru.toir.mobile.db.realm.Orders;
  */
 public interface IOrders {
     @GET("/api/orders")
-    Call<List<Orders>> orders(@Header("Authorization") String token);
+    Call<List<Orders>> orders();
 
     @GET("/api/orders")
-    Call<List<Orders>> orders(@Header("Authorization") String token,
-                              @Query("changedAfter") String changedAfter);
+    Call<List<Orders>> orders(@Query("changedAfter") String changedAfter);
 
     @GET("/api/orders")
-    Call<List<Orders>> ordersById(@Header("Authorization") String token,
-                                  @Query("id") String id);
+    Call<List<Orders>> ordersById(@Query("id") String id);
 
     @GET("/api/orders")
-    Call<List<Orders>> ordersByStatus(@Header("Authorization") String token,
-                                      @Query("status") String status);
-
-    @GET("/api/orders")
-    Call<List<Orders>> ordersByStatus(@Header("Authorization") String token,
-                                      @Query("status") String status,
-                                      @Query("XDEBUG_SESSION_START") String debugLabel);
+    Call<List<Orders>> ordersByStatus(@Query("status") String status);
 }

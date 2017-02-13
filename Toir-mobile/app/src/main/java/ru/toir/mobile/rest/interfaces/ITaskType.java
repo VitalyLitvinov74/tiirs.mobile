@@ -15,13 +15,11 @@ import ru.toir.mobile.db.realm.TaskType;
 
 public interface ITaskType {
     @GET("/references/task-type")
-    Call<List<TaskType>> taskType(@Header("Authorization") String token);
+    Call<List<TaskType>> taskType();
 
     @GET("/references/task-type")
-    Call<List<TaskType>> taskType(@Header("Authorization") String token,
-                                  @Query("changedAfter") String changedAfter);
+    Call<List<TaskType>> taskType(@Query("changedAfter") String changedAfter);
 
     @GET("/references/task-type")
-    Call<List<TaskType>> taskTypeById(@Header("Authorization") String token,
-                                      @Query("id") String id);
+    Call<List<TaskType>> taskTypeById(@Query("id") String id);
 }

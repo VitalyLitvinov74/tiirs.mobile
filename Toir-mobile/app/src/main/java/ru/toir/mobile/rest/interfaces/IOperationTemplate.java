@@ -15,14 +15,12 @@ import ru.toir.mobile.db.realm.OperationTemplate;
 
 public interface IOperationTemplate {
     @GET("/references/operation-template")
-    Call<List<OperationTemplate>> operationTemplate(@Header("Authorization") String token);
+    Call<List<OperationTemplate>> operationTemplate();
 
     @GET("/references/operation-template")
-    Call<List<OperationTemplate>> operationTemplate(@Header("Authorization") String token,
-                                                    @Query("changedAfter") String changedAfter);
+    Call<List<OperationTemplate>> operationTemplate(@Query("changedAfter") String changedAfter);
 
     @GET("/references/operation-template")
-    Call<List<OperationTemplate>> operationTemplateById(@Header("Authorization") String token,
-                                                        @Query("id") String id);
+    Call<List<OperationTemplate>> operationTemplateById(@Query("id") String id);
 
 }

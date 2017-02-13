@@ -15,13 +15,11 @@ import ru.toir.mobile.db.realm.TaskTemplate;
 
 public interface ITaskTemplate {
     @GET("/references/task-template")
-    Call<List<TaskTemplate>> taskTemplate(@Header("Authorization") String token);
+    Call<List<TaskTemplate>> taskTemplate();
 
     @GET("/references/task-template")
-    Call<List<TaskTemplate>> taskTemplate(@Header("Authorization") String token,
-                                          @Query("changedAfter") String changedAfter);
+    Call<List<TaskTemplate>> taskTemplate(@Query("changedAfter") String changedAfter);
 
     @GET("/references/task-template")
-    Call<List<TaskTemplate>> taskTemplateById(@Header("Authorization") String token,
-                                              @Query("id") String id);
+    Call<List<TaskTemplate>> taskTemplateById(@Query("id") String id);
 }

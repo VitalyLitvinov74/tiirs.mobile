@@ -15,13 +15,11 @@ import ru.toir.mobile.db.realm.OrderLevel;
 
 public interface IOrderLevel {
     @GET("/references/order-level")
-    Call<List<OrderLevel>> orderLevel(@Header("Authorization") String token);
+    Call<List<OrderLevel>> orderLevel();
 
     @GET("/references/order-level")
-    Call<List<OrderLevel>> orderLevel(@Header("Authorization") String token,
-                                      @Query("changedAfter") String changedAfter);
+    Call<List<OrderLevel>> orderLevel(@Query("changedAfter") String changedAfter);
 
     @GET("/references/order-level")
-    Call<List<OrderLevel>> orderLevelById(@Header("Authorization") String token,
-                                          @Query("id") String id);
+    Call<List<OrderLevel>> orderLevelById(@Query("id") String id);
 }

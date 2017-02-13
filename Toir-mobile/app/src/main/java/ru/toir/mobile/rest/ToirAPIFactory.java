@@ -1,11 +1,16 @@
 package ru.toir.mobile.rest;
 
+import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.BuildConfig;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.*;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -70,6 +75,33 @@ public class ToirAPIFactory {
         CLIENT.setConnectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS);
         CLIENT.setWriteTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS);
         CLIENT.setReadTimeout(TIMEOUT, TimeUnit.SECONDS);
+        CLIENT.interceptors().add(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request origRequest = chain.request();
+                Headers origHeaders = origRequest.headers();
+                AuthorizedUser user = AuthorizedUser.getInstance();
+                Headers newHeaders = origHeaders.newBuilder().add("Authorization", user.getBearer()).build();
+                Request.Builder requestBuilder = origRequest.newBuilder().headers(newHeaders);
+                Request newRequest = requestBuilder.build();
+                return chain.proceed(newRequest);
+            }
+        });
+        if (BuildConfig.DEBUG) {
+            CLIENT.interceptors().add(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    Request request = chain.request();
+                    HttpUrl url = request.httpUrl()
+                            .newBuilder()
+                            .addQueryParameter("XDEBUG_SESSION_START", "netbeans-xdebug")
+                            .build();
+                    Request.Builder requestBuilder = request.newBuilder().url(url);
+                    Request newRequest = requestBuilder.build();
+                    return chain.proceed(newRequest);
+                }
+            });
+        }
     }
 
     @NonNull

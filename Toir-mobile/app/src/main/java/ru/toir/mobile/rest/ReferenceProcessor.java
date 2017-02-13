@@ -25,23 +25,7 @@ import com.google.gson.GsonBuilder;
 import io.realm.Realm;
 import retrofit.Call;
 import ru.toir.mobile.AuthorizedUser;
-//import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.ToirApplication;
-//import ru.toir.mobile.ToirDatabaseContext;
-//import ru.toir.mobile.db.adapters.CriticalTypeDBAdapter;
-//import ru.toir.mobile.db.adapters.DocumentationTypeDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentDocumentationDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentOperationDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentStatusDBAdapter;
-//import ru.toir.mobile.db.adapters.EquipmentTypeDBAdapter;
-//import ru.toir.mobile.db.adapters.MeasureTypeDBAdapter;
-//import ru.toir.mobile.db.adapters.MeasureValueDBAdapter;
-//import ru.toir.mobile.db.adapters.OperationPatternDBAdapter;
-//import ru.toir.mobile.db.adapters.OperationPatternStepDBAdapter;
-//import ru.toir.mobile.db.adapters.OperationPatternStepResultDBAdapter;
-//import ru.toir.mobile.db.adapters.OperationResultDBAdapter;
-//import ru.toir.mobile.db.adapters.OperationTypeDBAdapter;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.EquipmentStatus;
@@ -49,26 +33,14 @@ import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
+import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.TaskStatus;
-//import ru.toir.mobile.db.tables.Equipment;
-//import ru.toir.mobile.db.tables.EquipmentDocumentation;
-//import ru.toir.mobile.db.tables.EquipmentOperation;
-//import ru.toir.mobile.db.tables.MeasureValue;
-//import ru.toir.mobile.db.tables.OperationPatternStep;
 import ru.toir.mobile.rest.RestClient.Method;
-//import ru.toir.mobile.serverapi.EquipmentDocumentationSrv;
-//import ru.toir.mobile.serverapi.DocumentationTypeSrv;
-//import ru.toir.mobile.serverapi.EquipmentSrv;
-//import ru.toir.mobile.serverapi.OperationPatternSrv;
-//import ru.toir.mobile.serverapi.OperationPatternStepSrv;
-//import ru.toir.mobile.serverapi.OperationResultSrv;
 import ru.toir.mobile.serverapi.ReferenceListSrv;
 import ru.toir.mobile.serverapi.TokenSrv;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
@@ -91,12 +63,6 @@ public class ReferenceProcessor {
             throw new Exception("URL сервера не указан!");
         }
     }
-
-    // TODO нужно изменить условие на сервере с >= на > для lastChangedAt
-    // внятного ответа не получено, оставляем костыль в виде +1 секунды
-    // это черевато тем, что если на сервере при создании записи дата изменения
-    // не будет равна дате создания, новые данные не получим, до тех пор пока
-    // запись не будет изменена
 
     /**
      * Делает запрос по переданному url и возвращает строку данных
@@ -368,19 +334,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(DocumentationType.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        String referenceName = DocumentationType.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<DocumentationType>> call = ToirAPIFactory.getDocumentationTypeService()
-                .documentationType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .documentationType(lastChangedAt);
         try {
             retrofit.Response<List<DocumentationType>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -685,19 +646,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(EquipmentStatus.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        String referenceName = EquipmentStatus.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<EquipmentStatus>> call = ToirAPIFactory.getEquipmentStatusService()
-                .equipmentStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .equipmentStatus(lastChangedAt);
         try {
             retrofit.Response<List<EquipmentStatus>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -726,19 +682,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(EquipmentType.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        String referenceName = EquipmentType.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<EquipmentType>> call = ToirAPIFactory.getEquipmentTypeService()
-                .equipmentType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .equipmentType(lastChangedAt);
         try {
             retrofit.Response<List<EquipmentType>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -767,19 +718,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(MeasureType.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.US).format(changed);
+        String referenceName = MeasureType.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<MeasureType>> call = ToirAPIFactory.getMeasureTypeService()
-                .measureType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .measureType(lastChangedAt);
         try {
             retrofit.Response<List<MeasureType>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -808,19 +754,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(OperationStatus.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        String referenceName = OperationStatus.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatusService()
-                .operationStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .operationStatus(lastChangedAt);
         try {
             retrofit.Response<List<OperationStatus>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -849,19 +790,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(OperationType.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        String referenceName = OperationType.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<OperationType>> call = ToirAPIFactory.getOperationTypeService()
-                .operationType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .operationType(lastChangedAt);
         try {
             retrofit.Response<List<OperationType>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -890,19 +826,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(TaskStatus.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        String referenceName = TaskStatus.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatus()
-                .taskStatus(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .taskStatus(lastChangedAt);
         try {
             retrofit.Response<List<TaskStatus>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;
@@ -1004,19 +935,14 @@ public class ReferenceProcessor {
             return result;
         }
 
-        Realm realm = Realm.getDefaultInstance();
-
-        // TODO: реализовать механизм хранения даты последней модификации в таблице
-        // TODO: реализовать выборку даты последней модификации и отправки её на сервер
-        Date changed = realm.where(CriticalType.class).findFirst().getChangedAt();
-        String lastChangedAt = new SimpleDateFormat(dateFormat, Locale.ENGLISH).format(changed);
+        String referenceName = CriticalType.class.getSimpleName();
+        String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
+        Date updateDate = new Date();
         Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService()
-                .criticalType(AuthorizedUser.getInstance().getBearer(), lastChangedAt);
+                .criticalType(lastChangedAt);
         try {
             retrofit.Response<List<CriticalType>> response = call.execute();
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(response.body());
-            realm.commitTransaction();
+            ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
             return result;

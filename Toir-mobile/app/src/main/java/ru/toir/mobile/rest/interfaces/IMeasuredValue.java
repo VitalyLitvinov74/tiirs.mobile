@@ -15,14 +15,12 @@ import ru.toir.mobile.db.realm.MeasuredValue;
 
 public interface IMeasuredValue {
     @GET("/references/measured-value")
-    Call<List<MeasuredValue>> measuredValue(@Header("Authorization") String token);
+    Call<List<MeasuredValue>> measuredValue();
 
     @GET("/references/measured-value")
-    Call<List<MeasuredValue>> measuredValue(@Header("Authorization") String token,
-                                            @Query("changedAfter") String changedAfter);
+    Call<List<MeasuredValue>> measuredValue(@Query("changedAfter") String changedAfter);
 
     @GET("/references/measured-value")
-    Call<List<MeasuredValue>> measuredValueById(@Header("Authorization") String token,
-                                                @Query("id") String id);
+    Call<List<MeasuredValue>> measuredValueById(@Query("id") String id);
 
 }

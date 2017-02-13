@@ -15,12 +15,11 @@ import ru.toir.mobile.db.realm.CriticalType;
 public interface ICriticalType {
 
     @GET("/references/critical-type")
-    Call<List<CriticalType>> criticalType(@Header("Authorization") String token);
+    Call<List<CriticalType>> criticalType();
 
     @GET("/references/critical-type")
-    Call<List<CriticalType>> criticalType(@Header("Authorization") String token,
-                                          @Query("changedAfter") String changedAfter);
+    Call<List<CriticalType>> criticalType(@Query("changedAfter") String changedAfter);
+
     @GET("/references/critical-type")
-    Call<List<CriticalType>> criticalTypeById(@Header("Authorization") String token,
-                                              @Query("id") String id);
+    Call<List<CriticalType>> criticalTypeById(@Query("id") String id);
 }

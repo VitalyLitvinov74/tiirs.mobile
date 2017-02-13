@@ -15,11 +15,11 @@ import ru.toir.mobile.db.realm.EquipmentModel;
 
 public interface IEquipmentModel {
     @GET("/references/equipment-model")
-    Call<List<EquipmentModel>> equipmentModel(@Header("Authorization") String token);
+    Call<List<EquipmentModel>> equipmentModel();
+
     @GET("/references/equipment-model")
-    Call<List<EquipmentModel>> equipmentModel(@Header("Authorization") String token,
-                                              @Query("changedAfter") String changedAfter);
+    Call<List<EquipmentModel>> equipmentModel(@Query("changedAfter") String changedAfter);
+
     @GET("/references/equipment-model")
-    Call<List<EquipmentModel>> equipmentModelById(@Header("Authorization") String token,
-                                                  @Query("id") String id);
+    Call<List<EquipmentModel>> equipmentModelById(@Query("id") String id);
 }

@@ -16,5 +16,5 @@ import ru.toir.mobile.rest.ToirAPIResponse;
 
 public interface IJournal {
     @POST("/journal/create")
-    Call<ToirAPIResponse> sendJournal(@Header("Authorization") String token, @Body List<Journal> data);
+    Call<ToirAPIResponse> sendJournal(@Body List<Journal> data);
 }

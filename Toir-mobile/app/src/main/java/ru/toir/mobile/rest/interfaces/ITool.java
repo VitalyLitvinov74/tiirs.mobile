@@ -15,14 +15,12 @@ import ru.toir.mobile.db.realm.Tool;
 
 public interface ITool {
     @GET("/references/tool")
-    Call<List<Tool>> tool(@Header("Authorization") String token);
+    Call<List<Tool>> tool();
 
     @GET("/references/tool")
-    Call<List<Tool>> tool(@Header("Authorization") String token,
-                          @Query("changedAfter") String changedAfter);
+    Call<List<Tool>> tool(@Query("changedAfter") String changedAfter);
 
     @GET("/references/tool")
-    Call<List<Tool>> toolById(@Header("Authorization") String token,
-                              @Query("id") String id);
+    Call<List<Tool>> toolById(@Query("id") String id);
 
 }

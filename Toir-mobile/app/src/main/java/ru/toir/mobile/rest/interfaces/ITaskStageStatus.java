@@ -15,13 +15,11 @@ import ru.toir.mobile.db.realm.TaskStageStatus;
 
 public interface ITaskStageStatus {
     @GET("/references/task-stage-status")
-    Call<List<TaskStageStatus>> taskStageStatus(@Header("Authorization") String token);
+    Call<List<TaskStageStatus>> taskStageStatus();
 
     @GET("/references/task-stage-status")
-    Call<List<TaskStageStatus>> taskStageStatus(@Header("Authorization") String token,
-                                                @Query("changedAfter") String changedAfter);
+    Call<List<TaskStageStatus>> taskStageStatus(@Query("changedAfter") String changedAfter);
 
     @GET("/references/task-stage-status")
-    Call<List<TaskStageStatus>> taskStageStatusById(@Header("Authorization") String token,
-                                                    @Query("id") String id);
+    Call<List<TaskStageStatus>> taskStageStatusById(@Query("id") String id);
 }

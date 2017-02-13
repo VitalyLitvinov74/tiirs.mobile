@@ -15,14 +15,12 @@ import ru.toir.mobile.db.realm.OrderStatus;
 
 public interface IOrderStatus {
     @GET("/references/order-status")
-    Call<List<OrderStatus>> orderStatus(@Header("Authorization") String token);
+    Call<List<OrderStatus>> orderStatus();
 
     @GET("/references/order-status")
-    Call<List<OrderStatus>> orderStatus(@Header("Authorization") String token,
-                                        @Query("changedAfter") String changedAfter);
+    Call<List<OrderStatus>> orderStatus(@Query("changedAfter") String changedAfter);
 
     @GET("/references/order-status")
-    Call<List<OrderStatus>> orderStatusById(@Header("Authorization") String token,
-                                            @Query("id") String id);
+    Call<List<OrderStatus>> orderStatusById(@Query("id") String id);
 
 }

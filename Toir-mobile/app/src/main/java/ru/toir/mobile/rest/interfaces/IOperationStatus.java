@@ -14,11 +14,11 @@ import ru.toir.mobile.db.realm.OperationStatus;
  */
 public interface IOperationStatus {
     @GET("/references/operation-status")
-    Call<List<OperationStatus>> operationStatus(@Header("Authorization") String token);
+    Call<List<OperationStatus>> operationStatus();
+
     @GET("/references/operation-status")
-    Call<List<OperationStatus>> operationStatus(@Header("Authorization") String token,
-                                                @Query("changedAfter") String changedAfter);
+    Call<List<OperationStatus>> operationStatus(@Query("changedAfter") String changedAfter);
+
     @GET("/references/operation-status")
-    Call<List<OperationStatus>> operationStatusById(@Header("Authorization") String token,
-                                                    @Query("id") String id);
+    Call<List<OperationStatus>> operationStatusById(@Query("id") String id);
 }

@@ -11,5 +11,5 @@ import ru.toir.mobile.db.realm.User;
  */
 public interface IUserService {
     @GET("/api/account/me")
-    Call<User> user(@Header("Authorization") String token);
+    Call<User> user();
 }

@@ -15,12 +15,11 @@ import ru.toir.mobile.db.realm.Documentation;
 
 public interface IDocumentation {
     @GET("/references/documentation")
-    Call<List<Documentation>> documentation(@Header("Authorization") String token);
+    Call<List<Documentation>> documentation();
 
     @GET("/references/documentation")
-    Call<List<Documentation>> documentation(@Header("Authorization") String token,
-                         @Query("changedAfter") String changedAfter);
+    Call<List<Documentation>> documentation(@Query("changedAfter") String changedAfter);
+
     @GET("/references/documentation")
-    Call<List<Documentation>> documentationById(@Header("Authorization") String token,
-                             @Query("id") String id);
+    Call<List<Documentation>> documentationById(@Query("id") String id);
 }

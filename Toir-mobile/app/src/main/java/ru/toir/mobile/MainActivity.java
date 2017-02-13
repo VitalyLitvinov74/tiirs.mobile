@@ -245,8 +245,7 @@ public class MainActivity extends AppCompatActivity {
                     authorizationDialog = new ProgressDialog(MainActivity.this);
                     authorizationDialog.setMessage("Вход в систему");
                     authorizationDialog.setIndeterminate(true);
-                    authorizationDialog
-                            .setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    authorizationDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     authorizationDialog.setCancelable(false);
                     authorizationDialog.show();
 
@@ -263,8 +262,7 @@ public class MainActivity extends AppCompatActivity {
                                     "Токен получен.", Toast.LENGTH_SHORT).show();
 
                             // запрашиваем актуальную информацию по пользователю
-                            Call<User> call = ToirAPIFactory.getUserService()
-                                    .user(AuthorizedUser.getInstance().getBearer());
+                            Call<User> call = ToirAPIFactory.getUserService().user();
                             call.enqueue(new Callback<User>() {
                                 @Override
                                 public void onResponse(Response<User> response, Retrofit retrofit) {

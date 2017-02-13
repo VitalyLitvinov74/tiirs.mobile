@@ -15,14 +15,12 @@ import ru.toir.mobile.db.realm.RepairPart;
 
 public interface IRepairPart {
     @GET("/references/repair-part")
-    Call<List<RepairPart>> repairPart(@Header("Authorization") String token);
+    Call<List<RepairPart>> repairPart();
 
     @GET("/references/repair-part")
-    Call<List<RepairPart>> repairPart(@Header("Authorization") String token,
-                                      @Query("changedAfter") String changedAfter);
+    Call<List<RepairPart>> repairPart(@Query("changedAfter") String changedAfter);
 
     @GET("/references/repair-part")
-    Call<List<RepairPart>> repairPartById(@Header("Authorization") String token,
-                                          @Query("id") String id);
+    Call<List<RepairPart>> repairPartById(@Query("id") String id);
 
 }

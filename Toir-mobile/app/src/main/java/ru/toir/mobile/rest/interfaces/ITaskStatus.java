@@ -14,12 +14,11 @@ import ru.toir.mobile.db.realm.TaskStatus;
  */
 public interface ITaskStatus {
     @GET("/references/task-status")
-    Call<List<TaskStatus>> taskStatus(@Header("Authorization") String token);
+    Call<List<TaskStatus>> taskStatus();
 
     @GET("/references/task-status")
-    Call<List<TaskStatus>> taskStatus(@Header("Authorization") String token,
-                                      @Query("changedAfter") String changedAfter);
+    Call<List<TaskStatus>> taskStatus(@Query("changedAfter") String changedAfter);
+
     @GET("/references/task-status")
-    Call<List<TaskStatus>> taskStatusById(@Header("Authorization") String token,
-                                          @Query("id") String id);
+    Call<List<TaskStatus>> taskStatusById(@Query("id") String id);
 }

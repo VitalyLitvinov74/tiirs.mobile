@@ -15,13 +15,11 @@ import ru.toir.mobile.db.realm.TaskStageVerdict;
 
 public interface ITaskStageVerdict {
     @GET("/references/task-stage-verdict")
-    Call<List<TaskStageVerdict>> taskStageVerdict(@Header("Authorization") String token);
+    Call<List<TaskStageVerdict>> taskStageVerdict();
 
     @GET("/references/task-stage-verdict")
-    Call<List<TaskStageVerdict>> taskStageVerdict(@Header("Authorization") String token,
-                                                  @Query("changedAfter") String changedAfter);
+    Call<List<TaskStageVerdict>> taskStageVerdict(@Query("changedAfter") String changedAfter);
 
     @GET("/references/task-stage-verdict")
-    Call<List<TaskStageVerdict>> taskStageVerdictById(@Header("Authorization") String token,
-                                                      @Query("id") String id);
+    Call<List<TaskStageVerdict>> taskStageVerdictById(@Query("id") String id);
 }

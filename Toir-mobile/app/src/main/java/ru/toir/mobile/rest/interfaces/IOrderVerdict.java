@@ -15,13 +15,11 @@ import ru.toir.mobile.db.realm.OrderVerdict;
 
 public interface IOrderVerdict {
     @GET("/references/order-verdict")
-    Call<List<OrderVerdict>> orderVerdict(@Header("Authorization") String token);
+    Call<List<OrderVerdict>> orderVerdict();
 
     @GET("/references/order-verdict")
-    Call<List<OrderVerdict>> orderVerdict(@Header("Authorization") String token,
-                                          @Query("changedAfter") String changedAfter);
+    Call<List<OrderVerdict>> orderVerdict(@Query("changedAfter") String changedAfter);
 
     @GET("/references/order-verdict")
-    Call<List<OrderVerdict>> orderVerdictById(@Header("Authorization") String token,
-                                              @Query("id") String id);
+    Call<List<OrderVerdict>> orderVerdictById(@Query("id") String id);
 }

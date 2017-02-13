@@ -14,11 +14,11 @@ import ru.toir.mobile.db.realm.MeasureType;
  */
 public interface IMeasureType {
     @GET("/references/measure-type")
-    Call<List<MeasureType>> measureType(@Header("Authorization") String token);
+    Call<List<MeasureType>> measureType();
+
     @GET("/references/measure-type")
-    Call<List<MeasureType>> measureType(@Header("Authorization") String token,
-                                        @Query("changedAfter") String changedAfter);
+    Call<List<MeasureType>> measureType(@Query("changedAfter") String changedAfter);
+
     @GET("/references/measure-type")
-    Call<List<MeasureType>> measureTypeById(@Header("Authorization") String token,
-                                            @Query("id") String id);
+    Call<List<MeasureType>> measureTypeById(@Query("id") String id);
 }

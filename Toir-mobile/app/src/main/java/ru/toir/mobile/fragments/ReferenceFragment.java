@@ -29,7 +29,6 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import retrofit.Response;
-import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.AlertTypeAdapter;
@@ -249,16 +248,15 @@ public class ReferenceFragment extends Fragment {
                     @Override
                     public void run() {
                         // получаем справочники, обновляем всё несмотря на то что часть данных будет дублироваться
-                        String bearer = AuthorizedUser.getInstance().getBearer();
                         final Date currentDate = new Date();
                         String changedDate;
 
                         // AlertType
                         changedDate = ReferenceUpdate.lastChangedAsStr(AlertType.class.getSimpleName());
                         try {
-                            Response<List<AlertType>> response = ToirAPIFactory.getAlertTypeService().alertType(bearer, changedDate).execute();
+                            Response<List<AlertType>> response = ToirAPIFactory.getAlertTypeService().alertType(changedDate).execute();
                             List<AlertType> list = response.body();
-                            saveReferenceData(AlertType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(AlertType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -266,9 +264,9 @@ public class ReferenceFragment extends Fragment {
                         // Clients
                         changedDate = ReferenceUpdate.lastChangedAsStr(Clients.class.getSimpleName());
                         try {
-                            Response<List<Clients>> response = ToirAPIFactory.getClientsService().clients(bearer, changedDate).execute();
+                            Response<List<Clients>> response = ToirAPIFactory.getClientsService().clients(changedDate).execute();
                             List<Clients> list = response.body();
-                            saveReferenceData(Clients.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Clients.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -276,9 +274,9 @@ public class ReferenceFragment extends Fragment {
                         // CriticalType
                         changedDate = ReferenceUpdate.lastChangedAsStr(CriticalType.class.getSimpleName());
                         try {
-                            Response<List<CriticalType>> response = ToirAPIFactory.getCriticalTypeService().criticalType(bearer, changedDate).execute();
+                            Response<List<CriticalType>> response = ToirAPIFactory.getCriticalTypeService().criticalType(changedDate).execute();
                             List<CriticalType> list = response.body();
-                            saveReferenceData(CriticalType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(CriticalType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -287,9 +285,9 @@ public class ReferenceFragment extends Fragment {
                         // нужно ли вообще таким образом обновлять этот справочник???
                         changedDate = ReferenceUpdate.lastChangedAsStr(Documentation.class.getSimpleName());
                         try {
-                            Response<List<Documentation>> response = ToirAPIFactory.getDocumentationService().documentation(bearer, changedDate).execute();
+                            Response<List<Documentation>> response = ToirAPIFactory.getDocumentationService().documentation(changedDate).execute();
                             List<Documentation> list = response.body();
-                            saveReferenceData(Documentation.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Documentation.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -297,9 +295,9 @@ public class ReferenceFragment extends Fragment {
                         // DocumentationType ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(DocumentationType.class.getSimpleName());
                         try {
-                            Response<List<DocumentationType>> response = ToirAPIFactory.getDocumentationTypeService().documentationType(bearer, changedDate).execute();
+                            Response<List<DocumentationType>> response = ToirAPIFactory.getDocumentationTypeService().documentationType(changedDate).execute();
                             List<DocumentationType> list = response.body();
-                            saveReferenceData(DocumentationType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(DocumentationType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -307,9 +305,9 @@ public class ReferenceFragment extends Fragment {
                         // Equipment ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(Equipment.class.getSimpleName());
                         try {
-                            Response<List<Equipment>> response = ToirAPIFactory.getEquipmentService().equipment(bearer, changedDate).execute();
+                            Response<List<Equipment>> response = ToirAPIFactory.getEquipmentService().equipment(changedDate).execute();
                             List<Equipment> list = response.body();
-                            saveReferenceData(Equipment.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Equipment.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -317,9 +315,9 @@ public class ReferenceFragment extends Fragment {
                         // EquipmentModel ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(EquipmentModel.class.getSimpleName());
                         try {
-                            Response<List<EquipmentModel>> response = ToirAPIFactory.getEquipmentModelService().equipmentModel(bearer, changedDate).execute();
+                            Response<List<EquipmentModel>> response = ToirAPIFactory.getEquipmentModelService().equipmentModel(changedDate).execute();
                             List<EquipmentModel> list = response.body();
-                            saveReferenceData(EquipmentModel.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(EquipmentModel.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -327,9 +325,9 @@ public class ReferenceFragment extends Fragment {
                         // EquipmentStatus
                         changedDate = ReferenceUpdate.lastChangedAsStr(EquipmentStatus.class.getSimpleName());
                         try {
-                            Response<List<EquipmentStatus>> response = ToirAPIFactory.getEquipmentStatusService().equipmentStatus(bearer, changedDate).execute();
+                            Response<List<EquipmentStatus>> response = ToirAPIFactory.getEquipmentStatusService().equipmentStatus(changedDate).execute();
                             List<EquipmentStatus> list = response.body();
-                            saveReferenceData(EquipmentStatus.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(EquipmentStatus.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -337,9 +335,9 @@ public class ReferenceFragment extends Fragment {
                         // EquipmentType ??
                         changedDate = ReferenceUpdate.lastChangedAsStr(EquipmentType.class.getSimpleName());
                         try {
-                            Response<List<EquipmentType>> response = ToirAPIFactory.getEquipmentTypeService().equipmentType(bearer, changedDate).execute();
+                            Response<List<EquipmentType>> response = ToirAPIFactory.getEquipmentTypeService().equipmentType(changedDate).execute();
                             List<EquipmentType> list = response.body();
-                            saveReferenceData(EquipmentType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(EquipmentType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -350,9 +348,9 @@ public class ReferenceFragment extends Fragment {
                         // MeasuredValue ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(MeasuredValue.class.getSimpleName());
                         try {
-                            Response<List<MeasuredValue>> response = ToirAPIFactory.getMeasuredValueService().measuredValue(bearer, changedDate).execute();
+                            Response<List<MeasuredValue>> response = ToirAPIFactory.getMeasuredValueService().measuredValue(changedDate).execute();
                             List<MeasuredValue> list = response.body();
-                            saveReferenceData(MeasuredValue.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(MeasuredValue.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -360,9 +358,9 @@ public class ReferenceFragment extends Fragment {
                         // MeasureType
                         changedDate = ReferenceUpdate.lastChangedAsStr(MeasureType.class.getSimpleName());
                         try {
-                            Response<List<MeasureType>> response = ToirAPIFactory.getMeasureTypeService().measureType(bearer, changedDate).execute();
+                            Response<List<MeasureType>> response = ToirAPIFactory.getMeasureTypeService().measureType(changedDate).execute();
                             List<MeasureType> list = response.body();
-                            saveReferenceData(MeasureType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(MeasureType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -370,9 +368,9 @@ public class ReferenceFragment extends Fragment {
                         // Operation ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(Operation.class.getSimpleName());
                         try {
-                            Response<List<Operation>> response = ToirAPIFactory.getOperationService().operation(bearer, changedDate).execute();
+                            Response<List<Operation>> response = ToirAPIFactory.getOperationService().operation(changedDate).execute();
                             List<Operation> list = response.body();
-                            saveReferenceData(Operation.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Operation.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -380,9 +378,9 @@ public class ReferenceFragment extends Fragment {
                         // OperationStatus
                         changedDate = ReferenceUpdate.lastChangedAsStr(OperationStatus.class.getSimpleName());
                         try {
-                            Response<List<OperationStatus>> response = ToirAPIFactory.getOperationStatusService().operationStatus(bearer, changedDate).execute();
+                            Response<List<OperationStatus>> response = ToirAPIFactory.getOperationStatusService().operationStatus(changedDate).execute();
                             List<OperationStatus> list = response.body();
-                            saveReferenceData(OperationStatus.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OperationStatus.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -390,9 +388,9 @@ public class ReferenceFragment extends Fragment {
                         // OperationTemplate
                         changedDate = ReferenceUpdate.lastChangedAsStr(OperationTemplate.class.getSimpleName());
                         try {
-                            Response<List<OperationTemplate>> response = ToirAPIFactory.getOperationTemplateService().operationTemplate(bearer, changedDate).execute();
+                            Response<List<OperationTemplate>> response = ToirAPIFactory.getOperationTemplateService().operationTemplate(changedDate).execute();
                             List<OperationTemplate> list = response.body();
-                            saveReferenceData(OperationTemplate.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OperationTemplate.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -400,9 +398,9 @@ public class ReferenceFragment extends Fragment {
                         // OperationTool
                         changedDate = ReferenceUpdate.lastChangedAsStr(OperationTool.class.getSimpleName());
                         try {
-                            Response<List<OperationTool>> response = ToirAPIFactory.getOperationToolService().operationTool(bearer, changedDate).execute();
+                            Response<List<OperationTool>> response = ToirAPIFactory.getOperationToolService().operationTool(changedDate).execute();
                             List<OperationTool> list = response.body();
-                            saveReferenceData(OperationTool.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OperationTool.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -410,9 +408,9 @@ public class ReferenceFragment extends Fragment {
                         // OperationType
                         changedDate = ReferenceUpdate.lastChangedAsStr(OperationType.class.getSimpleName());
                         try {
-                            Response<List<OperationType>> response = ToirAPIFactory.getOperationTypeService().operationType(bearer, changedDate).execute();
+                            Response<List<OperationType>> response = ToirAPIFactory.getOperationTypeService().operationType(changedDate).execute();
                             List<OperationType> list = response.body();
-                            saveReferenceData(OperationType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OperationType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -420,9 +418,9 @@ public class ReferenceFragment extends Fragment {
                         // OperationVerdict
                         changedDate = ReferenceUpdate.lastChangedAsStr(OperationVerdict.class.getSimpleName());
                         try {
-                            Response<List<OperationVerdict>> response = ToirAPIFactory.getOperationVerdictService().operationVerdict(bearer, changedDate).execute();
+                            Response<List<OperationVerdict>> response = ToirAPIFactory.getOperationVerdictService().operationVerdict(changedDate).execute();
                             List<OperationVerdict> list = response.body();
-                            saveReferenceData(OperationVerdict.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OperationVerdict.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -430,9 +428,9 @@ public class ReferenceFragment extends Fragment {
                         // OrderLevel
                         changedDate = ReferenceUpdate.lastChangedAsStr(OrderLevel.class.getSimpleName());
                         try {
-                            Response<List<OrderLevel>> response = ToirAPIFactory.getOrderLevelService().orderLevel(bearer, changedDate).execute();
+                            Response<List<OrderLevel>> response = ToirAPIFactory.getOrderLevelService().orderLevel(changedDate).execute();
                             List<OrderLevel> list = response.body();
-                            saveReferenceData(OrderLevel.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OrderLevel.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -440,9 +438,9 @@ public class ReferenceFragment extends Fragment {
                         // Orders ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(Orders.class.getSimpleName());
                         try {
-                            Response<List<Orders>> response = ToirAPIFactory.getOrdersService().orders(bearer, changedDate).execute();
+                            Response<List<Orders>> response = ToirAPIFactory.getOrdersService().orders(changedDate).execute();
                             List<Orders> list = response.body();
-                            saveReferenceData(Orders.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Orders.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -450,9 +448,9 @@ public class ReferenceFragment extends Fragment {
                         // OrderStatus
                         changedDate = ReferenceUpdate.lastChangedAsStr(OrderStatus.class.getSimpleName());
                         try {
-                            Response<List<OrderStatus>> response = ToirAPIFactory.getOrderStatusService().orderStatus(bearer, changedDate).execute();
+                            Response<List<OrderStatus>> response = ToirAPIFactory.getOrderStatusService().orderStatus(changedDate).execute();
                             List<OrderStatus> list = response.body();
-                            saveReferenceData(OrderStatus.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OrderStatus.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -460,9 +458,9 @@ public class ReferenceFragment extends Fragment {
                         // OrderVerdict
                         changedDate = ReferenceUpdate.lastChangedAsStr(OrderVerdict.class.getSimpleName());
                         try {
-                            Response<List<OrderVerdict>> response = ToirAPIFactory.getOrderVerdictService().orderVerdict(bearer, changedDate).execute();
+                            Response<List<OrderVerdict>> response = ToirAPIFactory.getOrderVerdictService().orderVerdict(changedDate).execute();
                             List<OrderVerdict> list = response.body();
-                            saveReferenceData(OrderVerdict.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(OrderVerdict.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -470,9 +468,9 @@ public class ReferenceFragment extends Fragment {
                         // RepairPart ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(RepairPart.class.getSimpleName());
                         try {
-                            Response<List<RepairPart>> response = ToirAPIFactory.getRepairPartService().repairPart(bearer, changedDate).execute();
+                            Response<List<RepairPart>> response = ToirAPIFactory.getRepairPartService().repairPart(changedDate).execute();
                             List<RepairPart> list = response.body();
-                            saveReferenceData(RepairPart.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(RepairPart.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -480,9 +478,9 @@ public class ReferenceFragment extends Fragment {
                         // RepairPartType ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(RepairPartType.class.getSimpleName());
                         try {
-                            Response<List<RepairPartType>> response = ToirAPIFactory.getRepairPartTypeService().repairPartType(bearer, changedDate).execute();
+                            Response<List<RepairPartType>> response = ToirAPIFactory.getRepairPartTypeService().repairPartType(changedDate).execute();
                             List<RepairPartType> list = response.body();
-                            saveReferenceData(RepairPartType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(RepairPartType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -490,9 +488,9 @@ public class ReferenceFragment extends Fragment {
                         // Tasks ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(Tasks.class.getSimpleName());
                         try {
-                            Response<List<Tasks>> response = ToirAPIFactory.getTasksService().tasks(bearer, changedDate).execute();
+                            Response<List<Tasks>> response = ToirAPIFactory.getTasksService().tasks(changedDate).execute();
                             List<Tasks> list = response.body();
-                            saveReferenceData(Tasks.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Tasks.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -500,9 +498,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStageList ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageList.class.getSimpleName());
                         try {
-                            Response<List<TaskStageList>> response = ToirAPIFactory.getTaskStageListService().taskStageList(bearer, changedDate).execute();
+                            Response<List<TaskStageList>> response = ToirAPIFactory.getTaskStageListService().taskStageList(changedDate).execute();
                             List<TaskStageList> list = response.body();
-                            saveReferenceData(TaskStageList.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStageList.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -510,9 +508,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStageOperationList ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageOperationList.class.getSimpleName());
                         try {
-                            Response<List<TaskStageOperationList>> response = ToirAPIFactory.getTaskStageOperationListService().taskStageOperationList(bearer, changedDate).execute();
+                            Response<List<TaskStageOperationList>> response = ToirAPIFactory.getTaskStageOperationListService().taskStageOperationList(changedDate).execute();
                             List<TaskStageOperationList> list = response.body();
-                            saveReferenceData(TaskStageOperationList.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStageOperationList.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -520,9 +518,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStages ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStages.class.getSimpleName());
                         try {
-                            Response<List<TaskStages>> response = ToirAPIFactory.getTaskStagesService().taskStages(bearer, changedDate).execute();
+                            Response<List<TaskStages>> response = ToirAPIFactory.getTaskStagesService().taskStages(changedDate).execute();
                             List<TaskStages> list = response.body();
-                            saveReferenceData(TaskStages.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStages.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -530,9 +528,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStageStatus
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageStatus.class.getSimpleName());
                         try {
-                            Response<List<TaskStageStatus>> response = ToirAPIFactory.getTaskStageStatusService().taskStageStatus(bearer, changedDate).execute();
+                            Response<List<TaskStageStatus>> response = ToirAPIFactory.getTaskStageStatusService().taskStageStatus(changedDate).execute();
                             List<TaskStageStatus> list = response.body();
-                            saveReferenceData(TaskStageStatus.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStageStatus.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -540,9 +538,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStageTemplate ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageTemplate.class.getSimpleName());
                         try {
-                            Response<List<TaskStageTemplate>> response = ToirAPIFactory.getTaskStageTemplateService().taskStageTemplate(bearer, changedDate).execute();
+                            Response<List<TaskStageTemplate>> response = ToirAPIFactory.getTaskStageTemplateService().taskStageTemplate(changedDate).execute();
                             List<TaskStageTemplate> list = response.body();
-                            saveReferenceData(TaskStageTemplate.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStageTemplate.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -550,9 +548,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStageType ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageType.class.getSimpleName());
                         try {
-                            Response<List<TaskStageType>> response = ToirAPIFactory.getTaskStageTypeService().taskStageType(bearer, changedDate).execute();
+                            Response<List<TaskStageType>> response = ToirAPIFactory.getTaskStageTypeService().taskStageType(changedDate).execute();
                             List<TaskStageType> list = response.body();
-                            saveReferenceData(TaskStageType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStageType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -560,9 +558,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStageVerdict
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStageVerdict.class.getSimpleName());
                         try {
-                            Response<List<TaskStageVerdict>> response = ToirAPIFactory.getTaskStageVerdictService().taskStageVerdict(bearer, changedDate).execute();
+                            Response<List<TaskStageVerdict>> response = ToirAPIFactory.getTaskStageVerdictService().taskStageVerdict(changedDate).execute();
                             List<TaskStageVerdict> list = response.body();
-                            saveReferenceData(TaskStageVerdict.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStageVerdict.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -570,9 +568,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskStatus
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskStatus.class.getSimpleName());
                         try {
-                            Response<List<TaskStatus>> response = ToirAPIFactory.getTaskStatusService().taskStatus(bearer, changedDate).execute();
+                            Response<List<TaskStatus>> response = ToirAPIFactory.getTaskStatusService().taskStatus(changedDate).execute();
                             List<TaskStatus> list = response.body();
-                            saveReferenceData(TaskStatus.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskStatus.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -580,9 +578,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskTemplate ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskTemplate.class.getSimpleName());
                         try {
-                            Response<List<TaskTemplate>> response = ToirAPIFactory.getTaskTemplateService().taskTemplate(bearer, changedDate).execute();
+                            Response<List<TaskTemplate>> response = ToirAPIFactory.getTaskTemplateService().taskTemplate(changedDate).execute();
                             List<TaskTemplate> list = response.body();
-                            saveReferenceData(TaskTemplate.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskTemplate.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -590,9 +588,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskType ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskType.class.getSimpleName());
                         try {
-                            Response<List<TaskType>> response = ToirAPIFactory.getTaskTypeService().taskType(bearer, changedDate).execute();
+                            Response<List<TaskType>> response = ToirAPIFactory.getTaskTypeService().taskType(changedDate).execute();
                             List<TaskType> list = response.body();
-                            saveReferenceData(TaskType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -600,9 +598,9 @@ public class ReferenceFragment extends Fragment {
                         // TaskVerdict
                         changedDate = ReferenceUpdate.lastChangedAsStr(TaskVerdict.class.getSimpleName());
                         try {
-                            Response<List<TaskVerdict>> response = ToirAPIFactory.getTaskVerdictService().taskVerdict(bearer, changedDate).execute();
+                            Response<List<TaskVerdict>> response = ToirAPIFactory.getTaskVerdictService().taskVerdict(changedDate).execute();
                             List<TaskVerdict> list = response.body();
-                            saveReferenceData(TaskVerdict.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(TaskVerdict.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -610,9 +608,9 @@ public class ReferenceFragment extends Fragment {
                         // Tool ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(Tool.class.getSimpleName());
                         try {
-                            Response<List<Tool>> response = ToirAPIFactory.getToolService().tool(bearer, changedDate).execute();
+                            Response<List<Tool>> response = ToirAPIFactory.getToolService().tool(changedDate).execute();
                             List<Tool> list = response.body();
-                            saveReferenceData(Tool.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(Tool.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -620,9 +618,9 @@ public class ReferenceFragment extends Fragment {
                         // ToolType ???
                         changedDate = ReferenceUpdate.lastChangedAsStr(ToolType.class.getSimpleName());
                         try {
-                            Response<List<ToolType>> response = ToirAPIFactory.getToolTypeService().toolType(bearer, changedDate).execute();
+                            Response<List<ToolType>> response = ToirAPIFactory.getToolTypeService().toolType(changedDate).execute();
                             List<ToolType> list = response.body();
-                            saveReferenceData(ToolType.class.getSimpleName(), list, currentDate);
+                            ReferenceUpdate.saveReferenceData(ToolType.class.getSimpleName(), list, currentDate);
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
@@ -661,24 +659,6 @@ public class ReferenceFragment extends Fragment {
                 return true;
             }
         });
-    }
-
-    /**
-     * @param referenceName Название справочника (используем имя класса).
-     * @param list          Список объектов для сохранения в базу.
-     * @param updateDate    Дата обновления содержимого справочника.
-     */
-    private void saveReferenceData(String referenceName, List list, Date updateDate) {
-        Realm realm = Realm.getDefaultInstance();
-
-        ReferenceUpdate item = new ReferenceUpdate();
-        item.setReferenceName(referenceName);
-        item.setUpdateDate(updateDate);
-
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(list);
-        realm.copyToRealmOrUpdate(item);
-        realm.commitTransaction();
     }
 
     /**

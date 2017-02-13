@@ -15,14 +15,12 @@ import ru.toir.mobile.db.realm.TaskStageOperationList;
 
 public interface ITaskStageOperationList {
     @GET("/references/task-stage-operation-list")
-    Call<List<TaskStageOperationList>> taskStageOperationList(@Header("Authorization") String token);
+    Call<List<TaskStageOperationList>> taskStageOperationList();
 
     @GET("/references/")
-    Call<List<TaskStageOperationList>> taskStageOperationList(@Header("Authorization") String token,
-                                                              @Query("changedAfter") String changedAfter);
+    Call<List<TaskStageOperationList>> taskStageOperationList(@Query("changedAfter") String changedAfter);
 
     @GET("/references/")
-    Call<List<TaskStageOperationList>> taskStageOperationListById(@Header("Authorization") String token,
-                                                                  @Query("id") String id);
+    Call<List<TaskStageOperationList>> taskStageOperationListById(@Query("id") String id);
 
 }

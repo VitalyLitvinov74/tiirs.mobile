@@ -506,9 +506,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 AsyncTask<Void, Void, List<Orders>> aTask = new AsyncTask<Void, Void, List<Orders>>() {
                     @Override
                     protected List<Orders> doInBackground(Void... voids) {
-                        AuthorizedUser user = AuthorizedUser.getInstance();
                         Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
-                                .ordersByStatus(user.getBearer(), OrderStatus.Status.NEW);
+                                .ordersByStatus(OrderStatus.Status.NEW);
                         List<Orders> result = null;
                         try {
                             Response<List<Orders>> response = call.execute();
@@ -604,7 +603,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                AuthorizedUser user = AuthorizedUser.getInstance();
+//                AuthorizedUser user = AuthorizedUser.getInstance();
 //                TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext(getActivity()));
 //                List<Task> tasks;
 //                String currentUserUuid = AuthorizedUser.getInstance() .getUuid();
@@ -645,7 +644,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        AuthorizedUser user = AuthorizedUser.getInstance();
                         Call<ToirAPIResponse> call;
                         Response<ToirAPIResponse> response;
                         Realm realm = Realm.getDefaultInstance();
@@ -655,8 +653,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 .equalTo("sent", false)
                                 .findAll();
                         List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-                        call = ToirAPIFactory.getJournalService()
-                                .sendJournal(user.getBearer(), journalList);
+                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
                         try {
                             response = call.execute();
                             ToirAPIResponse result = response.body();
@@ -699,8 +696,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 .equalTo("sent", false)
                                 .findAll();
                         List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-                        call = ToirAPIFactory.getGpsTrackService()
-                                .sendGpsTrack(user.getBearer(), gpsTrackList);
+                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
                         try {
                             response = call.execute();
                             ToirAPIResponse result = response.body();

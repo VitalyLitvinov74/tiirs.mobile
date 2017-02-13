@@ -15,12 +15,11 @@ import ru.toir.mobile.db.realm.Clients;
 
 public interface IClients {
     @GET("/references/clients")
-    Call<List<Clients>> clients(@Header("Authorization") String token);
+    Call<List<Clients>> clients();
 
     @GET("/references/clients")
-    Call<List<Clients>> clients(@Header("Authorization") String token,
-                                    @Query("changedAfter") String changedAfter);
+    Call<List<Clients>> clients(@Query("changedAfter") String changedAfter);
+
     @GET("/references/clients")
-    Call<List<Clients>> clientsById(@Header("Authorization") String token,
-                                        @Query("id") String id);
+    Call<List<Clients>> clientsById(@Query("id") String id);
 }
