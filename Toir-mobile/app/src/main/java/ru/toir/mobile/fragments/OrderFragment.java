@@ -46,7 +46,6 @@ import com.roughike.bottombar.BottomBar;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -619,8 +618,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // TODO: реализовать отправку
-//                                    sendCompleteTask();
+                                    sendCompleteTask();
                                     dialog.dismiss();
                                 }
                             });
@@ -633,6 +631,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 }
                             });
                     dialog.show();
+                } else {
+                    sendCompleteTask();
                 }
 
                 // отправляем данные из журнала и лога GPS
@@ -727,31 +727,28 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
      * Отправка всех выполненных нарядов на сервер
      */
     private void sendCompleteTask() {
+        // TODO: реализовать отправку
+        AuthorizedUser user = AuthorizedUser.getInstance();
+        RealmResults<Orders> ordersList = realmDB.where(Orders.class)
+                .equalTo("userUuid", user.getUuid())
+                .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE)
+                .equalTo("sent", false)
+                .findAll();
+        if (ordersList.size() == 0) {
+            Toast.makeText(getActivity(), "Нет результатов для отправки.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-//        TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext( getActivity()));
-//        List<Task> tasks;
-//        String currentUserUuid = AuthorizedUser.getInstance().getUuid();
-//
-//        tasks = adapter.getTaskByUserAndUpdated(currentUserUuid);
-//
-//        if (tasks == null) {
-//            Toast.makeText(getActivity(), "Нет результатов для отправки.", Toast.LENGTH_SHORT);
-//            return;
-//        }
-//
-//        String[] sendTaskUuids = new String[tasks.size()];
-//        int i = 0;
-//        for (Task task : tasks) {
-//            sendTaskUuids[i] = task.getUuid();
-//            // устанавливаем дату попытки отправки
-//            // (пока только для наряда)
-//            task.setAttempt_send_date(Calendar.getInstance().getTime() .getTime());
-//            adapter.replace(task);
-//            i++;
-//        }
-//
-//        getActivity() .registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
-//
+        // строим список uuid нарядов для отправки на сервер
+        // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
+        String[] sendTaskUuids = new String[ordersList.size()];
+        int i = 0;
+        for (Orders order : ordersList) {
+            sendTaskUuids[i] = order.getUuid();
+            i++;
+        }
+
+//        getActivity().registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
 //        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
 //        tsh.SendTaskResult(sendTaskUuids);
 
@@ -880,7 +877,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         operation.setOperationVerdict(verdict);
                     }
                 });
-                // TODO обновляем содержимое курсора
+
                 // закрываем диалог
                 dialog.dismiss();
             }
@@ -921,11 +918,18 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         orderVerdictAdapter.notifyDataSetChanged();
         orderVerdictSpinner.setAdapter(orderVerdictAdapter);
 
-        // TODO заменить на реальные статусы "не выполнено"
-        orderStatusUnComplete = realmDB.where(OrderStatus.class).findFirst();
-        taskStageStatusUnComplete = realmDB.where(TaskStageStatus.class).findFirst();
-        operationStatusUnComplete = realmDB.where(OperationStatus.class).findFirst();
-        taskStatusUnComplete = realmDB.where(TaskStatus.class).equalTo("_id", 1).findFirst();
+        orderStatusUnComplete = realmDB.where(OrderStatus.class)
+                .equalTo("uuid", OrderStatus.Status.UN_COMPLETE)
+                .findFirst();
+        taskStageStatusUnComplete = realmDB.where(TaskStageStatus.class)
+                .equalTo("uuid", TaskStageStatus.Status.UN_COMPLETE)
+                .findFirst();
+        operationStatusUnComplete = realmDB.where(OperationStatus.class)
+                .equalTo("uuid", OperationStatus.Status.UN_COMPLETE)
+                .findFirst();
+        taskStatusUnComplete = realmDB.where(TaskStatus.class)
+                .equalTo("uuid", TaskStatus.Status.UN_COMPLETE)
+                .findFirst();
 
         dialog.setView(myView);
         dialog.setTitle("Закрытие наряда");
@@ -936,12 +940,11 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                        /*
-                         * закрываем наряд, в зависимости от статуса выполнения
-						 * операции выставляем статус наряда
-						 */
+                /*
+                 * закрываем наряд, в зависимости от статуса выполнения
+                 * операции выставляем статус наряда
+                 */
                 for (final Tasks task : order.getTasks()) {
-                    // TODO заменить на реальный статус "не закончена"
                     realmDB.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
@@ -949,7 +952,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         }
                     });
                     for (final TaskStages taskStages : task.getTaskStages()) {
-                        // TODO заменить на реальный статус "не закончена"
                         realmDB.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
@@ -957,7 +959,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                             }
                         });
                         for (final Operation operation : taskStages.getOperations()) {
-                            // TODO заменить на реальный статус "не закончена"
                             realmDB.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {

@@ -30,6 +30,7 @@ public class Orders extends RealmObject {
     private int attemptCount;
     private int updated;
     private RealmList<Tasks> tasks;
+    private boolean sent;
 
     public long get_id() {
         return _id;
@@ -177,5 +178,13 @@ public class Orders extends RealmObject {
 
     public void addTask(Tasks task) {
         this.tasks.add(task);
+    }
+
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
     }
 }

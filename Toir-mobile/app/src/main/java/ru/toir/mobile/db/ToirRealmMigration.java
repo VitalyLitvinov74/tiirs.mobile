@@ -200,6 +200,12 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 6) {
+            Log.d(TAG, "from version 6");
+            schema.get("Orders").addField("sent", boolean.class);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
