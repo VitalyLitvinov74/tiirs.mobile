@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 24.01.17.
  */
-public class GpsTrack extends RealmObject {
+public class GpsTrack extends RealmObject implements ISend {
     @PrimaryKey
     private long _id;
     private String userUuid;

@@ -67,6 +67,7 @@ import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.GpsTrack;
+import ru.toir.mobile.db.realm.ISend;
 import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
@@ -496,8 +497,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(TAG, "Получаем новые наряды.");
-//                TaskServiceHelper tsh = new TaskServiceHelper(
-//                        getActivity().getApplicationContext(),
+//                TaskServiceHelper tsh = new TaskServiceHelper(getActivity().getApplicationContext(),
 //                        TaskServiceProvider.Actions.ACTION_GET_TASK);
 //                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
 //                tsh.GetTaskNew();
@@ -603,18 +603,12 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-//                AuthorizedUser user = AuthorizedUser.getInstance();
-//                TaskDBAdapter adapter = new TaskDBAdapter(new ToirDatabaseContext(getActivity()));
-//                List<Task> tasks;
-//                String currentUserUuid = AuthorizedUser.getInstance() .getUuid();
-//                // проверяем наличие не законченных нарядов
-//                tasks = adapter.getOrdersByUser(currentUserUuid, TaskStatusDBAdapter.Status.IN_WORK, "");
-                boolean isInWork = false;
-                int inWorkCount = 0;
-//                isInWork = tasks.size() > 0;
-//                inWorkCount = tasks.size();
-
-                if (isInWork) {
+                // проверяем наличие не законченных нарядов
+                RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
+                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
+                        .findAll();
+                int inWorkCount = ordersInWork.size();
+                if (inWorkCount > 0) {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
                     dialog.setTitle("Внимание!");
@@ -625,7 +619,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    sendCompleteTask();
+                                    // TODO: реализовать отправку
+//                                    sendCompleteTask();
                                     dialog.dismiss();
                                 }
                             });
@@ -661,31 +656,11 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 Log.d(TAG, "Журнал отправлен успешно.");
                             } else {
                                 Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-                                List<Long> ids = new ArrayList<>();
-                                List<String> data = (List<String>) result.getData();
-
-                                for (String item : data) {
-                                    ids.add(Long.valueOf(item));
-                                }
-
-                                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                                Iterator<Journal> jIter = journalList.iterator();
-                                while (jIter.hasNext()) {
-                                    Journal next = jIter.next();
-                                    if (ids.contains(next.get_id())) {
-                                        journalList.remove(next);
-                                    }
-                                }
+                                removeNotSaved(journalList, (List<String>) result.getData());
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(journalList);
+                                realm.commitTransaction();
                             }
-
-                            // меняем статус на "отправлено" для записей которые сохранены сервером
-                            realm.beginTransaction();
-                            for (Journal item : journalList) {
-                                item.setSent(true);
-                            }
-
-                            realm.copyToRealmOrUpdate(journalList);
-                            realm.commitTransaction();
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                             Log.e(TAG, "Ошибка при отправке журнала.");
@@ -704,31 +679,11 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 Log.d(TAG, "GPS лог отправлен успешно.");
                             } else {
                                 Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-                                List<Long> ids = new ArrayList<>();
-                                List<String> data = (List<String>) result.getData();
-
-                                for (String item : data) {
-                                    ids.add(Long.valueOf(item));
-                                }
-
-                                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                                Iterator<Journal> jIter = journalList.iterator();
-                                while (jIter.hasNext()) {
-                                    Journal next = jIter.next();
-                                    if (ids.contains(next.get_id())) {
-                                        journalList.remove(next);
-                                    }
-                                }
+                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(gpsTrackList);
+                                realm.commitTransaction();
                             }
-
-                            // меняем статус на "отправлено" для записей которые сохранены сервером
-                            realm.beginTransaction();
-                            for (GpsTrack item : gpsTrackList) {
-                                item.setSent(true);
-                            }
-
-                            realm.copyToRealmOrUpdate(gpsTrackList);
-                            realm.commitTransaction();
                         } catch (Exception e) {
                             Log.e(TAG, e.getLocalizedMessage());
                             Log.e(TAG, "Ошибка при отправке GPS лога.");
@@ -737,10 +692,35 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 });
                 thread.start();
 
-
                 return true;
             }
         });
+    }
+
+    /**
+     * Вспомогательный метод для удаления из отправленого списка записей тех которые
+     * не сохранены на сервере.
+     *
+     * @param list Список отправленных записей.
+     * @param data Список id записей которые не сохранили.
+     */
+    private void removeNotSaved(List<? extends ISend> list, List<String> data) {
+
+        List<Long> ids = new ArrayList<>();
+
+        for (String item : data) {
+            ids.add(Long.valueOf(item));
+        }
+
+        for (Object item : list) {
+            if (ids.contains(((ISend) item).get_id())) {
+                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
+                list.remove(item);
+            } else {
+                // меняем статус на "отправлено" для записей которые сохранены сервером
+                ((ISend) item).setSent(true);
+            }
+        }
     }
 
     /**

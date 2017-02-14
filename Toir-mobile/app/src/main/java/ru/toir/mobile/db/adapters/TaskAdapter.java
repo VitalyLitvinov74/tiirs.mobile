@@ -19,7 +19,7 @@ import ru.toir.mobile.db.realm.Tasks;
 
 /**
  * @author olejek
- * Created by olejek on 13.09.16.
+ *         Created by olejek on 13.09.16.
  */
 public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter {
     public static final String TABLE_NAME = "Tasks";
@@ -30,7 +30,11 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -66,36 +70,38 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        // TODO: реализовать проверку на null !!!!
         Tasks task = adapterData.get(position);
         Date lDate = task.getStartDate();
         if (lDate != null) {
-                String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
-                viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
-            } else {
-                viewHolder.date.setText("не выполнялся");
-            }
+            String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
+            viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
+        } else {
+            viewHolder.date.setText("не выполнялся");
+        }
 
         viewHolder.equipment.setText(task.getEquipment().getTitle());
         viewHolder.title.setText(task.getTaskTemplate().getTitle());
 
-            if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-            if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-            if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-            if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
-                viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-            if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
-                viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-            if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
-                viewHolder.icon.setImageResource(R.drawable.status_high_work);
-            if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-            if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-            if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-                viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+        // TODO: исправить всю эту херобору на проверку uuid
+        if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+            viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
+        if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+            viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
+        if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+            viewHolder.icon.setImageResource(R.drawable.status_high_receive);
+        if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
+            viewHolder.icon.setImageResource(R.drawable.status_easy_work);
+        if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
+            viewHolder.icon.setImageResource(R.drawable.status_mod_work);
+        if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
+            viewHolder.icon.setImageResource(R.drawable.status_high_work);
+        if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+            viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
+        if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+            viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
+        if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+            viewHolder.icon.setImageResource(R.drawable.status_high_ready);
         return convertView;
     }
 

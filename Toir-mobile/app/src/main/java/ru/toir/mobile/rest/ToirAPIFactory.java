@@ -275,11 +275,6 @@ public class ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStatus getTaskStatus() {
-        return getRetrofit().create(ITaskStatus.class);
-    }
-
-    @NonNull
     public static ITaskTemplate getTaskTemplateService() {
         return getRetrofit().create(ITaskTemplate.class);
     }
@@ -327,10 +322,10 @@ public class ToirAPIFactory {
                 .build();
     }
 
-    public static final class Actions {
-        public static final String ACTION_GET_TOKEN = "action_get_token";
-        public static final String ACTION_GET_USER = "action_get_user";
-        public static final String ACTION_GET_ALL_REFERENCE = "action_get_all_reference";
-    }
+//    public static final class Actions {
+//        public static final String ACTION_GET_TOKEN = "action_get_token";
+//        public static final String ACTION_GET_USER = "action_get_user";
+//        public static final String ACTION_GET_ALL_REFERENCE = "action_get_all_reference";
+//    }
 
 }

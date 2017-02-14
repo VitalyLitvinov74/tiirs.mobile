@@ -352,7 +352,7 @@ public class ReferenceFragment extends Fragment {
                             Log.e(TAG, e.getLocalizedMessage());
                         }
 
-                        // GpdTrack ???
+                        // GpsTrack ???
                         // Journal ???
 
                         // MeasuredValue ???

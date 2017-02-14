@@ -829,7 +829,7 @@ public class ReferenceProcessor {
         String referenceName = TaskStatus.class.getSimpleName();
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
-        Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatus()
+        Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatusService()
                 .taskStatus(lastChangedAt);
         try {
             retrofit.Response<List<TaskStatus>> response = call.execute();

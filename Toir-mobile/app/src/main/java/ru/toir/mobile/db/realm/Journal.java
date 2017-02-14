@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 24.01.17.
  */
-public class Journal extends RealmObject {
+public class Journal extends RealmObject implements ISend {
     @PrimaryKey
     private long _id;
     private String description;
