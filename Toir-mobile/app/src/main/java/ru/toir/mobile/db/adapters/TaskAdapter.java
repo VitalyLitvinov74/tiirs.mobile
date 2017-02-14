@@ -15,6 +15,8 @@ import java.util.Locale;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 
 /**
@@ -70,39 +72,74 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // TODO: реализовать проверку на null !!!!
-        Tasks task = adapterData.get(position);
-        Date lDate = task.getStartDate();
-        if (lDate != null) {
-            String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
-            viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
-        } else {
-            viewHolder.date.setText("не выполнялся");
+        if (adapterData != null) {
+            Tasks task = adapterData.get(position);
+            Date lDate = task.getStartDate();
+            if (lDate != null) {
+                String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
+                viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
+            } else {
+                viewHolder.date.setText("не выполнялся");
+            }
+
+            viewHolder.equipment.setText(task.getEquipment().getTitle());
+            viewHolder.title.setText(task.getTaskTemplate().getTitle());
+
+            String taskStatusUuid = task.getTaskStatus().getUuid();
+            String criticalTypeUuid = task.getEquipment().getCriticalType().getUuid();
+            viewHolder.icon.setImageResource(getIconForStatusAndCriticalType(taskStatusUuid, criticalTypeUuid));
         }
 
-        viewHolder.equipment.setText(task.getEquipment().getTitle());
-        viewHolder.title.setText(task.getTaskTemplate().getTitle());
-
-        // TODO: исправить всю эту херобору на проверку uuid
-        if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-            viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-        if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-            viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-        if (task.getTaskStatus().getTitle().equals("Получен") && task.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
-            viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-        if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
-            viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-        if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
-            viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-        if (task.getTaskStatus().getTitle().equals("В работе") && task.getEquipment().getCriticalType().getTitle().equals("Средний"))
-            viewHolder.icon.setImageResource(R.drawable.status_high_work);
-        if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-            viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-        if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-            viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-        if (task.getTaskStatus().getTitle().equals("Выполнен") && task.getEquipment().getCriticalType().getTitle().equals("Критичный"))
-            viewHolder.icon.setImageResource(R.drawable.status_high_ready);
         return convertView;
+    }
+
+    /**
+     * Вспомогательный метод, возвращает id ресурса в зависимости от сочетания статуса и критичности.
+     *
+     * @param statusUuid   Uuid статуса задачи.
+     * @param criticalUuid Uuid типа критичности.
+     * @return Id drawable ресурса.
+     */
+    private int getIconForStatusAndCriticalType(String statusUuid, String criticalUuid) {
+        int id = R.drawable.status_easy_receive;
+
+        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+            id = R.drawable.status_easy_receive;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+            id = R.drawable.status_mod_receive;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+            id = R.drawable.status_high_receive;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
+            id = R.drawable.status_easy_work;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
+            id = R.drawable.status_mod_work;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
+            id = R.drawable.status_high_work;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
+            id = R.drawable.status_easy_ready;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
+            id = R.drawable.status_mod_ready;
+        }
+
+        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
+            id = R.drawable.status_high_ready;
+        }
+
+        return id;
     }
 
     private static class ViewHolder {
