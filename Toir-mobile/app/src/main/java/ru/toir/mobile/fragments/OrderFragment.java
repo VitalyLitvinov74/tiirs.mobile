@@ -332,20 +332,35 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private void initView() {
 
         Level = 0;
-        fillListViewOrders(null, null);
+        fillListViewOrders();
     }
 
     // Orders----------------------------------------------------------------------------------------
+    private void fillListViewOrders() {
+        fillListViewOrders(null, null);
+    }
+
     private void fillListViewOrders(String orderStatus, String orderByField) {
         // !!!!!
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
         User user = realmDB.where(User.class)
-                .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                .equalTo("tagId", authUser.getTagId())
                 .findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
+            RealmQuery<Orders> query = realmDB.where(Orders.class).equalTo("userUuid", authUser.getUuid());
+            if (orderStatus != null) {
+                query.equalTo("orderStatus.uuid", orderStatus);
+            }
+
             RealmResults<Orders> orders;
-            orders = realmDB.where(Orders.class).findAll();
+            if (orderByField != null) {
+                orders = query.findAllSorted(orderByField);
+            } else {
+                orders = query.findAll();
+            }
+
             orderAdapter = new OrderAdapter(getContext(), orders);
             mainListView.setAdapter(orderAdapter);
         }
@@ -507,7 +522,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     protected List<Orders> doInBackground(Void... voids) {
                         Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
                                 .ordersByStatus(OrderStatus.Status.NEW);
-                        List<Orders> result = null;
+                        List<Orders> result;
                         try {
                             Response<List<Orders>> response = call.execute();
                             result = response.body();
@@ -1102,8 +1117,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     try {
                         bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
                     } catch (Exception e) {
-                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT)
-                                .show();
+                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
                     }
                 }
