@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.OrderVerdict;
 
@@ -14,12 +13,12 @@ import ru.toir.mobile.db.realm.OrderVerdict;
  */
 
 public interface IOrderVerdict {
-    @GET("/references/order-verdict")
+    @GET("/api/orders/verdict")
     Call<List<OrderVerdict>> orderVerdict();
 
-    @GET("/references/order-verdict")
+    @GET("/api/orders/verdict")
     Call<List<OrderVerdict>> orderVerdict(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/order-verdict")
+    @GET("/api/orders/verdict")
     Call<List<OrderVerdict>> orderVerdictById(@Query("id") String id);
 }

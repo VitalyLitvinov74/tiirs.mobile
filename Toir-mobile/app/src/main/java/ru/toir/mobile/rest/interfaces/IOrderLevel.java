@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.OrderLevel;
 
@@ -14,12 +13,12 @@ import ru.toir.mobile.db.realm.OrderLevel;
  */
 
 public interface IOrderLevel {
-    @GET("/references/order-level")
+    @GET("/api/orders/level")
     Call<List<OrderLevel>> orderLevel();
 
-    @GET("/references/order-level")
+    @GET("/api/orders/level")
     Call<List<OrderLevel>> orderLevel(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/order-level")
+    @GET("/api/orders/level")
     Call<List<OrderLevel>> orderLevelById(@Query("id") String id);
 }

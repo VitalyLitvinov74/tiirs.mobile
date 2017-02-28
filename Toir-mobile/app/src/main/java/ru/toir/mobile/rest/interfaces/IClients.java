@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.Clients;
 
@@ -14,12 +13,12 @@ import ru.toir.mobile.db.realm.Clients;
  */
 
 public interface IClients {
-    @GET("/references/clients")
+    @GET("/api/objects/clients")
     Call<List<Clients>> clients();
 
-    @GET("/references/clients")
+    @GET("/api/objects/clients")
     Call<List<Clients>> clients(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/clients")
+    @GET("/api/objects/clients")
     Call<List<Clients>> clientsById(@Query("id") String id);
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.MeasureType;
 
@@ -13,12 +12,12 @@ import ru.toir.mobile.db.realm.MeasureType;
  *         Created by koputo on 05.10.16.
  */
 public interface IMeasureType {
-    @GET("/references/measure-type")
+    @GET("/api/objects/measure-type")
     Call<List<MeasureType>> measureType();
 
-    @GET("/references/measure-type")
+    @GET("/api/objects/measure-type")
     Call<List<MeasureType>> measureType(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/measure-type")
+    @GET("/api/objects/measure-type")
     Call<List<MeasureType>> measureTypeById(@Query("id") String id);
 }

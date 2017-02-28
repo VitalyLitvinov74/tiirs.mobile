@@ -2,7 +2,6 @@ package ru.toir.mobile.rest.interfaces;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import ru.toir.mobile.db.realm.User;
 
 /**

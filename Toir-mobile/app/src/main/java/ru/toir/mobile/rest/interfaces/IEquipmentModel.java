@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.EquipmentModel;
 
@@ -14,12 +13,12 @@ import ru.toir.mobile.db.realm.EquipmentModel;
  */
 
 public interface IEquipmentModel {
-    @GET("/references/equipment-model")
+    @GET("/api/equipment/model")
     Call<List<EquipmentModel>> equipmentModel();
 
-    @GET("/references/equipment-model")
+    @GET("/api/equipment/model")
     Call<List<EquipmentModel>> equipmentModel(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/equipment-model")
+    @GET("/api/equipment/model")
     Call<List<EquipmentModel>> equipmentModelById(@Query("id") String id);
 }

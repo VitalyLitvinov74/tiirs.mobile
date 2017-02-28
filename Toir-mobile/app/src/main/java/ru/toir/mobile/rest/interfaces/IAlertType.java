@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.AlertType;
 
@@ -14,12 +13,12 @@ import ru.toir.mobile.db.realm.AlertType;
  */
 
 public interface IAlertType {
-    @GET("/references/alert-type")
+    @GET("/api/references/alert-type")
     Call<List<AlertType>> alertType();
 
-    @GET("/references/alert-type")
+    @GET("/api/references/alert-type")
     Call<List<AlertType>> alertType(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/alert-type")
+    @GET("/api/references/alert-type")
     Call<List<AlertType>> alertTypeById(@Query("id") String id);
 }

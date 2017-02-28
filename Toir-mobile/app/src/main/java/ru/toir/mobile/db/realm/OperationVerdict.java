@@ -65,4 +65,11 @@ public class OperationVerdict extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
+
+    public class Verdict {
+        public static final String NOT_DEFINED = "5205B8B3-E32B-46D0-9B67-1C47A346168F";
+        public static final String COMPLETE = "4B72A9A1-01AA-45E5-BA8A-C4C2F586E8FD";
+        public static final String UN_COMPLETE = "17BF9E6F-F9AF-4FA8-8814-C9ED00378D48";
+        public static final String CANCELED = "0102D95B-F8CF-4779-8021-0327EC66ED16";
+    }
 }

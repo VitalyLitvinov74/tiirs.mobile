@@ -37,10 +37,11 @@ import ru.toir.mobile.db.realm.User;
 
 public class LoadTestData {
     public static Equipment equipment;
+    public static EquipmentType equipmentType;
+    public static TaskStatus taskStatusUncomplete;
     private static Equipment equipment2;
     private static Equipment equipment3;
     private static Equipment equipment4;
-    public static EquipmentType equipmentType;
     private static EquipmentType equipmentType2;
     private static EquipmentType equipmentType3;
     private static EquipmentType equipmentType4;
@@ -55,7 +56,6 @@ public class LoadTestData {
     private static TaskStageStatus taskStageStatusComplete;
     private static TaskStageStatus taskStageStatusUncomplete;
     private static TaskStatus taskStatus;
-    public static TaskStatus taskStatusUncomplete;
     private static User profile;
     private static EquipmentStatus equipmentStatus;
     private static EquipmentStatus equipmentStatus2;
@@ -1097,17 +1097,17 @@ public class LoadTestData {
             taskStage.set_id(1);
             taskStage.setUuid(taskStageUuid);
             taskStage.setTaskStageStatus(taskStageStatusUncomplete);
-            taskStage.setTaskStageStatusUuid(taskStageStatusUuid);
+//            taskStage.setTaskStageStatusUuid(taskStageStatusUuid);
             taskStage.setEndDate(new Date());
             taskStage.setFlowOrder(1);
             taskStage.setStartDate(new Date());
             taskStage.setEquipment(equipment);
-            taskStage.setEquipmentUuid(equipmentUuid);
+//            taskStage.setEquipmentUuid(equipmentUuid);
             taskStage.setTaskStageVerdict(taskStageVerdict);
-            taskStage.setTaskStageVerdictUuid(taskStageVerdictUuid);
+//            taskStage.setTaskStageVerdictUuid(taskStageVerdictUuid);
             taskStage.setTaskStageTemplate(taskStageTemplate);
-            taskStage.setTaskStageTemplateUuid(taskStageTemplateUuid);
-            taskStage.setTaskUuid(taskUuid);
+//            taskStage.setTaskStageTemplateUuid(taskStageTemplateUuid);
+//            taskStage.setTaskUuid(taskUuid);
             taskStage.addOperations(operation);
             taskStage.addOperations(operation2);
             taskStage.addOperations(operation3);
@@ -1121,17 +1121,17 @@ public class LoadTestData {
             taskStage2.set_id(2);
             taskStage2.setUuid(taskStageUuid2);
             taskStage2.setTaskStageStatus(taskStageStatusUncomplete);
-            taskStage2.setTaskStageStatusUuid(taskStageStatusUuid);
+//            taskStage2.setTaskStageStatusUuid(taskStageStatusUuid);
             taskStage2.setEndDate(new Date());
             taskStage2.setFlowOrder(2);
             taskStage2.setStartDate(new Date());
             taskStage2.setEquipment(equipment2);
-            taskStage2.setEquipmentUuid(equipmentUuid2);
+//            taskStage2.setEquipmentUuid(equipmentUuid2);
             taskStage2.setTaskStageVerdict(taskStageVerdict);
-            taskStage2.setTaskStageVerdictUuid(taskStageVerdictUuid);
+//            taskStage2.setTaskStageVerdictUuid(taskStageVerdictUuid);
             taskStage2.setTaskStageTemplate(taskStageTemplate2);
-            taskStage2.setTaskStageTemplateUuid(taskStageTemplateUuid2);
-            taskStage2.setTaskUuid(taskUuid);
+//            taskStage2.setTaskStageTemplateUuid(taskStageTemplateUuid2);
+//            taskStage2.setTaskUuid(taskUuid);
         }
     });
 

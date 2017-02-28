@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.Tool;
 
@@ -14,13 +13,13 @@ import ru.toir.mobile.db.realm.Tool;
  */
 
 public interface ITool {
-    @GET("/references/tool")
+    @GET("/api/objects/tool")
     Call<List<Tool>> tool();
 
-    @GET("/references/tool")
+    @GET("/api/objects/tool")
     Call<List<Tool>> tool(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/tool")
+    @GET("/api/objects/tool")
     Call<List<Tool>> toolById(@Query("id") String id);
 
 }

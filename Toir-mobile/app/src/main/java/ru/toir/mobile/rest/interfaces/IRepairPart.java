@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.RepairPart;
 
@@ -14,13 +13,13 @@ import ru.toir.mobile.db.realm.RepairPart;
  */
 
 public interface IRepairPart {
-    @GET("/references/repair-part")
+    @GET("/api/references/repair-part")
     Call<List<RepairPart>> repairPart();
 
-    @GET("/references/repair-part")
+    @GET("/api/references/repair-part")
     Call<List<RepairPart>> repairPart(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/repair-part")
+    @GET("/api/references/repair-part")
     Call<List<RepairPart>> repairPartById(@Query("id") String id);
 
 }

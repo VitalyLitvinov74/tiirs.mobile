@@ -206,6 +206,16 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 7) {
+            Log.d(TAG, "from version 7");
+            schema.get("TaskStages")
+                    .removeField("equipmentUuid")
+                    .removeField("taskStageVerdictUuid")
+                    .removeField("taskStageStatusUuid")
+                    .removeField("taskStageTemplateUuid");
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 

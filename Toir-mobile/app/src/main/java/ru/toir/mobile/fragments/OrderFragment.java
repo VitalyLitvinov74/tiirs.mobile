@@ -119,7 +119,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private long startTime = 0;
     private boolean firstLaunch = true;
     CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
+        @Override
         public void onTick(long millisUntilFinished) {
+            Log.d(TAG, "Тик таймера...");
             TextView textTime;
             long currentTime = System.currentTimeMillis();
             if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
@@ -129,12 +131,13 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 currentOperationUuid = operationAdapter.getItem(currentOperationId).getUuid();
                 currentOperation = operationAdapter.getItem(currentOperationId);
                 if (firstLaunch) {
-                    onStart();
+                    firstLaunch();
                 }
             }
         }
 
-        void onStart() {
+        void firstLaunch() {
+            Log.d(TAG, "Инициализация вьюх для отображения секунд...");
             int totalOperationCount;
             CheckBox checkBox;
             if (operationAdapter != null && mainListView != null) {
@@ -150,6 +153,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             }
         }
 
+        @Override
         public void onFinish() {
         }
     };
@@ -498,6 +502,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         // время начала работы (приступаем к первой операции и нехрен тормозить)
         startTime = System.currentTimeMillis();
+        Log.d(TAG, "Запуск таймера...");
         taskTimer.start();
     }
 
@@ -829,6 +834,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             Log.d("order", "dialog");
         }
 
+        Log.d(TAG, "Остановка таймера...");
         taskTimer.cancel();
         firstLaunch = true;
         currentOperationId = 0;
@@ -1262,12 +1268,17 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             final long currentTime = System.currentTimeMillis();
             final OperationStatus operationStatusCompleted;
             final OperationVerdict operationVerdictCompleted;
-            operationStatusCompleted = realmDB.where(OperationStatus.class).equalTo("title", "Выполнена").findFirst();
-            operationVerdictCompleted = realmDB.where(OperationVerdict.class).equalTo("title", "Выполнена").findFirst();
+
+            operationStatusCompleted = realmDB.where(OperationStatus.class)
+                    .equalTo("uuid", OperationStatus.Status.COMPLETE)
+                    .findFirst();
             if (operationStatusCompleted == null) {
                 Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
             }
 
+            operationVerdictCompleted = realmDB.where(OperationVerdict.class)
+                    .equalTo("uuid", OperationVerdict.Verdict.COMPLETE)
+                    .findFirst();
             if (operationVerdictCompleted == null) {
                 Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
             }

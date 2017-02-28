@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.OperationTemplate;
 
@@ -14,13 +13,13 @@ import ru.toir.mobile.db.realm.OperationTemplate;
  */
 
 public interface IOperationTemplate {
-    @GET("/references/operation-template")
+    @GET("/api/operation/template")
     Call<List<OperationTemplate>> operationTemplate();
 
-    @GET("/references/operation-template")
+    @GET("/api/operation/template")
     Call<List<OperationTemplate>> operationTemplate(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/operation-template")
+    @GET("/api/operation/template")
     Call<List<OperationTemplate>> operationTemplateById(@Query("id") String id);
 
 }

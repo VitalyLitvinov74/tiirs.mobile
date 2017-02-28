@@ -16,13 +16,9 @@ public class TaskStages extends RealmObject {
     private String uuid;
     private String comment;
     private String taskUuid;
-    private String equipmentUuid;
     private Equipment equipment;
-    private String taskStageVerdictUuid;
     private TaskStageVerdict taskStageVerdict;
-    private String taskStageStatusUuid;
     private TaskStageStatus taskStageStatus;
-    private String taskStageTemplateUuid;
     private TaskStageTemplate taskStageTemplate;
     private Date startDate;
     private Date endDate;
@@ -63,28 +59,12 @@ public class TaskStages extends RealmObject {
         this.taskUuid = taskUuid;
     }
 
-    public String getEquipmentUuid() {
-        return equipmentUuid;
-    }
-
-    public void setEquipmentUuid(String equipmentUuid) {
-        this.equipmentUuid = equipmentUuid;
-    }
-
     public Equipment getEquipment() {
         return equipment;
     }
 
     public void setEquipment(Equipment equipment) {
         this.equipment = equipment;
-    }
-
-    public String getTaskStageVerdictUuid() {
-        return taskStageVerdictUuid;
-    }
-
-    public void setTaskStageVerdictUuid(String taskStageVerdictUuid) {
-        this.taskStageVerdictUuid = taskStageVerdictUuid;
     }
 
     public TaskStageVerdict getTaskStageVerdict() {
@@ -95,28 +75,12 @@ public class TaskStages extends RealmObject {
         this.taskStageVerdict = taskStageVerdict;
     }
 
-    public String getTaskStageStatusUuid() {
-        return taskStageStatusUuid;
-    }
-
-    public void setTaskStageStatusUuid(String taskStageStatusUuid) {
-        this.taskStageStatusUuid = taskStageStatusUuid;
-    }
-
     public TaskStageStatus getTaskStageStatus() {
         return taskStageStatus;
     }
 
     public void setTaskStageStatus(TaskStageStatus taskStageStatus) {
         this.taskStageStatus = taskStageStatus;
-    }
-
-    public String getTaskStageTemplateUuid() {
-        return taskStageTemplateUuid;
-    }
-
-    public void setTaskStageTemplateUuid(String taskStageTemplateUuid) {
-        this.taskStageTemplateUuid = taskStageTemplateUuid;
     }
 
     public TaskStageTemplate getTaskStageTemplate() {

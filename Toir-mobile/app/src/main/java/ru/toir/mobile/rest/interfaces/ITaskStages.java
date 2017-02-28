@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.TaskStages;
 
@@ -14,12 +13,12 @@ import ru.toir.mobile.db.realm.TaskStages;
  */
 
 public interface ITaskStages {
-    @GET("/references/task-stages")
+    @GET("/api/task-stage")
     Call<List<TaskStages>> taskStages();
 
-    @GET("/references/task-stages")
+    @GET("/api/task-stage")
     Call<List<TaskStages>> taskStages(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/task-stages")
+    @GET("/api/task-stage")
     Call<List<TaskStages>> taskStagesById(@Query("id") String id);
 }

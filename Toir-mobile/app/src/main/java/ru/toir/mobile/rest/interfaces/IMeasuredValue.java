@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.MeasuredValue;
 
@@ -14,13 +13,13 @@ import ru.toir.mobile.db.realm.MeasuredValue;
  */
 
 public interface IMeasuredValue {
-    @GET("/references/measured-value")
+    @GET("/api/objects/measured-value")
     Call<List<MeasuredValue>> measuredValue();
 
-    @GET("/references/measured-value")
+    @GET("/api/objects/measured-value")
     Call<List<MeasuredValue>> measuredValue(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/measured-value")
+    @GET("/api/objects/measured-value")
     Call<List<MeasuredValue>> measuredValueById(@Query("id") String id);
 
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit.Call;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.Query;
 import ru.toir.mobile.db.realm.TaskStatus;
 
@@ -13,12 +12,12 @@ import ru.toir.mobile.db.realm.TaskStatus;
  *         Created by koputo on 05.10.16.
  */
 public interface ITaskStatus {
-    @GET("/references/task-status")
+    @GET("/api/task/status")
     Call<List<TaskStatus>> taskStatus();
 
-    @GET("/references/task-status")
+    @GET("/api/task/status")
     Call<List<TaskStatus>> taskStatus(@Query("changedAfter") String changedAfter);
 
-    @GET("/references/task-status")
+    @GET("/api/task/status")
     Call<List<TaskStatus>> taskStatusById(@Query("id") String id);
 }
