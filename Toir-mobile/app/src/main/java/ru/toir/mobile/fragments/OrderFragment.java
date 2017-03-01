@@ -595,6 +595,52 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
 //                tsh.GetTaskDone();
 
+                // запускаем поток получения выполненных, невыполненных, отменнённых нарядов с сервера
+                AsyncTask<Void, Void, List<Orders>> aTask = new AsyncTask<Void, Void, List<Orders>>() {
+                    @Override
+                    protected List<Orders> doInBackground(Void... voids) {
+                        List<String> stUuids = new ArrayList<String>();
+                        stUuids.add(OrderStatus.Status.CANCELED);
+                        stUuids.add(OrderStatus.Status.COMPLETE);
+                        stUuids.add(OrderStatus.Status.UN_COMPLETE);
+                        Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
+                                .ordersByStatus(stUuids);
+                        List<Orders> result;
+                        try {
+                            Response<List<Orders>> response = call.execute();
+                            result = response.body();
+                            return result;
+                        } catch (Exception e) {
+                            Log.d(TAG, e.getLocalizedMessage());
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    protected void onPostExecute(List<Orders> orders) {
+                        super.onPostExecute(orders);
+                        if (orders == null) {
+                            // сообщаем описание неудачи
+                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
+                        } else {
+                            int count = orders.size();
+                            // собщаем количество полученных нарядов
+                            if (count > 0) {
+                                Realm realm = Realm.getDefaultInstance();
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(orders);
+                                realm.commitTransaction();
+                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        processDialog.dismiss();
+                    }
+                };
+                aTask.execute();
+
                 // показываем диалог получения наряда
                 processDialog = new ProgressDialog(getActivity());
                 processDialog.setMessage("Получаем наряды");

@@ -23,4 +23,7 @@ public interface IOrders {
 
     @GET("/api/orders")
     Call<List<Orders>> ordersByStatus(@Query("status") String status);
+
+    @GET("/api/orders")
+    Call<List<Orders>> ordersByStatus(@Query("status[]") List<String> status);
 }
