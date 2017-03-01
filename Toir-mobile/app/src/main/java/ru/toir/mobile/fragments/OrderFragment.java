@@ -57,7 +57,6 @@ import retrofit.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.adapters.MeasureTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
@@ -68,6 +67,7 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
 import ru.toir.mobile.db.realm.Journal;
+import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -1083,7 +1083,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             suffixList.clear();
         }
 
-        if (measureType.equals(MeasureTypeAdapter.Type.FREQUENCY)) {
+        if (measureType.equals(MeasureType.Type.FREQUENCY)) {
             //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("Гц", 1));
@@ -1104,7 +1104,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureTypeAdapter.Type.VOLTAGE)) {
+        } else if (measureType.equals(MeasureType.Type.VOLTAGE)) {
             //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("В", 1));
@@ -1125,7 +1125,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureTypeAdapter.Type.PRESSURE)) {
+        } else if (measureType.equals(MeasureType.Type.PRESSURE)) {
             //resultButtonLayout.addView(numberPicker);
 
             suffixList.add(new Suffixes("Па", 1));
@@ -1146,7 +1146,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             spinnerSuffix.setAdapter(spinnerSuffixAdapter);
 
             //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureTypeAdapter.Type.PHOTO)) {
+        } else if (measureType.equals(MeasureType.Type.PHOTO)) {
             Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
             File photo = getOutputMediaFile();
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));

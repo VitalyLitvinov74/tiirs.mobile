@@ -72,12 +72,15 @@ public class EquipmentStatus extends RealmObject {
      * @author Dmitriy Logachov
      */
     public class Status {
-        public static final String WORK = "75ad2a48-16d8-4592-ba38-8137b38ad669";
-        public static final String DONT_WORK = "ff1ce1eb-e17e-4e8b-bed9-98e7e9d163af";
-        public static final String UNMOUNTED = "ac9e9d23-980a-4bd1-9008-675946b1e794";
-        public static final String ON_REPAIR = "b012e9f5-14a6-4100-8a16-15a51b4f7258";
-        public static final String IN_STOCK = "26c9a653-41f4-4806-9490-eba9545013e6";
-        public static final String UNKNOWN = "ed20012c-629a-4275-9bfa-a81d08b45758";
+        public static final String ON_REPAIR = "B012E9F5-14A6-4100-8A16-15A51B4F7258";
+        public static final String IN_STOCK = "26C9A653-41F4-4806-9490-EBA9545013E6";
+
+        public static final String NOT_MOUNTED = "62A9AA68-9FE5-4D8C-A4B8-34278B95E51E";
+        public static final String WORK = "61C5007F-AE18-4C4E-BD57-737A20EF9EBC";
+        public static final String NEED_CHECK = "D818A97E-B6EB-4AEC-9168-174C780E365B";
+        public static final String NEED_REPAIR = "7D0713CC-E79D-48D3-A2A2-60898A70BD8A";
+        public static final String NOT_WORK = "7B9C5D15-4079-489F-AF73-5135C36B330A";
+        public static final String UNKNOWN = "ED20012C-629A-4275-9BFA-A81D08B45758";
     }
 
 }

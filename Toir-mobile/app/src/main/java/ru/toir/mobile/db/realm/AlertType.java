@@ -65,4 +65,11 @@ public class AlertType extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
+
+    public class Type {
+        public static final String LOW = "0CF208CB-F672-4F52-90A2-6F617250C0A1";
+        public static final String MEDIUM = "5EDF63AA-1470-4975-B61F-D597ACA02D0F";
+        public static final String HIGH = "E50E1A38-B365-4004-A47B-D7DD4FEB3562";
+    }
+
 }
