@@ -353,7 +353,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
-            RealmQuery<Orders> query = realmDB.where(Orders.class).equalTo("userUuid", authUser.getUuid());
+            RealmQuery<Orders> query = realmDB.where(Orders.class).equalTo("user.uuid", authUser.getUuid());
             if (orderStatus != null) {
                 query.equalTo("orderStatus.uuid", orderStatus);
             }
@@ -796,7 +796,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         // TODO: реализовать отправку
         AuthorizedUser user = AuthorizedUser.getInstance();
         RealmResults<Orders> ordersList = realmDB.where(Orders.class)
-                .equalTo("userUuid", user.getUuid())
+                .equalTo("user.uuid", user.getUuid())
                 .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE)
                 .equalTo("sent", false)
                 .findAll();

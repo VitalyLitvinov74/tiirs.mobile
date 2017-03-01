@@ -92,15 +92,6 @@ public class Equipment extends RealmObject {
         this.criticalType = criticalType;
     }
 
-    /*
-    public String getUserUuid() {
-        return userUuid;
-    }
-    public void setUserUuid(String userUuid) {
-        this.userUuid = userUuid;
-    }
-*/
-
     public Date getStartDate() {
         return startDate;
     }

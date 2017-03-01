@@ -15,8 +15,8 @@ public class Orders extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String authorUuid;
-    private String userUuid;
+    private User author;
+    private User user;
     private Date receiveDate;
     private Date startDate;
     private Date createdAt;
@@ -56,20 +56,20 @@ public class Orders extends RealmObject {
         this.title = title;
     }
 
-    public String getAuthorUuid() {
-        return authorUuid;
+    public User getAuthor() {
+        return author;
     }
 
-    public void setAuthorUuid(String authorUuid) {
-        this.authorUuid = authorUuid;
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
-    public String getUserUuid() {
-        return userUuid;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserUuid(String userUuid) {
-        this.userUuid = userUuid;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Date getReceiveDate() {

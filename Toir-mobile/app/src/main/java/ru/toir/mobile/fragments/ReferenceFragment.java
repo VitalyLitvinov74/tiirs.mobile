@@ -231,19 +231,6 @@ public class ReferenceFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         // добавляем элемент меню для обновления справочников
-        MenuItem clearUpdInf = menu.add("Clear update info");
-        clearUpdInf.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Realm r = Realm.getDefaultInstance();
-                r.beginTransaction();
-                r.where(ReferenceUpdate.class).findAll().deleteAllFromRealm();
-                r.commitTransaction();
-                return true;
-            }
-        });
-
-        // добавляем элемент меню для обновления справочников
         MenuItem getTask = menu.add("Обновить справочники");
         getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 

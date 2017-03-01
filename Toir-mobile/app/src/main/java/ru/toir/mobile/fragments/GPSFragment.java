@@ -146,7 +146,7 @@ public class GPSFragment extends Fragment {
         equipmentListView = (ListView) rootView
                 .findViewById(R.id.gps_listView);
 
-        //orders = realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
+        //orders = realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         RealmQuery<Equipment> q = realmDB.where(Equipment.class);
 
         final ArrayList<GeoPoint> waypoints = new ArrayList<>();
@@ -156,7 +156,7 @@ public class GPSFragment extends Fragment {
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         for (Orders itemOrder : orders) {
             RealmList<Tasks> tasks = itemOrder.getTasks();
-            //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("userUuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
+            //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
             for (Tasks itemTask : tasks) {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();
                 for (Equipment equipment : equipments) {
@@ -286,20 +286,6 @@ public class GPSFragment extends Fragment {
 		return rootView;
 	}
 
-	/**
-	 * Класс объекта оборудования для отображения на крате
-	 *
-	 * @author koputo
-	 */
-	class EquipmentOverlayItem extends OverlayItem {
-		public Equipment equipment;
-
-		public EquipmentOverlayItem(String a, String b, GeoPoint p) {
-			super(a, b, p);
-		}
-	}
-
-
     private Location getLastKnownLocation() {
         LocationManager mLocationManager;
         mLocationManager = (LocationManager)getActivity().getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -315,5 +301,18 @@ public class GPSFragment extends Fragment {
             }
         }
         return bestLocation;
+    }
+
+    /**
+     * Класс объекта оборудования для отображения на крате
+     *
+     * @author koputo
+     */
+    class EquipmentOverlayItem extends OverlayItem {
+        public Equipment equipment;
+
+        public EquipmentOverlayItem(String a, String b, GeoPoint p) {
+            super(a, b, p);
+        }
     }
 }

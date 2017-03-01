@@ -12,6 +12,7 @@ import io.realm.RealmMigration;
 import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 import io.realm.exceptions.RealmException;
+import ru.toir.mobile.db.realm.User;
 
 /**
  * @author Dmitriy Logachev
@@ -213,6 +214,16 @@ public class ToirRealmMigration implements RealmMigration {
                     .removeField("taskStageVerdictUuid")
                     .removeField("taskStageStatusUuid")
                     .removeField("taskStageTemplateUuid");
+            oldVersion++;
+        }
+
+        if (oldVersion == 8) {
+            Log.d(TAG, "from version 8");
+            schema.get("Orders")
+                    .removeField("userUuid")
+                    .removeField("authorUuid")
+                    .addRealmObjectField("user", schema.get("User"))
+                    .addRealmObjectField("author", schema.get("User"));
             oldVersion++;
         }
 
