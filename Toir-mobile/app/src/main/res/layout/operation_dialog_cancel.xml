@@ -1,0 +1,111 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tl_global_layout"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/material_drawer_background"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginTop="5dip"
+        android:text="@string/operation_cancel_text"
+        android:textSize="16sp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <CheckBox
+            android:id="@+id/odc_main_status"
+            android:layout_width="wrap_content"
+            android:theme="@style/checkBoxStyle"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+
+        <RelativeLayout
+            android:id="@+id/odc_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/odc_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_all"
+                android:textSize="16sp"
+                android:paddingLeft="5dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_below="@+id/odc_title"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:textColor="#333333"
+                android:background="@drawable/back_spinner"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/simple_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="#457445"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:spinnerMode="dropdown"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignBottom="@+id/imageView" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_drop"
+                    android:id="@+id/imageView" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/operation_divider"
+        android:layout_width="match_parent"
+        android:background="#222222"
+        android:orientation="horizontal"
+        android:layout_height="1dp"
+        android:paddingTop="5dp"
+        android:layout_marginTop="5dp">
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/odc_listview_layout"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/odc_list_view"
+            android:layout_width="match_parent"
+            android:divider="#333333"
+            android:dividerHeight="1px"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:layout_height="match_parent">
+        </ListView>
+
+    </LinearLayout>
+
+</LinearLayout>

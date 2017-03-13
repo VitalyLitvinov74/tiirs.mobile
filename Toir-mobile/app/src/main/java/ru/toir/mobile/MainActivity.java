@@ -255,11 +255,11 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Response<TokenSrv> response, Retrofit retrofit) {
                             TokenSrv token = response.body();
-
-                            AuthorizedUser.getInstance().setToken(token.getAccessToken());
-
-                            Toast.makeText(getApplicationContext(),
-                                    "Токен получен.", Toast.LENGTH_SHORT).show();
+                            if (token!=null) {
+                                AuthorizedUser.getInstance().setToken(token.getAccessToken());
+                                Toast.makeText(getApplicationContext(),
+                                        "Токен получен.", Toast.LENGTH_SHORT).show();
+                            }
 
                             // запрашиваем актуальную информацию по пользователю
                             Call<User> call = ToirAPIFactory.getUserService().user();
