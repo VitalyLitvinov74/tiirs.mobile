@@ -24,6 +24,7 @@ import ru.toir.mobile.db.realm.Equipment;
 
 import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
 /**
  * @author koputo
@@ -121,7 +122,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     viewHolder.criticalLevel.setText(equipment.getCriticalType().getTitle());
                 }
                 else {
-                    /*
                     // временные фото иконки
                     if (equipment.get_id() == 1)
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_teplogenerator);
@@ -139,14 +139,14 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                          Bitmap crop = getRoundedBitmap(myBitmap, 70);
                          viewHolder.icon.setImageBitmap(crop);
                         }
-                    */
-                    String filename=getPicturesDirectory(context)+"equipments"+equipment.getImage();
+
+                    String filename=getPicturesDirectory(context) + "equipments" + File.separator + equipment.getImage();
                     Bitmap image_bitmap=getResizedBitmap(filename, 100, 0);
                     if (image_bitmap!=null) {
                         viewHolder.icon.setImageBitmap(image_bitmap);
                     }
                     else {
-                        image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
+                        //image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
                     }
                     viewHolder.icon.setImageBitmap(image_bitmap);
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
@@ -170,6 +170,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         }
         return convertView;
     }
+
 
     private static class ViewHolder {
         ImageView icon;
