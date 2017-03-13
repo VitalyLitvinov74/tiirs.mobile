@@ -1,8 +1,10 @@
 package ru.toir.mobile.utils;
 
 import android.content.Context;
+import android.os.Environment;
 import android.telephony.TelephonyManager;
 
+import java.io.File;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -46,6 +48,18 @@ public static void addToJournal(final String description){
             count = realmDB.where(Orders.class).equalTo("orderStatus.title","Получен").findAll().size();
         }
         return count;
+    }
+
+    public static String getPicturesDirectory(Context context) {
+        String filename=Environment.getExternalStorageDirectory().getAbsolutePath()
+                + File.separator
+                + "Android"
+                + File.separator
+                + "data"
+                + File.separator
+                + context.getPackageName()
+                + File.separator;
+        return filename;
     }
 }
 

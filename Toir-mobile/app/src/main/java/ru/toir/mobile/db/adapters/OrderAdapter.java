@@ -123,7 +123,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 if (order == null) break;
                 OrderStatus orderStatus;
                 orderStatus = order.getOrderStatus();
-                lDate = order.getCloseDate();
+                lDate = order.getOpenDate();
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
                     viewHolder.created.setText(sDate);

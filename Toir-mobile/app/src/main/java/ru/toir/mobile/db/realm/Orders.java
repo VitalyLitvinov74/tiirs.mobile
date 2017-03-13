@@ -17,12 +17,12 @@ public class Orders extends RealmObject {
     private String title;
     private User author;
     private User user;
-    private Date receiveDate;
-    private Date startDate;
+    private Date receiveDate;   // дата получения наряда
+    private Date startDate;     // дата назначения наряда
     private Date createdAt;
     private Date changedAt;
-    private Date openDate;
-    private Date closeDate;
+    private Date openDate;      // дата начала работы над нарядом
+    private Date closeDate;     // дата окончания работы над нарядом
     private OrderLevel orderLevel;
     private OrderStatus orderStatus;
     private OrderVerdict orderVerdict;
