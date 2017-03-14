@@ -44,8 +44,10 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
+import com.squareup.okhttp.ResponseBody;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -267,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Response<User> response, Retrofit retrofit) {
                                     User user = response.body();
+                                    final String fileName = user.getImage();
                                     Realm realm = Realm.getDefaultInstance();
                                     realm.beginTransaction();
                                     realm.copyToRealmOrUpdate(user);
@@ -275,6 +278,35 @@ public class MainActivity extends AppCompatActivity {
                                     AuthorizedUser.getInstance().setUuid(user.getUuid());
                                     addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
                                     startGpsTracker(user.getUuid());
+
+                                    // получаем изображение пользователя
+                                    Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
+                                            .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
+                                    callFile.enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
+                                            ResponseBody fileBody = response.body();
+                                            File file = new File(getExternalFilesDir("/users"), fileName);
+                                            if (!file.getParentFile().exists()) {
+                                                if (!file.getParentFile().mkdirs()) {
+                                                    return;
+                                                }
+                                            }
+
+                                            try {
+                                                FileOutputStream fos = new FileOutputStream(file);
+                                                fos.write(fileBody.bytes());
+                                                fos.close();
+                                            } catch (Exception e) {
+                                                Log.e(TAG, e.getLocalizedMessage());
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Throwable t) {
+                                            Log.e(TAG, t.getLocalizedMessage());
+                                        }
+                                    });
 
                                     setMainLayout(savedInstance);
                                     authorizationDialog.dismiss();
