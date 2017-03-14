@@ -42,8 +42,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
+import com.squareup.okhttp.ResponseBody;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,6 +59,7 @@ import retrofit.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
@@ -531,11 +534,73 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         try {
                             Response<List<Orders>> response = call.execute();
                             result = response.body();
-                            return result;
                         } catch (Exception e) {
                             Log.d(TAG, e.getLocalizedMessage());
                             return null;
                         }
+
+                        // список файлов для загрузки
+                        List<FilePath> files = new ArrayList<FilePath>();
+                        // строим список изображений для загрузки
+                        for (Orders order : result) {
+                            List<Tasks> tasks = order.getTasks();
+                            for (Tasks task : tasks) {
+                                // UUID шаблона задачи
+                                String taskTemplateUuid = task.getTaskTemplate().getUuid();
+                                // путь до папки с файлами
+                                String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
+                                // общий путь до файлов на сервере
+                                String basePath = "/storage/" + equipmentModelUuid + "/";
+                                // общий путь до файлов локальный
+                                String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
+                                // урл изображения задачи
+                                files.add(new FilePath(task.getTaskTemplate().getImage(),
+                                        basePath, basePathLocal));
+                                // урл изображения оборудования
+                                files.add(new FilePath(task.getEquipment().getImage(),
+                                        basePath, "/equipment/"));
+
+                                List<TaskStages> stages = task.getTaskStages();
+                                for (TaskStages stage : stages) {
+                                    // урл изображения этапа задачи
+                                    files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
+                                            basePath, basePathLocal));
+
+                                    List<Operation> operations = stage.getOperations();
+                                    for (Operation operation : operations) {
+                                        // урл изображения операции
+                                        files.add(new FilePath(operation.getOperationTemplate().getImage(),
+                                                basePath, basePathLocal));
+                                    }
+                                }
+                            }
+                        }
+
+                        // загружаем файлы
+                        for (FilePath path : files) {
+                            Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(ToirApplication.serverUrl + path.urlPath + path.fileName);
+                            try {
+                                Response<ResponseBody> r = call1.execute();
+                                ResponseBody trueImgBody = r.body();
+                                File file = new File(
+                                        getContext().getExternalFilesDir(path.localPath), path.fileName);
+                                if (!file.getParentFile().exists()) {
+                                    if (!file.getParentFile().mkdirs()) {
+                                        continue;
+                                    }
+                                }
+
+                                FileOutputStream fos = new FileOutputStream(file);
+                                fos.write(trueImgBody.bytes());
+                                fos.close();
+//                                equipment.setImage(file.getPath());
+//                                equipmentDBAdapter.replace(equipment);
+                            } catch (Exception e) {
+                                Log.e(TAG, e.getLocalizedMessage());
+                            }
+                        }
+
+                        return result;
                     }
 
                     @Override
@@ -1449,6 +1514,18 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         public String toString() {
             return title;
+        }
+    }
+
+    private class FilePath {
+        String fileName;
+        String urlPath;
+        String localPath;
+
+        FilePath(String name, String url, String local) {
+            fileName = name;
+            urlPath = url;
+            localPath = local;
         }
     }
 }

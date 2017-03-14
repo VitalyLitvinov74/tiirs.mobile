@@ -18,6 +18,7 @@ import java.util.Locale;
  */
 public class DateTypeDeserializer implements JsonDeserializer<Date> {
     private final String[] DATE_FORMATS = new String[]{
+            "yyyy-MM-dd HH:mm:ss",
             "yyyy-MM-dd'T'HH:mm:ssZ",
             "yyyy-MM-dd'T'HH:mm:ss",
             "yyyy-MM-dd",
@@ -33,10 +34,11 @@ public class DateTypeDeserializer implements JsonDeserializer<Date> {
     @Override
     public Date deserialize(JsonElement jsonElement, Type typeOF,
                             JsonDeserializationContext context) throws JsonParseException {
+        String dateString = jsonElement.getAsString();
         for (String format : DATE_FORMATS) {
             try {
-                return new SimpleDateFormat(format, Locale.US)
-                        .parse(jsonElement.getAsString());
+                Date date = new SimpleDateFormat(format, Locale.US).parse(dateString);
+                return date;
             } catch (ParseException e) {
                 // do noting
             }

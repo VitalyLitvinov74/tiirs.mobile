@@ -106,7 +106,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 convertView.setTag(viewHolder);
                 long id = separates.get(position + 1);
                 if (adapterData == null) break;
-                lDate = adapterData.get((int)id).getCloseDate();
+                lDate = adapterData.get((int) id).getCreatedAt();
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MMMM yyyy", myDateFormatSymbols).format(lDate);
                     viewHolder.title.setText(sDate);
@@ -123,7 +123,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 if (order == null) break;
                 OrderStatus orderStatus;
                 orderStatus = order.getOrderStatus();
-                lDate = order.getCloseDate();
+                lDate = order.getCreatedAt();
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
                     viewHolder.created.setText(sDate);
