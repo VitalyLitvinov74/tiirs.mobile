@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -21,6 +22,8 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Equipment;
 
+import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
 /**
@@ -64,6 +67,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+        File image;
         if (convertView == null) {
             //if (parent.getId() == R.id.gps_listView) {
             if (parent.getId() == R.id.eril_status_label) {
@@ -135,6 +139,16 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                          Bitmap crop = getRoundedBitmap(myBitmap, 70);
                          viewHolder.icon.setImageBitmap(crop);
                         }
+
+                    String filename=getPicturesDirectory(context) + "equipments" + File.separator + equipment.getImage();
+                    Bitmap image_bitmap=getResizedBitmap(filename, 100, 0);
+                    if (image_bitmap!=null) {
+                        viewHolder.icon.setImageBitmap(image_bitmap);
+                    }
+                    else {
+                        //image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
+                    }
+                    viewHolder.icon.setImageBitmap(image_bitmap);
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
                     viewHolder.location.setText(equipment.getLocation());
@@ -156,6 +170,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         }
         return convertView;
     }
+
 
     private static class ViewHolder {
         ImageView icon;

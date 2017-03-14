@@ -7,6 +7,7 @@ package ru.toir.mobile.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,6 +21,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class RoundedImageView extends ImageView {
 
@@ -100,5 +106,46 @@ public class RoundedImageView extends ImageView {
         mpaint.setShader(new BitmapShader(bmp, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
         canvas.drawRoundRect((new RectF(0, 0, bmp.getWidth(), bmp.getHeight())), radius, radius, mpaint);
         return imageRounded;
+    }
+
+    public static Bitmap getResizedBitmap(String filename, int newWidth, int newHeight) {
+        Bitmap imageBitmap;
+        Bitmap imageBitmap2;
+        float scaleWidth;
+        float scaleHeight;
+        File image = new File(filename.replace(".","_m."));
+        if (image==null) return null;
+        imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
+        if (imageBitmap2!=null) return imageBitmap2;
+
+        imageBitmap = BitmapFactory.decodeFile(filename);
+        if (imageBitmap != null) {
+            int width = imageBitmap.getWidth();
+            int height = imageBitmap.getHeight();
+            if (newWidth<=0 || newHeight<=0) return null;
+            if (newWidth>0) {
+                 scaleWidth = (float) newWidth / (float) width;
+                 newHeight = (int) (height * scaleWidth);
+                }
+            else if (newHeight>0) {
+                scaleHeight = (float) newHeight / (float) height;
+                newWidth = (int) (width * scaleHeight);
+            }
+
+            imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
+            FileOutputStream fOut = null;
+            try {
+                fOut = new FileOutputStream(image);
+                imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                fOut.flush();
+                fOut.close();
+                return imageBitmap2;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

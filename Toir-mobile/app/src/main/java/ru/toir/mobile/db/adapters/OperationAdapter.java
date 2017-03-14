@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
@@ -28,6 +29,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
+import ru.toir.mobile.db.realm.OperationVerdict;
 
 /**
  * @author olejek
@@ -39,6 +41,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     private int counter=0;
     private boolean[] visibility = new boolean[50];
     private boolean[] completed = new boolean[50];
+    Realm realm = Realm.getDefaultInstance();
 
     public class Status {
         public static final String NEW = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
@@ -100,104 +103,122 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         if (adapterData==null) return convertView;
         operation = adapterData.get(position);
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.operation_item, parent, false);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
-            viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
-            viewHolder.verdict = (ImageView) convertView.findViewById(R.id.operation_verdict);
-            viewHolder.start_date = (TextView) convertView.findViewById(R.id.operation_startDate);
-            viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
-            viewHolder.description = (TextView) convertView.findViewById(R.id.op_description);
-            viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
-            viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_value);
-            viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
-            viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
+            if (parent.getId() == R.id.list_view) {
+                convertView = inflater.inflate(R.layout.operation_item, parent, false);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
+                viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
+                viewHolder.verdict = (ImageView) convertView.findViewById(R.id.operation_verdict);
+                viewHolder.start_date = (TextView) convertView.findViewById(R.id.operation_startDate);
+                viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
+                viewHolder.description = (TextView) convertView.findViewById(R.id.op_description);
+                viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
+                viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_value);
+                viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
+                viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
+            }
+            else {
+                convertView = inflater.inflate(R.layout.operation_cancel_item, parent, false);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
+                viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
+                viewHolder.spinner = (Spinner) convertView.findViewById(R.id.operation_verdict_spinner);
+            }
             convertView.setTag(viewHolder);
         }
         else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.status.setEnabled(completed[position]);
+        if (parent.getId() == R.id.list_view) {
 
-        if (visibility[position]) {
-            viewHolder.description_layout.setVisibility(View.VISIBLE);
-            convertView.setTag(viewHolder);
-            viewHolder = (ViewHolder) convertView.getTag();
-            //notifyDataSetChanged();
-           }
-        else {
-            viewHolder.description_layout.setVisibility(View.GONE);
-            convertView.setTag(viewHolder);
-            viewHolder = (ViewHolder) convertView.getTag();
-            //notifyDataSetChanged();
-        }
+            viewHolder.status.setEnabled(completed[position]);
+            if (visibility[position]) {
+                viewHolder.description_layout.setVisibility(View.VISIBLE);
+                convertView.setTag(viewHolder);
+                viewHolder = (ViewHolder) convertView.getTag();
+                //notifyDataSetChanged();
+            } else {
+                viewHolder.description_layout.setVisibility(View.GONE);
+                convertView.setTag(viewHolder);
+                viewHolder = (ViewHolder) convertView.getTag();
+                //notifyDataSetChanged();
+            }
 
-        if (adapterData != null) {
-            if (operation != null) {
-                String sDate;
-                OperationStatus operationStatus;
-                operationStatus = operation.getOperationStatus();
-                viewHolder.title.setText(operation.getOperationTemplate().getTitle());
-                Date lDate = operation.getStartDate();
-                if (lDate != null) {
-                    sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
-                    viewHolder.start_date.setText(sDate);
-                }
-                lDate = operation.getEndDate();
-                if (lDate != null) {
-                    sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
-                    viewHolder.end_date.setText(sDate);
-                }
-
-                if (operationStatus != null) {
-                    if (operationStatus.getTitle().equals("Не выполнена")) {
-                        viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
+            if (adapterData != null) {
+                if (operation != null) {
+                    String sDate;
+                    OperationStatus operationStatus;
+                    operationStatus = operation.getOperationStatus();
+                    viewHolder.title.setText(operation.getOperationTemplate().getTitle());
+                    Date lDate = operation.getStartDate();
+                    if (lDate != null) {
+                        sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
+                        viewHolder.start_date.setText(sDate);
                     }
-                    if (operationStatus.getTitle().equals("Выполнена")) {
-                        viewHolder.status.setChecked(true);
-                        viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
+                    lDate = operation.getEndDate();
+                    if (lDate != null) {
+                        sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
+                        viewHolder.end_date.setText(sDate);
                     }
-                }
 
-                viewHolder.description.setText(operation.getOperationTemplate().getDescription());
-                viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
-
-                image=getOutputMediaFile(operation.getUuid(),1);
-                Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
-                //counter++;
-                //Toast toast = Toast.makeText(context,""+counter,Toast.LENGTH_SHORT);
-                //toast.show();
-                Realm realmDB = Realm.getDefaultInstance();
-                MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid",operation.getUuid()).findFirst();
-                if (lastValue!=null)
-                    viewHolder.measure.setText(lastValue.getValue()+" ("+new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate())+")");
-
-                if (imageBitmap==null) {
-                    image2=getOutputMediaFile(operation.getUuid(),0);
-                    imageBitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
-                    if (imageBitmap!=null) {
-                        int width = imageBitmap.getWidth();
-                        int height = imageBitmap.getHeight();
-                        int newWidth = 300;
-                        float scaleWidth = (float) newWidth / (float) width;
-                        int newHeight = (int) (height * scaleWidth);
-
-                        Bitmap imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
-                        FileOutputStream fOut = null;
-                        try {
-                            fOut = new FileOutputStream(image);
-                            imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                            fOut.flush();
-                            fOut.close();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    if (operationStatus != null) {
+                        if (operationStatus.getTitle().equals("Не выполнена")) {
+                            viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
                         }
-                        viewHolder.image.setImageBitmap(imageBitmap2);
+                        if (operationStatus.getTitle().equals("Выполнена")) {
+                            viewHolder.status.setChecked(true);
+                            viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
+                        }
                     }
+                    viewHolder.description.setText(operation.getOperationTemplate().getDescription());
+                    viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
+
+                    image = getOutputMediaFile(operation.getUuid(), 1);
+                    Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+                    //counter++;
+                    //Toast toast = Toast.makeText(context,""+counter,Toast.LENGTH_SHORT);
+                    //toast.show();
+                    Realm realmDB = Realm.getDefaultInstance();
+                    MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid", operation.getUuid()).findFirst();
+                    if (lastValue != null)
+                        viewHolder.measure.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
+
+                    if (imageBitmap == null) {
+                        image2 = getOutputMediaFile(operation.getUuid(), 0);
+                        imageBitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
+                        if (imageBitmap != null) {
+                            int width = imageBitmap.getWidth();
+                            int height = imageBitmap.getHeight();
+                            int newWidth = 300;
+                            float scaleWidth = (float) newWidth / (float) width;
+                            int newHeight = (int) (height * scaleWidth);
+
+                            Bitmap imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
+                            FileOutputStream fOut = null;
+                            try {
+                                fOut = new FileOutputStream(image);
+                                imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                                fOut.flush();
+                                fOut.close();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            viewHolder.image.setImageBitmap(imageBitmap2);
+                        }
+                    } else viewHolder.image.setImageBitmap(imageBitmap);
                 }
-                else viewHolder.image.setImageBitmap(imageBitmap);
+            }
+        }
+        else {
+            if (adapterData != null) {
+                if (operation != null) {
+                    viewHolder.title.setText(operation.getOperationTemplate().getTitle());
+                    RealmResults<OperationVerdict> operationVerdict;
+                    operationVerdict = realm.where(OperationVerdict.class).findAll();
+                    OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(context, operationVerdict);
+                    viewHolder.spinner.setAdapter(operationVerdictAdapter);
+                }
             }
         }
       return convertView;
@@ -226,6 +247,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     private static class ViewHolder {
         TextView title;
         CheckBox status;
+        Spinner spinner;
         ImageView verdict;
         TextView start_date;
         TextView end_date;

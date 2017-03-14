@@ -133,4 +133,8 @@
     <string name="journal">Журнал</string>
     <string name="toirSettings">Настройки приложения</string>
 
+    <string name="dialog_accept">Принять</string>
+    <string name="dialog_cancel">Отменить</string>
+    <string name="select_all">Выбрать все операции</string>
+    <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
 </resources>

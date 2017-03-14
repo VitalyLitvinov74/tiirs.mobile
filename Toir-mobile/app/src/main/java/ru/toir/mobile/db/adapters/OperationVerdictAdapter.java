@@ -33,10 +33,11 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
 
     @Override
     public OperationVerdict getItem(int position) {
+        OperationVerdict operationVerdict = null;
         if (adapterData != null) {
-            return adapterData.get(position);
+            operationVerdict = adapterData.get(position);
         }
-        return null;
+        return operationVerdict;
     }
 
     @Override
@@ -52,35 +53,49 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (parent.getId() == R.id.simple_spinner) {
-            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            OperationVerdict operationVerdict;
-            if (adapterData != null) {
-                operationVerdict = adapterData.get(position);
-                textView.setText(operationVerdict.getTitle());
-            }
-            return textView;
-        }
-        if (parent.getId() == R.id.reference_listView) {
-            if (convertView == null) {
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            if (parent.getId() == R.id.reference_listView) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder = new ViewHolder();
                 viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
                 viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
             }
-            OperationVerdict operationVerdict;
+            if (parent.getId() == R.id.simple_spinner || parent.getId() == R.id.operation_verdict_spinner) {
+                convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+                viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+                convertView.setTag(viewHolder);
+            }
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        OperationVerdict operationVerdict;
+        if (adapterData != null && viewHolder.title !=null) {
+            operationVerdict = adapterData.get(position);
+            if (operationVerdict != null)
+                viewHolder.title.setText(operationVerdict.getTitle());
+        }
+
+        if (convertView == null) {
+            TextView textView = new TextView(context);
             if (adapterData != null) {
                 operationVerdict = adapterData.get(position);
-                viewHolder.title.setText(operationVerdict.getTitle());
-                viewHolder.uuid.setText(operationVerdict.getUuid());
+                if (operationVerdict != null)
+                    textView.setText(operationVerdict.getTitle());
+                textView.setTextSize(16);
+                //textView.setPadding(5,5,5,5);
             }
-            return convertView;
+            return textView;
         }
         return convertView;
     }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return getView(position, null, parent);
+    }
+
 
     private static class ViewHolder {
         TextView uuid;

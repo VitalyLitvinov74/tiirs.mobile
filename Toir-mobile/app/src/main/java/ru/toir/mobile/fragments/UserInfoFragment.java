@@ -2,12 +2,10 @@ package ru.toir.mobile.fragments;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +25,9 @@ import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.User;
+
+import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 public class UserInfoFragment extends Fragment {
     private Realm realmDB;
@@ -127,27 +128,11 @@ public class UserInfoFragment extends Fragment {
                 user_status_gprs.setChecked(false);
             }
 
-            if (AuthorizedUser.getInstance().getTagId().equals("3000E2004000860902332580112D")) {
-                // ваще хардкодед для демонстрашки
-				// TODO реальные фотки должны адресоваться из базы
-				File imgFile = new File(Environment
-						.getExternalStorageDirectory().getAbsolutePath()
-						+ File.separator
-						+ "Android"
-						+ File.separator
-						+ "data"
-						+ File.separator
-						+ getActivity().getApplicationContext()
-								.getPackageName()
-						+ File.separator
-						+ "img"
-						+ File.separator + "m_kazantcev.jpg");
-				if (imgFile.exists() && imgFile.isFile()) {
-					Bitmap myBitmap = BitmapFactory.decodeFile(imgFile
-							.getAbsolutePath());
-					user_image.setImageBitmap(myBitmap);
-				}
-			}
+            String filename=getPicturesDirectory(getActivity().getApplicationContext())+"users"+ File.separator + user.getImage();
+            Bitmap user_bitmap=getResizedBitmap(filename, 0, 200);
+            if (user_bitmap!=null) {
+                user_image.setImageBitmap(user_bitmap);
+            }
 		}
 	}
 }
