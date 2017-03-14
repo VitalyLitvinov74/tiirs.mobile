@@ -2,14 +2,10 @@ package ru.toir.mobile;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-//import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,14 +42,21 @@ import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Tasks;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.ReferenceServiceHelper;
-//import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
+
+import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+
+//import android.content.BroadcastReceiver;
+//import android.content.Context;
+//import android.content.IntentFilter;
+//import ru.toir.mobile.rest.IServiceProvider;
+//import ru.toir.mobile.rest.ProcessorService;
+//import ru.toir.mobile.rest.ReferenceServiceHelper;
+//import ru.toir.mobile.rest.ReferenceServiceProvider;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
     private Realm realmDB;
@@ -392,10 +395,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
         tv_equipment_task_date.setText(startDate);
-        /*
-		tv_equipment_critical.setText("Критичность: "
-				+ equipment.getCriticalType().getTitle());
-*/
+        /* tv_equipment_critical.setText("Критичность: "
+				+ equipment.getCriticalType().getTitle());*/
 
         if (equipment.getEquipmentStatus() != null) {
             tv_equipment_status.setText(equipment.getEquipmentStatus().getTitle());
@@ -413,10 +414,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (equipment.get_id() == 3) tv_equipment_image.setImageResource(R.drawable.pressure);
         if (equipment.get_id() == 4) tv_equipment_image.setImageResource(R.drawable.gas_counter);
 
-        File imgFile = new File(equipment.getImage());
-        if (imgFile.exists() && imgFile.isFile()) {
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            //tv_equipment_image.setImageBitmap(myBitmap);
+        String filename=getPicturesDirectory(getApplicationContext()) + "equipments" + File.separator + equipment.getImage();
+        Bitmap image_bitmap=getResizedBitmap(filename, 0, 200);
+        if (image_bitmap!=null) {
+            tv_equipment_image.setImageBitmap(image_bitmap);
+        }
+        else {
+            //image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
         }
 
         RealmResults<Documentation> documentation;

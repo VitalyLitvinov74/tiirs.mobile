@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 //import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -120,6 +122,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private int currentOperationId = 0;
     private long startTime = 0;
     private boolean firstLaunch = true;
+    private SharedPreferences sp;
+
     CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
@@ -262,6 +266,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                              @Nullable Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.orders_layout, container, false);
+        sp = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         Toolbar toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
         submit = (Button) rootView.findViewById(R.id.tl_finishButton);
@@ -471,7 +476,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         operations = q.findAll();
 
-        operationAdapter = new OperationAdapter(getContext(), operations);
+        operationAdapter = new OperationAdapter(getContext(), operations, currentTaskUuid);
         mainListView.setAdapter(operationAdapter);
         //resultButtonLayout.setVisibility(View.VISIBLE);
         makePhotoButton.setVisibility(View.VISIBLE);
@@ -539,7 +544,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         }
 
                         // список файлов для загрузки
-                        List<FilePath> files = new ArrayList<FilePath>();
+                        List<FilePath> files = new ArrayList<>();
                         // строим список изображений для загрузки
                         for (Orders order : result) {
                             List<Tasks> tasks = order.getTasks();
@@ -1299,11 +1304,13 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                                     String tagId = ((String) message.obj).substring(4);
                                     Log.d(TAG, "Ид метки получили: " + tagId);
-                                    //if (expectedTagId.equals(tagId)) {
-                                    if (true) {
-                                        Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
-                                        intent.putExtra("hardwareUUID", currentEquipment.getUuid());
-                                        startActivity(intent);
+                                    if (expectedTagId.equals(tagId)) {
+                                        boolean run_ar_content = sp.getBoolean("@string/pref_debug_mode",false);
+                                        if (run_ar_content) {
+                                            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
+                                            intent.putExtra("hardwareUUID", currentEquipment.getUuid());
+                                            startActivity(intent);
+                                        }
                                         fillListViewTaskStage(selectedTask);
                                         Level = 2;
                                     } else {
@@ -1658,7 +1665,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         operations = q.findAll();
 
         OperationAdapter uncompleteOperationAdapter;
-        uncompleteOperationAdapter = new OperationAdapter(getContext(), operations);
+        uncompleteOperationAdapter = new OperationAdapter(getContext(), operations, currentTaskUuid);
         listView.setAdapter(uncompleteOperationAdapter);
     }
 

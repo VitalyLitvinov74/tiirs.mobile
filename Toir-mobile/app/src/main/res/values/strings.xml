@@ -137,4 +137,6 @@
     <string name="dialog_cancel">Отменить</string>
     <string name="select_all">Выбрать все операции</string>
     <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
+
+    <string name="run_ar_content">Запуск AR-контента</string>
 </resources>
