@@ -71,7 +71,7 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
         }
 
         OperationVerdict operationVerdict;
-        if (adapterData != null && viewHolder.title !=null) {
+        if (adapterData != null && viewHolder.title != null) {
             operationVerdict = adapterData.get(position);
             if (operationVerdict != null)
                 viewHolder.title.setText(operationVerdict.getTitle());

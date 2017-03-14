@@ -41,30 +41,6 @@ public class RoundedImageView extends ImageView {
         super(context, attrs, defStyle);
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-
-        Drawable drawable = getDrawable();
-
-        if (drawable == null) {
-            return;
-        }
-
-        if (getWidth() == 0 || getHeight() == 0) {
-            return;
-        }
-        Bitmap b = ((BitmapDrawable) drawable).getBitmap();
-        Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
-
-        int w = getWidth();
-        @SuppressWarnings("unused")
-        int h = getHeight();
-
-        Bitmap roundBitmap = getCroppedBitmap(bitmap, w);
-        canvas.drawBitmap(roundBitmap, 0, 0, null);
-
-    }
-
     public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
         Bitmap sbmp;
 
@@ -113,21 +89,20 @@ public class RoundedImageView extends ImageView {
         Bitmap imageBitmap2;
         float scaleWidth;
         float scaleHeight;
-        File image = new File(filename.replace(".","_m."));
-        if (image==null) return null;
+        File image = new File(filename.replace(".", "_m."));
+        if (image == null) return null;
         imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
-        if (imageBitmap2!=null) return imageBitmap2;
+        if (imageBitmap2 != null) return imageBitmap2;
 
         imageBitmap = BitmapFactory.decodeFile(filename);
         if (imageBitmap != null) {
             int width = imageBitmap.getWidth();
             int height = imageBitmap.getHeight();
-            if (newWidth<=0 || newHeight<=0) return null;
-            if (newWidth>0) {
-                 scaleWidth = (float) newWidth / (float) width;
-                 newHeight = (int) (height * scaleWidth);
-                }
-            else if (newHeight>0) {
+            if (newWidth <= 0 || newHeight <= 0) return null;
+            if (newWidth > 0) {
+                scaleWidth = (float) newWidth / (float) width;
+                newHeight = (int) (height * scaleWidth);
+            } else if (newHeight > 0) {
                 scaleHeight = (float) newHeight / (float) height;
                 newWidth = (int) (width * scaleHeight);
             }
@@ -147,5 +122,29 @@ public class RoundedImageView extends ImageView {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+
+        Drawable drawable = getDrawable();
+
+        if (drawable == null) {
+            return;
+        }
+
+        if (getWidth() == 0 || getHeight() == 0) {
+            return;
+        }
+        Bitmap b = ((BitmapDrawable) drawable).getBitmap();
+        Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+
+        int w = getWidth();
+        @SuppressWarnings("unused")
+        int h = getHeight();
+
+        Bitmap roundBitmap = getCroppedBitmap(bitmap, w);
+        canvas.drawBitmap(roundBitmap, 0, 0, null);
+
     }
 }

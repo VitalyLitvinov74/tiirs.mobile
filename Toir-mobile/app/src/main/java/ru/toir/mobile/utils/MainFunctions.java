@@ -51,7 +51,7 @@ public static void addToJournal(final String description){
     }
 
     public static String getPicturesDirectory(Context context) {
-        String filename=Environment.getExternalStorageDirectory().getAbsolutePath()
+        String filename = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + File.separator
                 + "Android"
                 + File.separator

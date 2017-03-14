@@ -140,12 +140,11 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                          viewHolder.icon.setImageBitmap(crop);
                         }
 
-                    String filename=getPicturesDirectory(context) + "equipments" + File.separator + equipment.getImage();
-                    Bitmap image_bitmap=getResizedBitmap(filename, 100, 0);
-                    if (image_bitmap!=null) {
+                    String filename = getPicturesDirectory(context) + "equipments" + File.separator + equipment.getImage();
+                    Bitmap image_bitmap = getResizedBitmap(filename, 100, 0);
+                    if (image_bitmap != null) {
                         viewHolder.icon.setImageBitmap(image_bitmap);
-                    }
-                    else {
+                    } else {
                         //image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
                     }
                     viewHolder.icon.setImageBitmap(image_bitmap);
