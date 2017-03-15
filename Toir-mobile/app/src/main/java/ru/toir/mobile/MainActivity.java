@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Response<TokenSrv> response, Retrofit retrofit) {
                             TokenSrv token = response.body();
-                            if (token!=null) {
+                            if (token != null) {
                                 AuthorizedUser.getInstance().setToken(token.getAccessToken());
                                 Toast.makeText(getApplicationContext(),
                                         "Токен получен.", Toast.LENGTH_SHORT).show();

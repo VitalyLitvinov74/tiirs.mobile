@@ -128,11 +128,11 @@ public class UserInfoFragment extends Fragment {
                 user_status_gprs.setChecked(false);
             }
 
-            String filename=getPicturesDirectory(getActivity().getApplicationContext())+"users"+ File.separator + user.getImage();
-            Bitmap user_bitmap=getResizedBitmap(filename, 0, 200);
-            if (user_bitmap!=null) {
+            String filename = getPicturesDirectory(getActivity().getApplicationContext()) + "users" + File.separator + user.getImage();
+            Bitmap user_bitmap = getResizedBitmap(filename, 0, 200);
+            if (user_bitmap != null) {
                 user_image.setImageBitmap(user_bitmap);
             }
-		}
-	}
+        }
+    }
 }

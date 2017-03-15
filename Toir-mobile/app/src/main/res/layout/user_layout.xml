@@ -2,10 +2,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="#FAFAFA"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FAFAFA"
+    android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/user_info_common"
@@ -18,42 +18,42 @@
                 android:layout_height="200dp"
                 android:layout_gravity="top"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/profile_ivanov"
-                android:scaleType="center" />
+                android:scaleType="center"
+                android:src="@drawable/profile_ivanov" />
 
             <TextView
                 android:id="@+id/user_text_name"
                 android:layout_width="fill_parent"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
                 android:layout_height="40dp"
+                android:layout_below="@+id/user_image"
+                android:adjustViewBounds="true"
+                android:background="#1565C0"
                 android:paddingLeft="15dp"
                 android:paddingTop="10dp"
-                android:layout_below="@+id/user_image"
+                android:scaleType="centerCrop"
                 android:textColor="#ffffff"
-                android:background="#1565C0"
                 android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/user_text_uuid"
                 android:layout_width="fill_parent"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
                 android:layout_height="30dp"
-                android:paddingLeft="15dp"
-                android:paddingBottom="10dp"
-                android:textColor="#ffffff"
                 android:layout_below="@+id/user_text_name"
+                android:adjustViewBounds="true"
                 android:background="#1565C0"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:scaleType="centerCrop"
+                android:textColor="#ffffff"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/user_text_type"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="48dp"
                 android:layout_below="@+id/user_text_uuid"
                 android:background="#FAFAFA"
+                android:paddingLeft="48dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
@@ -61,23 +61,23 @@
                 android:id="@+id/user_text_whois_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="48dp"
                 android:layout_below="@+id/user_text_type"
                 android:background="#FAFAFA"
-                android:textColor="@color/larisaTextColor"
+                android:paddingLeft="48dp"
                 android:text="@string/whois"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/user_edit_image"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:layout_alignParentRight="true"
-                android:paddingRight="10dp"
                 android:layout_above="@id/user_text_type"
+                android:layout_alignParentRight="true"
                 android:layout_marginBottom="-30dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image_description"
+                android:paddingRight="10dp"
                 android:src="@drawable/circle3" />
 
             <ImageView
@@ -93,10 +93,10 @@
                 android:id="@+id/user_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/user_text_whois_label"
                 android:layout_toRightOf="@+id/user_location_icon"
                 android:background="#FAFAFA"
+                android:paddingLeft="10dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
@@ -104,12 +104,12 @@
                 android:id="@+id/user_text_location_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/user_text_location"
                 android:layout_toRightOf="@+id/user_location_icon"
                 android:background="#FAFAFA"
-                android:textColor="@color/larisaTextColor"
+                android:paddingLeft="10dp"
                 android:text="@string/current_location"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <ImageView
@@ -118,18 +118,18 @@
                 android:layout_height="50dp"
                 android:layout_below="@+id/user_text_location_label"
                 android:layout_marginLeft="15dp"
+                android:clickable="false"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/calendar"
-                android:clickable="false" />
+                android:src="@drawable/calendar" />
 
             <TextView
                 android:id="@+id/user_text_date"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/user_text_location_label"
                 android:layout_toRightOf="@+id/user_date_icon"
                 android:background="#FAFAFA"
+                android:paddingLeft="10dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
@@ -137,82 +137,82 @@
                 android:id="@+id/user_text_date_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/user_text_date"
                 android:layout_toRightOf="@+id/user_date_icon"
                 android:background="#FAFAFA"
-                android:textColor="@color/larisaTextColor"
+                android:paddingLeft="10dp"
                 android:text="@string/server_date_connect"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <View
                 android:id="@+id/user_divider"
                 android:layout_width="match_parent"
-                android:paddingTop="20dp"
-                android:layout_below="@+id/user_text_date_label"
                 android:layout_height="1dp"
-                android:background="#EDEDED" />
+                android:layout_below="@+id/user_text_date_label"
+                android:background="#EDEDED"
+                android:paddingTop="20dp" />
 
             <TextView
                 android:id="@+id/user_status_gprs"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
-                android:paddingLeft="45dp"
                 android:layout_below="@+id/user_divider"
                 android:background="#FAFAFA"
-                android:textColor="@color/larisaTextColor"
-                android:text="@string/gprs_status"
-                android:textSize="18sp"
+                android:clickable="false"
                 android:gravity="center_vertical"
-                android:clickable="false" />
+                android:paddingLeft="45dp"
+                android:text="@string/gprs_status"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/user_status_gps"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
-                android:paddingLeft="45dp"
                 android:layout_below="@+id/user_status_gprs"
                 android:background="#FAFAFA"
-                android:textColor="@color/larisaTextColor"
+                android:clickable="false"
+                android:gravity="center_vertical"
+                android:paddingLeft="45dp"
                 android:text="@string/gps_status"
-                android:textSize="18sp"
-                android:gravity="center_vertical"
-                android:clickable="false" />
+                android:textColor="@color/larisaTextColor"
+                android:textSize="18sp" />
 
             <Switch
-                android:layout_width="wrap_content"
-                android:text=""
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
                 android:id="@+id/user_status_gprs_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignRight="@+id/user_boss_contact"
                 android:layout_below="@+id/user_divider"
-                android:layout_alignRight="@+id/user_boss_contact" />
+                android:gravity="center_vertical"
+                android:text="" />
 
             <Switch
-                android:layout_width="wrap_content"
-                android:text=""
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
                 android:id="@+id/user_status_gps_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignRight="@+id/user_boss_contact"
                 android:layout_below="@+id/user_status_gprs"
-                android:layout_alignRight="@+id/user_boss_contact" />
+                android:gravity="center_vertical"
+                android:text="" />
 
             <View
                 android:id="@+id/user_divider2"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/user_status_gps"
                 android:layout_height="1dp"
+                android:layout_below="@+id/user_status_gps"
+                android:background="#EDEDED"
                 android:paddingLeft="30dp"
-                android:paddingRight="10dp"
-                android:background="#EDEDED" />
+                android:paddingRight="10dp" />
 
             <TextView
                 android:id="@+id/user_text_boss"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="45dp"
                 android:layout_below="@+id/user_divider2"
                 android:background="#FAFAFA"
+                android:paddingLeft="45dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
@@ -220,9 +220,9 @@
                 android:id="@+id/user_text_boss_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="45dp"
                 android:layout_below="@+id/user_text_boss"
                 android:background="#FAFAFA"
+                android:paddingLeft="45dp"
                 android:text="@string/boss_contact"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
@@ -231,18 +231,18 @@
                 android:id="@+id/user_boss_contact"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
+                android:layout_alignParentRight="true"
                 android:layout_below="@+id/user_divider2"
-                android:layout_marginRight="15dp"
                 android:layout_gravity="right"
+                android:layout_marginRight="15dp"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/phone"
-                android:layout_alignParentRight="true" />
+                android:src="@drawable/phone" />
 
             <View
                 android:id="@+id/user_divider3"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/user_boss_contact"
                 android:layout_height="80dp"
+                android:layout_below="@+id/user_boss_contact"
                 android:background="#ffffff" />
 
         </RelativeLayout>

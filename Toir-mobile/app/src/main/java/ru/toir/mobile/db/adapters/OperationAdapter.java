@@ -15,6 +15,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -37,19 +40,12 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
  */
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     public static final String TABLE_NAME = "Operation";
+    Realm realm = Realm.getDefaultInstance();
     private Context context;
     private int counter=0;
     private String taskStageTemplateUuid;
     private boolean[] visibility = new boolean[50];
     private boolean[] completed = new boolean[50];
-    Realm realm = Realm.getDefaultInstance();
-
-    public class Status {
-        public static final String NEW = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
-        public static final String IN_WORK = "9f980db5-934c-4ddb-999a-04c6c3daca59";
-        public static final String COMPLETE = "dc6dca37-2cc9-44da-aff9-19bf143e611a";
-        public static final String UN_COMPLETE = "363c08ec-89d9-47df-b7cf-63a05d56594c";
-    }
 
     public OperationAdapter(@NonNull Context context, RealmResults<Operation> data, String taskStageTemplateUuid) {
         super(context, data);
@@ -90,6 +86,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     {
         completed[position]=enable;
     }
+
     public boolean getItemEnable(int position)
     {
         return completed[position];
@@ -117,8 +114,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_value);
                 viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
                 viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
-            }
-            else {
+            } else {
                 convertView = inflater.inflate(R.layout.operation_cancel_item, parent, false);
                 viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
                 viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
@@ -254,6 +250,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         TextView measure;
         ImageView image;
         RelativeLayout description_layout;
+    }
+
+    public class Status {
+        public static final String NEW = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
+        public static final String IN_WORK = "9f980db5-934c-4ddb-999a-04c6c3daca59";
+        public static final String COMPLETE = "dc6dca37-2cc9-44da-aff9-19bf143e611a";
+        public static final String UN_COMPLETE = "363c08ec-89d9-47df-b7cf-63a05d56594c";
     }
 
 }
