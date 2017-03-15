@@ -180,31 +180,28 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     if (lastValue != null)
                         viewHolder.measure.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
 
-                    String filename=getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator + operation.getOperationTemplate().getImage();
-                    Bitmap image_bitmap=getResizedBitmap(filename, 100, 0);
-                    if (image_bitmap!=null) {
+                    String filename = getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator + operation.getOperationTemplate().getImage();
+                    Bitmap image_bitmap = getResizedBitmap(filename, 100, 0);
+                    if (image_bitmap != null) {
                         viewHolder.image.setImageBitmap(image_bitmap);
-                    }
-                    else {
-                            File mediaStorageDir = new File(context
+                    } else {
+                        File mediaStorageDir = new File(context
                                 .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                                 .getAbsolutePath());
-                            filename = mediaStorageDir.getPath() + File.separator + operation.getOperationTemplate().getImage();
-                            String filename2 = filename.replace(".","_m.");
-                            image2 = new File (filename2);
-                            if (image2!=null) {
-                                image_bitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
-                                viewHolder.image.setImageBitmap(image_bitmap);
-                                }
-                            else {
-                                image_bitmap = getResizedBitmap(filename, 100, 0);
-                                viewHolder.image.setImageBitmap(image_bitmap);
+                        filename = mediaStorageDir.getPath() + File.separator + operation.getOperationTemplate().getImage();
+                        String filename2 = filename.replace(".", "_m.");
+                        image2 = new File(filename2);
+                        if (image2 != null) {
+                            image_bitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
+                            viewHolder.image.setImageBitmap(image_bitmap);
+                        } else {
+                            image_bitmap = getResizedBitmap(filename, 100, 0);
+                            viewHolder.image.setImageBitmap(image_bitmap);
                             }
                         }
-                    }
                 }
             }
-        else {
+        } else {
             if (adapterData != null) {
                 if (operation != null) {
                     viewHolder.title.setText(operation.getOperationTemplate().getTitle());
@@ -229,7 +226,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 return null;
             }
         }*/
-        File mediaFile=null;
+        File mediaFile = null;
         if (mini==1)
             mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + operationUuid + "_m.jpg");

@@ -7,28 +7,28 @@
         android:title="@string/pref_cat_main">
 
         <EditTextPreference
-            android:dialogTitle="@string/pref_update_url_dialog_title"
-            android:key="@string/updateUrl"
-            android:icon="@drawable/pref_server"
             android:defaultValue="http://toir.server.loc"
+            android:dialogTitle="@string/pref_update_url_dialog_title"
+            android:icon="@drawable/pref_server"
+            android:key="@string/updateUrl"
             android:title="@string/pref_update_url" />
 
         <EditTextPreference
-            android:dialogTitle="@string/pref_server_url_dialog_title"
-            android:key="@string/serverUrl"
             android:defaultValue="http://toir.server.loc"
+            android:dialogTitle="@string/pref_server_url_dialog_title"
             android:icon="@drawable/pref_server"
+            android:key="@string/serverUrl"
             android:title="@string/pref_server_url" />
 
         <ListPreference
-            android:key="@string/rfidDriverListPrefKey"
             android:icon="@drawable/pref_rfid"
+            android:key="@string/rfidDriverListPrefKey"
             android:title="@string/pref_rfid_driver" />
 
     </PreferenceScreen>
     <PreferenceScreen
-        android:title="Отображение и данные"
-        android:icon="@drawable/pref_check">
+        android:icon="@drawable/pref_check"
+        android:title="Отображение и данные">
         <PreferenceCategory android:title="@string/pref_cat_show" >
             <CheckBoxPreference
                 android:defaultValue="false"
@@ -43,8 +43,8 @@
                 android:key="@string/run_ar_content"
                 android:title="@string/run_ar_content" />
             <Preference
-                android:title="@string/load_test_data"
-                android:key="@string/load_test_data" />
+                android:key="@string/load_test_data"
+                android:title="@string/load_test_data" />
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen

@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void onResponse(Response<User> response, Retrofit retrofit) {
                                     User user = response.body();
                                     final String fileName = user.getImage();
-                                    if (user!=null) {
+                                    if (user != null) {
                                         Realm realm = Realm.getDefaultInstance();
                                         realm.beginTransaction();
                                         realm.copyToRealmOrUpdate(user);
@@ -280,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
                                         AuthorizedUser.getInstance().setUuid(user.getUuid());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
                                         startGpsTracker(user.getUuid());
+
                                         // получаем изображение пользователя
                                         Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
                                                 .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
@@ -287,6 +288,10 @@ public class MainActivity extends AppCompatActivity {
                                             @Override
                                             public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
                                                 ResponseBody fileBody = response.body();
+                                                if (fileBody == null) {
+                                                    return;
+                                                }
+
                                                 File file = new File(getExternalFilesDir("/users"), fileName);
                                                 if (!file.getParentFile().exists()) {
                                                     if (!file.getParentFile().mkdirs()) {
@@ -308,10 +313,11 @@ public class MainActivity extends AppCompatActivity {
                                                 Log.e(TAG, t.getLocalizedMessage());
                                             }
                                         });
+
                                         setMainLayout(savedInstance);
                                     } else {
-                                        String message = "Авторизация безуспешна";
-                                        addToJournal("Авторизация пользователя с ID " + tag + " безуспешна");
+                                        String message = "Информация о пользователе не получена с сервера.";
+                                        addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
                                         Toast.makeText(getApplicationContext(), message,
                                                 Toast.LENGTH_LONG).show();
                                     }
@@ -391,9 +397,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-        service_mode = sp.getBoolean("pref_debug_mode",false);
+        service_mode = sp.getBoolean("pref_debug_mode", false);
         Toast.makeText(getApplicationContext(),
-                "Debug="+service_mode, Toast.LENGTH_LONG).show();
+                "Debug=" + service_mode, Toast.LENGTH_LONG).show();
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 
@@ -418,9 +424,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        int new_orders= MainFunctions.getActiveOrdersCount();
-        if (new_orders>0)
-           bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
+        int new_orders = MainFunctions.getActiveOrdersCount();
+        if (new_orders > 0)
+            bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar == null) {
@@ -446,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
-                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.white))
+                .withTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white))
                 .addProfiles(
                         new ProfileSettingDrawerItem().withName("Добавить пользователя").withDescription("Добавить пользователя").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_plus)).withIdentifier(PROFILE_ADD),
                         new ProfileSettingDrawerItem().withName("Редактировать пользователей").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings)).withIdentifier(PROFILE_SETTINGS)
@@ -477,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
                             User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
                             //User user = realmDB.where(User.class).findFirst();
                             if (user != null) user.setActive(true);
-                            if (profilesList != null && profilesList.get(profile_pos)!=null)
+                            if (profilesList != null && profilesList.get(profile_pos) != null)
                                 profilesList.get(profile_pos).setActive(true);
                             else
                                 Toast.makeText(getApplicationContext(),
@@ -508,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
                         //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)).withBadge(""+new_orders).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.red)),
+                        new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)).withBadge("" + new_orders).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.red)),
                         new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new DividerDrawerItem(),
@@ -626,14 +632,13 @@ public class MainActivity extends AppCompatActivity {
         //tabs.setViewPager(pager);
     }
 
-    void startGpsTracker(String user_uuid)
-        {
-         LocationManager lm = (LocationManager) getSystemService(
-            Context.LOCATION_SERVICE);
-            if (lm != null) {
-                GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
-                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
-            }
+    void startGpsTracker(String user_uuid) {
+        LocationManager lm = (LocationManager) getSystemService(
+                Context.LOCATION_SERVICE);
+        if (lm != null) {
+            GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
+        }
     }
 
 
@@ -841,7 +846,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void ShowSettings() {
-        TextView driver,update_server,system_server;
+        TextView driver, update_server, system_server;
         driver = (TextView) findViewById(R.id.login_current_driver);
         update_server = (TextView) findViewById(R.id.login_current_update_server);
         system_server = (TextView) findViewById(R.id.login_current_system_server);

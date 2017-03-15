@@ -3,13 +3,13 @@
     <string-array name="list">
         <item >01234567</item>
         <item >E20040008609006920603ED7</item>
-        <item >E20040008609007320603EE5</item>
-        <item >E20030841808002320703E73</item>
-        <item >E2003072470200700610D8B6</item>
-        <item >E20030841808021523102861</item>
-        <item >E2003072470202450610DA1D</item>
-        <item >E2003072470301652890004F</item>
-        <item >35E017004FAAFDCC0000AE74</item>
+        <item>E20040008609007320603EE5</item>
+        <item>E20030841808002320703E73</item>
+        <item>E2003072470200700610D8B6</item>
+        <item>E20030841808021523102861</item>
+        <item>E2003072470202450610DA1D</item>
+        <item>E2003072470301652890004F</item>
+        <item>35E017004FAAFDCC0000AE74</item>
         <item >00000008</item>
         <item >00000009</item>
         <item >00000010</item>

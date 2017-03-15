@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:gravity="top"
         android:layout_width="match_parent"
-        android:background="@color/larisaBlueColor"
         android:layout_height="?attr/actionBarSize"
+        android:background="@color/larisaBlueColor"
+        android:gravity="top"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
@@ -36,36 +36,36 @@
         <TextView
                 android:id="@+id/equipment_text_name"
                 android:layout_width="fill_parent"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
                 android:layout_height="40dp"
+            android:layout_below="@+id/equipment_image"
+            android:adjustViewBounds="true"
+            android:background="@color/larisaBlueColor"
                 android:paddingLeft="15dp"
                 android:paddingTop="10dp"
-                android:layout_below="@+id/equipment_image"
+            android:scaleType="centerCrop"
                 android:textColor="#ffffff"
-                android:background="@color/larisaBlueColor"
                 android:textSize="20sp" />
         <TextView
                 android:id="@+id/equipment_text_inventory"
                 android:layout_width="fill_parent"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
                 android:layout_height="30dp"
-                android:paddingLeft="15dp"
-                android:paddingBottom="10dp"
-                android:textColor="#ffffff"
                 android:layout_below="@+id/equipment_text_name"
+            android:adjustViewBounds="true"
                 android:background="@color/larisaBlueColor"
+            android:paddingBottom="10dp"
+            android:paddingLeft="15dp"
+            android:scaleType="centerCrop"
+            android:textColor="#ffffff"
                 android:textSize="16sp" />
 
         <TextView
                 android:id="@+id/equipment_text_uuid"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
-                android:paddingLeft="45dp"
-                android:layout_marginTop="15dp"
                 android:layout_below="@+id/equipment_text_inventory"
+            android:layout_marginTop="15dp"
                 android:background="#FAFAFA"
+            android:paddingLeft="45dp"
                 android:textColor="#000000"
                 android:textSize="14sp" />
 
@@ -83,10 +83,10 @@
                 android:id="@+id/equipment_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/equipment_text_uuid"
                 android:layout_toRightOf="@+id/equipment_location_icon"
                 android:background="#FAFAFA"
+            android:paddingLeft="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -94,12 +94,12 @@
                 android:id="@+id/equipment_text_location_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/equipment_text_location"
                 android:layout_toRightOf="@+id/equipment_location_icon"
                 android:background="#FAFAFA"
-                android:textColor="#757575"
+            android:paddingLeft="10dp"
                 android:text="@string/current_location"
+            android:textColor="#757575"
                 android:textSize="14sp" />
 
         <ImageView
@@ -115,10 +115,10 @@
                 android:id="@+id/equipment_text_date"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/equipment_text_location_label"
                 android:layout_toRightOf="@+id/equipment_date_icon"
                 android:background="#FAFAFA"
+                android:paddingLeft="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -126,12 +126,12 @@
                 android:id="@+id/equipment_text_date_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/equipment_text_date"
                 android:layout_toRightOf="@+id/equipment_date_icon"
                 android:background="#FAFAFA"
-                android:textColor="#757575"
+                android:paddingLeft="10dp"
                 android:text="@string/last_date"
+                android:textColor="#757575"
                 android:textSize="14sp" />
 
             <ImageView
@@ -147,10 +147,10 @@
                 android:id="@+id/equipment_text_status"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/equipment_text_date_label"
                 android:layout_toRightOf="@+id/equipment_status_icon"
                 android:background="#FAFAFA"
+                android:paddingLeft="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -158,12 +158,12 @@
                 android:id="@+id/equipment_text_status_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
                 android:layout_below="@+id/equipment_text_status"
                 android:layout_toRightOf="@+id/equipment_status_icon"
                 android:background="#FAFAFA"
-                android:textColor="#757575"
+                android:paddingLeft="10dp"
                 android:text="@string/current_status"
+                android:textColor="#757575"
                 android:textSize="14sp" />
 
             <View
@@ -177,85 +177,85 @@
                 android:id="@+id/equipment_text_operation_list"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:paddingTop="10dp"
-                android:paddingLeft="20dp"
                 android:layout_below="@+id/equipment_divider1"
                 android:background="#FAFAFA"
-                android:textColor="#757575"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
                 android:text="@string/operation_list"
+                android:textColor="#757575"
                 android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/equipment_information_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxHeight="32dp"
-                android:layout_below="@+id/equipment_divider1"
-                android:layout_toRightOf="@+id/equipment_text_operation_list"
-                android:layout_marginRight="25dp"
                 android:layout_alignParentRight="true"
+                android:layout_below="@+id/equipment_divider1"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/equipment_text_operation_list"
                 android:contentDescription="@string/image_description"
+                android:maxHeight="32dp"
                 android:src="@drawable/ic_icon_tools" />
 
             <ListView
                     android:id="@+id/list_view"
                     android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_operation_list"
                     android:divider="#333333"
                     android:dividerHeight="1px"
-                    android:layout_below="@+id/equipment_text_operation_list"
-                    android:scrollbarAlwaysDrawVerticalTrack="true"
-                    android:layout_height="wrap_content"
-                android:paddingBottom="10dp">
+                android:paddingBottom="10dp"
+                android:scrollbarAlwaysDrawVerticalTrack="true">
             </ListView>
 
             <View
                 android:id="@+id/equipment_divider2"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/list_view"
                 android:layout_height="1dp"
+                android:layout_below="@+id/list_view"
                 android:background="#777777" />
 
             <TextView
                 android:id="@+id/equipment_text_documentation"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:paddingLeft="20dp"
-                android:paddingTop="10dp"
                 android:layout_below="@+id/equipment_divider2"
                 android:background="#FAFAFA"
-                android:textColor="#757575"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
                 android:text="@string/documentation"
+                android:textColor="#757575"
                 android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/equipment_documentation_listView"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/equipment_text_documentation"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_documentation">
             </ListView>
 
             <ImageView
                 android:id="@+id/overlapImageWriteTag"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:paddingRight="10dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/circle2"
                 android:layout_below="@+id/equipment_text_name"
                 android:layout_toLeftOf="@+id/overlapImageReadTag"
-                android:clickable="false" />
+                android:adjustViewBounds="true"
+                android:clickable="false"
+                android:contentDescription="@string/image_description"
+                android:paddingRight="10dp"
+                android:src="@drawable/circle2" />
 
             <ImageView
                 android:id="@+id/overlapImageReadTag"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
-                android:paddingRight="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/equipment_text_name"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/circle"
-                android:layout_below="@+id/equipment_text_name"
-                android:layout_alignParentRight="true" />
+                android:paddingRight="10dp"
+                android:src="@drawable/circle" />
 
         </RelativeLayout>
 </ScrollView>

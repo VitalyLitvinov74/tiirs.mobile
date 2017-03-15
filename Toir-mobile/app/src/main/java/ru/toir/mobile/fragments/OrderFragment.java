@@ -122,8 +122,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     private int currentOperationId = 0;
     private long startTime = 0;
     private boolean firstLaunch = true;
-    private SharedPreferences sp;
-
     CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
@@ -133,9 +131,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
                 //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
                 textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
-                textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000 ));
+                textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
                 currentOperation = operationAdapter.getItem(currentOperationId);
-                if (currentOperation!=null) {
+                if (currentOperation != null) {
                     currentOperationUuid = currentOperation.getUuid();
                     if (firstLaunch) {
                         firstLaunch();
@@ -163,7 +161,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         public void onFinish() {
         }
     };
-
+    private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
     private NumberPicker numberPicker;
@@ -516,16 +514,16 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             taskStageStatusInWork = realmDB.where(TaskStageStatus.class)
                     .equalTo("uuid", TaskStageStatus.Status.IN_WORK)
                     .findFirst();
-            if (taskStageStatus!=null && taskStageStatusInWork!=null)
-            if (taskStageStatus.getUuid().equals(TaskStageStatus.Status.NEW) || taskStageStatus.getUuid().equals(TaskStageStatus.Status.UN_COMPLETE)) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        selectedStage.setStartDate(new Date());
-                        selectedStage.setTaskStageStatus(taskStageStatusInWork);
+            if (taskStageStatus != null && taskStageStatusInWork != null)
+                if (taskStageStatus.getUuid().equals(TaskStageStatus.Status.NEW) || taskStageStatus.getUuid().equals(TaskStageStatus.Status.UN_COMPLETE)) {
+                    realmDB.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            selectedStage.setStartDate(new Date());
+                            selectedStage.setTaskStageStatus(taskStageStatusInWork);
                         }
-                });
-            }
+                    });
+                }
         }
         // фиксируем начало работы над задачей (если у нее статус получен), меняем ее статус на в процессе
         final TaskStatus taskStatus;
@@ -640,6 +638,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                             try {
                                 Response<ResponseBody> r = call1.execute();
                                 ResponseBody trueImgBody = r.body();
+                                if (trueImgBody == null) {
+                                    continue;
+                                }
+
                                 File file = new File(
                                         getContext().getExternalFilesDir(path.localPath), path.fileName);
                                 if (!file.getParentFile().exists()) {
@@ -1321,6 +1323,141 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         return new File(mediaStorageDir.getPath() + File.separator + currentOperationUuid + ".jpg");
     }
 
+    /**
+     * Диалог если не выполнены некоторые операции
+     */
+    private void setOperationsVerdict() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+        final OperationStatus operationStatusUnComplete;
+        operationStatusUnComplete = realmDB.where(OperationStatus.class).findFirst();
+        //final OperationVerdict operationVerdictUnComplete;
+        //operationVerdictUnComplete = realmDB.where(OperationVerdict.class).findFirst();
+        //Button btnAccept = (Button) myView.findViewById(R.id.odc_accept);
+        //Button btnCancel = (Button) myView.findViewById(R.id.odc_cancel);
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View myView = inflater.inflate(R.layout.operation_dialog_cancel, null);
+        // список статусов нарядов в выпадающем списке для выбора
+        final ListView listView = (ListView) myView.findViewById(R.id.odc_list_view);
+        CheckBox checkBoxAll = (CheckBox) myView.findViewById(R.id.odc_main_status);
+        Spinner mainSpinner = (Spinner) myView.findViewById(R.id.simple_spinner);
+
+        RealmResults<OperationVerdict> operationVerdict = realmDB.where(OperationVerdict.class).findAll();
+        final OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getContext(), operationVerdict);
+        operationVerdictAdapter.notifyDataSetChanged();
+        mainSpinner.setAdapter(operationVerdictAdapter);
+
+        fillListViewUncompleteOperations(listView);
+
+        dialog.setView(myView);
+/*
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
+
+        btnAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+*/
+        dialog.setPositiveButton(R.string.dialog_accept,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        CheckBox checkBox;
+                        Spinner spinner;
+                        for (int i = 0; i < uncompleteOperationList.size(); i++) {
+                            checkBox = (CheckBox) getViewByPosition(i, listView).findViewById(R.id.operation_status);
+                            spinner = (Spinner) getViewByPosition(i, listView).findViewById(R.id.simple_spinner);
+                            final OperationVerdict operationVerdict = operationVerdictAdapter.getItem(spinner.getSelectedItemPosition());
+                            final Operation operation = uncompleteOperationList.get(i);
+                            if (operation != null && checkBox.isChecked()) {
+                                realmDB.executeTransaction(new Realm.Transaction() {
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        operation.setOperationStatus(operationStatusUnComplete);
+                                        operation.setOperationVerdict(operationVerdict);
+                                    }
+                                });
+                            }
+                        }
+                        Log.d(TAG, "Остановка таймера...");
+                        taskTimer.cancel();
+                        firstLaunch = true;
+                        currentOperationId = 0;
+
+                        if (selectedTask != null) {
+                            currentTaskStageUuid = selectedStage.getUuid();
+                            currentTaskUuid = selectedTask.getUuid();
+                            fillListViewTaskStage(selectedTask);
+                            submit.setVisibility(View.GONE);
+                            measure.setVisibility(View.GONE);
+                            Level = 2;
+                        }
+                    }
+                });
+
+        dialog.setNegativeButton(R.string.dialog_cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        checkBoxAll.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                CheckBox checkBox;
+                CheckBox checkBoxAll;
+                checkBoxAll = (CheckBox) v.findViewById(R.id.odc_main_status);
+                for (int i = 0; i < uncompleteOperationList.size(); i++) {
+                    checkBox = (CheckBox) getViewByPosition(i, listView).findViewById(R.id.operation_status);
+                    checkBox.setChecked(checkBoxAll.isChecked());
+                }
+            }
+        });
+        mainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Spinner spinner;
+                for (int j = 0; j < uncompleteOperationList.size(); j++) {
+                    spinner = (Spinner) getViewByPosition(j, listView).findViewById(R.id.operation_verdict_spinner);
+                    spinner.setSelection(i);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        dialog.show();
+    }
+
+    private void fillListViewUncompleteOperations(ListView listView) {
+        RealmResults<Operation> operations;
+        RealmQuery<Operation> q = realmDB.where(Operation.class);
+        boolean first = true;
+        for (Operation operation : uncompleteOperationList) {
+            long id = operation.get_id();
+            if (first) {
+                q = q.equalTo("_id", id);
+                first = false;
+            } else {
+                q = q.or().equalTo("_id", id);
+            }
+        }
+        operations = q.findAll();
+
+        OperationAdapter uncompleteOperationAdapter;
+        uncompleteOperationAdapter = new OperationAdapter(getContext(), operations, currentTaskUuid);
+        listView.setAdapter(uncompleteOperationAdapter);
+    }
+
     public class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -1355,7 +1492,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                     String tagId = ((String) message.obj).substring(4);
                                     Log.d(TAG, "Ид метки получили: " + tagId);
                                     if (expectedTagId.equals(tagId)) {
-                                        boolean run_ar_content = sp.getBoolean("@string/pref_debug_mode",false);
+                                        boolean run_ar_content = sp.getBoolean("@string/pref_debug_mode", false);
                                         if (run_ar_content) {
                                             Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
                                             intent.putExtra("hardwareUUID", currentEquipment.getUuid());
@@ -1461,7 +1598,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             if (operationAdapter != null) {
                 textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000 ));
+                textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
 
                 if (currentOperationId < operationAdapter.getCount()) {
                     operationAdapter.setItemEnable(currentOperationId + 1, true);
@@ -1580,141 +1717,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         public String toString() {
             return title;
         }
-    }
-
-    /**
-     * Диалог если не выполнены некоторые операции
-     */
-    private void setOperationsVerdict() {
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-
-        final OperationStatus operationStatusUnComplete;
-        operationStatusUnComplete = realmDB.where(OperationStatus.class).findFirst();
-        //final OperationVerdict operationVerdictUnComplete;
-        //operationVerdictUnComplete = realmDB.where(OperationVerdict.class).findFirst();
-        //Button btnAccept = (Button) myView.findViewById(R.id.odc_accept);
-        //Button btnCancel = (Button) myView.findViewById(R.id.odc_cancel);
-
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View myView = inflater.inflate(R.layout.operation_dialog_cancel, null);
-        // список статусов нарядов в выпадающем списке для выбора
-        final ListView listView = (ListView) myView.findViewById(R.id.odc_list_view);
-        CheckBox checkBoxAll = (CheckBox) myView.findViewById(R.id.odc_main_status);
-        Spinner mainSpinner = (Spinner) myView.findViewById(R.id.simple_spinner);
-
-        RealmResults<OperationVerdict> operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-        final OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getContext(), operationVerdict);
-        operationVerdictAdapter.notifyDataSetChanged();
-        mainSpinner.setAdapter(operationVerdictAdapter);
-
-        fillListViewUncompleteOperations (listView);
-
-        dialog.setView(myView);
-/*
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-
-        btnAccept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-*/
-        dialog.setPositiveButton(R.string.dialog_accept,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        CheckBox checkBox;
-                        Spinner spinner;
-                        for (int i = 0; i < uncompleteOperationList.size(); i++) {
-                            checkBox = (CheckBox) getViewByPosition(i, listView).findViewById(R.id.operation_status);
-                            spinner = (Spinner) getViewByPosition(i, listView).findViewById(R.id.simple_spinner);
-                            final OperationVerdict operationVerdict = operationVerdictAdapter.getItem(spinner.getSelectedItemPosition());
-                            final Operation operation = uncompleteOperationList.get(i);
-                            if (operation != null && checkBox.isChecked()) {
-                                realmDB.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        operation.setOperationStatus(operationStatusUnComplete);
-                                        operation.setOperationVerdict(operationVerdict);
-                                    }
-                                });
-                            }
-                        }
-                        Log.d(TAG, "Остановка таймера...");
-                        taskTimer.cancel();
-                        firstLaunch = true;
-                        currentOperationId = 0;
-
-                        if (selectedTask != null) {
-                            currentTaskStageUuid = selectedStage.getUuid();
-                            currentTaskUuid = selectedTask.getUuid();
-                            fillListViewTaskStage(selectedTask);
-                            submit.setVisibility(View.GONE);
-                            measure.setVisibility(View.GONE);
-                            Level = 2;
-                        }
-                    }
-                });
-
-        dialog.setNegativeButton(R.string.dialog_cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-        checkBoxAll.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                CheckBox checkBox;
-                CheckBox checkBoxAll;
-                checkBoxAll = (CheckBox) v.findViewById(R.id.odc_main_status);
-                for (int i = 0; i < uncompleteOperationList.size(); i++) {
-                    checkBox = (CheckBox) getViewByPosition(i, listView).findViewById(R.id.operation_status);
-                    checkBox.setChecked(checkBoxAll.isChecked());
-                }
-            }
-        });
-        mainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                Spinner spinner;
-                for (int j = 0; j < uncompleteOperationList.size(); j++) {
-                    spinner = (Spinner) getViewByPosition(j, listView).findViewById(R.id.operation_verdict_spinner);
-                    spinner.setSelection(i);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-        dialog.show();
-    }
-
-    private void fillListViewUncompleteOperations(ListView listView) {
-        RealmResults<Operation> operations;
-        RealmQuery<Operation> q = realmDB.where(Operation.class);
-        boolean first = true;
-        for (Operation operation : uncompleteOperationList) {
-            long id = operation.get_id();
-            if (first) {
-                q = q.equalTo("_id", id);
-                first = false;
-            } else {
-                q = q.or().equalTo("_id", id);
-            }
-        }
-        operations = q.findAll();
-
-        OperationAdapter uncompleteOperationAdapter;
-        uncompleteOperationAdapter = new OperationAdapter(getContext(), operations, currentTaskUuid);
-        listView.setAdapter(uncompleteOperationAdapter);
     }
 
     private class FilePath {

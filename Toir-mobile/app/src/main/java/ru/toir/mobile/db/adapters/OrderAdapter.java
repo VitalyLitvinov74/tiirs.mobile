@@ -111,8 +111,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 if (lDate != null) {
                     sDate = new SimpleDateFormat("dd MMMM yyyy", myDateFormatSymbols).format(lDate);
                     viewHolder.title.setText(sDate);
-                }
-                else {
+                } else {
                     viewHolder.title.setText("");
                 }
                 break;
