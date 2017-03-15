@@ -32,9 +32,14 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
 
     @Override
     public int getCount() {
-        Realm realmDB = Realm.getDefaultInstance();
-        RealmResults<TaskStages> rows = realmDB.where(TaskStages.class).findAll();
-        return rows.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        } else {
+            return 0;
+        }
+        //Realm realmDB = Realm.getDefaultInstance();
+        //RealmResults<TaskStages> rows = realmDB.where(TaskStages.class).findAll();
+        //return rows.size();
     }
 
     @Override

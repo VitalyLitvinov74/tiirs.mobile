@@ -237,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                     String tagId = (String) msg.obj;
                     tagId = tagId.substring(4);
+                    final String tag = tagId;
                     Log.d(TAG, tagId);
 
                     AuthorizedUser.getInstance().setTagId(tagId);
@@ -267,16 +268,23 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Response<User> response, Retrofit retrofit) {
                                     User user = response.body();
-                                    Realm realm = Realm.getDefaultInstance();
-                                    realm.beginTransaction();
-                                    realm.copyToRealmOrUpdate(user);
-                                    realm.commitTransaction();
-                                    isLogged = true;
-                                    AuthorizedUser.getInstance().setUuid(user.getUuid());
-                                    addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-                                    startGpsTracker(user.getUuid());
-
-                                    setMainLayout(savedInstance);
+                                    if (user!=null) {
+                                        Realm realm = Realm.getDefaultInstance();
+                                        realm.beginTransaction();
+                                        realm.copyToRealmOrUpdate(user);
+                                        realm.commitTransaction();
+                                        isLogged = true;
+                                        AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                        addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
+                                        startGpsTracker(user.getUuid());
+                                        setMainLayout(savedInstance);
+                                    }
+                                    else {
+                                        String message = "Авторизация безуспешна";
+                                        addToJournal("Авторизация пользователя с ID " + tag + " безуспешна");
+                                        Toast.makeText(getApplicationContext(), message,
+                                                Toast.LENGTH_LONG).show();
+                                    }
                                     authorizationDialog.dismiss();
                                 }
 
