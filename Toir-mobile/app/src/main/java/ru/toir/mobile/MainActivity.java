@@ -239,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                     String tagId = (String) msg.obj;
                     tagId = tagId.substring(4);
+                    final String tag = tagId;
                     Log.d(TAG, tagId);
 
                     AuthorizedUser.getInstance().setTagId(tagId);
@@ -270,45 +271,51 @@ public class MainActivity extends AppCompatActivity {
                                 public void onResponse(Response<User> response, Retrofit retrofit) {
                                     User user = response.body();
                                     final String fileName = user.getImage();
-                                    Realm realm = Realm.getDefaultInstance();
-                                    realm.beginTransaction();
-                                    realm.copyToRealmOrUpdate(user);
-                                    realm.commitTransaction();
-                                    isLogged = true;
-                                    AuthorizedUser.getInstance().setUuid(user.getUuid());
-                                    addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-                                    startGpsTracker(user.getUuid());
+                                    if (user!=null) {
+                                        Realm realm = Realm.getDefaultInstance();
+                                        realm.beginTransaction();
+                                        realm.copyToRealmOrUpdate(user);
+                                        realm.commitTransaction();
+                                        isLogged = true;
+                                        AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                        addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
+                                        startGpsTracker(user.getUuid());
+                                        // получаем изображение пользователя
+                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
+                                                .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
+                                        callFile.enqueue(new Callback<ResponseBody>() {
+                                            @Override
+                                            public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
+                                                ResponseBody fileBody = response.body();
+                                                File file = new File(getExternalFilesDir("/users"), fileName);
+                                                if (!file.getParentFile().exists()) {
+                                                    if (!file.getParentFile().mkdirs()) {
+                                                        return;
+                                                    }
+                                                }
 
-                                    // получаем изображение пользователя
-                                    Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
-                                            .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
-                                    callFile.enqueue(new Callback<ResponseBody>() {
-                                        @Override
-                                        public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
-                                            ResponseBody fileBody = response.body();
-                                            File file = new File(getExternalFilesDir("/users"), fileName);
-                                            if (!file.getParentFile().exists()) {
-                                                if (!file.getParentFile().mkdirs()) {
-                                                    return;
+                                                try {
+                                                    FileOutputStream fos = new FileOutputStream(file);
+                                                    fos.write(fileBody.bytes());
+                                                    fos.close();
+                                                } catch (Exception e) {
+                                                    Log.e(TAG, e.getLocalizedMessage());
                                                 }
                                             }
 
-                                            try {
-                                                FileOutputStream fos = new FileOutputStream(file);
-                                                fos.write(fileBody.bytes());
-                                                fos.close();
-                                            } catch (Exception e) {
-                                                Log.e(TAG, e.getLocalizedMessage());
+                                            @Override
+                                            public void onFailure(Throwable t) {
+                                                Log.e(TAG, t.getLocalizedMessage());
                                             }
-                                        }
+                                        });
+                                        setMainLayout(savedInstance);
+                                    } else {
+                                        String message = "Авторизация безуспешна";
+                                        addToJournal("Авторизация пользователя с ID " + tag + " безуспешна");
+                                        Toast.makeText(getApplicationContext(), message,
+                                                Toast.LENGTH_LONG).show();
+                                    }
 
-                                        @Override
-                                        public void onFailure(Throwable t) {
-                                            Log.e(TAG, t.getLocalizedMessage());
-                                        }
-                                    });
-
-                                    setMainLayout(savedInstance);
                                     authorizationDialog.dismiss();
                                 }
 

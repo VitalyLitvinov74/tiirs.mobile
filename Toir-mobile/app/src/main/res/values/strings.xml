@@ -126,6 +126,7 @@
     <string name="operation_time">Время операции:</string>
     <string name="tire"> - </string>
     <string name="sec">сек.</string>
+    <string name="sec_with_value">%1$d сек.</string>
     <string name="input_value">введите данные</string>
     <string name="program_version">TOiR Mobile v1.0.5\n ООО Технологии Энергосбережения (tourus.ru) (&#169;)2017</string>
 
@@ -137,4 +138,6 @@
     <string name="dialog_cancel">Отменить</string>
     <string name="select_all">Выбрать все операции</string>
     <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
+
+    <string name="run_ar_content">Запуск AR-контента</string>
 </resources>

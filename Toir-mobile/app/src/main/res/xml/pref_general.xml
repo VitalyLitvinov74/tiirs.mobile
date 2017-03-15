@@ -38,6 +38,10 @@
                 android:defaultValue="false"
                 android:key="@string/pref_autonome_mode"
                 android:title="@string/pref_autonome_mode" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/run_ar_content"
+                android:title="@string/run_ar_content" />
             <Preference
                 android:title="@string/load_test_data"
                 android:key="@string/load_test_data" />

@@ -31,6 +31,9 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationVerdict;
 
+import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+
 /**
  * @author olejek
  * Created by olejek on 13.09.16.
@@ -40,12 +43,14 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     Realm realm = Realm.getDefaultInstance();
     private Context context;
     private int counter=0;
+    private String taskStageTemplateUuid;
     private boolean[] visibility = new boolean[50];
     private boolean[] completed = new boolean[50];
 
-    public OperationAdapter(@NonNull Context context, RealmResults<Operation> data) {
+    public OperationAdapter(@NonNull Context context, RealmResults<Operation> data, String taskStageTemplateUuid) {
         super(context, data);
         this.context = context;
+        this.taskStageTemplateUuid = taskStageTemplateUuid;
     }
 
     @Override
@@ -175,34 +180,31 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     if (lastValue != null)
                         viewHolder.measure.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
 
-                    if (imageBitmap == null) {
-                        image2 = getOutputMediaFile(operation.getUuid(), 0);
-                        imageBitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
-                        if (imageBitmap != null) {
-                            int width = imageBitmap.getWidth();
-                            int height = imageBitmap.getHeight();
-                            int newWidth = 300;
-                            float scaleWidth = (float) newWidth / (float) width;
-                            int newHeight = (int) (height * scaleWidth);
-
-                            Bitmap imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
-                            FileOutputStream fOut = null;
-                            try {
-                                fOut = new FileOutputStream(image);
-                                imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                                fOut.flush();
-                                fOut.close();
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                    String filename=getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator + operation.getOperationTemplate().getImage();
+                    Bitmap image_bitmap=getResizedBitmap(filename, 100, 0);
+                    if (image_bitmap!=null) {
+                        viewHolder.image.setImageBitmap(image_bitmap);
+                    }
+                    else {
+                            File mediaStorageDir = new File(context
+                                .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                                .getAbsolutePath());
+                            filename = mediaStorageDir.getPath() + File.separator + operation.getOperationTemplate().getImage();
+                            String filename2 = filename.replace(".","_m.");
+                            image2 = new File (filename2);
+                            if (image2!=null) {
+                                image_bitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
+                                viewHolder.image.setImageBitmap(image_bitmap);
+                                }
+                            else {
+                                image_bitmap = getResizedBitmap(filename, 100, 0);
+                                viewHolder.image.setImageBitmap(image_bitmap);
                             }
-                            viewHolder.image.setImageBitmap(imageBitmap2);
                         }
-                    } else viewHolder.image.setImageBitmap(imageBitmap);
+                    }
                 }
             }
-        } else {
+        else {
             if (adapterData != null) {
                 if (operation != null) {
                     viewHolder.title.setText(operation.getOperationTemplate().getTitle());
@@ -227,7 +229,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 return null;
             }
         }*/
-        File mediaFile;
+        File mediaFile=null;
         if (mini==1)
             mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + operationUuid + "_m.jpg");
