@@ -66,6 +66,7 @@ import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
+import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
@@ -626,6 +627,25 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                 files.add(new FilePath(operation.getOperationTemplate().getImage(),
                                         basePath, basePathLocal));
                             }
+                        }
+                    }
+                }
+
+                // список файлов документации
+                for (Orders order : result) {
+                    List<Tasks> tasks = order.getTasks();
+                    Realm realm = Realm.getDefaultInstance();
+                    for (Tasks task : tasks) {
+                        String equipmentUuid = task.getEquipment().getUuid();
+                        List<Documentation> docList = realm.where(Documentation.class)
+                                .equalTo("equipment.uuid", equipmentUuid)
+//                                .equalTo("required", 1)
+                                .findAll();
+                        for (Documentation doc : docList) {
+                            String docFileName = doc.getPath();
+                            String url = "/storage/" + equipmentUuid + "/";
+                            String localPath = "/documentation/" + equipmentUuid + "/";
+                            files.add(new FilePath(docFileName, url, localPath));
                         }
                     }
                 }
