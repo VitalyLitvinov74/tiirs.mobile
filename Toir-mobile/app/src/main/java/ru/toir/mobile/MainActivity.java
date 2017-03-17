@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -74,6 +73,7 @@ import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.utils.MainFunctions;
 
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PROFILE_ADD = 1;
@@ -644,7 +644,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Обработчик клика кнопки "Войти"
-     *
+     *-
      * @param view Event's view
      */
     public void onClickLogin(View view) {
@@ -800,16 +800,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void addProfile(User item) {
         IProfile new_profile;
-        String target_filename = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getPackageName() + File.separator + "img" + File.separator + item.getImage();
-        File imgFile = new File(target_filename);
-        if (imgFile.exists()) {
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            // first two elements reserved
-            new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(myBitmap).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
-        } else
-            new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(R.drawable.profile_default_small).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
-        iprofilelist.add(new_profile);
-        headerResult.addProfile(new_profile, headerResult.getProfiles().size());
+        String path = getExternalFilesDir("/users") + File.separator;
+        if (item.getChangedAt()!=null) {
+            Bitmap myBitmap = getResizedBitmap(path, item.getImage(), 0, 600, item.getChangedAt().getTime());
+            if (myBitmap != null) {
+                // first two elements reserved
+                new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(myBitmap).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
+            } else
+                new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(R.drawable.profile_default_small).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
+            iprofilelist.add(new_profile);
+            headerResult.addProfile(new_profile, headerResult.getProfiles().size());
+        }
     }
 
     public void refreshProfileList() {

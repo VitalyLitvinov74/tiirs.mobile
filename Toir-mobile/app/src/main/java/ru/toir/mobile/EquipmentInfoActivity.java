@@ -2,15 +2,10 @@ package ru.toir.mobile;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-//import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,18 +47,21 @@ import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Tasks;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.ReferenceServiceHelper;
-//import ru.toir.mobile.rest.ReferenceServiceProvider;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
 
-import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+
+//import android.content.BroadcastReceiver;
+//import android.content.Context;
+//import android.content.IntentFilter;
+//import ru.toir.mobile.rest.IServiceProvider;
+//import ru.toir.mobile.rest.ProcessorService;
+//import ru.toir.mobile.rest.ReferenceServiceHelper;
+//import ru.toir.mobile.rest.ReferenceServiceProvider;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
 	private final static String TAG = "EquipmentInfoActivity";
@@ -395,7 +393,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (equipment.get_id() == 3) tv_equipment_image.setImageResource(R.drawable.pressure);
         if (equipment.get_id() == 4) tv_equipment_image.setImageResource(R.drawable.gas_counter);
 
-        String path = getPicturesDirectory(getApplicationContext()) + "equipments" + File.separator + equipment.getImage();
+        String path = getExternalFilesDir("/equipment") + File.separator;
         Bitmap image_bitmap = getResizedBitmap(path, equipment.getImage(), 0, 200, equipment.getChangedAt().getTime());
         if (image_bitmap != null) {
             tv_equipment_image.setImageBitmap(image_bitmap);

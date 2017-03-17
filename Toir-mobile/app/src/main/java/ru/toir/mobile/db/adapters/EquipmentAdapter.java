@@ -147,7 +147,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     } else {
                         //image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
                     }
-                    viewHolder.icon.setImageBitmap(image_bitmap);
+                    //viewHolder.icon.setImageBitmap(image_bitmap);
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
                     viewHolder.location.setText(equipment.getLocation());

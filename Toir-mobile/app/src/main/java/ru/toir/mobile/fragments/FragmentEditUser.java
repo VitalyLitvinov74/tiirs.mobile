@@ -26,6 +26,8 @@ import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.User;
 
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+
 public class FragmentEditUser extends Fragment implements View.OnClickListener {
     private static final int PICK_PHOTO_FOR_AVATAR = 1;
     private ImageView iView;
@@ -72,12 +74,12 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
             name.setText(user.getName());
             image_name = user.getImage();
 
-            File sd_card = Environment.getExternalStorageDirectory();
-            String target_filename = sd_card.getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getActivity().getPackageName() + File.separator + "img" + File.separator + user.getImage();
-            File imgFile = new File(target_filename);
-            if(imgFile.exists()){
-                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                iView.setImageBitmap(myBitmap);
+            String path = getActivity().getExternalFilesDir("/users") + File.separator;
+            if (user.getChangedAt()!=null) {
+                Bitmap myBitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
+                if (myBitmap!=null) {
+                    iView.setImageBitmap(myBitmap);
+                }
             }
         }
         return view;
