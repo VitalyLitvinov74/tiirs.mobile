@@ -10,6 +10,7 @@
         <item>Типы операций:OperationType</item>
         <item>Статусы операций:OperationStatus</item>
         <item>Статусы задач:TaskStatus</item>
+        <item>Статусы этапов задач:TaskStageStatus</item>
         <item>Статусы оборудования:EquipmentStatus</item>
     </string-array>
 

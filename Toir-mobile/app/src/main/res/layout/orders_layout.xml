@@ -42,8 +42,8 @@
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical|center_horizontal"
-            android:layout_height="150dp"
-            android:layout_marginBottom="50dp">
+            android:layout_marginBottom="50dp"
+            android:layout_height="80dp">
 
             <Button
                 android:id="@+id/tl_finishButton"

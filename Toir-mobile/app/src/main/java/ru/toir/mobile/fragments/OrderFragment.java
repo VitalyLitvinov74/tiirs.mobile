@@ -970,7 +970,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         final TaskStageStatus taskStageComplete;
         uncompleteOperationList.clear();
         // по умолчанию у нас все выполнено
-        taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("title", "Выполнен").findFirst();
+        taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("uuid", TaskStageStatus.Status.COMPLETE).findFirst();
 
         if (operationAdapter != null) {
             totalOperationCount = operationAdapter.getCount();

@@ -3,8 +3,9 @@
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
 	android:stretchColumns="*">
-	
-	<TableRow>
+
+	<TableRow android:layout_width="match_parent"
+		android:layout_height="match_parent">
 	<ImageView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -15,15 +16,17 @@
 
 	<TextView
 	    android:id="@+id/info_text"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
+	    android:layout_width="wrap_content"
+	    android:layout_height="match_parent"
         android:layout_gravity="center"
 		android:gravity="center"
 	    android:minHeight="220dp"
 		android:minLines="10"
 		android:padding="5dip"
 		android:layout_marginBottom="10dp"
-		android:paddingBottom="10dp" />
+		android:paddingBottom="10dp"
+		android:textColor="@color/almostblack"
+		android:text="@string/program_version" />
 
 	</TableRow>
 

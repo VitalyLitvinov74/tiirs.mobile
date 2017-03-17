@@ -24,7 +24,7 @@
         android:textColor="#454545"
         android:gravity="center_vertical"
         android:text="@string/description"
-        android:textSize="16sp" />
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/ts_Status"

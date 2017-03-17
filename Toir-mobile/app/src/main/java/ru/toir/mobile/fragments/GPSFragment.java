@@ -86,8 +86,6 @@ public class GPSFragment extends Fragment {
         Realm realmDB = Realm.getDefaultInstance();
         RealmResults<Equipment> equipments; // = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
 
-		//Float equipment_latitude = 0f, equipment_longitude = 0f;
-        // !!!!!
         User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         //User user = realmDB.where(User.class).findFirst();
 		LocationManager lm = (LocationManager) getActivity().getSystemService(
@@ -161,8 +159,8 @@ public class GPSFragment extends Fragment {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment().getUuid()).findAll();
                 for (Equipment equipment : equipments) {
                     q = q.or().equalTo("_id", equipment.get_id());
-                    curLatitude = curLatitude - 0.002;
-                    curLongitude = curLongitude - 0.006;
+                    curLatitude = equipment.getLatitude();
+                    curLongitude = equipment.getLongitude();
 
                     GeoPoint endPoint = new GeoPoint(curLatitude, curLongitude);
                     waypoints.add(endPoint);

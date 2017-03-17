@@ -105,24 +105,25 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             else {
                 viewHolder.end_date.setText("не закончен");
             }
+            TaskStageStatus taskStageStatus1 = taskStage.getTaskStageStatus();
             if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null) {
-                if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.NEW) && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.NEW) && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (taskStage.getTaskStageStatus().getTitle().equals("Получен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.NEW) && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.IN_WORK) && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.IN_WORK) && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (taskStage.getTaskStageStatus().getTitle().equals("В работе") && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.IN_WORK) && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE) && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE) && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (taskStage.getTaskStageStatus().getTitle().equals("Выполнен") && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE) && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
             }
         }

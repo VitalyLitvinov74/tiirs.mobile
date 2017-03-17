@@ -1,11 +1,7 @@
 package ru.toir.mobile.fragments;
 
 import android.app.ProgressDialog;
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
 import android.content.DialogInterface;
-//import android.content.Intent;
-//import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -39,6 +35,7 @@ import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
+import ru.toir.mobile.db.adapters.TaskStageStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
 import ru.toir.mobile.db.realm.Clients;
@@ -78,10 +75,15 @@ import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.Tool;
 import ru.toir.mobile.db.realm.ToolType;
+import ru.toir.mobile.rest.ToirAPIFactory;
+
+//import android.content.BroadcastReceiver;
+//import android.content.Context;
+//import android.content.Intent;
+//import android.content.IntentFilter;
 //import ru.toir.mobile.rest.IServiceProvider;
 //import ru.toir.mobile.rest.ProcessorService;
 //import ru.toir.mobile.rest.ReferenceServiceHelper;
-import ru.toir.mobile.rest.ToirAPIFactory;
 
 public class ReferenceFragment extends Fragment {
     private static final String TAG = "ReferenceFragment";
@@ -209,6 +211,13 @@ public class ReferenceFragment extends Fragment {
         taskStatuses = realmDB.where(TaskStatus.class).findAll();
         TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity().getApplicationContext(), taskStatuses);
         contentListView.setAdapter(taskStatusAdapter);
+    }
+
+    private void fillListViewTaskStageStatus() {
+        RealmResults<TaskStageStatus> taskStageStatuses;
+        taskStageStatuses = realmDB.where(TaskStageStatus.class).findAll();
+        TaskStageStatusAdapter taskStageStatusAdapter = new TaskStageStatusAdapter(getActivity().getApplicationContext(), taskStageStatuses);
+        contentListView.setAdapter(taskStageStatusAdapter);
     }
 
     private void fillListViewEquipmentStatus() {
@@ -812,6 +821,9 @@ public class ReferenceFragment extends Fragment {
                     break;
                 case TaskStatusAdapter.TABLE_NAME:
                     fillListViewTaskStatus();
+                    break;
+                case TaskStageStatusAdapter.TABLE_NAME:
+                    fillListViewTaskStageStatus();
                     break;
                 case EquipmentStatusAdapter.TABLE_NAME:
                     fillListViewEquipmentStatus();

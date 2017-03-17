@@ -94,11 +94,8 @@ public class UserInfoFragment extends Fragment {
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
-            if (user.getTagId().length() > 20) {
-                tv_user_id.setText("ID: " + user.getTagId().substring(0, 20));
-            } else {
-                tv_user_id.setText("ID: " + user.getTagId());
-            }
+            //if (user.getTagId().length() > 20) tv_user_id.setText("ID: " + user.getTagId().substring(4, 24));
+            tv_user_id.setText("ID: " + user.getTagId());
 
 			tv_user_name.setText(user.getName());
 			tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
