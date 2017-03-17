@@ -139,41 +139,25 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     /**
      * Показываем документ из базы во внешнем приложении.
      *
-     * @param uuid - идентификатор документа
+     * @param file - файл
      */
-    private void showDocument(String uuid) {
+    private void showDocument(File file) {
+        MimeTypeMap mt = MimeTypeMap.getSingleton();
+        String[] patternList = file.getName().split("\\.");
+        String extension = patternList[patternList.length - 1];
 
-        RealmResults<Documentation> documentation;
-        documentation = realmDB.where(Documentation.class).findAll();
-        documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
+        if (mt.hasExtension(extension)) {
+            String mimeType = mt.getMimeTypeFromExtension(extension);
+            Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(file), mimeType);
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-        if (uuid != null) {
-            Documentation item = realmDB.where(Documentation.class).equalTo("uuid", uuid).findFirst();
-            MimeTypeMap mt = MimeTypeMap.getSingleton();
-            File file = new File(item.getUuid());
-            //File file = new File(item.getPath());
-            String[] patternList = file.getName().split("\\.");
-            String extension = patternList[patternList.length - 1];
-
-            if (mt.hasExtension(extension)) {
-                String mimeType = mt.getMimeTypeFromExtension(extension);
-                Intent target = new Intent(Intent.ACTION_VIEW);
-                target.setDataAndType(Uri.fromFile(new File(item.getUuid())),
-                        mimeType);
-                //target.setDataAndType(Uri.fromFile(new File(item.getPath())),
-                //		mimeType);
-                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-                Intent viewFileIntent = Intent.createChooser(target,
-                        "Open File");
-                try {
-                    startActivity(viewFileIntent);
-                } catch (ActivityNotFoundException e) {
-                    // сообщить пользователю установить подходящее
-                    // приложение
-                }
+            Intent viewFileIntent = Intent.createChooser(target, "Open File");
+            try {
+                startActivity(viewFileIntent);
+            } catch (ActivityNotFoundException e) {
+                // сообщить пользователю установить подходящее приложение
             }
-
         }
     }
 
@@ -496,26 +480,23 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         about.show();
     }
 
-    private class ListViewClickListener implements
-            AdapterView.OnItemClickListener {
+    private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             Documentation documentation = (Documentation) parent.getItemAtPosition(position);
             // TODO как все таки пути к файлу формируем
-            File file = new File(documentation.getEquipment().getUuid());
+            String path = "/documentation/" + documentation.getEquipment().getUuid() + "/";
+            File file = new File(getExternalFilesDir(path), documentation.getPath());
             if (file.exists()) {
-                showDocument(documentation.getUuid());
+                showDocument(file);
             } else {
                 // либо сказать что файла нет, либо предложить скачать с сервера
                 Log.d(TAG, "Получаем файл документации.");
 //				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getApplicationContext(),
 //						ReferenceServiceProvider.Actions.ACTION_GET_DOCUMENTATION_FILE);
-//
 //				registerReceiver(mReceiverGetDocumentationFile, mFilterGetDocumentationFile);
-//
 //				rsh.getDocumentationFile(new String[] { documentation.getUuid() });
 
                 // показываем диалог получения наряда
