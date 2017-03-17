@@ -639,7 +639,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                         String equipmentUuid = task.getEquipment().getUuid();
                         List<Documentation> docList = realm.where(Documentation.class)
                                 .equalTo("equipment.uuid", equipmentUuid)
-//                                .equalTo("required", 1)
+                                .equalTo("required", true)
                                 .findAll();
                         for (Documentation doc : docList) {
                             String docFileName = doc.getPath();
