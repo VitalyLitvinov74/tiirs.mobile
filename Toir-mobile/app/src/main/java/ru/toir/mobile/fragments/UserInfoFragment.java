@@ -26,7 +26,6 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.User;
 
-import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 public class UserInfoFragment extends Fragment {
@@ -128,8 +127,8 @@ public class UserInfoFragment extends Fragment {
                 user_status_gprs.setChecked(false);
             }
 
-            String filename = getPicturesDirectory(getActivity().getApplicationContext()) + "users" + File.separator + user.getImage();
-            Bitmap user_bitmap = getResizedBitmap(filename, 0, 200);
+            String path = getActivity().getExternalFilesDir("/users") + File.separator;
+            Bitmap user_bitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
             if (user_bitmap != null) {
                 user_image.setImageBitmap(user_bitmap);
             }

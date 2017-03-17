@@ -471,7 +471,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         operations = q.findAll();
 
-        operationAdapter = new OperationAdapter(getContext(), operations, currentTaskUuid);
+        operationAdapter = new OperationAdapter(getContext(), operations, selectedTask.getTaskTemplate().getUuid());
         mainListView.setAdapter(operationAdapter);
         //resultButtonLayout.setVisibility(View.VISIBLE);
         makePhotoButton.setVisibility(View.VISIBLE);

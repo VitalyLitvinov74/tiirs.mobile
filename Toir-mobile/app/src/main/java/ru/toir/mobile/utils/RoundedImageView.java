@@ -84,21 +84,28 @@ public class RoundedImageView extends ImageView {
         return imageRounded;
     }
 
-    public static Bitmap getResizedBitmap(String filename, int newWidth, int newHeight) {
+    public static Bitmap getResizedBitmap(String path, String filename, int newWidth, int newHeight, long changedAt) {
         Bitmap imageBitmap;
         Bitmap imageBitmap2;
         float scaleWidth;
         float scaleHeight;
-        File image = new File(filename.replace(".", "_m."));
+        // /storage/sdcard1/Android/data/ru.toir.mobile/users/4CD4A64F-F6CB-4A7C-B5A6-42936E656F31.jpg
+        File image = new File(path+filename.replace(".", "_m."));
+        File image_full = new File(path+filename);
+        // не смогли создать копию
         if (image == null) return null;
-        imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
-        if (imageBitmap2 != null) return imageBitmap2;
+        Long last_modified=image.lastModified();
+        if (image.exists() && changedAt<=last_modified) {
+             // файл есть, преобразовывать не нужно
+             imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
+             if (imageBitmap2 != null) return imageBitmap2;
+            }
 
-        imageBitmap = BitmapFactory.decodeFile(filename);
+        imageBitmap = BitmapFactory.decodeFile(image_full.getAbsolutePath());
         if (imageBitmap != null) {
             int width = imageBitmap.getWidth();
             int height = imageBitmap.getHeight();
-            if (newWidth <= 0 || newHeight <= 0) return null;
+            if ((newWidth==0) && (newHeight==0)) return null;
             if (newWidth > 0) {
                 scaleWidth = (float) newWidth / (float) width;
                 newHeight = (int) (height * scaleWidth);

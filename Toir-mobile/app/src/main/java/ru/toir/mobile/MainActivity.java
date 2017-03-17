@@ -270,8 +270,8 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Response<User> response, Retrofit retrofit) {
                                     User user = response.body();
-                                    final String fileName = user.getImage();
                                     if (user != null) {
+                                        final String fileName = user.getImage();
                                         Realm realm = Realm.getDefaultInstance();
                                         realm.beginTransaction();
                                         realm.copyToRealmOrUpdate(user);

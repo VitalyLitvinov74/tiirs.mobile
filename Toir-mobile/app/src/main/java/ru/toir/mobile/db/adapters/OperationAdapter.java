@@ -15,9 +15,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -31,7 +28,6 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationVerdict;
 
-import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
@@ -43,14 +39,14 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     Realm realm = Realm.getDefaultInstance();
     private Context context;
     private int counter=0;
-    private String taskStageTemplateUuid;
+    private String taskTemplateUuid;
     private boolean[] visibility = new boolean[50];
     private boolean[] completed = new boolean[50];
 
-    public OperationAdapter(@NonNull Context context, RealmResults<Operation> data, String taskStageTemplateUuid) {
+    public OperationAdapter(@NonNull Context context, RealmResults<Operation> data, String taskTemplateUuid) {
         super(context, data);
         this.context = context;
-        this.taskStageTemplateUuid = taskStageTemplateUuid;
+        this.taskTemplateUuid = taskTemplateUuid;
     }
 
     @Override
@@ -180,25 +176,12 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     if (lastValue != null)
                         viewHolder.measure.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
 
-                    String filename = getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator + operation.getOperationTemplate().getImage();
-                    Bitmap image_bitmap = getResizedBitmap(filename, 100, 0);
+                    //String path = getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator;
+                    String path = context.getExternalFilesDir("/tasks") + File.separator + taskTemplateUuid + File.separator;
+                    Bitmap image_bitmap = getResizedBitmap(path, operation.getOperationTemplate().getImage(), 500, 0, operation.getChangedAt().getTime());
                     if (image_bitmap != null) {
                         viewHolder.image.setImageBitmap(image_bitmap);
-                    } else {
-                        File mediaStorageDir = new File(context
-                                .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                                .getAbsolutePath());
-                        filename = mediaStorageDir.getPath() + File.separator + operation.getOperationTemplate().getImage();
-                        String filename2 = filename.replace(".", "_m.");
-                        image2 = new File(filename2);
-                        if (image2 != null) {
-                            image_bitmap = BitmapFactory.decodeFile(image2.getAbsolutePath());
-                            viewHolder.image.setImageBitmap(image_bitmap);
-                        } else {
-                            image_bitmap = getResizedBitmap(filename, 100, 0);
-                            viewHolder.image.setImageBitmap(image_bitmap);
-                            }
-                        }
+                    }
                 }
             }
         } else {
