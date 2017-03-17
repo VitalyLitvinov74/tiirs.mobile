@@ -582,11 +582,15 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
      *
      * @param status
      */
-    private void getOrdersByStatus(final List<String> status) {
-        AsyncTask<Void, Void, List<Orders>> aTask = new AsyncTask<Void, Void, List<Orders>>() {
+    private void getOrdersByStatus(List<String> status) {
+        AsyncTask<List<String>, Void, List<Orders>> aTask = new AsyncTask<List<String>, Void, List<Orders>>() {
             @Override
-            protected List<Orders> doInBackground(Void... voids) {
-                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(status);
+            protected List<Orders> doInBackground(List<String>... params) {
+                // обновляем справочники
+                ReferenceFragment.updateReferences(null);
+
+                // запрашиваем наряды
+                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
@@ -706,7 +710,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 processDialog.dismiss();
             }
         };
-        aTask.execute();
+        aTask.execute(status);
     }
 
     @Override
