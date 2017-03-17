@@ -36,8 +36,7 @@ public class EquipmentsFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.equipment_reference_layout,
-				container, false);
+        View rootView = inflater.inflate(R.layout.equipment_reference_layout, container, false);
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Оборудование");
         realmDB = Realm.getDefaultInstance();
@@ -55,8 +54,7 @@ public class EquipmentsFragment extends Fragment {
 		sortSpinner.setAdapter(sortSpinnerAdapter);
 		sortSpinner.setOnItemSelectedListener(spinnerListener);
 */
-		equipmentListView = (ListView) rootView
-				.findViewById(R.id.erl_equipment_listView);
+        equipmentListView = (ListView) rootView.findViewById(R.id.erl_equipment_listView);
 
 
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();

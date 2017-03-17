@@ -66,6 +66,7 @@ import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
+import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
@@ -565,6 +566,153 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Обёртка к методу получения нарядов.
+     *
+     * @param status
+     */
+    private void getOrdersByStatus(String status) {
+        List<String> list = new ArrayList<>();
+        list.add(status);
+        getOrdersByStatus(list);
+    }
+
+    /**
+     * Получение нарядов с определённым статусом.
+     *
+     * @param status
+     */
+    private void getOrdersByStatus(List<String> status) {
+        AsyncTask<List<String>, Void, List<Orders>> aTask = new AsyncTask<List<String>, Void, List<Orders>>() {
+            @Override
+            protected List<Orders> doInBackground(List<String>... params) {
+                // обновляем справочники
+                ReferenceFragment.updateReferences(null);
+
+                // запрашиваем наряды
+                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
+                List<Orders> result;
+                try {
+                    Response<List<Orders>> response = call.execute();
+                    result = response.body();
+                } catch (Exception e) {
+                    Log.d(TAG, e.getLocalizedMessage());
+                    return null;
+                }
+
+                // список файлов для загрузки
+                List<FilePath> files = new ArrayList<>();
+                // строим список изображений для загрузки
+                for (Orders order : result) {
+                    List<Tasks> tasks = order.getTasks();
+                    for (Tasks task : tasks) {
+                        // UUID шаблона задачи
+                        String taskTemplateUuid = task.getTaskTemplate().getUuid();
+                        // путь до папки с файлами
+                        String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
+                        // общий путь до файлов на сервере
+                        String basePath = "/storage/" + equipmentModelUuid + "/";
+                        // общий путь до файлов локальный
+                        String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
+                        // урл изображения задачи
+                        files.add(new FilePath(task.getTaskTemplate().getImage(), basePath, basePathLocal));
+                        // урл изображения оборудования
+                        files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
+
+                        List<TaskStages> stages = task.getTaskStages();
+                        for (TaskStages stage : stages) {
+                            // урл изображения этапа задачи
+                            files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
+                                    basePath, basePathLocal));
+
+                            List<Operation> operations = stage.getOperations();
+                            for (Operation operation : operations) {
+                                // урл изображения операции
+                                files.add(new FilePath(operation.getOperationTemplate().getImage(),
+                                        basePath, basePathLocal));
+                            }
+                        }
+                    }
+                }
+
+                // список файлов документации
+                for (Orders order : result) {
+                    List<Tasks> tasks = order.getTasks();
+                    Realm realm = Realm.getDefaultInstance();
+                    for (Tasks task : tasks) {
+                        String equipmentUuid = task.getEquipment().getUuid();
+                        List<Documentation> docList = realm.where(Documentation.class)
+                                .equalTo("equipment.uuid", equipmentUuid)
+                                .equalTo("required", true)
+                                .findAll();
+                        for (Documentation doc : docList) {
+                            String docFileName = doc.getPath();
+                            String url = "/storage/" + equipmentUuid + "/";
+                            String localPath = "/documentation/" + equipmentUuid + "/";
+                            files.add(new FilePath(docFileName, url, localPath));
+                        }
+                    }
+                }
+
+                // загружаем файлы
+                for (FilePath path : files) {
+                    Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(ToirApplication.serverUrl + path.urlPath + path.fileName);
+                    try {
+                        Response<ResponseBody> r = call1.execute();
+                        ResponseBody trueImgBody = r.body();
+                        if (trueImgBody == null) {
+                            continue;
+                        }
+
+                        File file = new File(getContext().getExternalFilesDir(path.localPath), path.fileName);
+                        if (!file.getParentFile().exists()) {
+                            if (!file.getParentFile().mkdirs()) {
+                                Log.e(TAG, "Не удалось создать папку " +
+                                        file.getParentFile().toString() +
+                                        " для сохранения файла изображения!");
+                                continue;
+                            }
+                        }
+
+                        FileOutputStream fos = new FileOutputStream(file);
+                        fos.write(trueImgBody.bytes());
+                        fos.close();
+//                        equipment.setImage(file.getPath());
+//                        equipmentDBAdapter.replace(equipment);
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getLocalizedMessage());
+                    }
+                }
+
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(List<Orders> orders) {
+                super.onPostExecute(orders);
+                if (orders == null) {
+                    // сообщаем описание неудачи
+                    Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
+                } else {
+                    int count = orders.size();
+                    // собщаем количество полученных нарядов
+                    if (count > 0) {
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(orders);
+                        realm.commitTransaction();
+                        Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                processDialog.dismiss();
+            }
+        };
+        aTask.execute(status);
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -581,112 +729,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                tsh.GetTaskNew();
 
                 // запускаем поток получения новых нарядов с сервера
-                AsyncTask<Void, Void, List<Orders>> aTask = new AsyncTask<Void, Void, List<Orders>>() {
-                    @Override
-                    protected List<Orders> doInBackground(Void... voids) {
-                        Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
-                                .ordersByStatus(OrderStatus.Status.NEW);
-                        List<Orders> result;
-                        try {
-                            Response<List<Orders>> response = call.execute();
-                            result = response.body();
-                        } catch (Exception e) {
-                            Log.d(TAG, e.getLocalizedMessage());
-                            return null;
-                        }
-
-                        // список файлов для загрузки
-                        List<FilePath> files = new ArrayList<>();
-                        // строим список изображений для загрузки
-                        for (Orders order : result) {
-                            List<Tasks> tasks = order.getTasks();
-                            for (Tasks task : tasks) {
-                                // UUID шаблона задачи
-                                String taskTemplateUuid = task.getTaskTemplate().getUuid();
-                                // путь до папки с файлами
-                                String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
-                                // общий путь до файлов на сервере
-                                String basePath = "/storage/" + equipmentModelUuid + "/";
-                                // общий путь до файлов локальный
-                                String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
-                                // урл изображения задачи
-                                files.add(new FilePath(task.getTaskTemplate().getImage(),
-                                        basePath, basePathLocal));
-                                // урл изображения оборудования
-                                files.add(new FilePath(task.getEquipment().getImage(),
-                                        basePath, "/equipment/"));
-
-                                List<TaskStages> stages = task.getTaskStages();
-                                for (TaskStages stage : stages) {
-                                    // урл изображения этапа задачи
-                                    files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
-                                            basePath, basePathLocal));
-
-                                    List<Operation> operations = stage.getOperations();
-                                    for (Operation operation : operations) {
-                                        // урл изображения операции
-                                        files.add(new FilePath(operation.getOperationTemplate().getImage(),
-                                                basePath, basePathLocal));
-                                    }
-                                }
-                            }
-                        }
-
-                        // загружаем файлы
-                        for (FilePath path : files) {
-                            Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(ToirApplication.serverUrl + path.urlPath + path.fileName);
-                            try {
-                                Response<ResponseBody> r = call1.execute();
-                                ResponseBody trueImgBody = r.body();
-                                if (trueImgBody == null) {
-                                    continue;
-                                }
-
-                                File file = new File(
-                                        getContext().getExternalFilesDir(path.localPath), path.fileName);
-                                if (!file.getParentFile().exists()) {
-                                    if (!file.getParentFile().mkdirs()) {
-                                        continue;
-                                    }
-                                }
-
-                                FileOutputStream fos = new FileOutputStream(file);
-                                fos.write(trueImgBody.bytes());
-                                fos.close();
-//                                equipment.setImage(file.getPath());
-//                                equipmentDBAdapter.replace(equipment);
-                            } catch (Exception e) {
-                                Log.e(TAG, e.getLocalizedMessage());
-                            }
-                        }
-
-                        return result;
-                    }
-
-                    @Override
-                    protected void onPostExecute(List<Orders> orders) {
-                        super.onPostExecute(orders);
-                        if (orders == null) {
-                            // сообщаем описание неудачи
-                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
-                        } else {
-                            int count = orders.size();
-                            // собщаем количество полученных нарядов
-                            if (count > 0) {
-                                Realm realm = Realm.getDefaultInstance();
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(orders);
-                                realm.commitTransaction();
-                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        processDialog.dismiss();
-                    }
-                };
-                aTask.execute();
+                getOrdersByStatus(OrderStatus.Status.NEW);
 
                 // показываем диалог получения нарядов
                 processDialog = new ProgressDialog(getActivity());
@@ -721,50 +764,11 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                tsh.GetTaskDone();
 
                 // запускаем поток получения выполненных, невыполненных, отменнённых нарядов с сервера
-                AsyncTask<Void, Void, List<Orders>> aTask = new AsyncTask<Void, Void, List<Orders>>() {
-                    @Override
-                    protected List<Orders> doInBackground(Void... voids) {
-                        List<String> stUuids = new ArrayList<>();
-                        stUuids.add(OrderStatus.Status.CANCELED);
-                        stUuids.add(OrderStatus.Status.COMPLETE);
-                        stUuids.add(OrderStatus.Status.UN_COMPLETE);
-                        Call<List<Orders>> call = ToirAPIFactory.getOrdersService()
-                                .ordersByStatus(stUuids);
-                        List<Orders> result;
-                        try {
-                            Response<List<Orders>> response = call.execute();
-                            result = response.body();
-                            return result;
-                        } catch (Exception e) {
-                            Log.d(TAG, e.getLocalizedMessage());
-                            return null;
-                        }
-                    }
-
-                    @Override
-                    protected void onPostExecute(List<Orders> orders) {
-                        super.onPostExecute(orders);
-                        if (orders == null) {
-                            // сообщаем описание неудачи
-                            Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
-                        } else {
-                            int count = orders.size();
-                            // собщаем количество полученных нарядов
-                            if (count > 0) {
-                                Realm realm = Realm.getDefaultInstance();
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(orders);
-                                realm.commitTransaction();
-                                Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        processDialog.dismiss();
-                    }
-                };
-                aTask.execute();
+                List<String> stUuids = new ArrayList<>();
+                stUuids.add(OrderStatus.Status.CANCELED);
+                stUuids.add(OrderStatus.Status.COMPLETE);
+                stUuids.add(OrderStatus.Status.UN_COMPLETE);
+                getOrdersByStatus(stUuids);
 
                 // показываем диалог получения наряда
                 processDialog = new ProgressDialog(getActivity());

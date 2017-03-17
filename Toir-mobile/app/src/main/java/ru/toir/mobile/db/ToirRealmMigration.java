@@ -227,7 +227,24 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 9) {
+            toVersion10(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
+    }
+
+    /**
+     * Переход на версию 10
+     *
+     * @param realm
+     */
+    private void toVersion10(DynamicRealm realm) {
+        Log.d(TAG, "from version 8");
+        RealmSchema schema = realm.getSchema();
+        schema.get("Documentation").addField("required", boolean.class);
+
     }
 
     private boolean testPropsFields(DynamicRealm realm) {

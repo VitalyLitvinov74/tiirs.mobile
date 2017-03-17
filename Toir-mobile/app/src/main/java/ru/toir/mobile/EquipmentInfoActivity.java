@@ -2,11 +2,17 @@ package ru.toir.mobile;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+//import android.content.BroadcastReceiver;
+//import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+//import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,18 +36,27 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
+import com.squareup.okhttp.ResponseBody;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import retrofit.Call;
+import retrofit.Response;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Tasks;
+//import ru.toir.mobile.rest.IServiceProvider;
+//import ru.toir.mobile.rest.ProcessorService;
+//import ru.toir.mobile.rest.ReferenceServiceHelper;
+//import ru.toir.mobile.rest.ReferenceServiceProvider;
+import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
@@ -49,14 +64,6 @@ import ru.toir.mobile.utils.DataUtils;
 
 import static ru.toir.mobile.utils.MainFunctions.getPicturesDirectory;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
-
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
-//import android.content.IntentFilter;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.ReferenceServiceHelper;
-//import ru.toir.mobile.rest.ReferenceServiceProvider;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
 	private final static String TAG = "EquipmentInfoActivity";
@@ -92,18 +99,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 //	private BroadcastReceiver mReceiverGetDocumentationFile = new BroadcastReceiver() {
 //		@Override
 //		public void onReceive(Context context, Intent intent) {
-//			int provider = intent.getIntExtra(
-//					ProcessorService.Extras.PROVIDER_EXTRA, 0);
+//			int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
 //			Log.d(TAG, "" + provider);
 //			if (provider == ProcessorService.Providers.REFERENCE_PROVIDER) {
-//				int method = intent.getIntExtra(
-//						ProcessorService.Extras.METHOD_EXTRA, 0);
+//				int method = intent.getIntExtra( ProcessorService.Extras.METHOD_EXTRA, 0);
 //				Log.d(TAG, "" + method);
 //				if (method == ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE) {
-//					boolean result = intent.getBooleanExtra(
-//							ProcessorService.Extras.RESULT_EXTRA, false);
-//					Bundle bundle = intent
-//							.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
+//					boolean result = intent.getBooleanExtra( ProcessorService.Extras.RESULT_EXTRA, false);
+//					Bundle bundle = intent .getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
 //					Log.d(TAG, "boolean result" + result);
 //
 //					if (result) {
@@ -111,8 +114,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 //								"Файл загружен успешно и готов к просмотру.",
 //								Toast.LENGTH_LONG).show();
 //                        //Documentation<Documentation> documentation = realmDB.where(Documentation.class).equalTo("equipmentUuid",);
-//						// показываем только первый файл, по идее он один и
-//						// должен быть
+//						// показываем только первый файл, по идее он один и должен быть
 //						String[] uuids = bundle
 //								.getStringArray(ReferenceServiceProvider.Methods.RESULT_GET_DOCUMENTATION_FILE_UUID);
 //						if (uuids != null) {
@@ -120,8 +122,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 //						}
 //					} else {
 //						// сообщаем описание неудачи
-//						String message = bundle
-//								.getString(IServiceProvider.MESSAGE);
+//						String message = bundle.getString(IServiceProvider.MESSAGE);
 //						Toast.makeText(getApplicationContext(),
 //								"Ошибка при файла. " + message,
 //								Toast.LENGTH_LONG).show();
@@ -139,41 +140,25 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     /**
      * Показываем документ из базы во внешнем приложении.
      *
-     * @param uuid - идентификатор документа
+     * @param file - файл
      */
-    private void showDocument(String uuid) {
+    private void showDocument(File file) {
+        MimeTypeMap mt = MimeTypeMap.getSingleton();
+        String[] patternList = file.getName().split("\\.");
+        String extension = patternList[patternList.length - 1];
 
-        RealmResults<Documentation> documentation;
-        documentation = realmDB.where(Documentation.class).findAll();
-        documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
+        if (mt.hasExtension(extension)) {
+            String mimeType = mt.getMimeTypeFromExtension(extension);
+            Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(file), mimeType);
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-        if (uuid != null) {
-            Documentation item = realmDB.where(Documentation.class).equalTo("uuid", uuid).findFirst();
-            MimeTypeMap mt = MimeTypeMap.getSingleton();
-            File file = new File(item.getUuid());
-            //File file = new File(item.getPath());
-            String[] patternList = file.getName().split("\\.");
-            String extension = patternList[patternList.length - 1];
-
-            if (mt.hasExtension(extension)) {
-                String mimeType = mt.getMimeTypeFromExtension(extension);
-                Intent target = new Intent(Intent.ACTION_VIEW);
-                target.setDataAndType(Uri.fromFile(new File(item.getUuid())),
-                        mimeType);
-                //target.setDataAndType(Uri.fromFile(new File(item.getPath())),
-                //		mimeType);
-                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-                Intent viewFileIntent = Intent.createChooser(target,
-                        "Open File");
-                try {
-                    startActivity(viewFileIntent);
-                } catch (ActivityNotFoundException e) {
-                    // сообщить пользователю установить подходящее
-                    // приложение
-                }
+            Intent viewFileIntent = Intent.createChooser(target, "Open File");
+            try {
+                startActivity(viewFileIntent);
+            } catch (ActivityNotFoundException e) {
+                // сообщить пользователю установить подходящее приложение
             }
-
         }
     }
 
@@ -496,27 +481,77 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         about.show();
     }
 
-    private class ListViewClickListener implements
-            AdapterView.OnItemClickListener {
+    private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             Documentation documentation = (Documentation) parent.getItemAtPosition(position);
             // TODO как все таки пути к файлу формируем
-            File file = new File(documentation.getEquipment().getUuid());
+            String path = "/documentation/" + documentation.getEquipment().getUuid() + "/";
+            File file = new File(getExternalFilesDir(path), documentation.getPath());
             if (file.exists()) {
-                showDocument(documentation.getUuid());
+                showDocument(file);
             } else {
                 // либо сказать что файла нет, либо предложить скачать с сервера
                 Log.d(TAG, "Получаем файл документации.");
 //				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getApplicationContext(),
 //						ReferenceServiceProvider.Actions.ACTION_GET_DOCUMENTATION_FILE);
-//
 //				registerReceiver(mReceiverGetDocumentationFile, mFilterGetDocumentationFile);
-//
 //				rsh.getDocumentationFile(new String[] { documentation.getUuid() });
+
+                // запускаем поток получения файла с сервера
+                AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
+                    @Override
+                    protected String doInBackground(String... params) {
+                        String fileElements[] = params[0].split("/");
+                        String url = ToirApplication.serverUrl + "/storage/" + params[0];
+                        Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(url);
+                        try {
+                            Response<ResponseBody> r = call1.execute();
+                            ResponseBody trueImgBody = r.body();
+                            if (trueImgBody == null) {
+                                return null;
+                            }
+
+                            File file = new File(getApplicationContext().getExternalFilesDir("/documentation/" + fileElements[0]), fileElements[1]);
+                            if (!file.getParentFile().exists()) {
+                                if (!file.getParentFile().mkdirs()) {
+                                    Log.e(TAG, "Не удалось создать папку " +
+                                            file.getParentFile().toString() +
+                                            " для сохранения файла изображения!");
+                                    return null;
+                                }
+                            }
+
+                            FileOutputStream fos = new FileOutputStream(file);
+                            fos.write(trueImgBody.bytes());
+                            fos.close();
+                            return file.getAbsolutePath();
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String filePath) {
+                        super.onPostExecute(filePath);
+                        loadDocumentationDialog.dismiss();
+                        if (filePath != null) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Файл загружен успешно и готов к просмотру.",
+                                    Toast.LENGTH_LONG).show();
+                            showDocument(new File(filePath));
+                        } else {
+                            // сообщаем описание неудачи
+                            Toast.makeText(getApplicationContext(), "Ошибка при получении файла.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                };
+                task.execute(documentation.getEquipment().getUuid() + "/" + documentation.getPath());
 
                 // показываем диалог получения наряда
                 loadDocumentationDialog = new ProgressDialog(EquipmentInfoActivity.this);

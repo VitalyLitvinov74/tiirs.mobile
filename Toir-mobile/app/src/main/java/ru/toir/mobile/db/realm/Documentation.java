@@ -19,6 +19,7 @@ public class Documentation extends RealmObject {
     private String path;
     private Date createdAt;
     private Date changedAt;
+    private boolean required;
 
     public long get_id() {
         return _id;
@@ -82,5 +83,13 @@ public class Documentation extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }
