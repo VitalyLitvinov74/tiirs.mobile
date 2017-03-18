@@ -31,7 +31,8 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
-import com.squareup.okhttp.ResponseBody;
+
+import okhttp3.ResponseBody;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,8 +41,8 @@ import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import retrofit.Call;
-import retrofit.Response;
+import retrofit2.Call;
+import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;

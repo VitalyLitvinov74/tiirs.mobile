@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.realm.Realm;
-import retrofit.Call;
+import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.CriticalType;
@@ -340,7 +340,7 @@ public class ReferenceProcessor {
         Call<List<DocumentationType>> call = ToirAPIFactory.getDocumentationTypeService()
                 .documentationType(lastChangedAt);
         try {
-            retrofit.Response<List<DocumentationType>> response = call.execute();
+            retrofit2.Response<List<DocumentationType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -652,7 +652,7 @@ public class ReferenceProcessor {
         Call<List<EquipmentStatus>> call = ToirAPIFactory.getEquipmentStatusService()
                 .equipmentStatus(lastChangedAt);
         try {
-            retrofit.Response<List<EquipmentStatus>> response = call.execute();
+            retrofit2.Response<List<EquipmentStatus>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -688,7 +688,7 @@ public class ReferenceProcessor {
         Call<List<EquipmentType>> call = ToirAPIFactory.getEquipmentTypeService()
                 .equipmentType(lastChangedAt);
         try {
-            retrofit.Response<List<EquipmentType>> response = call.execute();
+            retrofit2.Response<List<EquipmentType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -724,7 +724,7 @@ public class ReferenceProcessor {
         Call<List<MeasureType>> call = ToirAPIFactory.getMeasureTypeService()
                 .measureType(lastChangedAt);
         try {
-            retrofit.Response<List<MeasureType>> response = call.execute();
+            retrofit2.Response<List<MeasureType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -760,7 +760,7 @@ public class ReferenceProcessor {
         Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatusService()
                 .operationStatus(lastChangedAt);
         try {
-            retrofit.Response<List<OperationStatus>> response = call.execute();
+            retrofit2.Response<List<OperationStatus>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -796,7 +796,7 @@ public class ReferenceProcessor {
         Call<List<OperationType>> call = ToirAPIFactory.getOperationTypeService()
                 .operationType(lastChangedAt);
         try {
-            retrofit.Response<List<OperationType>> response = call.execute();
+            retrofit2.Response<List<OperationType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -832,7 +832,7 @@ public class ReferenceProcessor {
         Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatusService()
                 .taskStatus(lastChangedAt);
         try {
-            retrofit.Response<List<TaskStatus>> response = call.execute();
+            retrofit2.Response<List<TaskStatus>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -941,7 +941,7 @@ public class ReferenceProcessor {
         Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService()
                 .criticalType(lastChangedAt);
         try {
-            retrofit.Response<List<CriticalType>> response = call.execute();
+            retrofit2.Response<List<CriticalType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
             result = new Bundle();
             result.putBoolean(IServiceProvider.RESULT, true);
@@ -1378,7 +1378,7 @@ public class ReferenceProcessor {
         if (au.getToken() == null) {
             Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(au.getTagId(), TokenSrv.Type.LABEL);
             try {
-                retrofit.Response<TokenSrv> response = call.execute();
+                retrofit2.Response<TokenSrv> response = call.execute();
                 TokenSrv token = response.body();
                 au.setToken(token.getAccessToken());
                 return true;

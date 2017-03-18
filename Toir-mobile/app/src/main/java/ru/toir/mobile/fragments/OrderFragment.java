@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,7 +44,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
-import com.squareup.okhttp.ResponseBody;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,8 +60,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import retrofit.Call;
-import retrofit.Response;
+import retrofit2.Call;
+import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
@@ -713,6 +719,69 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         aTask.execute(status);
     }
 
+    /**
+     * тестовый метод для проверки отправки нескольких файлов по http
+     */
+    private void sendFiles() {
+        Thread thread = new Thread(new Runnable() {
+            @NonNull
+            private RequestBody createPartFromString(String descriptionString) {
+                return RequestBody.create(MultipartBody.FORM, descriptionString);
+            }
+
+            @NonNull
+            private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+                // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+                // use the FileUtils to get the actual file by uri
+//                File file = FileUtils.getFile(this, fileUri);
+                // TODO: Проверить!!!!
+                File file = new File(fileUri.getPath());
+                // create RequestBody instance from file
+//                String type = getContext().getContentResolver().getType(fileUri);
+                String type = null;
+                String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.getPath());
+                if (extension != null) {
+                    type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                }
+
+                MediaType mediaType = MediaType.parse(type);
+                RequestBody requestFile = RequestBody.create(mediaType, file);
+
+                // MultipartBody.Part is used to send also the actual file name
+                return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+            }
+
+
+            @Override
+            public void run() {
+                RequestBody descr = createPartFromString("hello, this is description speaking");
+                Uri uri1 = null, uri2 = null, uri3 = null;
+                try {
+                    uri1 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
+                    uri2 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
+                    uri3 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+                List<MultipartBody.Part> list = new ArrayList<>();
+                list.add(prepareFilePart("photo[AAA-BBB]", uri1));
+                list.add(prepareFilePart("photo[AAA-CCC]", uri2));
+                list.add(prepareFilePart("photo[EEE-BBB]", uri3));
+                Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
+                try {
+                    Response response = call.execute();
+                    ResponseBody result = (ResponseBody) response.body();
+                    if (response.isSuccessful()) {
+                        Log.d(TAG, "!!!!");
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+            }
+        });
+        thread.start();
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -795,101 +864,104 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         MenuItem sendTaskResultMenu = menu.add("Отправить результаты");
         sendTaskResultMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                // проверяем наличие не законченных нарядов
-                RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
-                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
-                        .findAll();
-                int inWorkCount = ordersInWork.size();
-                if (inWorkCount > 0) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                                                          @Override
+                                                          public boolean onMenuItemClick(MenuItem item) {
+                                                              sendFiles();
+                                                              // проверяем наличие не законченных нарядов
+//                RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
+//                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
+//                        .findAll();
+//                int inWorkCount = ordersInWork.size();
+//                if (inWorkCount > 0) {
+//                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+//
+//                    dialog.setTitle("Внимание!");
+//                    dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
+//                            + "Отправить выполненные наряды?");
+//                    dialog.setPositiveButton(android.R.string.ok,
+//                            new DialogInterface.OnClickListener() {
+//
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    sendCompleteTask();
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                    dialog.setNegativeButton(android.R.string.cancel,
+//                            new DialogInterface.OnClickListener() {
+//
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                    dialog.show();
+//                } else {
+//                    sendCompleteTask();
+//                }
+//
+//                // отправляем данные из журнала и лога GPS
+//                Thread thread = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Call<ToirAPIResponse> call;
+//                        Response<ToirAPIResponse> response;
+//                        Realm realm = Realm.getDefaultInstance();
+//
+//                        // выбираем все неотправленные данные из таблицы journal
+//                        RealmResults<Journal> journals = realm.where(Journal.class)
+//                                .equalTo("sent", false)
+//                                .findAll();
+//                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
+//                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
+//                        try {
+//                            response = call.execute();
+//                            ToirAPIResponse result = response.body();
+//                            if (result.isSuccess()) {
+//                                Log.d(TAG, "Журнал отправлен успешно.");
+//                            } else {
+//                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
+//                                removeNotSaved(journalList, (List<String>) result.getData());
+//                                realm.beginTransaction();
+//                                realm.copyToRealmOrUpdate(journalList);
+//                                realm.commitTransaction();
+//                            }
+//                        } catch (Exception e) {
+//                            Log.e(TAG, e.getLocalizedMessage());
+//                            Log.e(TAG, "Ошибка при отправке журнала.");
+//                        }
+//
+//                        // выбираем все неотправленные данные из таблицы gpstrack
+//                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
+//                                .equalTo("sent", false)
+//                                .findAll();
+//                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
+//                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
+//                        try {
+//                            response = call.execute();
+//                            ToirAPIResponse result = response.body();
+//                            if (result.isSuccess()) {
+//                                Log.d(TAG, "GPS лог отправлен успешно.");
+//                            } else {
+//                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
+//                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
+//                                realm.beginTransaction();
+//                                realm.copyToRealmOrUpdate(gpsTrackList);
+//                                realm.commitTransaction();
+//                            }
+//                        } catch (Exception e) {
+//                            Log.e(TAG, e.getLocalizedMessage());
+//                            Log.e(TAG, "Ошибка при отправке GPS лога.");
+//                        }
+//                    }
+//                });
+//                thread.start();
 
-                    dialog.setTitle("Внимание!");
-                    dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
-                            + "Отправить выполненные наряды?");
-                    dialog.setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
+                                                              return true;
+                                                          }
+                                                      }
 
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    sendCompleteTask();
-                                    dialog.dismiss();
-                                }
-                            });
-                    dialog.setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    dialog.show();
-                } else {
-                    sendCompleteTask();
-                }
-
-                // отправляем данные из журнала и лога GPS
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Call<ToirAPIResponse> call;
-                        Response<ToirAPIResponse> response;
-                        Realm realm = Realm.getDefaultInstance();
-
-                        // выбираем все неотправленные данные из таблицы journal
-                        RealmResults<Journal> journals = realm.where(Journal.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
-                        try {
-                            response = call.execute();
-                            ToirAPIResponse result = response.body();
-                            if (result.isSuccess()) {
-                                Log.d(TAG, "Журнал отправлен успешно.");
-                            } else {
-                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-                                removeNotSaved(journalList, (List<String>) result.getData());
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(journalList);
-                                realm.commitTransaction();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                            Log.e(TAG, "Ошибка при отправке журнала.");
-                        }
-
-                        // выбираем все неотправленные данные из таблицы gpstrack
-                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
-                        try {
-                            response = call.execute();
-                            ToirAPIResponse result = response.body();
-                            if (result.isSuccess()) {
-                                Log.d(TAG, "GPS лог отправлен успешно.");
-                            } else {
-                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(gpsTrackList);
-                                realm.commitTransaction();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                            Log.e(TAG, "Ошибка при отправке GPS лога.");
-                        }
-                    }
-                });
-                thread.start();
-
-                return true;
-            }
-        });
+        );
     }
 
     /**
@@ -899,6 +971,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
      * @param list Список отправленных записей.
      * @param data Список id записей которые не сохранили.
      */
+
     private void removeNotSaved(List<? extends ISend> list, List<String> data) {
 
         List<Long> ids = new ArrayList<>();

@@ -1,21 +1,25 @@
 package ru.toir.mobile.rest;
 
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import retrofit2.converter.gson.GsonConverterFactory;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.BuildConfig;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.*;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
+import retrofit2.Retrofit;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
@@ -70,40 +74,41 @@ public class ToirAPIFactory {
     private static final int WRITE_TIMEOUT = 60;
     private static final int TIMEOUT = 60;
 
-    private static final OkHttpClient CLIENT = new OkHttpClient();
-
-    static {
-        CLIENT.setConnectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS);
-        CLIENT.setWriteTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS);
-        CLIENT.setReadTimeout(TIMEOUT, TimeUnit.SECONDS);
-        CLIENT.interceptors().add(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request origRequest = chain.request();
-                Headers origHeaders = origRequest.headers();
-                AuthorizedUser user = AuthorizedUser.getInstance();
-                Headers newHeaders = origHeaders.newBuilder().add("Authorization", user.getBearer()).build();
-                Request.Builder requestBuilder = origRequest.newBuilder().headers(newHeaders);
-                Request newRequest = requestBuilder.build();
-                return chain.proceed(newRequest);
-            }
-        });
-        if (BuildConfig.DEBUG) {
-            CLIENT.interceptors().add(new Interceptor() {
+    private static final OkHttpClient CLIENT = new OkHttpClient()
+            .newBuilder()
+            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT, TimeUnit.SECONDS)
+            .addInterceptor(new Interceptor() {
                 @Override
                 public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request();
-                    HttpUrl url = request.httpUrl()
-                            .newBuilder()
-                            .addQueryParameter("XDEBUG_SESSION_START", "netbeans-xdebug")
-                            .build();
-                    Request.Builder requestBuilder = request.newBuilder().url(url);
+                    Request origRequest = chain.request();
+                    Headers origHeaders = origRequest.headers();
+                    AuthorizedUser user = AuthorizedUser.getInstance();
+                    Headers newHeaders = origHeaders.newBuilder().add("Authorization", user.getBearer()).build();
+                    Request.Builder requestBuilder = origRequest.newBuilder().headers(newHeaders);
                     Request newRequest = requestBuilder.build();
                     return chain.proceed(newRequest);
                 }
-            });
-        }
-    }
+            })
+            .addInterceptor(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    if (BuildConfig.DEBUG) {
+                        Request request = chain.request();
+                        HttpUrl url = request.url()
+                                .newBuilder()
+                                .addQueryParameter("XDEBUG_SESSION_START", "netbeans-xdebug")
+                                .build();
+                        Request.Builder requestBuilder = request.newBuilder().url(url);
+                        Request newRequest = requestBuilder.build();
+                        return chain.proceed(newRequest);
+                    } else {
+                        return chain.proceed(chain.request());
+                    }
+                }
+            })
+            .build();
 
     @NonNull
     public static ITokenService getTokenService() {

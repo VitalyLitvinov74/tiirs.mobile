@@ -43,7 +43,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
-import com.squareup.okhttp.ResponseBody;
+
+import okhttp3.ResponseBody;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,10 +52,10 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
@@ -256,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                     Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(tagId, TokenSrv.Type.LABEL);
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
-                        public void onResponse(Response<TokenSrv> response, Retrofit retrofit) {
+                        public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
                             TokenSrv token = response.body();
                             if (token != null) {
                                 AuthorizedUser.getInstance().setToken(token.getAccessToken());
@@ -268,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                             Call<User> call = ToirAPIFactory.getUserService().user();
                             call.enqueue(new Callback<User>() {
                                 @Override
-                                public void onResponse(Response<User> response, Retrofit retrofit) {
+                                public void onResponse(Call<User> userCall, Response<User> response) {
                                     User user = response.body();
                                     if (user != null) {
                                         final String fileName = user.getImage();
@@ -286,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                                                 .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
                                         callFile.enqueue(new Callback<ResponseBody>() {
                                             @Override
-                                            public void onResponse(Response<ResponseBody> response, Retrofit retrofit) {
+                                            public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
                                                 ResponseBody fileBody = response.body();
                                                 if (fileBody == null) {
                                                     return;
@@ -309,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                                             }
 
                                             @Override
-                                            public void onFailure(Throwable t) {
+                                            public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
                                                 Log.e(TAG, t.getLocalizedMessage());
                                             }
                                         });
@@ -326,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(Throwable t) {
+                                public void onFailure(Call<User> userCall, Throwable t) {
                                     // сообщаем описание неудачи
                                     // TODO нужен какой-то механизм уведомления о причине не успеха
 //                                    String message = bundle.getString(IServiceProvider.MESSAGE);
@@ -338,8 +339,8 @@ public class MainActivity extends AppCompatActivity {
                             });
                         }
 
-                        @Override
-                        public void onFailure(Throwable t) {
+                        //                        @Override
+                        public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
                             // TODO нужен какой-то механизм уведомления о причине не успеха
 //                            String message = bundle.getString(IServiceProvider.MESSAGE);
                             String message = "Просто не получили токен.";
