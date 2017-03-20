@@ -55,7 +55,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -722,8 +721,9 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     /**
      * тестовый метод для проверки отправки нескольких файлов по http
      */
-    private void sendFiles() {
-        Thread thread = new Thread(new Runnable() {
+    private void sendFiles(List<String> files) {
+
+        AsyncTask<String[], Void, List<String>> task = new AsyncTask<String[], Void, List<String>>() {
             @NonNull
             private RequestBody createPartFromString(String descriptionString) {
                 return RequestBody.create(MultipartBody.FORM, descriptionString);
@@ -731,13 +731,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             @NonNull
             private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
-                // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-                // use the FileUtils to get the actual file by uri
-//                File file = FileUtils.getFile(this, fileUri);
-                // TODO: Проверить!!!!
                 File file = new File(fileUri.getPath());
-                // create RequestBody instance from file
-//                String type = getContext().getContentResolver().getType(fileUri);
                 String type = null;
                 String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.getPath());
                 if (extension != null) {
@@ -746,40 +740,106 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
                 MediaType mediaType = MediaType.parse(type);
                 RequestBody requestFile = RequestBody.create(mediaType, file);
-
-                // MultipartBody.Part is used to send also the actual file name
-                return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+                MultipartBody.Part part = MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+                return part;
             }
-
 
             @Override
-            public void run() {
-                RequestBody descr = createPartFromString("hello, this is description speaking");
-                Uri uri1 = null, uri2 = null, uri3 = null;
-                try {
-                    uri1 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
-                    uri2 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
-                    uri3 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
-                }
-                List<MultipartBody.Part> list = new ArrayList<>();
-                list.add(prepareFilePart("photo[AAA-BBB]", uri1));
-                list.add(prepareFilePart("photo[AAA-CCC]", uri2));
-                list.add(prepareFilePart("photo[EEE-BBB]", uri3));
-                Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
-                try {
-                    Response response = call.execute();
-                    ResponseBody result = (ResponseBody) response.body();
-                    if (response.isSuccessful()) {
-                        Log.d(TAG, "!!!!");
+            protected List<String> doInBackground(String[]... lists) {
+                for (String file : lists[0]) {
+                    RequestBody descr = createPartFromString("Photos due execution operation.");
+                    Uri uri = null;
+                    try {
+//                        uri = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), file));
+                        uri = Uri.fromFile(new File(file));
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getLocalizedMessage());
                     }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+
+                    List<MultipartBody.Part> list = new ArrayList<>();
+                    String[] fileNameParts = file.split("/");
+                    String fileName = fileNameParts[fileNameParts.length - 1];
+                    fileNameParts = fileName.split("\\.");
+                    list.add(prepareFilePart("photo[" + fileNameParts[0] + "]", uri));
+                    Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
+                    try {
+                        Response response = call.execute();
+                        ResponseBody result = (ResponseBody) response.body();
+                        if (response.isSuccessful()) {
+                            Log.d(TAG, "result" + result.contentType());
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getLocalizedMessage());
+                    }
                 }
+
+                return null;
             }
-        });
-        thread.start();
+
+            @Override
+            protected void onPostExecute(List<String> strings) {
+                super.onPostExecute(strings);
+            }
+        };
+
+        String[] sendFiles = new String[files.size()];
+        int i = 0;
+        for (String item : files) {
+            sendFiles[i++] = item;
+        }
+
+        task.execute(sendFiles);
+
+//        Thread thread = new Thread(new Runnable() {
+//            @NonNull
+//            private RequestBody createPartFromString(String descriptionString) {
+//                return RequestBody.create(MultipartBody.FORM, descriptionString);
+//            }
+//
+//            @NonNull
+//            private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+//                File file = new File(fileUri.getPath());
+//                String type = null;
+//                String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.getPath());
+//                if (extension != null) {
+//                    type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+//                }
+//
+//                MediaType mediaType = MediaType.parse(type);
+//                RequestBody requestFile = RequestBody.create(mediaType, file);
+//                MultipartBody.Part part = MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+//                return part;
+//            }
+//
+//
+//            @Override
+//            public void run() {
+//                RequestBody descr = createPartFromString("Photos due execution operation.");
+//                Uri uri1 = null, uri2 = null, uri3 = null;
+//                try {
+//                    uri1 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
+//                    uri2 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
+//                    uri3 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
+//                } catch (Exception e) {
+//                    Log.e(TAG, e.getLocalizedMessage());
+//                }
+//                List<MultipartBody.Part> list = new ArrayList<>();
+//                list.add(prepareFilePart("photo[AAA-BBB]", uri1));
+//                list.add(prepareFilePart("photo[AAA-CCC]", uri2));
+//                list.add(prepareFilePart("photo[EEE-BBB]", uri3));
+//                Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
+//                try {
+//                    Response response = call.execute();
+//                    ResponseBody result = (ResponseBody) response.body();
+//                    if (response.isSuccessful()) {
+//                        Log.d(TAG, "!!!!");
+//                    }
+//                } catch (Exception e) {
+//                    Log.e(TAG, e.getLocalizedMessage());
+//                }
+//            }
+//        });
+//        thread.start();
     }
 
     @Override
@@ -862,45 +922,45 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
         // добавляем элемент меню для отправки результатов выполнения нарядов
         MenuItem sendTaskResultMenu = menu.add("Отправить результаты");
-        sendTaskResultMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
 
-                                                          @Override
-                                                          public boolean onMenuItemClick(MenuItem item) {
-                                                              sendFiles();
-                                                              // проверяем наличие не законченных нарядов
-//                RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
-//                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
-//                        .findAll();
-//                int inWorkCount = ordersInWork.size();
-//                if (inWorkCount > 0) {
-//                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-//
-//                    dialog.setTitle("Внимание!");
-//                    dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
-//                            + "Отправить выполненные наряды?");
-//                    dialog.setPositiveButton(android.R.string.ok,
-//                            new DialogInterface.OnClickListener() {
-//
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    sendCompleteTask();
-//                                    dialog.dismiss();
-//                                }
-//                            });
-//                    dialog.setNegativeButton(android.R.string.cancel,
-//                            new DialogInterface.OnClickListener() {
-//
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    dialog.dismiss();
-//                                }
-//                            });
-//                    dialog.show();
-//                } else {
-//                    sendCompleteTask();
-//                }
-//
-//                // отправляем данные из журнала и лога GPS
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // TODO: отправить данные по нарядам
+                // проверяем наличие не законченных нарядов
+                RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
+                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
+                        .findAll();
+                int inWorkCount = ordersInWork.size();
+                if (inWorkCount > 0) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+                    dialog.setTitle("Внимание!");
+                    dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
+                            + "Отправить выполненные наряды?");
+                    dialog.setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    sendCompleteTask();
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialog.setNegativeButton(android.R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialog.show();
+                } else {
+                    sendCompleteTask();
+                }
+
+                // отправляем данные из журнала и лога GPS
 //                Thread thread = new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -957,11 +1017,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 //                });
 //                thread.start();
 
-                                                              return true;
-                                                          }
-                                                      }
-
-        );
+                return true;
+            }
+        };
+        sendTaskResultMenu.setOnMenuItemClickListener(listener);
     }
 
     /**
@@ -1008,17 +1067,38 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
 
         // строим список uuid нарядов для отправки на сервер
+        // строим список фотографий связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
+        List<String> photos = new ArrayList<>();
         String[] sendTaskUuids = new String[ordersList.size()];
         int i = 0;
         for (Orders order : ordersList) {
             sendTaskUuids[i] = order.getUuid();
             i++;
+            List<Tasks> tasks = order.getTasks();
+            for (Tasks task : tasks) {
+                List<TaskStages> stages = task.getTaskStages();
+                for (TaskStages stage : stages) {
+                    List<Operation> operations = stage.getOperations();
+                    for (Operation operation : operations) {
+                        String photoFileName = operation.getUuid() + ".jpg";
+                        File operationPhoto = new File(
+                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                                photoFileName);
+                        if (operationPhoto.exists()) {
+                            photos.add(operationPhoto.getAbsolutePath());
+                        }
+                    }
+                }
+            }
         }
+
+        sendFiles(photos);
 
 //        getActivity().registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
 //        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
 //        tsh.SendTaskResult(sendTaskUuids);
+
 
         // показываем диалог отправки результатов
         processDialog = new ProgressDialog(getActivity());
@@ -1081,6 +1161,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 });
                 taskStage.getEquipment();
             }
+
             Log.d(TAG, "Остановка таймера...");
             taskTimer.cancel();
             firstLaunch = true;
@@ -1095,6 +1176,13 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 Level = 2;
             }
 
+            // TODO: не реализована логика завершения наряда
+            // пока рыба для установки статуса наряда в Выполненно
+            Orders order = realmDB.where(Orders.class).equalTo("uuid", currentOrderUuid).findFirst();
+            realmDB.beginTransaction();
+            OrderStatus status = realmDB.where(OrderStatus.class).equalTo("uuid", OrderStatus.Status.COMPLETE).findFirst();
+            order.setOrderStatus(status);
+            realmDB.commitTransaction();
         } else {
             // TODO показать диалог с коментарием и выбором вердикта
             Log.d("order", "dialog");
