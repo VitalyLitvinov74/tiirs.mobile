@@ -20,6 +20,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Equipment;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
@@ -145,17 +146,22 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     if (image_bitmap != null) {
                         viewHolder.icon.setImageBitmap(image_bitmap);
                     } else {
-                        //image_bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
+                        viewHolder.icon.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image));
                     }
-                    //viewHolder.icon.setImageBitmap(image_bitmap);
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
                     viewHolder.location.setText(equipment.getLocation());
                     viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
-                    viewHolder.criticalTypeUuid.setText(equipment.getCriticalType().getTitle());
-                    if (equipment.getCriticalType().getTitle().equals("Критичный")) viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context,R.color.red));
-                    if (equipment.getCriticalType().getTitle().equals("Не критичный")) viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context,R.color.green));
-                    if (equipment.getCriticalType().getTitle().equals("Средний")) viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context,R.color.blue));
+                    CriticalType criticalType = equipment.getCriticalType();
+                    if (criticalType!=null) {
+                        viewHolder.criticalTypeUuid.setText(criticalType.getTitle());
+                        if (criticalType.getUuid()==CriticalType.Status.TYPE_1)
+                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));
+                        if (criticalType.getUuid()==CriticalType.Status.TYPE_2)
+                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
+                        if (criticalType.getUuid()==CriticalType.Status.TYPE_3)
+                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
+                    }
                     Date date = equipment.getStartDate();
                     String sDate;
                     if (date != null) {
