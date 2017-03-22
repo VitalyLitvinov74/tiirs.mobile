@@ -16,6 +16,7 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.TaskStageStatus;
 import ru.toir.mobile.db.realm.TaskStages;
 
@@ -88,7 +89,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
                 viewHolder.status.setText("Статус: " + taskStage.getTaskStageStatus().getTitle());
             if (taskStage.getStartDate()!=null) {
                 Date lDate = taskStage.getStartDate();
-                if (lDate != null) {
+                if (lDate != null && lDate.after(new Date(100000))) {
                     viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(lDate));
                 } else {
                     viewHolder.start_date.setText("не выполнялся");
@@ -96,7 +97,7 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             }
             if (taskStage.getEndDate()!=null) {
                 Date lDate = taskStage.getEndDate();
-                if (lDate != null) {
+                if (lDate != null && lDate.after(new Date(100000))) {
                     viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(lDate));
                 } else {
                     viewHolder.end_date.setText("не выполнялся");
@@ -105,25 +106,27 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             else {
                 viewHolder.end_date.setText("не закончен");
             }
-            TaskStageStatus taskStageStatus1 = taskStage.getTaskStageStatus();
-            if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null) {
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.NEW) && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+
+            if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null && taskStage.getEquipment().getCriticalType()!=null) {
+                String taskStageStatusUuid = taskStage.getTaskStageStatus().getUuid();
+                String criticalTypeUuid = taskStage.getEquipment().getCriticalType().getUuid();
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid==CriticalType.Status.TYPE_3))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.NEW) && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid==CriticalType.Status.TYPE_3))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.NEW) && taskStage.getEquipment().getCriticalType().getTitle().equals("Не критичный"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid==CriticalType.Status.TYPE_3))
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.IN_WORK) && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid==CriticalType.Status.TYPE_2))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.IN_WORK) && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid==CriticalType.Status.TYPE_2))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.IN_WORK) && taskStage.getEquipment().getCriticalType().getTitle().equals("Средний"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid==CriticalType.Status.TYPE_2))
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE) && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid==CriticalType.Status.TYPE_1))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE) && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid==CriticalType.Status.TYPE_1))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (taskStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE) && taskStage.getEquipment().getCriticalType().getTitle().equals("Критичный"))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid==CriticalType.Status.TYPE_1))
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
             }
         }

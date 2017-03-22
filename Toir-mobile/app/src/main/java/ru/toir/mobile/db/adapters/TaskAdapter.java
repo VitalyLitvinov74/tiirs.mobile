@@ -86,8 +86,11 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             viewHolder.title.setText(task.getTaskTemplate().getTitle());
 
             String taskStatusUuid = task.getTaskStatus().getUuid();
-            String criticalTypeUuid = task.getEquipment().getCriticalType().getUuid();
-            viewHolder.icon.setImageResource(getIconForStatusAndCriticalType(taskStatusUuid, criticalTypeUuid));
+            CriticalType criticalType=task.getEquipment().getCriticalType();
+            if (criticalType!=null) {
+                String criticalTypeUuid = criticalType.getUuid();
+                viewHolder.icon.setImageResource(getIconForStatusAndCriticalType(taskStatusUuid, criticalTypeUuid));
+            }
         }
 
         return convertView;

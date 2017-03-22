@@ -194,7 +194,9 @@ public class MainActivity extends AppCompatActivity {
             //ToirRealm.init(this);
             // получаем базу realm
             realmDB = Realm.getDefaultInstance();
-
+            //realmDB.beginTransaction();
+            //realmDB.where(CriticalType.class).findAll().deleteAllFromRealm();
+            //realmDB.commitTransaction();
             //LoadTestData.LoadAllTestData();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             //helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
