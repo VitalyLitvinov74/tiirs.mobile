@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -66,9 +65,6 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Realm realmDB = Realm.getDefaultInstance();
-        TaskStageStatus taskStageStatus;
-        String pathToImages;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
@@ -86,21 +82,21 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             TaskStages taskStage = adapterData.get(position);
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
             if (taskStage.getTaskStageStatus() != null)
-                viewHolder.status.setText("Статус: " + taskStage.getTaskStageStatus().getTitle());
+                viewHolder.status.setText(context.getString(R.string.status, taskStage.getTaskStageStatus().getTitle()));
             if (taskStage.getStartDate()!=null) {
                 Date lDate = taskStage.getStartDate();
                 if (lDate != null && lDate.after(new Date(100000))) {
-                    viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(lDate));
+                    viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
                 } else {
-                    viewHolder.start_date.setText("не выполнялся");
+                    viewHolder.start_date.setText(R.string.not_started);
                 }
             }
             if (taskStage.getEndDate()!=null) {
                 Date lDate = taskStage.getEndDate();
                 if (lDate != null && lDate.after(new Date(100000))) {
-                    viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(lDate));
+                    viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
                 } else {
-                    viewHolder.end_date.setText("не выполнялся");
+                    viewHolder.end_date.setText(R.string.not_finished);
                 }
             }
             else {
@@ -110,23 +106,23 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null && taskStage.getEquipment().getCriticalType()!=null) {
                 String taskStageStatusUuid = taskStage.getTaskStageStatus().getUuid();
                 String criticalTypeUuid = taskStage.getEquipment().getCriticalType().getUuid();
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid==CriticalType.Status.TYPE_3))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid==CriticalType.Status.TYPE_3))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid==CriticalType.Status.TYPE_3))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid==CriticalType.Status.TYPE_2))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid==CriticalType.Status.TYPE_2))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid==CriticalType.Status.TYPE_2))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid==CriticalType.Status.TYPE_1))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid==CriticalType.Status.TYPE_1))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid==CriticalType.Status.TYPE_1))
+                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
             }
         }

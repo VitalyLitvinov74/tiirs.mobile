@@ -65,7 +65,7 @@
     <string name="empty"></string>
     <string name="created">Создан: </string>
     <string name="off">Отключен: </string>
-    <string name="status">Статус: </string>
+    <string name="status">Статус: %1$s</string>
     <string name="closed">Закрыт: </string>
     <string name="operation_status_title">Статус операции</string>
     <string name="equipment_title">Оборудование:</string>
@@ -140,4 +140,6 @@
     <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
 
     <string name="run_ar_content">Запуск AR-контента</string>
+    <string name="not_started">не начинался</string>
+    <string name="not_finished">не закончен</string>
 </resources>

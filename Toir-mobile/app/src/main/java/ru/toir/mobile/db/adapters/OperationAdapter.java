@@ -145,13 +145,19 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     viewHolder.title.setText(operation.getOperationTemplate().getTitle());
                     Date lDate = operation.getStartDate();
                     if (lDate != null && lDate.after(new Date(100000))) {
-                        sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
+                        sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(lDate);
                         viewHolder.start_date.setText(sDate);
+                    }
+                    else {
+                        viewHolder.start_date.setText(R.string.not_started);
                     }
                     lDate = operation.getEndDate();
                     if (lDate != null && lDate.after(new Date(100000))) {
-                        sDate = new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lDate);
+                        sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(lDate);
                         viewHolder.end_date.setText(sDate);
+                    }
+                    else {
+                        viewHolder.end_date.setText(R.string.not_finished);
                     }
 
                     if (operationStatus != null) {

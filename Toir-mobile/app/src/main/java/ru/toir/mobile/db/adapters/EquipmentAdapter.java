@@ -67,7 +67,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        File image;
         if (convertView == null) {
             //if (parent.getId() == R.id.gps_listView) {
             if (parent.getId() == R.id.eril_status_label) {
@@ -155,11 +154,11 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     CriticalType criticalType = equipment.getCriticalType();
                     if (criticalType!=null) {
                         viewHolder.criticalTypeUuid.setText(criticalType.getTitle());
-                        if (criticalType.getUuid()==CriticalType.Status.TYPE_1)
+                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_1))
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));
-                        if (criticalType.getUuid()==CriticalType.Status.TYPE_2)
+                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_2))
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
-                        if (criticalType.getUuid()==CriticalType.Status.TYPE_3)
+                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_3))
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
                     }
                     Date date = equipment.getStartDate();

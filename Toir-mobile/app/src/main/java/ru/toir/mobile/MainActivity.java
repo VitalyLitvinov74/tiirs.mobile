@@ -400,8 +400,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         service_mode = sp.getBoolean("pref_debug_mode", false);
-        Toast.makeText(getApplicationContext(),
-                "Debug=" + service_mode, Toast.LENGTH_LONG).show();
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 
