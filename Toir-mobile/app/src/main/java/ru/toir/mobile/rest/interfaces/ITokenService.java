@@ -1,9 +1,9 @@
 package ru.toir.mobile.rest.interfaces;
 
-import retrofit.Call;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
-import retrofit.http.POST;
+import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
 import ru.toir.mobile.serverapi.TokenSrv;
 
 /**

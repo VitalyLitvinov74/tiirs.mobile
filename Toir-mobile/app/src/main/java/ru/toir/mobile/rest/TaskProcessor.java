@@ -17,7 +17,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import retrofit.Call;
+import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
 //import ru.toir.mobile.DatabaseHelper;
 import ru.toir.mobile.R;
@@ -734,7 +734,7 @@ public class TaskProcessor {
         if (au.getToken() == null) {
             Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(au.getTagId(), TokenSrv.Type.LABEL);
             try {
-                retrofit.Response<TokenSrv> response = call.execute();
+                retrofit2.Response<TokenSrv> response = call.execute();
                 TokenSrv token = response.body();
                 au.setToken(token.getAccessToken());
                 return true;
