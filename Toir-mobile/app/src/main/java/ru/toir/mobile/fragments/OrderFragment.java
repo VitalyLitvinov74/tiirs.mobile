@@ -719,7 +719,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * тестовый метод для проверки отправки нескольких файлов по http
+     * Метод для отправки файлов фотографий созданных во время выполнения операций.
      */
     private void sendFiles(List<String> files) {
 
@@ -750,7 +750,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
                     try {
-//                        uri = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), file));
                         uri = Uri.fromFile(new File(file));
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
@@ -789,57 +788,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
 
         task.execute(sendFiles);
-
-//        Thread thread = new Thread(new Runnable() {
-//            @NonNull
-//            private RequestBody createPartFromString(String descriptionString) {
-//                return RequestBody.create(MultipartBody.FORM, descriptionString);
-//            }
-//
-//            @NonNull
-//            private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
-//                File file = new File(fileUri.getPath());
-//                String type = null;
-//                String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.getPath());
-//                if (extension != null) {
-//                    type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-//                }
-//
-//                MediaType mediaType = MediaType.parse(type);
-//                RequestBody requestFile = RequestBody.create(mediaType, file);
-//                MultipartBody.Part part = MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-//                return part;
-//            }
-//
-//
-//            @Override
-//            public void run() {
-//                RequestBody descr = createPartFromString("Photos due execution operation.");
-//                Uri uri1 = null, uri2 = null, uri3 = null;
-//                try {
-//                    uri1 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
-//                    uri2 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
-//                    uri3 = Uri.fromFile(new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/E5AE4591-C22B-44A8-8C39-464AFF08F7C4.jpg"));
-//                } catch (Exception e) {
-//                    Log.e(TAG, e.getLocalizedMessage());
-//                }
-//                List<MultipartBody.Part> list = new ArrayList<>();
-//                list.add(prepareFilePart("photo[AAA-BBB]", uri1));
-//                list.add(prepareFilePart("photo[AAA-CCC]", uri2));
-//                list.add(prepareFilePart("photo[EEE-BBB]", uri3));
-//                Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
-//                try {
-//                    Response response = call.execute();
-//                    ResponseBody result = (ResponseBody) response.body();
-//                    if (response.isSuccessful()) {
-//                        Log.d(TAG, "!!!!");
-//                    }
-//                } catch (Exception e) {
-//                    Log.e(TAG, e.getLocalizedMessage());
-//                }
-//            }
-//        });
-//        thread.start();
     }
 
     @Override
@@ -1050,6 +998,29 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void sendOrders(List<Orders> orders) {
+        AsyncTask<List<Orders>, Void, String> task = new AsyncTask<List<Orders>, Void, String>() {
+            @Override
+            protected String doInBackground(List<Orders>... lists) {
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendOrders(lists[0]);
+                try {
+                    Response response = call.execute();
+                    Log.d(TAG, "response = " + response);
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+            }
+        };
+        task.execute(orders);
+    }
+
     /**
      * Отправка всех выполненных нарядов на сервер
      */
@@ -1066,15 +1037,13 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             return;
         }
 
-        // строим список uuid нарядов для отправки на сервер
+        // отправляем результат
+        sendOrders(realmDB.copyFromRealm(ordersList));
+
         // строим список фотографий связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
         List<String> photos = new ArrayList<>();
-        String[] sendTaskUuids = new String[ordersList.size()];
-        int i = 0;
         for (Orders order : ordersList) {
-            sendTaskUuids[i] = order.getUuid();
-            i++;
             List<Tasks> tasks = order.getTasks();
             for (Tasks task : tasks) {
                 List<TaskStages> stages = task.getTaskStages();
