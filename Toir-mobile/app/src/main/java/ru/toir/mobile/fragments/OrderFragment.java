@@ -422,7 +422,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         toolbar.setSubtitle("Задачи");
         for (Tasks task : order.getTasks()) {
             long id = task.get_id();
-            if (!order.getOrderStatus().equals(OrderStatus.Status.COMPLETE)) all_complete=false;
+            if (!task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) all_complete=false;
             if (first) {
                 q = q.equalTo("_id", id);
                 first = false;
@@ -445,8 +445,8 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     selectedOrder.setOrderStatus(orderStatusComplete);
                 }
             });
-            fillListViewOrders(null, null);
             Level = 0;
+            fillListViewOrders(null, null);
         }
 
         taskAdapter = new TaskAdapter(getContext(), tasks);

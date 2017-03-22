@@ -110,15 +110,15 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             id = R.drawable.status_easy_receive;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
             id = R.drawable.status_mod_receive;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
             id = R.drawable.status_high_receive;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
+        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
             id = R.drawable.status_easy_work;
         }
 
@@ -126,15 +126,15 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
             id = R.drawable.status_mod_work;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
+        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
             id = R.drawable.status_high_work;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
+        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
             id = R.drawable.status_easy_ready;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
+        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
             id = R.drawable.status_mod_ready;
         }
 
