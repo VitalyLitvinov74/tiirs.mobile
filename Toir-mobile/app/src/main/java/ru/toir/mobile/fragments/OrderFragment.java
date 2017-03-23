@@ -3,8 +3,6 @@ package ru.toir.mobile.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-//import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,11 +42,6 @@ import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -58,6 +51,10 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
@@ -72,9 +69,7 @@ import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
-import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
@@ -88,12 +83,13 @@ import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.ToirAPIFactory;
-import ru.toir.mobile.rest.ToirAPIResponse;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+
+//import android.content.BroadcastReceiver;
 
 //import android.content.BroadcastReceiver;
 //import ru.toir.mobile.rest.IServiceProvider;
@@ -1415,7 +1411,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     try {
                         //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
                         String path = getContext().getExternalFilesDir("/Pictures") + File.separator;
-                        getResizedBitmap(path, fileUri.getPath().replace(path,""), 300, 0, new Date().getTime());
+                        getResizedBitmap(path, fileUri.getPath().replace(path,""), 1024, 0, new Date().getTime());
                     } catch (Exception e) {
                         Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
@@ -1609,7 +1605,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                                     String tagId = ((String) message.obj).substring(4);
                                     Log.d(TAG, "Ид метки получили: " + tagId);
                                     if (expectedTagId.equals(tagId)) {
-                                        boolean run_ar_content = sp.getBoolean("@string/pref_debug_mode", false);
+                                        boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
                                         if (run_ar_content) {
                                             Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
                                             intent.putExtra("hardwareUUID", currentEquipment.getUuid());

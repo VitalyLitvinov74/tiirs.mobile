@@ -44,18 +44,16 @@ import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
-import okhttp3.ResponseBody;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
@@ -400,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-        service_mode = sp.getBoolean("pref_debug_mode", false);
+        service_mode = sp.getBoolean("pref_debug_mode_key", false);
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 

@@ -69,7 +69,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         ViewHolder viewHolder;
         if (convertView == null) {
             //if (parent.getId() == R.id.gps_listView) {
-            if (parent.getId() == R.id.eril_status_label) {
+            if (parent.getId() == R.id.eril_status) {
                 convertView = inflater.inflate(R.layout.equipment_gps_item, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image_critical);
@@ -103,7 +103,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
             if (equipment != null) {
                 viewHolder.title.setText(equipment.getTitle());
                 //if (parent.getId() == R.id.gps_listView) {
-                if (parent.getId() == R.id.eril_status_label) {
+                if (parent.getId() == R.id.eril_status) {
                     if (equipment.getCriticalType().get_id() == 1)
                         viewHolder.icon.setImageResource(R.drawable.critical_level_1);
                     if (equipment.getCriticalType().get_id() ==  2)
@@ -116,7 +116,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     if (equipment.get_id()==2)
                         viewHolder.location.setText("Котельная №3");
 
-                    viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
+                    viewHolder.equipmentStatus.setText(context.getString(R.string.status, equipment.getEquipmentStatus().getTitle()));
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.criticalLevel.setText(equipment.getCriticalType().getTitle());
                 }
@@ -150,7 +150,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
                     viewHolder.location.setText(equipment.getLocation());
-                    viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
+                    viewHolder.equipmentStatus.setText(context.getString(R.string.status, equipment.getEquipmentStatus().getTitle()));
                     CriticalType criticalType = equipment.getCriticalType();
                     if (criticalType!=null) {
                         viewHolder.criticalTypeUuid.setText(criticalType.getTitle());

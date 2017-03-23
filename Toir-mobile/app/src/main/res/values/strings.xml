@@ -140,6 +140,9 @@
     <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
 
     <string name="run_ar_content">Запуск AR-контента</string>
+    <string name="run_ar_content_key">run_ar_content_key</string>
+    <string name="pref_debug_mode_key">debug_mode</string>
+    <string name="pref_autonome_mode_key">auto_mode</string>
     <string name="not_started">не начинался</string>
     <string name="not_finished">не закончен</string>
 </resources>
