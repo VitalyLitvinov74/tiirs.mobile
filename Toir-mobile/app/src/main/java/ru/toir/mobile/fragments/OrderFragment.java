@@ -96,7 +96,7 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 //import ru.toir.mobile.rest.ProcessorService;
 //import ru.toir.mobile.rest.TaskServiceProvider;
 
-public class OrderFragment extends Fragment implements View.OnClickListener {
+public class OrderFragment extends Fragment {
     private Toolbar toolbar;
 
     private Tasks selectedTask;
@@ -282,7 +282,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
         submit = (Button) rootView.findViewById(R.id.tl_finishButton);
-        submit.setOnClickListener(this);
+        //submit.setOnClickListener(this);
         submit.setVisibility(View.GONE);
 
         measure = (Button) rootView.findViewById(R.id.tl_measureButton);
@@ -1224,10 +1224,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 setOperationsVerdict();
             }
         }
-    }
-
-    @Override
-    public void onClick(View v) {
     }
 
     public View getViewByPosition(int pos, ListView listView) {

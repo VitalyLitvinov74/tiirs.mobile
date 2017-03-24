@@ -121,13 +121,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
             });
 
 
-            //meas_header.setText("");
-        //tvX = (TextView) findViewById(R.id.meas_tvXMax);
-        //tvY = (TextView) findViewById(R.id.meas_tvYMax);
-        //mSeekBarX = (SeekBar) findViewById(R.id.meas_seekBar1);
-        //mSeekBarY = (SeekBar) findViewById(R.id.meas_seekBar2);
         mChart = (BarChart) findViewById(R.id.chart1);
-        //mChart.setOnChartValueSelectedListener(this);
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
         mChart.setDescription("");
