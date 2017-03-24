@@ -32,15 +32,15 @@
         <PreferenceCategory android:title="@string/pref_cat_show" >
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:key="@string/pref_debug_mode"
+                android:key="@string/pref_debug_mode_key"
                 android:title="@string/pref_debug_mode" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:key="@string/pref_autonome_mode"
+                android:key="@string/pref_autonome_mode_key"
                 android:title="@string/pref_autonome_mode" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:key="@string/run_ar_content"
+                android:key="@string/run_ar_content_key"
                 android:title="@string/run_ar_content" />
             <Preference
                 android:key="@string/load_test_data"
