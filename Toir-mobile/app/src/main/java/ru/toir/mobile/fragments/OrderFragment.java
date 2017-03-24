@@ -54,6 +54,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -950,7 +951,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // TODO: отправить данные по нарядам
                 // проверяем наличие не законченных нарядов
                 RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
                         .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
@@ -985,61 +985,61 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 }
 
                 // отправляем данные из журнала и лога GPS
-//                Thread thread = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Call<ToirAPIResponse> call;
-//                        Response<ToirAPIResponse> response;
-//                        Realm realm = Realm.getDefaultInstance();
-//
-//                        // выбираем все неотправленные данные из таблицы journal
-//                        RealmResults<Journal> journals = realm.where(Journal.class)
-//                                .equalTo("sent", false)
-//                                .findAll();
-//                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-//                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
-//                        try {
-//                            response = call.execute();
-//                            ToirAPIResponse result = response.body();
-//                            if (result.isSuccess()) {
-//                                Log.d(TAG, "Журнал отправлен успешно.");
-//                            } else {
-//                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-//                                removeNotSaved(journalList, (List<String>) result.getData());
-//                                realm.beginTransaction();
-//                                realm.copyToRealmOrUpdate(journalList);
-//                                realm.commitTransaction();
-//                            }
-//                        } catch (Exception e) {
-//                            Log.e(TAG, e.getLocalizedMessage());
-//                            Log.e(TAG, "Ошибка при отправке журнала.");
-//                        }
-//
-//                        // выбираем все неотправленные данные из таблицы gpstrack
-//                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
-//                                .equalTo("sent", false)
-//                                .findAll();
-//                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-//                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
-//                        try {
-//                            response = call.execute();
-//                            ToirAPIResponse result = response.body();
-//                            if (result.isSuccess()) {
-//                                Log.d(TAG, "GPS лог отправлен успешно.");
-//                            } else {
-//                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-//                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
-//                                realm.beginTransaction();
-//                                realm.copyToRealmOrUpdate(gpsTrackList);
-//                                realm.commitTransaction();
-//                            }
-//                        } catch (Exception e) {
-//                            Log.e(TAG, e.getLocalizedMessage());
-//                            Log.e(TAG, "Ошибка при отправке GPS лога.");
-//                        }
-//                    }
-//                });
-//                thread.start();
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Call<ToirAPIResponse> call;
+                        Response<ToirAPIResponse> response;
+                        Realm realm = Realm.getDefaultInstance();
+
+                        // выбираем все неотправленные данные из таблицы journal
+                        RealmResults<Journal> journals = realm.where(Journal.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
+                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
+                        try {
+                            response = call.execute();
+                            ToirAPIResponse result = response.body();
+                            if (result.isSuccess()) {
+                                Log.d(TAG, "Журнал отправлен успешно.");
+                            } else {
+                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
+                                removeNotSaved(journalList, (List<String>) result.getData());
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(journalList);
+                                realm.commitTransaction();
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                            Log.e(TAG, "Ошибка при отправке журнала.");
+                        }
+
+                        // выбираем все неотправленные данные из таблицы gpstrack
+                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
+                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
+                        try {
+                            response = call.execute();
+                            ToirAPIResponse result = response.body();
+                            if (result.isSuccess()) {
+                                Log.d(TAG, "GPS лог отправлен успешно.");
+                            } else {
+                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
+                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(gpsTrackList);
+                                realm.commitTransaction();
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                            Log.e(TAG, "Ошибка при отправке GPS лога.");
+                        }
+                    }
+                });
+                thread.start();
 
                 return true;
             }
@@ -1161,73 +1161,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     }
                 });
         processDialog.show();
-    }
-
-    // обработчик кнопки "завершить все операции"
-    public class submitOnClickListener implements View.OnClickListener
-    {
-        @Override
-        public void onClick(final View v)
-        {
-            int completedOperationCount = 0;
-            final long currentTime = System.currentTimeMillis();
-            //long totalTimeElapsed = currentTime - startTime;
-            CheckBox checkBox;
-            final TaskStageStatus taskStageComplete;
-            uncompleteOperationList.clear();
-            // по умолчанию у нас все выполнено
-            taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("uuid", TaskStageStatus.Status.COMPLETE).findFirst();
-
-            if (operationAdapter != null) {
-                totalOperationCount = operationAdapter.getCount();
-            }
-
-            for (int i = 0; i < totalOperationCount; i++) {
-                checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
-                final Operation operation = operationAdapter.getItem(i);
-                if (operation != null) {
-                    if (checkBox.isChecked()) {
-                        completedOperationCount++;
-                    } else {
-                        uncompleteOperationList.add(operation);
-                    }
-                } else {
-                    Log.d(TAG, "Операция под индексом " + i + " не найдена");
-                }
-            }
-
-            // все операции выполнены
-            if (totalOperationCount == completedOperationCount) {
-                if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            selectedStage.setTaskStageStatus(taskStageComplete);
-                            //taskStage.setEndDate();
-                            selectedStage.setEndDate(new Date());
-                        }
-                    });
-                }
-
-                Log.d(TAG, "Остановка таймера...");
-                taskTimer.cancel();
-                firstLaunch = true;
-                currentOperationId = 0;
-
-                if (selectedTask != null) {
-                    currentTaskStageUuid = selectedStage.getUuid();
-                    currentTaskUuid = selectedTask.getUuid();
-                    Level = 2;
-                    fillListViewTaskStage(selectedTask, true);
-                    submit.setVisibility(View.GONE);
-                    measure.setVisibility(View.GONE);
-                }
-
-            } else {
-                Log.d("order", "dialog");
-                setOperationsVerdict();
-            }
-        }
     }
 
     @Override
@@ -1575,6 +1508,165 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         listView.setAdapter(uncompleteOperationAdapter);
     }
 
+    /**
+     * Создание элементов интерфейса для шагов операции с измерениями значений
+     *
+     * @param measureType - тип осуществляемого измерения
+     */
+    private void measureUI(String measureType) {
+        // выбор значения
+        if (numberPicker == null) {
+            numberPicker = new NumberPicker(getActivity().getApplicationContext());
+        }
+
+        numberPicker.setOrientation(NumberPicker.VERTICAL);
+        numberPicker.setMinValue(1);
+        numberPicker.setMaxValue(999);
+
+        // перечень множителей
+        if (suffixList == null) {
+            suffixList = new ArrayList<>();
+        } else {
+            suffixList.clear();
+        }
+
+        ArrayAdapter<Suffixes> spinnerSuffixAdapter;
+        if (measureType.equals(MeasureType.Type.FREQUENCY)) {
+            //resultButtonLayout.addView(numberPicker);
+
+            suffixList.add(new Suffixes("Гц", 1));
+            suffixList.add(new Suffixes("кГц", 1000));
+            suffixList.add(new Suffixes("МГц", 1000000));
+            suffixList.add(new Suffixes("ГГц", 1000000000));
+
+            // адаптер для множителей
+            spinnerSuffixAdapter = new ArrayAdapter<>(
+                    getActivity().getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+            // выпадающий список с множителями
+            if (spinnerSuffix == null) {
+                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+            }
+
+            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+            //resultButtonLayout.addView(spinnerSuffix);
+        } else if (measureType.equals(MeasureType.Type.VOLTAGE)) {
+            //resultButtonLayout.addView(numberPicker);
+
+            suffixList.add(new Suffixes("В", 1));
+            suffixList.add(new Suffixes("кВ", 1000));
+            suffixList.add(new Suffixes("МВ", 1000000));
+            suffixList.add(new Suffixes("ГВ", 1000000000));
+
+            // адаптер для множителей
+            spinnerSuffixAdapter = new ArrayAdapter<>(
+                    getActivity().getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+            // выпадающий список с множителями
+            if (spinnerSuffix == null) {
+                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+            }
+
+            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+            //resultButtonLayout.addView(spinnerSuffix);
+        } else if (measureType.equals(MeasureType.Type.PRESSURE)) {
+            //resultButtonLayout.addView(numberPicker);
+
+            suffixList.add(new Suffixes("Па", 1));
+            suffixList.add(new Suffixes("кПа", 1000));
+            suffixList.add(new Suffixes("МПа", 1000000));
+            suffixList.add(new Suffixes("ГПа", 1000000000));
+
+            // адаптер для множителей
+            spinnerSuffixAdapter = new ArrayAdapter<>(
+                    getActivity().getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+
+            // выпадающий список с множителями
+            if (spinnerSuffix == null) {
+                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+            }
+
+            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+
+            //resultButtonLayout.addView(spinnerSuffix);
+        } else if (measureType.equals(MeasureType.Type.PHOTO)) {
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+            File photo = getOutputMediaFile();
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+            startActivityForResult(intent, 100);
+        }
+    }
+
+    // обработчик кнопки "завершить все операции"
+    public class submitOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(final View v) {
+            int completedOperationCount = 0;
+            final long currentTime = System.currentTimeMillis();
+            //long totalTimeElapsed = currentTime - startTime;
+            CheckBox checkBox;
+            final TaskStageStatus taskStageComplete;
+            uncompleteOperationList.clear();
+            // по умолчанию у нас все выполнено
+            taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("uuid", TaskStageStatus.Status.COMPLETE).findFirst();
+
+            if (operationAdapter != null) {
+                totalOperationCount = operationAdapter.getCount();
+            }
+
+            for (int i = 0; i < totalOperationCount; i++) {
+                checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
+                final Operation operation = operationAdapter.getItem(i);
+                if (operation != null) {
+                    if (checkBox.isChecked()) {
+                        completedOperationCount++;
+                    } else {
+                        uncompleteOperationList.add(operation);
+                    }
+                } else {
+                    Log.d(TAG, "Операция под индексом " + i + " не найдена");
+                }
+            }
+
+            // все операции выполнены
+            if (totalOperationCount == completedOperationCount) {
+                if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) {
+                    realmDB.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            selectedStage.setTaskStageStatus(taskStageComplete);
+                            //taskStage.setEndDate();
+                            selectedStage.setEndDate(new Date());
+                        }
+                    });
+                }
+
+                Log.d(TAG, "Остановка таймера...");
+                taskTimer.cancel();
+                firstLaunch = true;
+                currentOperationId = 0;
+
+                if (selectedTask != null) {
+                    currentTaskStageUuid = selectedStage.getUuid();
+                    currentTaskUuid = selectedTask.getUuid();
+                    Level = 2;
+                    fillListViewTaskStage(selectedTask, true);
+                    submit.setVisibility(View.GONE);
+                    measure.setVisibility(View.GONE);
+                }
+
+            } else {
+                Log.d("order", "dialog");
+                setOperationsVerdict();
+            }
+        }
+    }
+
     public class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -1866,100 +1958,6 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
             fileName = name;
             urlPath = url;
             localPath = local;
-        }
-    }
-
-    /**
-     * Создание элементов интерфейса для шагов операции с измерениями значений
-     *
-     * @param measureType - тип осуществляемого измерения
-     */
-    private void measureUI(String measureType) {
-        // выбор значения
-        if (numberPicker == null) {
-            numberPicker = new NumberPicker(getActivity().getApplicationContext());
-        }
-
-        numberPicker.setOrientation(NumberPicker.VERTICAL);
-        numberPicker.setMinValue(1);
-        numberPicker.setMaxValue(999);
-
-        // перечень множителей
-        if (suffixList == null) {
-            suffixList = new ArrayList<>();
-        } else {
-            suffixList.clear();
-        }
-
-        ArrayAdapter<Suffixes> spinnerSuffixAdapter;
-        if (measureType.equals(MeasureType.Type.FREQUENCY)) {
-            //resultButtonLayout.addView(numberPicker);
-
-            suffixList.add(new Suffixes("Гц", 1));
-            suffixList.add(new Suffixes("кГц", 1000));
-            suffixList.add(new Suffixes("МГц", 1000000));
-            suffixList.add(new Suffixes("ГГц", 1000000000));
-
-            // адаптер для множителей
-            spinnerSuffixAdapter = new ArrayAdapter<>(
-                    getActivity().getApplicationContext(),
-                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-
-            // выпадающий список с множителями
-            if (spinnerSuffix == null) {
-                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-            }
-
-            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-
-            //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureType.Type.VOLTAGE)) {
-            //resultButtonLayout.addView(numberPicker);
-
-            suffixList.add(new Suffixes("В", 1));
-            suffixList.add(new Suffixes("кВ", 1000));
-            suffixList.add(new Suffixes("МВ", 1000000));
-            suffixList.add(new Suffixes("ГВ", 1000000000));
-
-            // адаптер для множителей
-            spinnerSuffixAdapter = new ArrayAdapter<>(
-                    getActivity().getApplicationContext(),
-                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-
-            // выпадающий список с множителями
-            if (spinnerSuffix == null) {
-                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-            }
-
-            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-
-            //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureType.Type.PRESSURE)) {
-            //resultButtonLayout.addView(numberPicker);
-
-            suffixList.add(new Suffixes("Па", 1));
-            suffixList.add(new Suffixes("кПа", 1000));
-            suffixList.add(new Suffixes("МПа", 1000000));
-            suffixList.add(new Suffixes("ГПа", 1000000000));
-
-            // адаптер для множителей
-            spinnerSuffixAdapter = new ArrayAdapter<>(
-                    getActivity().getApplicationContext(),
-                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-
-            // выпадающий список с множителями
-            if (spinnerSuffix == null) {
-                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-            }
-
-            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-
-            //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureType.Type.PHOTO)) {
-            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-            File photo = getOutputMediaFile();
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-            startActivityForResult(intent, 100);
         }
     }
 }

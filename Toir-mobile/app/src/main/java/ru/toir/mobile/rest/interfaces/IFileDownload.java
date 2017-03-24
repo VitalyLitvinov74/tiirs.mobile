@@ -22,6 +22,6 @@ public interface IFileDownload {
     Call<ResponseBody> getFile(@Url String url);
 
     @Multipart
-    @POST("/api/orders/upload-files")
+    @POST("/api/orders/upload")
     Call<ResponseBody> uploadFiles(@Part("descr") RequestBody descr, @Part List<MultipartBody.Part> files);
 }
