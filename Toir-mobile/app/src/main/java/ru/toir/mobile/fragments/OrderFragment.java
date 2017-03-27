@@ -270,6 +270,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
         super.onDestroy();
     }
+
     /*
      * (non-Javadoc)
      *
@@ -422,7 +423,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         toolbar.setSubtitle("Задачи");
         for (Tasks task : order.getTasks()) {
             long id = task.get_id();
-            if (!task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) all_complete=false;
+            if (!task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
+                all_complete = false;
+            }
+
             if (first) {
                 q = q.equalTo("_id", id);
                 first = false;
@@ -470,7 +474,10 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         boolean all_complete = true;
         for (TaskStages stage : task.getTaskStages()) {
             long id = stage.get_id();
-            if (!stage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) all_complete=false;
+            if (!stage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) {
+                all_complete = false;
+            }
+
             if (first) {
                 q = q.equalTo("_id", id);
                 first = false;
@@ -490,19 +497,19 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
         }
 
         if (complete_operation && all_complete && !task.getTaskStatus().equals(TaskStatus.Status.COMPLETE)) {
-                final TaskStatus taskStatusComplete = realmDB.where(TaskStatus.class)
-                        .equalTo("uuid", TaskStatus.Status.COMPLETE)
-                        .findFirst();
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        selectedTask.setEndDate(new Date());
-                        selectedTask.setTaskStatus(taskStatusComplete);
-                    }
-                });
-                Level = 1;
-                fillListViewTasks(selectedOrder, true);
-            }
+            final TaskStatus taskStatusComplete = realmDB.where(TaskStatus.class)
+                    .equalTo("uuid", TaskStatus.Status.COMPLETE)
+                    .findFirst();
+            realmDB.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    selectedTask.setEndDate(new Date());
+                    selectedTask.setTaskStatus(taskStatusComplete);
+                }
+            });
+            Level = 1;
+            fillListViewTasks(selectedOrder, true);
+        }
 
         submit.setVisibility(View.GONE);
         measure.setVisibility(View.GONE);
@@ -1347,7 +1354,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     try {
                         //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
                         String path = getContext().getExternalFilesDir("/Pictures") + File.separator;
-                        getResizedBitmap(path, fileUri.getPath().replace(path,""), 1024, 0, new Date().getTime());
+                        getResizedBitmap(path, fileUri.getPath().replace(path, ""), 1024, 0, new Date().getTime());
                     } catch (Exception e) {
                         Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
@@ -1809,7 +1816,7 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                 textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
                 textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
 
-                if (currentOperationId+1 < operationAdapter.getCount()) {
+                if (currentOperationId + 1 < operationAdapter.getCount()) {
                     operationAdapter.setItemEnable(currentOperationId + 1, true);
                     operationAdapter.setItemVisibility(currentOperationId);
                     operationAdapter.setItemVisibility(currentOperationId + 1);
@@ -1820,18 +1827,18 @@ public class OrderFragment extends Fragment implements View.OnClickListener {
                     final Operation operation = operationAdapter.getItem(currentOperationId);
                     final OperationStatus operationStatusInWork;
                     operationStatusInWork = realmDB.where(OperationStatus.class)
-                             .equalTo("uuid", OperationStatus.Status.IN_WORK)
-                             .findFirst();
+                            .equalTo("uuid", OperationStatus.Status.IN_WORK)
+                            .findFirst();
                     if (operation != null) {
                         OperationStatus operationStatus = operation.getOperationStatus();
                         if (!operationStatus.getUuid().equals(OperationStatus.Status.COMPLETE)) {
                             realmDB.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                 operation.setStartDate(new Date());
-                                 operation.setOperationStatus(operationStatusInWork);
+                                @Override
+                                public void execute(Realm realm) {
+                                    operation.setStartDate(new Date());
+                                    operation.setOperationStatus(operationStatusInWork);
                                 }
-                                });
+                            });
                         }
                     }
                 }

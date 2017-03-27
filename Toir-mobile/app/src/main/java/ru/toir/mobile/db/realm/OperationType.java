@@ -65,4 +65,8 @@ public class OperationType extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
+
+    public class Type {
+        public static final String MEASURE = "6B4A9362-BBD8-4A17-9721-04728781F449";
+    }
 }
