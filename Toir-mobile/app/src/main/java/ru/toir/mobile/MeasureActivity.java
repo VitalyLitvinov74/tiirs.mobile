@@ -1,7 +1,9 @@
 package ru.toir.mobile;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -46,18 +48,15 @@ import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 
 public class MeasureActivity extends AppCompatActivity implements OnChartValueSelectedListener {
-    private Realm realmDB;
-
-    AccountHeader headerResult = null;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
-
+    protected BarChart mChart;
+    AccountHeader headerResult = null;
+    private Realm realmDB;
     private EditText meas_value;
     private Spinner meas_typeSpinner;
     private Button meas_submit;
     private MeasuredValue measuredValue;
-
-    protected BarChart mChart;
     private Typeface mTf;
 
     private String equipmentUuid = "";
@@ -104,7 +103,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                             long next_id = realm.where(MeasuredValue.class).max("_id").intValue() + 1;
                             final MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
                             measuredValue.set_id(next_id);
-                            measuredValue.setUuid(uuid.toString());
+                            measuredValue.setUuid(uuid.toString().toUpperCase());
                             measuredValue.setMeasureType(measureType);
                             measuredValue.setDate(new Date());
                             measuredValue.setChangedAt(new Date());
@@ -117,6 +116,14 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                         }
                     });
                     setData();
+                    Intent data = new Intent();
+                    data.putExtra("value", meas_value.getText().toString());
+                    if (getParent() == null) {
+                        setResult(Activity.RESULT_OK, data);
+                    } else {
+                        getParent().setResult(Activity.RESULT_OK, data);
+                    }
+                    finish();
                 }
             });
 
