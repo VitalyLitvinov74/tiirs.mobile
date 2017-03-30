@@ -47,6 +47,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -69,7 +70,9 @@ import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.adapters.TaskStageAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
+import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
@@ -83,6 +86,7 @@ import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.ToirAPIResponse;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
@@ -946,7 +950,6 @@ public class OrderFragment extends Fragment {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // TODO: отправить данные по нарядам
                 // проверяем наличие не законченных нарядов
                 RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
                         .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
@@ -981,61 +984,61 @@ public class OrderFragment extends Fragment {
                 }
 
                 // отправляем данные из журнала и лога GPS
-//                Thread thread = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Call<ToirAPIResponse> call;
-//                        Response<ToirAPIResponse> response;
-//                        Realm realm = Realm.getDefaultInstance();
-//
-//                        // выбираем все неотправленные данные из таблицы journal
-//                        RealmResults<Journal> journals = realm.where(Journal.class)
-//                                .equalTo("sent", false)
-//                                .findAll();
-//                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-//                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
-//                        try {
-//                            response = call.execute();
-//                            ToirAPIResponse result = response.body();
-//                            if (result.isSuccess()) {
-//                                Log.d(TAG, "Журнал отправлен успешно.");
-//                            } else {
-//                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-//                                removeNotSaved(journalList, (List<String>) result.getData());
-//                                realm.beginTransaction();
-//                                realm.copyToRealmOrUpdate(journalList);
-//                                realm.commitTransaction();
-//                            }
-//                        } catch (Exception e) {
-//                            Log.e(TAG, e.getLocalizedMessage());
-//                            Log.e(TAG, "Ошибка при отправке журнала.");
-//                        }
-//
-//                        // выбираем все неотправленные данные из таблицы gpstrack
-//                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
-//                                .equalTo("sent", false)
-//                                .findAll();
-//                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-//                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
-//                        try {
-//                            response = call.execute();
-//                            ToirAPIResponse result = response.body();
-//                            if (result.isSuccess()) {
-//                                Log.d(TAG, "GPS лог отправлен успешно.");
-//                            } else {
-//                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-//                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
-//                                realm.beginTransaction();
-//                                realm.copyToRealmOrUpdate(gpsTrackList);
-//                                realm.commitTransaction();
-//                            }
-//                        } catch (Exception e) {
-//                            Log.e(TAG, e.getLocalizedMessage());
-//                            Log.e(TAG, "Ошибка при отправке GPS лога.");
-//                        }
-//                    }
-//                });
-//                thread.start();
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Call<ToirAPIResponse> call;
+                        Response<ToirAPIResponse> response;
+                        Realm realm = Realm.getDefaultInstance();
+
+                        // выбираем все неотправленные данные из таблицы journal
+                        RealmResults<Journal> journals = realm.where(Journal.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
+                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
+                        try {
+                            response = call.execute();
+                            ToirAPIResponse result = response.body();
+                            if (result.isSuccess()) {
+                                Log.d(TAG, "Журнал отправлен успешно.");
+                            } else {
+                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
+                                removeNotSaved(journalList, (List<String>) result.getData());
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(journalList);
+                                realm.commitTransaction();
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                            Log.e(TAG, "Ошибка при отправке журнала.");
+                        }
+
+                        // выбираем все неотправленные данные из таблицы gpstrack
+                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
+                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
+                        try {
+                            response = call.execute();
+                            ToirAPIResponse result = response.body();
+                            if (result.isSuccess()) {
+                                Log.d(TAG, "GPS лог отправлен успешно.");
+                            } else {
+                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
+                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
+                                realm.beginTransaction();
+                                realm.copyToRealmOrUpdate(gpsTrackList);
+                                realm.commitTransaction();
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getLocalizedMessage());
+                            Log.e(TAG, "Ошибка при отправке GPS лога.");
+                        }
+                    }
+                });
+                thread.start();
 
                 return true;
             }
