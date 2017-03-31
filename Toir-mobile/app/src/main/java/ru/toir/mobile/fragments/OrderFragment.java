@@ -74,6 +74,7 @@ import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
 import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasureType;
+import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
@@ -271,6 +272,7 @@ public class OrderFragment extends Fragment {
         }
         super.onDestroy();
     }
+
     /*
      * (non-Javadoc)
      *
@@ -423,7 +425,10 @@ public class OrderFragment extends Fragment {
         toolbar.setSubtitle("Задачи");
         for (Tasks task : order.getTasks()) {
             long id = task.get_id();
-            if (!task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) all_complete=false;
+            if (!task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
+                all_complete = false;
+            }
+
             if (first) {
                 q = q.equalTo("_id", id);
                 first = false;
@@ -471,7 +476,10 @@ public class OrderFragment extends Fragment {
         boolean all_complete = true;
         for (TaskStages stage : task.getTaskStages()) {
             long id = stage.get_id();
-            if (!stage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) all_complete=false;
+            if (!stage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) {
+                all_complete = false;
+            }
+
             if (first) {
                 q = q.equalTo("_id", id);
                 first = false;
@@ -491,19 +499,19 @@ public class OrderFragment extends Fragment {
         }
 
         if (complete_operation && all_complete && !task.getTaskStatus().equals(TaskStatus.Status.COMPLETE)) {
-                final TaskStatus taskStatusComplete = realmDB.where(TaskStatus.class)
-                        .equalTo("uuid", TaskStatus.Status.COMPLETE)
-                        .findFirst();
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        selectedTask.setEndDate(new Date());
-                        selectedTask.setTaskStatus(taskStatusComplete);
-                    }
-                });
-                Level = 1;
-                fillListViewTasks(selectedOrder, true);
-            }
+            final TaskStatus taskStatusComplete = realmDB.where(TaskStatus.class)
+                    .equalTo("uuid", TaskStatus.Status.COMPLETE)
+                    .findFirst();
+            realmDB.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    selectedTask.setEndDate(new Date());
+                    selectedTask.setTaskStatus(taskStatusComplete);
+                }
+            });
+            Level = 1;
+            fillListViewTasks(selectedOrder, true);
+        }
 
         submit.setVisibility(View.GONE);
         measure.setVisibility(View.GONE);
@@ -1115,11 +1123,33 @@ public class OrderFragment extends Fragment {
         task.execute(orders);
     }
 
+    private void sendMeasuredValues(List<MeasuredValue> values) {
+        AsyncTask<List<MeasuredValue>, Void, String> task = new AsyncTask<List<MeasuredValue>, Void, String>() {
+            @Override
+            protected String doInBackground(List<MeasuredValue>... lists) {
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendMeasuredValues(lists[0]);
+                try {
+                    Response response = call.execute();
+                    Log.d(TAG, "response = " + response);
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+            }
+        };
+        task.execute(values);
+    }
+
     /**
      * Отправка всех выполненных нарядов на сервер
      */
     private void sendCompleteTask() {
-        // TODO: реализовать отправку
         AuthorizedUser user = AuthorizedUser.getInstance();
         RealmResults<Orders> ordersList = realmDB.where(Orders.class)
                 .equalTo("user.uuid", user.getUuid())
@@ -1137,6 +1167,7 @@ public class OrderFragment extends Fragment {
         // строим список фотографий связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
         List<String> photos = new ArrayList<>();
+        List<String> operationUuids = new ArrayList<>();
         for (Orders order : ordersList) {
             List<Tasks> tasks = order.getTasks();
             for (Tasks task : tasks) {
@@ -1144,6 +1175,7 @@ public class OrderFragment extends Fragment {
                 for (TaskStages stage : stages) {
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
+                        operationUuids.add(operation.getUuid());
                         String photoFileName = operation.getUuid() + ".jpg";
                         File operationPhoto = new File(
                                 getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
@@ -1157,6 +1189,19 @@ public class OrderFragment extends Fragment {
         }
 
         sendFiles(photos);
+
+        String[] opUuidsArray = new String[operationUuids.size()];
+        for (int i = 0; i < operationUuids.size(); i++) {
+            opUuidsArray[i] = operationUuids.get(i);
+        }
+
+        // получаем все измерения связанные с выполненными операциями
+        RealmResults<MeasuredValue> measuredValues = realmDB
+                .where(MeasuredValue.class)
+                .in("operation.uuid", opUuidsArray)
+                .findAll();
+
+        sendMeasuredValues(realmDB.copyFromRealm(measuredValues));
 
 //        getActivity().registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
 //        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
@@ -1362,7 +1407,7 @@ public class OrderFragment extends Fragment {
                     try {
                         //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
                         String path = getContext().getExternalFilesDir("/Pictures") + File.separator;
-                        getResizedBitmap(path, fileUri.getPath().replace(path,""), 1024, 0, new Date().getTime());
+                        getResizedBitmap(path, fileUri.getPath().replace(path, ""), 1024, 0, new Date().getTime());
                     } catch (Exception e) {
                         Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());

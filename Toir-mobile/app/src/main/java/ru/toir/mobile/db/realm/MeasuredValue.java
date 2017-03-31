@@ -3,6 +3,7 @@ package ru.toir.mobile.db.realm;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -10,8 +11,9 @@ import io.realm.annotations.PrimaryKey;
  *         Created by koputo on 16.01.17.
  */
 public class MeasuredValue extends RealmObject {
-    @PrimaryKey
+    @Index
     private long _id;
+    @PrimaryKey
     private String uuid;
     private Equipment equipment;
     private Operation operation;

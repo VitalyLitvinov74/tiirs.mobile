@@ -232,6 +232,11 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 10) {
+            toVersion11(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -241,10 +246,24 @@ public class ToirRealmMigration implements RealmMigration {
      * @param realm
      */
     private void toVersion10(DynamicRealm realm) {
-        Log.d(TAG, "from version 8");
+        Log.d(TAG, "from version 9");
         RealmSchema schema = realm.getSchema();
         schema.get("Documentation").addField("required", boolean.class);
 
+    }
+
+    /**
+     * Переход на версию 11
+     *
+     * @param realm
+     */
+    private void toVersion11(DynamicRealm realm) {
+        Log.d(TAG, "from version 10");
+        RealmSchema schema = realm.getSchema();
+        schema.get("MeasuredValue")
+                .removePrimaryKey()
+                .addPrimaryKey("uuid")
+                .addIndex("_id");
     }
 
     private boolean testPropsFields(DynamicRealm realm) {
