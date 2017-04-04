@@ -237,6 +237,11 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 11) {
+            toVersion12(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -264,6 +269,38 @@ public class ToirRealmMigration implements RealmMigration {
                 .removePrimaryKey()
                 .addPrimaryKey("uuid")
                 .addIndex("_id");
+    }
+
+    /**
+     * Переход на версию 12
+     *
+     * @param realm
+     */
+    private void toVersion12(DynamicRealm realm) {
+        Log.d(TAG, "from version 11");
+        RealmSchema schema = realm.getSchema();
+        schema.create("ObjectType")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addField("title", String.class)
+                .addField("descr", String.class)
+                .addField("icon", String.class)
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+        schema.create("Objects")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addField("title", String.class)
+                .addField("descr", String.class)
+                .addField("photo", String.class)
+                .addField("longitude", double.class)
+                .addField("latitude", double.class)
+                .addRealmObjectField("objectType",schema.get("ObjectType"))
+                .addRealmObjectField("parentObject",schema.get("Objects"))
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
     }
 
     private boolean testPropsFields(DynamicRealm realm) {

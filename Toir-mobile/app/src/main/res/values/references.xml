@@ -8,6 +8,7 @@
         <item>Типы предупреждений:AlertType</item>
         <item>Вердикты операций:OperationVerdict</item>
         <item>Типы операций:OperationType</item>
+        <item>Типы объектов:ObjectType</item>
         <item>Статусы операций:OperationStatus</item>
         <item>Статусы задач:TaskStatus</item>
         <item>Статусы этапов задач:TaskStageStatus</item>

@@ -80,7 +80,7 @@
     <string name="additional_information">Дополнительная информация</string>
     <string name="operation_step_descr_title">Описание шага обслуживания</string>
     <string name="operation_status_change_title">Изменить статус операции</string>
-    <string name="operation_choose_status">Выберите статус завершения операции</string>>
+    <string name="operation_choose_status">Выберите статус завершения операции</string>
     <string name="divider"> | </string>
     <string name="num500">500</string>
     <string name="application_full_name">Мобильный ТОиР</string>
