@@ -48,6 +48,7 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.ObjectType;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
@@ -332,6 +333,19 @@ public class ReferenceFragment extends Fragment {
                     Response<List<OperationType>> response = ToirAPIFactory.getOperationTypeService().operationType(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationType> list = response.body();
+                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+
+                // ObjectType
+                referenceName = ObjectType.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<ObjectType>> response = ToirAPIFactory.getObjectTypeService().objectType(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<ObjectType> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {

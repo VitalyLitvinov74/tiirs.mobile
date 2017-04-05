@@ -35,6 +35,8 @@ import ru.toir.mobile.rest.interfaces.IFileDownload;
 import ru.toir.mobile.rest.interfaces.IGpsTrack;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
 import ru.toir.mobile.rest.interfaces.IMeasuredValue;
+import ru.toir.mobile.rest.interfaces.IObjectType;
+import ru.toir.mobile.rest.interfaces.IObjects;
 import ru.toir.mobile.rest.interfaces.IOperation;
 import ru.toir.mobile.rest.interfaces.IOperationStatus;
 import ru.toir.mobile.rest.interfaces.IOperationTemplate;
@@ -173,6 +175,16 @@ public class ToirAPIFactory {
     @NonNull
     public static IMeasureType getMeasureTypeService() {
         return getRetrofit().create(IMeasureType.class);
+    }
+
+    @NonNull
+    public static IObjects getObjectService() {
+        return getRetrofit().create(IObjects.class);
+    }
+
+    @NonNull
+    public static IObjectType getObjectTypeService() {
+        return getRetrofit().create(IObjectType.class);
     }
 
     @NonNull

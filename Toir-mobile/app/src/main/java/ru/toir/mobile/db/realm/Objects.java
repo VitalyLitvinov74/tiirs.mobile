@@ -17,8 +17,8 @@ public class Objects extends RealmObject {
     private Objects parentObject;
     private String title;
     private String descr;
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
     private String photo;
     private Date createdAt;
     private Date changedAt;
@@ -71,19 +71,19 @@ public class Objects extends RealmObject {
         this.parentObject = parentObject;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
