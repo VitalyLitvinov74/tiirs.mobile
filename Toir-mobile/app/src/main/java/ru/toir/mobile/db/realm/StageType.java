@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 15.09.16.
  */
-public class TaskStageVerdict extends RealmObject {
+public class StageType extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;

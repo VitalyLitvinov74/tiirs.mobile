@@ -16,17 +16,17 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
-import ru.toir.mobile.db.realm.TaskStageStatus;
+import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.TaskStages;
 
 /**
  * @author olejek
  * Created by olejek on 14.09.16.
  */
-public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements ListAdapter {
+public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAdapter {
     public static final String TABLE_NAME = "TaskStages";
 
-    public TaskStageAdapter(@NonNull Context context, RealmResults<TaskStages> data) {
+    public StageAdapter(@NonNull Context context, RealmResults<TaskStages> data) {
         super(context, data);
     }
 
@@ -106,23 +106,23 @@ public class TaskStageAdapter extends RealmBaseAdapter<TaskStages> implements Li
             if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null && taskStage.getEquipment().getCriticalType()!=null) {
                 String taskStageStatusUuid = taskStage.getTaskStageStatus().getUuid();
                 String criticalTypeUuid = taskStage.getEquipment().getCriticalType().getUuid();
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (taskStageStatusUuid.equals(TaskStageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                if (taskStageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
             }
         }

@@ -17,9 +17,9 @@ public class TaskStages extends RealmObject {
     private String comment;
     private String taskUuid;
     private Equipment equipment;
-    private TaskStageVerdict taskStageVerdict;
-    private TaskStageStatus taskStageStatus;
-    private TaskStageTemplate taskStageTemplate;
+    private StageVerdict taskStageVerdict;
+    private StageStatus taskStageStatus;
+    private StageTemplate taskStageTemplate;
     private Date startDate;
     private Date endDate;
     private int flowOrder;
@@ -67,27 +67,27 @@ public class TaskStages extends RealmObject {
         this.equipment = equipment;
     }
 
-    public TaskStageVerdict getTaskStageVerdict() {
+    public StageVerdict getTaskStageVerdict() {
         return taskStageVerdict;
     }
 
-    public void setTaskStageVerdict(TaskStageVerdict taskStageVerdict) {
+    public void setTaskStageVerdict(StageVerdict taskStageVerdict) {
         this.taskStageVerdict = taskStageVerdict;
     }
 
-    public TaskStageStatus getTaskStageStatus() {
+    public StageStatus getTaskStageStatus() {
         return taskStageStatus;
     }
 
-    public void setTaskStageStatus(TaskStageStatus taskStageStatus) {
+    public void setTaskStageStatus(StageStatus taskStageStatus) {
         this.taskStageStatus = taskStageStatus;
     }
 
-    public TaskStageTemplate getTaskStageTemplate() {
+    public StageTemplate getTaskStageTemplate() {
         return taskStageTemplate;
     }
 
-    public void setTaskStageTemplate(TaskStageTemplate taskStageTemplate) {
+    public void setTaskStageTemplate(StageTemplate taskStageTemplate) {
         this.taskStageTemplate = taskStageTemplate;
     }
 

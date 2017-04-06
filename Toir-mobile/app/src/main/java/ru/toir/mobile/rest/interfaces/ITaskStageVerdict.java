@@ -5,7 +5,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.toir.mobile.db.realm.TaskStageVerdict;
+import ru.toir.mobile.db.realm.StageVerdict;
 
 /**
  * @author Dmitriy Logachev
@@ -14,11 +14,11 @@ import ru.toir.mobile.db.realm.TaskStageVerdict;
 
 public interface ITaskStageVerdict {
     @GET("/api/task-stage/verdict")
-    Call<List<TaskStageVerdict>> taskStageVerdict();
+    Call<List<StageVerdict>> taskStageVerdict();
 
     @GET("/api/task-stage/verdict")
-    Call<List<TaskStageVerdict>> taskStageVerdict(@Query("changedAfter") String changedAfter);
+    Call<List<StageVerdict>> taskStageVerdict(@Query("changedAfter") String changedAfter);
 
     @GET("/api/task-stage/verdict")
-    Call<List<TaskStageVerdict>> taskStageVerdictById(@Query("id") String id);
+    Call<List<StageVerdict>> taskStageVerdictById(@Query("id") String id);
 }

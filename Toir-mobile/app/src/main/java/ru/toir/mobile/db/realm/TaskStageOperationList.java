@@ -13,7 +13,7 @@ public class TaskStageOperationList extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private TaskStageTemplate taskStageTemplate;
+    private StageTemplate taskStageTemplate;
     private OperationTemplate operationTemplate;
     private int flowOrder ;
     private Date createdAt;
@@ -35,11 +35,11 @@ public class TaskStageOperationList extends RealmObject {
         this.uuid = uuid;
     }
 
-    public TaskStageTemplate getTaskStageTemplate() {
+    public StageTemplate getTaskStageTemplate() {
         return taskStageTemplate;
     }
 
-    public void setTaskStageTemplate(TaskStageTemplate taskStageTemplate) {
+    public void setTaskStageTemplate(StageTemplate taskStageTemplate) {
         this.taskStageTemplate = taskStageTemplate;
     }
 

@@ -5,7 +5,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.toir.mobile.db.realm.TaskStageType;
+import ru.toir.mobile.db.realm.StageType;
 
 /**
  * @author Dmitriy Logachev
@@ -14,11 +14,11 @@ import ru.toir.mobile.db.realm.TaskStageType;
 
 public interface ITaskStageType {
     @GET("/api/task-stage/type")
-    Call<List<TaskStageType>> taskStageType();
+    Call<List<StageType>> taskStageType();
 
     @GET("/api/task-stage/type")
-    Call<List<TaskStageType>> taskStageType(@Query("changedAfter") String changedAfter);
+    Call<List<StageType>> taskStageType(@Query("changedAfter") String changedAfter);
 
     @GET("/api/task-stage/type")
-    Call<List<TaskStageType>> taskStageTypeById(@Query("id") String id);
+    Call<List<StageType>> taskStageTypeById(@Query("id") String id);
 }

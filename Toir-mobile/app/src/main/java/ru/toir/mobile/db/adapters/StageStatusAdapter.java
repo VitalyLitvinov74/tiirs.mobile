@@ -10,16 +10,16 @@ import android.widget.TextView;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.TaskStageStatus;
+import ru.toir.mobile.db.realm.StageStatus;
 
 /**
  * @author olejek
  * Created by olejek on 16.03.17.
  */
-public class TaskStageStatusAdapter extends RealmBaseAdapter<TaskStageStatus> implements ListAdapter {
-    public static final String TABLE_NAME = "TaskStageStatus";
+public class StageStatusAdapter extends RealmBaseAdapter<StageStatus> implements ListAdapter {
+    public static final String TABLE_NAME = "StageStatus";
 
-    public TaskStageStatusAdapter(@NonNull Context context, RealmResults<TaskStageStatus> data) {
+    public StageStatusAdapter(@NonNull Context context, RealmResults<StageStatus> data) {
         super(context, data);
     }
 
@@ -29,7 +29,7 @@ public class TaskStageStatusAdapter extends RealmBaseAdapter<TaskStageStatus> im
     }
 
     @Override
-    public TaskStageStatus getItem(int position) {
+    public StageStatus getItem(int position) {
         return null;
     }
 
@@ -43,7 +43,7 @@ public class TaskStageStatusAdapter extends RealmBaseAdapter<TaskStageStatus> im
         ViewHolder viewHolder;
         if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            TaskStageStatus taskStageStatus;
+            StageStatus taskStageStatus;
             if (adapterData != null) {
                 taskStageStatus = adapterData.get(position);
                 textView.setText(taskStageStatus.getTitle());
@@ -60,7 +60,7 @@ public class TaskStageStatusAdapter extends RealmBaseAdapter<TaskStageStatus> im
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            TaskStageStatus taskStageStatus;
+            StageStatus taskStageStatus;
             if (adapterData != null) {
                 taskStageStatus = adapterData.get(position);
                 if (taskStageStatus != null) {

@@ -293,7 +293,9 @@ public class MainActivity extends AppCompatActivity {
                                                     return;
                                                 }
 
-                                                File file = new File(getExternalFilesDir("/users"), fileName);
+                                                // TODO: почему возвращает NULL?!
+                                                File filePath = getExternalFilesDir("/users");
+                                                File file = new File(filePath, fileName);
                                                 if (!file.getParentFile().exists()) {
                                                     if (!file.getParentFile().mkdirs()) {
                                                         return;

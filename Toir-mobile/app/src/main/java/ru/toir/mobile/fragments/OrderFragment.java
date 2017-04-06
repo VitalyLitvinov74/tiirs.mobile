@@ -67,7 +67,7 @@ import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
-import ru.toir.mobile.db.adapters.TaskStageAdapter;
+import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.GpsTrack;
@@ -82,7 +82,7 @@ import ru.toir.mobile.db.realm.OperationVerdict;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
-import ru.toir.mobile.db.realm.TaskStageStatus;
+import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
@@ -112,7 +112,7 @@ public class OrderFragment extends Fragment {
 
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
-    private TaskStageAdapter taskStageAdapter;
+    private StageAdapter taskStageAdapter;
     private OperationAdapter operationAdapter;
 
     private String currentOrderUuid = "";
@@ -476,7 +476,7 @@ public class OrderFragment extends Fragment {
         boolean all_complete = true;
         for (TaskStages stage : task.getTaskStages()) {
             long id = stage.get_id();
-            if (!stage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) {
+            if (!stage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
                 all_complete = false;
             }
 
@@ -490,7 +490,7 @@ public class OrderFragment extends Fragment {
         // этапов нет
         if (first) all_complete = false;
         stages = q.findAll();
-        taskStageAdapter = new TaskStageAdapter(getContext(), stages);
+        taskStageAdapter = new StageAdapter(getContext(), stages);
         mainListView.setAdapter(taskStageAdapter);
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
@@ -604,15 +604,15 @@ public class OrderFragment extends Fragment {
         taskTimer.start();
 
         // фиксируем начало работы над этапом задачи (если у него статус получен), меняем его статус на в процессе
-        final TaskStageStatus taskStageStatus;
-        final TaskStageStatus taskStageStatusInWork;
+        final StageStatus taskStageStatus;
+        final StageStatus taskStageStatusInWork;
         if (selectedStage != null) {
             taskStageStatus = selectedStage.getTaskStageStatus();
-            taskStageStatusInWork = realmDB.where(TaskStageStatus.class)
-                    .equalTo("uuid", TaskStageStatus.Status.IN_WORK)
+            taskStageStatusInWork = realmDB.where(StageStatus.class)
+                    .equalTo("uuid", StageStatus.Status.IN_WORK)
                     .findFirst();
             if (taskStageStatus != null && taskStageStatusInWork != null)
-                if (taskStageStatus.getUuid().equals(TaskStageStatus.Status.NEW) || taskStageStatus.getUuid().equals(TaskStageStatus.Status.UN_COMPLETE)) {
+                if (taskStageStatus.getUuid().equals(StageStatus.Status.NEW) || taskStageStatus.getUuid().equals(StageStatus.Status.UN_COMPLETE)) {
                     realmDB.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
@@ -772,6 +772,7 @@ public class OrderFragment extends Fragment {
                             continue;
                         }
 
+                        // TODO: разобраться почему не возвращает папку!!!
                         File file = new File(getContext().getExternalFilesDir(path.localPath), path.fileName);
                         if (!file.getParentFile().exists()) {
                             if (!file.getParentFile().mkdirs()) {
@@ -1303,7 +1304,7 @@ public class OrderFragment extends Fragment {
         // диалог для отмены операции
         final OrderStatus orderStatusUnComplete;
         final TaskStatus taskStatusUnComplete;
-        final TaskStageStatus taskStageStatusUnComplete;
+        final StageStatus taskStageStatusUnComplete;
         final OperationStatus operationStatusUnComplete;
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -1319,8 +1320,8 @@ public class OrderFragment extends Fragment {
         orderStatusUnComplete = realmDB.where(OrderStatus.class)
                 .equalTo("uuid", OrderStatus.Status.UN_COMPLETE)
                 .findFirst();
-        taskStageStatusUnComplete = realmDB.where(TaskStageStatus.class)
-                .equalTo("uuid", TaskStageStatus.Status.UN_COMPLETE)
+        taskStageStatusUnComplete = realmDB.where(StageStatus.class)
+                .equalTo("uuid", StageStatus.Status.UN_COMPLETE)
                 .findFirst();
         operationStatusUnComplete = realmDB.where(OperationStatus.class)
                 .equalTo("uuid", OperationStatus.Status.UN_COMPLETE)
@@ -1762,10 +1763,10 @@ public class OrderFragment extends Fragment {
             final long currentTime = System.currentTimeMillis();
             //long totalTimeElapsed = currentTime - startTime;
             CheckBox checkBox;
-            final TaskStageStatus taskStageComplete;
+            final StageStatus taskStageComplete;
             uncompleteOperationList.clear();
             // по умолчанию у нас все выполнено
-            taskStageComplete = realmDB.where(TaskStageStatus.class).equalTo("uuid", TaskStageStatus.Status.COMPLETE).findFirst();
+            taskStageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
 
             if (operationAdapter != null) {
                 totalOperationCount = operationAdapter.getCount();
@@ -1787,7 +1788,7 @@ public class OrderFragment extends Fragment {
 
             // все операции выполнены
             if (totalOperationCount == completedOperationCount) {
-                if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(TaskStageStatus.Status.COMPLETE)) {
+                if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
                     realmDB.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {

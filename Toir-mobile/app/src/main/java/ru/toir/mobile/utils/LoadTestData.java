@@ -21,12 +21,12 @@ import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.StageTemplate;
+import ru.toir.mobile.db.realm.StageType;
+import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.TaskStageList;
 import ru.toir.mobile.db.realm.TaskStageOperationList;
-import ru.toir.mobile.db.realm.TaskStageStatus;
-import ru.toir.mobile.db.realm.TaskStageTemplate;
-import ru.toir.mobile.db.realm.TaskStageType;
-import ru.toir.mobile.db.realm.TaskStageVerdict;
+import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
@@ -53,8 +53,8 @@ public class LoadTestData {
     private static OrderStatus orderStatusUncomplete;
     private static OperationStatus operationStatusUncomplete;
     private static OperationStatus operationStatusComplete;
-    private static TaskStageStatus taskStageStatusComplete;
-    private static TaskStageStatus taskStageStatusUncomplete;
+    private static StageStatus taskStageStatusComplete;
+    private static StageStatus taskStageStatusUncomplete;
     private static TaskStatus taskStatus;
     private static User profile;
     private static EquipmentStatus equipmentStatus;
@@ -101,16 +101,16 @@ public class LoadTestData {
     private static OperationTemplate operationTemplate;
     private static OperationTemplate operationTemplate2;
     private static OperationTemplate operationTemplate3;
-    private static TaskStageVerdict taskStageVerdict;
+    private static StageVerdict taskStageVerdict;
     private static TaskStages taskStage;
     private static TaskStages taskStage2;
-    private static TaskStageType taskStageType;
-    private static TaskStageType taskStageType2;
-    private static TaskStageType taskStageType3;
+    private static StageType taskStageType;
+    private static StageType taskStageType2;
+    private static StageType taskStageType3;
     private static TaskStageList taskStageList;
     private static TaskStageOperationList taskStageOperationList;
-    private static TaskStageTemplate taskStageTemplate;
-    private static TaskStageTemplate taskStageTemplate2;
+    private static StageTemplate taskStageTemplate;
+    private static StageTemplate taskStageTemplate2;
     private static TaskVerdict taskVerdict;
 
     private static Tasks task;
@@ -993,7 +993,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageVerdict = realmDB.createObject(TaskStageVerdict.class);
+                taskStageVerdict = realmDB.createObject(StageVerdict.class);
                 taskStageVerdict.set_id(1);
                 taskStageVerdict.setUuid(taskStageVerdictUuid);
                 taskStageVerdict.setTitle("Выполнен");
@@ -1004,7 +1004,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageType = realmDB.createObject(TaskStageType.class);
+                taskStageType = realmDB.createObject(StageType.class);
                 taskStageType.set_id(1);
                 taskStageType.setUuid(taskStageTypeUuid);
                 taskStageType.setTitle("Снятие крышки");
@@ -1014,7 +1014,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageType2 = realmDB.createObject(TaskStageType.class);
+                taskStageType2 = realmDB.createObject(StageType.class);
                 taskStageType2.set_id(2);
                 taskStageType2.setUuid(taskStageTypeUuid2);
                 taskStageType2.setTitle("Демонтаж экрана");
@@ -1024,7 +1024,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageType3 = realmDB.createObject(TaskStageType.class);
+                taskStageType3 = realmDB.createObject(StageType.class);
                 taskStageType3.set_id(3);
                 taskStageType3.setUuid(taskStageTypeUuid3);
                 taskStageType3.setTitle("Осмотр горелки");
@@ -1035,7 +1035,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageStatusUncomplete = realmDB.createObject(TaskStageStatus.class);
+                taskStageStatusUncomplete = realmDB.createObject(StageStatus.class);
                 taskStageStatusUncomplete.set_id(1);
                 taskStageStatusUncomplete.setUuid(taskStageStatusUuid);
                 taskStageStatusUncomplete.setTitle("Не выполнен");
@@ -1045,7 +1045,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageStatusComplete = realmDB.createObject(TaskStageStatus.class);
+                taskStageStatusComplete = realmDB.createObject(StageStatus.class);
                 taskStageStatusComplete.set_id(2);
                 taskStageStatusComplete.setUuid(taskStageStatusUuid2);
                 taskStageStatusComplete.setTitle("Выполнен");
@@ -1056,7 +1056,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageTemplate = realmDB.createObject(TaskStageTemplate.class);
+                taskStageTemplate = realmDB.createObject(StageTemplate.class);
                 taskStageTemplate.set_id(1);
                 taskStageTemplate.setUuid(taskStageTemplateUuid);
                 taskStageTemplate.setEquipmentModel(equipmentModel);
@@ -1074,7 +1074,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageTemplate2 = realmDB.createObject(TaskStageTemplate.class);
+                taskStageTemplate2 = realmDB.createObject(StageTemplate.class);
                 taskStageTemplate2.set_id(2);
                 taskStageTemplate2.setUuid(taskStageTemplateUuid2);
                 taskStageTemplate2.setEquipmentModel(equipmentModel);

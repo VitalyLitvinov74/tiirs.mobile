@@ -1,22 +1,23 @@
 package ru.toir.mobile.db;
 
 import android.util.Log;
+
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import io.realm.DynamicRealm;
+import io.realm.DynamicRealmObject;
 import io.realm.RealmMigration;
 import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 import io.realm.exceptions.RealmException;
-import ru.toir.mobile.db.realm.User;
 
 /**
  * @author Dmitriy Logachev
- *
  */
 public class ToirRealmMigration implements RealmMigration {
     private final String TAG = this.getClass().getName();
@@ -92,12 +93,12 @@ public class ToirRealmMigration implements RealmMigration {
                     .addField("changedAt", Date.class)
                     .addPrimaryKey("_id");
 
-            schema.get("Documentation").renameField("filename","path");
+            schema.get("Documentation").renameField("filename", "path");
             schema.get("Equipment").removeField("equipmentModelUuid");
             schema.get("Equipment").removeField("equipmentStatusUuid");
             schema.get("Equipment").removeField("criticalTypeUuid");
             schema.get("Equipment").removeField("userUuid");
-            schema.get("Equipment").addRealmObjectField("parentEquipment",schema.get("Equipment"));
+            schema.get("Equipment").addRealmObjectField("parentEquipment", schema.get("Equipment"));
 
             schema.get("EquipmentModel").removeField("equipmentTypeUuid");
 
@@ -128,8 +129,8 @@ public class ToirRealmMigration implements RealmMigration {
             schema.create("OperationTool")
                     .addField("_id", long.class)
                     .addField("uuid", String.class)
-                    .addRealmObjectField("operationTemplate",schema.get("OperationTemplate"))
-                    .addRealmObjectField("tool",schema.get("Tool"))
+                    .addRealmObjectField("operationTemplate", schema.get("OperationTemplate"))
+                    .addRealmObjectField("tool", schema.get("Tool"))
                     .addField("createdAt", Date.class)
                     .addField("changedAt", Date.class)
                     .addPrimaryKey("_id");
@@ -153,7 +154,7 @@ public class ToirRealmMigration implements RealmMigration {
                     .removeField("icon");
 
             schema.get("TaskVerdict")
-                    .addRealmObjectField("taskType",schema.get("TaskType"));
+                    .addRealmObjectField("taskType", schema.get("TaskType"));
 
             schema.get("Tasks")
                     .removeField("orderUuid")
@@ -252,6 +253,11 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 14) {
+            toVersion15(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -306,8 +312,8 @@ public class ToirRealmMigration implements RealmMigration {
                 .addField("photo", String.class)
                 .addField("longitude", double.class)
                 .addField("latitude", double.class)
-                .addRealmObjectField("objectType",schema.get("ObjectType"))
-                .addRealmObjectField("parentObject",schema.get("Objects"))
+                .addRealmObjectField("objectType", schema.get("ObjectType"))
+                .addRealmObjectField("parentObject", schema.get("Objects"))
                 .addField("createdAt", Date.class)
                 .addField("changedAt", Date.class)
                 .addPrimaryKey("_id");
@@ -333,25 +339,104 @@ public class ToirRealmMigration implements RealmMigration {
         schema.get("EquipmentModel").addField("image", String.class);
 
     }
+
+    /**
+     * Переход на версию 14
+     *
+     * @param realm
+     */
+    private void toVersion15(DynamicRealm realm) {
+        Log.d(TAG, "from version 14");
+        RealmSchema schema = realm.getSchema();
+        schema.rename("TaskStageVerdict", "StageVerdict");
+        schema.rename("TaskStageType", "StageType");
+        schema.rename("TaskStageStatus", "StageStatus");
+        schema.rename("TaskStageTemplate", "StageTemplate");
+
+        RealmObjectSchema objSchema = schema.get("TaskStages");
+        objSchema.addRealmObjectField("stageVerdict", schema.get("StageVerdict"))
+                .transform(new RealmObjectSchema.Function() {
+                    @Override
+                    public void apply(DynamicRealmObject obj) {
+                        obj.set("stageVerdict", obj.get("taskStageVerdict"));
+                    }
+                })
+                .removeField("taskStageVerdict")
+                .renameField("stageVerdict", "taskStageVerdict");
+
+        objSchema.addRealmObjectField("stageStatus", schema.get("StageStatus"))
+                .transform(new RealmObjectSchema.Function() {
+                    @Override
+                    public void apply(DynamicRealmObject obj) {
+                        obj.set("stageStatus", obj.get("taskStageStatus"));
+                    }
+                })
+                .removeField("taskStageStatus")
+                .renameField("stageStatus", "taskStageStatus");
+
+        objSchema.addRealmObjectField("stageTemplate", schema.get("StageTemplate"))
+                .transform(new RealmObjectSchema.Function() {
+                    @Override
+                    public void apply(DynamicRealmObject obj) {
+                        obj.set("stageTemplate", obj.get("taskStageTemplate"));
+                    }
+                })
+                .removeField("taskStageTemplate")
+                .renameField("stageTemplate", "taskStageTemplate");
+
+        objSchema = schema.get("StageTemplate");
+        objSchema.addRealmObjectField("stageType", schema.get("StageType"))
+                .transform(new RealmObjectSchema.Function() {
+                    @Override
+                    public void apply(DynamicRealmObject obj) {
+                        obj.set("stageType", obj.get("taskStageType"));
+                    }
+                })
+                .removeField("taskStageType")
+                .renameField("stageType", "taskStageType");
+
+        objSchema = schema.get("TaskStageList");
+        objSchema.addRealmObjectField("stageTemplate", schema.get("StageTemplate"))
+                .transform(new RealmObjectSchema.Function() {
+                    @Override
+                    public void apply(DynamicRealmObject obj) {
+                        obj.set("stageTemplate", obj.get("taskStageTemplate"));
+                    }
+                })
+                .removeField("taskStageTemplate")
+                .renameField("stageTemplate", "taskStageTemplate");
+
+        objSchema = schema.get("TaskStageOperationList");
+        objSchema.addRealmObjectField("stageTemplate", schema.get("StageTemplate"))
+                .transform(new RealmObjectSchema.Function() {
+                    @Override
+                    public void apply(DynamicRealmObject obj) {
+                        obj.set("stageTemplate", obj.get("taskStageTemplate"));
+                    }
+                })
+                .removeField("taskStageTemplate")
+                .renameField("stageTemplate", "taskStageTemplate");
+    }
+
     private boolean testPropsFields(DynamicRealm realm) {
         boolean result = true;
         RealmSchema schema = realm.getSchema();
         // проверяем соответствие схемы базы со свойствами классов
         Set<RealmObjectSchema> realmObjects = schema.getAll();
-        for (RealmObjectSchema realmObject: realmObjects) {
+        for (RealmObjectSchema realmObject : realmObjects) {
             Log.d(TAG, "Class name = " + realmObject.getClassName());
             Field[] classProps = null;
-            Set<String> props= new HashSet<>();
+            Set<String> props = new HashSet<>();
             Map<String, String> propsType = new HashMap<>();
             try {
                 Class<?> c = Class.forName("ru.toir.mobile.db.realm." + realmObject.getClassName());
                 classProps = c.getDeclaredFields();
-                for (Field prop: classProps) {
+                for (Field prop : classProps) {
                     props.add(prop.getName());
                     propsType.put(prop.getName(), prop.getType().getName());
 //                    propsType.put(prop.getName(), prop.getGenericType().toString());
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, e.getLocalizedMessage());
             }
 
@@ -366,7 +451,7 @@ public class ToirRealmMigration implements RealmMigration {
             }
 
             // сравниваем типы свойств и полей
-            for (String fieldName: fieldNames) {
+            for (String fieldName : fieldNames) {
                 String realmType = realmObject.getFieldType(fieldName).name();
                 String propType = propsType.get(fieldName);
                 if (!realmType.equals(getType(propType))) {

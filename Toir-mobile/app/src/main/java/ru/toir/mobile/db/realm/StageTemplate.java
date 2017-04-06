@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 14.09.16.
  */
-public class TaskStageTemplate extends RealmObject {
+public class StageTemplate extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -18,7 +18,7 @@ public class TaskStageTemplate extends RealmObject {
     private String image;
     private int normative;
     private EquipmentModel equipmentModel;
-    private TaskStageType taskStageType;
+    private StageType taskStageType;
     private Date createdAt;
     private Date changedAt;
 
@@ -71,11 +71,11 @@ public class TaskStageTemplate extends RealmObject {
         this.equipmentModel = equipmentModel;
     }
 
-    public TaskStageType getTaskStageType() {
+    public StageType getTaskStageType() {
         return taskStageType;
     }
 
-    public void setTaskStageType(TaskStageType taskStageType) {
+    public void setTaskStageType(StageType taskStageType) {
         this.taskStageType = taskStageType;
     }
 

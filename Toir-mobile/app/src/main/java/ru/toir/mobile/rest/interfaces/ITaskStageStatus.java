@@ -5,7 +5,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.toir.mobile.db.realm.TaskStageStatus;
+import ru.toir.mobile.db.realm.StageStatus;
 
 /**
  * @author Dmitriy Logachev
@@ -14,11 +14,11 @@ import ru.toir.mobile.db.realm.TaskStageStatus;
 
 public interface ITaskStageStatus {
     @GET("/api/task-stage/status")
-    Call<List<TaskStageStatus>> taskStageStatus();
+    Call<List<StageStatus>> taskStageStatus();
 
     @GET("/api/task-stage/status")
-    Call<List<TaskStageStatus>> taskStageStatus(@Query("changedAfter") String changedAfter);
+    Call<List<StageStatus>> taskStageStatus(@Query("changedAfter") String changedAfter);
 
     @GET("/api/task-stage/status")
-    Call<List<TaskStageStatus>> taskStageStatusById(@Query("id") String id);
+    Call<List<StageStatus>> taskStageStatusById(@Query("id") String id);
 }
