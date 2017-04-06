@@ -27,6 +27,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import ru.toir.mobile.db.realm.Equipment;
+
 public class RoundedImageView extends ImageView {
 
     public RoundedImageView(Context context) {

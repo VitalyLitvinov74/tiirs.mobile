@@ -23,6 +23,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Equipment;
 
+import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
@@ -141,7 +142,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
                     String path = context.getExternalFilesDir("/equipment") + File.separator;
                     //String path = getPicturesDirectory(context) + "equipments" + File.separator;
-                    Bitmap image_bitmap = getResizedBitmap(path, equipment.getImage(), 300, 0, equipment.getChangedAt().getTime());
+                    Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(),equipment), 300, 0, equipment.getChangedAt().getTime());
                     if (image_bitmap != null) {
                         viewHolder.icon.setImageBitmap(image_bitmap);
                     } else {

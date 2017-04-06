@@ -15,6 +15,7 @@ public class EquipmentModel extends RealmObject {
     private String uuid;
     private EquipmentType equipmentType;
     private String title;
+    private String image;
     private Date createdAt;
     private Date changedAt;
 
@@ -48,6 +49,14 @@ public class EquipmentModel extends RealmObject {
 
     public void setEquipmentType(EquipmentType equipmentType) {
         this.equipmentType = equipmentType;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public Date getCreatedAt() {

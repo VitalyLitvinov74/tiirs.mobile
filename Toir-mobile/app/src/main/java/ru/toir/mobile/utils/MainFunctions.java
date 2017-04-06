@@ -9,6 +9,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
@@ -62,5 +63,19 @@ public static void addToJournal(final String description){
                 + File.separator;
         return filename;
     }
+
+    //  функция возвращает путь до фотографии оборудования
+    public static String getEquipmentImage(String path, Equipment equipment) {
+        if (equipment != null) {
+            if (equipment.getImage() != null && equipment.getImage().length()>5) {
+                return equipment.getImage();
+            }
+            if (equipment.getEquipmentModel() != null) {
+                return equipment.getEquipmentModel().getImage();
+            }
+        }
+        return null;
+    }
 }
+
 

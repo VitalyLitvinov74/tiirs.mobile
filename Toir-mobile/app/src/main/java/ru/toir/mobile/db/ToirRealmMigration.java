@@ -242,6 +242,16 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 12) {
+            toVersion13(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 13) {
+            toVersion14(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -303,6 +313,26 @@ public class ToirRealmMigration implements RealmMigration {
                 .addPrimaryKey("_id");
     }
 
+    /**
+     * Переход на версию 13
+     *
+     * @param realm
+     */
+    private void toVersion13(DynamicRealm realm) {
+        Log.d(TAG, "from version 12");
+    }
+
+    /**
+     * Переход на версию 14
+     *
+     * @param realm
+     */
+    private void toVersion14(DynamicRealm realm) {
+        Log.d(TAG, "from version 13");
+        RealmSchema schema = realm.getSchema();
+        schema.get("EquipmentModel").addField("image", String.class);
+
+    }
     private boolean testPropsFields(DynamicRealm realm) {
         boolean result = true;
         RealmSchema schema = realm.getSchema();
