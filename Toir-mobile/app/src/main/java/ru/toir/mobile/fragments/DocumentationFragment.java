@@ -104,9 +104,9 @@ public class DocumentationFragment extends Fragment {
 		RealmResults<Documentation> documentation;
 		if (documentationTypeUuid != null) {
 			if (sort != null)
-				documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAllSorted(sort);
+				documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
 			else
-				documentation = realmDB.where(Documentation.class).equalTo("documentationTypeUuid", documentationTypeUuid).findAll();
+				documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
 		} else {
 			if (sort != null)
 				documentation = realmDB.where(Documentation.class).findAllSorted(sort);

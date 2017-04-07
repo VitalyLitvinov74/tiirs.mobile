@@ -93,6 +93,7 @@ import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
 
+import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 //import android.content.BroadcastReceiver;
@@ -451,6 +452,7 @@ public class OrderFragment extends Fragment {
                     selectedOrder.setOrderStatus(orderStatusComplete);
                 }
             });
+            addToJournal("Закончен наряд " +   order.getTitle() + "(" + order.getUuid() + ")");
             Level = 0;
             fillListViewOrders(null, null);
         }
@@ -509,6 +511,7 @@ public class OrderFragment extends Fragment {
                     selectedTask.setTaskStatus(taskStatusComplete);
                 }
             });
+            addToJournal("Закончено выполнение задачи " + task.getTaskTemplate().getTitle() + "(" + task.getUuid() + ")");
             Level = 1;
             fillListViewTasks(selectedOrder, true);
         }
@@ -1121,6 +1124,7 @@ public class OrderFragment extends Fragment {
                 super.onPostExecute(s);
             }
         };
+        addToJournal("Отправляем выполненные наряды на сервер");
         task.execute(orders);
     }
 
