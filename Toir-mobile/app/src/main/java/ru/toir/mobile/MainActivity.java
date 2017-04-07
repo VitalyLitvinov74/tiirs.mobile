@@ -60,6 +60,7 @@ import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.FragmentAddUser;
 import ru.toir.mobile.fragments.FragmentEditUser;
 import ru.toir.mobile.fragments.GPSFragment;
+import ru.toir.mobile.fragments.ObjectFragment;
 import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.ServiceFragment;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DRAWER_EXIT = 14;
     private static final int FRAGMENT_SERVICE = 15;
     //private static final int DRAWER_ONLINE = 15;
+    private static final int FRAGMENT_OBJECTS = 16;
 
     private static final String TAG = "MainActivity";
     public int currentFragment = NO_FRAGMENT;
@@ -522,6 +524,7 @@ public class MainActivity extends AppCompatActivity {
                         taskPrimaryDrawerItem,
                         new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName("Объекты").withDescription("Здания и сооружения").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_OBJECTS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new DividerDrawerItem(),
                         //new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         //new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
@@ -584,6 +587,9 @@ public class MainActivity extends AppCompatActivity {
                             } else if (drawerItem.getIdentifier() == FRAGMENT_SERVICE) {
                                 currentFragment = FRAGMENT_SERVICE;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ServiceFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_OBJECTS) {
+                                currentFragment = FRAGMENT_OBJECTS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ObjectFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 startAboutDialog();
                                 /*

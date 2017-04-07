@@ -15,6 +15,7 @@ public class Documentation extends RealmObject {
     private String uuid;
     private DocumentationType documentationType;
     private Equipment equipment;
+    private EquipmentModel equipmentModel;
     private String title;
     private String path;
     private Date createdAt;
@@ -67,6 +68,14 @@ public class Documentation extends RealmObject {
 
     public void setEquipment(Equipment equipment) {
         this.equipment = equipment;
+    }
+
+    public EquipmentModel getEquipmentModel() {
+        return equipmentModel;
+    }
+
+    public void setEquipmentModel(EquipmentModel equipmentModel) {
+        this.equipmentModel = equipmentModel;
     }
 
     public Date getCreatedAt() {
