@@ -54,7 +54,6 @@ public class GPSFragment extends Fragment {
 
 	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<>();
 	Location location;
-	TextView gpsLog;
 	ArrayList<OverlayItem> aOverlayItemArray;
     private double curLatitude, curLongitude;
 	private int LastItemPosition = -1;

@@ -269,7 +269,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 10
      *
-     * @param realm
+     * @param realm - экземпляр realmDB
      */
     private void toVersion10(DynamicRealm realm) {
         Log.d(TAG, "from version 9");
@@ -281,7 +281,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 11
      *
-     * @param realm
+     * @param realm - экземпляр realmDB
      */
     private void toVersion11(DynamicRealm realm) {
         Log.d(TAG, "from version 10");
@@ -295,7 +295,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 12
      *
-     * @param realm
+     * @param realm экземпляр realmDB
      */
     private void toVersion12(DynamicRealm realm) {
         Log.d(TAG, "from version 11");
@@ -327,7 +327,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 13
      *
-     * @param realm
+     * @param realm - экземпляр realmDB
      */
     private void toVersion13(DynamicRealm realm) {
         Log.d(TAG, "from version 12");
@@ -336,7 +336,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 14
      *
-     * @param realm
+     * @param realm - экземпляр realmDB
      */
     private void toVersion14(DynamicRealm realm) {
         Log.d(TAG, "from version 13");
@@ -348,7 +348,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 14
      *
-     * @param realm
+     * @param realm - экземпляр realmDB
      */
     private void toVersion15(DynamicRealm realm) {
         Log.d(TAG, "from version 14");
@@ -426,7 +426,7 @@ public class ToirRealmMigration implements RealmMigration {
     /**
      * Переход на версию 16
      *
-     * @param realm
+     * @param realm - экземпляр realmDB
      */
     private void toVersion16(DynamicRealm realm) {
         Log.d(TAG, "from version 15");

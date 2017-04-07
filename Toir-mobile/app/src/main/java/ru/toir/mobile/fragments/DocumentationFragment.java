@@ -126,7 +126,7 @@ public class DocumentationFragment extends Fragment {
 		}
 	}
 
-	public class ListviewClickListener implements
+	private class ListviewClickListener implements
 			AdapterView.OnItemClickListener {
 
 		@Override
@@ -158,7 +158,7 @@ public class DocumentationFragment extends Fragment {
 		}
 	}
 
-	public class SpinnerListener implements AdapterView.OnItemSelectedListener {
+	private class SpinnerListener implements AdapterView.OnItemSelectedListener {
 
 		@Override
 		public void onNothingSelected(AdapterView<?> parentView) {

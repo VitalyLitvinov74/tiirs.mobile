@@ -145,7 +145,7 @@ public class EquipmentsFragment extends Fragment {
 		}
 	}
 
-    public class ListviewClickListener implements
+    private class ListviewClickListener implements
             AdapterView.OnItemClickListener {
 
         @Override
@@ -164,7 +164,7 @@ public class EquipmentsFragment extends Fragment {
         }
     }
 
-    public class SpinnerListener implements AdapterView.OnItemSelectedListener {
+    private class SpinnerListener implements AdapterView.OnItemSelectedListener {
         //boolean userSelect = false;
 
         @Override
