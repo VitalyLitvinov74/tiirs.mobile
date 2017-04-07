@@ -14,7 +14,7 @@ import io.realm.RealmConfiguration;
  */
 public class ToirRealm {
     // версия схемы базы данных приложения
-    public static final int VERSION = 15;
+    public static final int VERSION = 16;
 
     public static void init(Context context) {
         init(context, "toir.realm");

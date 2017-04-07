@@ -258,6 +258,11 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 15) {
+            toVersion16(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -417,6 +422,18 @@ public class ToirRealmMigration implements RealmMigration {
                 .removeField("taskStageTemplate")
                 .renameField("stageTemplate", "taskStageTemplate");
     }
+
+    /**
+     * Переход на версию 16
+     *
+     * @param realm
+     */
+    private void toVersion16(DynamicRealm realm) {
+        Log.d(TAG, "from version 15");
+        RealmSchema schema = realm.getSchema();
+        schema.get("Documentation").addRealmObjectField("equipmentModel", schema.get("EquipmentModel"));
+    }
+
 
     private boolean testPropsFields(DynamicRealm realm) {
         boolean result = true;
