@@ -185,20 +185,12 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean initDB() {
         boolean success = false;
-        //DatabaseHelper helper;
-        // создаём базу данных, в качестве контекста передаём свой, с
-        // переопределёнными путями к базе
         try {
             //ToirRealm.init(this);
             // получаем базу realm
             realmDB = Realm.getDefaultInstance();
-            //realmDB.beginTransaction();
-            //realmDB.where(CriticalType.class).findAll().deleteAllFromRealm();
-            //realmDB.commitTransaction();
             //LoadTestData.LoadAllTestData();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
-            //helper = DatabaseHelper.getInstance(new ToirDatabaseContext(
-            //		getApplicationContext()));
             Log.d(TAG, "db.version=" + realmDB.getVersion());
             if (Realm.getDefaultInstance().getVersion() == 0) {
                 Toast toast = Toast.makeText(this, "База данных не актуальна!",
