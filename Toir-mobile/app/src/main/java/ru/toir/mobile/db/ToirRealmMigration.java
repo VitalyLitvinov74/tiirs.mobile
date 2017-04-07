@@ -434,6 +434,7 @@ public class ToirRealmMigration implements RealmMigration {
         schema.get("Documentation").addRealmObjectField("equipmentModel", schema.get("EquipmentModel"));
     }
 
+
     private boolean testPropsFields(DynamicRealm realm) {
         boolean result = true;
         RealmSchema schema = realm.getSchema();
