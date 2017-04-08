@@ -16,7 +16,7 @@ public class Objects extends RealmObject {
     private ObjectType objectType;
     private Objects parentObject;
     private String title;
-    private String descr;
+    private String description;
     private double latitude;
     private double longitude;
     private String photo;
@@ -47,12 +47,12 @@ public class Objects extends RealmObject {
         this.title = title;
     }
 
-    public String getDescr() {
-        return descr;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescr(String descr) {
-        this.descr = descr;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public ObjectType getObjectType() {
