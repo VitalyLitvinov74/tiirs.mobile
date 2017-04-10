@@ -95,7 +95,7 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
                 if (object.getObjectType() != null) {
                     viewHolder.objectType.setText(object.getObjectType().getTitle());
                 }
-                //viewHolder.descr.setText(object.getDescr());
+                //viewHolder.descr.setText(object.getDescription());
                 //viewHolder.latitude.setText(String.valueOf(object.getLatitude()));
                 //viewHolder.longitude.setText(String.valueOf(object.getLongitude()));
             }

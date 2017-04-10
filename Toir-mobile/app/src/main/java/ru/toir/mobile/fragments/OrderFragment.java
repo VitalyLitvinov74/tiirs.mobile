@@ -728,7 +728,9 @@ public class OrderFragment extends Fragment {
                         // урл изображения задачи
                         files.add(new FilePath(task.getTaskTemplate().getImage(), basePath, basePathLocal));
                         // урл изображения оборудования
-                        files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
+//                        files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
+                        // урл изображения модели оборудования
+                        files.add(new FilePath(task.getEquipment().getEquipmentModel().getImage(), basePath, "/equipment/"));
 
                         List<TaskStages> stages = task.getTaskStages();
                         for (TaskStages stage : stages) {
@@ -775,7 +777,6 @@ public class OrderFragment extends Fragment {
                             continue;
                         }
 
-                        // TODO: разобраться почему не возвращает папку!!!
                         File file = new File(getContext().getExternalFilesDir(path.localPath), path.fileName);
                         if (!file.getParentFile().exists()) {
                             if (!file.getParentFile().mkdirs()) {
