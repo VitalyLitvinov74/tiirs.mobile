@@ -69,7 +69,7 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 //import ru.toir.mobile.rest.ReferenceServiceProvider;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
-	private final static String TAG = "EquipmentInfoActivity";
+    private final static String TAG = "EquipmentInfoActivity";
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
     //private ListView lv;
@@ -78,12 +78,12 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private TextView tv_equipment_name;
     private TextView tv_equipment_inventory;
     private TextView tv_equipment_uuid;
-	//private TextView tv_equipment_type;
-	private TextView tv_equipment_position;
-	//private TextView tv_equipment_tasks;
-	//private TextView tv_equipment_critical;
-	private ImageView tv_equipment_image;
-	private TextView tv_equipment_task_date;
+    //private TextView tv_equipment_type;
+    private TextView tv_equipment_position;
+    //private TextView tv_equipment_tasks;
+    //private TextView tv_equipment_critical;
+    private ImageView tv_equipment_image;
+    private TextView tv_equipment_task_date;
     private ListView tv_equipment_listview;
     private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
@@ -91,9 +91,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private StageAdapter stageAdapter;
 
     // диалог для работы с rfid считывателем
-	private RfidDialog rfidDialog;
-	// диалог при загрузке файла документации
-	private ProgressDialog loadDocumentationDialog;
+    private RfidDialog rfidDialog;
+    // диалог при загрузке файла документации
+    private ProgressDialog loadDocumentationDialog;
 
     private DocumentationAdapter documentationAdapter;
 
@@ -404,8 +404,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         RealmResults<Documentation> documentation;
         ListView documentationListView = (ListView) findViewById(R.id.equipment_documentation_listView);
-        //documentation = realmDB.where(Documentation.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
-        documentation = realmDB.where(Documentation.class).findAll();
+        documentation = realmDB.where(Documentation.class)
+                .equalTo("equipment.uuid", equipment.getUuid()).or()
+                .equalTo("equipmentModel.uuid", equipment.getEquipmentModel().getUuid())
+                .findAll();
+//        documentation = realmDB.where(Documentation.class).findAll();
         documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
         if (documentationListView != null) {
             documentationListView.setAdapter(documentationAdapter);
@@ -487,9 +490,21 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            String path;
+            String objUuid;
             Documentation documentation = (Documentation) parent.getItemAtPosition(position);
-            // TODO как все таки пути к файлу формируем
-            String path = "/documentation/" + documentation.getEquipment().getUuid() + "/";
+            // TODO: как все таки пути к файлу формируем
+            if (documentation.getEquipment() != null && documentation.getEquipmentModel() == null) {
+                objUuid = documentation.getEquipment().getUuid();
+            } else if (documentation.getEquipment() == null && documentation.getEquipmentModel() != null) {
+                objUuid = documentation.getEquipmentModel().getUuid();
+            } else if (documentation.getEquipment() != null && documentation.getEquipmentModel() != null) {
+                objUuid = documentation.getEquipment().getUuid();
+            } else {
+                return;
+            }
+
+            path = "/documentation/" + objUuid + "/";
             File file = new File(getExternalFilesDir(path), documentation.getPath());
             if (file.exists()) {
                 showDocument(file);
@@ -552,7 +567,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         }
                     }
                 };
-                task.execute(documentation.getEquipment().getUuid() + "/" + documentation.getPath());
+                task.execute(objUuid + "/" + documentation.getPath());
 
                 // показываем диалог получения наряда
                 loadDocumentationDialog = new ProgressDialog(EquipmentInfoActivity.this);

@@ -14,7 +14,7 @@ import ru.toir.mobile.db.realm.Documentation;
 
 /**
  * @author koputo
- * Created by koputo on 08.09.16.
+ *         Created by koputo on 08.09.16.
  */
 public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implements ListAdapter {
     public static final String TABLE_NAME = "Documentation";
@@ -29,6 +29,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         if (adapterData != null) {
             return adapterData.size();
         }
+
         return 0;
     }
 
@@ -37,6 +38,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         if (adapterData != null) {
             return adapterData.get(position);
         }
+
         return null;
     }
 
@@ -47,6 +49,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
             documentation = adapterData.get(position);
             return documentation.get_id();
         }
+
         return 0;
     }
 
@@ -66,7 +69,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         Documentation Documentation;
         if (adapterData != null) {
             Documentation = adapterData.get(position);
-            String information="";
+            String information = "";
             if (Documentation != null) {
                 viewHolder.title.setText(Documentation.getTitle());
                 if (Documentation.getDocumentationType() != null) {
@@ -75,16 +78,18 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
                     if (Documentation.getEquipmentModel() != null) {
                         information = information.concat(Documentation.getEquipmentModel().getTitle());
                     }
+
                     if (Documentation.getEquipment() != null) {
                         information = information.concat(Documentation.getEquipment().getTitle());
                     }
-                }
-                else {
+                } else {
                     information = information.concat("не определена");
                 }
+
                 viewHolder.information.setText(information);
             }
         }
+
         return convertView;
     }
 
