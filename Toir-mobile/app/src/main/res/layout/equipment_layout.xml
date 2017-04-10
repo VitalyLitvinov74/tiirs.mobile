@@ -216,7 +216,7 @@
 
             <TextView
                 android:id="@+id/equipment_text_documentation"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_below="@+id/equipment_divider2"
                 android:background="#FAFAFA"
