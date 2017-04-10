@@ -121,6 +121,11 @@ public class OrderFragment extends Fragment {
     private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
 
+    private static final int ORDER_LEVEL = 0;
+    private static final int TASK_LEVEL = 1;
+    private static final int STAGE_LEVEL = 2;
+    private static final int OPERATION_LEVEL = 3;
+
     private ListView mainListView;
     private Button submit;
     private Button measure;
@@ -128,7 +133,7 @@ public class OrderFragment extends Fragment {
     private BottomBar bottomBar;
     private String TAG = "OrderFragment";
     private Realm realmDB;
-    private int Level = 0;
+    private int Level = ORDER_LEVEL;
     private Equipment currentEquipment;
     private Operation currentOperation;
     private ArrayList<Operation> uncompleteOperationList;
@@ -338,7 +343,7 @@ public class OrderFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "OrderFragment !!! back pressed!!!");
-                    if (Level == 1) {
+                    if (Level == TASK_LEVEL) {
                         initView();
                     }
 
@@ -362,7 +367,7 @@ public class OrderFragment extends Fragment {
 
     private void initView() {
 
-        Level = 0;
+        Level = ORDER_LEVEL;
         fillListViewOrders();
     }
 
@@ -453,7 +458,7 @@ public class OrderFragment extends Fragment {
                 }
             });
             addToJournal("Закончен наряд " + order.getTitle() + "(" + order.getUuid() + ")");
-            Level = 0;
+            Level = ORDER_LEVEL;
             fillListViewOrders(null, null);
         }
 
@@ -512,7 +517,7 @@ public class OrderFragment extends Fragment {
                 }
             });
             addToJournal("Закончено выполнение задачи " + task.getTaskTemplate().getTitle() + "(" + task.getUuid() + ")");
-            Level = 1;
+            Level = TASK_LEVEL;
             fillListViewTasks(selectedOrder, true);
         }
 
@@ -699,6 +704,7 @@ public class OrderFragment extends Fragment {
             protected List<Orders> doInBackground(List<String>... params) {
                 // обновляем справочники
                 ReferenceFragment.updateReferences(null);
+                int current_files_cnt=0;
 
                 // запрашиваем наряды
                 Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
@@ -710,7 +716,6 @@ public class OrderFragment extends Fragment {
                     Log.d(TAG, e.getLocalizedMessage());
                     return null;
                 }
-
                 // список файлов для загрузки
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
@@ -737,7 +742,12 @@ public class OrderFragment extends Fragment {
                             // урл изображения этапа задачи
                             files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
                                     basePath, basePathLocal));
-
+                            if (stage.getEquipment() != null) {
+                                String equipmentPath = "/storage/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
+                                files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
+                                equipmentPath = "/storage/" + stage.getEquipment().getUuid() + "/";
+                                files.add(new FilePath(stage.getEquipment().getImage(), basePath, "/equipment/"));
+                            }
                             List<Operation> operations = stage.getOperations();
                             for (Operation operation : operations) {
                                 // урл изображения операции
@@ -793,7 +803,7 @@ public class OrderFragment extends Fragment {
                         if (trueImgBody == null) {
                             continue;
                         }
-
+                        //processDialog.setProgress(50+((current_files_cnt*50)/files.size()));
                         File file = new File(getContext().getExternalFilesDir(path.localPath), path.fileName);
                         if (!file.getParentFile().exists()) {
                             if (!file.getParentFile().mkdirs()) {
@@ -812,6 +822,7 @@ public class OrderFragment extends Fragment {
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
+                    current_files_cnt++;
                 }
 
                 return result;
@@ -1540,7 +1551,7 @@ public class OrderFragment extends Fragment {
                             fillListViewTaskStage(selectedTask, true);
                             submit.setVisibility(View.GONE);
                             measure.setVisibility(View.GONE);
-                            Level = 2;
+                            Level = STAGE_LEVEL;
                         }
                     }
                 });
@@ -1829,7 +1840,7 @@ public class OrderFragment extends Fragment {
                 if (selectedTask != null) {
                     currentTaskStageUuid = selectedStage.getUuid();
                     currentTaskUuid = selectedTask.getUuid();
-                    Level = 2;
+                    Level = STAGE_LEVEL;
                     fillListViewTaskStage(selectedTask, true);
                     submit.setVisibility(View.GONE);
                     measure.setVisibility(View.GONE);
@@ -1847,13 +1858,13 @@ public class OrderFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View selectedItemView, int position, long id) {
             // находимся на "экране" нарядов
-            if (Level == 0) {
+            if (Level == ORDER_LEVEL) {
                 if (orderAdapter != null) {
                     selectedOrder = orderAdapter.getItem(position);
                     if (selectedOrder != null) {
                         currentOrderUuid = selectedOrder.getUuid();
                         fillListViewTasks(selectedOrder, false);
-                        Level = 1;
+                        Level = TASK_LEVEL;
                     }
                 }
 
@@ -1861,55 +1872,13 @@ public class OrderFragment extends Fragment {
             }
 
             // Tasks
-            if (Level == 1) {
+            if (Level == TASK_LEVEL) {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);
                     if (selectedTask != null) {
                         Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
                         final String expectedTagId = selectedTask.getEquipment().getTagId();
-                        currentEquipment = selectedTask.getEquipment();
-                        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
-                        Handler handler = new Handler(new Handler.Callback() {
-                            @Override
-                            public boolean handleMessage(Message message) {
-                                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                                    String tagId = ((String) message.obj).substring(4);
-                                    Log.d(TAG, "Ид метки получили: " + tagId);
-                                    if (expectedTagId.equals(tagId)) {
-                                        boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
-                                        if (run_ar_content) {
-                                            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
-                                            if (intent != null) {
-                                                intent.putExtra("hardwareUUID", currentEquipment.getUuid());
-                                                startActivity(intent);
-                                            } else {
-                                                Toast.makeText(getContext(),
-                                                        "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                        fillListViewTaskStage(selectedTask, false);
-                                        Level = 2;
-                                    } else {
-                                        Toast.makeText(getContext(),
-                                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Log.d(TAG, "Ошибка чтения метки!");
-                                    Toast.makeText(getContext(),
-                                            "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
-                                }
-
-                                // закрываем диалог
-                                rfidDialog.dismiss();
-                                return true;
-                            }
-                        });
-
-                        rfidDialog = new RfidDialog();
-                        rfidDialog.setHandler(handler);
-                        rfidDialog.readTagId();
-                        rfidDialog.show(getActivity().getFragmentManager(), TAG);
-
+                        runRfidDialog(expectedTagId,TASK_LEVEL);
                     }
                 }
 
@@ -1917,17 +1886,14 @@ public class OrderFragment extends Fragment {
             }
 
             // TaskStage
-            if (Level == 2) {
+            if (Level == STAGE_LEVEL) {
                 if (taskStageAdapter != null) {
                     selectedStage = taskStageAdapter.getItem(position);
                     if (selectedStage != null) {
                         currentTaskStageUuid = selectedStage.getUuid();
-                        fillListViewOperations(selectedStage);
-                        submit.setVisibility(View.VISIBLE);
-                        submit.setOnClickListener(new submitOnClickListener());
-                        measure.setVisibility(View.VISIBLE);
-                        Level = 3;
-                        startOperations();
+                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+                        final String expectedTagId = selectedStage.getEquipment().getTagId();
+                        runRfidDialog(expectedTagId,STAGE_LEVEL);
                     }
                 }
 
@@ -1935,7 +1901,7 @@ public class OrderFragment extends Fragment {
             }
 
             // Operation
-            if (Level == 3) {
+            if (Level == ORDER_LEVEL) {
                 if (operationAdapter != null) {
                     selectedOperation = operationAdapter.getItem(position);
                     if (selectedOperation != null) {
@@ -1976,7 +1942,7 @@ public class OrderFragment extends Fragment {
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
             // находимся на "экране" с операциями
-            if (Level == 3) {
+            if (Level == OPERATION_LEVEL) {
                 //String operationStatus = operation.getOperation_status_uuid();
                 // менять произвольно статус операции позволяем только если
                 // статус операции "Новая" или "В работе"
@@ -2001,7 +1967,7 @@ public class OrderFragment extends Fragment {
                             });
                     dialog.show();
                 }
-            } else if (Level == 0) {
+            } else if (Level == ORDER_LEVEL) {
                 // находимся на экране с нарядами
                 Orders order = orderAdapter.getItem(position);
                 OrderStatus orderStatus;
@@ -2066,5 +2032,64 @@ public class OrderFragment extends Fragment {
             urlPath = url;
             localPath = local;
         }
+    }
+
+    private void runRfidDialog (String expectedTagId, final int level)
+    {
+        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+        final String expectedTagUuid = expectedTagId;
+
+        currentEquipment = selectedTask.getEquipment();
+        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message message) {
+                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                    String tagId = ((String) message.obj).substring(4);
+                    Log.d(TAG, "Ид метки получили: " + tagId);
+                    if (expectedTagUuid.equals(tagId)) {
+                        boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
+                        if (run_ar_content) {
+                            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
+                            if (intent != null) {
+                                intent.putExtra("hardwareUUID", currentEquipment.getUuid());
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getContext(),
+                                        "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        if (level==TASK_LEVEL) {
+                            fillListViewTaskStage(selectedTask, false);
+                            Level = STAGE_LEVEL;
+                        }
+                        if (level==STAGE_LEVEL) {
+                            fillListViewTaskStage(selectedTask, false);
+                            submit.setVisibility(View.VISIBLE);
+                            submit.setOnClickListener(new submitOnClickListener());
+                            measure.setVisibility(View.VISIBLE);
+                            Level = OPERATION_LEVEL;
+                            startOperations();
+                        }
+                    } else {
+                        Toast.makeText(getContext(),
+                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.d(TAG, "Ошибка чтения метки!");
+                    Toast.makeText(getContext(),
+                            "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                }
+
+                // закрываем диалог
+                rfidDialog.dismiss();
+                return false;
+            }
+        });
+
+        rfidDialog = new RfidDialog();
+        rfidDialog.setHandler(handler);
+        rfidDialog.readTagId();
+        rfidDialog.show(getActivity().getFragmentManager(), TAG);
     }
 }

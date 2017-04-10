@@ -58,6 +58,7 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
 
+import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 //import android.content.BroadcastReceiver;
@@ -395,7 +396,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_listview.setAdapter(stageAdapter);
 
         String path = getExternalFilesDir("/equipment") + File.separator;
-        Bitmap image_bitmap = getResizedBitmap(path, equipment.getImage(), 0, 200, equipment.getChangedAt().getTime());
+        Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(),equipment), 0, 300, equipment.getChangedAt().getTime());
         if (image_bitmap != null) {
             tv_equipment_image.setImageBitmap(image_bitmap);
         } else {
