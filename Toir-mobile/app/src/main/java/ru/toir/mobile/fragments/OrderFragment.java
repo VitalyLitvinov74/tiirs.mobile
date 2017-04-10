@@ -452,7 +452,7 @@ public class OrderFragment extends Fragment {
                     selectedOrder.setOrderStatus(orderStatusComplete);
                 }
             });
-            addToJournal("Закончен наряд " +   order.getTitle() + "(" + order.getUuid() + ")");
+            addToJournal("Закончен наряд " + order.getTitle() + "(" + order.getUuid() + ")");
             Level = 0;
             fillListViewOrders(null, null);
         }
@@ -748,21 +748,38 @@ public class OrderFragment extends Fragment {
                     }
                 }
 
+                // TODO: реализовать получение списка оборудования из операций!!!!
                 // список файлов документации
                 for (Orders order : result) {
                     List<Tasks> tasks = order.getTasks();
                     Realm realm = Realm.getDefaultInstance();
                     for (Tasks task : tasks) {
                         String equipmentUuid = task.getEquipment().getUuid();
+                        String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
                         List<Documentation> docList = realm.where(Documentation.class)
-                                .equalTo("equipment.uuid", equipmentUuid)
+                                .equalTo("equipment.uuid", equipmentUuid).or()
+                                .equalTo("equipmentModel.uuid", equipmentModelUuid)
                                 .equalTo("required", true)
                                 .findAll();
                         for (Documentation doc : docList) {
                             String docFileName = doc.getPath();
-                            String url = "/storage/" + equipmentUuid + "/";
-                            String localPath = "/documentation/" + equipmentUuid + "/";
-                            files.add(new FilePath(docFileName, url, localPath));
+                            String url = "/storage/";
+                            String localPath = "/documentation/";
+                            if (doc.getEquipment() != null && doc.getEquipmentModel() == null) {
+                                // документация привязана только к оборудованию
+                                url += doc.getEquipment().getUuid() + "/";
+                                localPath += doc.getEquipment().getUuid() + "/";
+                                files.add(new FilePath(docFileName, url, localPath));
+                            } else if (doc.getEquipment() == null && doc.getEquipmentModel() != null) {
+                                // документация привязана только к модели оборудования
+                                url += doc.getEquipmentModel().getUuid() + "/";
+                                localPath += doc.getEquipmentModel().getUuid() + "/";
+                                files.add(new FilePath(docFileName, url, localPath));
+                            } else if (doc.getEquipment() != null && doc.getEquipmentModel() != null) {
+                                // документация привязана и к оборудованию и к модели оборудования
+                                files.add(new FilePath(docFileName, url + doc.getEquipment().getUuid() + "/", localPath + doc.getEquipment().getUuid() + "/"));
+                                files.add(new FilePath(docFileName, url + doc.getEquipmentModel().getUuid() + "/", localPath + doc.getEquipmentModel().getUuid() + "/"));
+                            }
                         }
                     }
                 }
