@@ -32,6 +32,7 @@ import ru.toir.mobile.db.adapters.CriticalTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
+import ru.toir.mobile.db.adapters.ObjectTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationStatusAdapter;
 import ru.toir.mobile.db.adapters.OperationTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
@@ -731,6 +732,13 @@ public class ReferenceFragment extends Fragment {
         operationVerdict = realmDB.where(OperationVerdict.class).findAll();
         OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity().getApplicationContext(), operationVerdict);
         contentListView.setAdapter(operationVerdictAdapter);
+    }
+
+    private void fillListViewObjectType() {
+        RealmResults<ObjectType> objectType;
+        objectType = realmDB.where(ObjectType.class).findAll();
+        ObjectTypeAdapter objectAdapter = new ObjectTypeAdapter(getActivity().getApplicationContext(), objectType);
+        contentListView.setAdapter(objectAdapter);
     }
 
     private void fillListViewOperationType() {

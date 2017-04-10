@@ -18,7 +18,7 @@ public class Equipment extends RealmObject {
     private Equipment parentEquipment;
     private String title;
     private String inventoryNumber;
-    private String location;
+    private Objects location;
     private CriticalType criticalType;
     private Date startDate;
     private float latitude;
@@ -76,11 +76,11 @@ public class Equipment extends RealmObject {
         this.inventoryNumber = inventoryNumber;
     }
 
-    public String getLocation() {
+    public Objects getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Objects location) {
         this.location = location;
     }
 

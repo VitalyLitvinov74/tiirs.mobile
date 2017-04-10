@@ -18,14 +18,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FAFAFA"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical">
 
         <RelativeLayout
             android:id="@+id/equipment_info_common"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
-        <ImageView
+            <ImageView
                 android:id="@+id/equipment_image"
                 android:layout_width="fill_parent"
                 android:layout_height="200dp"
@@ -33,7 +33,7 @@
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/kotel" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_name"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
@@ -45,7 +45,8 @@
                 android:scaleType="centerCrop"
                 android:textColor="#ffffff"
                 android:textSize="20sp" />
-        <TextView
+
+            <TextView
                 android:id="@+id/equipment_text_inventory"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
@@ -58,7 +59,7 @@
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_uuid"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
@@ -79,7 +80,7 @@
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/location" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
@@ -90,7 +91,7 @@
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_location_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
@@ -102,7 +103,7 @@
                 android:textColor="#757575"
                 android:textSize="14sp" />
 
-        <ImageView
+            <ImageView
                 android:id="@+id/equipment_date_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
@@ -198,15 +199,13 @@
                 android:src="@drawable/ic_icon_tools" />
 
             <ListView
-                    android:id="@+id/list_view"
-                    android:layout_width="match_parent"
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/equipment_text_operation_list"
-                    android:divider="#333333"
-                    android:dividerHeight="1px"
-                android:paddingBottom="10dp"
-                android:scrollbarAlwaysDrawVerticalTrack="true">
-            </ListView>
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp" />
 
             <View
                 android:id="@+id/equipment_divider2"
@@ -217,7 +216,7 @@
 
             <TextView
                 android:id="@+id/equipment_text_documentation"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_below="@+id/equipment_divider2"
                 android:background="#FAFAFA"
@@ -227,12 +226,26 @@
                 android:textColor="#757575"
                 android:textSize="16sp" />
 
+            <ImageView
+                android:id="@+id/equipment_documentation_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/equipment_divider2"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/equipment_text_documentation"
+                android:contentDescription="@string/image_description"
+                android:maxHeight="32dp"
+                android:src="@drawable/ic_icon_tasks2" />
+
             <ListView
                 android:id="@+id/equipment_documentation_listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/equipment_text_documentation">
-            </ListView>
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp"
+                android:layout_below="@+id/equipment_text_documentation"></ListView>
 
             <ImageView
                 android:id="@+id/overlapImageWriteTag"
@@ -258,5 +271,5 @@
                 android:src="@drawable/circle" />
 
         </RelativeLayout>
-</ScrollView>
+    </ScrollView>
 </LinearLayout>

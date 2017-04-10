@@ -16,9 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,9 +46,11 @@ import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
+import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
@@ -81,9 +85,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 	private ImageView tv_equipment_image;
 	private TextView tv_equipment_task_date;
     private ListView tv_equipment_listview;
+    private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
 
-    private TaskAdapter taskAdapter;
+    private StageAdapter stageAdapter;
 
     // диалог для работы с rfid считывателем
 	private RfidDialog rfidDialog;
@@ -189,6 +194,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         //tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_status);
         tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
         tv_equipment_listview = (ListView) findViewById(R.id.list_view);
+        tv_equipment_docslistview = (ListView) findViewById(R.id.equipment_documentation_listView);
         tv_equipment_status = (TextView) findViewById(R.id.equipment_text_status);
         //tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
         //lv = (ListView) findViewById(R.id.equipment_info_operation_list);
@@ -384,15 +390,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tv_equipment_status.setText("неизвестен");
         }
 
-        RealmResults<Tasks> tasks = realmDB.where(Tasks.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
-        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-        tv_equipment_listview.setAdapter(taskAdapter);
-
-        // TODO временно пока изображения не загружены
-        if (equipment.get_id() == 1) tv_equipment_image.setImageResource(R.drawable.kotel);
-        if (equipment.get_id() == 2) tv_equipment_image.setImageResource(R.drawable.kotel);
-        if (equipment.get_id() == 3) tv_equipment_image.setImageResource(R.drawable.pressure);
-        if (equipment.get_id() == 4) tv_equipment_image.setImageResource(R.drawable.gas_counter);
+        RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
+        stageAdapter = new StageAdapter(getApplicationContext(), stages);
+        tv_equipment_listview.setAdapter(stageAdapter);
 
         String path = getExternalFilesDir("/equipment") + File.separator;
         Bitmap image_bitmap = getResizedBitmap(path, equipment.getImage(), 0, 200, equipment.getChangedAt().getTime());
@@ -411,6 +411,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             documentationListView.setAdapter(documentationAdapter);
             documentationListView.setOnItemClickListener(new ListViewClickListener());
         }
+        setListViewHeightBasedOnChildren(tv_equipment_docslistview);
+        setListViewHeightBasedOnChildren(tv_equipment_listview);
     }
 
     void setMainLayout(Bundle savedInstanceState) {
@@ -574,4 +576,24 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
     }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
+
 }

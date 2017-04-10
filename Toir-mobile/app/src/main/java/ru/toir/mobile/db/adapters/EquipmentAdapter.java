@@ -123,7 +123,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 }
                 else {
                     // временные фото иконки
-                    if (equipment.get_id() == 1)
+                    /*if (equipment.get_id() == 1)
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_teplogenerator);
                     if (equipment.get_id() == 2)
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_kotelgas);
@@ -138,7 +138,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                          //Bitmap crop = getCroppedBitmap(myBitmap, 80);
                          Bitmap crop = getRoundedBitmap(myBitmap, 70);
                          viewHolder.icon.setImageBitmap(crop);
-                        }
+                        }*/
 
                     String path = context.getExternalFilesDir("/equipment") + File.separator;
                     //String path = getPicturesDirectory(context) + "equipments" + File.separator;
@@ -150,7 +150,9 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     }
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
-                    viewHolder.location.setText(equipment.getLocation());
+                    if (equipment.getLocation() != null) {
+                        viewHolder.location.setText(equipment.getLocation().getTitle());
+                    }
                     viewHolder.equipmentStatus.setText(context.getString(R.string.status, equipment.getEquipmentStatus().getTitle()));
                     CriticalType criticalType = equipment.getCriticalType();
                     if (criticalType!=null) {
@@ -158,7 +160,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         if (criticalType.getUuid().equals(CriticalType.Status.TYPE_1))
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));
                         if (criticalType.getUuid().equals(CriticalType.Status.TYPE_2))
-                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
+                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.md_deep_orange_300));
                         if (criticalType.getUuid().equals(CriticalType.Status.TYPE_3))
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
                     }

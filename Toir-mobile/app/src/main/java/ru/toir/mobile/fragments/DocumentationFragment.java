@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,8 @@ public class DocumentationFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.documentation_layout,
 				container, false);
         realmDB = Realm.getDefaultInstance();
+		Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+		toolbar.setSubtitle("Документация");
 
 		// обработчик для выпадающих списков у нас один
 		SpinnerListener spinnerListener = new SpinnerListener();

@@ -555,7 +555,7 @@ public class LoadTestData {
                 equipment.setTitle("Теплогенератор Тепловей-250А");
                 equipment.setTagId("1234-5678-9101112");
                 //equipment.setUserUuid(userTestUuid);
-                equipment.setLocation("Цех изоляторов ПФИ");
+                //equipment.setLocation("Цех изоляторов ПФИ");
                 equipment.setLatitude((float) 55.343);
                 equipment.setLongitude((float) 55.234);
                 equipment.setStartDate(new Date());
@@ -579,7 +579,7 @@ public class LoadTestData {
                 equipment2.setTitle("Газовый котел Unical");
                 equipment2.setTagId("02345567");
                 //equipment2.setUserUuid(userTestUuid);
-                equipment2.setLocation("Котельная №3");
+                //equipment2.setLocation("Котельная №3");
                 equipment2.setLatitude((float) 55.5311);
                 equipment2.setLongitude((float) 55.1222);
                 equipment2.setStartDate(new Date());
@@ -603,7 +603,7 @@ public class LoadTestData {
                 equipment3.setTitle("Счетчик газа ВК-G10T");
                 equipment3.setTagId("2321232-22322-74341");
                 //equipment3.setUserUuid(userTestUuid2);
-                equipment3.setLocation("Теплопункт");
+                //equipment3.setLocation("Теплопункт");
                 equipment3.setLatitude((float) 55.222143);
                 equipment3.setLongitude((float) 55.212134);
                 equipment3.setStartDate(new Date());
@@ -627,7 +627,7 @@ public class LoadTestData {
                 equipment4.setTitle("Датчик давления YSO-04");
                 equipment4.setTagId("19532-09021123-2562293");
                 //equipment4.setUserUuid(userTestUuid);
-                equipment4.setLocation("Котельная №2");
+                //equipment4.setLocation("Котельная №2");
                 equipment4.setLatitude((float) 55.53121);
                 equipment4.setLongitude((float) 55.12222);
                 equipment4.setStartDate(new Date());

@@ -59,7 +59,7 @@
     <string name="critical">Критичность:</string>
     <string name="last_date">Дата обслуживания</string>
     <string name="last_result">Результат обслуживания:</string>
-    <string name="documentation">Документация:</string>
+    <string name="documentation">Документация</string>
     <string name="pleaseScanImg">Наведите камеру на код</string>
     <string name="scan_process">Процесс сканирования</string>
     <string name="empty"></string>
