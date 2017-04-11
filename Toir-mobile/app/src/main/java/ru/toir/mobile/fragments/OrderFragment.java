@@ -147,13 +147,14 @@ public class OrderFragment extends Fragment {
             Log.d(TAG, "Тик таймера...");
             TextView textTime;
             long currentTime = System.currentTimeMillis();
-            if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
+            currentOperation = operationAdapter.getItem(currentOperationId);
+            if (operationAdapter != null && currentOperation != null && currentOperationId < operationAdapter.getCount()) {
                 //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                if (!operationAdapter.getItem(currentOperationId).getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
+                if (!currentOperation.getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
                     textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
                     textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
                 }
-                currentOperation = operationAdapter.getItem(currentOperationId);
+
                 if (currentOperation != null) {
                     currentOperationUuid = currentOperation.getUuid();
                     if (firstLaunch) {
@@ -505,7 +506,7 @@ public class OrderFragment extends Fragment {
             tl_Header.setText(task.getTaskTemplate().getTitle());
         }
 
-        if (complete_operation && all_complete && !task.getTaskStatus().equals(TaskStatus.Status.COMPLETE)) {
+        if (complete_operation && all_complete && !task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
             final TaskStatus taskStatusComplete = realmDB.where(TaskStatus.class)
                     .equalTo("uuid", TaskStatus.Status.COMPLETE)
                     .findFirst();
@@ -704,7 +705,7 @@ public class OrderFragment extends Fragment {
             protected List<Orders> doInBackground(List<String>... params) {
                 // обновляем справочники
                 ReferenceFragment.updateReferences(null);
-                int current_files_cnt=0;
+                //int current_files_cnt=0;
 
                 // запрашиваем наряды
                 Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
@@ -746,7 +747,7 @@ public class OrderFragment extends Fragment {
                                 String equipmentPath = "/storage/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
                                 equipmentPath = "/storage/" + stage.getEquipment().getUuid() + "/";
-                                files.add(new FilePath(stage.getEquipment().getImage(), basePath, "/equipment/"));
+                                files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
                             }
                             List<Operation> operations = stage.getOperations();
                             for (Operation operation : operations) {
@@ -822,7 +823,7 @@ public class OrderFragment extends Fragment {
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
-                    current_files_cnt++;
+                    //current_files_cnt++;
                 }
 
                 return result;
@@ -1789,7 +1790,7 @@ public class OrderFragment extends Fragment {
     }
 
     // обработчик кнопки "завершить все операции"
-    public class submitOnClickListener implements View.OnClickListener {
+    private class submitOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
             int completedOperationCount = 0;
@@ -1853,7 +1854,7 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    public class ListViewClickListener implements AdapterView.OnItemClickListener {
+    private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View selectedItemView, int position, long id) {
@@ -1876,7 +1877,6 @@ public class OrderFragment extends Fragment {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);
                     if (selectedTask != null) {
-                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
                         final String expectedTagId = selectedTask.getEquipment().getTagId();
                         runRfidDialog(expectedTagId,TASK_LEVEL);
                     }
@@ -1891,7 +1891,6 @@ public class OrderFragment extends Fragment {
                     selectedStage = taskStageAdapter.getItem(position);
                     if (selectedStage != null) {
                         currentTaskStageUuid = selectedStage.getUuid();
-                        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
                         final String expectedTagId = selectedStage.getEquipment().getTagId();
                         runRfidDialog(expectedTagId,STAGE_LEVEL);
                     }
@@ -1901,7 +1900,7 @@ public class OrderFragment extends Fragment {
             }
 
             // Operation
-            if (Level == ORDER_LEVEL) {
+            if (Level == OPERATION_LEVEL) {
                 if (operationAdapter != null) {
                     selectedOperation = operationAdapter.getItem(position);
                     if (selectedOperation != null) {
@@ -1936,7 +1935,7 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    public class ListViewLongClickListener implements AdapterView.OnItemLongClickListener {
+    private class ListViewLongClickListener implements AdapterView.OnItemLongClickListener {
 
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -2008,7 +2007,7 @@ public class OrderFragment extends Fragment {
      *
      * @author Dmitriy Logachov
      */
-    protected class Suffixes {
+    private class Suffixes {
         String title;
         long multiplier;
 
@@ -2064,7 +2063,7 @@ public class OrderFragment extends Fragment {
                             Level = STAGE_LEVEL;
                         }
                         if (level==STAGE_LEVEL) {
-                            fillListViewTaskStage(selectedTask, false);
+                            fillListViewOperations(selectedStage);
                             submit.setVisibility(View.VISIBLE);
                             submit.setOnClickListener(new submitOnClickListener());
                             measure.setVisibility(View.VISIBLE);
