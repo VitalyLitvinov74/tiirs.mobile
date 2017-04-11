@@ -92,22 +92,21 @@ public class RoundedImageView extends ImageView {
         float scaleWidth;
         float scaleHeight;
         // /storage/sdcard1/Android/data/ru.toir.mobile/users/4CD4A64F-F6CB-4A7C-B5A6-42936E656F31.jpg
-        File image = new File(path+filename.replace(".", "_m."));
-        File image_full = new File(path+filename);
-        // не смогли создать копию
-        if (image == null) return null;
-        Long last_modified=image.lastModified();
-        if (image.exists() && changedAt<=last_modified) {
-             // файл есть, преобразовывать не нужно
-             imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
-             if (imageBitmap2 != null) return imageBitmap2;
-            }
+        File image = new File(path + filename.replace(".", "_m."));
+        File image_full = new File(path + filename);
+
+        Long last_modified = image.lastModified();
+        if (image.exists() && changedAt <= last_modified) {
+            // файл есть, преобразовывать не нужно
+            imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
+            if (imageBitmap2 != null) return imageBitmap2;
+        }
 
         imageBitmap = BitmapFactory.decodeFile(image_full.getAbsolutePath());
         if (imageBitmap != null) {
             int width = imageBitmap.getWidth();
             int height = imageBitmap.getHeight();
-            if ((newWidth==0) && (newHeight==0)) return null;
+            if ((newWidth == 0) && (newHeight == 0)) return null;
             if (newWidth > 0) {
                 scaleWidth = (float) newWidth / (float) width;
                 newHeight = (int) (height * scaleWidth);

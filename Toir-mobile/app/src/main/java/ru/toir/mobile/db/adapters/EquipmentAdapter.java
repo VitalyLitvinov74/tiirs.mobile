@@ -29,7 +29,7 @@ import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
 /**
  * @author koputo
- * Created by koputo on 08.09.16.
+ *         Created by koputo on 08.09.16.
  */
 public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements ListAdapter {
 
@@ -38,6 +38,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     public EquipmentAdapter(@NonNull Context context, RealmResults<Equipment> data) {
         super(context, data);
     }
+
     public EquipmentAdapter(@NonNull Context context, RealmList<Equipment> data) {
         super(context, data);
     }
@@ -80,8 +81,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder.inventoryNumber = (TextView) convertView.findViewById(R.id.eril_inventory_number);
                 viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
                 convertView.setTag(viewHolder);
-            }
-            else {
+            } else {
                 convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image);
@@ -107,21 +107,20 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 if (parent.getId() == R.id.eril_status) {
                     if (equipment.getCriticalType().get_id() == 1)
                         viewHolder.icon.setImageResource(R.drawable.critical_level_1);
-                    if (equipment.getCriticalType().get_id() ==  2)
+                    if (equipment.getCriticalType().get_id() == 2)
                         viewHolder.icon.setImageResource(R.drawable.critical_level_3);
-                    if (equipment.getCriticalType().get_id() ==  2)
+                    if (equipment.getCriticalType().get_id() == 2)
                         viewHolder.icon.setImageResource(R.drawable.critical_level_5);
                     //viewHolder.location.setText(equipment.getLocation());
-                    if (equipment.get_id()==1)
+                    if (equipment.get_id() == 1)
                         viewHolder.location.setText("Цех изоляторов ПФИ");
-                    if (equipment.get_id()==2)
+                    if (equipment.get_id() == 2)
                         viewHolder.location.setText("Котельная №3");
 
                     viewHolder.equipmentStatus.setText(context.getString(R.string.status, equipment.getEquipmentStatus().getTitle()));
                     viewHolder.inventoryNumber.setText(equipment.getInventoryNumber());
                     viewHolder.criticalLevel.setText(equipment.getCriticalType().getTitle());
-                }
-                else {
+                } else {
                     // временные фото иконки
                     /*if (equipment.get_id() == 1)
                         viewHolder.icon.setImageResource(R.drawable.equipment_model_teplogenerator);
@@ -142,7 +141,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
                     String path = context.getExternalFilesDir("/equipment") + File.separator;
                     //String path = getPicturesDirectory(context) + "equipments" + File.separator;
-                    Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(),equipment), 300, 0, equipment.getChangedAt().getTime());
+                    Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(), equipment), 300, 0, equipment.getChangedAt().getTime());
                     if (image_bitmap != null) {
                         viewHolder.icon.setImageBitmap(image_bitmap);
                     } else {
@@ -155,7 +154,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     }
                     viewHolder.equipmentStatus.setText(context.getString(R.string.status, equipment.getEquipmentStatus().getTitle()));
                     CriticalType criticalType = equipment.getCriticalType();
-                    if (criticalType!=null) {
+                    if (criticalType != null) {
                         viewHolder.criticalTypeUuid.setText(criticalType.getTitle());
                         if (criticalType.getUuid().equals(CriticalType.Status.TYPE_1))
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));

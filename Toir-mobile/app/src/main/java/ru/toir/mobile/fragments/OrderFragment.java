@@ -728,7 +728,7 @@ public class OrderFragment extends Fragment {
                         // урл изображения задачи
                         files.add(new FilePath(task.getTaskTemplate().getImage(), basePath, basePathLocal));
                         // урл изображения оборудования
-//                        files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
+                        files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
                         // урл изображения модели оборудования
                         files.add(new FilePath(task.getEquipment().getEquipmentModel().getImage(), basePath, "/equipment/"));
 
