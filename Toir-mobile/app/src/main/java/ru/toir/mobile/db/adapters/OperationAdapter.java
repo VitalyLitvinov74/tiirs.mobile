@@ -107,7 +107,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
                 viewHolder.description = (TextView) convertView.findViewById(R.id.op_description);
                 viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
-                viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_value);
+                viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_label);
+                viewHolder.measure_value = (TextView) convertView.findViewById(R.id.op_measure_value);
                 viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
                 viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
             } else {
@@ -179,9 +180,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     //toast.show();
                     Realm realmDB = Realm.getDefaultInstance();
                     MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid", operation.getUuid()).findFirst();
-                    if (lastValue != null)
-                        viewHolder.measure.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
-
+                    if (lastValue != null) {
+                        viewHolder.measure_value.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
+                    }
+                    else {
+                        viewHolder.measure.setVisibility(View.GONE);
+                        viewHolder.measure_value.setVisibility(View.GONE);
+                    }
                     //String path = getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator;
                     String path = context.getExternalFilesDir("/tasks") + File.separator + taskTemplateUuid + File.separator;
                     Bitmap image_bitmap = getResizedBitmap(path, operation.getOperationTemplate().getImage(), 500, 0, operation.getChangedAt().getTime());
@@ -234,6 +239,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         TextView description;
         TextView normative;
         TextView measure;
+        TextView measure_value;
         ImageView image;
         RelativeLayout description_layout;
     }
