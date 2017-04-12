@@ -70,6 +70,7 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
             viewHolder = new ViewHolder();
             viewHolder.icon = (ImageView) convertView.findViewById(R.id.ts_ImageStatus);
             viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
+            viewHolder.equipment = (TextView) convertView.findViewById(R.id.ts_Equipment);
             viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
             viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);
             viewHolder.end_date = (TextView) convertView.findViewById(R.id.ts_EndDate);
@@ -91,6 +92,11 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
                     viewHolder.start_date.setText(R.string.not_started);
                 }
             }
+
+            if (taskStage.getEquipment() != null) {
+                viewHolder.equipment.setText(taskStage.getEquipment().getTitle());
+            }
+
             if (taskStage.getEndDate()!=null) {
                 Date lDate = taskStage.getEndDate();
                 if (lDate != null && lDate.after(new Date(100000))) {

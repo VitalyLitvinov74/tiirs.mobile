@@ -50,6 +50,7 @@ import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.TaskStages;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.rest.ToirAPIFactory;
@@ -79,7 +80,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private TextView tv_equipment_name;
     private TextView tv_equipment_inventory;
     private TextView tv_equipment_uuid;
-    //private TextView tv_equipment_type;
+    private TextView tv_equipment_id;
     private TextView tv_equipment_position;
     //private TextView tv_equipment_tasks;
     //private TextView tv_equipment_critical;
@@ -197,7 +198,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_listview = (ListView) findViewById(R.id.list_view);
         tv_equipment_docslistview = (ListView) findViewById(R.id.equipment_documentation_listView);
         tv_equipment_status = (TextView) findViewById(R.id.equipment_text_status);
-        //tv_equipment_type = (TextView) findViewById(R.id.equipment_text_type);
+        tv_equipment_id = (TextView) findViewById(R.id.equipment_text_id);
         //lv = (ListView) findViewById(R.id.equipment_info_operation_list);
         //tv_equipment_critical = (TextView) findViewById(R.id.equipment_critical);
 
@@ -364,15 +365,30 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     private void initView() {
         Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
-
+        if (equipment == null) {
+            Toast.makeText(getApplicationContext(),"Неизвестное оборудование!!",Toast.LENGTH_LONG).show();
+            return;
+        }
+        EquipmentModel equipmentModel = equipment.getEquipmentModel();
         tv_equipment_name.setText(equipment.getTitle());
-        tv_equipment_inventory.setText("ИД: " + equipment.getInventoryNumber());
+        if (equipmentModel != null) {
+            tv_equipment_inventory.setText(getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle());
+        }
+        tv_equipment_id.setText(getString(R.string.id,equipment.getInventoryNumber()));
         tv_equipment_uuid.setText(equipment.getUuid());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
-        tv_equipment_position.setText(""
-                + String.valueOf(equipment.getLatitude()) + " / "
-                + String.valueOf(equipment.getLongitude()));
-
+        if (equipment.getLatitude()>0) {
+            tv_equipment_position.setText(""
+                    + String.valueOf(equipment.getLatitude()) + " / "
+                    + String.valueOf(equipment.getLongitude()));
+        }
+        else {
+            if (equipment.getLocation() != null) {
+                tv_equipment_position.setText(""
+                        + String.valueOf(equipment.getLocation().getLatitude()) + " / "
+                        + String.valueOf(equipment.getLocation().getLongitude()));
+            }
+        }
         Date date = equipment.getStartDate();
         String startDate;
         if (date != null) {
@@ -600,7 +616,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             return;
         }
 
-        int totalHeight = 0;
+        int totalHeight = 5;
         for (int i = 0; i < listAdapter.getCount(); i++) {
             View listItem = listAdapter.getView(i, null, listView);
             listItem.measure(0, 0);

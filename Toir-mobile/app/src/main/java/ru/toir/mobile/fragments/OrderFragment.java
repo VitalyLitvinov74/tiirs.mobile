@@ -705,7 +705,7 @@ public class OrderFragment extends Fragment {
             protected List<Orders> doInBackground(List<String>... params) {
                 // обновляем справочники
                 ReferenceFragment.updateReferences(null);
-                //int current_files_cnt=0;
+                int current_files_cnt=0;
 
                 // запрашиваем наряды
                 Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
@@ -804,7 +804,6 @@ public class OrderFragment extends Fragment {
                         if (trueImgBody == null) {
                             continue;
                         }
-                        //processDialog.setProgress(50+((current_files_cnt*50)/files.size()));
                         File file = new File(getContext().getExternalFilesDir(path.localPath), path.fileName);
                         if (!file.getParentFile().exists()) {
                             if (!file.getParentFile().mkdirs()) {

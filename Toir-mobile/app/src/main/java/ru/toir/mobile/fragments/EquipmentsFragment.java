@@ -124,10 +124,10 @@ public class EquipmentsFragment extends Fragment {
 
 	}
 */
-	private void FillListViewEquipments(String equipmentModelUuid) {
+	private void FillListViewEquipments(String equipmentTypeUuid) {
         RealmResults<Equipment> equipments;
-        if (equipmentModelUuid != null) {
-            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.uuid", equipmentModelUuid).findAll();
+        if (equipmentTypeUuid != null) {
+            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
         }
         else {
             equipments = realmDB.where(Equipment.class).findAll();
@@ -180,7 +180,7 @@ public class EquipmentsFragment extends Fragment {
             EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
             if (typeSelected != null) {
                 type = typeSelected.getUuid();
-                if (typeSelected.get_id() == 1) type = null;
+                //if (typeSelected.get_id() == 1) type = null;
             }
 
             FillListViewEquipments(type);

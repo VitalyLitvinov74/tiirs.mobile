@@ -15,6 +15,8 @@
     <string name="pref_debug_mode">Отладочный режим</string>
     <string name="pref_autonome_mode">Работать автономно</string>
     <string name="load_test_data">Загрузить тестовые данные</string>
+    <string name="delete_test_data">Удалить справочники</string>
+
     <string name="pref_update_url">Сервер обновления</string>
     <string name="pref_update_url_dialog_title">Введите URL сервера обновления</string>
     <string name="pref_server_url">Сервер системы</string>
@@ -43,7 +45,7 @@
     <string name="make_photo">Снять</string>
     <string name="image_description">изображение</string>
     <string name="description">описание</string>
-    <string name="id">ID</string>
+    <string name="id">Идентификатор: %1$s</string>
     <string name="whois">Должность</string>
     <string name="current_location">Текущие координаты</string>
     <string name="no_gps_data">Нет данных GPS</string>
@@ -145,4 +147,6 @@
     <string name="pref_autonome_mode_key">auto_mode</string>
     <string name="not_started">не начинался</string>
     <string name="not_finished">не закончен</string>
+
+    <string name="model">Модель: %1$s</string>
 </resources>
