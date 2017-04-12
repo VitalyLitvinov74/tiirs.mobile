@@ -183,7 +183,7 @@ public class DocumentationFragment extends Fragment {
 
 			SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
 			if (fieldSelected != null) {
-				orderBy = fieldSelected.getField();
+				//orderBy = fieldSelected.getField();
 			}
 			FillListViewDocumentation(type, orderBy);
 		}

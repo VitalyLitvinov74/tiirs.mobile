@@ -2,6 +2,7 @@ package ru.toir.mobile.fragments;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.Criteria;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -95,21 +96,23 @@ public class UserInfoFragment extends Fragment {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
             //if (user.getTagId().length() > 20) tv_user_id.setText("ID: " + user.getTagId().substring(4, 24));
-            tv_user_id.setText("ID: " + user.getTagId());
-
+            tv_user_id.setText(getString(R.string.id, user.getTagId()));
 			tv_user_name.setText(user.getName());
 			tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
 			tv_user_boss.setText(user.getContact());
 			tv_user_type.setText(user.getWhoIs());
 
             LocationManager manager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (statusOfGPS) {
-                user_status_gps.setChecked(true);
-            } else {
-                user_status_gps.setChecked(false);
+            if (manager != null) {
+                boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                if (statusOfGPS) {
+                    user_status_gps.setChecked(true);
+                    tv_user_gps.setText(String.valueOf(manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)).getLongitude()) + ", " + String.valueOf(manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)).getLatitude()));
+                } else {
+                    user_status_gps.setChecked(false);
+                    tv_user_gps.setText("не определено");
+                }
             }
-
             ConnectivityManager cm = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
             if (activeNetwork != null) { // connected to the internet

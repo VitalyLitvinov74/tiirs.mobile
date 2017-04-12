@@ -105,23 +105,28 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 //import ru.toir.mobile.rest.TaskServiceProvider;
 
 public class OrderFragment extends Fragment {
-    private static final int ORDER_LEVEL = 0;
-    private static final int TASK_LEVEL = 1;
-    private static final int STAGE_LEVEL = 2;
-    private static final int OPERATION_LEVEL = 3;
     private Toolbar toolbar;
+
     private Tasks selectedTask;
     private Orders selectedOrder;
     private TaskStages selectedStage;
     private Operation selectedOperation;
+
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
     private StageAdapter taskStageAdapter;
     private OperationAdapter operationAdapter;
+
     private String currentOrderUuid = "";
     private String currentTaskUuid = "";
     private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
+
+    private static final int ORDER_LEVEL = 0;
+    private static final int TASK_LEVEL = 1;
+    private static final int STAGE_LEVEL = 2;
+    private static final int OPERATION_LEVEL = 3;
+
     private ListView mainListView;
     private Button submit;
     private Button measure;
@@ -1800,64 +1805,6 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    private void runRfidDialog(String expectedTagId, final int level) {
-        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
-        final String expectedTagUuid = expectedTagId;
-
-        currentEquipment = selectedTask.getEquipment();
-        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
-        Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message message) {
-                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    String tagId = ((String) message.obj).substring(4);
-                    Log.d(TAG, "Ид метки получили: " + tagId);
-                    if (expectedTagUuid.equals(tagId)) {
-                        boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
-                        if (run_ar_content) {
-                            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
-                            if (intent != null) {
-                                intent.putExtra("hardwareUUID", currentEquipment.getUuid());
-                                startActivity(intent);
-                            } else {
-                                Toast.makeText(getContext(),
-                                        "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        if (level == TASK_LEVEL) {
-                            fillListViewTaskStage(selectedTask, false);
-                            Level = STAGE_LEVEL;
-                        }
-                        if (level == STAGE_LEVEL) {
-                            fillListViewOperations(selectedStage);
-                            submit.setVisibility(View.VISIBLE);
-                            submit.setOnClickListener(new submitOnClickListener());
-                            measure.setVisibility(View.VISIBLE);
-                            Level = OPERATION_LEVEL;
-                            startOperations();
-                        }
-                    } else {
-                        Toast.makeText(getContext(),
-                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.d(TAG, "Ошибка чтения метки!");
-                    Toast.makeText(getContext(),
-                            "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
-                }
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return false;
-            }
-        });
-
-        rfidDialog = new RfidDialog();
-        rfidDialog.setHandler(handler);
-        rfidDialog.readTagId();
-        rfidDialog.show(getActivity().getFragmentManager(), TAG);
-    }
-
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
@@ -2100,5 +2047,64 @@ public class OrderFragment extends Fragment {
             urlPath = url;
             localPath = local;
         }
+    }
+
+    private void runRfidDialog (String expectedTagId, final int level)
+    {
+        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+        final String expectedTagUuid = expectedTagId;
+
+        currentEquipment = selectedTask.getEquipment();
+        Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message message) {
+                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                    String tagId = ((String) message.obj).substring(4);
+                    Log.d(TAG, "Ид метки получили: " + tagId);
+                    if (expectedTagUuid.equals(tagId)) {
+                        boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
+                        if (run_ar_content) {
+                            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
+                            if (intent != null) {
+                                intent.putExtra("hardwareUUID", currentEquipment.getUuid());
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getContext(),
+                                        "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        if (level==TASK_LEVEL) {
+                            fillListViewTaskStage(selectedTask, false);
+                            Level = STAGE_LEVEL;
+                        }
+                        if (level==STAGE_LEVEL) {
+                            fillListViewOperations(selectedStage);
+                            submit.setVisibility(View.VISIBLE);
+                            submit.setOnClickListener(new submitOnClickListener());
+                            measure.setVisibility(View.VISIBLE);
+                            Level = OPERATION_LEVEL;
+                            startOperations();
+                        }
+                    } else {
+                        Toast.makeText(getContext(),
+                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.d(TAG, "Ошибка чтения метки!");
+                    Toast.makeText(getContext(),
+                            "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                }
+
+                // закрываем диалог
+                rfidDialog.dismiss();
+                return false;
+            }
+        });
+
+        rfidDialog = new RfidDialog();
+        rfidDialog.setHandler(handler);
+        rfidDialog.readTagId();
+        rfidDialog.show(getActivity().getFragmentManager(), TAG);
     }
 }

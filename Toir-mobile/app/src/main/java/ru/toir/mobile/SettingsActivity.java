@@ -196,6 +196,15 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 return true;
             }
         });
+
+        Preference button2 = this.findPreference(getString(R.string.delete_test_data));
+        button2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                LoadTestData.DeleteSomeData();
+                return true;
+            }
+        });
     }
 
     @SuppressWarnings("deprecation")

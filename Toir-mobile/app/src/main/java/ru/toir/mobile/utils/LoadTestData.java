@@ -1420,4 +1420,14 @@ public class LoadTestData {
         });
     }
 
+    public static void DeleteSomeData() {
+        final Realm realmDB;
+        realmDB = Realm.getDefaultInstance();
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realmDB.where(Documentation.class).findAll().deleteAllFromRealm();
+            }
+        });
+    }
 }

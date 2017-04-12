@@ -70,12 +70,21 @@
                 android:textColor="#000000"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/equipment_text_id"
+                android:layout_width="fill_parent"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_text_uuid"
+                android:background="#FAFAFA"
+                android:paddingLeft="45dp"
+                android:textColor="#000000"
+                android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/equipment_location_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_below="@+id/equipment_text_uuid"
+                android:layout_below="@+id/equipment_text_id"
                 android:layout_marginLeft="15dp"
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/location" />
@@ -84,7 +93,7 @@
                 android:id="@+id/equipment_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:layout_below="@+id/equipment_text_uuid"
+                android:layout_below="@+id/equipment_text_id"
                 android:layout_toRightOf="@+id/equipment_location_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
