@@ -50,7 +50,7 @@
         android:textColor="#454545"
         android:layout_below="@+id/ts_Name"
         android:ellipsize="marquee"
-        android:text="@string/tire"
+        android:text="@string/divider"
         android:textSize="12sp" />
 
     <TextView
