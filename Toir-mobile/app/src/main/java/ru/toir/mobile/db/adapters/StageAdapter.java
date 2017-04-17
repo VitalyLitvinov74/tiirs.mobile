@@ -81,36 +81,38 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
 
         if (adapterData!=null) {
             TaskStages taskStage = adapterData.get(position);
+            StageStatus stageStatus = taskStage.getTaskStageStatus();
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
-            if (taskStage.getTaskStageStatus() != null)
+            if (stageStatus != null) {
                 viewHolder.status.setText(context.getString(R.string.status, taskStage.getTaskStageStatus().getTitle()));
-            if (taskStage.getStartDate()!=null) {
-                Date lDate = taskStage.getStartDate();
-                if (lDate != null && lDate.after(new Date(100000))) {
-                    viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
-                } else {
-                    viewHolder.start_date.setText(R.string.not_started);
+                if (!stageStatus.getUuid().equals(StageStatus.Status.NEW)) {
+                    if (taskStage.getStartDate() != null) {
+                        Date lDate = taskStage.getStartDate();
+                        if (lDate != null && lDate.after(new Date(100000))) {
+                            viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
+                        } else {
+                            viewHolder.start_date.setText(R.string.not_started);
+                        }
+                    }
+
+                    if (taskStage.getEndDate() != null) {
+                        Date lDate = taskStage.getEndDate();
+                        if (lDate != null && lDate.after(new Date(100000))) {
+                            viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
+                        } else {
+                            viewHolder.end_date.setText(R.string.not_finished);
+                        }
+                    } else {
+                        viewHolder.end_date.setText("не закончен");
+                    }
                 }
             }
-
             if (taskStage.getEquipment() != null) {
                 viewHolder.equipment.setText(taskStage.getEquipment().getTitle());
             }
 
-            if (taskStage.getEndDate()!=null) {
-                Date lDate = taskStage.getEndDate();
-                if (lDate != null && lDate.after(new Date(100000))) {
-                    viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
-                } else {
-                    viewHolder.end_date.setText(R.string.not_finished);
-                }
-            }
-            else {
-                viewHolder.end_date.setText("не закончен");
-            }
-
-            if (taskStage.getTaskStageStatus() != null && taskStage.getEquipment() != null && taskStage.getEquipment().getCriticalType()!=null) {
-                String taskStageStatusUuid = taskStage.getTaskStageStatus().getUuid();
+            if (stageStatus != null && taskStage.getEquipment() != null && taskStage.getEquipment().getCriticalType()!=null) {
+                String taskStageStatusUuid = stageStatus.getUuid();
                 String criticalTypeUuid = taskStage.getEquipment().getCriticalType().getUuid();
                 if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);

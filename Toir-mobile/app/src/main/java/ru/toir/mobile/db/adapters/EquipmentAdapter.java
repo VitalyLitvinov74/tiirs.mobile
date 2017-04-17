@@ -25,7 +25,6 @@ import ru.toir.mobile.db.realm.Equipment;
 
 import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
-import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
 /**
  * @author koputo
@@ -45,7 +44,10 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        }
+        return 0;
     }
 
     @Override
@@ -165,10 +167,10 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     }
                     Date date = equipment.getStartDate();
                     String sDate;
-                    if (date != null) {
+                    if (date != null && date.after(new Date(100000))) {
                         sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
                     } else {
-                        sDate = "none";
+                        sDate = "не обслуживалось";
                     }
                     viewHolder.startDate.setText(sDate);
                 }

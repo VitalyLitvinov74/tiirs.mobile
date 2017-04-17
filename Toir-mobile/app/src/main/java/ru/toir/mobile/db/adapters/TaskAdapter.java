@@ -75,11 +75,11 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
         if (adapterData != null) {
             Tasks task = adapterData.get(position);
             Date lDate = task.getStartDate();
-            if (lDate != null) {
+            if (lDate != null  && lDate.after(new Date(100000))) {
                 String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
                 viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
             } else {
-                viewHolder.date.setText("не выполнялся");
+                //viewHolder.date.setText("не выполнялся");
             }
 
             viewHolder.equipment.setText(task.getEquipment().getTitle());

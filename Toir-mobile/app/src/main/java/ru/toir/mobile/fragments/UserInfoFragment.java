@@ -1,11 +1,13 @@
 package ru.toir.mobile.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -67,6 +69,7 @@ public class UserInfoFragment extends Fragment {
         TextView tv_user_gps;
         ImageView user_image;
         ImageView edit_image;
+        ImageView call_image;
         Switch user_status_gps;
         Switch user_status_gprs;
         TextView tv_user_date;
@@ -78,6 +81,7 @@ public class UserInfoFragment extends Fragment {
 		tv_user_gps = (TextView) view.findViewById(R.id.user_text_location);
         user_image = (ImageView) view.findViewById(R.id.user_image);
         edit_image = (ImageView) view.findViewById(R.id.user_edit_image);
+        call_image = (ImageView) view.findViewById(R.id.user_boss_contact);
         tv_user_date = (TextView) view.findViewById(R.id.user_text_date);
         tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
         user_status_gps = (Switch) view.findViewById(R.id.user_status_gps_switch);
@@ -125,6 +129,17 @@ public class UserInfoFragment extends Fragment {
                 }
             } else {
                 user_status_gprs.setChecked(false);
+            }
+
+            if (user.getContact() != null) {
+                call_image.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                      Uri call = Uri.parse(user.getContact());
+                      Intent callIntent = new Intent(Intent.ACTION_DIAL, call);
+                      startActivity(callIntent);
+                  }
+              });
             }
 
             String path = getActivity().getExternalFilesDir("/users") + File.separator;
