@@ -1426,7 +1426,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realmDB.where(Documentation.class).findAll().deleteAllFromRealm();
+                realmDB.where(Equipment.class).findAll().deleteAllFromRealm();
             }
         });
     }

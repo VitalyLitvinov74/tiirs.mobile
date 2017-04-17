@@ -105,7 +105,7 @@ public class UserInfoFragment extends Fragment {
             LocationManager manager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             if (manager != null) {
                 boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                if (statusOfGPS) {
+                if (statusOfGPS && manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)) != null) {
                     user_status_gps.setChecked(true);
                     tv_user_gps.setText(String.valueOf(manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)).getLongitude()) + ", " + String.valueOf(manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)).getLatitude()));
                 } else {

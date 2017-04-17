@@ -50,7 +50,7 @@
     <string name="current_location">Текущие координаты</string>
     <string name="no_gps_data">Нет данных GPS</string>
     <string name="current_status">Текущий статус</string>
-    <string name="operation_list">Список операций</string>
+    <string name="operation_list">Список последних операций</string>
     <string name="gps_status">Состояние GPS</string>
     <string name="gprs_status">Связь GPRS</string>
     <string name="server_date_connect">Дата связи с сервером</string>

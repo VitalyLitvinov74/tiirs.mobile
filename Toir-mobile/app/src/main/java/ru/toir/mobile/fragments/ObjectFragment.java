@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
+import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.ObjectAdapter;
 import ru.toir.mobile.db.realm.Objects;
@@ -69,8 +71,8 @@ public class ObjectFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.gps_layout, container, false);
 
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
-        ObjectAdapter objectAdapter;
-        ListView objectsListView;
+        final ObjectAdapter objectAdapter;
+        final ListView objectsListView;
 
         toolbar.setSubtitle("Карта объектов");
         Realm realmDB = Realm.getDefaultInstance();
@@ -135,6 +137,22 @@ public class ObjectFragment extends Fragment {
             public boolean onLongClick(View view) {
                 //equipmentListView.getItemAtPosition();
                 return false;
+            }
+        });
+
+        objectsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Objects object = objectAdapter.getItem(position);
+                if (object != null) {
+                    String object_uuid = object.getUuid();
+                    Bundle bundle=new Bundle();
+                    bundle.putString("object_uuid", object_uuid);
+                    EquipmentsFragment equipmentsFragment=new EquipmentsFragment();
+                    equipmentsFragment.setArguments(bundle);
+                    //objectInfo.putExtra("object_uuid", object_uuid);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, equipmentsFragment).commit();
+                }
             }
         });
 

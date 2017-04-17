@@ -28,6 +28,8 @@ public class EquipmentsFragment extends Fragment {
 	private Spinner typeSpinner;
 	private ListView equipmentListView;
 
+    private String object_uuid;
+
     public static EquipmentsFragment newInstance() {
 		return new EquipmentsFragment();
 	}
@@ -126,15 +128,25 @@ public class EquipmentsFragment extends Fragment {
 */
 	private void FillListViewEquipments(String equipmentTypeUuid) {
         RealmResults<Equipment> equipments;
+        //String object_uuid = intent.getStringExtra("object_uuid");
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            object_uuid = bundle.getString("object_uuid");
+        }
         if (equipmentTypeUuid != null) {
             equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
-        }
-        else {
+            if (object_uuid != null) {
+                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
+            }
+        } else {
             equipments = realmDB.where(Equipment.class).findAll();
+            if (object_uuid != null) {
+                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).findAll();
+            }
         }
         EquipmentAdapter equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
         equipmentListView.setAdapter(equipmentAdapter);
-	}
+    }
 
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
