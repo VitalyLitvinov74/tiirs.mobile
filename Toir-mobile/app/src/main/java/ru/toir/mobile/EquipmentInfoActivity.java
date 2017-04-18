@@ -276,9 +276,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             write_rfid_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "Пишем в метку оборудования.");
-                    Log.d(TAG, "uuid оборудования = " + equipment_uuid);
-                    Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
+                    Intent intent = getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
+                    if (intent != null) {
+                        startActivity(intent);
+                    }
+
+                    //Log.d(TAG, "Пишем в метку оборудования.");
+                    //Log.d(TAG, "uuid оборудования = " + equipment_uuid);
+                    Equipment equipment = null;
+                    //equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
                     if (equipment != null) {
                         Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
                         TagStructure tag = new TagStructure();

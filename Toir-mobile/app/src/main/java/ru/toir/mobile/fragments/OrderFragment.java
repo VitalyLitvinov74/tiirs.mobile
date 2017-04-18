@@ -853,6 +853,7 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(orders);
                         realm.commitTransaction();
+                        addToJournal("Клиент успешно получил " + count + " нарядов");
                         Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
@@ -1253,6 +1254,7 @@ public class OrderFragment extends Fragment {
                 .findAll();
 
         sendMeasuredValues(realmDB.copyFromRealm(measuredValues));
+        addToJournal("Наряды отправлены на сервер");
 
 //        getActivity().registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
 //        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
@@ -1893,8 +1895,16 @@ public class OrderFragment extends Fragment {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);
                     if (selectedTask != null) {
-                        final String expectedTagId = selectedTask.getEquipment().getTagId();
-                        runRfidDialog(expectedTagId,TASK_LEVEL);
+                        currentEquipment = selectedTask.getEquipment();
+                        final String expectedTagId = currentEquipment.getTagId();
+                        boolean ask_tags = sp.getBoolean("dont_ask_text_tags_key", true);
+                        if (!ask_tags) {
+                            runRfidDialog(expectedTagId, TASK_LEVEL);
+                        }
+                        else {
+                            fillListViewTaskStage(selectedTask, false);
+                            Level = STAGE_LEVEL;
+                        }
                     }
                 }
 
@@ -1908,7 +1918,17 @@ public class OrderFragment extends Fragment {
                     if (selectedStage != null) {
                         currentTaskStageUuid = selectedStage.getUuid();
                         final String expectedTagId = selectedStage.getEquipment().getTagId();
-                        runRfidDialog(expectedTagId,STAGE_LEVEL);
+                        boolean ask_tags = sp.getBoolean("dont_ask_text_tags_key", true);
+                        if (!ask_tags) {
+                            runRfidDialog(expectedTagId,STAGE_LEVEL);
+                        } else {
+                            fillListViewOperations(selectedStage);
+                            submit.setVisibility(View.VISIBLE);
+                            submit.setOnClickListener(new submitOnClickListener());
+                            measure.setVisibility(View.VISIBLE);
+                            Level = OPERATION_LEVEL;
+                            startOperations();
+                        }
                     }
                 }
 
