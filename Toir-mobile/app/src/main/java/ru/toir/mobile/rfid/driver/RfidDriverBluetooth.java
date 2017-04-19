@@ -42,14 +42,13 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 
 	public static final String DRIVER_NAME = "Bluetooth драйвер";
-	private String mServerMac;
 	public static final String SERVER_MAC_PREF_KEY = "rfidDrvBluetoothServer";
-	private BluetoothAdapter mAdapter;
+    public static final int DRIVER_STATE_READ_ANSWER = 1;
+    public static final int DRIVER_STATE_DISCONNECT = 2;
+    private String mServerMac;
+    private BluetoothAdapter mAdapter;
 	private BluetoothDevice mDevice;
 	private CommunicationThread mCommunicationThread;
-
-	public static final int DRIVER_STATE_READ_ANSWER = 1;
-	public static final int DRIVER_STATE_DISCONNECT = 2;
 
 	@Override
 	public boolean init() {
@@ -196,7 +195,12 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
 			mCommunicationThread.write(new byte[] { (byte) 0xBB, 0x00,
 					RfidDialog.READER_COMMAND_READ_ID, 0x00, 0x00, 0x7E });
 		}
-	}
+    }
+
+    @Override
+    public void readMultiplyTagId(final String[] tagIds) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
 
 	@Override
 	public void readTagData(String password, int memoryBank, int address,

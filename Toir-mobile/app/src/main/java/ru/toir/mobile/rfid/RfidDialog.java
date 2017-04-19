@@ -32,6 +32,7 @@ public class RfidDialog extends DialogFragment {
 	public static final int READER_COMMAND_READ_DATA_ID = 3;
 	public static final int READER_COMMAND_WRITE_DATA = 4;
 	public static final int READER_COMMAND_WRITE_DATA_ID = 5;
+    public static final int READER_COMMAND_READ_MULTI_ID = 6;
 
 	public static final String TAG = "RfidDialog";
 	private Class<?> driverClass;
@@ -47,6 +48,7 @@ public class RfidDialog extends DialogFragment {
 	private int tagAddress;
 	private String tagWriteData;
 	private int tagReadCount;
+    private String[] tagIds;
 
 	/*
 	 * проверка для защиты от повтороного выполнения комманды драйвера при
@@ -148,7 +150,10 @@ public class RfidDialog extends DialogFragment {
 		case READER_COMMAND_READ_ID:
 			driver.readTagId();
 			break;
-		case READER_COMMAND_READ_DATA:
+            case READER_COMMAND_READ_MULTI_ID:
+                driver.readMultiplyTagId(tagIds);
+                break;
+            case READER_COMMAND_READ_DATA:
 			driver.readTagData(tagPassword, tagMemoryBank, tagAddress, tagReadCount);
 			break;
 		case READER_COMMAND_READ_DATA_ID:
@@ -167,9 +172,8 @@ public class RfidDialog extends DialogFragment {
 	}
 
 	/**
-	 * Необходимо потому что один из драйверов стартует отдельную activity для
-	 * своих нужд.
-	 */
+     * Необходимо потому что один из драйверов стартует отдельную activity для своих нужд.
+     */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -206,8 +210,44 @@ public class RfidDialog extends DialogFragment {
 		command = READER_COMMAND_READ_ID;
 	}
 
-	/**
-	 * <p>
+    /**
+     * <p>
+     * Поиск всех меток в поле считывателя.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     */
+    public void readMultiTagId() {
+
+        command = READER_COMMAND_READ_MULTI_ID;
+        tagIds = new String[]{};
+    }
+
+    /**
+     * <p>
+     * Поиск всех меток в поле считывателя.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     */
+    public void readMultiTagId(String id) {
+
+        command = READER_COMMAND_READ_MULTI_ID;
+        tagIds = new String[]{id};
+    }
+
+    /**
+     * <p>
+     * Поиск всех меток в поле считывателя.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     */
+    public void readMultiTagId(String[] ids) {
+
+        command = READER_COMMAND_READ_MULTI_ID;
+        tagIds = ids;
+    }
+
+    /**
+     * <p>
 	 * Чтение данных из памяти конкретной метки.
 	 * </p>
 	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.

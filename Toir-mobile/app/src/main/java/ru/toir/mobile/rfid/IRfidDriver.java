@@ -33,6 +33,11 @@ public interface IRfidDriver {
 	 */
 	void readTagId();
 
+    /**
+     * Считывание всех id меток в поле считывателя.
+     */
+    void readMultiplyTagId(String[] tagIds);
+
 	/**
 	 * Читаем данные с метки в два этапа, сначала находим метку(получаем Id),
 	 * потом читаем данные.

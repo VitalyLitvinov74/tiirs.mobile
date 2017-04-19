@@ -33,6 +33,11 @@ import android.widget.TextView;
 public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
 	public static final String DRIVER_NAME = "Драйвер QR кодов";
+
+    static {
+        System.loadLibrary("iconv");
+    }
+
 	private String TAG = "RFIDQRcode";
 	private Camera mCamera;
 	private CameraPreview mPreview;
@@ -42,11 +47,51 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	private FrameLayout preview;
 	private Image codeImage;
 	private String lastScannedCode;
-	private Context mContext;
+    PreviewCallback previewCb = new PreviewCallback() {
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            codeImage.setData(data);
+            int result = scanner.scanImage(codeImage);
+            if (result != 0) {
+                SymbolSet syms = scanner.getResults();
+                for (Symbol sym : syms) {
+                    lastScannedCode = sym.getData();
+                    if (lastScannedCode != null) {
+                        Log.d(TAG, "прочитано: " + lastScannedCode);
+                        scanText.setText("Результат сканирования: "
+                                + lastScannedCode);
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS,
+                                lastScannedCode).sendToTarget();
+                        releaseCamera();
+                    }
+                }
+            }
+            camera.addCallbackBuffer(data);
+        }
+    };
+    private Context mContext;
+    private Runnable doAutoFocus = new Runnable() {
+        public void run() {
+            if (mCamera != null) {
+                mCamera.autoFocus(autoFocusCB);
+            }
+        }
+    };
+    // Mimic continuous auto-focusing
+    final AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
+        public void onAutoFocus(boolean success, Camera camera) {
+            autoFocusHandler.postDelayed(doAutoFocus, 1000);
+        }
+    };
 
-	static {
-		System.loadLibrary("iconv");
-	}
+    public static Camera getCameraInstance() {
+        Camera c = null;
+        try {
+            c = Camera.open();
+        } catch (Exception e) {
+        }
+
+        return c;
+    }
 
 	@Override
 	public boolean init() {
@@ -60,7 +105,12 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public void close() {
+    public void readMultiplyTagId(final String[] tagIds) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
+
+    @Override
+    public void close() {
 
 	}
 
@@ -92,53 +142,6 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 			mPreview.refreshDrawableState();
 		}
 	}
-
-	public static Camera getCameraInstance() {
-		Camera c = null;
-		try {
-			c = Camera.open();
-		} catch (Exception e) {
-		}
-
-		return c;
-	}
-
-	PreviewCallback previewCb = new PreviewCallback() {
-		public void onPreviewFrame(byte[] data, Camera camera) {
-			codeImage.setData(data);
-			int result = scanner.scanImage(codeImage);
-			if (result != 0) {
-				SymbolSet syms = scanner.getResults();
-				for (Symbol sym : syms) {
-					lastScannedCode = sym.getData();
-					if (lastScannedCode != null) {
-						Log.d(TAG, "прочитано: " + lastScannedCode);
-						scanText.setText("Результат сканирования: "
-								+ lastScannedCode);
-						sHandler.obtainMessage(RESULT_RFID_SUCCESS,
-								lastScannedCode).sendToTarget();
-						releaseCamera();
-					}
-				}
-			}
-			camera.addCallbackBuffer(data);
-		}
-	};
-
-	private Runnable doAutoFocus = new Runnable() {
-		public void run() {
-			if (mCamera != null) {
-				mCamera.autoFocus(autoFocusCB);
-			}
-		}
-	};
-
-	// Mimic continuous auto-focusing
-	final AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
-		public void onAutoFocus(boolean success, Camera camera) {
-			autoFocusHandler.postDelayed(doAutoFocus, 1000);
-		}
-	};
 
 	@Override
 	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
