@@ -13,6 +13,7 @@ import android.util.Log;
 import android.hardware.p6300.jni.Linuxc;
 
 public class UHF {
+    private static final String TAG = "UHF";
     public int com_fd;
     public String com_name;
     public int com_baudrate;
@@ -44,7 +45,8 @@ public class UHF {
     }
 
     public void transfer_close(UHF mUHF) {
-        this.mReceiveThread.isFlag = false;
+        this.mReceiveThread.setFlag(false);
+        this.mReceiveThread.cancel(true);
         Linuxc.closeUart(mUHF.com_fd);
     }
 
@@ -54,7 +56,7 @@ public class UHF {
         if (BuildConfig.DEBUG) {
             int i = 0;
             while (i < cmd[2] + 6) {
-                Log.e("", (UHF.change(Integer.toHexString(cmd[i])) + " "));
+                Log.e(TAG, (UHF.change(Integer.toHexString(cmd[i])) + " "));
                 ++i;
             }
         }
