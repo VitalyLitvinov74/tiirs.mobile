@@ -34,6 +34,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
+import io.realm.Sort;
 import okhttp3.ResponseBody;
 
 import java.io.File;
@@ -413,7 +414,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tv_equipment_status.setText("неизвестен");
         }
 
-        RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAll();
+        RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
         stageAdapter = new StageAdapter(getApplicationContext(), stages);
         tv_equipment_listview.setAdapter(stageAdapter);
 

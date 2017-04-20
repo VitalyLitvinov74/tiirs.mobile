@@ -768,10 +768,11 @@ public class OrderFragment extends Fragment {
                     for (Tasks task : tasks) {
                         String equipmentUuid = task.getEquipment().getUuid();
                         String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
+                        // TODO добавить загрузку документации для этапов задач
                         List<Documentation> docList = realm.where(Documentation.class)
-                                .equalTo("equipment.uuid", equipmentUuid).or()
-                                .equalTo("equipmentModel.uuid", equipmentModelUuid)
-                                .equalTo("required", true)
+                                //.equalTo("equipment.uuid", equipmentUuid).or()
+                                //.equalTo("equipmentModel.uuid", equipmentModelUuid)
+                                //.equalTo("required", true)
                                 .findAll();
                         for (Documentation doc : docList) {
                             String docFileName = doc.getPath();
