@@ -25,49 +25,10 @@ import android.widget.EditText;
 public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	public static final String DRIVER_NAME = "Драйвер лазерного считывателя штрихкодов";
 	private final static String TAG = "RfidDriverBarcode2D";
-	private Handler c5Handler;
-
 	// view в котором будет текстовое поле,
 	// в которое будет помещен распознанный код
 	private static View driverView;
-
-	private static class MainHandler extends Handler {
-
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case Scanner.BARCODE_READ: {
-				String tagId;
-				if (!msg.obj.equals("")) {
-					tagId = (String) msg.obj;
-				} else {
-					if (driverView != null) {
-						EditText ed = (EditText) driverView
-								.findViewById(R.id.catch2bbarcode);
-						if (ed != null) {
-							tagId = ed.getText().toString();
-						} else {
-							tagId = "";
-						}
-					} else {
-						tagId = "";
-					}
-				}
-
-				Log.d(TAG, tagId);
-				sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId)
-						.sendToTarget();
-				break;
-			}
-			case Scanner.BARCODE_NOREAD: {
-				sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-				break;
-			}
-			default:
-				break;
-			}
-		}
-	}
+    private Handler c5Handler;
 
 	@Override
 	public boolean init() {
@@ -84,7 +45,12 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	}
 
 	@Override
-	public void close() {
+    public void readMultiplyTagId(final String[] tagIds) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
+
+    @Override
+    public void close() {
 	}
 
 	@Override
@@ -151,5 +117,43 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 	public void writeTagData(String password, String tagId, int memoryBank,
 			int address, String data) {
 		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-	}
+    }
+
+    private static class MainHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Scanner.BARCODE_READ: {
+                    String tagId;
+                    if (!msg.obj.equals("")) {
+                        tagId = (String) msg.obj;
+                    } else {
+                        if (driverView != null) {
+                            EditText ed = (EditText) driverView
+                                    .findViewById(R.id.catch2bbarcode);
+                            if (ed != null) {
+                                tagId = ed.getText().toString();
+                            } else {
+                                tagId = "";
+                            }
+                        } else {
+                            tagId = "";
+                        }
+                    }
+
+                    Log.d(TAG, tagId);
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId)
+                            .sendToTarget();
+                    break;
+                }
+                case Scanner.BARCODE_NOREAD: {
+                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
 }

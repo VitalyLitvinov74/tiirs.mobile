@@ -39,9 +39,9 @@ import java.util.Arrays;
 public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
     @SuppressWarnings("unused")
 	public static final String DRIVER_NAME = "Текстовый драйвер";
-	private String TAG = "RfidDriverText";
 	private static final String TEXTDRV_MODE_PREF_KEY = "textDrvMode";
     private static boolean mMode; // false - простой режим, true - расшириный режим
+    private String TAG = "RfidDriverText";
 
 	@Override
 	public boolean init() {
@@ -53,7 +53,12 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
 	@Override
 	public void readTagId() {
-		// В данном драйвере реального считывания не происходит.
+        // В данном драйвере реального считывания не происходит.
+    }
+
+    @Override
+    public void readMultiplyTagId(final String[] tagIds) {
+        // В данном драйвере реального считывания не происходит.
 	}
 
 	@Override

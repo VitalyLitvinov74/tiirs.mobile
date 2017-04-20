@@ -27,7 +27,12 @@ public class RfidDriverNull extends RfidDriverBase {
 	}
 
 	@Override
-	public void close() {
+    public void readMultiplyTagId(final String[] tagIds) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
+
+    @Override
+    public void close() {
 	}
 
 	@Override

@@ -80,8 +80,13 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
         thread.start();
 	}
 
-	@Override
-	public void close() {
+    @Override
+    public void readMultiplyTagId(final String[] tagIds) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
+
+    @Override
+    public void close() {
 		reader.m_handler = null;
 		sHandler = null;
 		//reader.Close();

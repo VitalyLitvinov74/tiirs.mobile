@@ -496,10 +496,9 @@ public class MainActivity extends AppCompatActivity {
         fillProfileList();
 
         PrimaryDrawerItem taskPrimaryDrawerItem;
-        if (new_orders>0) {
+        if (new_orders > 0) {
             taskPrimaryDrawerItem = new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)).withBadge("" + new_orders).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.red));
-        }
-        else {
+        } else {
             taskPrimaryDrawerItem = new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
         }
 
@@ -648,7 +647,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Обработчик клика кнопки "Войти"
-     *-
+     *
      * @param view Event's view
      */
     public void onClickLogin(View view) {
@@ -805,7 +804,7 @@ public class MainActivity extends AppCompatActivity {
     public void addProfile(User item) {
         IProfile new_profile;
         String path = getExternalFilesDir("/users") + File.separator;
-        if (item.getChangedAt()!=null) {
+        if (item.getChangedAt() != null) {
             Bitmap myBitmap = getResizedBitmap(path, item.getImage(), 0, 600, item.getChangedAt().getTime());
             if (myBitmap != null) {
                 // first two elements reserved
