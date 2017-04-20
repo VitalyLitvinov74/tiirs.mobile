@@ -1200,7 +1200,10 @@ public class OrderFragment extends Fragment {
         AuthorizedUser user = AuthorizedUser.getInstance();
         RealmResults<Orders> ordersList = realmDB.where(Orders.class)
                 .equalTo("user.uuid", user.getUuid())
-                .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE)
+                .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE).or()
+                .equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE).or()
+                .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or()
+                .equalTo("orderStatus.uuid", OrderStatus.Status.CANCELED).or()
                 .equalTo("sent", false)
                 .findAll();
         if (ordersList.size() == 0) {

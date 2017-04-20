@@ -20,7 +20,9 @@ import java.util.Arrays;
 import android.hardware.p6300.jni.Linuxc;
 
 public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
-    boolean isFlag = false;
+    private static final String TAG = "ReceiveThread";
+
+    private boolean isFlag = false;
     private UHF mUHF;
     private MultiLableCallBack mc;
 
@@ -41,9 +43,14 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
         int datalen = 0;
         int mark_head;
 
-        Log.v("onProgressUpdate", "ReceiveThread ++++++ ");
+        Log.v(TAG, "onProgressUpdate - ReceiveThread doInBackground");
 
-        block16 : while (isFlag) {
+        while (isFlag) {
+            if (isCancelled()) {
+                Log.d(TAG, "Canceled thread!!!");
+                return 1;
+            }
+
             str_receive = Linuxc.receiveMsgUartHex(mUHF.com_fd);
             if (str_receive == null || (len = str_receive.length()) == 0) {
                 continue;
@@ -59,12 +66,13 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                     sb.append(tmpStr.length() == 1 ? "0" + tmpStr : tmpStr);
                 }
 
-                Log.d("UHF", "Считано: " + sb.toString());
+                Log.d(TAG, "Считано: " + sb.toString());
             }
 
             System.arraycopy(recvBuff, 0, data, datalen, len);
             datalen += len;
-            block17 : while (datalen >= 6) {
+
+            while (datalen >= 6) {
                 mark_head = -1;
                 for (int i = 0; i < datalen; i++) {
                     if (data[i] == 0xBB) {
@@ -75,31 +83,31 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                 if (mark_head < 0) {
                     datalen = 0;
-                    continue block16;
+                    break;
                 }
 
                 if (mark_head + 2 > datalen || mark_head + 6 + data[mark_head + 2] > datalen) {
-                    continue block16;
+                    break;
                 }
 
                 if (data[mark_head + 3 + data[mark_head + 2] + 1] != '\r' || data[mark_head + 3 + data[mark_head + 2] + 2] != '\n') {
                     datalen = datalen - mark_head - data[mark_head + 2] - 5;
                     System.arraycopy(data, mark_head + data[mark_head + 2] + 5, data, 0, datalen);
-                    continue block16;
+                    break;
                 }
 
                 char checksum = data[mark_head + 3 + data[mark_head + 2]];
-                Log.e("2", ("checksum ==" + Integer.toHexString(checksum)));
+                Log.e(TAG, ("checksum ==" + Integer.toHexString(checksum)));
                 CheckSum(mark_head + 1, data, data[mark_head + 2] + 2);
                 if (checksum != data[mark_head + 3 + data[mark_head + 2]]) {
-                    Log.e("2", "check error");
-                    Log.e("2", ("checksum ==" + Integer.toHexString(data[mark_head + 3 + data[mark_head + 2]])));
+                    Log.e(TAG, "check error");
+                    Log.e(TAG, ("checksum ==" + Integer.toHexString(data[mark_head + 3 + data[mark_head + 2]])));
                     datalen = datalen - mark_head - data[mark_head + 2] - 5;
                     System.arraycopy(data, mark_head + data[mark_head + 2] + 5, data, 0, datalen);
-                    continue block16;
+                    break;
                 }
 
-                Log.e("Data", "OK");
+                Log.e(TAG, "Data - OK");
                 if (mc != null && data[mark_head + 1] == '\u0097') {
                     char[] copydata = new char[data[mark_head + 2]];
                     System.arraycopy(data, mark_head + 3, copydata, 0, copydata.length);
@@ -126,13 +134,13 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.STOP_MULTI_QUERY_TAGS_EPC: {
                         CommandType.CommandOK = true;
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_HARDWARE_VERSION:
                     case CommandType.GET_FIRMWARE_VERSION: {
@@ -142,7 +150,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         ((Ware)mUHF.mObject).revision_version = data[mark_head + 5];
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_POWER: {
                         CommandType.CommandOK = true;
@@ -151,7 +159,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         ((Power)mUHF.mObject).write = data[mark_head + 5];
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_FREQUENCY_STATE: {
                         CommandType.CommandOK = true;
@@ -168,7 +176,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_FREQUENCY_REGION: {
                         if (data[mark_head + 3] == 0x01) {
@@ -181,7 +189,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_MODULE_TEMPERATURE: {
                         if (data[mark_head + 3] == 0x01) {
@@ -195,7 +203,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_GEN2_PARAM: {
                         CommandType.CommandOK = true;
@@ -205,7 +213,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         ((Gen2)mUHF.mObject).MaxQ = data[mark_head + 5] >> 4 & 15;
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_MULTI_QUERY_TAGS_INTERVAL: {
                         if (data[mark_head + 3] == 0x01) {
@@ -223,10 +231,10 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.GET_FASTID: {
-                        if (data[mark_head + 3] == '\u0001') {
+                        if (data[mark_head + 3] == 0x01) {
                             CommandType.CommandOK = true;
                             ((Fastid)mUHF.mObject).fastid_switch = data[mark_head + 4];
                         } else {
@@ -236,7 +244,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.READ_TAGS_DATA: {
                         if (data[mark_head + 3] == 0x01) {
@@ -256,7 +264,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.LOCK_TAGS: {
                         if (data[mark_head + 3] == 0x01) {
@@ -269,7 +277,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.KILL_TAGS: {
                         if (data[mark_head + 3] == 0x01) {
@@ -282,16 +290,16 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
                     }
                     case CommandType.SINGLE_QUERY_TAGS_EPC: {
                         if (data[mark_head + 1] == 0xFF) {
-                            Log.e("UHF", "Reseive COMMAND_ERROR_RESPOND");
+                            Log.e(TAG, "Reseive COMMAND_ERROR_RESPOND");
                             CommandType.CommandOK = false;
                             CommandType.CommandResend = true;
                             datalen = 0;
                             Arrays.fill(data, (char)0);
-                            continue block17;
+                            continue;
                         }
 
                         EPC mTemp = new EPC();
@@ -316,12 +324,17 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
                         CommandType.CommandResend = false;
                         datalen = 0;
                         Arrays.fill(data, (char)0);
-                        continue block17;
+                        continue;
+                    }
+                    default : {
+                        datalen = 0;
+                        Arrays.fill(data, (char)0);
+                        continue;
                     }
                 }
-                if (mc == null) continue;
-                datalen = 0;
-                Arrays.fill(data, (char)0);
+//                if (mc == null) continue;
+//                datalen = 0;
+//                Arrays.fill(data, (char)0);
             }
         }
 
@@ -330,7 +343,7 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
     protected void onPostExecute(Integer result) {
         super.onPostExecute(result);
-        Log.v("onProgressUpdate", "ReceiveThread ------");
+        Log.v(TAG, "onProgressUpdate - ReceiveThread onPostExecute");
     }
 
     protected void onPreExecute() {
@@ -350,4 +363,13 @@ public class ReceiveThread extends AsyncTask<Integer, String, Integer> {
 
         data[start + len] = (char)(data[start + len] & 255);
     }
+
+    public boolean isFlag() {
+        return isFlag;
+    }
+
+    public void setFlag(boolean flag) {
+        isFlag = flag;
+    }
+
 }
