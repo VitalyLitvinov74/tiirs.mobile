@@ -44,7 +44,7 @@
                 android:title="@string/run_ar_content" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:key="@string/dont_ask_text_tags_key"
+                android:key="without_tags_mode"
                 android:title="@string/dont_ask_text_tags" />
             <Preference
                 android:key="@string/load_test_data"

@@ -148,6 +148,6 @@
     <string name="not_started">не начинался</string>
     <string name="not_finished">не закончен</string>
     <string name="dont_ask_text_tags">Не спрашивать текстовые теги</string>
-    <string name="dont_ask_text_tags_key">without_tags_mode</string>
+    <string name="ask_text_tags_key">without_tags_mode</string>
     <string name="model">Модель: %1$s</string>
 </resources>

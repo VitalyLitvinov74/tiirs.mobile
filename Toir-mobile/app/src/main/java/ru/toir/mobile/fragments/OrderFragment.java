@@ -498,7 +498,7 @@ public class OrderFragment extends Fragment {
         }
         // этапов нет
         if (first) all_complete = false;
-        stages = q.findAll();
+        stages = q.findAllSorted("flowOrder");
         taskStageAdapter = new StageAdapter(getContext(), stages);
         mainListView.setAdapter(taskStageAdapter);
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
@@ -1897,7 +1897,7 @@ public class OrderFragment extends Fragment {
                     if (selectedTask != null) {
                         currentEquipment = selectedTask.getEquipment();
                         final String expectedTagId = currentEquipment.getTagId();
-                        boolean ask_tags = sp.getBoolean("dont_ask_text_tags_key", true);
+                        boolean ask_tags = sp.getBoolean("without_tags_mode", true);
                         if (!ask_tags) {
                             runRfidDialog(expectedTagId, TASK_LEVEL);
                         }
@@ -1918,7 +1918,7 @@ public class OrderFragment extends Fragment {
                     if (selectedStage != null) {
                         currentTaskStageUuid = selectedStage.getUuid();
                         final String expectedTagId = selectedStage.getEquipment().getTagId();
-                        boolean ask_tags = sp.getBoolean("dont_ask_text_tags_key", true);
+                        boolean ask_tags = sp.getBoolean("without_tags_mode", true);
                         if (!ask_tags) {
                             runRfidDialog(expectedTagId,STAGE_LEVEL);
                         } else {
