@@ -124,7 +124,7 @@ public class OrderFragment extends Fragment {
     private String currentTaskStageUuid = "";
     private ListView mainListView;
     private Button submit;
-    private Button measure;
+    //private Button measure;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
     private String TAG = "OrderFragment";
@@ -295,8 +295,8 @@ public class OrderFragment extends Fragment {
         //submit.setOnClickListener(this);
         submit.setVisibility(View.GONE);
 
-        measure = (Button) rootView.findViewById(R.id.tl_measureButton);
-        measure.setVisibility(View.GONE);
+        //measure = (Button) rootView.findViewById(R.id.tl_measureButton);
+        //measure.setVisibility(View.GONE);
         uncompleteOperationList = new ArrayList<>();
 
         realmDB = Realm.getDefaultInstance();
@@ -316,6 +316,7 @@ public class OrderFragment extends Fragment {
                 startActivityForResult(intent, 100);
             }
         });
+        /*
         measure.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent measure = new Intent(getActivity(), MeasureActivity.class);
@@ -326,7 +327,7 @@ public class OrderFragment extends Fragment {
                 startActivityForResult(measure, 101);
 
             }
-        });
+        });*/
 
         mainListView = (ListView) rootView
                 .findViewById(R.id.list_view);
@@ -343,7 +344,22 @@ public class OrderFragment extends Fragment {
                     if (Level == TASK_LEVEL) {
                         initView();
                     }
-
+                    if (Level == OPERATION_LEVEL) {
+                        taskTimer.cancel();
+                        firstLaunch = true;
+                        currentOperationId = 0;
+                        if (selectedTask != null) {
+                            currentTaskStageUuid = selectedStage.getUuid();
+                            currentTaskUuid = selectedTask.getUuid();
+                            fillListViewTaskStage(selectedTask, true);
+                            submit.setVisibility(View.GONE);
+                            Level = STAGE_LEVEL;
+                        }
+                    }
+                    if (Level == STAGE_LEVEL) {
+                        Level = TASK_LEVEL;
+                        fillListViewTasks(selectedOrder, false);
+                    }
                     return true;
                 }
 
@@ -468,7 +484,7 @@ public class OrderFragment extends Fragment {
         }
 
         submit.setVisibility(View.GONE);
-        measure.setVisibility(View.GONE);
+        //measure.setVisibility(View.GONE);
     }
 
     // TaskStages----------------------------------------------------------------------------------------
@@ -519,7 +535,7 @@ public class OrderFragment extends Fragment {
         }
 
         submit.setVisibility(View.GONE);
-        measure.setVisibility(View.GONE);
+        //measure.setVisibility(View.GONE);
         makePhotoButton.setVisibility(View.GONE);
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -1568,7 +1584,7 @@ public class OrderFragment extends Fragment {
                             currentTaskUuid = selectedTask.getUuid();
                             fillListViewTaskStage(selectedTask, true);
                             submit.setVisibility(View.GONE);
-                            measure.setVisibility(View.GONE);
+                            //measure.setVisibility(View.GONE);
                             Level = STAGE_LEVEL;
                         }
                     }
@@ -1838,7 +1854,7 @@ public class OrderFragment extends Fragment {
                             fillListViewOperations(selectedStage);
                             submit.setVisibility(View.VISIBLE);
                             submit.setOnClickListener(new submitOnClickListener());
-                            measure.setVisibility(View.VISIBLE);
+                            //measure.setVisibility(View.VISIBLE);
                             Level = OPERATION_LEVEL;
                             startOperations();
                         }
@@ -1919,7 +1935,7 @@ public class OrderFragment extends Fragment {
                     Level = STAGE_LEVEL;
                     fillListViewTaskStage(selectedTask, true);
                     submit.setVisibility(View.GONE);
-                    measure.setVisibility(View.GONE);
+                    //measure.setVisibility(View.GONE);
                 }
 
             } else {
@@ -1981,7 +1997,7 @@ public class OrderFragment extends Fragment {
                             fillListViewOperations(selectedStage);
                             submit.setVisibility(View.VISIBLE);
                             submit.setOnClickListener(new submitOnClickListener());
-                            measure.setVisibility(View.VISIBLE);
+                            //measure.setVisibility(View.VISIBLE);
                             Level = OPERATION_LEVEL;
                             startOperations();
                         }
