@@ -1205,6 +1205,8 @@ public class OrderFragment extends Fragment {
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
+                processDialog.dismiss();
+                Toast.makeText(getContext(), "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
             }
         };
         task.execute(values);
