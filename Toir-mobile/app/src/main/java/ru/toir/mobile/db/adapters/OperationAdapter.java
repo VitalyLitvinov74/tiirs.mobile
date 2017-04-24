@@ -173,8 +173,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     viewHolder.description.setText(operation.getOperationTemplate().getDescription());
                     viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
 
-                    image = getOutputMediaFile(operation.getUuid(), 1);
-                    Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+                    //image = getOutputMediaFile(operation.getUuid(), 1);
+                    //Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
                     //counter++;
                     //Toast toast = Toast.makeText(context,""+counter,Toast.LENGTH_SHORT);
                     //toast.show();
