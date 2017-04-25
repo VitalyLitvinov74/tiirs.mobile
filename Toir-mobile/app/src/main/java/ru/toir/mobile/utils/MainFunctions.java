@@ -47,7 +47,16 @@ public class MainFunctions {
         final Realm realmDB = Realm.getDefaultInstance();
         final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user != null) {
-            count = realmDB.where(Orders.class).equalTo("user.uuid", user.getUuid()).equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or().equalTo("orderStatus.uuid", OrderStatus.Status.NEW).or().equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE).findAll().size();
+            count = realmDB.where(Orders.class)
+                    .equalTo("user.uuid", user.getUuid())
+                    .findAll()
+                    .where()
+                    .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
+                    .or()
+                    .equalTo("orderStatus.uuid", OrderStatus.Status.NEW)
+                    .or()
+                    .equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE)
+                    .findAll().size();
         }
         return count;
     }

@@ -44,7 +44,7 @@
     <string name="ok">ОК</string>
     <string name="make_photo">Снять</string>
     <string name="image_description">изображение</string>
-    <string name="description">описание</string>
+    <string name="description"> </string>
     <string name="id">Идентификатор: %1$s</string>
     <string name="whois">Должность</string>
     <string name="current_location">Текущие координаты</string>
