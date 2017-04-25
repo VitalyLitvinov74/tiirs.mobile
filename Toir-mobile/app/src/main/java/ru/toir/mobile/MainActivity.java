@@ -24,6 +24,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -334,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                             });
                         }
 
-                        //                        @Override
+                        @Override
                         public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
                             // TODO нужен какой-то механизм уведомления о причине не успеха
 //                            String message = bundle.getString(IServiceProvider.MESSAGE);
@@ -373,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // закрываем диалог
                 rfidDialog.dismiss();
-
+                setEnabledLoginButton(true);
                 return true;
             }
         });
@@ -383,6 +384,17 @@ public class MainActivity extends AppCompatActivity {
         rfidDialog.readTagId();
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
 
+    }
+
+    /**
+     * Включает / отключает кнопку "Войти" на экране входа.
+     *
+     * @param enable Режим.
+     */
+    private void setEnabledLoginButton(boolean enable) {
+        Button loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton.setEnabled(enable);
+        loginButton.setClickable(enable);
     }
 
     /**
@@ -419,8 +431,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         int new_orders = MainFunctions.getActiveOrdersCount();
-        if (new_orders > 0)
+        if (new_orders > 0) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar == null) {
@@ -651,6 +664,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view Event's view
      */
     public void onClickLogin(View view) {
+        setEnabledLoginButton(false);
         startAuthorise();
     }
 
