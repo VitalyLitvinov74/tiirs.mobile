@@ -11,6 +11,7 @@ import java.util.Arrays;
 class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
     private static final String TAG = "ParseTask";
     boolean resend = false;
+    private IMultiInventoryCallback callback;
 
     @Override
     protected UHFCommandResult doInBackground(UHFCommand... commands) {
@@ -80,6 +81,8 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                     }
 
                     if (parsedCommand != commands[0].command) {
+                        // TODO: реализовать исключение для случая когда поток разбирает ответ на чтение всех меток в поле
+                        // TODO: а мы шлём остановку чтения !!!!
                         Log.e(TAG, "Разобран ответ на другую команду.");
 
                         Arrays.fill(buff, (byte)0);
@@ -90,7 +93,7 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
 
                     // разбираем и возвращаем полученные данные
                     switch (parsedCommand) {
-                        case UHFCommand.Command.READ_TAG_ID:
+                        case UHFCommand.Command.INVENTORY:
                             return new UHFCommandResult(reader.RESULT_SUCCESS,
                                     reader.BytesToString(buff, pktStart + 5 + 1, dataSize - 3));
 
@@ -132,11 +135,32 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 return new UHFCommandResult(reader.RESULT_WRITE_ERROR, null);
                             }
 
+                        case UHFCommand.Command.MULTI_INVENTORY:
+                            // TODO: разобраться какая команда будет в ответе и что именно будет в ответе !!!
+                            if (callback != null) {
+                                callback.processTag(buff.toString());
+                            }
+                            // TODO: здесь ни чего мы не должны возвращать!!!
+                            // TODO: нужно продолжать разбор пока не получим ответ на команду STOP_MULTI_INVENTORY
+                            return new UHFCommandResult(reader.RESULT_ERROR, null);
+
+                        case UHFCommand.Command.STOP_MULTI_INVENTORY:
+                            // TODO: нужно реализовать разбор ответа, если это необходимо !!!
+                            return new UHFCommandResult(reader.RESULT_ERROR, null);
+
                         default:
                             return new UHFCommandResult(reader.RESULT_ERROR, null);
                     }
                 }
             }
         }
+    }
+
+    public IMultiInventoryCallback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(IMultiInventoryCallback callback) {
+        this.callback = callback;
     }
 }

@@ -194,13 +194,88 @@ public class reader {
     static public UHFCommandResult readTagId(int timeOut) {
 
         ParseTask parseTask = new ParseTask();
-        UHFCommand command = new UHFCommand(UHFCommand.Command.READ_TAG_ID);
+        UHFCommand command = new UHFCommand(UHFCommand.Command.INVENTORY);
         UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
         // отправляем команду чтения Id метки
         Inventory();
+        for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
+            if (parseTask.resend) {
+                parseTask.resend = false;
+                Inventory();
+            }
+
+            try {
+                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+                Log.d(TAG, "Результат: " + result.data);
+                break;
+            } catch (Exception e) {
+                Log.e(TAG, e.toString());
+            }
+        }
+
+        parseTask.cancel(true);
+
+        return result;
+    }
+
+    /**
+     * Запуск процесса чтения Id всех доступных меток. Новый вариант, с правильным
+     * разбором данных поступающих из считывателя.
+     *
+     * @param timeOut время на выполнение операции
+     * @param times ??? либо время либо количество попыток ???
+     */
+    static public UHFCommandResult StartMultiInventory(int timeOut, int times, IMultiInventoryCallback callback) {
+
+        ParseTask parseTask = new ParseTask();
+        parseTask.setCallback(callback);
+        UHFCommand command = new UHFCommand(UHFCommand.Command.MULTI_INVENTORY, 10);
+        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
+
+        // запускаем поток разбора ответа от считывателя
+        parseTask.execute(command);
+        // отправляем команду чтения Id всех меток
+        MultiInventory(times);
+        for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
+            if (parseTask.resend) {
+                parseTask.resend = false;
+                Inventory();
+            }
+
+            try {
+                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+                Log.d(TAG, "Результат: " + result.data);
+                break;
+            } catch (Exception e) {
+                Log.e(TAG, e.toString());
+            }
+        }
+
+        parseTask.setCallback(null);
+        parseTask.cancel(true);
+
+        return result;
+    }
+
+    /**
+     * Остановка процесса чтения Id всех доступных меток. Новый вариант, с правильным
+     * разбором данных поступающих из считывателя.
+     *
+     * @param timeOut время на выполнение операции
+     */
+    static public UHFCommandResult StopMultiInventory(int timeOut) {
+
+        ParseTask parseTask = new ParseTask();
+        UHFCommand command = new UHFCommand(UHFCommand.Command.STOP_MULTI_INVENTORY);
+        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
+
+        // запускаем поток разбора ответа от считывателя
+        parseTask.execute(command);
+        // отправляем команду остановки чтения Id всех меток
+        StopMultiInventory();
         for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
             if (parseTask.resend) {
                 parseTask.resend = false;
@@ -541,18 +616,18 @@ public class reader {
     static public native int Inventory();
 
     /**
-     * single polling
+     * repeatedly polling
      *
      * @return return 0x10, error return 0X11
      */
-    // static public native int MultiInventory(int ntimes);
+     static public native int MultiInventory(int ntimes);
 
     /**
      * stop repeatedly polling
      *
      * @return return 0x10, error return 0X11
      */
-    // static public native int StopMultiInventory();
+     static public native int StopMultiInventory();
 
     /**
      * set the Select parameter, and set before a single polling or multiple
