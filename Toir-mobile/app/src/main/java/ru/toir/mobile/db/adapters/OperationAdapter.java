@@ -26,6 +26,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
+import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationVerdict;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
@@ -171,7 +172,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                         }
                     }
                     viewHolder.description.setText(operation.getOperationTemplate().getDescription());
-                    viewHolder.normative.setText("" + operation.getOperationTemplate().getNormative());
+                    OperationTemplate operationTemplate;
+                    operationTemplate = operation.getOperationTemplate();
+                    viewHolder.normative.setText("" + operationTemplate.getNormative());
 
                     //image = getOutputMediaFile(operation.getUuid(), 1);
                     //Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());

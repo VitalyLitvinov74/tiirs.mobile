@@ -60,6 +60,7 @@
     <string name="service">Сервис:</string>
     <string name="critical">Критичность:</string>
     <string name="last_date">Дата обслуживания</string>
+    <string name="regular_date">Следующая поверка</string>
     <string name="last_result">Результат обслуживания:</string>
     <string name="documentation">Документация</string>
     <string name="pleaseScanImg">Наведите камеру на код</string>

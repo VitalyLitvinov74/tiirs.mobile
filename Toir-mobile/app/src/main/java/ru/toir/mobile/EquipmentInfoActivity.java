@@ -30,6 +30,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
@@ -40,7 +41,9 @@ import okhttp3.ResponseBody;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -87,6 +90,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     //private TextView tv_equipment_critical;
     private ImageView tv_equipment_image;
     private TextView tv_equipment_task_date;
+    private TextView tv_equipment_check_date;
     private ListView tv_equipment_listview;
     private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
@@ -194,7 +198,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_uuid = (TextView) findViewById(R.id.equipment_text_uuid);
         tv_equipment_position = (TextView) findViewById(R.id.equipment_text_location);
         tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
-        //tv_equipment_tasks = (TextView) findViewById(R.id.equipment_text_status);
+        tv_equipment_check_date = (TextView) findViewById(R.id.equipment_text_date2);
         tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
         tv_equipment_listview = (ListView) findViewById(R.id.list_view);
         tv_equipment_docslistview = (ListView) findViewById(R.id.equipment_documentation_listView);
@@ -414,8 +418,18 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tv_equipment_status.setText("неизвестен");
         }
 
+        String sDate;
         RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
         stageAdapter = new StageAdapter(getApplicationContext(), stages);
+        if (stageAdapter.getCount()>0) {
+            date = stages.get(0).getEndDate();
+            if (date != null && date.after(new Date(100000))) {
+                sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
+            } else {
+                sDate = "не обслуживалось";
+            }
+            tv_equipment_check_date.setText(sDate);
+        }
         tv_equipment_listview.setAdapter(stageAdapter);
 
         String path = getExternalFilesDir("/equipment") + File.separator;

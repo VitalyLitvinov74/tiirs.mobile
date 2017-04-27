@@ -16,12 +16,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.TaskStages;
 
 import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
@@ -170,7 +174,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     if (date != null && date.after(new Date(100000))) {
                         sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
                     } else {
-                        sDate = "не обслуживалось";
+                        sDate = "неизвестна";
                     }
                     viewHolder.startDate.setText(sDate);
                 }
@@ -191,5 +195,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         TextView criticalTypeUuid;
         TextView criticalLevel;
         TextView startDate;
+        TextView checkDate;
     }
 }
