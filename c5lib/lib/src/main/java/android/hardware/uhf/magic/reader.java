@@ -240,11 +240,8 @@ public class reader {
         // отправляем команду чтения Id всех меток
         MultiInventory(times);
         for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
-            if (parseTask.resend) {
-                parseTask.resend = false;
-                Inventory();
-            }
-
+            // данную команду повторно отправлять не нужно, т.к. это фактически
+            // перевод считывателя в определённый режим, просто ожидаем результата
             try {
                 result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
                 Log.d(TAG, "Результат: " + result.data);
@@ -261,39 +258,12 @@ public class reader {
     }
 
     /**
-     * Остановка процесса чтения Id всех доступных меток. Новый вариант, с правильным
-     * разбором данных поступающих из считывателя.
+     * Обёртка для метода остановки поиска всех меток в поле считывателя.
      *
-     * @param timeOut время на выполнение операции
+     * @return boolean
      */
-    static public UHFCommandResult StopMultiInventory(int timeOut) {
-
-        ParseTask parseTask = new ParseTask();
-        UHFCommand command = new UHFCommand(UHFCommand.Command.STOP_MULTI_INVENTORY);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
-
-        // запускаем поток разбора ответа от считывателя
-        parseTask.execute(command);
-        // отправляем команду остановки чтения Id всех меток
-        StopMultiInventory();
-        for (int i = 0; i < timeOut / READ_TIME_INTERVAL; i++) {
-            if (parseTask.resend) {
-                parseTask.resend = false;
-                Inventory();
-            }
-
-            try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
-                Log.d(TAG, "Результат: " + result.data);
-                break;
-            } catch (Exception e) {
-                Log.e(TAG, e.toString());
-            }
-        }
-
-        parseTask.cancel(true);
-
-        return result;
+    static public boolean stopMultiInventory() {
+        return StopMultiInventory() == 0x10;
     }
 
     /**

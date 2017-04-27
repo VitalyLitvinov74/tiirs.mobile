@@ -80,9 +80,10 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                         }
                     }
 
-                    if (parsedCommand != commands[0].command) {
-                        // TODO: реализовать исключение для случая когда поток разбирает ответ на чтение всех меток в поле
-                        // TODO: а мы шлём остановку чтения !!!!
+                    if (commands[0].command == UHFCommand.Command.MULTI_INVENTORY && parsedCommand == UHFCommand.Command.INVENTORY) {
+                        // т.е. находимся в режиме чтения всех меток в поле считывателя
+                        Log.d(TAG, "MultiInventory - Hack!!!");
+                    } else if (parsedCommand != commands[0].command) {
                         Log.e(TAG, "Разобран ответ на другую команду.");
 
                         Arrays.fill(buff, (byte)0);
@@ -94,8 +95,20 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                     // разбираем и возвращаем полученные данные
                     switch (parsedCommand) {
                         case UHFCommand.Command.INVENTORY:
-                            return new UHFCommandResult(reader.RESULT_SUCCESS,
-                                    reader.BytesToString(buff, pktStart + 5 + 1, dataSize - 3));
+                            String result = reader.BytesToString(buff, pktStart + 5 + 1, dataSize - 3);
+                            if (commands[0].command == UHFCommand.Command.MULTI_INVENTORY) {
+                                // "ищем" все метки в поле считывателя
+                                if (callback != null) {
+                                    callback.processTag(result);
+                                }
+
+                                // TODO: здесь ни чего мы не должны возвращать!!!
+                                // TODO: нужно продолжать разбор пока не получим ответ на команду STOP_MULTI_INVENTORY
+                                continue;
+                            } else {
+                                // "искали" одну метку
+                                return new UHFCommandResult(reader.RESULT_SUCCESS, result);
+                            }
 
                         case UHFCommand.Command.READ_TAG_DATA:
                             Log.d(TAG, "Данные карты прочитаны успешно!");
@@ -135,19 +148,6 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                 return new UHFCommandResult(reader.RESULT_WRITE_ERROR, null);
                             }
 
-                        case UHFCommand.Command.MULTI_INVENTORY:
-                            // TODO: разобраться какая команда будет в ответе и что именно будет в ответе !!!
-                            if (callback != null) {
-                                callback.processTag(buff.toString());
-                            }
-                            // TODO: здесь ни чего мы не должны возвращать!!!
-                            // TODO: нужно продолжать разбор пока не получим ответ на команду STOP_MULTI_INVENTORY
-                            return new UHFCommandResult(reader.RESULT_ERROR, null);
-
-                        case UHFCommand.Command.STOP_MULTI_INVENTORY:
-                            // TODO: нужно реализовать разбор ответа, если это необходимо !!!
-                            return new UHFCommandResult(reader.RESULT_ERROR, null);
-
                         default:
                             return new UHFCommandResult(reader.RESULT_ERROR, null);
                     }
@@ -160,7 +160,7 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
         return callback;
     }
 
-    public void setCallback(IMultiInventoryCallback callback) {
+    void setCallback(IMultiInventoryCallback callback) {
         this.callback = callback;
     }
 }

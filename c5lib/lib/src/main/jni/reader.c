@@ -1498,7 +1498,7 @@ jint Java_android_hardware_uhf_magic_reader_StopMultiInventory(JNIEnv *env, jcla
 
     __android_log_print(ANDROID_LOG_INFO, TAG, "StopMultiInventory: %p, %p", env, jc);
 
-    result = 17 - ((uint32_t) (MagicStopMultiInventory() - 7) <= 0);
+    result = 0x11 - ((uint32_t) (MagicStopMultiInventory() - 7) <= 0);
     while (1) {
         count += readSerial(&Magicbuf[count], 8);
         ++watchDog;
@@ -1507,7 +1507,7 @@ jint Java_android_hardware_uhf_magic_reader_StopMultiInventory(JNIEnv *env, jcla
         }
 
         if (watchDog > 19) {
-            return 17;
+            return 0x11;
         }
     }
 
@@ -1515,6 +1515,6 @@ jint Java_android_hardware_uhf_magic_reader_StopMultiInventory(JNIEnv *env, jcla
         return result;
     }
 
-    return 17;
+    return 0x11;
 }
 
