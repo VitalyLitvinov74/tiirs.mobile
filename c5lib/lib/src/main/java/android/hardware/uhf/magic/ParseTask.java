@@ -2,11 +2,12 @@ package android.hardware.uhf.magic;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
 import java.util.Arrays;
 
 /**
  * @author Dmitriy Logachev
- * Created by koputo on 28.12.16.
+ *         Created by koputo on 28.12.16.
  */
 class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
     private static final String TAG = "ParseTask";
@@ -35,13 +36,12 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
             if (readed > 0) {
                 Log.d(TAG, "readed: " + reader.BytesToString(buff, buffIndex, readed));
                 buffIndex += readed;
-                if (buffIndex < 5) {
-                    continue;
-                }
+            }
 
+            if (buffIndex > 4) {
                 pktStart = -1;
                 for (int i = 0; i < buffIndex - 4; i++) {
-                    if (buff[i] == (byte)0xBB && (buff[i + 1] == (byte)0x01 || buff[i + 1] == (byte)0x02) && buff[i + 3] == (byte)0x00) {
+                    if (buff[i] == (byte) 0xBB && (buff[i + 1] == (byte) 0x01 || buff[i + 1] == (byte) 0x02) && buff[i + 3] == (byte) 0x00) {
                         pktStart = i;
                         break;
                     }
@@ -52,7 +52,7 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                 }
 
                 // получаем размер данных в ответе
-                dataSize = (((int)buff[pktStart + 3]) << 8) | (int)buff[pktStart + 4];
+                dataSize = (((int) buff[pktStart + 3]) << 8) | (int) buff[pktStart + 4];
                 pktEnd = pktStart + 5 + dataSize + 2;
                 Log.d(TAG, "pktStart = " + pktStart + ", pktEnd = " + pktEnd + ", buffIndex = " + buffIndex);
 
@@ -73,7 +73,7 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                             return new UHFCommandResult(reader.RESULT_SUCCESS, null);
                         } else {
                             // продолжим попытки отправки команды
-                            Arrays.fill(buff, (byte)0);
+                            Arrays.fill(buff, (byte) 0);
                             buffIndex = 0;
                             resend = true;
                             continue;
@@ -86,7 +86,7 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                     } else if (parsedCommand != commands[0].command) {
                         Log.e(TAG, "Разобран ответ на другую команду.");
 
-                        Arrays.fill(buff, (byte)0);
+                        Arrays.fill(buff, (byte) 0);
                         buffIndex = 0;
                         resend = true;
                         continue;
@@ -102,8 +102,14 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                                     callback.processTag(result);
                                 }
 
-                                // TODO: здесь ни чего мы не должны возвращать!!!
-                                // TODO: нужно продолжать разбор пока не получим ответ на команду STOP_MULTI_INVENTORY
+                                // "откатываем" buffIndex назад на размер разобранного пакета
+                                // копируем всё что находится за разобранным пакетом в начало буффера
+                                int tmpEnd = buffIndex - pktEnd;
+                                for (int i = 0, j = pktEnd; i < tmpEnd; i++, j++) {
+                                    buff[i] = buff[j];
+                                }
+
+                                buffIndex = tmpEnd;
                                 continue;
                             } else {
                                 // "искали" одну метку

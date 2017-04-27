@@ -232,8 +232,8 @@ public class reader {
 
         ParseTask parseTask = new ParseTask();
         parseTask.setCallback(callback);
-        UHFCommand command = new UHFCommand(UHFCommand.Command.MULTI_INVENTORY, 10);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
+        UHFCommand command = new UHFCommand(UHFCommand.Command.MULTI_INVENTORY);
+        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
