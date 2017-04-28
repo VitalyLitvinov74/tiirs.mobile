@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-//import ru.toir.mobile.rfid.RfidDriverBase;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -71,7 +71,6 @@ public class reader {
 
         ParseTask parseTask = new ParseTask();
         UHFCommand command = new UHFCommand(UHFCommand.Command.KILL_TAG);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
@@ -85,16 +84,13 @@ public class reader {
             }
 
             try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
-                break;
+                return parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
         }
 
-        parseTask.cancel(true);
-
-        return result;
+        return stopParseTask(parseTask, RESULT_TIMEOUT);
     }
 
     /**
@@ -112,7 +108,6 @@ public class reader {
 
         ParseTask parseTask = new ParseTask();
         UHFCommand command = new UHFCommand(UHFCommand.Command.LOCK_TAG);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
@@ -126,16 +121,13 @@ public class reader {
             }
 
             try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
-                break;
+                return parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
         }
 
-        parseTask.cancel(true);
-
-        return result;
+        return stopParseTask(parseTask, RESULT_TIMEOUT);
     }
 
     /**
@@ -160,7 +152,6 @@ public class reader {
 
         ParseTask parseTask = new ParseTask();
         UHFCommand command = new UHFCommand(UHFCommand.Command.WRITE_TAG_DATA);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
@@ -173,16 +164,13 @@ public class reader {
             }
 
             try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
-                break;
+                return parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
         }
 
-        parseTask.cancel(true);
-
-        return result;
+        return stopParseTask(parseTask, RESULT_TIMEOUT);
     }
 
     /**
@@ -195,7 +183,6 @@ public class reader {
 
         ParseTask parseTask = new ParseTask();
         UHFCommand command = new UHFCommand(UHFCommand.Command.INVENTORY);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
@@ -208,17 +195,15 @@ public class reader {
             }
 
             try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+                UHFCommandResult result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
                 Log.d(TAG, "Результат: " + result.data);
-                break;
+                return result;
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
         }
 
-        parseTask.cancel(true);
-
-        return result;
+        return stopParseTask(parseTask, RESULT_TIMEOUT);
     }
 
     /**
@@ -233,7 +218,6 @@ public class reader {
         ParseTask parseTask = new ParseTask();
         parseTask.setCallback(callback);
         UHFCommand command = new UHFCommand(UHFCommand.Command.MULTI_INVENTORY);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
@@ -243,18 +227,35 @@ public class reader {
             // данную команду повторно отправлять не нужно, т.к. это фактически
             // перевод считывателя в определённый режим, просто ожидаем результата
             try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+                UHFCommandResult result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
                 Log.d(TAG, "Результат: " + result.data);
-                break;
+                return result;
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
         }
 
-        parseTask.setCallback(null);
-        parseTask.cancel(true);
+        return stopParseTask(parseTask, RESULT_SUCCESS);
+    }
 
-        return result;
+    /**
+     * Oстанавливаем поток разбора ответов считывателя, и ждём его остановки.
+     *
+     * @param task Поток
+     * @param defaultResult Код выполнения по умолчанию.
+     * @return UHFCommandResult
+     */
+    static private UHFCommandResult stopParseTask(ParseTask task, int defaultResult) {
+        task.setCallback(null);
+        // так как после вызова asyncTask.cancel(true), метод asyncTask.get()
+        // не ждёт окончание потока, а сразу выбрасывает исключение - используем свой флаг
+        task.setRun(false);
+        try {
+            return (task.get(5000, TimeUnit.MILLISECONDS));
+        } catch (Exception e) {
+            Log.e(TAG, e.getLocalizedMessage());
+            return (new UHFCommandResult(defaultResult));
+        }
     }
 
     /**
@@ -297,7 +298,6 @@ public class reader {
 
         ParseTask parseTask = new ParseTask();
         UHFCommand command = new UHFCommand(UHFCommand.Command.READ_TAG_DATA);
-        UHFCommandResult result = new UHFCommandResult(RESULT_TIMEOUT, null);
 
         // запускаем поток разбора ответа от считывателя
         parseTask.execute(command);
@@ -311,17 +311,15 @@ public class reader {
             }
 
             try {
-                result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
+                UHFCommandResult result = parseTask.get(READ_TIME_INTERVAL, TimeUnit.MILLISECONDS);
                 Log.d(TAG, "Результат: " + result.data);
-                break;
+                return result;
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
         }
 
-        parseTask.cancel(true);
-
-        return result;
+        return stopParseTask(parseTask, RESULT_TIMEOUT);
     }
 
     /**
