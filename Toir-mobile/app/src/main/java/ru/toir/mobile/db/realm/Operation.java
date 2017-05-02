@@ -20,6 +20,7 @@ public class Operation extends RealmObject {
     private Date startDate;
     private Date endDate;
     private int flowOrder;
+    private String comment;
     private Date createdAt;
     private Date changedAt;
 

@@ -23,7 +23,7 @@ import retrofit2.Retrofit;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
-import ru.toir.mobile.rest.interfaces.IClients;
+import ru.toir.mobile.rest.interfaces.IContragent;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
 import ru.toir.mobile.rest.interfaces.IDocumentation;
 import ru.toir.mobile.rest.interfaces.IDocumentationType;
@@ -71,7 +71,8 @@ import ru.toir.mobile.rest.interfaces.IUserService;
  * @author Dmitriy Logachev
  *         Created by koputo on 15.09.16.
  */
-public class ToirAPIFactory {
+public class
+ToirAPIFactory {
     private static final int CONNECT_TIMEOUT = 15;
     private static final int WRITE_TIMEOUT = 60;
     private static final int TIMEOUT = 60;
@@ -133,8 +134,8 @@ public class ToirAPIFactory {
     }
 
     @NonNull
-    public static IClients getClientsService() {
-        return getRetrofit().create(IClients.class);
+    public static IContragent getContragentService() {
+        return getRetrofit().create(IContragent.class);
     }
 
     @NonNull

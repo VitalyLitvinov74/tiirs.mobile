@@ -7,16 +7,14 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- *         Created on 23.01.17.
+ *         Created on 02.05.17.
  */
-public class OperationTool extends RealmObject {
-
+public class DefectType extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private OperationTemplate operationTemplate;
-    private Tool tool;
-    private int quantity;
+    private String title;
+    private EquipmentType equipmentType;
     private Date createdAt;
     private Date changedAt;
 
@@ -36,20 +34,20 @@ public class OperationTool extends RealmObject {
         this.uuid = uuid;
     }
 
-    public OperationTemplate getOperationTemplate() {
-        return operationTemplate;
+    public String getTitle() {
+        return title;
     }
 
-    public void setOperationTemplate(OperationTemplate operationTemplate) {
-        this.operationTemplate = operationTemplate;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Tool getTool() {
-        return tool;
+    public EquipmentType getEquipmentType() {
+        return equipmentType;
     }
 
-    public void setTool(Tool tool) {
-        this.tool = tool;
+    public void setEquipmentType(EquipmentType equipmentType) {
+        this.equipmentType = equipmentType;
     }
 
     public Date getCreatedAt() {
@@ -66,5 +64,9 @@ public class OperationTool extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public class Status {
+        public static final String TYPE_NEW = "7B5FAAA6-0123-41AE-8403-D2F9EEEADA8B";
     }
 }

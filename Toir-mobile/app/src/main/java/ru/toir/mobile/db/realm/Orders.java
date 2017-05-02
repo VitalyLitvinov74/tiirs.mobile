@@ -17,6 +17,9 @@ public class Orders extends RealmObject {
     private String title;
     private User author;
     private User user;
+    private Contragent customer;
+    private Brigade perpetrator;
+    private String comment;
     private Date receiveDate;   // дата получения наряда
     private Date startDate;     // дата назначения наряда
     private Date createdAt;

@@ -15,6 +15,7 @@ import io.realm.RealmMigration;
 import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 import io.realm.exceptions.RealmException;
+import ru.toir.mobile.db.realm.Contragent;
 
 /**
  * @author Dmitriy Logachev
@@ -273,6 +274,11 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 18) {
+            toVersion19(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -466,6 +472,110 @@ public class ToirRealmMigration implements RealmMigration {
         RealmSchema schema = realm.getSchema();
         schema.get("Equipment").removeField("location")
                 .addRealmObjectField("location", schema.get("Objects"));
+    }
+
+    /**
+     * Переход на версию 19
+     *
+     * @param realm - экземпляр realmDB
+     */
+    private void toVersion19(DynamicRealm realm) {
+        Log.d(TAG, "from version 18");
+        RealmSchema schema = realm.getSchema();
+        schema.rename("Clients", "Contragent");
+        schema.get("Contragent").addField("contragentType", int.class);
+        schema.get("Contragent").addRealmObjectField("parentContragent", schema.get("Contragent"));
+        schema.create("Brigade")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addField("title", String.class)
+                .addRealmObjectField("contragent", schema.get("Contragent"))
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+
+        schema.create("ContragentUser")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addRealmObjectField("contragent", schema.get("Contragent"))
+                .addRealmObjectField("user", schema.get("User"))
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+
+        schema.create("BrigadeUser")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addRealmObjectField("brigade", schema.get("Brigade"))
+                .addRealmObjectField("user", schema.get("User"))
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+
+        schema.get("Orders").addRealmObjectField("customer", schema.get("Contragent"));
+        schema.get("Orders").addRealmObjectField("perpetrator", schema.get("Brigade"));
+
+        schema.create("DefectType")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addField("title", String.class)
+                .addRealmObjectField("equipmentType", schema.get("EquipmentType"))
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+
+        schema.create("Defect")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addRealmObjectField("contragent", schema.get("Contragent"))
+                .addField("date", Date.class)
+                .addRealmObjectField("equipment", schema.get("Equipment"))
+                .addRealmObjectField("defectType", schema.get("DefectType"))
+                .addField("process", boolean.class)
+                .addField("comment", String.class)
+                .addRealmObjectField("task", schema.get("Tasks"))
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+/*
+        schema.create("MeasureValueType")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addField("title", String.class)
+                .addField("units", String.class)
+                .addField("createdAt", Date.class)
+               .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+*/
+        schema.get("OperationTool").addField("quantity", int.class);
+
+        schema.create("TaskTemplateRepairPart")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addRealmObjectField("taskTemplate", schema.get("TaskTemplate"))
+                .addRealmObjectField("repairPart", schema.get("RepairPart"))
+                .addRealmObjectField("measureType", schema.get("MeasureType"))
+                .addField("quantity", int.class)
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+
+        schema.create("TaskRepairPart")
+                .addField("_id", long.class)
+                .addField("uuid", String.class)
+                .addRealmObjectField("task", schema.get("Tasks"))
+                .addRealmObjectField("repairPart", schema.get("RepairPart"))
+                .addRealmObjectField("measureType", schema.get("MeasureType"))
+                .addField("quantity", int.class)
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class)
+                .addPrimaryKey("_id");
+
+        //schema.get("Tasks").addField("comment", String.class);
+        //schema.get("TaskStages").addField("comment", String.class);
+        schema.get("Orders").addField("comment", String.class);
+        schema.get("Operation").addField("comment", String.class);
+
     }
 
     private boolean testPropsFields(DynamicRealm realm) {

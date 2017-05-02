@@ -9,13 +9,15 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 24.01.17.
  */
-public class Clients extends RealmObject {
+public class Contragent extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String name;
     private String description;
     private String phone;
+    private int contragentType;
+    private Contragent parentContragent;
     private Date createdAt;
     private Date changedAt;
 

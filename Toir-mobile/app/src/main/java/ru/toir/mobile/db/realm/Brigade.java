@@ -7,16 +7,14 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- *         Created on 23.01.17.
+ *         Created on 27.04.17.
  */
-public class OperationTool extends RealmObject {
-
+public class Brigade extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private OperationTemplate operationTemplate;
-    private Tool tool;
-    private int quantity;
+    private String title;
+    private Contragent contragent;
     private Date createdAt;
     private Date changedAt;
 
@@ -36,20 +34,20 @@ public class OperationTool extends RealmObject {
         this.uuid = uuid;
     }
 
-    public OperationTemplate getOperationTemplate() {
-        return operationTemplate;
+    public String getTitle() {
+        return title;
     }
 
-    public void setOperationTemplate(OperationTemplate operationTemplate) {
-        this.operationTemplate = operationTemplate;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Tool getTool() {
-        return tool;
+    public Contragent getContragent() {
+        return contragent;
     }
 
-    public void setTool(Tool tool) {
-        this.tool = tool;
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
     }
 
     public Date getCreatedAt() {

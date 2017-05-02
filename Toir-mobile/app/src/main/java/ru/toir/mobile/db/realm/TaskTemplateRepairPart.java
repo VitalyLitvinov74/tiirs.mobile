@@ -7,15 +7,15 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- *         Created on 23.01.17.
+ *         Created on 2.05.17.
  */
-public class OperationTool extends RealmObject {
-
+public class TaskTemplateRepairPart extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private OperationTemplate operationTemplate;
-    private Tool tool;
+    private TaskTemplate taskTemplate;
+    private RepairPart repairPart;
+    private MeasureType measureType;
     private int quantity;
     private Date createdAt;
     private Date changedAt;
@@ -36,20 +36,36 @@ public class OperationTool extends RealmObject {
         this.uuid = uuid;
     }
 
-    public OperationTemplate getOperationTemplate() {
-        return operationTemplate;
+    public TaskTemplate getTaskTemplate() {
+        return taskTemplate;
     }
 
-    public void setOperationTemplate(OperationTemplate operationTemplate) {
-        this.operationTemplate = operationTemplate;
+    public void setTaskTemplate(TaskTemplate taskTemplate) {
+        this.taskTemplate = taskTemplate;
     }
 
-    public Tool getTool() {
-        return tool;
+    public RepairPart getRepairPart() {
+        return repairPart;
     }
 
-    public void setTool(Tool tool) {
-        this.tool = tool;
+    public void setRepairPart (RepairPart repairPart) {
+        this.repairPart = repairPart;
+    }
+
+    public MeasureType getMeasureType() {
+        return measureType;
+    }
+
+    public void setMeasureType (MeasureType measureType) {
+        this.measureType = measureType;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public Date getCreatedAt() {
@@ -67,4 +83,5 @@ public class OperationTool extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
+
 }

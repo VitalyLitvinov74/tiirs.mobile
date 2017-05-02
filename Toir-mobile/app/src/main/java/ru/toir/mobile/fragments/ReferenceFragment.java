@@ -39,7 +39,7 @@ import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.StageStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
-import ru.toir.mobile.db.realm.Clients;
+import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
@@ -142,13 +142,13 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // Clients
-                referenceName = Clients.class.getSimpleName();
+                // Contragent
+                referenceName = Contragent.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<Clients>> response = ToirAPIFactory.getClientsService().clients(changedDate).execute();
+                    Response<List<Contragent>> response = ToirAPIFactory.getContragentService().contragents(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<Clients> list = response.body();
+                        List<Contragent> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {

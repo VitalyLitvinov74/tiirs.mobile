@@ -5,7 +5,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.toir.mobile.db.realm.Clients;
 import ru.toir.mobile.db.realm.Objects;
 
 /**
