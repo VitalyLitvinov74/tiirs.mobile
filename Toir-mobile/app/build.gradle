@@ -47,6 +47,9 @@ android {
     }
 
     productFlavors {
+        arm {
+            ndk.abiFilters "armeabi"
+        }
     }
 
     lintOptions {
