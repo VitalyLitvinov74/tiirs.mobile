@@ -107,7 +107,10 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                             if (commands[0].command == UHFCommand.Command.MULTI_INVENTORY) {
                                 // "ищем" все метки в поле считывателя
                                 if (callback != null) {
-                                    callback.processTag(result);
+                                    if (!callback.processTag(result)) {
+                                        Log.d(TAG, "Callback signal to stop parse!!!");
+                                        return new UHFCommandResult(reader.RESULT_SUCCESS);
+                                    }
                                 }
 
                                 // "откатываем" buffIndex назад на размер разобранного пакета

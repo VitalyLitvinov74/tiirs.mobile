@@ -1825,7 +1825,7 @@ public class OrderFragment extends Fragment {
     }
 
     private void runRfidDialog(String expectedTagId, final int level) {
-        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
         final String expectedTagUuid = expectedTagId;
 
         currentEquipment = selectedTask.getEquipment();
@@ -1866,8 +1866,7 @@ public class OrderFragment extends Fragment {
                     }
                 } else {
                     Log.d(TAG, "Ошибка чтения метки!");
-                    Toast.makeText(getContext(),
-                            "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
                 }
 
                 // закрываем диалог

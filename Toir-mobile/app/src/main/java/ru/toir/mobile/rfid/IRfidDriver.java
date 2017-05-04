@@ -53,8 +53,7 @@ public interface IRfidDriver {
 	 *            Количество байт для чтения (кратен 2, 1 = 2, 2 = 4, 3 = 6 и
 	 *            т.д.)
 	 */
-	void readTagData(String password, int memoryBank, int address,
-					 int count);
+    void readTagData(String password, int memoryBank, int address, int count);
 
 	/**
 	 * Читаем данные с метки в один этап.
@@ -72,8 +71,7 @@ public interface IRfidDriver {
 	 *            Количество байт для чтения (кратен 2, 1 = 2, 2 = 4, 3 = 6 и
 	 *            т.д.)
 	 */
-	void readTagData(String password, String tagId, int memoryBank,
-					 int address, int count);
+    void readTagData(String password, String tagId, int memoryBank, int address, int count);
 
 	/**
 	 * Пишем в метку в два этапа, сначала находим метку(получаем Id), потом
@@ -89,8 +87,7 @@ public interface IRfidDriver {
 	 * @param data
 	 *            Данные для записи
 	 */
-	void writeTagData(String password, int memoryBank, int address,
-					  String data);
+    void writeTagData(String password, int memoryBank, int address, String data);
 
 	/**
 	 * Пишем в метку в один этап.
@@ -107,8 +104,7 @@ public interface IRfidDriver {
 	 * @param data
 	 *            Данные для записи
 	 */
-	void writeTagData(String password, String tagId, int memoryBank,
-					  int address, String data);
+    void writeTagData(String password, String tagId, int memoryBank, int address, String data);
 
 	/**
 	 * <p>

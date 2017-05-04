@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package ru.toir.mobile.rfid;
 
@@ -23,192 +23,190 @@ import ru.toir.mobile.R;
 
 /**
  * @author Dmitriy Logachov
- * 
  */
 public class RfidDialog extends DialogFragment {
 
-	public static final int READER_COMMAND_READ_ID = 1;
-	public static final int READER_COMMAND_READ_DATA = 2;
-	public static final int READER_COMMAND_READ_DATA_ID = 3;
-	public static final int READER_COMMAND_WRITE_DATA = 4;
-	public static final int READER_COMMAND_WRITE_DATA_ID = 5;
+    public static final int READER_COMMAND_READ_ID = 1;
+    public static final int READER_COMMAND_READ_DATA = 2;
+    public static final int READER_COMMAND_READ_DATA_ID = 3;
+    public static final int READER_COMMAND_WRITE_DATA = 4;
+    public static final int READER_COMMAND_WRITE_DATA_ID = 5;
     public static final int READER_COMMAND_READ_MULTI_ID = 6;
 
-	public static final String TAG = "RfidDialog";
-	private Class<?> driverClass;
-	private RfidDriverBase driver;
+    public static final String TAG = "RfidDialog";
+    private Class<?> driverClass;
+    private RfidDriverBase driver;
 
-	// команда драйвера которая должна быть выполнена при старте диалога
-	private int command;
+    // команда драйвера которая должна быть выполнена при старте диалога
+    private int command;
 
-	// параметры передаваемые в драйвер
-	private String tagPassword;
-	private String tagId;
-	private int tagMemoryBank;
-	private int tagAddress;
-	private String tagWriteData;
-	private int tagReadCount;
+    // параметры передаваемые в драйвер
+    private String tagPassword;
+    private String tagId;
+    private int tagMemoryBank;
+    private int tagAddress;
+    private String tagWriteData;
+    private int tagReadCount;
     private String[] tagIds;
 
-	/*
-	 * проверка для защиты от повтороного выполнения комманды драйвера при
-	 * старте фрагмента диалога после запуска стронней activity
-	 */
-	private boolean isStarted = false;
+    /*
+     * проверка для защиты от повтороного выполнения комманды драйвера при
+     * старте фрагмента диалога после запуска стронней activity
+     */
+    private boolean isStarted = false;
 
-	/*
-	 * обработчик передаётся в драйвер, в том числе используется для отправки
-	 * сообщений об ошибках если драйвер не удаётся запустить
-	 */
-	private Handler mHandler;
+    /*
+     * обработчик передаётся в драйвер, в том числе используется для отправки
+     * сообщений об ошибках если драйвер не удаётся запустить
+     */
+    private Handler mHandler;
 
-	private boolean isInited = false;
+    private boolean isInited = false;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup,
-			Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
 
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-		String driverClassName;
+        String driverClassName;
 
-		getDialog().setTitle("Считайте метку");
+        getDialog().setTitle("Считайте метку");
 
-		// получаем текущий драйвер считывателя
-		SharedPreferences sp = PreferenceManager
-				.getDefaultSharedPreferences(getActivity()
-						.getApplicationContext());
-		driverClassName = sp.getString(getActivity().getApplicationContext()
-				.getString(R.string.rfidDriverListPrefKey), null);
+        // получаем текущий драйвер считывателя
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(getActivity()
+                        .getApplicationContext());
+        driverClassName = sp.getString(getActivity().getApplicationContext()
+                .getString(R.string.rfidDriverListPrefKey), null);
 
-		// пытаемся получить класс драйвера
-		try {
-			driverClass = Class.forName(driverClassName);
-		} catch (ClassNotFoundException e) {
-			Log.e(TAG, e.toString());
-			Message message = new Message();
-			message.what = RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND;
-			mHandler.sendMessage(message);
+        // пытаемся получить класс драйвера
+        try {
+            driverClass = Class.forName(driverClassName);
+        } catch (ClassNotFoundException e) {
+            Log.e(TAG, e.toString());
+            Message message = new Message();
+            message.what = RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND;
+            mHandler.sendMessage(message);
+        }
 
-		}
+        // пытаемся создать объект драйвера
+        try {
+            Constructor<?> c = driverClass.getConstructor();
+            driver = (RfidDriverBase) c.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Message message = new Message();
+            message.what = RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND;
+            mHandler.sendMessage(message);
+        }
 
-		// пытаемся создать объект драйвера
-		try {
-			Constructor<?> c = driverClass.getConstructor();
-			driver = (RfidDriverBase) c.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Message message = new Message();
-			message.what = RfidDriverBase.RESULT_RFID_CLASS_NOT_FOUND;
-			mHandler.sendMessage(message);
-		}
+        // т.к. работаем из DialogFragment, устанавливаем в качестве элемента
+        // интеграции DialogFragment
+        driver.setIntegration(this);
 
-		// т.к. работаем из DialogFragment, устанавливаем в качестве элемента
-		// интеграции DialogFragment
-		driver.setIntegration(this);
+        // передаём в драйвер контекст
+        driver.setContext(getActivity().getApplicationContext());
 
-		// передаём в драйвер контекст
-		driver.setContext(getActivity().getApplicationContext());
+        // передаём в драйвер обработчик
+        driver.setHandler(mHandler);
 
-		// передаём в драйвер обработчик
-		driver.setHandler(mHandler);
+        // инициализируем драйвер
+        if (!driver.init()) {
+            Message message = new Message();
+            message.what = RfidDriverBase.RESULT_RFID_INIT_ERROR;
+            mHandler.sendMessage(message);
+        } else {
+            isInited = true;
+        }
 
-		// инициализируем драйвер
-		if (!driver.init()) {
-			Message message = new Message();
-			message.what = RfidDriverBase.RESULT_RFID_INIT_ERROR;
-			mHandler.sendMessage(message);
+        View view = null;
+        if (isInited) {
+            view = driver.getView(inflater, viewGroup);
+        }
 
-		} else {
-			isInited = true;
-		}
+        return view;
+    }
 
-		View view = null;
-		if (isInited) {
-			view = driver.getView(inflater, viewGroup);
-		}
+    @Override
+    public void onStart() {
 
-		return view;
-	}
+        super.onStart();
 
-	@Override
-	public void onStart() {
+        if (!isInited) {
+            return;
+        }
 
-		super.onStart();
+        if (isStarted) {
+            return;
+        }
 
-		if (!isInited) {
-			return;
-		}
+        isStarted = true;
 
-		if (isStarted) {
-			return;
-		}
-
-		isStarted = true;
-
-		switch (command) {
-		case READER_COMMAND_READ_ID:
-			driver.readTagId();
-			break;
+        switch (command) {
+            case READER_COMMAND_READ_ID:
+                driver.readTagId();
+                break;
             case READER_COMMAND_READ_MULTI_ID:
                 driver.readMultiplyTagId(tagIds);
                 break;
             case READER_COMMAND_READ_DATA:
-			driver.readTagData(tagPassword, tagMemoryBank, tagAddress, tagReadCount);
-			break;
-		case READER_COMMAND_READ_DATA_ID:
-			driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagReadCount);
-			break;
-		case READER_COMMAND_WRITE_DATA:
-			driver.writeTagData(tagPassword, tagMemoryBank, tagAddress, tagWriteData);
-			break;
-		case READER_COMMAND_WRITE_DATA_ID:
-			driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagWriteData);
-			break;
-		default:
-			driver.readTagId();
-			break;
-		}
-	}
+                driver.readTagData(tagPassword, tagMemoryBank, tagAddress, tagReadCount);
+                break;
+            case READER_COMMAND_READ_DATA_ID:
+                driver.readTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagReadCount);
+                break;
+            case READER_COMMAND_WRITE_DATA:
+                driver.writeTagData(tagPassword, tagMemoryBank, tagAddress, tagWriteData);
+                break;
+            case READER_COMMAND_WRITE_DATA_ID:
+                driver.writeTagData(tagPassword, tagId, tagMemoryBank, tagAddress, tagWriteData);
+                break;
+            default:
+                driver.readTagId();
+                break;
+        }
+    }
 
-	/**
+    /**
      * Необходимо потому что один из драйверов стартует отдельную activity для своих нужд.
      */
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		Message message = new Message();
-		switch (requestCode) {
-		case IntentIntegrator.REQUEST_CODE:
-			if (data != null) {
-				String result = data.getStringExtra("SCAN_RESULT");
-				if (result != null && !result.equals("")) {
-					message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-					message.obj = result;
-				} else {
-					message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
-				}
-			} else {
-				message.what = RfidDriverBase.RESULT_RFID_CANCEL;
-			}
-			break;
-		default:
-			message.what = RfidDriverBase.RESULT_RFID_CANCEL;
-			break;
-		}
-		mHandler.sendMessage(message);
-	}
+        Message message = new Message();
+        switch (requestCode) {
+            case IntentIntegrator.REQUEST_CODE:
+                if (data != null) {
+                    String result = data.getStringExtra("SCAN_RESULT");
+                    if (result != null && !result.equals("")) {
+                        message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+                        message.obj = result;
+                    } else {
+                        message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
+                    }
+                } else {
+                    message.what = RfidDriverBase.RESULT_RFID_CANCEL;
+                }
 
-	/**
-	 * <p>
-	 * Чтение(поиск первой попавшейся метки) Id метки.
-	 * </p>
-	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
-	 */
-	public void readTagId() {
+                break;
+            default:
+                message.what = RfidDriverBase.RESULT_RFID_CANCEL;
+                break;
+        }
 
-		command = READER_COMMAND_READ_ID;
-	}
+        mHandler.sendMessage(message);
+    }
+
+    /**
+     * <p>
+     * Чтение(поиск первой попавшейся метки) Id метки.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     */
+    public void readTagId() {
+
+        command = READER_COMMAND_READ_ID;
+    }
 
     /**
      * <p>
@@ -248,101 +246,101 @@ public class RfidDialog extends DialogFragment {
 
     /**
      * <p>
-	 * Чтение данных из памяти конкретной метки.
-	 * </p>
-	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
-	 * 
-	 * @param password      password
-	 * @param id            tagId
-	 * @param memoryBank	memoryBank
-	 * @param address	    address
-	 * @param count	        count
-	 */
-	public void readTagData(String password, String id, int memoryBank, int address, int count) {
+     * Чтение данных из памяти конкретной метки.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param password   password
+     * @param id         tagId
+     * @param memoryBank memoryBank
+     * @param address    address
+     * @param count      count
+     */
+    public void readTagData(String password, String id, int memoryBank, int address, int count) {
 
-		tagPassword = password;
-		tagId = id;
-		tagMemoryBank = memoryBank;
-		tagAddress = address;
-		tagReadCount = count;
+        tagPassword = password;
+        tagId = id;
+        tagMemoryBank = memoryBank;
+        tagAddress = address;
+        tagReadCount = count;
 
-		command = READER_COMMAND_READ_DATA_ID;
-	}
+        command = READER_COMMAND_READ_DATA_ID;
+    }
 
-	/**
-	 * <p>
-	 * Чтение данных из памяти первой найденной метки.
-	 * </p>
-	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
-	 * 
-	 * @param password	    password
-	 * @param memoryBank    memoryBank
-	 * @param address       address
-	 * @param count         count
-	 */
-	public void readTagData(String password, int memoryBank, int address, int count) {
+    /**
+     * <p>
+     * Чтение данных из памяти первой найденной метки.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param password   password
+     * @param memoryBank memoryBank
+     * @param address    address
+     * @param count      count
+     */
+    public void readTagData(String password, int memoryBank, int address, int count) {
 
-		tagPassword = password;
-		tagMemoryBank = memoryBank;
-		tagAddress = address;
-		tagReadCount = count;
+        tagPassword = password;
+        tagMemoryBank = memoryBank;
+        tagAddress = address;
+        tagReadCount = count;
 
-		command = READER_COMMAND_READ_DATA;
-	}
+        command = READER_COMMAND_READ_DATA;
+    }
 
-	/**
-	 * <p>
-	 * Пишем в память конкретной метки.
-	 * </p>
-	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
-	 * 
-	 * @param password      password
-	 * @param id            id
-	 * @param memoryBank    memoryBank
-	 * @param address       address
-	 * @param data          data
-	 */
-	public void writeTagData(String password, String id, int memoryBank, int address, String data) {
+    /**
+     * <p>
+     * Пишем в память конкретной метки.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param password   password
+     * @param id         id
+     * @param memoryBank memoryBank
+     * @param address    address
+     * @param data       data
+     */
+    public void writeTagData(String password, String id, int memoryBank, int address, String data) {
 
-		tagPassword = password;
-		tagId = id;
-		tagMemoryBank = memoryBank;
-		tagAddress = address;
-		tagWriteData = data;
+        tagPassword = password;
+        tagId = id;
+        tagMemoryBank = memoryBank;
+        tagAddress = address;
+        tagWriteData = data;
 
-		command = READER_COMMAND_WRITE_DATA_ID;
-	}
+        command = READER_COMMAND_WRITE_DATA_ID;
+    }
 
-	/**
-	 * <p>
-	 * Пишем в память первой найденной метки.
-	 * </p>
-	 * Устанавливаем команду которую нужно будет выполнить при старте диалога.
-	 * 
-	 * @param password      password
-	 * @param memoryBank    memoryBank
-	 * @param address       address
-	 * @param data          data
-	 */
-	public void writeTagData(String password, int memoryBank, int address, String data) {
+    /**
+     * <p>
+     * Пишем в память первой найденной метки.
+     * </p>
+     * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param password   password
+     * @param memoryBank memoryBank
+     * @param address    address
+     * @param data       data
+     */
+    public void writeTagData(String password, int memoryBank, int address, String data) {
 
-		tagPassword = password;
-		tagMemoryBank = memoryBank;
-		tagAddress = address;
-		tagWriteData = data;
+        tagPassword = password;
+        tagMemoryBank = memoryBank;
+        tagAddress = address;
+        tagWriteData = data;
 
-		command = READER_COMMAND_WRITE_DATA;
-	}
+        command = READER_COMMAND_WRITE_DATA;
+    }
 
-	@Override
-	public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
 
-		super.onDestroyView();
-		driver.close();
-		driver = null;
-	}
-	
-	public void setHandler(Handler handler) {
-		mHandler = handler;
-	}
+        super.onDestroyView();
+        driver.close();
+        driver = null;
+    }
+
+    public void setHandler(Handler handler) {
+        mHandler = handler;
+    }
 }

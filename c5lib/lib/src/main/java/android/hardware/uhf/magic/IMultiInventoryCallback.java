@@ -6,5 +6,5 @@ package android.hardware.uhf.magic;
  */
 
 public interface IMultiInventoryCallback {
-    void processTag(String tagId);
+    boolean processTag(String tagId);
 }

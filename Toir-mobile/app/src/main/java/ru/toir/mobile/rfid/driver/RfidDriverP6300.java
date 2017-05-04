@@ -141,6 +141,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
                             for (String tagId : tagIds) {
                                 if (tagIdCheck.equals(tagId)) {
                                     Log.d(TAG, tagIdCheck + " tagId found!!!");
+                                    // останавливаем поток разбора ответов от считывателя
                                     CommandType.CommandOK = true;
                                     CommandType.CommandResend = false;
                                     sHandler.obtainMessage(RESULT_RFID_SUCCESS, readedTagId).sendToTarget();

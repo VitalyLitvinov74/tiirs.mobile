@@ -2,12 +2,8 @@ package android.hardware.uhf.magic;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 public class reader {
