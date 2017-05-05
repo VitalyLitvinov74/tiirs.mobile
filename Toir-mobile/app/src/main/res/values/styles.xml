@@ -60,4 +60,14 @@
     <style name="ToolbarStyle">
         <item name="android:background">@color/larisaBlueColor</item>
     </style>
+
+    <style name="custom_dialog" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowTitleStyle">@style/custom_dialog_title</item>
+    </style>
+
+    <style name="custom_dialog_title" parent="android:Widget.TextView">
+        <item name="android:background">@color/larisaBlueColor</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

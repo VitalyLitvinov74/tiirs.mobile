@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true"
+    tools:context=".EquipmentInfoActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -215,29 +218,28 @@
                 android:layout_below="@+id/equipment_text_status_label"
                 android:background="#777777" />
 
+            <ImageView
+                android:id="@+id/equipment_information_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_divider1"
+                android:contentDescription="@string/image_description"
+                android:maxHeight="32dp"
+                android:src="@drawable/ic_icon_tools" />
+
             <TextView
                 android:id="@+id/equipment_text_operation_list"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_below="@+id/equipment_divider1"
                 android:background="#FAFAFA"
+                android:layout_marginRight="25dp"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:text="@string/operation_list"
+                android:layout_toRightOf="@+id/equipment_information_icon"
                 android:textColor="#757575"
                 android:textSize="16sp" />
-
-            <ImageView
-                android:id="@+id/equipment_information_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/equipment_divider1"
-                android:layout_marginRight="25dp"
-                android:layout_toRightOf="@+id/equipment_text_operation_list"
-                android:contentDescription="@string/image_description"
-                android:maxHeight="32dp"
-                android:src="@drawable/ic_icon_tools" />
 
             <ListView
                 android:id="@+id/list_view"
@@ -256,6 +258,15 @@
                 android:layout_below="@+id/list_view"
                 android:background="#777777" />
 
+            <ImageView
+                android:id="@+id/equipment_documentation_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_divider2"
+                android:contentDescription="@string/image_description"
+                android:maxHeight="32dp"
+                android:src="@drawable/ic_icon_tasks2" />
+
             <TextView
                 android:id="@+id/equipment_text_documentation"
                 android:layout_width="wrap_content"
@@ -264,21 +275,11 @@
                 android:background="#FAFAFA"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/equipment_documentation_icon"
                 android:text="@string/documentation"
                 android:textColor="#757575"
                 android:textSize="16sp" />
-
-            <ImageView
-                android:id="@+id/equipment_documentation_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/equipment_divider2"
-                android:layout_marginRight="25dp"
-                android:layout_toRightOf="@+id/equipment_text_documentation"
-                android:contentDescription="@string/image_description"
-                android:maxHeight="32dp"
-                android:src="@drawable/ic_icon_tasks2" />
 
             <ListView
                 android:id="@+id/equipment_documentation_listView"
@@ -313,5 +314,20 @@
                 android:src="@drawable/circle" />
 
         </RelativeLayout>
+
     </ScrollView>
-</LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:src="@drawable/ic_plus_white_36dp"
+        app:fabSize="normal"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="15dp"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:layout_behavior="ru.toir.mobile.utils.ScrollAwareFABBehavior"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <include layout="@layout/equipment_action" />
+
+</android.support.design.widget.CoordinatorLayout>

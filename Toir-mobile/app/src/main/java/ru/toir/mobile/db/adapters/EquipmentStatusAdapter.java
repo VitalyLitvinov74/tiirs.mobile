@@ -12,7 +12,9 @@ import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.EquipmentStatus;
+import ru.toir.mobile.db.realm.MeasureType;
 
 /**
  * @author koputo
@@ -27,6 +29,26 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
         ImageView icon;
     }
 
+    @Override
+    public EquipmentStatus getItem(int position) {
+        EquipmentStatus equipmentStatus = null;
+        if (adapterData != null) {
+            equipmentStatus = adapterData.get(position);
+        }
+        return equipmentStatus;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        EquipmentStatus equipmentStatus;
+        if (adapterData != null) {
+            equipmentStatus = adapterData.get(position);
+            return equipmentStatus.get_id();
+        }
+        return 0;
+    }
+
+
     public EquipmentStatusAdapter(@NonNull Context context, int resId, RealmResults<EquipmentStatus> data) {
         super(context, data);
     }
@@ -39,37 +61,47 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
     }
 
     @Override
-    public EquipmentStatus getItem(int position) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (parent.getId() == R.id.simple_spinner) {
-            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            EquipmentStatus equipmentStatus = adapterData.get(position);
-            textView.setText(equipmentStatus.getTitle());
-            return textView;
-        }
-        if (parent.getId() == R.id.reference_listView) {
-            if (convertView == null) {
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            if (parent.getId() == R.id.reference_listView) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder = new ViewHolder();
                 viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
                 convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
             }
-            EquipmentStatus equipmentStatus = adapterData.get(position);
-            viewHolder.title.setText(equipmentStatus.getTitle());
-            return convertView;
+            if (parent.getId() == R.id.simple_spinner || parent.getId() == R.id.spinner_status) {
+                convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+                viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+                convertView.setTag(viewHolder);
+            }
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        EquipmentStatus equipmentStatus;
+        if (adapterData != null && viewHolder.title != null) {
+            equipmentStatus = adapterData.get(position);
+            if (equipmentStatus != null)
+                viewHolder.title.setText(equipmentStatus.getTitle());
+        }
+
+        if (convertView == null) {
+            TextView textView = new TextView(context);
+            if (adapterData != null) {
+                equipmentStatus = adapterData.get(position);
+                if (equipmentStatus != null)
+                    textView.setText(equipmentStatus.getTitle());
+                    textView.setTextSize(18);
+                    textView.setPadding(5, 5, 5, 5);
+            }
+            return textView;
         }
         return convertView;
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return getView(position, null, parent);
     }
 }

@@ -151,4 +151,12 @@
     <string name="dont_ask_text_tags">Не спрашивать текстовые теги</string>
     <string name="ask_text_tags_key">without_tags_mode</string>
     <string name="model">Модель: %1$s</string>
+
+    <string name="choose_defect">Выберите дефект</string>
+    <string name="add_new_defect">или введите новый</string>
+    <string name="choose_defect_category">Категория дефекта</string>
+    <string name="defects_category_all">Все категории</string>
+    <string name="defects_category_non_specific">Не специфические дефекты</string>
+    <string name="action_save">Записать</string>
+    <string name="new_status">Сменить статус на</string>
 </resources>
