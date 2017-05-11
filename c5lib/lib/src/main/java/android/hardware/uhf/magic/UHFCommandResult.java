@@ -12,6 +12,11 @@ public class UHFCommandResult {
     public UHFCommandResult() {
     }
 
+    public UHFCommandResult(int result) {
+        this.result = result;
+        this.data = null;
+    }
+
     public UHFCommandResult(int result, String data) {
         this.result = result;
         this.data = data;

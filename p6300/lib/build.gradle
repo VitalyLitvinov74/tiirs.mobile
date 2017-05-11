@@ -27,9 +27,9 @@ model {
     }
 
     android.productFlavors {
-        create("arm") {
-            ndk.abiFilters.add("armeabi")
-        }
+//        create("arm") {
+//            ndk.abiFilters.add("armeabi")
+//        }
     }
 }
 
@@ -39,8 +39,8 @@ apply plugin: 'maven'
 
 artifacts {
     // TODO: здесь нужно что-то более универсальное
-    def coreAarFile = file("build/outputs/aar/${archivesBaseName}-arm-release.aar")
-    archives coreAarFile
+//    def coreAarFile = file("build/outputs/aar/${archivesBaseName}-arm-release.aar")
+//    archives coreAarFile
 }
 
 uploadArchives {
@@ -61,5 +61,5 @@ uploadArchives {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+//    testCompile 'junit:junit:4.12'
 }

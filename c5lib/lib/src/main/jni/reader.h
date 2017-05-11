@@ -5,6 +5,23 @@
 #ifndef C5TOOLAS_READER_H
 #define C5TOOLAS_READER_H
 
+static const uint8_t ERROR = 0xFF;
+static const uint8_t INVENTORY = 0x22;
+static const uint8_t MULTI_INVENTORY = 0x27;
+static const uint8_t STOP_MULTI_INVENTORY = 0x28;
+static const uint8_t READ_TAG_DATA = 0x39;
+static const uint8_t WRITE_TAG_DATA = 0x49;
+static const uint8_t LOCK_TAG = 0x82;
+static const uint8_t KILL_TAG = 0x65;
+static const uint8_t GET_PARAMETER = 0xF1;
+static const uint8_t SET_TRANSMISSION_POWER = 0xB6;
+static const uint8_t GET_TRANSMISSION_POWER = 0xB7;
+static const uint8_t GET_CHANNEL = 0xAA;
+static const uint8_t SET_CHANNEL = 0xAB;
+static const uint8_t SET_FREQUENCY = 0x07;
+static const uint8_t SELECT = 0x0C;
+static const uint8_t SET_SELECT = 0x12;
+
 // низкоуровневая работа с устройством
 int32_t openSerial(int8_t *path, uint32_t baud);
 
@@ -66,6 +83,10 @@ int32_t MagicSelect(int16_t nPL, uint8_t selPa, int32_t nPTR, uint8_t nMaskLen, 
 
 int32_t MagicSetSelect(int32_t nPL, uint8_t data);
 
+int32_t MagicStopMultiInventory();
+
+int32_t MagicMultiInventory(int32_t ntimes);
+
 int8_t *makeHexString(void *buffer, int32_t start, int32_t count);
 
 
@@ -113,5 +134,9 @@ jint Java_android_hardware_uhf_magic_reader_Select(JNIEnv *env, jclass jc, jbyte
                                                    jbyte nMaskLen, jbyte turncate, jbyteArray jpMask);
 
 jint Java_android_hardware_uhf_magic_reader_SetSelect(JNIEnv *env, jclass jc, jbyte data);
+
+jint Java_android_hardware_uhf_magic_reader_MultiInventory(JNIEnv *env, jclass jc, jint ntimes);
+
+jint Java_android_hardware_uhf_magic_reader_StopMultiInventory(JNIEnv *env, jclass jc);
 
 #endif //C5TOOLAS_READER_H

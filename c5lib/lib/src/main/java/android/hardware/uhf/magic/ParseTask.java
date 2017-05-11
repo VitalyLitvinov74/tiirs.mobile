@@ -2,15 +2,18 @@ package android.hardware.uhf.magic;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
 import java.util.Arrays;
 
 /**
  * @author Dmitriy Logachev
- * Created by koputo on 28.12.16.
+ *         Created by koputo on 28.12.16.
  */
 class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
     private static final String TAG = "ParseTask";
     boolean resend = false;
+    private IMultiInventoryCallback callback;
+    boolean isRun = true;
 
     @Override
     protected UHFCommandResult doInBackground(UHFCommand... commands) {
@@ -25,22 +28,28 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
         int commandReturnCode;
 
         while (true) {
-            if (this.isCancelled()) {
+            if (!isRun) {
                 Log.d(TAG, "Tag data read interrupted");
-                return new UHFCommandResult(reader.RESULT_TIMEOUT, null);
+                UHFCommandResult result;
+                if (commands[0].command == UHFCommand.Command.MULTI_INVENTORY) {
+                    result = new UHFCommandResult(reader.RESULT_SUCCESS);
+                } else {
+                    result = new UHFCommandResult(reader.RESULT_TIMEOUT);
+                }
+
+                return result;
             }
 
             readed = reader.Read(buff, buffIndex, buffSize - buffIndex);
             if (readed > 0) {
                 Log.d(TAG, "readed: " + reader.BytesToString(buff, buffIndex, readed));
                 buffIndex += readed;
-                if (buffIndex < 5) {
-                    continue;
-                }
+            }
 
+            if (buffIndex > 4) {
                 pktStart = -1;
                 for (int i = 0; i < buffIndex - 4; i++) {
-                    if (buff[i] == (byte)0xBB && (buff[i + 1] == (byte)0x01 || buff[i + 1] == (byte)0x02) && buff[i + 3] == (byte)0x00) {
+                    if (buff[i] == (byte) 0xBB && (buff[i + 1] == (byte) 0x01 || buff[i + 1] == (byte) 0x02) && buff[i + 3] == (byte) 0x00) {
                         pktStart = i;
                         break;
                     }
@@ -51,7 +60,7 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                 }
 
                 // получаем размер данных в ответе
-                dataSize = (((int)buff[pktStart + 3]) << 8) | (int)buff[pktStart + 4];
+                dataSize = (((int) buff[pktStart + 3]) << 8) | (int) buff[pktStart + 4];
                 pktEnd = pktStart + 5 + dataSize + 2;
                 Log.d(TAG, "pktStart = " + pktStart + ", pktEnd = " + pktEnd + ", buffIndex = " + buffIndex);
 
@@ -69,20 +78,23 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                         Log.d(TAG, "Код ошибки: " + String.format("%02X", errCode));
                         if (errCode == 0xB3 && commands[0].command == UHFCommand.Command.WRITE_TAG_DATA) {
                             // по идее должны вернуть ошибку, но вернём успех
-                            return new UHFCommandResult(reader.RESULT_SUCCESS, null);
+                            return new UHFCommandResult(reader.RESULT_SUCCESS);
                         } else {
                             // продолжим попытки отправки команды
-                            Arrays.fill(buff, (byte)0);
+                            Arrays.fill(buff, (byte) 0);
                             buffIndex = 0;
                             resend = true;
                             continue;
                         }
                     }
 
-                    if (parsedCommand != commands[0].command) {
+                    if (commands[0].command == UHFCommand.Command.MULTI_INVENTORY && parsedCommand == UHFCommand.Command.INVENTORY) {
+                        // т.е. находимся в режиме чтения всех меток в поле считывателя
+                        Log.d(TAG, "MultiInventory - Hack!!!");
+                    } else if (parsedCommand != commands[0].command) {
                         Log.e(TAG, "Разобран ответ на другую команду.");
 
-                        Arrays.fill(buff, (byte)0);
+                        Arrays.fill(buff, (byte) 0);
                         buffIndex = 0;
                         resend = true;
                         continue;
@@ -90,9 +102,30 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
 
                     // разбираем и возвращаем полученные данные
                     switch (parsedCommand) {
-                        case UHFCommand.Command.READ_TAG_ID:
-                            return new UHFCommandResult(reader.RESULT_SUCCESS,
-                                    reader.BytesToString(buff, pktStart + 5 + 1, dataSize - 3));
+                        case UHFCommand.Command.INVENTORY:
+                            String result = reader.BytesToString(buff, pktStart + 5 + 1, dataSize - 3);
+                            if (commands[0].command == UHFCommand.Command.MULTI_INVENTORY) {
+                                // "ищем" все метки в поле считывателя
+                                if (callback != null) {
+                                    if (!callback.processTag(result)) {
+                                        Log.d(TAG, "Callback signal to stop parse!!!");
+                                        return new UHFCommandResult(reader.RESULT_SUCCESS);
+                                    }
+                                }
+
+                                // "откатываем" buffIndex назад на размер разобранного пакета
+                                // копируем всё что находится за разобранным пакетом в начало буффера
+                                int tmpEnd = buffIndex - pktEnd;
+                                for (int i = 0, j = pktEnd; i < tmpEnd; i++, j++) {
+                                    buff[i] = buff[j];
+                                }
+
+                                buffIndex = tmpEnd;
+                                continue;
+                            } else {
+                                // "искали" одну метку
+                                return new UHFCommandResult(reader.RESULT_SUCCESS, result);
+                            }
 
                         case UHFCommand.Command.READ_TAG_DATA:
                             Log.d(TAG, "Данные карты прочитаны успешно!");
@@ -104,10 +137,10 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                             Log.d(TAG, "код возврата после записи = " + commandReturnCode);
                             if (commandReturnCode == 0) {
                                 Log.d(TAG, "Данные записаны успешно!");
-                                return new UHFCommandResult(reader.RESULT_SUCCESS, null);
+                                return new UHFCommandResult(reader.RESULT_SUCCESS);
                             } else {
                                 Log.d(TAG, "Не удалось записать данные!");
-                                return new UHFCommandResult(reader.RESULT_WRITE_ERROR, null);
+                                return new UHFCommandResult(reader.RESULT_WRITE_ERROR);
                             }
 
                         case UHFCommand.Command.LOCK_TAG:
@@ -115,10 +148,10 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                             Log.d(TAG, "код возврата после блокировки = " + commandReturnCode);
                             if (commandReturnCode == 0) {
                                 Log.d(TAG, "Блокировка выполненна успешно!");
-                                return new UHFCommandResult(reader.RESULT_SUCCESS, null);
+                                return new UHFCommandResult(reader.RESULT_SUCCESS);
                             } else {
                                 Log.d(TAG, "Не удалось выполнить блокировку!");
-                                return new UHFCommandResult(reader.RESULT_WRITE_ERROR, null);
+                                return new UHFCommandResult(reader.RESULT_WRITE_ERROR);
                             }
 
                         case UHFCommand.Command.KILL_TAG:
@@ -126,17 +159,33 @@ class ParseTask extends AsyncTask<UHFCommand, Void, UHFCommandResult> {
                             Log.d(TAG, "код возврата после деактивации = " + commandReturnCode);
                             if (commandReturnCode == 0) {
                                 Log.d(TAG, "Деактивация выполненна успешно!");
-                                return new UHFCommandResult(reader.RESULT_SUCCESS, null);
+                                return new UHFCommandResult(reader.RESULT_SUCCESS);
                             } else {
                                 Log.d(TAG, "Не удалось выполнить деактивацию!");
-                                return new UHFCommandResult(reader.RESULT_WRITE_ERROR, null);
+                                return new UHFCommandResult(reader.RESULT_WRITE_ERROR);
                             }
 
                         default:
-                            return new UHFCommandResult(reader.RESULT_ERROR, null);
+                            return new UHFCommandResult(reader.RESULT_ERROR);
                     }
                 }
             }
         }
+    }
+
+    public IMultiInventoryCallback getCallback() {
+        return callback;
+    }
+
+    void setCallback(IMultiInventoryCallback callback) {
+        this.callback = callback;
+    }
+
+    public boolean isRun() {
+        return isRun;
+    }
+
+    public void setRun(boolean run) {
+        isRun = run;
     }
 }
