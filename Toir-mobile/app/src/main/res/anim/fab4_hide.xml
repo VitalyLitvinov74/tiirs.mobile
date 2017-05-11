@@ -6,16 +6,16 @@
     <translate
         android:duration="1000"
         android:fromXDelta="-170%"
-        android:fromYDelta="-100%"
+        android:fromYDelta="-90%"
         android:interpolator="@android:anim/linear_interpolator"
         android:toXDelta="0%"
-        android:toYDelta="0%"></translate>
+        android:toYDelta="0%"/>
 
     <!--Fade Out-->
     <alpha
         android:duration="2000"
         android:fromAlpha="1.0"
         android:interpolator="@android:anim/accelerate_interpolator"
-        android:toAlpha="0.0"></alpha>
+        android:toAlpha="0.0"/>
 
 </set>

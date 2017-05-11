@@ -159,4 +159,10 @@
     <string name="defects_category_non_specific">Не специфические дефекты</string>
     <string name="action_save">Записать</string>
     <string name="new_status">Сменить статус на</string>
+    <string name="contragents">Клиенты</string>
+    <string name="input_contragents_name">Введите название клиента</string>
+
+    <string name="client_type">Тип контрагента: $1$s</string>
+    <string name="client_phone">Телефон: %1$s</string>
+
 </resources>

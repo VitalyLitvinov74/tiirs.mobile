@@ -192,7 +192,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                LoadTestData.LoadAllTestData();
+                LoadTestData.LoadAllTestData2();
                 return true;
             }
         });

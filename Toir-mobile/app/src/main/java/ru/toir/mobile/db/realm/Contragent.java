@@ -53,6 +53,22 @@ public class Contragent extends RealmObject {
         this.description = description;
     }
 
+    public int getContragentType() {
+        return contragentType;
+    }
+
+    public void setContragentType(int contragentType) {
+        this.contragentType = contragentType;
+    }
+
+    public Contragent parentContragent() {
+        return parentContragent;
+    }
+
+    public void setParentContragent(Contragent parentContragent) {
+        this.parentContragent = parentContragent;
+    }
+
     public String getPhone() {
         return phone;
     }

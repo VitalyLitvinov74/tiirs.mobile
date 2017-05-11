@@ -4,6 +4,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import ru.toir.mobile.db.realm.AlertType;
+import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
@@ -1416,6 +1417,60 @@ public class LoadTestData {
                 order4.setOrderVerdict(orderVerdict2);
                 order4.setTitle("Демонтаж датчиков давления и счетчиков газа");
                 order4.addTask(task2);
+            }
+        });
+    }
+
+    private long _id;
+    private String uuid;
+    private String name;
+    private String description;
+    private String phone;
+    private int contragentType;
+    private Contragent parentContragent;
+    private Date createdAt;
+    private Date changedAt;
+
+    private static Contragent contragent;
+    private static Contragent contragent2;
+
+    public static void LoadAllTestData2() {
+
+        final Realm realmDB;
+        realmDB = Realm.getDefaultInstance();
+
+        final String contragentTestUuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+        final String contragentTestUuid2 = "5562ed77-9bf0-4542-b127-f4ecefce49da";
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                contragent = realmDB.createObject(Contragent.class);
+                contragent.set_id(1);
+                contragent.setUuid(contragentTestUuid);
+                contragent.setName("ООО Дюккерхофф Коркино Цемент");
+                contragent.setDescription("Компания");
+                contragent.setPhone("+89112121200");
+                contragent.setContragentType(1);
+                contragent.setParentContragent(null);
+                contragent.setChangedAt(new Date());
+                contragent.setCreatedAt(new Date());
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                contragent2 = realmDB.createObject(Contragent.class);
+                contragent2.set_id(2);
+                contragent2.setUuid(contragentTestUuid2);
+                contragent2.setName("ООО Модуль-М");
+                contragent2.setDescription("Компания-подрядчик работ");
+                contragent2.setPhone("+89112121200");
+                contragent2.setContragentType(2);
+                contragent2.setParentContragent(null);
+                contragent2.setChangedAt(new Date());
+                contragent2.setCreatedAt(new Date());
             }
         });
     }

@@ -608,7 +608,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     private void expandFAB() {
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin += (int) (fab1.getWidth() * 2.5);
+        layoutParams.rightMargin += (int) (fab1.getWidth() * 2.3);
         layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.05);
         fab1.setLayoutParams(layoutParams);
         fab1.startAnimation(show_fab_1);
@@ -623,20 +623,20 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
         layoutParams3.rightMargin += (int) (fab3.getWidth() * 0.05);
-        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 2.5);
+        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 2.3);
         fab3.setLayoutParams(layoutParams3);
         fab3.startAnimation(show_fab_3);
         fab3.setClickable(true);
 
         FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
         layoutParams4.rightMargin += (int) (fab4.getWidth() * 1.7);
-        layoutParams4.bottomMargin += (int) (fab4.getHeight() * 1);
+        layoutParams4.bottomMargin += (int) (fab4.getHeight() * 0.9);
         fab4.setLayoutParams(layoutParams4);
         fab4.startAnimation(show_fab_4);
         fab4.setClickable(true);
 
         FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
-        layoutParams5.rightMargin += (int) (fab5.getWidth() * 1);
+        layoutParams5.rightMargin += (int) (fab5.getWidth() * 0.9);
         layoutParams5.bottomMargin += (int) (fab5.getHeight() * 1.7);
         fab5.setLayoutParams(layoutParams5);
         fab5.startAnimation(show_fab_5);
@@ -647,35 +647,35 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private void hideFAB() {
 
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin -= (int) (fab1.getWidth() * 2.5);
+        layoutParams.rightMargin -= (int) (fab1.getWidth() * 2.3);
         layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.05);
         fab1.setLayoutParams(layoutParams);
         fab1.startAnimation(hide_fab_1);
         fab1.setClickable(false);
 
         FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin -= (int) (fab2.getWidth() * 1.5);
-        layoutParams2.bottomMargin -= (int) (fab2.getHeight() * 1.5);
+        layoutParams2.rightMargin -= (int) (fab2.getWidth() * 2);
+        layoutParams2.bottomMargin -= (int) (fab2.getHeight() * 2);
         fab2.setLayoutParams(layoutParams2);
         fab2.startAnimation(hide_fab_2);
         fab2.setClickable(false);
 
         FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
         layoutParams3.rightMargin -= (int) (fab3.getWidth() * 0.05);
-        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 2.5);
+        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 2.3);
         fab3.setLayoutParams(layoutParams3);
         fab3.startAnimation(hide_fab_3);
         fab3.setClickable(false);
 
         FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
         layoutParams4.rightMargin -= (int) (fab4.getWidth() * 1.7);
-        layoutParams4.bottomMargin -= (int) (fab4.getHeight() * 1);
+        layoutParams4.bottomMargin -= (int) (fab4.getHeight() * 0.9);
         fab4.setLayoutParams(layoutParams4);
         fab4.startAnimation(hide_fab_4);
         fab4.setClickable(false);
 
         FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
-        layoutParams5.rightMargin -= (int) (fab5.getWidth() * 1);
+        layoutParams5.rightMargin -= (int) (fab5.getWidth() * 0.9);
         layoutParams5.bottomMargin -= (int) (fab5.getHeight() * 1.7);
         fab5.setLayoutParams(layoutParams5);
         fab5.startAnimation(hide_fab_5);

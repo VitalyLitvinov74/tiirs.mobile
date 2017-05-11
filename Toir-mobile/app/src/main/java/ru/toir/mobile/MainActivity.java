@@ -56,6 +56,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.db.realm.User;
+import ru.toir.mobile.fragments.ContragentsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.FragmentAddUser;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_SERVICE = 15;
     //private static final int DRAWER_ONLINE = 15;
     private static final int FRAGMENT_OBJECTS = 16;
+    private static final int FRAGMENT_CONTRAGENTS = 17;
 
     private static final String TAG = "MainActivity";
     public int currentFragment = NO_FRAGMENT;
@@ -530,6 +532,7 @@ public class MainActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         new PrimaryDrawerItem().withName("Объекты").withDescription("Здания и сооружения").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(FRAGMENT_OBJECTS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem().withName(R.string.contragents).withDescription("Справочник контрагентов").withIcon(GoogleMaterial.Icon.gmd_accounts_alt).withIdentifier(FRAGMENT_CONTRAGENTS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
                         //new DividerDrawerItem(),
                         //new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
                         //new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
@@ -595,18 +598,11 @@ public class MainActivity extends AppCompatActivity {
                             } else if (drawerItem.getIdentifier() == FRAGMENT_OBJECTS) {
                                 currentFragment = FRAGMENT_OBJECTS;
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ObjectFragment.newInstance()).commit();
+                            } else if (drawerItem.getIdentifier() == FRAGMENT_CONTRAGENTS) {
+                                currentFragment = FRAGMENT_CONTRAGENTS;
+                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ContragentsFragment.newInstance()).commit();
                             } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 startAboutDialog();
-                                /*
-                                new AlertDialog.Builder(view.getContext())
-                                        .setTitle("О программе")
-                                        .setMessage("ToiR Mobile v2.0.3\n ООО Технологии Энергосбережения (technosber.ru) (c) 2016")
-                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                            }
-                                        })
-                                        .setIcon(android.R.drawable.ic_dialog_info)
-                                        .show();*/
                             } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
                                 System.exit(0);
                             }
