@@ -1,30 +1,19 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.Defect;
-import ru.toir.mobile.db.realm.DefectType;
-import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.Objects;
-import ru.toir.mobile.db.realm.Tasks;
-
-import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author olejek
@@ -37,13 +26,13 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
     public DefectAdapter(@NonNull Context context, RealmResults<Defect> data) {
         super(context, data);
     }
-    public DefectAdapter(@NonNull Context context, RealmList<Defect> data) {
-        super(context, data);
-    }
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        }
+        else return 0;
     }
 
     @Override
@@ -74,6 +63,14 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                 viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
                 convertView.setTag(viewHolder);
             }
+            else {
+                convertView = inflater.inflate(R.layout.defect_item_layout, parent, false);
+                viewHolder = new DefectAdapter.ViewHolder();
+                viewHolder.title = (TextView) convertView.findViewById(R.id.defect_title);
+                viewHolder.contragent_name = (TextView) convertView.findViewById(R.id.defect_user);
+                viewHolder.date = (TextView) convertView.findViewById(R.id.defect_date);
+                convertView.setTag(viewHolder);
+            }
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
@@ -82,7 +79,24 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
         if (adapterData != null) {
             defect = adapterData.get(position);
             if (defect != null) {
-                viewHolder.title.setText(defect.getComment());
+                if (parent.getId() == R.id.spinner_defects) {
+                    viewHolder.title.setText(defect.getComment());
+                }
+                else {
+                    if (defect.getDefectType() != null) {
+                        viewHolder.title.setText(defect.getDefectType().getTitle());
+                    }
+                    else {
+                        viewHolder.title.setText("новый");
+                    }
+                    if (defect.getDate() != null) {
+                        String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(defect.getDate());
+                        viewHolder.date.setText(sDate);
+                    }
+                    if (defect.getContragent() != null) {
+                        viewHolder.contragent_name.setText(defect.getContragent().getName());
+                    }
+                }
             }
         }
         return convertView;
@@ -94,8 +108,6 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
         TextView title;
         TextView contragent_name;
         TextView date;
-        TextView equipment;
-        TextView defectType;
-
+        //TextView equipment;
     }
 }

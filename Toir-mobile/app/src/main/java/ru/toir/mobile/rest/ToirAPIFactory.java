@@ -25,6 +25,8 @@ import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
 import ru.toir.mobile.rest.interfaces.IContragent;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
+import ru.toir.mobile.rest.interfaces.IDefect;
+import ru.toir.mobile.rest.interfaces.IDefectType;
 import ru.toir.mobile.rest.interfaces.IDocumentation;
 import ru.toir.mobile.rest.interfaces.IDocumentationType;
 import ru.toir.mobile.rest.interfaces.IEquipment;
@@ -136,6 +138,16 @@ ToirAPIFactory {
     @NonNull
     public static IContragent getContragentService() {
         return getRetrofit().create(IContragent.class);
+    }
+
+    @NonNull
+    public static IDefect getDefectService() {
+        return getRetrofit().create(IDefect.class);
+    }
+
+    @NonNull
+    public static IDefectType getDefectTypeService() {
+        return getRetrofit().create(IDefectType.class);
     }
 
     @NonNull

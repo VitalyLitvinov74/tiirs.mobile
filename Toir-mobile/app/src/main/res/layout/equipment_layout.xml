@@ -288,30 +288,46 @@
                 android:divider="#333333"
                 android:dividerHeight="1px"
                 android:paddingBottom="10dp"
-                android:layout_below="@+id/equipment_text_documentation"></ListView>
+                android:layout_below="@+id/equipment_text_documentation" />
+
+            <View
+                android:id="@+id/equipment_divider3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/equipment_documentation_listView"
+                android:background="#777777" />
 
             <ImageView
-                android:id="@+id/overlapImageWriteTag"
+                android:id="@+id/equipment_defects_icon"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_below="@+id/equipment_text_name"
-                android:layout_toLeftOf="@+id/overlapImageReadTag"
-                android:adjustViewBounds="true"
-                android:clickable="false"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_divider3"
                 android:contentDescription="@string/image_description"
-                android:paddingRight="10dp"
-                android:src="@drawable/circle2" />
+                android:maxHeight="32dp"
+                android:src="@drawable/ic_icon_tasks2" />
 
-            <ImageView
-                android:id="@+id/overlapImageReadTag"
+            <TextView
+                android:id="@+id/equipment_text_defects"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/equipment_text_name"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/image_description"
-                android:paddingRight="10dp"
-                android:src="@drawable/circle" />
+                android:layout_height="40dp"
+                android:layout_below="@+id/equipment_divider3"
+                android:background="#FAFAFA"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/equipment_defects_icon"
+                android:text="@string/defects"
+                android:textColor="#757575"
+                android:textSize="16sp" />
+
+            <ListView
+                android:id="@+id/equipment_defects_listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp"
+                android:layout_below="@+id/equipment_text_defects" />
 
         </RelativeLayout>
 

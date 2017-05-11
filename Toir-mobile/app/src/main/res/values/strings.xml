@@ -165,4 +165,6 @@
     <string name="client_type">Тип контрагента: $1$s</string>
     <string name="client_phone">Телефон: %1$s</string>
 
+    <string name="defects">Зафиксированные дефекты</string>
+    <string name="defect_user">Обнаружил: </string>
 </resources>

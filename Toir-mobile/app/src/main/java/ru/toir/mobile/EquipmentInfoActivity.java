@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.DefaultDatabaseErrorHandler;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -126,6 +127,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private ListView tv_equipment_listview;
     private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
+    private ListView tv_equipment_defects;
 
     Spinner defectTypeSpinner;
 
@@ -253,6 +255,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_docslistview = (ListView) findViewById(R.id.equipment_documentation_listView);
         tv_equipment_status = (TextView) findViewById(R.id.equipment_text_status);
         tv_equipment_id = (TextView) findViewById(R.id.equipment_text_id);
+        tv_equipment_defects = (ListView) findViewById(R.id.equipment_defects_listView);
 
         initView();
     }
@@ -303,6 +306,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         String sDate;
         RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
+        stages.subList(0,2);
         StageAdapter stageAdapter = new StageAdapter(getApplicationContext(), stages);
         if (stageAdapter.getCount()>0) {
             date = stages.get(0).getEndDate();
@@ -314,6 +318,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tv_equipment_check_date.setText(sDate);
         }
         tv_equipment_listview.setAdapter(stageAdapter);
+
+        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("date", Sort.DESCENDING);
+        stages.subList(0,2);
+        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
+        tv_equipment_defects.setAdapter(defectAdapter);
 
         String path = getExternalFilesDir("/equipment") + File.separator;
         Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(),equipment), 0, 300, equipment.getChangedAt().getTime());
@@ -654,8 +663,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab1.setClickable(false);
 
         FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin -= (int) (fab2.getWidth() * 2);
-        layoutParams2.bottomMargin -= (int) (fab2.getHeight() * 2);
+        layoutParams2.rightMargin -= (fab2.getWidth() * 2);
+        layoutParams2.bottomMargin -= (fab2.getHeight() * 2);
         fab2.setLayoutParams(layoutParams2);
         fab2.startAnimation(hide_fab_2);
         fab2.setClickable(false);

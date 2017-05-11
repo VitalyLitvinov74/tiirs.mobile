@@ -29,6 +29,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.AlertTypeAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeAdapter;
+import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
@@ -41,6 +42,8 @@ import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
 import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.Equipment;
@@ -162,6 +165,31 @@ public class ReferenceFragment extends Fragment {
                     Response<List<CriticalType>> response = ToirAPIFactory.getCriticalTypeService().criticalType(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<CriticalType> list = response.body();
+                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+                // DefectType
+                referenceName = DefectType.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<DefectType>> response = ToirAPIFactory.getDefectTypeService().defectType(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<DefectType> list = response.body();
+                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+                }
+
+                // Defect
+                referenceName = Defect.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<Defect>> response = ToirAPIFactory.getDefectService().defect(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<Defect> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
@@ -741,6 +769,13 @@ public class ReferenceFragment extends Fragment {
         contentListView.setAdapter(objectAdapter);
     }
 
+    private void fillListViewDefectType() {
+        RealmResults<DefectType> defectType;
+        defectType = realmDB.where(DefectType.class).findAll();
+        DefectTypeAdapter defectAdapter = new DefectTypeAdapter(getActivity().getApplicationContext(), defectType);
+        contentListView.setAdapter(defectAdapter);
+    }
+
     private void fillListViewOperationType() {
         RealmResults<OperationType> operationType;
         operationType = realmDB.where(OperationType.class).findAll();
@@ -868,6 +903,12 @@ public class ReferenceFragment extends Fragment {
                     break;
                 case EquipmentStatusAdapter.TABLE_NAME:
                     fillListViewEquipmentStatus();
+                    break;
+                case ObjectTypeAdapter.TABLE_NAME:
+                    fillListViewObjectType();
+                    break;
+                case DefectTypeAdapter.TABLE_NAME:
+                    fillListViewDefectType();
                     break;
                 default:
                     break;
