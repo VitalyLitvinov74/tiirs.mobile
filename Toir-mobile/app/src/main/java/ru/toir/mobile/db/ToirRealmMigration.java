@@ -279,6 +279,16 @@ public class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 19) {
+            toVersion20(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 20) {
+            toVersion21(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -575,7 +585,37 @@ public class ToirRealmMigration implements RealmMigration {
         //schema.get("TaskStages").addField("comment", String.class);
         schema.get("Orders").addField("comment", String.class);
         schema.get("Operation").addField("comment", String.class);
+    }
 
+    /**
+     * Переход на версию 20
+     *
+     * @param realm - экземпляр realmDB
+     */
+    private void toVersion20(DynamicRealm realm) {
+        Log.d(TAG, "from version 19");
+        RealmSchema schema = realm.getSchema();
+
+        RealmObjectSchema objSchema = schema.get("Defect");
+        objSchema.addRealmObjectField("user", schema.get("User"));
+        objSchema.removeField("contragent");
+
+        objSchema = schema.get("Contragent");
+        objSchema.addField("photo",String.class);
+        objSchema.addField("longitude", double.class);
+        objSchema.addField("latitude", double.class);
+    }
+
+    /**
+     * Переход на версию 21
+     *
+     * @param realm - экземпляр realmDB
+     */
+    private void toVersion21(DynamicRealm realm) {
+        Log.d(TAG, "from version 20");
+        RealmSchema schema = realm.getSchema();
+        RealmObjectSchema objSchema = schema.get("Contragent");
+        objSchema.addField("address",String.class);
     }
 
     private boolean testPropsFields(DynamicRealm realm) {

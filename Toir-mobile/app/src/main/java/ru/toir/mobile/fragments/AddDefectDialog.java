@@ -55,7 +55,7 @@ public class AddDefectDialog extends DialogFragment {
 
 		if (actionBar != null) {
 			actionBar.setDisplayHomeAsUpEnabled(true);
-			actionBar.setHomeAsUpIndicator(R.drawable.ic_close_black_24dp);
+			//actionBar.setHomeAsUpIndicator(R.drawable.ic_close_black_24dp);
 		}
 	}
 

@@ -16,8 +16,12 @@ public class Contragent extends RealmObject {
     private String name;
     private String description;
     private String phone;
+    private String address;
     private int contragentType;
     private Contragent parentContragent;
+    private String photo;
+    private double latitude;
+    private double longitude;
     private Date createdAt;
     private Date changedAt;
 
@@ -69,12 +73,44 @@ public class Contragent extends RealmObject {
         this.parentContragent = parentContragent;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public Date getCreatedAt() {

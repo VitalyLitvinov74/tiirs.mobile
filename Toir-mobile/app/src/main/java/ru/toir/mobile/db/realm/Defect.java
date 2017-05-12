@@ -13,7 +13,7 @@ public class Defect extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private Contragent contragent;
+    private User user;
     private Date date;
     private Equipment equipment;
     private DefectType defectType;
@@ -39,12 +39,12 @@ public class Defect extends RealmObject {
         this.uuid = uuid;
     }
 
-    public Contragent getContragent() {
-        return contragent;
+    public User getUser() {
+        return user;
     }
 
-    public void setContragent(Contragent contragent) {
-        this.contragent = contragent;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Date getDate() {

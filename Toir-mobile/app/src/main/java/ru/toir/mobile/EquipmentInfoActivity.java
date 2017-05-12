@@ -1,14 +1,11 @@
 package ru.toir.mobile;
 
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.DefaultDatabaseErrorHandler;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,16 +13,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,15 +39,9 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
-
-import org.w3c.dom.Text;
-
-import io.realm.Sort;
-import okhttp3.ResponseBody;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -67,6 +53,8 @@ import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DefectAdapter;
@@ -74,21 +62,14 @@ import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusAdapter;
 import ru.toir.mobile.db.adapters.StageAdapter;
-import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Documentation;
-import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
-import ru.toir.mobile.db.realm.MeasureType;
-import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.TaskStages;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.fragments.AddDefectDialog;
-import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -129,7 +110,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private TextView tv_equipment_status;
     private ListView tv_equipment_defects;
 
-    Spinner defectTypeSpinner;
+    //Spinner defectTypeSpinner;
 
     // диалог для работы с rfid считывателем
     private RfidDialog rfidDialog;
@@ -306,7 +287,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         String sDate;
         RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
-        stages.subList(0,2);
+        if (stages.size()>2) {
+            stages.subList(0,2);
+        }
         StageAdapter stageAdapter = new StageAdapter(getApplicationContext(), stages);
         if (stageAdapter.getCount()>0) {
             date = stages.get(0).getEndDate();
@@ -320,7 +303,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_listview.setAdapter(stageAdapter);
 
         RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("date", Sort.DESCENDING);
-        stages.subList(0,2);
+        if (defects.size()>2) {
+            defects.subList(0,2);
+        }
         DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
         tv_equipment_defects.setAdapter(defectAdapter);
 
@@ -624,8 +609,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab1.setClickable(true);
 
         FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin += (int) (fab2.getWidth() * 2);
-        layoutParams2.bottomMargin += (int) (fab2.getHeight() * 2);
+        layoutParams2.rightMargin += (fab2.getWidth() * 2);
+        layoutParams2.bottomMargin += (fab2.getHeight() * 2);
         fab2.setLayoutParams(layoutParams2);
         fab2.startAnimation(show_fab_2);
         fab2.setClickable(true);
@@ -759,8 +744,18 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     if (currentDefectType != null) {
                         defect.setDefectType(currentDefectType);
                     }
-                    defect.setDefectType(null);
-                    defect.setContragent(null);
+                    else {
+                        defect.setDefectType(null);
+                    }
+                    AuthorizedUser authUser = AuthorizedUser.getInstance();
+                    User user = realmDB.where(User.class)
+                            .equalTo("tagId", authUser.getTagId())
+                            .findFirst();
+                    if (user != null) {
+                        defect.setUser(user);
+                    }
+                    else
+                        defect.setUser(null);
                     defect.setTask(null);
                     realm.commitTransaction();
                 }

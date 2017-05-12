@@ -67,7 +67,7 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                 convertView = inflater.inflate(R.layout.defect_item_layout, parent, false);
                 viewHolder = new DefectAdapter.ViewHolder();
                 viewHolder.title = (TextView) convertView.findViewById(R.id.defect_title);
-                viewHolder.contragent_name = (TextView) convertView.findViewById(R.id.defect_user);
+                viewHolder.user_name = (TextView) convertView.findViewById(R.id.defect_user);
                 viewHolder.date = (TextView) convertView.findViewById(R.id.defect_date);
                 convertView.setTag(viewHolder);
             }
@@ -93,8 +93,8 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                         String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(defect.getDate());
                         viewHolder.date.setText(sDate);
                     }
-                    if (defect.getContragent() != null) {
-                        viewHolder.contragent_name.setText(defect.getContragent().getName());
+                    if (defect.getUser() != null) {
+                        viewHolder.user_name.setText(defect.getUser().getName());
                     }
                 }
             }
@@ -106,7 +106,7 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
     private static class ViewHolder {
         TextView uuid;
         TextView title;
-        TextView contragent_name;
+        TextView user_name;
         TextView date;
         //TextView equipment;
     }
