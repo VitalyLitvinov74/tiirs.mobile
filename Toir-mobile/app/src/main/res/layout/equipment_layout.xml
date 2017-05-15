@@ -304,7 +304,8 @@
                 android:layout_below="@+id/equipment_divider3"
                 android:contentDescription="@string/image_description"
                 android:maxHeight="32dp"
-                android:src="@drawable/ic_icon_tasks2" />
+                android:paddingLeft="5dp"
+                android:src="@drawable/ic_icon_warnings" />
 
             <TextView
                 android:id="@+id/equipment_text_defects"
@@ -313,8 +314,7 @@
                 android:layout_below="@+id/equipment_divider3"
                 android:background="#FAFAFA"
                 android:paddingLeft="20dp"
-                android:paddingTop="10dp"
-                android:layout_marginRight="25dp"
+                android:paddingTop="5dp"
                 android:layout_toRightOf="@+id/equipment_defects_icon"
                 android:text="@string/defects"
                 android:textColor="#757575"

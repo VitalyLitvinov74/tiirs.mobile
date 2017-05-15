@@ -87,7 +87,8 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                         viewHolder.title.setText(defect.getDefectType().getTitle());
                     }
                     else {
-                        viewHolder.title.setText("новый");
+                        viewHolder.title.setText("новый: " + defect.getComment());
+                        //viewHolder.title.setText("новый");
                     }
                     if (defect.getDate() != null) {
                         String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(defect.getDate());

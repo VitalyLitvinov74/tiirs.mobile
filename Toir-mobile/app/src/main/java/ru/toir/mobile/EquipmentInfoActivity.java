@@ -48,10 +48,12 @@ import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import okhttp3.ResponseBody;
@@ -683,7 +685,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         realmDB = Realm.getDefaultInstance();
         RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
-        final Spinner defectTypeSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects_category);
+        final Spinner defectTypeSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
         final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(this, defectType);
         defectTypeSpinner.setAdapter(typeSpinnerAdapter);
 
@@ -711,7 +713,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Укажите дефект");
         alert.setView(alertLayout);
-        alert.setIcon(R.drawable.ic_icon_tools);
+        alert.setIcon(R.drawable.ic_icon_warnings);
         alert.setCancelable(false);
         alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
             @Override

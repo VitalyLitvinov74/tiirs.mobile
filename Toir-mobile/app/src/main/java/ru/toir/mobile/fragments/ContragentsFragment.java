@@ -63,7 +63,7 @@ public class ContragentsFragment extends Fragment {
         contragentFilter.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String text = contragentFilter.getText().toString().toLowerCase(Locale.getDefault());
-                contragentAdapter.setFilter(text);
+                contragentAdapter.setFilter(text, realmDB);
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

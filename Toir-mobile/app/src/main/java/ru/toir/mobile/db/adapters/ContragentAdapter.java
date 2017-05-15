@@ -18,6 +18,8 @@ import java.util.Locale;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
+import io.realm.Case;
+import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -53,9 +55,9 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
         return 0;
     }
 
-    public void setFilter(String text) {
+    public void setFilter(String text, Realm realmDB) {
         if (adapterData != null) {
-            adapterData = adapterData.where().contains("name",text).findAll();
+            adapterData = realmDB.where(Contragent.class).equalTo("name",text).or().contains("name",text, Case.INSENSITIVE).findAll();
             notifyDataSetChanged();
         }
     }
