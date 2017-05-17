@@ -45,8 +45,10 @@ import com.roughike.bottombar.BottomBar;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
@@ -309,9 +311,10 @@ public class OrderFragment extends Fragment {
         makePhotoButton = (Button) rootView.findViewById(R.id.tl_photoButton);
         makePhotoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                File photo = getOutputMediaFile();
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+//                File photo = getOutputMediaFile();
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
                 // TODO: Олег, объяви константу
                 startActivityForResult(intent, 100);
             }
@@ -344,6 +347,7 @@ public class OrderFragment extends Fragment {
                     if (Level == TASK_LEVEL) {
                         initView();
                     }
+
                     if (Level == OPERATION_LEVEL) {
                         taskTimer.cancel();
                         firstLaunch = true;
@@ -356,10 +360,12 @@ public class OrderFragment extends Fragment {
                             Level = STAGE_LEVEL;
                         }
                     }
+
                     if (Level == STAGE_LEVEL) {
                         Level = TASK_LEVEL;
                         fillListViewTasks(selectedOrder, false);
                     }
+
                     return true;
                 }
 
@@ -712,15 +718,17 @@ public class OrderFragment extends Fragment {
      * @param status - статус наряда
      */
     private void getOrdersByStatus(List<String> status) {
-        AsyncTask<List<String>, Integer, List<Orders>> aTask = new AsyncTask<List<String>, Integer, List<Orders>>() {
+        AsyncTask<String[], Integer, List<Orders>> aTask = new AsyncTask<String[], Integer, List<Orders>>() {
             @Override
-            protected List<Orders> doInBackground(List<String>... params) {
+            protected List<Orders> doInBackground(String[]... params) {
                 // обновляем справочники
                 ReferenceFragment.updateReferences(null);
                 //int current_files_cnt=0;
 
+                List<String> args = java.util.Arrays.asList(params[0]);
+
                 // запрашиваем наряды
-                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
+                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(args);
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
@@ -881,7 +889,9 @@ public class OrderFragment extends Fragment {
                 processDialog.setProgress(values[0]);
             }
         };
-        aTask.execute(status);
+
+        String[] statusArray = status.toArray(new String[]{});
+        aTask.execute(statusArray);
     }
 
     /**
@@ -1164,10 +1174,11 @@ public class OrderFragment extends Fragment {
     }
 
     private void sendOrders(List<Orders> orders) {
-        AsyncTask<List<Orders>, Void, String> task = new AsyncTask<List<Orders>, Void, String>() {
+        AsyncTask<Orders[], Void, String> task = new AsyncTask<Orders[], Void, String>() {
             @Override
-            protected String doInBackground(List<Orders>... lists) {
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendOrders(lists[0]);
+            protected String doInBackground(Orders[]... lists) {
+                List<Orders> args = Arrays.asList(lists[0]);
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendOrders(args);
                 try {
                     Response response = call.execute();
                     Log.d(TAG, "response = " + response);
@@ -1183,15 +1194,18 @@ public class OrderFragment extends Fragment {
                 super.onPostExecute(s);
             }
         };
+
         addToJournal("Отправляем выполненные наряды на сервер");
-        task.execute(orders);
+        Orders[] ordersArray = orders.toArray(new Orders[]{});
+        task.execute(ordersArray);
     }
 
     private void sendMeasuredValues(List<MeasuredValue> values) {
-        AsyncTask<List<MeasuredValue>, Void, String> task = new AsyncTask<List<MeasuredValue>, Void, String>() {
+        AsyncTask<MeasuredValue[], Void, String> task = new AsyncTask<MeasuredValue[], Void, String>() {
             @Override
-            protected String doInBackground(List<MeasuredValue>... lists) {
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendMeasuredValues(lists[0]);
+            protected String doInBackground(MeasuredValue[]... lists) {
+                List<MeasuredValue> args = Arrays.asList(lists[0]);
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendMeasuredValues(args);
                 try {
                     Response response = call.execute();
                     Log.d(TAG, "response = " + response);
@@ -1209,7 +1223,9 @@ public class OrderFragment extends Fragment {
                 Toast.makeText(getContext(), "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
             }
         };
-        task.execute(values);
+
+        MeasuredValue[] valuesArray = values.toArray(new MeasuredValue[]{});
+        task.execute(valuesArray);
     }
 
     /**
@@ -1500,16 +1516,19 @@ public class OrderFragment extends Fragment {
     private File getOutputMediaFile() {
 
         File mediaStorageDir;
-        mediaStorageDir = new File(getActivity().getApplicationContext()
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                .getAbsolutePath());
+        File picDir = getActivity().getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (picDir == null) {
+            return null;
+        }
 
+        mediaStorageDir = new File(picDir.getAbsolutePath());
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("Camera Guide", "Required media storage does not exist");
                 return null;
             }
         }
+//        + '-' + new Date().getTime() / 1000
         return new File(mediaStorageDir.getPath() + File.separator + currentOperationUuid + ".jpg");
     }
 
@@ -1730,99 +1749,99 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    /**
-     * Создание элементов интерфейса для шагов операции с измерениями значений
-     *
-     * @param measureType - тип осуществляемого измерения
-     */
-    private void measureUI(String measureType) {
-        // выбор значения
-        if (numberPicker == null) {
-            numberPicker = new NumberPicker(getActivity().getApplicationContext());
-        }
-
-        numberPicker.setOrientation(NumberPicker.VERTICAL);
-        numberPicker.setMinValue(1);
-        numberPicker.setMaxValue(999);
-
-        // перечень множителей
-        if (suffixList == null) {
-            suffixList = new ArrayList<>();
-        } else {
-            suffixList.clear();
-        }
-
-        ArrayAdapter<Suffixes> spinnerSuffixAdapter;
-        if (measureType.equals(MeasureType.Type.FREQUENCY)) {
-            //resultButtonLayout.addView(numberPicker);
-
-            suffixList.add(new Suffixes("Гц", 1));
-            suffixList.add(new Suffixes("кГц", 1000));
-            suffixList.add(new Suffixes("МГц", 1000000));
-            suffixList.add(new Suffixes("ГГц", 1000000000));
-
-            // адаптер для множителей
-            spinnerSuffixAdapter = new ArrayAdapter<>(
-                    getActivity().getApplicationContext(),
-                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-
-            // выпадающий список с множителями
-            if (spinnerSuffix == null) {
-                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-            }
-
-            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-
-            //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureType.Type.VOLTAGE)) {
-            //resultButtonLayout.addView(numberPicker);
-
-            suffixList.add(new Suffixes("В", 1));
-            suffixList.add(new Suffixes("кВ", 1000));
-            suffixList.add(new Suffixes("МВ", 1000000));
-            suffixList.add(new Suffixes("ГВ", 1000000000));
-
-            // адаптер для множителей
-            spinnerSuffixAdapter = new ArrayAdapter<>(
-                    getActivity().getApplicationContext(),
-                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-
-            // выпадающий список с множителями
-            if (spinnerSuffix == null) {
-                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-            }
-
-            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-
-            //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureType.Type.PRESSURE)) {
-            //resultButtonLayout.addView(numberPicker);
-
-            suffixList.add(new Suffixes("Па", 1));
-            suffixList.add(new Suffixes("кПа", 1000));
-            suffixList.add(new Suffixes("МПа", 1000000));
-            suffixList.add(new Suffixes("ГПа", 1000000000));
-
-            // адаптер для множителей
-            spinnerSuffixAdapter = new ArrayAdapter<>(
-                    getActivity().getApplicationContext(),
-                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-
-            // выпадающий список с множителями
-            if (spinnerSuffix == null) {
-                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-            }
-
-            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-
-            //resultButtonLayout.addView(spinnerSuffix);
-        } else if (measureType.equals(MeasureType.Type.PHOTO)) {
-            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-            File photo = getOutputMediaFile();
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-            startActivityForResult(intent, 100);
-        }
-    }
+//    /**
+//     * Создание элементов интерфейса для шагов операции с измерениями значений
+//     *
+//     * @param measureType - тип осуществляемого измерения
+//     */
+//    private void measureUI(String measureType) {
+//        // выбор значения
+//        if (numberPicker == null) {
+//            numberPicker = new NumberPicker(getActivity().getApplicationContext());
+//        }
+//
+//        numberPicker.setOrientation(NumberPicker.VERTICAL);
+//        numberPicker.setMinValue(1);
+//        numberPicker.setMaxValue(999);
+//
+//        // перечень множителей
+//        if (suffixList == null) {
+//            suffixList = new ArrayList<>();
+//        } else {
+//            suffixList.clear();
+//        }
+//
+//        ArrayAdapter<Suffixes> spinnerSuffixAdapter;
+//        if (measureType.equals(MeasureType.Type.FREQUENCY)) {
+//            //resultButtonLayout.addView(numberPicker);
+//
+//            suffixList.add(new Suffixes("Гц", 1));
+//            suffixList.add(new Suffixes("кГц", 1000));
+//            suffixList.add(new Suffixes("МГц", 1000000));
+//            suffixList.add(new Suffixes("ГГц", 1000000000));
+//
+//            // адаптер для множителей
+//            spinnerSuffixAdapter = new ArrayAdapter<>(
+//                    getActivity().getApplicationContext(),
+//                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+//
+//            // выпадающий список с множителями
+//            if (spinnerSuffix == null) {
+//                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+//            }
+//
+//            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+//
+//            //resultButtonLayout.addView(spinnerSuffix);
+//        } else if (measureType.equals(MeasureType.Type.VOLTAGE)) {
+//            //resultButtonLayout.addView(numberPicker);
+//
+//            suffixList.add(new Suffixes("В", 1));
+//            suffixList.add(new Suffixes("кВ", 1000));
+//            suffixList.add(new Suffixes("МВ", 1000000));
+//            suffixList.add(new Suffixes("ГВ", 1000000000));
+//
+//            // адаптер для множителей
+//            spinnerSuffixAdapter = new ArrayAdapter<>(
+//                    getActivity().getApplicationContext(),
+//                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+//
+//            // выпадающий список с множителями
+//            if (spinnerSuffix == null) {
+//                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+//            }
+//
+//            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+//
+//            //resultButtonLayout.addView(spinnerSuffix);
+//        } else if (measureType.equals(MeasureType.Type.PRESSURE)) {
+//            //resultButtonLayout.addView(numberPicker);
+//
+//            suffixList.add(new Suffixes("Па", 1));
+//            suffixList.add(new Suffixes("кПа", 1000));
+//            suffixList.add(new Suffixes("МПа", 1000000));
+//            suffixList.add(new Suffixes("ГПа", 1000000000));
+//
+//            // адаптер для множителей
+//            spinnerSuffixAdapter = new ArrayAdapter<>(
+//                    getActivity().getApplicationContext(),
+//                    android.R.layout.simple_spinner_dropdown_item, suffixList);
+//
+//            // выпадающий список с множителями
+//            if (spinnerSuffix == null) {
+//                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
+//            }
+//
+//            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
+//
+//            //resultButtonLayout.addView(spinnerSuffix);
+//        } else if (measureType.equals(MeasureType.Type.PHOTO)) {
+//            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+//            File photo = getOutputMediaFile();
+//            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+//            startActivityForResult(intent, 100);
+//        }
+//    }
 
     private void runRfidDialog(String expectedTagId, final int level) {
 //        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();

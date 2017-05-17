@@ -15,12 +15,11 @@ import io.realm.RealmMigration;
 import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 import io.realm.exceptions.RealmException;
-import ru.toir.mobile.db.realm.Contragent;
 
 /**
  * @author Dmitriy Logachev
  */
-public class ToirRealmMigration implements RealmMigration {
+class ToirRealmMigration implements RealmMigration {
     private final String TAG = this.getClass().getName();
 
     @Override
@@ -286,6 +285,11 @@ public class ToirRealmMigration implements RealmMigration {
 
         if (oldVersion == 20) {
             toVersion21(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 21) {
+            toVersion22(realm);
             oldVersion++;
         }
 
@@ -618,14 +622,37 @@ public class ToirRealmMigration implements RealmMigration {
         objSchema.addField("address",String.class);
     }
 
+    /**
+     * Переход на версию 22
+     *
+     * @param realm - экземпляр realmDB
+     */
+    private void toVersion22(DynamicRealm realm) {
+        Log.d(TAG, "from version 21");
+        RealmSchema schema = realm.getSchema();
+        schema.create("OperationPhoto")
+                .addField("_id", long.class)
+                .addIndex("_id")
+                .addField("uuid", String.class)
+                .addPrimaryKey("uuid")
+                .addRealmObjectField("operation", schema.get("Operation"))
+                .addField("fileName", String.class)
+                .addField("sent", boolean.class)
+                .addField("createdAt", Date.class)
+                .addField("changedAt", Date.class);
+    }
+
     private boolean testPropsFields(DynamicRealm realm) {
         boolean result = true;
         RealmSchema schema = realm.getSchema();
+        // TODO: получить наличные классы потомки RealmObject
+        // TODO: реализовать сравнение полученного списка с существующими таблицами
+
         // проверяем соответствие схемы базы со свойствами классов
         Set<RealmObjectSchema> realmObjects = schema.getAll();
         for (RealmObjectSchema realmObject : realmObjects) {
             Log.d(TAG, "Class name = " + realmObject.getClassName());
-            Field[] classProps = null;
+            Field[] classProps;
             Set<String> props = new HashSet<>();
             Map<String, String> propsType = new HashMap<>();
             try {
