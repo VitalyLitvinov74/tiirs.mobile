@@ -63,7 +63,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     private Equipment currentEquipment;
     private Operation currentOperation;
 
-        @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realmDB = Realm.getDefaultInstance();
@@ -71,21 +71,22 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         setMainLayout(savedInstanceState);
 
         Bundle b = getIntent().getExtras();
-            String operationUuid = b.getString("operationUuid");
+        String operationUuid = b.getString("operationUuid");
         equipmentUuid = b.getString("equipmentUuid");
 
         final RealmResults<Equipment> equipment = realmDB.where(Equipment.class).equalTo("uuid", equipmentUuid).findAll();
-        if(equipment.size()>0) {
-                currentEquipment = equipment.first();
-            }
+        if (equipment.size() > 0) {
+            currentEquipment = equipment.first();
+        }
+
         RealmResults<Operation> operations = realmDB.where(Operation.class).equalTo("uuid", operationUuid).findAll();
-        if(operations.size()>0) {
-                currentOperation = operations.first();
+        if (operations.size() > 0) {
+            currentOperation = operations.first();
         }
 
         //meas_header = (TextView) findViewById(R.id.meas_header);
         meas_value = (EditText) findViewById(R.id.meas_value);
-        meas_typeSpinner= (Spinner) findViewById(R.id.simple_spinner);
+        meas_typeSpinner = (Spinner) findViewById(R.id.simple_spinner);
         meas_submit = (Button) findViewById(R.id.meas_Button);
 
         RealmResults<MeasureType> measureType = realmDB.where(MeasureType.class).findAll();
@@ -93,39 +94,47 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         typeSpinnerAdapter.notifyDataSetChanged();
         meas_typeSpinner.setAdapter(typeSpinnerAdapter);
 
-            meas_submit.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            measuredValue = realmDB.createObject(MeasuredValue.class);
-                            UUID uuid = UUID.randomUUID();
-                            long next_id = realm.where(MeasuredValue.class).max("_id").intValue() + 1;
-                            final MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
-                            measuredValue.set_id(next_id);
-                            measuredValue.setUuid(uuid.toString().toUpperCase());
-                            measuredValue.setMeasureType(measureType);
-                            measuredValue.setDate(new Date());
-                            measuredValue.setChangedAt(new Date());
-                            measuredValue.setCreatedAt(new Date());
-                            if (meas_value.getText().toString().equals(""))
-                                measuredValue.setValue("0");
-                            else measuredValue.setValue(meas_value.getText().toString());
-                            if (currentEquipment!=null) measuredValue.setEquipment(currentEquipment);
-                            if (currentOperation!=null) measuredValue.setOperation(currentOperation);
+        meas_submit.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        measuredValue = realmDB.createObject(MeasuredValue.class);
+                        UUID uuid = UUID.randomUUID();
+                        long next_id = realm.where(MeasuredValue.class).max("_id").longValue() + 1;
+                        final MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
+                        measuredValue.set_id(next_id);
+                        measuredValue.setUuid(uuid.toString().toUpperCase());
+                        measuredValue.setMeasureType(measureType);
+                        measuredValue.setDate(new Date());
+                        measuredValue.setChangedAt(new Date());
+                        measuredValue.setCreatedAt(new Date());
+                        if (meas_value.getText().toString().equals("")) {
+                            measuredValue.setValue("0");
+                        } else {
+                            measuredValue.setValue(meas_value.getText().toString());
                         }
-                    });
-                    setData();
-                    Intent data = new Intent();
-                    data.putExtra("value", meas_value.getText().toString());
-                    if (getParent() == null) {
-                        setResult(Activity.RESULT_OK, data);
-                    } else {
-                        getParent().setResult(Activity.RESULT_OK, data);
+
+                        if (currentEquipment != null) {
+                            measuredValue.setEquipment(currentEquipment);
+                        }
+
+                        if (currentOperation != null) {
+                            measuredValue.setOperation(currentOperation);
+                        }
                     }
-                    finish();
+                });
+                setData();
+                Intent data = new Intent();
+                data.putExtra("value", meas_value.getText().toString());
+                if (getParent() == null) {
+                    setResult(Activity.RESULT_OK, data);
+                } else {
+                    getParent().setResult(Activity.RESULT_OK, data);
                 }
-            });
+                finish();
+            }
+        });
 
 
         mChart = (BarChart) findViewById(R.id.chart1);
@@ -176,23 +185,23 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         int count;
         ArrayList<String> xVals = new ArrayList<>();
         // TODO сделать выбор нужных значений по шаблону операции
-        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class).equalTo("equipment.uuid",equipmentUuid).findAll();
+        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class).equalTo("equipment.uuid", equipmentUuid).findAll();
 
         count = measuredValues.size();
         for (int i = 0; i < count; i++) {
             // add measured value
-            if (measuredValues.get(i)!=null) {
+            if (measuredValues.get(i) != null) {
                 xVals.add(measuredValues.get(i).getDate().toString());
             }
         }
         //RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
         //for (Operation operation : operations) {
-            //if (operation.getOperationTemplate().getUuid().equals(currentOperation.getOperationTemplateUuid()))
+        //if (operation.getOperationTemplate().getUuid().equals(currentOperation.getOperationTemplateUuid()))
         //}
 
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            if (measuredValues.get(i).getValue()!=null) {
+            if (measuredValues.get(i).getValue() != null) {
                 yVals1.add(new BarEntry(Float.parseFloat(measuredValues.get(i).getValue()), i));
             }
         }

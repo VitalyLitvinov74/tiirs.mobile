@@ -1,6 +1,7 @@
 package ru.toir.mobile.db.realm;
 
 import java.util.Date;
+import java.util.UUID;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
@@ -21,6 +22,14 @@ public class OperationPhoto extends RealmObject {
     private boolean sent;
     private Date createdAt;
     private Date changedAt;
+
+    public OperationPhoto() {
+        uuid = UUID.randomUUID().toString().toUpperCase();
+        sent = false;
+        Date createDate = new Date();
+        createdAt = createDate;
+        changedAt = createDate;
+    }
 
     public long get_id() {
         return _id;

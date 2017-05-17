@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -30,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
@@ -75,10 +74,10 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.ISend;
 import ru.toir.mobile.db.realm.Journal;
-import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OperationPhoto;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -312,9 +311,6 @@ public class OrderFragment extends Fragment {
         makePhotoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-//                File photo = getOutputMediaFile();
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
                 // TODO: Олег, объяви константу
                 startActivityForResult(intent, 100);
             }
@@ -1478,15 +1474,57 @@ public class OrderFragment extends Fragment {
         dialog.show();
     }
 
+    public String getLastPhotoFilePath() {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getActivity().managedQuery(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToLast();
+
+        return cursor.getString(column_index_data);
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 100:
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.d("test", "onPictureTaken - jpeg");
-                    File selectedImage = getOutputMediaFile();
-                    Uri fileUri = Uri.fromFile(selectedImage);
+                    // получаем штатными средствами последний снятый кадр в системе
+                    String fromFilePath = getLastPhotoFilePath();
+                    File fromFile = new File(fromFilePath);
+
+                    File mediaStorageDir;
+                    File picDir = getActivity().getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                    if (picDir == null) {
+                        return;
+                    }
+
+                    mediaStorageDir = new File(picDir.getAbsolutePath());
+                    if (!mediaStorageDir.exists()) {
+                        if (!mediaStorageDir.mkdirs()) {
+                            Log.d(TAG, "Required media storage does not exist");
+                            return;
+                        }
+                    }
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(mediaStorageDir.getPath())
+                            .append(File.separator)
+                            .append(currentOperationUuid)
+                            .append('-')
+                            .append(new Date().getTime() / 1000)
+                            .append(fromFilePath.substring(fromFilePath.lastIndexOf('.')));
+
+                    String toFilePath = builder.toString();
+                    File toFile = new File(toFilePath);
+                    if (!fromFile.renameTo(toFile)) {
+                        return;
+                    }
+
+                    Uri fileUri = Uri.fromFile(toFile);
                     //getActivity().getContentResolver().notifyChange(selectedImage, null);
                     //ContentResolver cr = getActivity().getContentResolver();
                     //Bitmap bitmap;
@@ -1498,6 +1536,16 @@ public class OrderFragment extends Fragment {
                         Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
                     }
+
+                    // добавляем запись о полученном файле
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    OperationPhoto operationPhoto = new OperationPhoto();
+                    operationPhoto.set_id(realm.where(OperationPhoto.class).max("_id").longValue() + 1);
+                    operationPhoto.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
+                    operationPhoto.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
+                    realm.copyToRealm(operationPhoto);
+                    realm.commitTransaction();
                 }
                 break;
             case 101:
@@ -1511,25 +1559,6 @@ public class OrderFragment extends Fragment {
                     CompleteCurrentOperation(currentOperationId, value);
                 }
         }
-    }
-
-    private File getOutputMediaFile() {
-
-        File mediaStorageDir;
-        File picDir = getActivity().getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        if (picDir == null) {
-            return null;
-        }
-
-        mediaStorageDir = new File(picDir.getAbsolutePath());
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("Camera Guide", "Required media storage does not exist");
-                return null;
-            }
-        }
-//        + '-' + new Date().getTime() / 1000
-        return new File(mediaStorageDir.getPath() + File.separator + currentOperationUuid + ".jpg");
     }
 
     /**
@@ -1748,100 +1777,6 @@ public class OrderFragment extends Fragment {
             }
         }
     }
-
-//    /**
-//     * Создание элементов интерфейса для шагов операции с измерениями значений
-//     *
-//     * @param measureType - тип осуществляемого измерения
-//     */
-//    private void measureUI(String measureType) {
-//        // выбор значения
-//        if (numberPicker == null) {
-//            numberPicker = new NumberPicker(getActivity().getApplicationContext());
-//        }
-//
-//        numberPicker.setOrientation(NumberPicker.VERTICAL);
-//        numberPicker.setMinValue(1);
-//        numberPicker.setMaxValue(999);
-//
-//        // перечень множителей
-//        if (suffixList == null) {
-//            suffixList = new ArrayList<>();
-//        } else {
-//            suffixList.clear();
-//        }
-//
-//        ArrayAdapter<Suffixes> spinnerSuffixAdapter;
-//        if (measureType.equals(MeasureType.Type.FREQUENCY)) {
-//            //resultButtonLayout.addView(numberPicker);
-//
-//            suffixList.add(new Suffixes("Гц", 1));
-//            suffixList.add(new Suffixes("кГц", 1000));
-//            suffixList.add(new Suffixes("МГц", 1000000));
-//            suffixList.add(new Suffixes("ГГц", 1000000000));
-//
-//            // адаптер для множителей
-//            spinnerSuffixAdapter = new ArrayAdapter<>(
-//                    getActivity().getApplicationContext(),
-//                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-//
-//            // выпадающий список с множителями
-//            if (spinnerSuffix == null) {
-//                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-//            }
-//
-//            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-//
-//            //resultButtonLayout.addView(spinnerSuffix);
-//        } else if (measureType.equals(MeasureType.Type.VOLTAGE)) {
-//            //resultButtonLayout.addView(numberPicker);
-//
-//            suffixList.add(new Suffixes("В", 1));
-//            suffixList.add(new Suffixes("кВ", 1000));
-//            suffixList.add(new Suffixes("МВ", 1000000));
-//            suffixList.add(new Suffixes("ГВ", 1000000000));
-//
-//            // адаптер для множителей
-//            spinnerSuffixAdapter = new ArrayAdapter<>(
-//                    getActivity().getApplicationContext(),
-//                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-//
-//            // выпадающий список с множителями
-//            if (spinnerSuffix == null) {
-//                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-//            }
-//
-//            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-//
-//            //resultButtonLayout.addView(spinnerSuffix);
-//        } else if (measureType.equals(MeasureType.Type.PRESSURE)) {
-//            //resultButtonLayout.addView(numberPicker);
-//
-//            suffixList.add(new Suffixes("Па", 1));
-//            suffixList.add(new Suffixes("кПа", 1000));
-//            suffixList.add(new Suffixes("МПа", 1000000));
-//            suffixList.add(new Suffixes("ГПа", 1000000000));
-//
-//            // адаптер для множителей
-//            spinnerSuffixAdapter = new ArrayAdapter<>(
-//                    getActivity().getApplicationContext(),
-//                    android.R.layout.simple_spinner_dropdown_item, suffixList);
-//
-//            // выпадающий список с множителями
-//            if (spinnerSuffix == null) {
-//                spinnerSuffix = new Spinner(getActivity().getApplicationContext());
-//            }
-//
-//            spinnerSuffix.setAdapter(spinnerSuffixAdapter);
-//
-//            //resultButtonLayout.addView(spinnerSuffix);
-//        } else if (measureType.equals(MeasureType.Type.PHOTO)) {
-//            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-//            File photo = getOutputMediaFile();
-//            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-//            startActivityForResult(intent, 100);
-//        }
-//    }
 
     private void runRfidDialog(String expectedTagId, final int level) {
 //        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
