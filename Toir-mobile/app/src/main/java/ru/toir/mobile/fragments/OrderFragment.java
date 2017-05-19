@@ -918,6 +918,7 @@ public class OrderFragment extends Fragment {
 
             @Override
             protected List<String> doInBackground(String[]... lists) {
+                List<String> sendFiles = new ArrayList<>();
                 for (String file : lists[0]) {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
@@ -931,24 +932,38 @@ public class OrderFragment extends Fragment {
                     String operationUuid = file.substring(0, file.lastIndexOf('-'));
                     operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
                     list.add(prepareFilePart("photo[" + operationUuid + "]", uri));
+                    // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
+                    // объём данных превышающий органичения на отправку POST запросом на сервере
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
                     try {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
                         if (response.isSuccessful()) {
                             Log.d(TAG, "result" + result.contentType());
+                            sendFiles.add(file.substring(file.lastIndexOf('/') + 1));
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
                 }
 
-                return null;
+                return sendFiles;
             }
 
             @Override
             protected void onPostExecute(List<String> strings) {
                 super.onPostExecute(strings);
+
+                // TODO: нужно придумать более правильный механизм передачи данных для отправки и обработки результата
+                // пока сделано по тупому
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                for (String item : strings) {
+                    OperationPhoto photo = realm.where(OperationPhoto.class).equalTo("fileName", item).findFirst();
+                    photo.setSent(true);
+                }
+
+                realm.commitTransaction();
             }
         };
 
