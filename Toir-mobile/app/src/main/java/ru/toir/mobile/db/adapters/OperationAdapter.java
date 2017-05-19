@@ -2,9 +2,9 @@ package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -36,13 +36,15 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
  * Created by olejek on 13.09.16.
  */
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
-    public static final String TABLE_NAME = "Operation";
+    private static final String TABLE_NAME = "Operation";
+    private static final int MAX_OPERATIONS = 100;
+
     Realm realm = Realm.getDefaultInstance();
     private Context context;
-    private int counter=0;
+    //private int counter=0;
     private String taskTemplateUuid;
-    private boolean[] visibility = new boolean[50];
-    private boolean[] completed = new boolean[50];
+    private boolean[] visibility = new boolean[MAX_OPERATIONS];
+    private boolean[] completed = new boolean[MAX_OPERATIONS];
 
     public OperationAdapter(@NonNull Context context, RealmResults<Operation> data, String taskTemplateUuid) {
         super(context, data);
@@ -57,7 +59,16 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            if (adapterData.size()<MAX_OPERATIONS) {
+                return adapterData.size();
+            }
+            else {
+                Log.d ("System error","Превышено максимальное число операций для одного этапа");
+                return MAX_OPERATIONS;
+            }
+        }
+        else return 0;
     }
 
     @Override
@@ -72,7 +83,10 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     @Override
     public long getItemId(int position) {
-        return adapterData.get(position).get_id();
+        if (adapterData != null) {
+            return adapterData.get(position).get_id();
+        }
+        else return 0;
     }
 
     public void setItemVisibility(int position) {
@@ -81,7 +95,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     public void setItemEnable(int position, boolean enable)
     {
-        completed[position]=enable;
+        if (position<MAX_OPERATIONS) {
+            completed[position] = enable;
+        }
     }
 
     public boolean getItemEnable(int position)
@@ -92,11 +108,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        File image;
-        File image2;
+        //File image;
+        //File image2;
         Operation operation;
         viewHolder = new ViewHolder();
-        if (adapterData==null) return convertView;
+        if (adapterData == null) return convertView;
+        if (position > MAX_OPERATIONS) {
+            Log.d("Debug","position > max_operations");
+            return convertView;
+        }
         operation = adapterData.get(position);
         if (convertView == null) {
             if (parent.getId() == R.id.list_view) {
@@ -110,6 +130,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
                 viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_label);
                 viewHolder.measure_value = (TextView) convertView.findViewById(R.id.op_measure_value);
+                viewHolder.time = (TextView) convertView.findViewById(R.id.op_time);
                 viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
                 viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
             } else {
@@ -163,10 +184,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     }
 
                     if (operationStatus != null) {
-                        if (operationStatus.getTitle().equals("Не выполнена")) {
+                        if (operationStatus.getUuid().equals(OperationStatus.Status.NEW)) {
                             viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
+                            viewHolder.status.setChecked(false);
                         }
-                        if (operationStatus.getTitle().equals("Выполнена")) {
+                        if (operationStatus.getUuid().equals(OperationStatus.Status.IN_WORK)) {
+                            viewHolder.verdict.setImageResource(R.drawable.status_easy_work);
+                            viewHolder.status.setChecked(false);
+                        }
+                        if (operationStatus.getUuid().equals(OperationStatus.Status.COMPLETE)) {
                             viewHolder.status.setChecked(true);
                             viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
                         }
@@ -174,7 +200,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     viewHolder.description.setText(operation.getOperationTemplate().getDescription());
                     OperationTemplate operationTemplate;
                     operationTemplate = operation.getOperationTemplate();
-                    viewHolder.normative.setText("" + operationTemplate.getNormative());
+                    viewHolder.normative.setText(String.valueOf(operationTemplate.getNormative()));
+                    if (operation.getEndDate().getTime() > 0 &&  operation.getStartDate().getTime() > 0)
+                        viewHolder.time.setText(context.getString(R.string.sec_with_value, (int) (operation.getEndDate().getTime() - operation.getStartDate().getTime()) / 1000));
 
                     //image = getOutputMediaFile(operation.getUuid(), 1);
                     //Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
@@ -223,7 +251,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 return null;
             }
         }*/
-        File mediaFile = null;
+        File mediaFile;
         if (mini==1)
             mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + operationUuid + "_m.jpg");
@@ -232,7 +260,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         return mediaFile;
     }
 
-    private static class ViewHolder {
+    public static class ViewHolder {
         TextView title;
         CheckBox status;
         Spinner spinner;
@@ -241,6 +269,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         TextView end_date;
         TextView description;
         TextView normative;
+        TextView time;
         TextView measure;
         TextView measure_value;
         ImageView image;

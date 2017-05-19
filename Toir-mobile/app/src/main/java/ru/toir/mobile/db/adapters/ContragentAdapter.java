@@ -1,22 +1,12 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.logging.Filter;
-import java.util.logging.LogRecord;
 
 import io.realm.Case;
 import io.realm.Realm;
@@ -25,12 +15,6 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Contragent;
-import ru.toir.mobile.db.realm.CriticalType;
-import ru.toir.mobile.db.realm.Equipment;
-
-import static org.slf4j.MDC.clear;
-import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
-import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author olejek

@@ -126,7 +126,7 @@ public class ObjectFragment extends Fragment {
                     new GeoPoint(curLatitude,
                             curLongitude));
             olItem.object = object;
-            Drawable newMarker = ContextCompat.getDrawable(getActivity(),R.drawable.forbidden_32);
+            Drawable newMarker = ContextCompat.getDrawable(getActivity(),R.drawable.equipment_32);
             olItem.setMarker(newMarker);
             overlayItemArray.add(olItem);
         }

@@ -124,7 +124,6 @@ public class OrderFragment extends Fragment {
     private String currentTaskStageUuid = "";
     private ListView mainListView;
     private Button submit;
-    //private Button measure;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
     private String TAG = "OrderFragment";
@@ -168,6 +167,7 @@ public class OrderFragment extends Fragment {
                 for (int i = 0; i < totalOperationCount; i++) {
                     if (mainListView.getChildAt(i) != null) {
                         checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
+                        //checkBox.setOnClickListener(new onCheckBoxClickListener(i));
                         checkBox.setOnClickListener(new onCheckBoxClickListener(i));
                     }
                 }
@@ -344,6 +344,10 @@ public class OrderFragment extends Fragment {
                     if (Level == TASK_LEVEL) {
                         initView();
                     }
+                    if (Level == STAGE_LEVEL) {
+                        Level = TASK_LEVEL;
+                        fillListViewTasks(selectedOrder, false);
+                    }
                     if (Level == OPERATION_LEVEL) {
                         taskTimer.cancel();
                         firstLaunch = true;
@@ -355,10 +359,6 @@ public class OrderFragment extends Fragment {
                             submit.setVisibility(View.GONE);
                             Level = STAGE_LEVEL;
                         }
-                    }
-                    if (Level == STAGE_LEVEL) {
-                        Level = TASK_LEVEL;
-                        fillListViewTasks(selectedOrder, false);
                     }
                     return true;
                 }
@@ -586,7 +586,7 @@ public class OrderFragment extends Fragment {
         if (operationAdapter != null) {
             totalOperationCount = operationAdapter.getCount();
             operation = operationAdapter.getItem(0);
-            operationAdapter.setItemEnable(0, true);
+            //operationAdapter.setItemEnable(0, true);
             // нет решительно никакой возможности выполнять выполненные операции по сто раз
             // только если сбросить все
             if (operation != null) {
@@ -612,12 +612,22 @@ public class OrderFragment extends Fragment {
             }
 
             for (int i = 0; i < totalOperationCount; i++) {
-                if (i > 0)
-                    operationAdapter.setItemEnable(i, false);
-                //checkBox = (CheckBox)operationAdapter.getView(i,null,mainListView);
-                //checkBox.setOnClickListener(new onCheckBoxClickListener());
+                if (operationAdapter.getItem(i) != null) {
+                    OperationStatus operationStatus = operationAdapter.getItem(i).getOperationStatus();
+                    if (operationStatus != null) {
+                        if (operationStatus.getUuid().equals(OperationStatus.Status.IN_WORK) ||
+                                operationStatus.getUuid().equals(OperationStatus.Status.NEW) ||
+                                operationStatus.getUuid().equals(OperationStatus.Status.UN_COMPLETE)) {
+                            operationAdapter.setItemEnable(i, true);
+                            currentOperationId = i;
+                            break;
+                        } else
+                            operationAdapter.setItemEnable(i, false);
+                    }
+                }
             }
         }
+
 
         // время начала работы (приступаем к первой операции и нехрен тормозить)
         startTime = System.currentTimeMillis();
@@ -1649,11 +1659,14 @@ public class OrderFragment extends Fragment {
     }
 
     void CompleteCurrentOperation(int position, String measureValue) {
-        TextView textTime;
+        TextView textTime = null;
         TextView textValue;
         final long currentTime = System.currentTimeMillis();
         final OperationStatus operationStatusCompleted;
         final OperationVerdict operationVerdictCompleted;
+        if (position >= operationAdapter.getCount() || currentOperationId >= operationAdapter.getCount()) {
+            Log.d(TAG, "Неверный индекс операции");
+        }
 
         operationStatusCompleted = realmDB.where(OperationStatus.class)
                 .equalTo("uuid", OperationStatus.Status.COMPLETE)
@@ -1670,9 +1683,14 @@ public class OrderFragment extends Fragment {
         }
 
         if (operationAdapter != null) {
-            textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-            textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
-
+            if (mainListView.getChildAt(currentOperationId) != null) {
+                textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
+                if (textTime != null) {
+                    textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
+                } else {
+                    Log.d(TAG, "Операции с индексом {currentOperationId} нет в списке");
+                }
+            }
             if (measureValue != null) {
                 textValue = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_measure_value);
                 textValue.setText(measureValue);
@@ -1717,10 +1735,12 @@ public class OrderFragment extends Fragment {
                         operation.setOperationVerdict(operationVerdictCompleted);
                     }
                 });
-                if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative())
-                    textTime.setBackgroundColor(Color.GREEN);
-                else {
-                    textTime.setBackgroundColor(Color.RED);
+                if (textTime != null) {
+                    if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative())
+                        textTime.setBackgroundColor(Color.GREEN);
+                    else {
+                        textTime.setBackgroundColor(Color.RED);
+                    }
                 }
 
                 // перезапоминаем таймер
@@ -1902,10 +1922,12 @@ public class OrderFragment extends Fragment {
                 checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
                 final Operation operation = operationAdapter.getItem(i);
                 if (operation != null) {
-                    if (checkBox.isChecked()) {
-                        completedOperationCount++;
-                    } else {
-                        uncompleteOperationList.add(operation);
+                    if (checkBox != null) {
+                        if (checkBox.isChecked()) {
+                            completedOperationCount++;
+                        } else {
+                            uncompleteOperationList.add(operation);
+                        }
                     }
                 } else {
                     Log.d(TAG, "Операция под индексом " + i + " не найдена");
@@ -2022,25 +2044,24 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    public class onCheckBoxClickListener implements View.OnClickListener {
-        int position;
+    private class onCheckBoxClickListener implements View.OnClickListener {
+        int pos;
 
-        onCheckBoxClickListener(int pos) {
-            this.position = pos;
+        onCheckBoxClickListener(int position) {
+            this.pos = position;
         }
 
         @Override
         public void onClick(View arg) {
-            if (position != currentOperationId) {
+            /*if (pos != currentOperationId) {
                 // показываем меню предупреждения о пропуске операций
+                return;
+            }*/
 
+            if (!operationAdapter.getItemEnable(currentOperationId)) {
                 return;
             }
-
-            if (!operationAdapter.getItemEnable(position)) {
-                return;
-            }
-            CompleteCurrentOperation(position, null);
+            CompleteCurrentOperation(currentOperationId, null);
         }
     }
 

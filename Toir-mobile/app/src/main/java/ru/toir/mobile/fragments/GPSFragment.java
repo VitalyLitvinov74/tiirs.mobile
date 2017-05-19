@@ -172,9 +172,9 @@ public class GPSFragment extends Fragment {
                     //TODO реальные уровни критичности в качестве маркеров
                     Drawable newMarker;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        newMarker = this.getResources().getDrawable(R.drawable.critical_level_3, getActivity().getApplicationContext().getTheme());
+                        newMarker = this.getResources().getDrawable(R.drawable.equipment_32, getActivity().getApplicationContext().getTheme());
                     } else {
-                        newMarker = this.getResources().getDrawable(R.drawable.critical_level_3);
+                        newMarker = this.getResources().getDrawable(R.drawable.equipment_32);
                     }
                     olItem.setMarker(newMarker);
                     overlayItemArray.add(olItem);
@@ -195,7 +195,7 @@ public class GPSFragment extends Fragment {
 				OverlayItem item = overlayItemArray.get(position);
 				// Get the new Drawable
 				Drawable marker = view.getResources().getDrawable(
-						R.drawable.marker_equip_selected);
+						R.drawable.equipment_32);
 				// Set the new marker
 				item.setMarker(marker);
 				if (LastItemPosition >= 0) {

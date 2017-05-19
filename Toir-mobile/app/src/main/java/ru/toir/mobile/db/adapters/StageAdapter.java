@@ -33,10 +33,7 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
     @Override
     public int getCount() {
         if (adapterData != null) {
-            if (adapterData.size()>2)
-                return 2;
-            else
-                return adapterData.size();
+            return adapterData.size();
         } else {
             return 0;
         }
