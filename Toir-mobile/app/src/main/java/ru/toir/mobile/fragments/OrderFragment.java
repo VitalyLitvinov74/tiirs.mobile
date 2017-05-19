@@ -928,10 +928,9 @@ public class OrderFragment extends Fragment {
                     }
 
                     List<MultipartBody.Part> list = new ArrayList<>();
-                    String[] fileNameParts = file.split("/");
-                    String fileName = fileNameParts[fileNameParts.length - 1];
-                    fileNameParts = fileName.split("\\.");
-                    list.add(prepareFilePart("photo[" + fileNameParts[0] + "]", uri));
+                    String operationUuid = file.substring(0, file.lastIndexOf('-'));
+                    operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
+                    list.add(prepareFilePart("photo[" + operationUuid + "]", uri));
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
                     try {
                         Response response = call.execute();
@@ -953,12 +952,7 @@ public class OrderFragment extends Fragment {
             }
         };
 
-        String[] sendFiles = new String[files.size()];
-        int i = 0;
-        for (String item : files) {
-            sendFiles[i++] = item;
-        }
-
+        String[] sendFiles = files.toArray(new String[]{});
         task.execute(sendFiles);
     }
 
@@ -1245,10 +1239,9 @@ public class OrderFragment extends Fragment {
         // отправляем результат
         sendOrders(realmDB.copyFromRealm(ordersList));
 
-        // строим список фотографий связанных с выполненными операциями
-        // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<String> photos = new ArrayList<>();
+        // получаем список всех операций
         List<String> operationUuids = new ArrayList<>();
+
         for (Orders order : ordersList) {
             List<Tasks> tasks = order.getTasks();
             for (Tasks task : tasks) {
@@ -1257,24 +1250,30 @@ public class OrderFragment extends Fragment {
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
                         operationUuids.add(operation.getUuid());
-                        String photoFileName = operation.getUuid() + ".jpg";
-                        File operationPhoto = new File(
-                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                                photoFileName);
-                        if (operationPhoto.exists()) {
-                            photos.add(operationPhoto.getAbsolutePath());
-                        }
                     }
                 }
             }
         }
 
+        // строим список фотографий связанных с выполненными операциями
+        // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
+        List<String> photos = new ArrayList<>();
+        RealmResults<OperationPhoto> operationPhotos = realmDB.where(OperationPhoto.class)
+                .in("operation.uuid", operationUuids.toArray(new String[]{}))
+                .findAll();
+
+        for (OperationPhoto item : operationPhotos) {
+            File operationPhoto = new File(
+                    getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                    item.getFileName());
+            if (operationPhoto.exists()) {
+                photos.add(operationPhoto.getAbsolutePath());
+            }
+        }
+
         sendFiles(photos);
 
-        String[] opUuidsArray = new String[operationUuids.size()];
-        for (int i = 0; i < operationUuids.size(); i++) {
-            opUuidsArray[i] = operationUuids.get(i);
-        }
+        String[] opUuidsArray = operationUuids.toArray(new String[]{});
 
         // получаем все измерения связанные с выполненными операциями
         RealmResults<MeasuredValue> measuredValues = realmDB
