@@ -37,9 +37,6 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
         } else {
             return 0;
         }
-        //Realm realmDB = Realm.getDefaultInstance();
-        //RealmResults<TaskStages> rows = realmDB.where(TaskStages.class).findAll();
-        //return rows.size();
     }
 
     @Override
@@ -71,7 +68,7 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
             viewHolder.icon = (ImageView) convertView.findViewById(R.id.ts_ImageStatus);
             viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
             viewHolder.equipment = (TextView) convertView.findViewById(R.id.ts_Equipment);
-            viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
+            //viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
             viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);
             viewHolder.end_date = (TextView) convertView.findViewById(R.id.ts_EndDate);
             convertView.setTag(viewHolder);
@@ -84,7 +81,7 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
             StageStatus stageStatus = taskStage.getTaskStageStatus();
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
             if (stageStatus != null) {
-                viewHolder.status.setText(context.getString(R.string.status, taskStage.getTaskStageStatus().getTitle()));
+                //viewHolder.status.setText(context.getString(R.string.status, taskStage.getTaskStageStatus().getTitle()));
                 if (!stageStatus.getUuid().equals(StageStatus.Status.NEW)) {
                     if (taskStage.getStartDate() != null) {
                         Date lDate = taskStage.getStartDate();
@@ -147,7 +144,7 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
         TextView taskStageType;
         TextView taskStageStatus;
         TextView taskStageVerdict;
-        TextView status;
+        //TextView status;
         ImageView icon;
         ImageView image;
         TextView start_date;
