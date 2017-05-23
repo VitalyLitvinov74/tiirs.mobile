@@ -33,7 +33,7 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author olejek
- * Created by olejek on 13.09.16.
+ *         Created by olejek on 13.09.16.
  */
 public class OperationAdapter extends RealmBaseAdapter<Operation> implements ListAdapter {
     private static final String TABLE_NAME = "Operation";
@@ -60,15 +60,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     @Override
     public int getCount() {
         if (adapterData != null) {
-            if (adapterData.size()<MAX_OPERATIONS) {
+            if (adapterData.size() < MAX_OPERATIONS) {
                 return adapterData.size();
-            }
-            else {
-                Log.d ("System error","Превышено максимальное число операций для одного этапа");
+            } else {
+                Log.d("System error", "Превышено максимальное число операций для одного этапа");
                 return MAX_OPERATIONS;
             }
+        } else {
+            return 0;
         }
-        else return 0;
     }
 
     @Override
@@ -85,23 +85,22 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     public long getItemId(int position) {
         if (adapterData != null) {
             return adapterData.get(position).get_id();
+        } else {
+            return 0;
         }
-        else return 0;
     }
 
     public void setItemVisibility(int position) {
-        visibility[position]=!visibility[position];
+        visibility[position] = !visibility[position];
     }
 
-    public void setItemEnable(int position, boolean enable)
-    {
-        if (position<MAX_OPERATIONS) {
+    public void setItemEnable(int position, boolean enable) {
+        if (position < MAX_OPERATIONS) {
             completed[position] = enable;
         }
     }
 
-    public boolean getItemEnable(int position)
-    {
+    public boolean getItemEnable(int position) {
         return completed[position];
     }
 
@@ -114,9 +113,10 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         viewHolder = new ViewHolder();
         if (adapterData == null) return convertView;
         if (position > MAX_OPERATIONS) {
-            Log.d("Debug","position > max_operations");
+            Log.d("Debug", "position > max_operations");
             return convertView;
         }
+
         operation = adapterData.get(position);
         if (convertView == null) {
             if (parent.getId() == R.id.list_view) {
@@ -139,9 +139,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
                 viewHolder.spinner = (Spinner) convertView.findViewById(R.id.operation_verdict_spinner);
             }
+
             convertView.setTag(viewHolder);
-        }
-        else {
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
@@ -170,16 +170,15 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     if (lDate != null && lDate.after(new Date(100000))) {
                         sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(lDate);
                         viewHolder.start_date.setText(sDate);
-                    }
-                    else {
+                    } else {
                         viewHolder.start_date.setText(R.string.not_started);
                     }
+
                     lDate = operation.getEndDate();
                     if (lDate != null && lDate.after(new Date(100000))) {
                         sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(lDate);
                         viewHolder.end_date.setText(sDate);
-                    }
-                    else {
+                    } else {
                         viewHolder.end_date.setText(R.string.not_finished);
                     }
 
@@ -188,21 +187,25 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                             viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
                             viewHolder.status.setChecked(false);
                         }
+
                         if (operationStatus.getUuid().equals(OperationStatus.Status.IN_WORK)) {
                             viewHolder.verdict.setImageResource(R.drawable.status_easy_work);
                             viewHolder.status.setChecked(false);
                         }
+
                         if (operationStatus.getUuid().equals(OperationStatus.Status.COMPLETE)) {
                             viewHolder.status.setChecked(true);
                             viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
                         }
                     }
+
                     viewHolder.description.setText(operation.getOperationTemplate().getDescription());
                     OperationTemplate operationTemplate;
                     operationTemplate = operation.getOperationTemplate();
                     viewHolder.normative.setText(String.valueOf(operationTemplate.getNormative()));
-                    if (operation.getEndDate().getTime() > 0 &&  operation.getStartDate().getTime() > 0)
+                    if (operation.getEndDate().getTime() > 0 && operation.getStartDate().getTime() > 0) {
                         viewHolder.time.setText(context.getString(R.string.sec_with_value, (int) (operation.getEndDate().getTime() - operation.getStartDate().getTime()) / 1000));
+                    }
 
                     //image = getOutputMediaFile(operation.getUuid(), 1);
                     //Bitmap imageBitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
@@ -213,8 +216,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid", operation.getUuid()).findFirst();
                     if (lastValue != null) {
                         viewHolder.measure_value.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
-                    }
-                    else {
+                    } else {
                         viewHolder.measure.setVisibility(View.GONE);
                         viewHolder.measure_value.setVisibility(View.GONE);
                     }
@@ -237,7 +239,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 }
             }
         }
-      return convertView;
+
+        return convertView;
     }
 
     private File getOutputMediaFile(String operationUuid, int mini) {
@@ -252,11 +255,14 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             }
         }*/
         File mediaFile;
-        if (mini==1)
+        if (mini == 1) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + operationUuid + "_m.jpg");
-        else mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + operationUuid + ".jpg");
+                    + operationUuid + "_m.jpg");
+        } else {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                    + operationUuid + ".jpg");
+        }
+
         return mediaFile;
     }
 

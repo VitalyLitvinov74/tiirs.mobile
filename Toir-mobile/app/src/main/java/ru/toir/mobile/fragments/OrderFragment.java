@@ -113,7 +113,8 @@ public class OrderFragment extends Fragment {
 
     private static final int ACTIVITY_PHOTO = 100;
     private static final int ACTIVITY_MEASURE = 101;
-
+    FloatingActionButton fab_check;
+    FloatingActionButton fab_camera;
     private Toolbar toolbar;
     private Tasks selectedTask;
     private Orders selectedOrder;
@@ -137,10 +138,6 @@ public class OrderFragment extends Fragment {
     private Equipment currentEquipment;
     private Operation currentOperation;
     private ArrayList<Operation> uncompleteOperationList;
-
-    FloatingActionButton fab_check;
-    FloatingActionButton fab_camera;
-
     private int totalOperationCount;
     private int currentOperationId = 0;
     private long startTime = 0;
@@ -544,7 +541,7 @@ public class OrderFragment extends Fragment {
         RealmQuery<Operation> q = realmDB.where(Operation.class);
         boolean first = true;
         toolbar.setSubtitle("Операции");
-        if (stage.getOperations().size()>0) {
+        if (stage.getOperations().size() > 0) {
             for (Operation operation : stage.getOperations()) {
                 long id = operation.get_id();
                 if (first) {
@@ -621,7 +618,7 @@ public class OrderFragment extends Fragment {
                             operationAdapter.setItemEnable(i, false);
                         }
                     } else {
-                        Log.d (TAG,"Найдена операция с неинициализированным статусом");
+                        Log.d(TAG, "Найдена операция с неинициализированным статусом");
                     }
                 }
             }
@@ -1969,7 +1966,7 @@ public class OrderFragment extends Fragment {
                             fab_camera.setVisibility(View.VISIBLE);
                             fab_check.setVisibility(View.VISIBLE);
                         } else {
-                            Log.d (TAG, "этапу задач не указано оборудование");
+                            Log.d(TAG, "этапу задач не указано оборудование");
                         }
                     }
                 }
