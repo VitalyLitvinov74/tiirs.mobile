@@ -137,16 +137,16 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
     private static class ViewHolder {
         TextView equipment;
         TextView title;
-        TextView taskTitle;
-        TextView description;
-        TextView normative;
-        TextView comment;
-        TextView taskStageType;
-        TextView taskStageStatus;
-        TextView taskStageVerdict;
+        //TextView taskTitle;
+        //TextView description;
+        //TextView normative;
+        //TextView comment;
+        //TextView taskStageType;
+        //TextView taskStageStatus;
+        //TextView taskStageVerdict;
         //TextView status;
         ImageView icon;
-        ImageView image;
+        //ImageView image;
         TextView start_date;
         TextView end_date;
     }

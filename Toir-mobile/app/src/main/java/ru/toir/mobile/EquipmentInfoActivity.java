@@ -48,12 +48,10 @@ import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import okhttp3.ResponseBody;
@@ -315,8 +313,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(),equipment), 0, 300, equipment.getChangedAt().getTime());
         if (image_bitmap != null) {
             tv_equipment_image.setImageBitmap(image_bitmap);
-        } else {
-//            image_bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image);
         }
 
         RealmResults<Documentation> documentation;
@@ -372,14 +368,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogDefect (equipment);
+                showDialogDefect (equipment, (ViewGroup) v.getParent());
             }
         });
 
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogStatus (equipment);
+                showDialogStatus (equipment, (ViewGroup) v.getParent());
             }
         });
 
@@ -679,9 +675,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     }
 
-    public void showDialogDefect(final Equipment equipment) {
+    public void showDialogDefect(final Equipment equipment, ViewGroup parent) {
         LayoutInflater inflater = getLayoutInflater();
-        final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, null);
+        final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
 
         realmDB = Realm.getDefaultInstance();
         RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
@@ -771,9 +767,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     }
 
 
-    public void showDialogStatus(final Equipment equipment) {
+    public void showDialogStatus(final Equipment equipment, ViewGroup parent) {
         LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.change_status_dialog, null);
+        View alertLayout = inflater.inflate(R.layout.change_status_dialog, parent, false);
         realmDB = Realm.getDefaultInstance();
         RealmResults<EquipmentStatus> equipmentStatus = realmDB.where(EquipmentStatus.class).findAll();
         final Spinner statusSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_status);
@@ -861,9 +857,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
             //data = "00000000000000000000000000000000";
             // data = "FFFFFFFFFFFFFFFF";
-            data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-            byte[] byteData = tag.getBinary();
-            data = DataUtils.toHexString(byteData);
+            //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+            //byte[] byteData = tag.getBinary();
+            //data = DataUtils.toHexString(byteData);
             // пишем в метку с id привязанным к оборудованию
             // rfidDialog.writeTagData("00000000", equipment.getTag_id(),
             // RfidDriverBase.MEMORY_BANK_USER, 0, data);
