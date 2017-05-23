@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -43,6 +45,7 @@ import com.roughike.bottombar.BottomBar;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -74,6 +77,7 @@ import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OperationPhoto;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -308,9 +312,7 @@ public class OrderFragment extends Fragment {
 
         fab_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                File photo = getOutputMediaFile();
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, ACTIVITY_PHOTO);
             }
         });
@@ -331,10 +333,12 @@ public class OrderFragment extends Fragment {
                     if (Level == TASK_LEVEL) {
                         initView();
                     }
+
                     if (Level == STAGE_LEVEL) {
                         Level = TASK_LEVEL;
                         fillListViewTasks(selectedOrder, false);
                     }
+
                     if (Level == OPERATION_LEVEL) {
                         taskTimer.cancel();
                         firstLaunch = true;
@@ -348,8 +352,10 @@ public class OrderFragment extends Fragment {
                             fab_check.setVisibility(View.INVISIBLE);
                         }
                     }
+
                     return true;
                 }
+
                 return false;
             }
         });
@@ -435,13 +441,16 @@ public class OrderFragment extends Fragment {
                     q = q.or().equalTo("_id", id);
                 }
             }
+
             tasks = q.findAll();
-        }
-        else {
+        } else {
             tasks = null;
         }
+
         // задач нет
-        if (first) all_complete = false;
+        if (first) {
+            all_complete = false;
+        }
 
         if (complete_operation && all_complete && !order.getOrderStatus().getUuid().equals(OrderStatus.Status.COMPLETE)) {
             final OrderStatus orderStatusComplete = realmDB.where(OrderStatus.class)
@@ -489,13 +498,17 @@ public class OrderFragment extends Fragment {
                     q = q.or().equalTo("_id", id);
                 }
             }
+
             stages = q.findAllSorted("flowOrder");
-        }
-        else {
+        } else {
             stages = null;
         }
+
         // этапов нет
-        if (first) all_complete = false;
+        if (first) {
+            all_complete = false;
+        }
+
         taskStageAdapter = new StageAdapter(getContext(), stages);
         mainListView.setAdapter(taskStageAdapter);
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
@@ -541,11 +554,12 @@ public class OrderFragment extends Fragment {
                     q = q.or().equalTo("_id", id);
                 }
             }
+
             operations = q.findAll();
-        }
-        else {
+        } else {
             operations = null;
         }
+
         operationAdapter = new OperationAdapter(getContext(), operations, selectedTask.getTaskTemplate().getUuid());
         mainListView.setAdapter(operationAdapter);
         //resultButtonLayout.setVisibility(View.VISIBLE);
@@ -591,6 +605,7 @@ public class OrderFragment extends Fragment {
                                 }
                             });
                         }
+
                         if (operationType.getUuid().equals(OperationType.Type.MEASURE)) {
                             isMeasure = true;
                         }
@@ -605,14 +620,12 @@ public class OrderFragment extends Fragment {
                         } else {
                             operationAdapter.setItemEnable(i, false);
                         }
-                    }
-                    else {
+                    } else {
                         Log.d (TAG,"Найдена операция с неинициализированным статусом");
                     }
                 }
             }
         }
-
 
         // время начала работы (приступаем к первой операции и нехрен тормозить)
         startTime = System.currentTimeMillis();
@@ -707,15 +720,17 @@ public class OrderFragment extends Fragment {
      * @param status - статус наряда
      */
     private void getOrdersByStatus(List<String> status) {
-        AsyncTask<List<String>, Integer, List<Orders>> aTask = new AsyncTask<List<String>, Integer, List<Orders>>() {
+        AsyncTask<String[], Integer, List<Orders>> aTask = new AsyncTask<String[], Integer, List<Orders>>() {
             @Override
-            protected List<Orders> doInBackground(List<String>... params) {
+            protected List<Orders> doInBackground(String[]... params) {
                 // обновляем справочники
                 ReferenceFragment.updateReferences(null);
                 //int current_files_cnt=0;
 
+                List<String> args = java.util.Arrays.asList(params[0]);
+
                 // запрашиваем наряды
-                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(params[0]);
+                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(args);
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
@@ -876,7 +891,9 @@ public class OrderFragment extends Fragment {
                 processDialog.setProgress(values[0]);
             }
         };
-        aTask.execute(status);
+
+        String[] statusArray = status.toArray(new String[]{});
+        aTask.execute(statusArray);
     }
 
     /**
@@ -907,6 +924,7 @@ public class OrderFragment extends Fragment {
 
             @Override
             protected List<String> doInBackground(String[]... lists) {
+                List<String> sendFiles = new ArrayList<>();
                 for (String file : lists[0]) {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
@@ -917,37 +935,45 @@ public class OrderFragment extends Fragment {
                     }
 
                     List<MultipartBody.Part> list = new ArrayList<>();
-                    String[] fileNameParts = file.split("/");
-                    String fileName = fileNameParts[fileNameParts.length - 1];
-                    fileNameParts = fileName.split("\\.");
-                    list.add(prepareFilePart("photo[" + fileNameParts[0] + "]", uri));
+                    String operationUuid = file.substring(0, file.lastIndexOf('-'));
+                    operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
+                    list.add(prepareFilePart("photo[" + operationUuid + "]", uri));
+                    // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
+                    // объём данных превышающий органичения на отправку POST запросом на сервере
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
                     try {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
                         if (response.isSuccessful()) {
                             Log.d(TAG, "result" + result.contentType());
+                            sendFiles.add(file.substring(file.lastIndexOf('/') + 1));
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
                 }
 
-                return null;
+                return sendFiles;
             }
 
             @Override
             protected void onPostExecute(List<String> strings) {
                 super.onPostExecute(strings);
+
+                // TODO: нужно придумать более правильный механизм передачи данных для отправки и обработки результата
+                // пока сделано по тупому
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                for (String item : strings) {
+                    OperationPhoto photo = realm.where(OperationPhoto.class).equalTo("fileName", item).findFirst();
+                    photo.setSent(true);
+                }
+
+                realm.commitTransaction();
             }
         };
 
-        String[] sendFiles = new String[files.size()];
-        int i = 0;
-        for (String item : files) {
-            sendFiles[i++] = item;
-        }
-
+        String[] sendFiles = files.toArray(new String[]{});
         task.execute(sendFiles);
     }
 
@@ -1159,10 +1185,11 @@ public class OrderFragment extends Fragment {
     }
 
     private void sendOrders(List<Orders> orders) {
-        AsyncTask<List<Orders>, Void, String> task = new AsyncTask<List<Orders>, Void, String>() {
+        AsyncTask<Orders[], Void, String> task = new AsyncTask<Orders[], Void, String>() {
             @Override
-            protected String doInBackground(List<Orders>... lists) {
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendOrders(lists[0]);
+            protected String doInBackground(Orders[]... lists) {
+                List<Orders> args = Arrays.asList(lists[0]);
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendOrders(args);
                 try {
                     Response response = call.execute();
                     Log.d(TAG, "response = " + response);
@@ -1178,15 +1205,18 @@ public class OrderFragment extends Fragment {
                 super.onPostExecute(s);
             }
         };
+
         addToJournal("Отправляем выполненные наряды на сервер");
-        task.execute(orders);
+        Orders[] ordersArray = orders.toArray(new Orders[]{});
+        task.execute(ordersArray);
     }
 
     private void sendMeasuredValues(List<MeasuredValue> values) {
-        AsyncTask<List<MeasuredValue>, Void, String> task = new AsyncTask<List<MeasuredValue>, Void, String>() {
+        AsyncTask<MeasuredValue[], Void, String> task = new AsyncTask<MeasuredValue[], Void, String>() {
             @Override
-            protected String doInBackground(List<MeasuredValue>... lists) {
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendMeasuredValues(lists[0]);
+            protected String doInBackground(MeasuredValue[]... lists) {
+                List<MeasuredValue> args = Arrays.asList(lists[0]);
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendMeasuredValues(args);
                 try {
                     Response response = call.execute();
                     Log.d(TAG, "response = " + response);
@@ -1204,7 +1234,9 @@ public class OrderFragment extends Fragment {
                 Toast.makeText(getContext(), "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
             }
         };
-        task.execute(values);
+
+        MeasuredValue[] valuesArray = values.toArray(new MeasuredValue[]{});
+        task.execute(valuesArray);
     }
 
     /**
@@ -1228,10 +1260,9 @@ public class OrderFragment extends Fragment {
         // отправляем результат
         sendOrders(realmDB.copyFromRealm(ordersList));
 
-        // строим список фотографий связанных с выполненными операциями
-        // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<String> photos = new ArrayList<>();
+        // получаем список всех операций
         List<String> operationUuids = new ArrayList<>();
+
         for (Orders order : ordersList) {
             List<Tasks> tasks = order.getTasks();
             for (Tasks task : tasks) {
@@ -1240,24 +1271,30 @@ public class OrderFragment extends Fragment {
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
                         operationUuids.add(operation.getUuid());
-                        String photoFileName = operation.getUuid() + ".jpg";
-                        File operationPhoto = new File(
-                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                                photoFileName);
-                        if (operationPhoto.exists()) {
-                            photos.add(operationPhoto.getAbsolutePath());
-                        }
                     }
                 }
             }
         }
 
+        // строим список фотографий связанных с выполненными операциями
+        // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
+        List<String> photos = new ArrayList<>();
+        RealmResults<OperationPhoto> operationPhotos = realmDB.where(OperationPhoto.class)
+                .in("operation.uuid", operationUuids.toArray(new String[]{}))
+                .findAll();
+
+        for (OperationPhoto item : operationPhotos) {
+            File operationPhoto = new File(
+                    getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                    item.getFileName());
+            if (operationPhoto.exists()) {
+                photos.add(operationPhoto.getAbsolutePath());
+            }
+        }
+
         sendFiles(photos);
 
-        String[] opUuidsArray = new String[operationUuids.size()];
-        for (int i = 0; i < operationUuids.size(); i++) {
-            opUuidsArray[i] = operationUuids.get(i);
-        }
+        String[] opUuidsArray = operationUuids.toArray(new String[]{});
 
         // получаем все измерения связанные с выполненными операциями
         RealmResults<MeasuredValue> measuredValues = realmDB
@@ -1457,15 +1494,57 @@ public class OrderFragment extends Fragment {
         dialog.show();
     }
 
+    public String getLastPhotoFilePath() {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getActivity().managedQuery(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToLast();
+
+        return cursor.getString(column_index_data);
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case ACTIVITY_PHOTO:
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.d("test", "onPictureTaken - jpeg");
-                    File selectedImage = getOutputMediaFile();
-                    Uri fileUri = Uri.fromFile(selectedImage);
+                    // получаем штатными средствами последний снятый кадр в системе
+                    String fromFilePath = getLastPhotoFilePath();
+                    File fromFile = new File(fromFilePath);
+
+                    File mediaStorageDir;
+                    File picDir = getActivity().getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                    if (picDir == null) {
+                        return;
+                    }
+
+                    mediaStorageDir = new File(picDir.getAbsolutePath());
+                    if (!mediaStorageDir.exists()) {
+                        if (!mediaStorageDir.mkdirs()) {
+                            Log.d(TAG, "Required media storage does not exist");
+                            return;
+                        }
+                    }
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(mediaStorageDir.getPath())
+                            .append(File.separator)
+                            .append(currentOperationUuid)
+                            .append('-')
+                            .append(new Date().getTime() / 1000)
+                            .append(fromFilePath.substring(fromFilePath.lastIndexOf('.')));
+
+                    String toFilePath = builder.toString();
+                    File toFile = new File(toFilePath);
+                    if (!fromFile.renameTo(toFile)) {
+                        return;
+                    }
+
+                    Uri fileUri = Uri.fromFile(toFile);
                     //getActivity().getContentResolver().notifyChange(selectedImage, null);
                     //ContentResolver cr = getActivity().getContentResolver();
                     //Bitmap bitmap;
@@ -1477,6 +1556,16 @@ public class OrderFragment extends Fragment {
                         Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
                     }
+
+                    // добавляем запись о полученном файле
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    OperationPhoto operationPhoto = new OperationPhoto();
+                    operationPhoto.set_id(realm.where(OperationPhoto.class).max("_id").longValue() + 1);
+                    operationPhoto.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
+                    operationPhoto.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
+                    realm.copyToRealm(operationPhoto);
+                    realm.commitTransaction();
                 }
                 break;
             case ACTIVITY_MEASURE:
@@ -1490,22 +1579,6 @@ public class OrderFragment extends Fragment {
                     CompleteCurrentOperation(currentOperationId, value);
                 }
         }
-    }
-
-    private File getOutputMediaFile() {
-
-        File mediaStorageDir;
-        mediaStorageDir = new File(getActivity().getApplicationContext()
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                .getAbsolutePath());
-
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("Camera Guide", "Required media storage does not exist");
-                return null;
-            }
-        }
-        return new File(mediaStorageDir.getPath() + File.separator + currentOperationUuid + ".jpg");
     }
 
     /**
@@ -1700,10 +1773,11 @@ public class OrderFragment extends Fragment {
                         operation.setOperationVerdict(operationVerdictCompleted);
                     }
                 });
+
                 if (textTime != null) {
-                    if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative())
+                    if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative()) {
                         textTime.setBackgroundColor(Color.GREEN);
-                    else {
+                    } else {
                         textTime.setBackgroundColor(Color.RED);
                     }
                 }
@@ -1865,6 +1939,7 @@ public class OrderFragment extends Fragment {
                             fillListViewTaskStage(selectedTask, false);
                             Level = STAGE_LEVEL;
                         }
+
                         fab_camera.setVisibility(View.INVISIBLE);
                         fab_check.setVisibility(View.INVISIBLE);
                     }
@@ -1890,10 +1965,10 @@ public class OrderFragment extends Fragment {
                                 Level = OPERATION_LEVEL;
                                 startOperations();
                             }
+
                             fab_camera.setVisibility(View.VISIBLE);
                             fab_check.setVisibility(View.VISIBLE);
-                        }
-                        else {
+                        } else {
                             Log.d (TAG, "этапу задач не указано оборудование");
                         }
                     }

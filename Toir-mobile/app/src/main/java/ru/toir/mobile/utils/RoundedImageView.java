@@ -19,17 +19,15 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import ru.toir.mobile.db.realm.Equipment;
-
-public class RoundedImageView extends ImageView {
+public class RoundedImageView extends AppCompatImageView {
 
     public RoundedImageView(Context context) {
         super(context);
@@ -99,14 +97,19 @@ public class RoundedImageView extends ImageView {
         if (image.exists() && changedAt <= last_modified) {
             // файл есть, преобразовывать не нужно
             imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
-            if (imageBitmap2 != null) return imageBitmap2;
+            if (imageBitmap2 != null) {
+                return imageBitmap2;
+            }
         }
 
         imageBitmap = BitmapFactory.decodeFile(image_full.getAbsolutePath());
         if (imageBitmap != null) {
             int width = imageBitmap.getWidth();
             int height = imageBitmap.getHeight();
-            if ((newWidth == 0) && (newHeight == 0)) return null;
+            if ((newWidth == 0) && (newHeight == 0)) {
+                return null;
+            }
+
             if (newWidth > 0) {
                 scaleWidth = (float) newWidth / (float) width;
                 newHeight = (int) (height * scaleWidth);
@@ -116,19 +119,18 @@ public class RoundedImageView extends ImageView {
             }
 
             imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
-            FileOutputStream fOut = null;
+            FileOutputStream fOut;
             try {
                 fOut = new FileOutputStream(image);
                 imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
                 fOut.flush();
                 fOut.close();
                 return imageBitmap2;
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         return null;
     }
 
