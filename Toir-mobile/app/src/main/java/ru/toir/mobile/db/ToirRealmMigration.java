@@ -1,17 +1,24 @@
 package ru.toir.mobile.db;
 
+import android.content.Context;
 import android.util.Log;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import dalvik.system.DexFile;
 import io.realm.DynamicRealm;
 import io.realm.DynamicRealmObject;
 import io.realm.RealmMigration;
+import io.realm.RealmObject;
 import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 import io.realm.exceptions.RealmException;
@@ -21,6 +28,11 @@ import io.realm.exceptions.RealmException;
  */
 class ToirRealmMigration implements RealmMigration {
     private final String TAG = this.getClass().getName();
+    private Context context;
+
+    public ToirRealmMigration(Context context) {
+        this.context = context;
+    }
 
     @Override
     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
@@ -359,6 +371,7 @@ class ToirRealmMigration implements RealmMigration {
      *
      * @param realm - экземпляр realmDB
      */
+    @SuppressWarnings("unused")
     private void toVersion13(DynamicRealm realm) {
         Log.d(TAG, "from version 12");
     }
@@ -605,7 +618,7 @@ class ToirRealmMigration implements RealmMigration {
         objSchema.removeField("contragent");
 
         objSchema = schema.get("Contragent");
-        objSchema.addField("photo",String.class);
+        objSchema.addField("photo", String.class);
         objSchema.addField("longitude", double.class);
         objSchema.addField("latitude", double.class);
     }
@@ -619,7 +632,7 @@ class ToirRealmMigration implements RealmMigration {
         Log.d(TAG, "from version 20");
         RealmSchema schema = realm.getSchema();
         RealmObjectSchema objSchema = schema.get("Contragent");
-        objSchema.addField("address",String.class);
+        objSchema.addField("address", String.class);
     }
 
     /**
@@ -643,20 +656,20 @@ class ToirRealmMigration implements RealmMigration {
     }
 
     private boolean testPropsFields(DynamicRealm realm) {
-        boolean result = true;
         RealmSchema schema = realm.getSchema();
-        // TODO: получить наличные классы потомки RealmObject
-        // TODO: реализовать сравнение полученного списка с существующими таблицами
 
         // проверяем соответствие схемы базы со свойствами классов
         Set<RealmObjectSchema> realmObjects = schema.getAll();
+        Set<String> tableList = new LinkedHashSet<>();
         for (RealmObjectSchema realmObject : realmObjects) {
-            Log.d(TAG, "Class name = " + realmObject.getClassName());
+            String tableName = realmObject.getClassName();
+            Log.d(TAG, "Class name = " + tableName);
+            tableList.add(tableName);
             Field[] classProps;
             Set<String> props = new HashSet<>();
             Map<String, String> propsType = new HashMap<>();
             try {
-                Class<?> c = Class.forName("ru.toir.mobile.db.realm." + realmObject.getClassName());
+                Class<?> c = Class.forName("ru.toir.mobile.db.realm." + tableName);
                 classProps = c.getDeclaredFields();
                 for (Field prop : classProps) {
                     props.add(prop.getName());
@@ -669,12 +682,31 @@ class ToirRealmMigration implements RealmMigration {
 
             // проверяем количество и названия полей и свойств
             Set<String> fieldNames = realmObject.getFieldNames();
-            if (fieldNames.containsAll(props)) {
-                Log.d(TAG, "Status: Идентичны!!!");
+            Set<String> backProps = new HashSet<>(props);
+            props.removeAll(fieldNames);
+            fieldNames.removeAll(backProps);
+            if (props.size() == 0 && fieldNames.size() == 0) {
+                Log.d(TAG, "Список полей идентичен.");
             } else {
-                Log.d(TAG, "Status: Отличаются!!!");
-                result = false;
-                // TODO: реализовать поиск различий в списках
+                StringBuilder b = new StringBuilder();
+                if (props.size() > 0) {
+                    for (String item : props) {
+                        b.append(item).append(", ");
+                    }
+
+                    Log.e(TAG, "Список свойств класса без соответствующих полей в таблице: " + b.toString());
+                }
+
+                if (fieldNames.size() > 0) {
+                    b.setLength(0);
+                    for (String item : fieldNames) {
+                        b.append(item).append(", ");
+                    }
+
+                    Log.e(TAG, "Список полей таблицы без соответствующих свойств класса: " + b.toString());
+                }
+
+                return false;
             }
 
             // сравниваем типы свойств и полей
@@ -683,17 +715,69 @@ class ToirRealmMigration implements RealmMigration {
                 String propType = propsType.get(fieldName);
                 if (!realmType.equals(getType(propType))) {
                     Log.e(TAG, "Type not same (fName = " + fieldName + "): fType = " + realmType + ", pType = " + propType);
-                    result = false;
+                    return false;
                 }
             }
         }
 
-        return result;
+        // получаем список классов объектов которые выступают в роли таблиц
+        Set<String> classList = new HashSet<>();
+        try {
+            DexFile df = new DexFile(context.getPackageCodePath());
+            Enumeration<String> iter = df.entries();
+            while (iter.hasMoreElements()) {
+                String classPath = iter.nextElement();
+                if (classPath.contains("ru.toir.mobile.db.realm") && !classPath.contains("$")) {
+                    try {
+                        Class<?> driverClass;
+                        driverClass = Class.forName(classPath);
+                        Constructor<?> constructor = driverClass.getConstructor();
+                        RealmObject o = (RealmObject) constructor.newInstance();
+                        o.getClass().getMethod("deleteFromRealm");
+                        classList.add(classPath.substring(classPath.lastIndexOf('.') + 1));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // проверяем соответствие полученых списков классов и таблиц
+        Set<String> backTableList = new HashSet<>(tableList);
+        tableList.removeAll(classList);
+        classList.removeAll(backTableList);
+        if (tableList.size() == 0 && classList.size() == 0) {
+            Log.d(TAG, "Список классов соответствует списку таблиц.");
+        } else {
+            StringBuilder b = new StringBuilder();
+            if (tableList.size() > 0) {
+                for (String item : tableList) {
+                    b.append(item).append(", ");
+                }
+
+                Log.e(TAG, "Список таблиц без соответствующих классов: " + b.toString());
+            }
+
+            if (classList.size() > 0) {
+                b.setLength(0);
+                for (String item : classList) {
+                    b.append(item).append(", ");
+                }
+
+                Log.e(TAG, "Список классов без соответствующих таблиц: " + b.toString());
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     private String getType(String type) {
-        String[] array = type.split("\\.");
-        String result = array[array.length - 1].toUpperCase();
+        String result = type.substring(type.lastIndexOf('.') + 1).toUpperCase();
 
         switch (result) {
             case "INT":
