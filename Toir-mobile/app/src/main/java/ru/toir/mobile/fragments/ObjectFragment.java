@@ -35,11 +35,15 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.adapters.GPSTrackAdapter;
 import ru.toir.mobile.db.adapters.ObjectAdapter;
+import ru.toir.mobile.db.realm.GpsTrack;
 import ru.toir.mobile.db.realm.Objects;
+import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -217,6 +221,22 @@ public class ObjectFragment extends Fragment {
                 }
             }
         }).start();
+
+        // добавляем путь
+        RoadManager roadManager = new OSRMRoadManager(getContext());
+        ArrayList<GeoPoint> trackpoints = new ArrayList<>();
+        RealmResults<GpsTrack> gpsTrack;
+        Polyline roadOverlay = new Polyline();
+        roadOverlay.setColor(Color.DKGRAY);
+        roadOverlay.setWidth(10.0f);
+        gpsTrack = realmDB.where(GpsTrack.class).findAll().sort("date", Sort.DESCENDING);
+        for (GpsTrack trackPoint : gpsTrack) {
+            GeoPoint startPoint = new GeoPoint(trackPoint.getLatitude(),trackPoint.getLongitude());
+            trackpoints.add(startPoint);
+        }
+        roadOverlay.setPoints(trackpoints);
+        mapView.getOverlays().add(roadOverlay);
+        mapView.invalidate();
 
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
