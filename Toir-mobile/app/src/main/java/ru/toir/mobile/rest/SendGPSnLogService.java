@@ -6,11 +6,16 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import retrofit2.*;
 import retrofit2.Response;
 import ru.toir.mobile.db.realm.GpsTrack;
+import ru.toir.mobile.db.realm.ISend;
 import ru.toir.mobile.db.realm.Journal;
 
 /**
@@ -45,24 +50,28 @@ public class SendGPSnLogService extends Service {
                 }
 
                 RealmResults<GpsTrack> items = realm.where(GpsTrack.class).in("_id", data).findAll();
-                // отправляем данные
-                call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(items);
+                // отправляем данные с координатами
+                call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
                     Response<ToirAPIResponse> response = call.execute();
                     if (response.isSuccessful()) {
-                        // отмечаем отправленные данные
+                        ToirAPIResponse apiResponse = response.body();
                         realm.beginTransaction();
+                        if (!apiResponse.isSuccess()) {
+                            // удаляем из списка не сохраннённые элементы
+                            removeNotSaved(items, (List<String>) apiResponse.getData());
+                        }
+
+                        // отмечаем отправленные данные
                         for (GpsTrack item : items) {
                             item.setSent(true);
                         }
 
                         realm.commitTransaction();
-                    } else {
-                        // TODO: реализовать отметку только тех данных которые успешно переданны на сервер
-                        response.body().getData();
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    Log.e(TAG, "Ошибка при отправке GPS лога.");
+                    e.printStackTrace();
                 }
             }
 
@@ -74,25 +83,28 @@ public class SendGPSnLogService extends Service {
                 }
 
                 RealmResults<Journal> items = realm.where(Journal.class).in("_id", data).findAll();
-                // отправляем данные
-                call = ToirAPIFactory.getJournalService().sendJournal(items);
+                // отправляем данные с логами
+                call = ToirAPIFactory.getJournalService().sendJournal(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
                     Response<ToirAPIResponse> response = call.execute();
                     if (response.isSuccessful()) {
-                        // отмечаем отправленные данные
+                        ToirAPIResponse apiResponse = response.body();
                         realm.beginTransaction();
+                        if (!apiResponse.isSuccess()) {
+                            // удаляем из списка не сохраннённые элементы
+                            removeNotSaved(items, (List<String>) apiResponse.getData());
+                        }
+
+                        // отмечаем отправленные данные
                         for (Journal item : items) {
                             item.setSent(true);
                         }
 
                         realm.commitTransaction();
-                    } else {
-                        // TODO: реализовать отметку только тех данных которые успешно переданны на сервер
-                        response.body().getData();
                     }
-
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
+                    Log.e(TAG, "Ошибка при отправке журнала.");
                 }
             }
 
@@ -134,4 +146,32 @@ public class SendGPSnLogService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    /**
+     * Вспомогательный метод для удаления из отправленого списка записей тех которые
+     * не сохранены на сервере.
+     *
+     * @param list Список отправленных записей.
+     * @param data Список id записей которые не сохранили.
+     */
+    private void removeNotSaved(List<? extends ISend> list, List<String> data) {
+
+        if (list == null || data == null) {
+            return;
+        }
+
+        List<Long> ids = new ArrayList<>();
+        for (String item : data) {
+            ids.add(Long.valueOf(item));
+        }
+
+        for (Object item : list) {
+            if (ids.contains(((ISend) item).get_id())) {
+                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
+                list.remove(item);
+            }
+        }
+    }
+
+
 }

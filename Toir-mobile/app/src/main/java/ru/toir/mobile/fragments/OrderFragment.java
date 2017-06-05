@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -48,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -71,9 +69,6 @@ import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.GpsTrack;
-import ru.toir.mobile.db.realm.ISend;
-import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
@@ -90,7 +85,6 @@ import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.ToirAPIFactory;
-import ru.toir.mobile.rest.ToirAPIResponse;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
@@ -915,8 +909,7 @@ public class OrderFragment extends Fragment {
 
                 MediaType mediaType = MediaType.parse(type);
                 RequestBody requestFile = RequestBody.create(mediaType, file);
-                MultipartBody.Part part = MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-                return part;
+                return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
             }
 
             @Override
@@ -1091,94 +1084,10 @@ public class OrderFragment extends Fragment {
                     sendCompleteTask();
                 }
 
-                // отправляем данные из журнала и лога GPS
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Call<ToirAPIResponse> call;
-                        Response<ToirAPIResponse> response;
-                        Realm realm = Realm.getDefaultInstance();
-
-                        // выбираем все неотправленные данные из таблицы journal
-                        RealmResults<Journal> journals = realm.where(Journal.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
-                        try {
-                            response = call.execute();
-                            ToirAPIResponse result = response.body();
-                            if (result.isSuccess()) {
-                                Log.d(TAG, "Журнал отправлен успешно.");
-                            } else {
-                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-                                removeNotSaved(journalList, (List<String>) result.getData());
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(journalList);
-                                realm.commitTransaction();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                            Log.e(TAG, "Ошибка при отправке журнала.");
-                        }
-
-                        // выбираем все неотправленные данные из таблицы gpstrack
-                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
-                        try {
-                            response = call.execute();
-                            ToirAPIResponse result = response.body();
-                            if (result.isSuccess()) {
-                                Log.d(TAG, "GPS лог отправлен успешно.");
-                            } else {
-                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(gpsTrackList);
-                                realm.commitTransaction();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                            Log.e(TAG, "Ошибка при отправке GPS лога.");
-                        }
-                    }
-                });
-                thread.start();
-
                 return true;
             }
         };
         sendTaskResultMenu.setOnMenuItemClickListener(listener);
-    }
-
-    /**
-     * Вспомогательный метод для удаления из отправленого списка записей тех которые
-     * не сохранены на сервере.
-     *
-     * @param list Список отправленных записей.
-     * @param data Список id записей которые не сохранили.
-     */
-
-    private void removeNotSaved(List<? extends ISend> list, List<String> data) {
-
-        List<Long> ids = new ArrayList<>();
-
-        for (String item : data) {
-            ids.add(Long.valueOf(item));
-        }
-
-        for (Object item : list) {
-            if (ids.contains(((ISend) item).get_id())) {
-                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                list.remove(item);
-            } else {
-                // меняем статус на "отправлено" для записей которые сохранены сервером
-                ((ISend) item).setSent(true);
-            }
-        }
     }
 
     private void sendOrders(List<Orders> orders) {
@@ -1527,15 +1436,11 @@ public class OrderFragment extends Fragment {
                         }
                     }
 
-                    StringBuilder builder = new StringBuilder();
-                    builder.append(mediaStorageDir.getPath())
-                            .append(File.separator)
-                            .append(currentOperationUuid)
-                            .append('-')
-                            .append(new Date().getTime() / 1000)
-                            .append(fromFilePath.substring(fromFilePath.lastIndexOf('.')));
-
-                    String toFilePath = builder.toString();
+                    String toFilePath = mediaStorageDir.getPath() +
+                            File.separator + currentOperationUuid +
+                            '-' +
+                            new Date().getTime() / 1000 +
+                            fromFilePath.substring(fromFilePath.lastIndexOf('.'));
                     File toFile = new File(toFilePath);
                     if (!fromFile.renameTo(toFile)) {
                         return;
@@ -2072,25 +1977,6 @@ public class OrderFragment extends Fragment {
             }
 
             return true;
-        }
-    }
-
-    /**
-     * Класс для представления множителей (частоты, напряжения, тока...)
-     *
-     * @author Dmitriy Logachov
-     */
-    private class Suffixes {
-        String title;
-        long multiplier;
-
-        Suffixes(String t, int m) {
-            title = t;
-            multiplier = m;
-        }
-
-        public String toString() {
-            return title;
         }
     }
 
