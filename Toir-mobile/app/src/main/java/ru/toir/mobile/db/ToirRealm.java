@@ -26,7 +26,7 @@ public class ToirRealm {
                 .schemaVersion(VERSION)
                 .build();
         try {
-            Realm.migrateRealm(realmConfig, new ToirRealmMigration());
+            Realm.migrateRealm(realmConfig, new ToirRealmMigration(context));
         } catch (Exception e) {
             // ни чего не делаем
         }
@@ -40,9 +40,5 @@ public class ToirRealm {
                         .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(context).build())
                         .build());
-    }
-
-    public static boolean isDBActual() {
-        return Realm.getDefaultInstance().getVersion() == Realm.getDefaultInstance().getVersion();
     }
 }

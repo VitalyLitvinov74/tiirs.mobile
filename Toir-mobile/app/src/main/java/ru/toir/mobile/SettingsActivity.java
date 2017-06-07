@@ -9,13 +9,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.design.widget.AppBarLayout;
@@ -31,6 +31,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -50,11 +51,9 @@ import ru.toir.mobile.utils.LoadTestData;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
-
-    private PreferenceScreen drvSettingScr;
-    private PreferenceCategory drvSettingCategory;
-
     private static String appVersion;
+    private PreferenceScreen basicSettingScr;
+    private PreferenceScreen driverSettingScr;
 
     @SuppressWarnings("deprecation")
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -112,13 +111,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // получаем список драйверов по имени класса
         List<String> driverClassList = new ArrayList<>();
         try {
-            DexFile df = new DexFile(getApplicationContext()
-                    .getPackageCodePath());
-            for (Enumeration<String> iter = df.entries(); iter
-                    .hasMoreElements(); ) {
+            DexFile df = new DexFile(getApplicationContext().getPackageCodePath());
+            Enumeration<String> iter = df.entries();
+            while (iter.hasMoreElements()) {
                 String classPath = iter.nextElement();
-                if (classPath.contains("ru.toir.mobile.rfid.driver")
-                        && !classPath.contains("$")) {
+                if (classPath.contains("ru.toir.mobile.rfid.driver") && !classPath.contains("$")) {
                     driverClassList.add(classPath);
                 }
             }
@@ -139,38 +136,25 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         }
 
-        // категория с экраном настроек драйвера
-        drvSettingCategory = (PreferenceCategory) SettingsActivity.this.findPreference("drvSettingsCategory");
-
         // элемент интерфейса со списком драйверов считывателей
         ListPreference drvList = (ListPreference) this.findPreference(getResources().getString(
                 R.string.rfidDriverListPrefKey));
-        drvSettingScr = (PreferenceScreen) this.findPreference(getResources()
+        basicSettingScr = (PreferenceScreen) this.findPreference("preferenceBasicScreen");
+        driverSettingScr = (PreferenceScreen) this.findPreference(getResources()
                 .getString(R.string.rfidDrvSettingKey));
 
         // указываем названия и значения для элементов списка
         drvList.setEntries(drvNames.toArray(new String[]{""}));
         drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
 
-        // при изменении драйвера, включаем дополнительный экран с
-        // настройками драйвера
+        // при изменении драйвера, включаем дополнительный экран с настройками драйвера
         drvList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
             @Override
-            public boolean onPreferenceChange(Preference preference,
-                                              Object newValue) {
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
 
                 String value = (String) newValue;
-                PreferenceScreen screen = getDrvSettingsScreen(value,
-                        drvSettingScr);
-
-                // проверяем есть ли настройки у драйвера
-                if (screen != null) {
-                    drvSettingCategory.setEnabled(true);
-                } else {
-                    drvSettingCategory.setEnabled(false);
-                }
-
+                showRfidDriverScreen(value);
                 return true;
             }
         });
@@ -178,15 +162,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // проверяем есть ли настройки у драйвера
         String currentDrv = preferences.getString(
                 getResources().getString(R.string.rfidDriverListPrefKey), null);
-        if (currentDrv != null) {
-            if (getDrvSettingsScreen(currentDrv, drvSettingScr) != null) {
-                drvSettingCategory.setEnabled(true);
-            } else {
-                drvSettingCategory.setEnabled(false);
-            }
-        } else {
-            drvSettingCategory.setEnabled(false);
-        }
+        showRfidDriverScreen(currentDrv);
 
         Preference button = this.findPreference(getString(R.string.load_test_data));
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -205,6 +181,15 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 return true;
             }
         });
+    }
+
+    void showRfidDriverScreen(String value) {
+        // проверяем есть ли настройки у драйвера
+        if (value != null && isDriverSettingsScreen(value, driverSettingScr)) {
+            basicSettingScr.addPreference(driverSettingScr);
+        } else {
+            basicSettingScr.removePreference(driverSettingScr);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -256,10 +241,18 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
         if (preference != null) {
             if (preference instanceof PreferenceScreen) {
-                if (((PreferenceScreen) preference).getDialog() != null) {
-                    ((PreferenceScreen) preference).getDialog().getWindow().getDecorView().setBackgroundDrawable(this.getWindow().getDecorView().getBackground().getConstantState().newDrawable());
-                    setUpNestedScreen((PreferenceScreen) preference);
+                Dialog dialog = ((PreferenceScreen) preference).getDialog();
+                if (dialog != null) {
+                    Window window = dialog.getWindow();
+                    if (window != null) {
+                        Drawable.ConstantState constantState = this.getWindow().getDecorView().getBackground().getConstantState();
+                        if (constantState != null) {
+                            window.getDecorView().setBackgroundDrawable(constantState.newDrawable());
+                        }
+                    }
                 }
+
+                setUpNestedScreen((PreferenceScreen) preference);
             }
         }
 
@@ -366,8 +359,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.onResume();
     }
 
-    private PreferenceScreen getDrvSettingsScreen(String classPath,
-                                                  PreferenceScreen rootScreen) {
+    private boolean isDriverSettingsScreen(String classPath, PreferenceScreen rootScreen) {
 
         Class<?> driverClass;
         PreferenceScreen screen;
@@ -385,13 +377,15 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
             // пытаемся вызвать метод
             screen = driver.getSettingsScreen(rootScreen);
-
-            // возвращаем результат
-            return screen;
+            if (screen == null) {
+                return false;
+            }
         } catch (Exception e) {
             Log.e(TAG, e.getLocalizedMessage());
-            return null;
+            return false;
         }
+
+        return true;
     }
 
 
@@ -420,6 +414,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                                     errorMessage = null;
                                 }
                             }
+
                             EditText edit = URLPreference.getEditText();
                             if (errorMessage == null) {
                                 edit.setError(null);
@@ -432,6 +427,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                         }
                     });
         }
+
         return true;
     }
 }
