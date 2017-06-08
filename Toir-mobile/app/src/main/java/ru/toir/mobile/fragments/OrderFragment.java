@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -77,7 +76,7 @@ import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationPhoto;
+import ru.toir.mobile.db.realm.OperationFile;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -934,7 +933,7 @@ public class OrderFragment extends Fragment {
                     List<MultipartBody.Part> list = new ArrayList<>();
                     String operationUuid = file.substring(0, file.lastIndexOf('-'));
                     operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
-                    list.add(prepareFilePart("photo[" + operationUuid + "]", uri));
+                    list.add(prepareFilePart("file[" + operationUuid + "]", uri));
                     // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
                     // объём данных превышающий органичения на отправку POST запросом на сервере
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
@@ -962,8 +961,8 @@ public class OrderFragment extends Fragment {
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 for (String item : strings) {
-                    OperationPhoto photo = realm.where(OperationPhoto.class).equalTo("fileName", item).findFirst();
-                    photo.setSent(true);
+                    OperationFile file = realm.where(OperationFile.class).equalTo("fileName", item).findFirst();
+                    file.setSent(true);
                 }
 
                 realm.commitTransaction();
@@ -1273,23 +1272,23 @@ public class OrderFragment extends Fragment {
             }
         }
 
-        // строим список фотографий связанных с выполненными операциями
+        // строим список файлов связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<String> photos = new ArrayList<>();
-        RealmResults<OperationPhoto> operationPhotos = realmDB.where(OperationPhoto.class)
+        List<String> filesToSend = new ArrayList<>();
+        RealmResults<OperationFile> operationFiles = realmDB.where(OperationFile.class)
                 .in("operation.uuid", operationUuids.toArray(new String[]{}))
                 .findAll();
 
-        for (OperationPhoto item : operationPhotos) {
-            File operationPhoto = new File(
+        for (OperationFile item : operationFiles) {
+            File operationFile = new File(
                     getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                     item.getFileName());
-            if (operationPhoto.exists()) {
-                photos.add(operationPhoto.getAbsolutePath());
+            if (operationFile.exists()) {
+                filesToSend.add(operationFile.getAbsolutePath());
             }
         }
 
-        sendFiles(photos);
+        sendFiles(filesToSend);
 
         String[] opUuidsArray = operationUuids.toArray(new String[]{});
 
@@ -1557,11 +1556,11 @@ public class OrderFragment extends Fragment {
                     // добавляем запись о полученном файле
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    OperationPhoto operationPhoto = new OperationPhoto();
-                    operationPhoto.set_id(realm.where(OperationPhoto.class).max("_id").longValue() + 1);
-                    operationPhoto.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
-                    operationPhoto.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
-                    realm.copyToRealm(operationPhoto);
+                    OperationFile operationFile = new OperationFile();
+                    operationFile.set_id(realm.where(OperationFile.class).max("_id").longValue() + 1);
+                    operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
+                    operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
+                    realm.copyToRealm(operationFile);
                     realm.commitTransaction();
                 }
                 break;

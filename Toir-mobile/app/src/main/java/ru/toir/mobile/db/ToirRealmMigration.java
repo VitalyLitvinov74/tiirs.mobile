@@ -30,7 +30,7 @@ class ToirRealmMigration implements RealmMigration {
     private final String TAG = this.getClass().getName();
     private Context context;
 
-    public ToirRealmMigration(Context context) {
+    ToirRealmMigration(Context context) {
         this.context = context;
     }
 
@@ -302,6 +302,11 @@ class ToirRealmMigration implements RealmMigration {
 
         if (oldVersion == 21) {
             toVersion22(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 22) {
+            toVersion23(realm);
             oldVersion++;
         }
 
@@ -653,6 +658,17 @@ class ToirRealmMigration implements RealmMigration {
                 .addField("sent", boolean.class)
                 .addField("createdAt", Date.class)
                 .addField("changedAt", Date.class);
+    }
+
+    /**
+     * Переход на версию 23
+     *
+     * @param realm - экземпляр realmDB
+     */
+    private void toVersion23(DynamicRealm realm) {
+        Log.d(TAG, "from version 22");
+        RealmSchema schema = realm.getSchema();
+        schema.rename("OperationPhoto", "OperationFile");
     }
 
     private boolean testPropsFields(DynamicRealm realm) {
