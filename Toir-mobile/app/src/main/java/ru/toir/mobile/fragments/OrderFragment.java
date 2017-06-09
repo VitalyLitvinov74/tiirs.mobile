@@ -893,11 +893,11 @@ public class OrderFragment extends Fragment {
     }
 
     /**
-     * Метод для отправки файлов фотографий созданных во время выполнения операций.
+     * Метод для отправки файлов созданных во время выполнения операций или привязанных к операции.
      */
-    private void sendFiles(List<String> files) {
+    private void sendFiles(List<OperationFile> files) {
 
-        AsyncTask<String[], Void, List<String>> task = new AsyncTask<String[], Void, List<String>>() {
+        AsyncTask<OperationFile[], Void, List<String>> task = new AsyncTask<OperationFile[], Void, List<String>>() {
             @NonNull
             private RequestBody createPartFromString(String descriptionString) {
                 return RequestBody.create(MultipartBody.FORM, descriptionString);
@@ -919,30 +919,40 @@ public class OrderFragment extends Fragment {
             }
 
             @Override
-            protected List<String> doInBackground(String[]... lists) {
+            protected List<String> doInBackground(OperationFile[]... lists) {
                 List<String> sendFiles = new ArrayList<>();
-                for (String file : lists[0]) {
+                for (OperationFile file : lists[0]) {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
                     try {
-                        uri = Uri.fromFile(new File(file));
+                        // TODO: нужно добавить полный путь до файла в каталоге Pictures !!!
+                        uri = Uri.fromFile(new File(
+                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                                file.getFileName()));
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
 
                     List<MultipartBody.Part> list = new ArrayList<>();
-                    String operationUuid = file.substring(0, file.lastIndexOf('-'));
-                    operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
-                    list.add(prepareFilePart("file[" + operationUuid + "]", uri));
+                    String fileUuid = file.getUuid();
+                    String formId = "file[" + fileUuid + "]";
+                    list.add(prepareFilePart(formId, uri));
+                    // TODO: реализовать отправку дополнительных полей в запросе!!!
+                    list.add(MultipartBody.Part.createFormData(formId + "[_id]", String.valueOf(file.get_id())));
+                    list.add(MultipartBody.Part.createFormData(formId + "[uuid]", file.getUuid()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[fileName]", file.getFileName()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
+                    list.add(MultipartBody.Part.createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
                     // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
-                    // объём данных превышающий органичения на отправку POST запросом на сервере
+                    // объём данных превышающий ограничения на отправку POST запросом на сервере
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
                     try {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
                         if (response.isSuccessful()) {
                             Log.d(TAG, "result" + result.contentType());
-                            sendFiles.add(file.substring(file.lastIndexOf('/') + 1));
+                            sendFiles.add(file.getFileName());
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
@@ -969,7 +979,7 @@ public class OrderFragment extends Fragment {
             }
         };
 
-        String[] sendFiles = files.toArray(new String[]{});
+        OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
         task.execute(sendFiles);
     }
 
@@ -1272,11 +1282,13 @@ public class OrderFragment extends Fragment {
             }
         }
 
+        // предполагаем что все файлы мы сохраняем в папку приложения DIRECTORY_PICTURES
         // строим список файлов связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<String> filesToSend = new ArrayList<>();
+        List<OperationFile> filesToSend = new ArrayList<>();
         RealmResults<OperationFile> operationFiles = realmDB.where(OperationFile.class)
                 .in("operation.uuid", operationUuids.toArray(new String[]{}))
+                .equalTo("sent", false)
                 .findAll();
 
         for (OperationFile item : operationFiles) {
@@ -1284,7 +1296,7 @@ public class OrderFragment extends Fragment {
                     getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                     item.getFileName());
             if (operationFile.exists()) {
-                filesToSend.add(operationFile.getAbsolutePath());
+                filesToSend.add(realmDB.copyFromRealm(item));
             }
         }
 
