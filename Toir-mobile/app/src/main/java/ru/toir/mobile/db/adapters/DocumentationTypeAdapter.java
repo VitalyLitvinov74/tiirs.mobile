@@ -34,7 +34,9 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
 
     public RealmResults<DocumentationType> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(DocumentationType.class).findAll();
+        RealmResults<DocumentationType> result = realm.where(DocumentationType.class).findAll();
+        realm.close();
+        return result;
     }
 
     @Override

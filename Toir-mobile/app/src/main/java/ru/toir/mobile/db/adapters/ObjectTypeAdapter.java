@@ -35,7 +35,9 @@ public class ObjectTypeAdapter extends RealmBaseAdapter<ObjectType> implements L
 
     public RealmResults<ObjectType> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(ObjectType.class).findAll();
+        RealmResults<ObjectType> result = realm.where(ObjectType.class).findAll();
+        realm.close();
+        return result;
     }
 
     @Override
@@ -43,6 +45,7 @@ public class ObjectTypeAdapter extends RealmBaseAdapter<ObjectType> implements L
         if (adapterData != null) {
             return adapterData.get(position);
         }
+
         return null;
     }
 
@@ -53,6 +56,7 @@ public class ObjectTypeAdapter extends RealmBaseAdapter<ObjectType> implements L
             objectType = adapterData.get(position);
             return objectType.get_id();
         }
+
         return 0;
     }
 
@@ -66,6 +70,7 @@ public class ObjectTypeAdapter extends RealmBaseAdapter<ObjectType> implements L
                 viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
                 convertView.setTag(viewHolder);
             }
+
             if (parent.getId() == R.id.simple_spinner) {
                 //convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
@@ -79,21 +84,26 @@ public class ObjectTypeAdapter extends RealmBaseAdapter<ObjectType> implements L
         ObjectType objectType;
         if (adapterData != null && viewHolder.title != null) {
             objectType = adapterData.get(position);
-            if (objectType != null)
+            if (objectType != null) {
                 viewHolder.title.setText(objectType.getTitle());
+            }
         }
 
         if (convertView == null) {
             TextView textView = new TextView(context);
             if (adapterData != null) {
                 objectType = adapterData.get(position);
-                if (objectType != null)
+                if (objectType != null) {
                     textView.setText(objectType.getTitle());
+                }
+
                 textView.setTextSize(16);
                 textView.setPadding(5, 5, 5, 5);
             }
+
             return textView;
         }
+
         return convertView;
     }
 

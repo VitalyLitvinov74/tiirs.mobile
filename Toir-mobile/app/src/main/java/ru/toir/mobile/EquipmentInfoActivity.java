@@ -94,7 +94,25 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     //private static final int DIALOG_SET_DEFECT = 1;
     //private static final int DIALOG_SET_STATUS = 2;
+    FloatingActionButton fab;
+    FloatingActionButton fab1;
+    FloatingActionButton fab2;
+    FloatingActionButton fab3;
+    FloatingActionButton fab4;
+    FloatingActionButton fab5;
+    CoordinatorLayout rootLayout;
+    Animation show_fab_1;
+    Animation hide_fab_1;
+    Animation show_fab_2;
+    Animation hide_fab_2;
+    Animation show_fab_3;
+    Animation hide_fab_3;
+    Animation show_fab_4;
 
+    //Spinner defectTypeSpinner;
+    Animation hide_fab_4;
+    Animation show_fab_5;
+    Animation hide_fab_5;
     private Realm realmDB;
     private String equipment_uuid;
     private TextView tv_equipment_name;
@@ -109,34 +127,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
     private ListView tv_equipment_defects;
-
-    //Spinner defectTypeSpinner;
-
     // диалог для работы с rfid считывателем
     private RfidDialog rfidDialog;
     // диалог при загрузке файла документации
     private ProgressDialog loadDocumentationDialog;
-
-    FloatingActionButton fab;
-    FloatingActionButton fab1;
-    FloatingActionButton fab2;
-    FloatingActionButton fab3;
-    FloatingActionButton fab4;
-    FloatingActionButton fab5;
-    CoordinatorLayout rootLayout;
-
     private boolean FAB_Status = false;
-
-    Animation show_fab_1;
-    Animation hide_fab_1;
-    Animation show_fab_2;
-    Animation hide_fab_2;
-    Animation show_fab_3;
-    Animation hide_fab_3;
-    Animation show_fab_4;
-    Animation hide_fab_4;
-    Animation show_fab_5;
-    Animation hide_fab_5;
 
 
     // фильтр для получения сообщений при получении файлов документации с сервера
@@ -182,6 +177,25 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 //
 //		}
 //	};
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 5;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
 
     /**
      * Показываем документ из базы во внешнем приложении.
@@ -244,7 +258,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private void initView() {
         final Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
         if (equipment == null) {
-            Toast.makeText(getApplicationContext(),"Неизвестное оборудование!!",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Неизвестное оборудование!!", Toast.LENGTH_LONG).show();
             return;
         }
         EquipmentModel equipmentModel = equipment.getEquipmentModel();
@@ -252,15 +266,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (equipmentModel != null) {
             tv_equipment_inventory.setText(getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle());
         }
-        tv_equipment_id.setText(getString(R.string.id,equipment.getInventoryNumber()));
+        tv_equipment_id.setText(getString(R.string.id, equipment.getInventoryNumber()));
         tv_equipment_uuid.setText(equipment.getUuid());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
-        if (equipment.getLatitude()>0) {
+        if (equipment.getLatitude() > 0) {
             tv_equipment_position.setText(""
                     + String.valueOf(equipment.getLatitude()) + " / "
                     + String.valueOf(equipment.getLongitude()));
-        }
-        else {
+        } else {
             if (equipment.getLocation() != null) {
                 tv_equipment_position.setText(""
                         + String.valueOf(equipment.getLocation().getLatitude()) + " / "
@@ -287,11 +300,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         String sDate;
         RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
-        if (stages.size()>2) {
-            stages.subList(0,2);
+        if (stages.size() > 2) {
+            stages.subList(0, 2);
         }
         StageAdapter stageAdapter = new StageAdapter(getApplicationContext(), stages);
-        if (stageAdapter.getCount()>0) {
+        if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
             if (date != null && date.after(new Date(100000))) {
                 sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
@@ -303,14 +316,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_listview.setAdapter(stageAdapter);
 
         RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("date", Sort.DESCENDING);
-        if (defects.size()>2) {
-            defects.subList(0,2);
+        if (defects.size() > 2) {
+            defects.subList(0, 2);
         }
         DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
         tv_equipment_defects.setAdapter(defectAdapter);
 
         String path = getExternalFilesDir("/equipment") + File.separator;
-        Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(),equipment), 0, 300, equipment.getChangedAt().getTime());
+        Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(), equipment), 0, 300, equipment.getChangedAt().getTime());
         if (image_bitmap != null) {
             tv_equipment_image.setImageBitmap(image_bitmap);
         }
@@ -368,14 +381,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogDefect (equipment, (ViewGroup) v.getParent());
+                showDialogDefect(equipment, (ViewGroup) v.getParent());
             }
         });
 
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogStatus (equipment, (ViewGroup) v.getParent());
+                showDialogStatus(equipment, (ViewGroup) v.getParent());
             }
         });
 
@@ -392,18 +405,26 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                readRFIDTag (equipment);
+                readRFIDTag(equipment);
             }
         });
 
         fab5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                writeRFIDTag (equipment);
+                writeRFIDTag(equipment);
             }
         });
 
     }
+
+//	private void FillListViewOperations() {
+//        TaskAdapter taskAdapter;
+//        RealmResults<Tasks> tasks;
+//        tasks = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
+//        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+//        lv.setAdapter(taskAdapter);
+//	}
 
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.equipment_layout);
@@ -458,18 +479,362 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
     }
 
-//	private void FillListViewOperations() {
-//        TaskAdapter taskAdapter;
-//        RealmResults<Tasks> tasks;
-//        tasks = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
-//        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-//        lv.setAdapter(taskAdapter);
-//	}
-
     public void startAboutDialog() {
         AboutDialog about = new AboutDialog(this);
         about.setTitle("О программе");
         about.show();
+    }
+
+    private void expandFAB() {
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
+        layoutParams.rightMargin += (int) (fab1.getWidth() * 2.3);
+        layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.05);
+        fab1.setLayoutParams(layoutParams);
+        fab1.startAnimation(show_fab_1);
+        fab1.setClickable(true);
+
+        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
+        layoutParams2.rightMargin += (fab2.getWidth() * 2);
+        layoutParams2.bottomMargin += (fab2.getHeight() * 2);
+        fab2.setLayoutParams(layoutParams2);
+        fab2.startAnimation(show_fab_2);
+        fab2.setClickable(true);
+
+        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
+        layoutParams3.rightMargin += (int) (fab3.getWidth() * 0.05);
+        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 2.3);
+        fab3.setLayoutParams(layoutParams3);
+        fab3.startAnimation(show_fab_3);
+        fab3.setClickable(true);
+
+        FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
+        layoutParams4.rightMargin += (int) (fab4.getWidth() * 1.7);
+        layoutParams4.bottomMargin += (int) (fab4.getHeight() * 0.9);
+        fab4.setLayoutParams(layoutParams4);
+        fab4.startAnimation(show_fab_4);
+        fab4.setClickable(true);
+
+        FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
+        layoutParams5.rightMargin += (int) (fab5.getWidth() * 0.9);
+        layoutParams5.bottomMargin += (int) (fab5.getHeight() * 1.7);
+        fab5.setLayoutParams(layoutParams5);
+        fab5.startAnimation(show_fab_5);
+        fab5.setClickable(true);
+    }
+
+    private void hideFAB() {
+
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
+        layoutParams.rightMargin -= (int) (fab1.getWidth() * 2.3);
+        layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.05);
+        fab1.setLayoutParams(layoutParams);
+        fab1.startAnimation(hide_fab_1);
+        fab1.setClickable(false);
+
+        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
+        layoutParams2.rightMargin -= (fab2.getWidth() * 2);
+        layoutParams2.bottomMargin -= (fab2.getHeight() * 2);
+        fab2.setLayoutParams(layoutParams2);
+        fab2.startAnimation(hide_fab_2);
+        fab2.setClickable(false);
+
+        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
+        layoutParams3.rightMargin -= (int) (fab3.getWidth() * 0.05);
+        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 2.3);
+        fab3.setLayoutParams(layoutParams3);
+        fab3.startAnimation(hide_fab_3);
+        fab3.setClickable(false);
+
+        FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
+        layoutParams4.rightMargin -= (int) (fab4.getWidth() * 1.7);
+        layoutParams4.bottomMargin -= (int) (fab4.getHeight() * 0.9);
+        fab4.setLayoutParams(layoutParams4);
+        fab4.startAnimation(hide_fab_4);
+        fab4.setClickable(false);
+
+        FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
+        layoutParams5.rightMargin -= (int) (fab5.getWidth() * 0.9);
+        layoutParams5.bottomMargin -= (int) (fab5.getHeight() * 1.7);
+        fab5.setLayoutParams(layoutParams5);
+        fab5.startAnimation(hide_fab_5);
+        fab5.setClickable(false);
+
+    }
+
+    public void showDialogDefect(final Equipment equipment, ViewGroup parent) {
+        LayoutInflater inflater = getLayoutInflater();
+        final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
+
+        RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
+        final Spinner defectTypeSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
+        final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(this, defectType);
+        defectTypeSpinner.setAdapter(typeSpinnerAdapter);
+
+        defectTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                DefectType typeSelected = (DefectType) defectTypeSpinner
+                        .getSelectedItem();
+                if (typeSelected != null) {
+                    DefectType currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
+                    if (currentDefectType != null) {
+                        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("DefectType.uuid", currentDefectType.getUuid()).findAll();
+                        Spinner defectSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
+                        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
+                        defectSpinner.setAdapter(defectAdapter);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Укажите дефект");
+        alert.setView(alertLayout);
+        alert.setIcon(R.drawable.ic_icon_warnings);
+        alert.setCancelable(false);
+        alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                TextView newDefect = (TextView) alertLayout.findViewById(R.id.add_new_comment);
+                DefectType currentDefectType = null;
+                if (defectTypeSpinner.getSelectedItemPosition() >= 0) {
+                    currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
+                }
+                if (newDefect != null) {
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    final Defect defect = realmDB.createObject(Defect.class);
+                    UUID uuid = UUID.randomUUID();
+                    long next_id = realm.where(Defect.class).max("_id").intValue() + 1;
+                    defect.set_id(next_id);
+                    defect.setUuid(uuid.toString().toUpperCase());
+                    defect.setDate(new Date());
+                    defect.setComment(newDefect.getText().toString());
+                    defect.setProcess(false);
+                    defect.setCreatedAt(new Date());
+                    defect.setChangedAt(new Date());
+                    defect.setEquipment(equipment);
+                    if (currentDefectType != null) {
+                        defect.setDefectType(currentDefectType);
+                    } else {
+                        defect.setDefectType(null);
+                    }
+
+                    AuthorizedUser authUser = AuthorizedUser.getInstance();
+                    User user = realmDB.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                    if (user != null) {
+                        defect.setUser(user);
+                    } else {
+                        defect.setUser(null);
+                    }
+
+                    defect.setTask(null);
+                    realm.commitTransaction();
+                    realm.close();
+                }
+            }
+        });
+
+        AlertDialog dialog = alert.create();
+        dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+        dialog.setContentView(R.layout.add_defect_dialog);
+        dialog.show();
+    }
+
+    public void showDialogStatus(final Equipment equipment, ViewGroup parent) {
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.change_status_dialog, parent, false);
+        RealmResults<EquipmentStatus> equipmentStatus = realmDB.where(EquipmentStatus.class).findAll();
+        final Spinner statusSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_status);
+        final EquipmentStatusAdapter equipmentStatusAdapter = new EquipmentStatusAdapter(this, R.id.spinner_status, equipmentStatus);
+        statusSpinner.setAdapter(equipmentStatusAdapter);
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Статус оборудования");
+        alert.setView(alertLayout);
+        alert.setIcon(R.drawable.ic_icon_tools);
+        alert.setCancelable(false);
+        alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                equipment.setEquipmentStatus(equipmentStatusAdapter.getItem(statusSpinner.getSelectedItemPosition()));
+                realm.commitTransaction();
+                realm.close();
+            }
+        });
+
+        TextView statusCurrent = (TextView) alertLayout.findViewById(R.id.current_status);
+        statusCurrent.setText(equipment.getEquipmentStatus().getTitle());
+
+        AlertDialog dialog = alert.create();
+        dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+        //dialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.ic_icon_tools);
+        dialog.setContentView(R.layout.add_defect_dialog);
+        dialog.show();
+    }
+
+    public void writeRFIDTag(Equipment equipment) {
+        Log.d(TAG, "Пишем в метку пользователя.");
+        // сюда нужно перенести код который отвечает за сохранение
+        // структуры данных в пользовательскую метку
+
+        Intent intent = getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
+        if (intent != null) {
+            startActivity(intent);
+        }
+        //Log.d(TAG, "Пишем в метку оборудования.");
+        //Log.d(TAG, "uuid оборудования = " + equipment_uuid);
+        //equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
+        if (equipment != null) {
+            Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
+            TagStructure tag = new TagStructure();
+            tag.uuid = equipment.getUuid();
+            tag.taskId = 0x10111213;
+            tag.taskTypeId = 0x14151617;
+            tag.start = 0x18191a1b;
+            tag.end = 0x1c1d1e1f;
+
+            Handler handler = new Handler(new Handler.Callback() {
+
+                @Override
+                public boolean handleMessage(Message msg) {
+                    Log.d(TAG, "Получили сообщение из драйвера.");
+
+                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                        Toast.makeText(getApplicationContext(),
+                                "Запись метки удалась.", Toast.LENGTH_SHORT)
+                                .show();
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                "Не удалось записать данные.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    // закрываем диалог
+                    rfidDialog.dismiss();
+                    return true;
+                }
+            });
+
+            rfidDialog = new RfidDialog();
+            rfidDialog.setHandler(handler);
+            // тестовые данные для примера
+            String data = "0a0a0a0a";
+            //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+            //data = "00000000000000000000000000000000";
+            // data = "FFFFFFFFFFFFFFFF";
+            //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+            //byte[] byteData = tag.getBinary();
+            //data = DataUtils.toHexString(byteData);
+            // пишем в метку с id привязанным к оборудованию
+            // rfidDialog.writeTagData("00000000", equipment.getTag_id(),
+            // RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+            // пишем в "известную" метку
+            // rfidDialog.writeTagData("00000000",
+            // "3000E2004000860902332580112D",
+            // RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+            // пишем в "произовольную" метку, ту которую найдём первой
+//                        rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+            // пишем в "известную" метку
+            data = "000102030405060708090A0B0C0D0E0F";
+            data += "101112131415161718191A1B1C1D1E1F";
+            data += "202122232425262728292A2B2C2D2E2F";
+            data += "303132333435363738393A3B3C3D3E3F";
+            data = "FF050403020100FF";
+//                        data = "EFFE";
+//                        rfidDialog.writeTagData("00000000", equipment.getTagId(),
+//                                RfidDriverBase.MEMORY_BANK_USER, 0, data);
+            rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
+
+            rfidDialog.show(getFragmentManager(), TAG);
+
+        }
+    }
+
+    public void readRFIDTag(Equipment equipment) {
+        Log.d(TAG, "Считываем память метки.");
+        if (equipment != null) {
+            Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
+            Handler handler = new Handler(new Handler.Callback() {
+
+                @Override
+                public boolean handleMessage(Message msg) {
+                    Log.d(TAG, "Получили сообщение из драйвера.");
+
+                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                        String tagData = (String) msg.obj;
+                        Log.d(TAG, tagData);
+                        if (tagData.length() / 2 == 64) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Считывание метки успешно.\r\n" + tagData,
+                                    Toast.LENGTH_SHORT).show();
+                            TagStructure tag = new TagStructure();
+                            tag.parse(DataUtils.hexStringToByteArray(tagData));
+                            Log.d(TAG, "uuid = " + tag.uuid);
+                            Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
+                            Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
+                            Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
+                            Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
+                            Log.d(TAG, "phone = " + tag.phone);
+                        }
+                    } else {
+                        Log.d(TAG, "Ошибка чтения метки!");
+                        Toast.makeText(getApplicationContext(),
+                                "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+
+
+                    // закрываем диалог
+                    rfidDialog.dismiss();
+                    return true;
+                }
+            });
+
+            rfidDialog = new RfidDialog();
+            rfidDialog.setHandler(handler);
+
+            // читаем метку с конкретным id для теста
+            // rfidDialog.readTagData("0000000000", "3000E2004000860902332580112D",
+            // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+
+            // читаем метку с id привязанным к оборудованию
+            rfidDialog.readTagData("00000000", equipment.getTagId(),
+                    RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+
+            // читаем "произовольную" метку, ту которую найдём первой
+//                        rfidDialog.readTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+
+            rfidDialog.show(getFragmentManager(), TAG);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realmDB.close();
     }
 
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
@@ -577,372 +942,5 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         }
 
-    }
-
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        int totalHeight = 5;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-    }
-
-    private void expandFAB() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin += (int) (fab1.getWidth() * 2.3);
-        layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.05);
-        fab1.setLayoutParams(layoutParams);
-        fab1.startAnimation(show_fab_1);
-        fab1.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin += (fab2.getWidth() * 2);
-        layoutParams2.bottomMargin += (fab2.getHeight() * 2);
-        fab2.setLayoutParams(layoutParams2);
-        fab2.startAnimation(show_fab_2);
-        fab2.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
-        layoutParams3.rightMargin += (int) (fab3.getWidth() * 0.05);
-        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 2.3);
-        fab3.setLayoutParams(layoutParams3);
-        fab3.startAnimation(show_fab_3);
-        fab3.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
-        layoutParams4.rightMargin += (int) (fab4.getWidth() * 1.7);
-        layoutParams4.bottomMargin += (int) (fab4.getHeight() * 0.9);
-        fab4.setLayoutParams(layoutParams4);
-        fab4.startAnimation(show_fab_4);
-        fab4.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
-        layoutParams5.rightMargin += (int) (fab5.getWidth() * 0.9);
-        layoutParams5.bottomMargin += (int) (fab5.getHeight() * 1.7);
-        fab5.setLayoutParams(layoutParams5);
-        fab5.startAnimation(show_fab_5);
-        fab5.setClickable(true);
-    }
-
-
-    private void hideFAB() {
-
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin -= (int) (fab1.getWidth() * 2.3);
-        layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.05);
-        fab1.setLayoutParams(layoutParams);
-        fab1.startAnimation(hide_fab_1);
-        fab1.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin -= (fab2.getWidth() * 2);
-        layoutParams2.bottomMargin -= (fab2.getHeight() * 2);
-        fab2.setLayoutParams(layoutParams2);
-        fab2.startAnimation(hide_fab_2);
-        fab2.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
-        layoutParams3.rightMargin -= (int) (fab3.getWidth() * 0.05);
-        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 2.3);
-        fab3.setLayoutParams(layoutParams3);
-        fab3.startAnimation(hide_fab_3);
-        fab3.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
-        layoutParams4.rightMargin -= (int) (fab4.getWidth() * 1.7);
-        layoutParams4.bottomMargin -= (int) (fab4.getHeight() * 0.9);
-        fab4.setLayoutParams(layoutParams4);
-        fab4.startAnimation(hide_fab_4);
-        fab4.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
-        layoutParams5.rightMargin -= (int) (fab5.getWidth() * 0.9);
-        layoutParams5.bottomMargin -= (int) (fab5.getHeight() * 1.7);
-        fab5.setLayoutParams(layoutParams5);
-        fab5.startAnimation(hide_fab_5);
-        fab5.setClickable(false);
-
-    }
-
-    public void showDialogDefect(final Equipment equipment, ViewGroup parent) {
-        LayoutInflater inflater = getLayoutInflater();
-        final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
-
-        realmDB = Realm.getDefaultInstance();
-        RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
-        final Spinner defectTypeSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
-        final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(this, defectType);
-        defectTypeSpinner.setAdapter(typeSpinnerAdapter);
-
-        defectTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                DefectType typeSelected = (DefectType) defectTypeSpinner
-                        .getSelectedItem();
-                if (typeSelected != null) {
-                    DefectType currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
-                    if (currentDefectType != null) {
-                        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("DefectType.uuid", currentDefectType.getUuid()).findAll();
-                        Spinner defectSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
-                        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
-                        defectSpinner.setAdapter(defectAdapter);
-                    }
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Укажите дефект");
-        alert.setView(alertLayout);
-        alert.setIcon(R.drawable.ic_icon_warnings);
-        alert.setCancelable(false);
-        alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                TextView newDefect = (TextView) alertLayout.findViewById(R.id.add_new_comment);
-                DefectType currentDefectType = null;
-                if (defectTypeSpinner.getSelectedItemPosition() >= 0) {
-                    currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
-                }
-                if (newDefect != null) {
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
-                    final Defect defect = realmDB.createObject(Defect.class);
-                    UUID uuid = UUID.randomUUID();
-                    long next_id = realm.where(Defect.class).max("_id").intValue() + 1;
-                    defect.set_id(next_id);
-                    defect.setUuid(uuid.toString().toUpperCase());
-                    defect.setDate(new Date());
-                    defect.setComment(newDefect.getText().toString());
-                    defect.setProcess(false);
-                    defect.setCreatedAt(new Date());
-                    defect.setChangedAt(new Date());
-                    defect.setEquipment(equipment);
-                    if (currentDefectType != null) {
-                        defect.setDefectType(currentDefectType);
-                    }
-                    else {
-                        defect.setDefectType(null);
-                    }
-                    AuthorizedUser authUser = AuthorizedUser.getInstance();
-                    User user = realmDB.where(User.class)
-                            .equalTo("tagId", authUser.getTagId())
-                            .findFirst();
-                    if (user != null) {
-                        defect.setUser(user);
-                    }
-                    else
-                        defect.setUser(null);
-                    defect.setTask(null);
-                    realm.commitTransaction();
-                }
-            }
-        });
-
-        AlertDialog dialog = alert.create();
-        dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-        dialog.setContentView(R.layout.add_defect_dialog);
-        dialog.show();
-    }
-
-
-    public void showDialogStatus(final Equipment equipment, ViewGroup parent) {
-        LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.change_status_dialog, parent, false);
-        realmDB = Realm.getDefaultInstance();
-        RealmResults<EquipmentStatus> equipmentStatus = realmDB.where(EquipmentStatus.class).findAll();
-        final Spinner statusSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_status);
-        final EquipmentStatusAdapter equipmentStatusAdapter = new EquipmentStatusAdapter(this, R.id.spinner_status, equipmentStatus);
-        statusSpinner.setAdapter(equipmentStatusAdapter);
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Статус оборудования");
-        alert.setView(alertLayout);
-        alert.setIcon(R.drawable.ic_icon_tools);
-        alert.setCancelable(false);
-        alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                equipment.setEquipmentStatus(equipmentStatusAdapter.getItem(statusSpinner.getSelectedItemPosition()));
-                realm.commitTransaction();
-            }
-        });
-
-        TextView statusCurrent = (TextView) alertLayout.findViewById(R.id.current_status);
-        statusCurrent.setText(equipment.getEquipmentStatus().getTitle());
-
-        AlertDialog dialog = alert.create();
-        dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-        //dialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.ic_icon_tools);
-        dialog.setContentView(R.layout.add_defect_dialog);
-        dialog.show();
-    }
-
-    public void writeRFIDTag (Equipment equipment) {
-        Log.d(TAG, "Пишем в метку пользователя.");
-        // сюда нужно перенести код который отвечает за сохранение
-        // структуры данных в пользовательскую метку
-
-        Intent intent = getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
-        if (intent != null) {
-            startActivity(intent);
-        }
-        //Log.d(TAG, "Пишем в метку оборудования.");
-        //Log.d(TAG, "uuid оборудования = " + equipment_uuid);
-        //equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
-        if (equipment != null) {
-            Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
-            TagStructure tag = new TagStructure();
-            tag.uuid = equipment.getUuid();
-            tag.taskId = 0x10111213;
-            tag.taskTypeId = 0x14151617;
-            tag.start = 0x18191a1b;
-            tag.end = 0x1c1d1e1f;
-
-            Handler handler = new Handler(new Handler.Callback() {
-
-                @Override
-                public boolean handleMessage(Message msg) {
-                    Log.d(TAG, "Получили сообщение из драйвера.");
-
-                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                        Toast.makeText(getApplicationContext(),
-                                "Запись метки удалась.", Toast.LENGTH_SHORT)
-                                .show();
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                                "Не удалось записать данные.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-
-                    // закрываем диалог
-                    rfidDialog.dismiss();
-                    return true;
-                }
-            });
-
-            rfidDialog = new RfidDialog();
-            rfidDialog.setHandler(handler);
-            // тестовые данные для примера
-            String data = "0a0a0a0a";
-            //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-            //data = "00000000000000000000000000000000";
-            // data = "FFFFFFFFFFFFFFFF";
-            //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-            //byte[] byteData = tag.getBinary();
-            //data = DataUtils.toHexString(byteData);
-            // пишем в метку с id привязанным к оборудованию
-            // rfidDialog.writeTagData("00000000", equipment.getTag_id(),
-            // RfidDriverBase.MEMORY_BANK_USER, 0, data);
-
-            // пишем в "известную" метку
-            // rfidDialog.writeTagData("00000000",
-            // "3000E2004000860902332580112D",
-            // RfidDriverBase.MEMORY_BANK_USER, 0, data);
-
-            // пишем в "произовольную" метку, ту которую найдём первой
-//                        rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
-
-            // пишем в "известную" метку
-            data = "000102030405060708090A0B0C0D0E0F";
-            data += "101112131415161718191A1B1C1D1E1F";
-            data += "202122232425262728292A2B2C2D2E2F";
-            data += "303132333435363738393A3B3C3D3E3F";
-            data = "FF050403020100FF";
-//                        data = "EFFE";
-//                        rfidDialog.writeTagData("00000000", equipment.getTagId(),
-//                                RfidDriverBase.MEMORY_BANK_USER, 0, data);
-            rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
-
-            rfidDialog.show(getFragmentManager(), TAG);
-
-        }
-    }
-
-    public void readRFIDTag (Equipment equipment) {
-        Log.d(TAG, "Считываем память метки.");
-        if (equipment != null) {
-            Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
-            Handler handler = new Handler(new Handler.Callback() {
-
-                @Override
-                public boolean handleMessage(Message msg) {
-                    Log.d(TAG, "Получили сообщение из драйвера.");
-
-                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                        String tagData = (String) msg.obj;
-                        Log.d(TAG, tagData);
-                        if (tagData.length() / 2 == 64) {
-                            Toast.makeText(getApplicationContext(),
-                                    "Считывание метки успешно.\r\n" + tagData,
-                                    Toast.LENGTH_SHORT).show();
-                            TagStructure tag = new TagStructure();
-                            tag.parse(DataUtils.hexStringToByteArray(tagData));
-                            Log.d(TAG, "uuid = " + tag.uuid);
-                            Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
-                            Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
-                            Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
-                            Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
-                            Log.d(TAG, "phone = " + tag.phone);
-                        }
-                    } else {
-                        Log.d(TAG, "Ошибка чтения метки!");
-                        Toast.makeText(getApplicationContext(),
-                                "Ошибка чтения метки.", Toast.LENGTH_SHORT)
-                                .show();
-                    }
-
-
-                    // закрываем диалог
-                    rfidDialog.dismiss();
-                    return true;
-                }
-            });
-
-            rfidDialog = new RfidDialog();
-            rfidDialog.setHandler(handler);
-
-            // читаем метку с конкретным id для теста
-            // rfidDialog.readTagData("0000000000", "3000E2004000860902332580112D",
-            // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
-
-            // читаем метку с id привязанным к оборудованию
-            rfidDialog.readTagData("00000000", equipment.getTagId(),
-                    RfidDriverBase.MEMORY_BANK_USER, 0, 64);
-
-            // читаем "произовольную" метку, ту которую найдём первой
-//                        rfidDialog.readTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, 64);
-
-            rfidDialog.show(getFragmentManager(), TAG);
-        }
     }
 }

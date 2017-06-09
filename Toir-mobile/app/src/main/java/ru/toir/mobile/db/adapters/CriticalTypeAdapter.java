@@ -20,11 +20,6 @@ import ru.toir.mobile.db.realm.CriticalType;
 public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implements ListAdapter {
     public static final String TABLE_NAME = "CriticalType";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-    }
-
     public CriticalTypeAdapter(@NonNull Context context, int resId, RealmResults<CriticalType> data) {
         super(context, data);
     }
@@ -33,6 +28,7 @@ public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implemen
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CriticalType> rows = realm.where(CriticalType.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -71,5 +67,10 @@ public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implemen
             return convertView;
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
     }
 }

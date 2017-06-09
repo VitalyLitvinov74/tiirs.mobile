@@ -172,6 +172,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         if (!target_file.getParentFile().exists()) {
             target_file.getParentFile().mkdirs();
         }
+
         iView.buildDrawingCache();
         bmp = iView.getDrawingCache();
         FileOutputStream out = new FileOutputStream(target_file);
@@ -181,5 +182,11 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         }
         out.flush();
         out.close();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 }

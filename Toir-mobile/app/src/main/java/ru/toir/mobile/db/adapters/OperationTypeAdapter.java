@@ -20,11 +20,6 @@ import ru.toir.mobile.db.realm.OperationType;
 public class OperationTypeAdapter extends RealmBaseAdapter<OperationType> implements ListAdapter {
     public static final String TABLE_NAME = "OperationType";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-    }
-
     public OperationTypeAdapter(@NonNull Context context, int resId, RealmResults<OperationType> data) {
         super(context, data);
     }
@@ -33,6 +28,7 @@ public class OperationTypeAdapter extends RealmBaseAdapter<OperationType> implem
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OperationType> rows = realm.where(OperationType.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -71,5 +67,10 @@ public class OperationTypeAdapter extends RealmBaseAdapter<OperationType> implem
             return convertView;
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
     }
 }

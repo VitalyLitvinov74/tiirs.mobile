@@ -28,6 +28,7 @@ public class EquipmentTypeAdapter extends RealmBaseAdapter<EquipmentType> implem
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<EquipmentType> rows = realm.where(EquipmentType.class).findAll();
+        realm.close();
         return rows.size();
     }
 

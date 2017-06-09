@@ -817,6 +817,8 @@ public class OrderFragment extends Fragment {
                             }
                         }
                     }
+
+                    realm.close();
                 }
 
                 // загружаем файлы
@@ -871,6 +873,7 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(orders);
                         realm.commitTransaction();
+                        realm.close();
                         addToJournal("Клиент успешно получил " + count + " нарядов");
                         Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
                     } else {
@@ -976,6 +979,7 @@ public class OrderFragment extends Fragment {
                 }
 
                 realm.commitTransaction();
+                realm.close();
             }
         };
 
@@ -1153,6 +1157,8 @@ public class OrderFragment extends Fragment {
                             Log.e(TAG, e.getLocalizedMessage());
                             Log.e(TAG, "Ошибка при отправке GPS лога.");
                         }
+
+                        realm.close();
                     }
                 });
                 thread.start();
@@ -1574,7 +1580,9 @@ public class OrderFragment extends Fragment {
                     operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
                     realm.copyToRealm(operationFile);
                     realm.commitTransaction();
+                    realm.close();
                 }
+
                 break;
             case ACTIVITY_MEASURE:
                 if (resultCode == Activity.RESULT_OK) {
@@ -1586,6 +1594,11 @@ public class OrderFragment extends Fragment {
                     checkBox.setChecked(true);
                     CompleteCurrentOperation(currentOperationId, value);
                 }
+
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -1849,6 +1862,12 @@ public class OrderFragment extends Fragment {
         rfidDialog.setHandler(handler);
         rfidDialog.readMultiTagId(expectedTagId);
         rfidDialog.show(getActivity().getFragmentManager(), TAG);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 
     // обработчик кнопки "завершить все операции"

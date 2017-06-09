@@ -128,6 +128,17 @@ public class LoadTestData {
     private static TaskTemplate taskTemplate2;
     private static TaskTemplate taskTemplate3;
     private static TaskTemplate taskTemplate4;
+    private static Contragent contragent;
+    private static Contragent contragent2;
+    private long _id;
+    private String uuid;
+    private String name;
+    private String description;
+    private String phone;
+    private int contragentType;
+    private Contragent parentContragent;
+    private Date createdAt;
+    private Date changedAt;
 
     public static void LoadAllTestData() {
 
@@ -1419,20 +1430,9 @@ public class LoadTestData {
                 order4.addTask(task2);
             }
         });
+
+        realmDB.close();
     }
-
-    private long _id;
-    private String uuid;
-    private String name;
-    private String description;
-    private String phone;
-    private int contragentType;
-    private Contragent parentContragent;
-    private Date createdAt;
-    private Date changedAt;
-
-    private static Contragent contragent;
-    private static Contragent contragent2;
 
     public static void LoadAllTestData2() {
 
@@ -1473,6 +1473,8 @@ public class LoadTestData {
                 contragent2.setCreatedAt(new Date());
             }
         });
+
+        realmDB.close();
     }
 
     public static void DeleteSomeData() {
@@ -1484,5 +1486,7 @@ public class LoadTestData {
                 realmDB.where(Equipment.class).findAll().deleteAllFromRealm();
             }
         });
+
+        realmDB.close();
     }
 }

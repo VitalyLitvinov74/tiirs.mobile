@@ -22,6 +22,11 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 	private String user_uuid;
 	private LocationManager lM;
 
+    public GPSListener(Context context, String uuid) {
+        this.context = context;
+        this.user_uuid = uuid;
+    }
+
 	@Override
 	public void onGpsStatusChanged(int event) {
 		GpsStatus gpsStatus = lM.getGpsStatus(null);
@@ -37,11 +42,6 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 						+ satellite.getElevation() + "\n\n";
 			}
 		}
-	}
-
-	public GPSListener(Context context, String uuid) {
-		this.context = context;
-		this.user_uuid = uuid;
 	}
 
 	public Location getLastLocation() {
@@ -88,5 +88,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 				gpstrack.setLongitude(longitude);
 			}
 		});
-	}
+
+        realmDB.close();
+    }
 }

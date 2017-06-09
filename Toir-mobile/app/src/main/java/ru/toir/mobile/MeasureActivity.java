@@ -292,4 +292,9 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realmDB.close();
+    }
 }

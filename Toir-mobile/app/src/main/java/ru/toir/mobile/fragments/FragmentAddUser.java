@@ -32,10 +32,10 @@ import ru.toir.mobile.db.realm.User;
 
 public class FragmentAddUser extends Fragment implements View.OnClickListener {
     private static final int PICK_PHOTO_FOR_AVATAR = 1;
-    private ImageView iView;
-    private EditText name,login,pass,tag_id;
     Spinner typeSpinner;
     Spinner whoSpinner;
+    private ImageView iView;
+    private EditText name, login, pass, tag_id;
     private Realm realmDB;
 
     public FragmentAddUser() {
@@ -183,5 +183,11 @@ public class FragmentAddUser extends Fragment implements View.OnClickListener {
         }
         out.flush();
         out.close();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 }
