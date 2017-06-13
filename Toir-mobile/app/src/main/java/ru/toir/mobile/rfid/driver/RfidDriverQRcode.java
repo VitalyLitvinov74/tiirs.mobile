@@ -60,7 +60,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
                         scanText.setText("Результат сканирования: "
                                 + lastScannedCode);
                         sHandler.obtainMessage(RESULT_RFID_SUCCESS,
-                                lastScannedCode).sendToTarget();
+                                "0000" + lastScannedCode).sendToTarget();
                         releaseCamera();
                     }
                 }
@@ -106,8 +106,10 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
 	@Override
     public void readMultiplyTagId(final String[] tagIds) {
-        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-    }
+//        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+		releaseCamera();
+		resumeCamera();
+	}
 
     @Override
     public void close() {
