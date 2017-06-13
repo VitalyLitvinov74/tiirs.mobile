@@ -28,6 +28,7 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OrderStatus> rows = realm.where(OrderStatus.class).findAll();
+        realm.close();
         return rows.size();
     }
 

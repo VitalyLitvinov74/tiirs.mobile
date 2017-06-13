@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -77,7 +76,7 @@ import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationPhoto;
+import ru.toir.mobile.db.realm.OperationFile;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -818,6 +817,8 @@ public class OrderFragment extends Fragment {
                             }
                         }
                     }
+
+                    realm.close();
                 }
 
                 // загружаем файлы
@@ -872,6 +873,7 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(orders);
                         realm.commitTransaction();
+                        realm.close();
                         addToJournal("Клиент успешно получил " + count + " нарядов");
                         Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
                     } else {
@@ -894,11 +896,11 @@ public class OrderFragment extends Fragment {
     }
 
     /**
-     * Метод для отправки файлов фотографий созданных во время выполнения операций.
+     * Метод для отправки файлов созданных во время выполнения операций или привязанных к операции.
      */
-    private void sendFiles(List<String> files) {
+    private void sendFiles(List<OperationFile> files) {
 
-        AsyncTask<String[], Void, List<String>> task = new AsyncTask<String[], Void, List<String>>() {
+        AsyncTask<OperationFile[], Void, List<String>> task = new AsyncTask<OperationFile[], Void, List<String>>() {
             @NonNull
             private RequestBody createPartFromString(String descriptionString) {
                 return RequestBody.create(MultipartBody.FORM, descriptionString);
@@ -920,30 +922,40 @@ public class OrderFragment extends Fragment {
             }
 
             @Override
-            protected List<String> doInBackground(String[]... lists) {
+            protected List<String> doInBackground(OperationFile[]... lists) {
                 List<String> sendFiles = new ArrayList<>();
-                for (String file : lists[0]) {
+                for (OperationFile file : lists[0]) {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
                     try {
-                        uri = Uri.fromFile(new File(file));
+                        // TODO: нужно добавить полный путь до файла в каталоге Pictures !!!
+                        uri = Uri.fromFile(new File(
+                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                                file.getFileName()));
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
 
                     List<MultipartBody.Part> list = new ArrayList<>();
-                    String operationUuid = file.substring(0, file.lastIndexOf('-'));
-                    operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
-                    list.add(prepareFilePart("photo[" + operationUuid + "]", uri));
+                    String fileUuid = file.getUuid();
+                    String formId = "file[" + fileUuid + "]";
+                    list.add(prepareFilePart(formId, uri));
+                    // TODO: реализовать отправку дополнительных полей в запросе!!!
+                    list.add(MultipartBody.Part.createFormData(formId + "[_id]", String.valueOf(file.get_id())));
+                    list.add(MultipartBody.Part.createFormData(formId + "[uuid]", file.getUuid()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[fileName]", file.getFileName()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
+                    list.add(MultipartBody.Part.createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
                     // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
-                    // объём данных превышающий органичения на отправку POST запросом на сервере
+                    // объём данных превышающий ограничения на отправку POST запросом на сервере
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
                     try {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
                         if (response.isSuccessful()) {
                             Log.d(TAG, "result" + result.contentType());
-                            sendFiles.add(file.substring(file.lastIndexOf('/') + 1));
+                            sendFiles.add(file.getFileName());
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
@@ -962,15 +974,16 @@ public class OrderFragment extends Fragment {
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 for (String item : strings) {
-                    OperationPhoto photo = realm.where(OperationPhoto.class).equalTo("fileName", item).findFirst();
-                    photo.setSent(true);
+                    OperationFile file = realm.where(OperationFile.class).equalTo("fileName", item).findFirst();
+                    file.setSent(true);
                 }
 
                 realm.commitTransaction();
+                realm.close();
             }
         };
 
-        String[] sendFiles = files.toArray(new String[]{});
+        OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
         task.execute(sendFiles);
     }
 
@@ -1144,6 +1157,8 @@ public class OrderFragment extends Fragment {
                             Log.e(TAG, e.getLocalizedMessage());
                             Log.e(TAG, "Ошибка при отправке GPS лога.");
                         }
+
+                        realm.close();
                     }
                 });
                 thread.start();
@@ -1273,23 +1288,25 @@ public class OrderFragment extends Fragment {
             }
         }
 
-        // строим список фотографий связанных с выполненными операциями
+        // предполагаем что все файлы мы сохраняем в папку приложения DIRECTORY_PICTURES
+        // строим список файлов связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<String> photos = new ArrayList<>();
-        RealmResults<OperationPhoto> operationPhotos = realmDB.where(OperationPhoto.class)
+        List<OperationFile> filesToSend = new ArrayList<>();
+        RealmResults<OperationFile> operationFiles = realmDB.where(OperationFile.class)
                 .in("operation.uuid", operationUuids.toArray(new String[]{}))
+                .equalTo("sent", false)
                 .findAll();
 
-        for (OperationPhoto item : operationPhotos) {
-            File operationPhoto = new File(
+        for (OperationFile item : operationFiles) {
+            File operationFile = new File(
                     getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                     item.getFileName());
-            if (operationPhoto.exists()) {
-                photos.add(operationPhoto.getAbsolutePath());
+            if (operationFile.exists()) {
+                filesToSend.add(realmDB.copyFromRealm(item));
             }
         }
 
-        sendFiles(photos);
+        sendFiles(filesToSend);
 
         String[] opUuidsArray = operationUuids.toArray(new String[]{});
 
@@ -1557,13 +1574,15 @@ public class OrderFragment extends Fragment {
                     // добавляем запись о полученном файле
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    OperationPhoto operationPhoto = new OperationPhoto();
-                    operationPhoto.set_id(realm.where(OperationPhoto.class).max("_id").longValue() + 1);
-                    operationPhoto.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
-                    operationPhoto.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
-                    realm.copyToRealm(operationPhoto);
+                    OperationFile operationFile = new OperationFile();
+                    operationFile.set_id(realm.where(OperationFile.class).max("_id").longValue() + 1);
+                    operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
+                    operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
+                    realm.copyToRealm(operationFile);
                     realm.commitTransaction();
+                    realm.close();
                 }
+
                 break;
             case ACTIVITY_MEASURE:
                 if (resultCode == Activity.RESULT_OK) {
@@ -1575,6 +1594,11 @@ public class OrderFragment extends Fragment {
                     checkBox.setChecked(true);
                     CompleteCurrentOperation(currentOperationId, value);
                 }
+
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -1838,6 +1862,12 @@ public class OrderFragment extends Fragment {
         rfidDialog.setHandler(handler);
         rfidDialog.readMultiTagId(expectedTagId);
         rfidDialog.show(getActivity().getFragmentManager(), TAG);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 
     // обработчик кнопки "завершить все операции"

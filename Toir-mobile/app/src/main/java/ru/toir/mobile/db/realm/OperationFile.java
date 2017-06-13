@@ -12,7 +12,7 @@ import io.realm.annotations.PrimaryKey;
  *         Created by koputo on 5/16/17.
  */
 
-public class OperationPhoto extends RealmObject {
+public class OperationFile extends RealmObject {
     @Index
     private long _id;
     @PrimaryKey
@@ -23,7 +23,7 @@ public class OperationPhoto extends RealmObject {
     private Date createdAt;
     private Date changedAt;
 
-    public OperationPhoto() {
+    public OperationFile() {
         uuid = UUID.randomUUID().toString().toUpperCase();
         sent = false;
         Date createDate = new Date();

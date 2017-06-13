@@ -23,10 +23,8 @@ import ru.toir.mobile.db.realm.MeasureType;
 public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> implements ListAdapter {
     public static final String TABLE_NAME = "EquipmentStatus";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-        ImageView icon;
+    public EquipmentStatusAdapter(@NonNull Context context, int resId, RealmResults<EquipmentStatus> data) {
+        super(context, data);
     }
 
     @Override
@@ -48,15 +46,11 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
         return 0;
     }
 
-
-    public EquipmentStatusAdapter(@NonNull Context context, int resId, RealmResults<EquipmentStatus> data) {
-        super(context, data);
-    }
-
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<EquipmentStatus> rows = realm.where(EquipmentStatus.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -103,5 +97,11 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return getView(position, null, parent);
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
+        ImageView icon;
     }
 }

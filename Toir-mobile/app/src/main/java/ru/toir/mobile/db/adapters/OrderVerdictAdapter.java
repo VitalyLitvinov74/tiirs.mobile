@@ -19,12 +19,6 @@ import ru.toir.mobile.db.realm.OrderVerdict;
  */
 public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implements ListAdapter {
     public static final String TABLE_NAME = "OrderVerdict";
-    public class Status {
-        public static final String COMPLETE = "886dca37-2cc9-44da-aff9-19bf143e611a";
-        public static final String UN_COMPLETE = "883c08ec-89d9-47df-b7cf-63a05d56594c";
-        public static final String CANNOT_COMPLETE = "893c08ec-89d9-47df-b7cf-63a05d56594c";
-    }
-
     public OrderVerdictAdapter(@NonNull Context context, RealmResults<OrderVerdict> data) {
         super(context, data);
     }
@@ -33,6 +27,7 @@ public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implemen
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OrderVerdict> rows = realm.where(OrderVerdict.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -94,5 +89,11 @@ public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implemen
     private static class ViewHolder {
         TextView uuid;
         TextView title;
+    }
+
+    public class Status {
+        public static final String COMPLETE = "886dca37-2cc9-44da-aff9-19bf143e611a";
+        public static final String UN_COMPLETE = "883c08ec-89d9-47df-b7cf-63a05d56594c";
+        public static final String CANNOT_COMPLETE = "893c08ec-89d9-47df-b7cf-63a05d56594c";
     }
 }

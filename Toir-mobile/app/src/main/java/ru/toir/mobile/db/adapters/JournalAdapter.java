@@ -37,7 +37,9 @@ public class JournalAdapter extends RealmBaseAdapter<Journal> implements ListAda
 
     public RealmResults<Journal> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(Journal.class).findAll();
+        RealmResults<Journal> result = realm.where(Journal.class).findAll();
+        realm.close();
+        return result;
     }
 
     @Override

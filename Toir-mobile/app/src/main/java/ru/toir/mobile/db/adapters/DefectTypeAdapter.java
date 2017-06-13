@@ -29,6 +29,7 @@ public class DefectTypeAdapter extends RealmBaseAdapter<DefectType> implements L
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<DefectType> rows = realm.where(DefectType.class).findAll();
+        realm.close();
         return rows.size();
     }
 

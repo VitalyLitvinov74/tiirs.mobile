@@ -53,6 +53,7 @@ public class ObjectFragment extends Fragment {
 	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<>();
 	Location location;
 	ArrayList<OverlayItem> aOverlayItemArray;
+    Realm realmDB;
     private double curLatitude, curLongitude;
 
     public ObjectFragment() {
@@ -79,15 +80,17 @@ public class ObjectFragment extends Fragment {
         final ListView objectsListView;
 
         toolbar.setSubtitle("Карта объектов");
-        Realm realmDB = Realm.getDefaultInstance();
+        realmDB = Realm.getDefaultInstance();
 
         //User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-		LocationManager lm = (LocationManager) getActivity().getSystemService(
-				LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
         if (lm != null) {
             location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location == null) location = getLastKnownLocation();
+            if (location == null) {
+                location = getLastKnownLocation();
+            }
+
 			if (location != null) {
 				curLatitude = location.getLatitude();
 				curLongitude = location.getLongitude();
@@ -110,8 +113,7 @@ public class ObjectFragment extends Fragment {
 				getActivity().getApplicationContext(), aOverlayItemArray, null);
 		mapView.getOverlays().add(aItemizedIconOverlay);
 
-        objectsListView = (ListView) rootView
-                .findViewById(R.id.gps_listView);
+        objectsListView = (ListView) rootView.findViewById(R.id.gps_listView);
 
         final ArrayList<GeoPoint> waypoints = new ArrayList<>();
         GeoPoint currentPoint = new GeoPoint(curLatitude, curLongitude);
@@ -134,6 +136,7 @@ public class ObjectFragment extends Fragment {
             olItem.setMarker(newMarker);
             overlayItemArray.add(olItem);
         }
+
         objectAdapter = new ObjectAdapter(getContext(), objects);
         objectsListView.setAdapter(objectAdapter);
         objectsListView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -259,6 +262,12 @@ public class ObjectFragment extends Fragment {
             }
         }
         return bestLocation;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 
     /**

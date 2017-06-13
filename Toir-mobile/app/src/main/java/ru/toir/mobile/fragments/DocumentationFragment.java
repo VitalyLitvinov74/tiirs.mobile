@@ -30,112 +30,118 @@ import ru.toir.mobile.db.realm.DocumentationType;
 
 public class DocumentationFragment extends Fragment {
     private Realm realmDB;
-	private boolean isInit;
+    private boolean isInit;
 
-	private Spinner sortSpinner;
-	private Spinner typeSpinner;
-	private ListView documentationListView;
+    private Spinner sortSpinner;
+    private Spinner typeSpinner;
+    private ListView documentationListView;
 
     private ArrayAdapter<SortField> sortSpinnerAdapter;
 
     public static DocumentationFragment newInstance() {
-		return new DocumentationFragment();
-	}
+        return new DocumentationFragment();
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.documentation_layout,
-				container, false);
+        View rootView = inflater.inflate(R.layout.documentation_layout,
+                container, false);
         realmDB = Realm.getDefaultInstance();
-		Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
-		toolbar.setSubtitle("Документация");
+        Toolbar toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
+        toolbar.setSubtitle("Документация");
 
-		// обработчик для выпадающих списков у нас один
-		SpinnerListener spinnerListener = new SpinnerListener();
+        // обработчик для выпадающих списков у нас один
+        SpinnerListener spinnerListener = new SpinnerListener();
 
-		RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
-		typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
+        RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
+        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
         DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(), documentationType);
-		typeSpinnerAdapter.notifyDataSetChanged();
-		typeSpinner.setAdapter(typeSpinnerAdapter);
-		typeSpinner.setOnItemSelectedListener(spinnerListener);
+        typeSpinnerAdapter.notifyDataSetChanged();
+        typeSpinner.setAdapter(typeSpinnerAdapter);
+        typeSpinner.setOnItemSelectedListener(spinnerListener);
 
-		// настраиваем сортировку по полям
-		sortSpinner = (Spinner) rootView
-				.findViewById(R.id.documentation_spinner_sort);
-		sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
-				android.R.layout.simple_spinner_dropdown_item,
-				new ArrayList<SortField>());
-		sortSpinner.setAdapter(sortSpinnerAdapter);
-		sortSpinner.setOnItemSelectedListener(spinnerListener);
+        // настраиваем сортировку по полям
+        sortSpinner = (Spinner) rootView
+                .findViewById(R.id.documentation_spinner_sort);
+        sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                new ArrayList<SortField>());
+        sortSpinner.setAdapter(sortSpinnerAdapter);
+        sortSpinner.setOnItemSelectedListener(spinnerListener);
 
-		documentationListView = (ListView) rootView
-				.findViewById(R.id.documentation_listView);
+        documentationListView = (ListView) rootView
+                .findViewById(R.id.documentation_listView);
 
-		documentationListView.setOnItemClickListener(new ListviewClickListener());
+        documentationListView.setOnItemClickListener(new ListviewClickListener());
 
-		initView();
+        initView();
 
-		rootView.setFocusableInTouchMode(true);
-		rootView.requestFocus();
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
 
-		isInit = true;
+        isInit = true;
 
-		return rootView;
-	}
+        return rootView;
+    }
 
-	private void initView() {
+    private void initView() {
 
-		FillListViewDocumentation(null, null);
-		fillSortFieldSpinner();
-	}
+        FillListViewDocumentation(null, null);
+        fillSortFieldSpinner();
+    }
 
-	private void fillSortFieldSpinner() {
+    private void fillSortFieldSpinner() {
 
-		sortSpinnerAdapter.clear();
-		sortSpinnerAdapter.add(new SortField("Сортировка", null));
-		sortSpinnerAdapter.add(new SortField("По типу",
-				"documentationTypeUuid"));
-		sortSpinnerAdapter.add(new SortField("По оборудованию",
-				"equipmentUuid"));
+        sortSpinnerAdapter.clear();
+        sortSpinnerAdapter.add(new SortField("Сортировка", null));
+        sortSpinnerAdapter.add(new SortField("По типу",
+                "documentationTypeUuid"));
+        sortSpinnerAdapter.add(new SortField("По оборудованию",
+                "equipmentUuid"));
 
-	}
+    }
 
-	private void FillListViewDocumentation(String documentationTypeUuid, String sort) {
-		RealmResults<Documentation> documentation;
-		if (documentationTypeUuid != null) {
-			if (sort != null)
-				documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
-			else
-				documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
-		} else {
-			if (sort != null)
-				documentation = realmDB.where(Documentation.class).findAllSorted(sort);
-			else
-				documentation = realmDB.where(Documentation.class).findAll();
-		}
+    private void FillListViewDocumentation(String documentationTypeUuid, String sort) {
+        RealmResults<Documentation> documentation;
+        if (documentationTypeUuid != null) {
+            if (sort != null)
+                documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
+            else
+                documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
+        } else {
+            if (sort != null)
+                documentation = realmDB.where(Documentation.class).findAllSorted(sort);
+            else
+                documentation = realmDB.where(Documentation.class).findAll();
+        }
         DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
         documentationListView.setAdapter(documentationAdapter);
-	}
+    }
 
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser) {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
 
-		super.setUserVisibleHint(isVisibleToUser);
-		if (isVisibleToUser && isInit) {
-			initView();
-		}
-	}
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && isInit) {
+            initView();
+        }
+    }
 
-	private class ListviewClickListener implements
-			AdapterView.OnItemClickListener {
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
 
-		@Override
-		public void onItemClick(AdapterView<?> parentView,
-				View selectedItemView, int position, long id) {
-            Documentation documentation = (Documentation)parentView.getItemAtPosition(position);
+    private class ListviewClickListener implements
+            AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parentView,
+                                View selectedItemView, int position, long id) {
+            Documentation documentation = (Documentation) parentView.getItemAtPosition(position);
             MimeTypeMap mt = MimeTypeMap.getSingleton();
             // TODO добавить путь
             File file = new File(documentation.getUuid());
@@ -158,35 +164,35 @@ public class DocumentationFragment extends Fragment {
                     // приложение
                 }
             }
-		}
-	}
+        }
+    }
 
-	private class SpinnerListener implements AdapterView.OnItemSelectedListener {
+    private class SpinnerListener implements AdapterView.OnItemSelectedListener {
 
-		@Override
-		public void onNothingSelected(AdapterView<?> parentView) {
-		}
+        @Override
+        public void onNothingSelected(AdapterView<?> parentView) {
+        }
 
-		@Override
-		public void onItemSelected(AdapterView<?> parentView,
-				View selectedItemView, int position, long id) {
-			String type = null;
-			String orderBy = null;
+        @Override
+        public void onItemSelected(AdapterView<?> parentView,
+                                   View selectedItemView, int position, long id) {
+            String type = null;
+            String orderBy = null;
 
-			DocumentationType typeSelected = (DocumentationType) typeSpinner
-					.getSelectedItem();
-			if (typeSelected != null) {
-				type = typeSelected.getUuid();
+            DocumentationType typeSelected = (DocumentationType) typeSpinner
+                    .getSelectedItem();
+            if (typeSelected != null) {
+                type = typeSelected.getUuid();
                 // временно неопределенный тип
                 if (typeSelected.get_id() == 1) type = null;
-			}
+            }
 
-			SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
-			if (fieldSelected != null) {
-				//orderBy = fieldSelected.getField();
-			}
-			FillListViewDocumentation(type, orderBy);
-		}
-	}
+            SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
+            if (fieldSelected != null) {
+                //orderBy = fieldSelected.getField();
+            }
 
+            FillListViewDocumentation(type, orderBy);
+        }
+    }
 }

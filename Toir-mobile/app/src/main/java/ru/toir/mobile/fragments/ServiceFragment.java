@@ -31,13 +31,10 @@ public class ServiceFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_service,
-                container, false);
+        View rootView = inflater.inflate(R.layout.fragment_service, container, false);
 
-        journalListView = (ListView) rootView
-                .findViewById(R.id.service_list_view_journal);
-        gpsListView = (ListView) rootView
-                .findViewById(R.id.service_list_view_gps);
+        journalListView = (ListView) rootView.findViewById(R.id.service_list_view_journal);
+        gpsListView = (ListView) rootView.findViewById(R.id.service_list_view_gps);
 
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Сервис");
@@ -57,5 +54,11 @@ public class ServiceFragment extends Fragment {
         rootView.requestFocus();
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 }

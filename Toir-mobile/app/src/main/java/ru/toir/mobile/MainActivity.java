@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             //LoadTestData.LoadAllTestData();
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             Log.d(TAG, "db.version=" + realmDB.getVersion());
-            if (Realm.getDefaultInstance().getVersion() == 0) {
+            if (realmDB.getVersion() == 0) {
                 Toast toast = Toast.makeText(this, "База данных не актуальна!",
                         Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 0);
@@ -314,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
                                         });
 
                                         setMainLayout(savedInstance);
+                                        realm.close();
                                     } else {
                                         String message = "Информация о пользователе не получена с сервера.";
                                         addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
@@ -888,5 +889,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         ShowSettings();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realmDB.close();
     }
 }

@@ -20,11 +20,6 @@ import ru.toir.mobile.db.realm.AlertType;
 public class AlertTypeAdapter extends RealmBaseAdapter<AlertType> implements ListAdapter {
     public static final String TABLE_NAME = "AlertType";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-    }
-
     public AlertTypeAdapter(@NonNull Context context, int resId, RealmResults<AlertType> data) {
         super(context, data);
     }
@@ -33,6 +28,7 @@ public class AlertTypeAdapter extends RealmBaseAdapter<AlertType> implements Lis
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<AlertType> rows = realm.where(AlertType.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -73,5 +69,10 @@ public class AlertTypeAdapter extends RealmBaseAdapter<AlertType> implements Lis
             return convertView;
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
     }
 }

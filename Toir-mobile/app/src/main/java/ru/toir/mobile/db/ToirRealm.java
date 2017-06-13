@@ -14,7 +14,7 @@ import io.realm.RealmConfiguration;
  */
 public class ToirRealm {
     // версия схемы базы данных приложения
-    public static final int VERSION = 22;
+    public static final int VERSION = 23;
 
     public static void init(Context context) {
         init(context, "toir.realm");
@@ -28,7 +28,7 @@ public class ToirRealm {
         try {
             Realm.migrateRealm(realmConfig, new ToirRealmMigration(context));
         } catch (Exception e) {
-            // ни чего не делаем
+            e.printStackTrace();
         }
 
 
