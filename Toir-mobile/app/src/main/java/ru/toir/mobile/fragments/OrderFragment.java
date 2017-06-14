@@ -326,7 +326,7 @@ public class OrderFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "OrderFragment !!! back pressed!!!");
-                    if (Level == TASK_LEVEL) {
+                    if (Level == TASK_LEVEL || Level == 0) {
                         initView();
                     }
 
@@ -345,7 +345,7 @@ public class OrderFragment extends Fragment {
                             fillListViewTaskStage(selectedTask, true);
                             Level = STAGE_LEVEL;
                             fab_camera.setVisibility(View.INVISIBLE);
-                            fab_check.setVisibility(View.INVISIBLE);
+                            //fab_check.setVisibility(View.INVISIBLE);
                         }
                     }
 
@@ -414,6 +414,7 @@ public class OrderFragment extends Fragment {
         if (new_orders > 0) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
         }
+        fab_check.setVisibility(View.INVISIBLE);
     }
 
     // Tasks----------------------------------------------------------------------------------------
@@ -452,13 +453,23 @@ public class OrderFragment extends Fragment {
             final OrderStatus orderStatusComplete = realmDB.where(OrderStatus.class)
                     .equalTo("uuid", OrderStatus.Status.COMPLETE)
                     .findFirst();
-            realmDB.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    selectedOrder.setCloseDate(new Date());
-                    selectedOrder.setOrderStatus(orderStatusComplete);
-                }
-            });
+/*
+            final OrderVerdict orderVerdictCommplete = realmDB.where(OrderVerdict.class)
+                    .equalTo("uuid", OrderVerdict.Status.COMPLETE)
+                    .findFirst();*/
+
+            try {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        selectedOrder.setCloseDate(new Date());
+                        selectedOrder.setOrderStatus(orderStatusComplete);
+                    }
+                });
+            }
+            catch (Exception e) {
+                return;
+            }
             addToJournal("Закончен наряд " + order.getTitle() + "(" + order.getUuid() + ")");
             Level = ORDER_LEVEL;
             fillListViewOrders(null, null);
@@ -471,6 +482,8 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
         }
+        fab_camera.setVisibility(View.INVISIBLE);
+        fab_check.setVisibility(View.VISIBLE);
     }
 
     // TaskStages----------------------------------------------------------------------------------------
@@ -532,6 +545,9 @@ public class OrderFragment extends Fragment {
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         listLayout.setLayoutParams(params);
+
+        fab_camera.setVisibility(View.INVISIBLE);
+        fab_check.setVisibility(View.VISIBLE);
     }
 
     // Operations----------------------------------------------------------------------------------------
@@ -569,7 +585,8 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(stage.getTaskStageTemplate().getTitle());
         }
-
+        fab_camera.setVisibility(View.VISIBLE);
+        fab_check.setVisibility(View.VISIBLE);
         //mainListView.setOnItemClickListener(mainListViewClickListener);
     }
 
@@ -1874,60 +1891,73 @@ public class OrderFragment extends Fragment {
     private class submitOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
-            int completedOperationCount = 0;
-            CheckBox checkBox;
-            final StageStatus taskStageComplete;
-            uncompleteOperationList.clear();
-            // по умолчанию у нас все выполнено
-            taskStageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
 
-            if (operationAdapter != null) {
-                totalOperationCount = operationAdapter.getCount();
-            }
+            if (Level == OPERATION_LEVEL) {
+                int completedOperationCount = 0;
+                CheckBox checkBox;
+                final StageStatus taskStageComplete;
+                uncompleteOperationList.clear();
+                // по умолчанию у нас все выполнено
+                taskStageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
 
-            for (int i = 0; i < totalOperationCount; i++) {
-                checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
-                final Operation operation = operationAdapter.getItem(i);
-                if (operation != null) {
-                    if (checkBox != null) {
-                        if (checkBox.isChecked()) {
-                            completedOperationCount++;
-                        } else {
-                            uncompleteOperationList.add(operation);
+                if (operationAdapter != null) {
+                    totalOperationCount = operationAdapter.getCount();
+                }
+
+                for (int i = 0; i < totalOperationCount; i++) {
+                    checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
+                    final Operation operation = operationAdapter.getItem(i);
+                    if (operation != null) {
+                        if (checkBox != null) {
+                            if (checkBox.isChecked()) {
+                                completedOperationCount++;
+                            } else {
+                                uncompleteOperationList.add(operation);
+                            }
                         }
+                    } else {
+                        Log.d(TAG, "Операция под индексом " + i + " не найдена");
                     }
-                } else {
-                    Log.d(TAG, "Операция под индексом " + i + " не найдена");
                 }
+
+                // все операции выполнены
+                if (totalOperationCount == completedOperationCount) {
+                    if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                selectedStage.setTaskStageStatus(taskStageComplete);
+                                selectedStage.setEndDate(new Date());
+                            }
+                        });
+                    }
+
+                    Log.d(TAG, "Остановка таймера...");
+                    taskTimer.cancel();
+                    firstLaunch = true;
+                    currentOperationId = 0;
+
+                    if (selectedStage != null && selectedTask != null) {
+                        currentTaskStageUuid = selectedStage.getUuid();
+                        currentTaskUuid = selectedTask.getUuid();
+                        Level = STAGE_LEVEL;
+                        fillListViewTaskStage(selectedTask, true);
+                    }
+
+                } else {
+                    Log.d("order", "dialog");
+                    setOperationsVerdict((ViewGroup) v.getParent());
+                }
+
             }
 
-            // все операции выполнены
-            if (totalOperationCount == completedOperationCount) {
-                if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            selectedStage.setTaskStageStatus(taskStageComplete);
-                            selectedStage.setEndDate(new Date());
-                        }
-                    });
-                }
+            if (Level == TASK_LEVEL || Level == ORDER_LEVEL) {
+                initView();
+            }
 
-                Log.d(TAG, "Остановка таймера...");
-                taskTimer.cancel();
-                firstLaunch = true;
-                currentOperationId = 0;
-
-                if (selectedTask != null) {
-                    currentTaskStageUuid = selectedStage.getUuid();
-                    currentTaskUuid = selectedTask.getUuid();
-                    Level = STAGE_LEVEL;
-                    fillListViewTaskStage(selectedTask, true);
-                }
-
-            } else {
-                Log.d("order", "dialog");
-                setOperationsVerdict((ViewGroup) v.getParent());
+            if (Level == STAGE_LEVEL) {
+                Level = TASK_LEVEL;
+                fillListViewTasks(selectedOrder, false);
             }
         }
     }
@@ -1968,7 +1998,7 @@ public class OrderFragment extends Fragment {
                         }
 
                         fab_camera.setVisibility(View.INVISIBLE);
-                        fab_check.setVisibility(View.INVISIBLE);
+                        //fab_check.setVisibility(View.INVISIBLE);
                     }
                 }
 
@@ -1992,9 +2022,6 @@ public class OrderFragment extends Fragment {
                                 Level = OPERATION_LEVEL;
                                 startOperations();
                             }
-
-                            fab_camera.setVisibility(View.VISIBLE);
-                            fab_check.setVisibility(View.VISIBLE);
                         } else {
                             Log.d(TAG, "этапу задач не указано оборудование");
                         }
