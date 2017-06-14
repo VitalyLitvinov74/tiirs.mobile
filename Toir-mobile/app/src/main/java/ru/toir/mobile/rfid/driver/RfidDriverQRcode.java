@@ -57,8 +57,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
                     lastScannedCode = sym.getData();
                     if (lastScannedCode != null) {
                         Log.d(TAG, "прочитано: " + lastScannedCode);
-                        scanText.setText("Результат сканирования: "
-                                + lastScannedCode);
+                        scanText.setText(lastScannedCode);
                         sHandler.obtainMessage(RESULT_RFID_SUCCESS,
                                 "0000" + lastScannedCode).sendToTarget();
                         releaseCamera();

@@ -117,12 +117,14 @@ public class MainActivity extends AppCompatActivity {
     private int cnt = 0;
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
-    private boolean service_mode = false;
+    //private boolean service_mode = false;
+    private boolean user_changed = false;
 
     private Realm realmDB;
     private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
         @Override
         public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+            Log.d(TAG, "onDrawerItemClick");
             return false;
         }
     };
@@ -227,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
     public void startAuthorise() {
 
         isLogged = false;
+        user_changed = false;
+
         Handler handler = new Handler(new Handler.Callback() {
 
             @Override
@@ -312,8 +316,10 @@ public class MainActivity extends AppCompatActivity {
                                                 Log.e(TAG, t.getLocalizedMessage());
                                             }
                                         });
-
                                         setMainLayout(savedInstance);
+                                        //user_changed = true;
+                                        changeActiveProfile(user);
+
                                         realm.close();
                                     } else {
                                         String message = "Информация о пользователе не получена с сервера.";
@@ -357,6 +363,9 @@ public class MainActivity extends AppCompatActivity {
                             // в зависимости от результата либо дать работать, либо не дать
                             if (user != null && user.isActive()) {
                                 isLogged = true;
+                                //user_changed = true;
+                                changeActiveProfile(user);
+
                                 AuthorizedUser.getInstance().setUuid(user.getUuid());
                                 addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
                                 startGpsTracker(user.getUuid());
@@ -377,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // закрываем диалог
                 rfidDialog.dismiss();
-                setEnabledLoginButton(true);
+                //setEnabledLoginButton(true);
                 return true;
             }
         });
@@ -408,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-        service_mode = sp.getBoolean("pref_debug_mode_key", false);
+        //service_mode = sp.getBoolean("pref_debug_mode_key", false);
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 
@@ -484,22 +493,8 @@ public class MainActivity extends AppCompatActivity {
                             for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++)
                                 if (users_id[profile_pos] == profileId) break;
 
-                            headerResult.setActiveProfile(iprofilelist.get(profile_pos));
-                            realmDB.beginTransaction();
-                            RealmResults<User> users = realmDB.where(User.class).findAll();
-                            for (int i = 0; i < users.size(); i++)
-                                users.get(i).setActive(false);
-                            // !!!!!
-                            User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-                            //User user = realmDB.where(User.class).findFirst();
-                            if (user != null) user.setActive(true);
-                            if (profilesList != null && profilesList.get(profile_pos) != null)
-                                profilesList.get(profile_pos).setActive(true);
-                            else
-                                Toast.makeText(getApplicationContext(),
-                                        "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
-                            realmDB.commitTransaction();
-                            //profileDBAdapter.setActiveUser(profilesList.get(profile_pos).get_id());
+                            // инициализируем процесс авторизации при смене пользователя
+                            startAuthorise();
                             currentFragment = FRAGMENT_USER;
                             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
                         }
@@ -663,6 +658,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickLogin(View view) {
         setEnabledLoginButton(false);
         startAuthorise();
+        setEnabledLoginButton(true);
     }
 
     /**
@@ -859,6 +855,33 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+
+    public void changeActiveProfile (User user) {
+        if (iprofilelist != null) {
+            if (iprofilelist.size() > 0) {
+                for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
+                    if (users_id[cnt] == user.get_id()) {
+                        headerResult.setActiveProfile(iprofilelist.get(cnt));
+
+                        realmDB.beginTransaction();
+                        RealmResults<User> users = realmDB.where(User.class).findAll();
+                        for (int i = 0; i < users.size(); i++)
+                            users.get(i).setActive(false);
+
+                        if (profilesList != null && profilesList.get(cnt) != null) {
+                            profilesList.get(cnt).setActive(true);
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
+                        }
+                        realmDB.commitTransaction();
+                        user.setActive(true);
+                    }
+                }
+            }
+        }
+    }
 
     public void ShowSettings() {
         TextView driver, update_server, system_server;
