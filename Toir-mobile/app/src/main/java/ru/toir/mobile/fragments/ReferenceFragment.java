@@ -858,6 +858,12 @@ public class ReferenceFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
+
     /**
      * @author Dmitriy Logachov
      *         <p>

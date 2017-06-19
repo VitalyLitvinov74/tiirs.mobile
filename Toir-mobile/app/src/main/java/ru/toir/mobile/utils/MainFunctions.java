@@ -40,6 +40,8 @@ public class MainFunctions {
                 }
             });
         }
+
+        realmDB.close();
     }
 
     public static int getActiveOrdersCount() {
@@ -58,6 +60,8 @@ public class MainFunctions {
                     .equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE)
                     .findAll().size();
         }
+
+        realmDB.close();
         return count;
     }
 

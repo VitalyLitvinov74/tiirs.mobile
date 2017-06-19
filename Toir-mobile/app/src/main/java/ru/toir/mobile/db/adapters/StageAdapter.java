@@ -77,6 +77,10 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
         }
 
         if (adapterData!=null) {
+
+            if (position >= adapterData.size())
+                return convertView;
+
             TaskStages taskStage = adapterData.get(position);
             StageStatus stageStatus = taskStage.getTaskStageStatus();
             viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());

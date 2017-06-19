@@ -55,6 +55,7 @@ public class GPSFragment extends Fragment {
 	private final ArrayList<OverlayItem> overlayItemArray = new ArrayList<>();
 	Location location;
 	ArrayList<OverlayItem> aOverlayItemArray;
+    Realm realmDB;
     private double curLatitude, curLongitude;
 	private int LastItemPosition = -1;
 
@@ -82,7 +83,7 @@ public class GPSFragment extends Fragment {
         ListView equipmentListView;
 
         toolbar.setSubtitle("Карта");
-        Realm realmDB = Realm.getDefaultInstance();
+        realmDB = Realm.getDefaultInstance();
         RealmResults<Equipment> equipments; // = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
 
         User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
@@ -298,6 +299,12 @@ public class GPSFragment extends Fragment {
             }
         }
         return bestLocation;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
     }
 
     /**

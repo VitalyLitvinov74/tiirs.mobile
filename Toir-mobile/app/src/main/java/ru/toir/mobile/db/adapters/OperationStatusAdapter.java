@@ -20,11 +20,6 @@ import ru.toir.mobile.db.realm.OperationStatus;
 public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> implements ListAdapter {
     public static final String TABLE_NAME = "OperationStatus";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-    }
-
     public OperationStatusAdapter(@NonNull Context context, int resId, RealmResults<OperationStatus> data) {
         super(context, data);
     }
@@ -33,6 +28,7 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OperationStatus> rows = realm.where(OperationStatus.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -55,6 +51,7 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
             textView.setText(operationStatus.getTitle());
             return textView;
         }
+
         if (parent.getId() == R.id.reference_listView) {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
@@ -65,11 +62,18 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+
             OperationStatus operationStatus = adapterData.get(position);
             viewHolder.title.setText(operationStatus.getTitle());
             viewHolder.uuid.setText(operationStatus.getUuid());
             return convertView;
         }
+
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
     }
 }

@@ -22,11 +22,15 @@ public class ReferenceUpdate extends RealmObject {
     public static Date lastChanged(String name) {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ReferenceUpdate> list = realm.where(ReferenceUpdate.class).equalTo("referenceName", name).findAll();
+        Date value;
         if (list.isEmpty()) {
-            return new Date(0);
+            value = new Date(0);
         } else {
-            return list.first().updateDate;
+            value = list.first().updateDate;
         }
+
+        realm.close();
+        return value;
     }
 
     public static String lastChangedAsStr(String name) {
@@ -52,6 +56,7 @@ public class ReferenceUpdate extends RealmObject {
         realm.copyToRealmOrUpdate(list);
         realm.copyToRealmOrUpdate(item);
         realm.commitTransaction();
+        realm.close();
     }
 
     /**
@@ -68,6 +73,7 @@ public class ReferenceUpdate extends RealmObject {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(item);
         realm.commitTransaction();
+        realm.close();
     }
 
     public String getReferenceName() {

@@ -81,6 +81,12 @@ public class ContragentsFragment extends Fragment {
 		return rootView;
 	}
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
+
     private class ListviewClickListener implements
             AdapterView.OnItemClickListener {
 

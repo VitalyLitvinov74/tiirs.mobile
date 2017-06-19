@@ -37,6 +37,7 @@ public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> impl
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<EquipmentModel> rows = realm.where(EquipmentModel.class).findAll();
+        realm.close();
         return rows.size();
     }
 

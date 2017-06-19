@@ -73,6 +73,8 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
         }
 
         if (adapterData != null) {
+            if (position >= adapterData.size())
+                return convertView;
             Tasks task = adapterData.get(position);
             Date lDate = task.getStartDate();
             if (lDate != null  && lDate.after(new Date(100000))) {

@@ -28,6 +28,7 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OperationVerdict> rows = realm.where(OperationVerdict.class).findAll();
+        realm.close();
         return rows.size();
     }
 

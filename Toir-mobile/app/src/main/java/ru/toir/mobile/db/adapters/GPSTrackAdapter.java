@@ -32,12 +32,15 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
         if (adapterData != null) {
             return adapterData.size();
         }
+
         return 0;
     }
 
     public RealmResults<GpsTrack> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(GpsTrack.class).findAll();
+        RealmResults<GpsTrack> result = realm.where(GpsTrack.class).findAll();
+        realm.close();
+        return result;
     }
 
     @Override
@@ -45,6 +48,7 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
         if (adapterData != null) {
             return adapterData.get(position);
         }
+
         return null;
     }
 
@@ -55,6 +59,7 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
             gpsTrack = adapterData.get(position);
             return gpsTrack.get_id();
         }
+
         return 0;
     }
 
@@ -82,6 +87,7 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
                 viewHolder.longitude.setText(gpsTrack.getLatitude() + "");
             }
         }
+
         return convertView;
     }
 

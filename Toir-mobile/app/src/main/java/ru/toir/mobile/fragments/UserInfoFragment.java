@@ -149,4 +149,10 @@ public class UserInfoFragment extends Fragment {
             }
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
 }

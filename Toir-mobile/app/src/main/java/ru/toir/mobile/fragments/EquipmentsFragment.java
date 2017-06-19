@@ -157,6 +157,12 @@ public class EquipmentsFragment extends Fragment {
 		}
 	}
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
+
     private class ListviewClickListener implements
             AdapterView.OnItemClickListener {
 

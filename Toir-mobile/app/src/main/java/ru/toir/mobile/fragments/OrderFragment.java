@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -72,7 +73,7 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationPhoto;
+import ru.toir.mobile.db.realm.OperationFile;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -321,7 +322,7 @@ public class OrderFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "OrderFragment !!! back pressed!!!");
-                    if (Level == TASK_LEVEL) {
+                    if (Level == TASK_LEVEL || Level == 0) {
                         initView();
                     }
 
@@ -340,7 +341,7 @@ public class OrderFragment extends Fragment {
                             fillListViewTaskStage(selectedTask, true);
                             Level = STAGE_LEVEL;
                             fab_camera.setVisibility(View.INVISIBLE);
-                            fab_check.setVisibility(View.INVISIBLE);
+                            //fab_check.setVisibility(View.INVISIBLE);
                         }
                     }
 
@@ -409,6 +410,8 @@ public class OrderFragment extends Fragment {
         if (new_orders > 0) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
         }
+
+        fab_check.setVisibility(View.INVISIBLE);
     }
 
     // Tasks----------------------------------------------------------------------------------------
@@ -447,13 +450,23 @@ public class OrderFragment extends Fragment {
             final OrderStatus orderStatusComplete = realmDB.where(OrderStatus.class)
                     .equalTo("uuid", OrderStatus.Status.COMPLETE)
                     .findFirst();
-            realmDB.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    selectedOrder.setCloseDate(new Date());
-                    selectedOrder.setOrderStatus(orderStatusComplete);
-                }
-            });
+/*
+            final OrderVerdict orderVerdictCommplete = realmDB.where(OrderVerdict.class)
+                    .equalTo("uuid", OrderVerdict.Status.COMPLETE)
+                    .findFirst();*/
+
+            try {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        selectedOrder.setCloseDate(new Date());
+                        selectedOrder.setOrderStatus(orderStatusComplete);
+                    }
+                });
+            }
+            catch (Exception e) {
+                return;
+            }
             addToJournal("Закончен наряд " + order.getTitle() + "(" + order.getUuid() + ")");
             Level = ORDER_LEVEL;
             fillListViewOrders(null, null);
@@ -466,6 +479,9 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
         }
+
+        fab_camera.setVisibility(View.INVISIBLE);
+        fab_check.setVisibility(View.VISIBLE);
     }
 
     // TaskStages----------------------------------------------------------------------------------------
@@ -527,6 +543,9 @@ public class OrderFragment extends Fragment {
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         listLayout.setLayoutParams(params);
+
+        fab_camera.setVisibility(View.INVISIBLE);
+        fab_check.setVisibility(View.VISIBLE);
     }
 
     // Operations----------------------------------------------------------------------------------------
@@ -565,6 +584,8 @@ public class OrderFragment extends Fragment {
             tl_Header.setText(stage.getTaskStageTemplate().getTitle());
         }
 
+        fab_camera.setVisibility(View.VISIBLE);
+        fab_check.setVisibility(View.VISIBLE);
         //mainListView.setOnItemClickListener(mainListViewClickListener);
     }
 
@@ -812,6 +833,8 @@ public class OrderFragment extends Fragment {
                             }
                         }
                     }
+
+                    realm.close();
                 }
 
                 // загружаем файлы
@@ -866,6 +889,7 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(orders);
                         realm.commitTransaction();
+                        realm.close();
                         addToJournal("Клиент успешно получил " + count + " нарядов");
                         Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
                     } else {
@@ -888,11 +912,11 @@ public class OrderFragment extends Fragment {
     }
 
     /**
-     * Метод для отправки файлов фотографий созданных во время выполнения операций.
+     * Метод для отправки файлов созданных во время выполнения операций или привязанных к операции.
      */
-    private void sendFiles(List<String> files) {
+    private void sendFiles(List<OperationFile> files) {
 
-        AsyncTask<String[], Void, List<String>> task = new AsyncTask<String[], Void, List<String>>() {
+        AsyncTask<OperationFile[], Void, List<String>> task = new AsyncTask<OperationFile[], Void, List<String>>() {
             @NonNull
             private RequestBody createPartFromString(String descriptionString) {
                 return RequestBody.create(MultipartBody.FORM, descriptionString);
@@ -913,30 +937,40 @@ public class OrderFragment extends Fragment {
             }
 
             @Override
-            protected List<String> doInBackground(String[]... lists) {
+            protected List<String> doInBackground(OperationFile[]... lists) {
                 List<String> sendFiles = new ArrayList<>();
-                for (String file : lists[0]) {
+                for (OperationFile file : lists[0]) {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
                     try {
-                        uri = Uri.fromFile(new File(file));
+                        // TODO: нужно добавить полный путь до файла в каталоге Pictures !!!
+                        uri = Uri.fromFile(new File(
+                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                                file.getFileName()));
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
 
                     List<MultipartBody.Part> list = new ArrayList<>();
-                    String operationUuid = file.substring(0, file.lastIndexOf('-'));
-                    operationUuid = operationUuid.substring(operationUuid.lastIndexOf('/') + 1);
-                    list.add(prepareFilePart("photo[" + operationUuid + "]", uri));
+                    String fileUuid = file.getUuid();
+                    String formId = "file[" + fileUuid + "]";
+                    list.add(prepareFilePart(formId, uri));
+                    // TODO: реализовать отправку дополнительных полей в запросе!!!
+                    list.add(MultipartBody.Part.createFormData(formId + "[_id]", String.valueOf(file.get_id())));
+                    list.add(MultipartBody.Part.createFormData(formId + "[uuid]", file.getUuid()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[fileName]", file.getFileName()));
+                    list.add(MultipartBody.Part.createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
+                    list.add(MultipartBody.Part.createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
                     // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
-                    // объём данных превышающий органичения на отправку POST запросом на сервере
+                    // объём данных превышающий ограничения на отправку POST запросом на сервере
                     Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
                     try {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
                         if (response.isSuccessful()) {
                             Log.d(TAG, "result" + result.contentType());
-                            sendFiles.add(file.substring(file.lastIndexOf('/') + 1));
+                            sendFiles.add(file.getFileName());
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
@@ -955,15 +989,16 @@ public class OrderFragment extends Fragment {
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 for (String item : strings) {
-                    OperationPhoto photo = realm.where(OperationPhoto.class).equalTo("fileName", item).findFirst();
-                    photo.setSent(true);
+                    OperationFile file = realm.where(OperationFile.class).equalTo("fileName", item).findFirst();
+                    file.setSent(true);
                 }
 
                 realm.commitTransaction();
+                realm.close();
             }
         };
 
-        String[] sendFiles = files.toArray(new String[]{});
+        OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
         task.execute(sendFiles);
     }
 
@@ -1182,23 +1217,25 @@ public class OrderFragment extends Fragment {
             }
         }
 
-        // строим список фотографий связанных с выполненными операциями
+        // предполагаем что все файлы мы сохраняем в папку приложения DIRECTORY_PICTURES
+        // строим список файлов связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<String> photos = new ArrayList<>();
-        RealmResults<OperationPhoto> operationPhotos = realmDB.where(OperationPhoto.class)
+        List<OperationFile> filesToSend = new ArrayList<>();
+        RealmResults<OperationFile> operationFiles = realmDB.where(OperationFile.class)
                 .in("operation.uuid", operationUuids.toArray(new String[]{}))
+                .equalTo("sent", false)
                 .findAll();
 
-        for (OperationPhoto item : operationPhotos) {
-            File operationPhoto = new File(
+        for (OperationFile item : operationFiles) {
+            File operationFile = new File(
                     getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                     item.getFileName());
-            if (operationPhoto.exists()) {
-                photos.add(operationPhoto.getAbsolutePath());
+            if (operationFile.exists()) {
+                filesToSend.add(realmDB.copyFromRealm(item));
             }
         }
 
-        sendFiles(photos);
+        sendFiles(filesToSend);
 
         String[] opUuidsArray = operationUuids.toArray(new String[]{});
 
@@ -1462,13 +1499,20 @@ public class OrderFragment extends Fragment {
                     // добавляем запись о полученном файле
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    OperationPhoto operationPhoto = new OperationPhoto();
-                    operationPhoto.set_id(realm.where(OperationPhoto.class).max("_id").longValue() + 1);
-                    operationPhoto.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
-                    operationPhoto.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
-                    realm.copyToRealm(operationPhoto);
+                    OperationFile operationFile = new OperationFile();
+                    Number lastId = realm.where(OperationFile.class).max("_id");
+                    if (lastId == null) {
+                        lastId = 0;
+                    }
+
+                    operationFile.set_id(lastId.longValue() + 1);
+                    operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
+                    operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
+                    realm.copyToRealm(operationFile);
                     realm.commitTransaction();
+                    realm.close();
                 }
+
                 break;
             case ACTIVITY_MEASURE:
                 if (resultCode == Activity.RESULT_OK) {
@@ -1480,6 +1524,11 @@ public class OrderFragment extends Fragment {
                     checkBox.setChecked(true);
                     CompleteCurrentOperation(currentOperationId, value);
                 }
+
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -1745,64 +1794,83 @@ public class OrderFragment extends Fragment {
         rfidDialog.show(getActivity().getFragmentManager(), TAG);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
+
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
-            int completedOperationCount = 0;
-            CheckBox checkBox;
-            final StageStatus taskStageComplete;
-            uncompleteOperationList.clear();
-            // по умолчанию у нас все выполнено
-            taskStageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
 
-            if (operationAdapter != null) {
-                totalOperationCount = operationAdapter.getCount();
-            }
+            if (Level == OPERATION_LEVEL) {
+                int completedOperationCount = 0;
+                CheckBox checkBox;
+                final StageStatus taskStageComplete;
+                uncompleteOperationList.clear();
+                // по умолчанию у нас все выполнено
+                taskStageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
 
-            for (int i = 0; i < totalOperationCount; i++) {
-                checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
-                final Operation operation = operationAdapter.getItem(i);
-                if (operation != null) {
-                    if (checkBox != null) {
-                        if (checkBox.isChecked()) {
-                            completedOperationCount++;
-                        } else {
-                            uncompleteOperationList.add(operation);
+                if (operationAdapter != null) {
+                    totalOperationCount = operationAdapter.getCount();
+                }
+
+                for (int i = 0; i < totalOperationCount; i++) {
+                    checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
+                    final Operation operation = operationAdapter.getItem(i);
+                    if (operation != null) {
+                        if (checkBox != null) {
+                            if (checkBox.isChecked()) {
+                                completedOperationCount++;
+                            } else {
+                                uncompleteOperationList.add(operation);
+                            }
                         }
+                    } else {
+                        Log.d(TAG, "Операция под индексом " + i + " не найдена");
                     }
-                } else {
-                    Log.d(TAG, "Операция под индексом " + i + " не найдена");
                 }
+
+                // все операции выполнены
+                if (totalOperationCount == completedOperationCount) {
+                    if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                selectedStage.setTaskStageStatus(taskStageComplete);
+                                selectedStage.setEndDate(new Date());
+                            }
+                        });
+                    }
+
+                    Log.d(TAG, "Остановка таймера...");
+                    taskTimer.cancel();
+                    firstLaunch = true;
+                    currentOperationId = 0;
+
+                    if (selectedStage != null && selectedTask != null) {
+                        currentTaskStageUuid = selectedStage.getUuid();
+                        currentTaskUuid = selectedTask.getUuid();
+                        Level = STAGE_LEVEL;
+                        fillListViewTaskStage(selectedTask, true);
+                    }
+
+                } else {
+                    Log.d("order", "dialog");
+                    setOperationsVerdict((ViewGroup) v.getParent());
+                }
+
             }
 
-            // все операции выполнены
-            if (totalOperationCount == completedOperationCount) {
-                if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            selectedStage.setTaskStageStatus(taskStageComplete);
-                            selectedStage.setEndDate(new Date());
-                        }
-                    });
-                }
+            if (Level == TASK_LEVEL || Level == ORDER_LEVEL) {
+                initView();
+            }
 
-                Log.d(TAG, "Остановка таймера...");
-                taskTimer.cancel();
-                firstLaunch = true;
-                currentOperationId = 0;
-
-                if (selectedTask != null) {
-                    currentTaskStageUuid = selectedStage.getUuid();
-                    currentTaskUuid = selectedTask.getUuid();
-                    Level = STAGE_LEVEL;
-                    fillListViewTaskStage(selectedTask, true);
-                }
-
-            } else {
-                Log.d("order", "dialog");
-                setOperationsVerdict((ViewGroup) v.getParent());
+            if (Level == STAGE_LEVEL) {
+                Level = TASK_LEVEL;
+                fillListViewTasks(selectedOrder, false);
             }
         }
     }
@@ -1843,7 +1911,7 @@ public class OrderFragment extends Fragment {
                         }
 
                         fab_camera.setVisibility(View.INVISIBLE);
-                        fab_check.setVisibility(View.INVISIBLE);
+                        //fab_check.setVisibility(View.INVISIBLE);
                     }
                 }
 
@@ -1867,9 +1935,6 @@ public class OrderFragment extends Fragment {
                                 Level = OPERATION_LEVEL;
                                 startOperations();
                             }
-
-                            fab_camera.setVisibility(View.VISIBLE);
-                            fab_check.setVisibility(View.VISIBLE);
                         } else {
                             Log.d(TAG, "этапу задач не указано оборудование");
                         }

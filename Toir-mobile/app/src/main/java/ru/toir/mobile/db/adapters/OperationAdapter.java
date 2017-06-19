@@ -39,7 +39,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     private static final String TABLE_NAME = "Operation";
     private static final int MAX_OPERATIONS = 100;
 
-    Realm realm = Realm.getDefaultInstance();
     private Context context;
     //private int counter=0;
     private String taskTemplateUuid;
@@ -78,6 +77,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             operation = adapterData.get(position);
             return operation;
         }
+
         return null;
     }
 
@@ -220,6 +220,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                         viewHolder.measure.setVisibility(View.GONE);
                         viewHolder.measure_value.setVisibility(View.GONE);
                     }
+
+                    realmDB.close();
+
                     //String path = getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator;
                     String path = context.getExternalFilesDir("/tasks") + File.separator + taskTemplateUuid + File.separator;
                     Bitmap image_bitmap = getResizedBitmap(path, operation.getOperationTemplate().getImage(), 500, 0, operation.getChangedAt().getTime());
@@ -231,11 +234,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         } else {
             if (adapterData != null) {
                 if (operation != null) {
+                    Realm realm = Realm.getDefaultInstance();
                     viewHolder.title.setText(operation.getOperationTemplate().getTitle());
                     RealmResults<OperationVerdict> operationVerdict;
                     operationVerdict = realm.where(OperationVerdict.class).findAll();
                     OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(context, operationVerdict);
                     viewHolder.spinner.setAdapter(operationVerdictAdapter);
+                    realm.close();
                 }
             }
         }
