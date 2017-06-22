@@ -40,6 +40,7 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 Log.d(TAG, Intent.ACTION_BOOT_COMPLETED);
                 // Взводим будильник при включении устройства
                 Intent alarmIntent = new Intent(context, SendDataAlerReceiver.class);
+                alarmIntent.setAction(SendGPSnLogService.ACTION);
                 boolean isAlarmRun = (PendingIntent.getBroadcast(context, 0, alarmIntent, PendingIntent.FLAG_NO_CREATE) != null);
                 if (!isAlarmRun) {
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -81,6 +82,7 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 bundle.putLongArray(SendGPSnLogService.LOG_IDS, logIds);
                 serviceIntent.putExtras(bundle);
                 context.startService(serviceIntent);
+                realm.close();
                 break;
 
             default:

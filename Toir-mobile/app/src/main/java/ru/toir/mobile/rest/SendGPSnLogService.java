@@ -49,7 +49,7 @@ public class SendGPSnLogService extends Service {
                     data[i] = gpsIds[i];
                 }
 
-                RealmResults<GpsTrack> items = realm.where(GpsTrack.class).in("_id", data).findAll();
+                RealmResults<GpsTrack> items = realm.where(GpsTrack.class).in("_id", data).equalTo("sent", false).findAll();
                 // отправляем данные с координатами
                 call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
@@ -82,7 +82,7 @@ public class SendGPSnLogService extends Service {
                     data[i] = logIds[i];
                 }
 
-                RealmResults<Journal> items = realm.where(Journal.class).in("_id", data).findAll();
+                RealmResults<Journal> items = realm.where(Journal.class).in("_id", data).equalTo("sent", false).findAll();
                 // отправляем данные с логами
                 call = ToirAPIFactory.getJournalService().sendJournal(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
