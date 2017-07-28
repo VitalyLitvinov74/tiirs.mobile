@@ -747,11 +747,25 @@ public class OrderFragment extends Fragment {
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
+                    if (response.code() != 200) {
+                        Toast.makeText(getContext(),
+                                "Ошибка получения нарядов! Код ответа сервера:" + response.code(),
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+
                     result = response.body();
+                    if (result == null) {
+                        Toast.makeText(getContext(),
+                                "Ошибка получения нарядов! Содержимого ответа нет.",
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
                 } catch (Exception e) {
                     Log.d(TAG, e.getLocalizedMessage());
                     return null;
                 }
+
                 // список файлов для загрузки
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
@@ -1120,7 +1134,7 @@ public class OrderFragment extends Fragment {
                 } else {
                     sendCompleteTask();
                 }
-
+/*
                 // отправляем данные из журнала и лога GPS
                 Thread thread = new Thread(new Runnable() {
                     @Override
@@ -1179,6 +1193,7 @@ public class OrderFragment extends Fragment {
                     }
                 });
                 thread.start();
+*/
 
                 return true;
             }

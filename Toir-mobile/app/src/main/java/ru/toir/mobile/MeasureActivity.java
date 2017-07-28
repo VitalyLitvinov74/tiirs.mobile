@@ -190,8 +190,14 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         count = measuredValues.size();
         for (int i = 0; i < count; i++) {
             // add measured value
-            if (measuredValues.get(i) != null) {
-                xVals.add(measuredValues.get(i).getDate().toString());
+            MeasuredValue val = measuredValues.get(i);
+            if (val != null) {
+                Date dateVal = val.getDate();
+                if (dateVal != null) {
+                    xVals.add(dateVal.toString());
+                } else {
+                    xVals.add("0000-00-00 00:00:01");
+                }
             }
         }
         //RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
