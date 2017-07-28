@@ -369,6 +369,7 @@ public class OrderFragment extends Fragment {
     private void initView() {
 
         Level = ORDER_LEVEL;
+        toolbar.setSubtitle("Наряды");
         fillListViewOrders();
     }
 
