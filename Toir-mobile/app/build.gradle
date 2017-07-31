@@ -110,8 +110,16 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.3.1'
     compile 'com.github.MKergall:osmbonuspack:6.0'
     testCompile 'junit:junit:4.12'
-    testCompile "org.powermock:powermock-module-junit4:1.6.2"
-    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
-    testCompile "org.powermock:powermock-api-mockito:1.6.2"
-    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
+    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
+    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+    androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.3.1'
+    compile files('robotium-solo-5.6.3.jar')
+}
+
+sourceSets {
+        androidTest {
+            java.srcDirs = ['androidTest/java']
+        }
 }
