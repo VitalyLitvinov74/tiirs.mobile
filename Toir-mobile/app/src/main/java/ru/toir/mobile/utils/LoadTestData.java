@@ -1393,7 +1393,7 @@ public class LoadTestData {
 //                order3.setAuthorUuid(userTestUuid);
                 order3.setAuthor(user);
                 order3.setCloseDate(new Date());
-                order3.setReceiveDate(new Date());
+                order3.setReceivDate(new Date());
                 order3.setStartDate(new Date());
                 order3.setOpenDate(new Date());
                 //order3.setOrderStatusUuid(orderStatusUuid3);

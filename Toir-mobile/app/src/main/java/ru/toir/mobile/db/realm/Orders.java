@@ -20,7 +20,7 @@ public class Orders extends RealmObject {
     private Contragent customer;
     private Brigade perpetrator;
     private String comment;
-    private Date receiveDate;   // дата получения наряда
+    private Date receivDate;   // дата получения наряда
     private Date startDate;     // дата назначения наряда
     private Date createdAt;
     private Date changedAt;
@@ -75,12 +75,12 @@ public class Orders extends RealmObject {
         this.user = user;
     }
 
-    public Date getReceiveDate() {
-        return receiveDate;
+    public Date getReceivDate() {
+        return receivDate;
     }
 
-    public void setReceiveDate(Date receiveDate) {
-        this.receiveDate = receiveDate;
+    public void setReceivDate(Date receivDate) {
+        this.receivDate = receivDate;
     }
 
     public Date getStartDate() {

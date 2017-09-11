@@ -365,6 +365,7 @@ public class OrderFragment extends Fragment {
     private void initView() {
 
         Level = ORDER_LEVEL;
+        toolbar.setSubtitle("Наряды");
         fillListViewOrders();
     }
 
@@ -746,11 +747,25 @@ public class OrderFragment extends Fragment {
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
+                    if (response.code() != 200) {
+                        Toast.makeText(getContext(),
+                                "Ошибка получения нарядов! Код ответа сервера:" + response.code(),
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+
                     result = response.body();
+                    if (result == null) {
+                        Toast.makeText(getContext(),
+                                "Ошибка получения нарядов! Содержимого ответа нет.",
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
                 } catch (Exception e) {
                     Log.d(TAG, e.getLocalizedMessage());
                     return null;
                 }
+
                 // список файлов для загрузки
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
@@ -1473,11 +1488,15 @@ public class OrderFragment extends Fragment {
                         }
                     }
 
-                    String toFilePath = mediaStorageDir.getPath() +
-                            File.separator + currentOperationUuid +
-                            '-' +
-                            new Date().getTime() / 1000 +
-                            fromFilePath.substring(fromFilePath.lastIndexOf('.'));
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(mediaStorageDir.getPath())
+                            .append(File.separator)
+                            .append(currentOperationUuid)
+                            .append('-')
+                            .append(new Date().getTime() / 1000)
+                            .append(fromFilePath.substring(fromFilePath.lastIndexOf('.')));
+
+                    String toFilePath = builder.toString();
                     File toFile = new File(toFilePath);
                     if (!fromFile.renameTo(toFile)) {
                         return;
