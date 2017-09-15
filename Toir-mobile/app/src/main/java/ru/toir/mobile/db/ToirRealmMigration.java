@@ -761,12 +761,14 @@ class ToirRealmMigration implements RealmMigration {
                 String classPath = iter.nextElement();
                 if (classPath.contains("ru.toir.mobile.db.realm") && !classPath.contains("$")) {
                     try {
-                        Class<?> driverClass;
-                        driverClass = Class.forName(classPath);
-                        Constructor<?> constructor = driverClass.getConstructor();
-                        RealmObject o = (RealmObject) constructor.newInstance();
-                        o.getClass().getMethod("deleteFromRealm");
-                        classList.add(classPath.substring(classPath.lastIndexOf('.') + 1));
+                        Class<?> driverClass = Class.forName(classPath);
+                        if (!driverClass.isInterface()) {
+
+                            Constructor<?> constructor = driverClass.getConstructor();
+                            RealmObject o = (RealmObject) constructor.newInstance();
+                            o.getClass().getMethod("deleteFromRealm");
+                            classList.add(classPath.substring(classPath.lastIndexOf('.') + 1));
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
