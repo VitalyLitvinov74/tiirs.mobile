@@ -310,6 +310,11 @@ class ToirRealmMigration implements RealmMigration {
             oldVersion++;
         }
 
+        if (oldVersion == 23) {
+            toVersion24(realm);
+            oldVersion++;
+        }
+
         testPropsFields(realm);
     }
 
@@ -671,6 +676,17 @@ class ToirRealmMigration implements RealmMigration {
         schema.rename("OperationPhoto", "OperationFile");
     }
 
+    /**
+     * Переход на версию 24
+     *
+     * @param realm - экземпляр realmDB
+     */
+    private void toVersion24(DynamicRealm realm) {
+        Log.d(TAG, "from version 23");
+        RealmSchema schema = realm.getSchema();
+        schema.get("Orders").renameField("receiveDate", "receivDate");
+    }
+
     private boolean testPropsFields(DynamicRealm realm) {
         RealmSchema schema = realm.getSchema();
 
@@ -745,12 +761,14 @@ class ToirRealmMigration implements RealmMigration {
                 String classPath = iter.nextElement();
                 if (classPath.contains("ru.toir.mobile.db.realm") && !classPath.contains("$")) {
                     try {
-                        Class<?> driverClass;
-                        driverClass = Class.forName(classPath);
-                        Constructor<?> constructor = driverClass.getConstructor();
-                        RealmObject o = (RealmObject) constructor.newInstance();
-                        o.getClass().getMethod("deleteFromRealm");
-                        classList.add(classPath.substring(classPath.lastIndexOf('.') + 1));
+                        Class<?> driverClass = Class.forName(classPath);
+                        if (!driverClass.isInterface()) {
+
+                            Constructor<?> constructor = driverClass.getConstructor();
+                            RealmObject o = (RealmObject) constructor.newInstance();
+                            o.getClass().getMethod("deleteFromRealm");
+                            classList.add(classPath.substring(classPath.lastIndexOf('.') + 1));
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

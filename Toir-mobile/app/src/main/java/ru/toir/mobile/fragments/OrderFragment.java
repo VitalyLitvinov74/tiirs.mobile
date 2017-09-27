@@ -369,6 +369,7 @@ public class OrderFragment extends Fragment {
     private void initView() {
 
         Level = ORDER_LEVEL;
+        toolbar.setSubtitle("Наряды");
         fillListViewOrders();
     }
 
@@ -747,11 +748,25 @@ public class OrderFragment extends Fragment {
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
+                    if (response.code() != 200) {
+                        Toast.makeText(getContext(),
+                                "Ошибка получения нарядов! Код ответа сервера:" + response.code(),
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+
                     result = response.body();
+                    if (result == null) {
+                        Toast.makeText(getContext(),
+                                "Ошибка получения нарядов! Содержимого ответа нет.",
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
                 } catch (Exception e) {
                     Log.d(TAG, e.getLocalizedMessage());
                     return null;
                 }
+
                 // список файлов для загрузки
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
@@ -1120,7 +1135,7 @@ public class OrderFragment extends Fragment {
                 } else {
                     sendCompleteTask();
                 }
-
+/*
                 // отправляем данные из журнала и лога GPS
                 Thread thread = new Thread(new Runnable() {
                     @Override
@@ -1179,6 +1194,7 @@ public class OrderFragment extends Fragment {
                     }
                 });
                 thread.start();
+*/
 
                 return true;
             }
@@ -1463,7 +1479,6 @@ public class OrderFragment extends Fragment {
                 .findFirst();
 
         dialog.setView(myView);
-        dialog.setIcon(R.drawable.ic_icon_warnings);
         dialog.setTitle("Закрытие наряда");
         dialog.setMessage("Всем не законченным задачам будет установлен статус \"Не выполнена\""
                 + "\n" + "Закрыть наряд?");
@@ -1572,31 +1587,38 @@ public class OrderFragment extends Fragment {
 
                     String toFilePath = builder.toString();
                     File toFile = new File(toFilePath);
-                    if (fromFile.renameTo(toFile)) {
-                        Uri fileUri = Uri.fromFile(toFile);
-                        //getActivity().getContentResolver().notifyChange(selectedImage, null);
-                        //ContentResolver cr = getActivity().getContentResolver();
-                        //Bitmap bitmap;
-                        try {
-                            //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
-                            String path = getContext().getExternalFilesDir("/Pictures") + File.separator;
-                            getResizedBitmap(path, fileUri.getPath().replace(path, ""), 1024, 0, new Date().getTime());
-                        } catch (Exception e) {
-                            Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
-                            Log.e("Camera", e.toString());
-                        }
-
-                        // добавляем запись о полученном файле
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        OperationFile operationFile = new OperationFile();
-                        operationFile.set_id(realm.where(OperationFile.class).max("_id").longValue() + 1);
-                        operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
-                        operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
-                        realm.copyToRealm(operationFile);
-                        realm.commitTransaction();
-                        realm.close();
+                    if (!fromFile.renameTo(toFile)) {
+                        return;
                     }
+
+                    Uri fileUri = Uri.fromFile(toFile);
+                    //getActivity().getContentResolver().notifyChange(selectedImage, null);
+                    //ContentResolver cr = getActivity().getContentResolver();
+                    //Bitmap bitmap;
+                    try {
+                        //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
+                        String path = getContext().getExternalFilesDir("/Pictures") + File.separator;
+                        getResizedBitmap(path, fileUri.getPath().replace(path, ""), 1024, 0, new Date().getTime());
+                    } catch (Exception e) {
+                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
+                        Log.e("Camera", e.toString());
+                    }
+
+                    // добавляем запись о полученном файле
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    OperationFile operationFile = new OperationFile();
+                    Number lastId = realm.where(OperationFile.class).max("_id");
+                    if (lastId == null) {
+                        lastId = 0;
+                    }
+
+                    operationFile.set_id(lastId.longValue() + 1);
+                    operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
+                    operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
+                    realm.copyToRealm(operationFile);
+                    realm.commitTransaction();
+                    realm.close();
                 }
 
                 break;

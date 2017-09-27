@@ -36,7 +36,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -115,11 +114,21 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             Enumeration<String> iter = df.entries();
             while (iter.hasMoreElements()) {
                 String classPath = iter.nextElement();
+
                 if (classPath.contains("ru.toir.mobile.rfid.driver") && !classPath.contains("$")) {
-                    driverClassList.add(classPath);
+                    try {
+                        Class<?> driverClass = Class.forName(classPath);
+                        Constructor<?> constructor = driverClass.getConstructor();
+                        Object o = constructor.newInstance();
+                        if (o instanceof RfidDriverBase) {
+                            driverClassList.add(classPath);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
