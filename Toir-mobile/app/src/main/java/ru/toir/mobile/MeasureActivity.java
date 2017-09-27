@@ -190,8 +190,11 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         count = measuredValues.size();
         for (int i = 0; i < count; i++) {
             // add measured value
-            if (measuredValues.get(i) != null) {
-                xVals.add(measuredValues.get(i).getDate().toString());
+            if (measuredValues.get(i) != null && xVals!=null) {
+                MeasuredValue mv = measuredValues.get(i);
+                if (mv!=null && mv.getDate()!=null) {
+                    xVals.add(mv.getDate().toString());
+                }
             }
         }
         //RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
@@ -201,7 +204,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
 
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            if (measuredValues.get(i).getValue() != null) {
+            if (measuredValues.get(i).getValue() != null && yVals1!=null) {
                 yVals1.add(new BarEntry(Float.parseFloat(measuredValues.get(i).getValue()), i));
             }
         }

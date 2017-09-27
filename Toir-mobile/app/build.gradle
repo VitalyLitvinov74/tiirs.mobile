@@ -99,7 +99,6 @@ dependencies {
     compile('com.mikepenz:aboutlibraries:5.5.1@aar') {
         transitive = true
     }
-
     compile 'com.mikepenz:fontawesome-typeface:4.5.0.1@aar'
     compile 'com.mikepenz:octicons-typeface:3.2.0.1@aar'
     compile 'com.mikepenz:google-material-typeface:2.2.0.1@aar'
@@ -113,9 +112,10 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.3.1'
     compile 'com.github.MKergall:osmbonuspack:6.0'
     testCompile 'junit:junit:4.12'
-    testCompile "org.powermock:powermock-module-junit4:1.6.2"
-    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
-    testCompile "org.powermock:powermock-api-mockito:1.6.2"
-    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
+    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
+    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
     compile 'junit:junit:4.12'
+    compile files('robotium-solo-5.6.3.jar')
 }

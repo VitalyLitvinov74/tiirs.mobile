@@ -62,7 +62,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         AppBarLayout bar;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent();
+            LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(bar, 0);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -202,6 +202,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // Allow super to try and create a view first
         final View result = super.onCreateView(name, context, attrs);
         if (result != null) {
+            Log.d("AA","bb");
             return result;
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -268,7 +269,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         ViewGroup mRootView = (ViewGroup) dialog.findViewById(android.R.id.content);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent().getParent();
+            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
