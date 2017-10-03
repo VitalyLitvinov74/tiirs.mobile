@@ -1,6 +1,3 @@
-/**
- *
- */
 package ru.toir.mobile.rfid;
 
 import android.app.DialogFragment;
@@ -73,8 +70,7 @@ public class RfidDialog extends DialogFragment {
         getDialog().setTitle("Считайте метку");
 
         // получаем текущий драйвер считывателя
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(getActivity()
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity()
                         .getApplicationContext());
         driverClassName = sp.getString(getActivity().getApplicationContext()
                 .getString(R.string.rfidDriverListPrefKey), null);
@@ -169,6 +165,7 @@ public class RfidDialog extends DialogFragment {
 
     /**
      * Необходимо потому что один из драйверов стартует отдельную activity для своих нужд.
+     * В частности RfidDriverBarcode.
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -179,8 +176,17 @@ public class RfidDialog extends DialogFragment {
                 if (data != null) {
                     String result = data.getStringExtra("SCAN_RESULT");
                     if (result != null && !result.equals("")) {
-                        message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-                        message.obj = result;
+                        // Так как в зависимости от вызванного метода разнится тип возвращаемиого результата,
+                        // проверяем какой именно метод был вызван.
+                        if (command == READER_COMMAND_READ_ID) {
+                            message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+                            message.obj = "0000" + result;
+                        } else if (command == READER_COMMAND_READ_MULTI_ID) {
+                            message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
+                            message.obj = new String[]{"0000" + result};
+                        } else {
+                            message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
+                        }
                     } else {
                         message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
                     }

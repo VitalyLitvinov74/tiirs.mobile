@@ -7,7 +7,6 @@ import ru.toir.mobile.utils.DataUtils;
 
 import android.hardware.uhf.magic.UHFCommandResult;
 import android.hardware.uhf.magic.reader;
-import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -103,17 +102,14 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
                 if (result.result == reader.RESULT_SUCCESS) {
                     if (tagIds.length == 0) {
-                        Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS);
-                        Bundle bundle = new Bundle();
-                        bundle.putStringArray("result", mc.getFoundTagIds().toArray(new String[]{}));
-                        message.setData(bundle);
+                        Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, mc.getFoundTagIds().toArray(new String[]{}));
                         message.sendToTarget();
                     } else {
                         String tmp = mc.getFoundTagId();
                         Message message;
                         if (tmp != null) {
-                            message = sHandler.obtainMessage(RESULT_RFID_SUCCESS);
-                            message.obj = tmp;
+                            // нашли метку из переданного списка, возвращаем одно значение в массиве
+                            message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tmp});
                         } else {
                             // если искали метку из списка и ни одной не нашли
                             message = sHandler.obtainMessage(RESULT_RFID_TIMEOUT);
@@ -169,8 +165,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
     }
 
     @Override
-    public void writeTagData(String password, String tagId, int memoryBank, int address,
-                             String data) {
+    public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
 
         WriteDataToTAG runnable = new WriteDataToTAG(password, tagId, memoryBank, address, data);
         Thread thread = new Thread(runnable);

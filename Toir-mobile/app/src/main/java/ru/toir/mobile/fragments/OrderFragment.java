@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -124,7 +123,6 @@ public class OrderFragment extends Fragment {
     private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
     private ListView mainListView;
-    //private Button submit;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
     private String TAG = "OrderFragment";
@@ -310,8 +308,7 @@ public class OrderFragment extends Fragment {
         });
         fab_check.setOnClickListener(new submitOnClickListener());
 
-        mainListView = (ListView) rootView
-                .findViewById(R.id.list_view);
+        mainListView = (ListView) rootView.findViewById(R.id.list_view);
 
         setHasOptionsMenu(true);
         rootView.setFocusableInTouchMode(true);
@@ -1769,7 +1766,15 @@ public class OrderFragment extends Fragment {
             @Override
             public boolean handleMessage(Message message) {
                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    String tagId = ((String) message.obj).substring(4);
+//                    Bundle bundle = message.getData();
+//                    String[] tagIds = bundle.getStringArray("result");
+                    String[] tagIds = (String[]) message.obj;
+                    if (tagIds == null) {
+                        Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    String tagId = tagIds[0].substring(4);
                     Log.d(TAG, "Ид метки получили: " + tagId);
                     if (expectedTagUuid.equals(tagId)) {
                         boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
@@ -1779,22 +1784,22 @@ public class OrderFragment extends Fragment {
                                 intent.putExtra("hardwareUUID", currentEquipment.getUuid());
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(getContext(),
-                                        "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
                             }
                         }
+
                         if (level == TASK_LEVEL) {
                             fillListViewTaskStage(selectedTask, false);
                             Level = STAGE_LEVEL;
                         }
+
                         if (level == STAGE_LEVEL) {
                             fillListViewOperations(selectedStage);
                             Level = OPERATION_LEVEL;
                             startOperations();
                         }
                     } else {
-                        Toast.makeText(getContext(),
-                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.d(TAG, "Ошибка чтения метки!");
