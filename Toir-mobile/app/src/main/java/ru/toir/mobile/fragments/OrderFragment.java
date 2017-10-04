@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -70,9 +69,6 @@ import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.GpsTrack;
-import ru.toir.mobile.db.realm.ISend;
-import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
@@ -89,7 +85,6 @@ import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.ToirAPIFactory;
-import ru.toir.mobile.rest.ToirAPIResponse;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
@@ -128,7 +123,6 @@ public class OrderFragment extends Fragment {
     private String currentOperationUuid = "";
     private String currentTaskStageUuid = "";
     private ListView mainListView;
-    //private Button submit;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
     private String TAG = "OrderFragment";
@@ -314,8 +308,7 @@ public class OrderFragment extends Fragment {
         });
         fab_check.setOnClickListener(new submitOnClickListener());
 
-        mainListView = (ListView) rootView
-                .findViewById(R.id.list_view);
+        mainListView = (ListView) rootView.findViewById(R.id.list_view);
 
         setHasOptionsMenu(true);
         rootView.setFocusableInTouchMode(true);
@@ -415,6 +408,7 @@ public class OrderFragment extends Fragment {
         if (new_orders > 0) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
         }
+
         fab_check.setVisibility(View.INVISIBLE);
     }
 
@@ -483,6 +477,7 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
         }
+
         fab_camera.setVisibility(View.INVISIBLE);
         fab_check.setVisibility(View.VISIBLE);
     }
@@ -586,6 +581,7 @@ public class OrderFragment extends Fragment {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(stage.getTaskStageTemplate().getTitle());
         }
+
         fab_camera.setVisibility(View.VISIBLE);
         fab_check.setVisibility(View.VISIBLE);
         //mainListView.setOnItemClickListener(mainListViewClickListener);
@@ -949,8 +945,7 @@ public class OrderFragment extends Fragment {
 
                 MediaType mediaType = MediaType.parse(type);
                 RequestBody requestFile = RequestBody.create(mediaType, file);
-                MultipartBody.Part part = MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-                return part;
+                return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
             }
 
             @Override
@@ -1135,98 +1130,11 @@ public class OrderFragment extends Fragment {
                 } else {
                     sendCompleteTask();
                 }
-/*
-                // отправляем данные из журнала и лога GPS
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Call<ToirAPIResponse> call;
-                        Response<ToirAPIResponse> response;
-                        Realm realm = Realm.getDefaultInstance();
-
-                        // выбираем все неотправленные данные из таблицы journal
-                        RealmResults<Journal> journals = realm.where(Journal.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        List<Journal> journalList = new CopyOnWriteArrayList<>(realm.copyFromRealm(journals));
-                        call = ToirAPIFactory.getJournalService().sendJournal(journalList);
-                        try {
-                            response = call.execute();
-                            ToirAPIResponse result = response.body();
-                            if (result.isSuccess()) {
-                                Log.d(TAG, "Журнал отправлен успешно.");
-                            } else {
-                                Log.e(TAG, "Журнал отправлен, но не все записи сохранены.");
-                                removeNotSaved(journalList, (List<String>) result.getData());
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(journalList);
-                                realm.commitTransaction();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                            Log.e(TAG, "Ошибка при отправке журнала.");
-                        }
-
-                        // выбираем все неотправленные данные из таблицы gpstrack
-                        RealmResults<GpsTrack> gpsTracks = realm.where(GpsTrack.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        List<GpsTrack> gpsTrackList = new CopyOnWriteArrayList<>(realm.copyFromRealm(gpsTracks));
-                        call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(gpsTrackList);
-                        try {
-                            response = call.execute();
-                            ToirAPIResponse result = response.body();
-                            if (result.isSuccess()) {
-                                Log.d(TAG, "GPS лог отправлен успешно.");
-                            } else {
-                                Log.e(TAG, "GPS лог отправлен, но не все записи сохранены.");
-                                removeNotSaved(gpsTrackList, (List<String>) result.getData());
-                                realm.beginTransaction();
-                                realm.copyToRealmOrUpdate(gpsTrackList);
-                                realm.commitTransaction();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                            Log.e(TAG, "Ошибка при отправке GPS лога.");
-                        }
-
-                        realm.close();
-                    }
-                });
-                thread.start();
-*/
 
                 return true;
             }
         };
         sendTaskResultMenu.setOnMenuItemClickListener(listener);
-    }
-
-    /**
-     * Вспомогательный метод для удаления из отправленого списка записей тех которые
-     * не сохранены на сервере.
-     *
-     * @param list Список отправленных записей.
-     * @param data Список id записей которые не сохранили.
-     */
-
-    private void removeNotSaved(List<? extends ISend> list, List<String> data) {
-
-        List<Long> ids = new ArrayList<>();
-
-        for (String item : data) {
-            ids.add(Long.valueOf(item));
-        }
-
-        for (Object item : list) {
-            if (ids.contains(((ISend) item).get_id())) {
-                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                list.remove(item);
-            } else {
-                // меняем статус на "отправлено" для записей которые сохранены сервером
-                ((ISend) item).setSent(true);
-            }
-        }
     }
 
     private void sendOrders(List<Orders> orders) {
@@ -1858,7 +1766,15 @@ public class OrderFragment extends Fragment {
             @Override
             public boolean handleMessage(Message message) {
                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    String tagId = ((String) message.obj).substring(4);
+//                    Bundle bundle = message.getData();
+//                    String[] tagIds = bundle.getStringArray("result");
+                    String[] tagIds = (String[]) message.obj;
+                    if (tagIds == null) {
+                        Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    String tagId = tagIds[0].substring(4);
                     Log.d(TAG, "Ид метки получили: " + tagId);
                     if (expectedTagUuid.equals(tagId)) {
                         boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
@@ -1868,22 +1784,22 @@ public class OrderFragment extends Fragment {
                                 intent.putExtra("hardwareUUID", currentEquipment.getUuid());
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(getContext(),
-                                        "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
                             }
                         }
+
                         if (level == TASK_LEVEL) {
                             fillListViewTaskStage(selectedTask, false);
                             Level = STAGE_LEVEL;
                         }
+
                         if (level == STAGE_LEVEL) {
                             fillListViewOperations(selectedStage);
                             Level = OPERATION_LEVEL;
                             startOperations();
                         }
                     } else {
-                        Toast.makeText(getContext(),
-                                "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.d(TAG, "Ошибка чтения метки!");
@@ -2150,25 +2066,6 @@ public class OrderFragment extends Fragment {
             }
 
             return true;
-        }
-    }
-
-    /**
-     * Класс для представления множителей (частоты, напряжения, тока...)
-     *
-     * @author Dmitriy Logachov
-     */
-    private class Suffixes {
-        String title;
-        long multiplier;
-
-        Suffixes(String t, int m) {
-            title = t;
-            multiplier = m;
-        }
-
-        public String toString() {
-            return title;
         }
     }
 

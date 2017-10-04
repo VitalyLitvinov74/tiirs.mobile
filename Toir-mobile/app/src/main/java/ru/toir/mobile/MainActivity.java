@@ -55,6 +55,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.toir.mobile.db.realm.GpsTrack;
+import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ContragentsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
@@ -68,6 +70,7 @@ import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.ServiceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
+import ru.toir.mobile.rest.SendGPSnLogService;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -104,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_CONTRAGENTS = 17;
 
     private static final String TAG = "MainActivity";
+    private static final long LOG_AND_GPS_SEND_INTERVAL = 1 * 60 * 1000;
     public int currentFragment = NO_FRAGMENT;
     Bundle savedInstance = null;
     int activeUserID = 0;
@@ -119,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean splashShown = false;
     //private boolean service_mode = false;
     private boolean user_changed = false;
-
     private Realm realmDB;
     private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
         @Override
@@ -128,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
+    private Handler logNGpsHandler;
+    private Runnable logNGpsRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,14 +205,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             Log.d(TAG, "db.version=" + realmDB.getVersion());
             if (realmDB.getVersion() == 0) {
-                Toast toast = Toast.makeText(this, "База данных не актуальна!",
-                        Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 0);
                 toast.show();
                 success = true;
             } else {
-                Toast toast = Toast.makeText(this, "База данных актуальна!",
-                        Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.BOTTOM, 0, 0);
                 toast.show();
                 success = true;
@@ -231,7 +234,9 @@ public class MainActivity extends AppCompatActivity {
         isLogged = false;
         user_changed = false;
 
-        Handler handler = new Handler(new Handler.Callback() {
+        stopLogSend();
+
+        final Handler handler = new Handler(new Handler.Callback() {
 
             @Override
             public boolean handleMessage(Message msg) {
@@ -282,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                                         AuthorizedUser.getInstance().setUuid(user.getUuid());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
                                         startGpsTracker(user.getUuid());
+                                        startLogSend();
 
                                         // получаем изображение пользователя
                                         Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
@@ -856,7 +862,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void changeActiveProfile (User user) {
+    public void changeActiveProfile(User user) {
         if (iprofilelist != null) {
             if (iprofilelist.size() > 0) {
                 for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
@@ -870,8 +876,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (profilesList != null && profilesList.get(cnt) != null) {
                             profilesList.get(cnt).setActive(true);
-                        }
-                        else {
+                        } else {
                             Toast.makeText(getApplicationContext(),
                                     "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
                         }
@@ -917,6 +922,61 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realmDB.close();
+        stopLogSend();
+        if (realmDB != null) {
+            realmDB.close();
+        }
     }
+
+    /**
+     * Стартуем периодический отложенный запуск сервиса отправки логов и координат GPS.
+     */
+    private void startLogSend() {
+        Log.d(TAG, "startLogSend()");
+        logNGpsRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // получаем данные для отправки
+                Realm realm = Realm.getDefaultInstance();
+
+                RealmResults<GpsTrack> gpsItems = realm.where(GpsTrack.class).equalTo("sent", false).findAll();
+                long[] gpsIds = new long[gpsItems.size()];
+                for (int i = 0; i < gpsItems.size(); i++) {
+                    gpsIds[i] = gpsItems.get(i).get_id();
+                }
+
+                RealmResults<Journal> logItems = realm.where(Journal.class).equalTo("sent", false).findAll();
+                long[] logIds = new long[logItems.size()];
+                for (int i = 0; i < logItems.size(); i++) {
+                    logIds[i] = logItems.get(i).get_id();
+                }
+
+                // стартуем сервис отправки данных на сервер
+                Intent serviceIntent = new Intent(getApplicationContext(), SendGPSnLogService.class);
+                serviceIntent.setAction(SendGPSnLogService.ACTION);
+                Bundle bundle = new Bundle();
+                bundle.putLongArray(SendGPSnLogService.GPS_IDS, gpsIds);
+                bundle.putLongArray(SendGPSnLogService.LOG_IDS, logIds);
+                serviceIntent.putExtras(bundle);
+                getApplicationContext().startService(serviceIntent);
+                realm.close();
+
+                // "взводим" отложенный запуск отправки
+                logNGpsHandler.postDelayed(this, LOG_AND_GPS_SEND_INTERVAL);
+            }
+        };
+        logNGpsHandler = new Handler();
+        logNGpsHandler.postDelayed(logNGpsRunnable, LOG_AND_GPS_SEND_INTERVAL);
+    }
+
+    /**
+     * Останавливаем периодический процесс отправки логов и координат GPS.
+     */
+    private void stopLogSend() {
+        Log.d(TAG, "stopLogSend()");
+        if (logNGpsHandler != null) {
+            logNGpsHandler.removeCallbacks(logNGpsRunnable);
+        }
+    }
+
 }

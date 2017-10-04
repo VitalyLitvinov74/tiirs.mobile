@@ -144,7 +144,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
                                     // останавливаем поток разбора ответов от считывателя
                                     CommandType.CommandOK = true;
                                     CommandType.CommandResend = false;
-                                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, readedTagId).sendToTarget();
+                                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{readedTagId}).sendToTarget();
                                 }
                             }
                         } else {
@@ -161,10 +161,10 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 mUhf.setCallBack(null);
                 mUhf.command(CommandType.STOP_MULTI_QUERY_TAGS_EPC, null);
                 if (!result && tagIds.length == 0) {
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArray("result", foundTagIds.toArray(new String[]{}));
-                    Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS);
-                    message.setData(bundle);
+//                    Bundle bundle = new Bundle();
+//                    bundle.putStringArray("result", foundTagIds.toArray(new String[]{}));
+                    Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, foundTagIds.toArray(new String[]{}));
+//                    message.setData(bundle);
                     message.sendToTarget();
                 } else {
                     sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
