@@ -30,7 +30,7 @@ import java.util.Arrays;
 
 
 /**
- * @author Dmitriy Logachov
+ * @author Dmitriy Logachev
  *         <p>
  *         Драйвер считывателя RFID который "считывает" содержимое меток из
  *         текстового файла.
@@ -160,12 +160,13 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
             public void onClick(View v) {
                 Log.d(TAG, "pressed OK");
                 Spinner spinner = (Spinner) v.getRootView().findViewById(R.id.rfid_dialog_text_spinner_lables);
+                String tagId = "0000" + spinner.getSelectedItem();
                 switch (command) {
                     case RfidDialog.READER_COMMAND_READ_ID:
-                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, "0000" + spinner.getSelectedItem()).sendToTarget();
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
                         break;
                     case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{"0000" + spinner.getSelectedItem()}).sendToTarget();
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
                         break;
                     default:
                         sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();

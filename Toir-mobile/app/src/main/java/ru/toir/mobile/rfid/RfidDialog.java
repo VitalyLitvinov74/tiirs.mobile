@@ -19,7 +19,7 @@ import java.lang.reflect.Constructor;
 import ru.toir.mobile.R;
 
 /**
- * @author Dmitriy Logachov
+ * @author Dmitriy Logachev
  */
 public class RfidDialog extends DialogFragment {
 
@@ -175,15 +175,16 @@ public class RfidDialog extends DialogFragment {
             case IntentIntegrator.REQUEST_CODE:
                 if (data != null) {
                     String result = data.getStringExtra("SCAN_RESULT");
+                    String tagId = "0000" + result;
                     if (result != null && !result.equals("")) {
                         // Так как в зависимости от вызванного метода разнится тип возвращаемиого результата,
                         // проверяем какой именно метод был вызван.
                         if (command == READER_COMMAND_READ_ID) {
                             message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-                            message.obj = "0000" + result;
+                            message.obj = tagId;
                         } else if (command == READER_COMMAND_READ_MULTI_ID) {
                             message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-                            message.obj = new String[]{"0000" + result};
+                            message.obj = new String[]{tagId};
                         } else {
                             message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
                         }

@@ -33,7 +33,7 @@ import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 
 /**
- * @author Dmitriy Logachov
+ * @author Dmitriy Logachev
  *         <p>
  *         Драйвер считывателя RFID который использует реальный считыватель на
  *         другом устройстве через bluetooth.
@@ -53,8 +53,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
     @Override
     public boolean init() {
         if (mContext != null) {
-            SharedPreferences preferences = PreferenceManager
-                    .getDefaultSharedPreferences(mContext);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
             mServerMac = preferences.getString(SERVER_MAC_PREF_KEY, null);
             if (mServerMac == null) {
                 return false;
@@ -96,8 +95,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
             if (mDevice != null) {
                 BluetoothSocket socket;
                 try {
-                    socket = mDevice
-                            .createRfcommSocketToServiceRecord(BTRfidServer.BT_SERVICE_RECORD_UUID);
+                    socket = mDevice.createRfcommSocketToServiceRecord(BTRfidServer.BT_SERVICE_RECORD_UUID);
                 } catch (IOException e) {
                     Log.e(TAG, e.getLocalizedMessage());
                     return false;
@@ -550,8 +548,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
         BluetoothAdapter adapter;
         adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter != null) {
-            ListPreference listPreference = new ListPreference(
-                    screen.getContext());
+            ListPreference listPreference = new ListPreference(screen.getContext());
             listPreference.setKey(SERVER_MAC_PREF_KEY);
             listPreference.setTitle("Доступные устройства");
             List<String> names = new ArrayList<>();
@@ -622,7 +619,6 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
             int payloadLength = 0;
             byte[] payloadLenBuff = new byte[2];
             int payloadLenBuffIndex = 0;
-            boolean packetEnd = false;
 
             while (true) {
                 try {
@@ -637,19 +633,24 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
                                 if (typePacketExists) {
                                     if (commandExists) {
                                         if (payloadLengthExists) {
-                                            if (packetEnd) {
-                                                // пакет разобран
-                                                // мы сюда не должны попадать
+                                            byte tmpData = buffer[parseIndex++];
+                                            if (tmpData == (byte) 0x7E && dataIndex == payloadLength) {
+                                                // добрались до конца пакета
+
+                                                Bundle bundle = parseCommand(command, data);
+                                                mHandler.obtainMessage(DRIVER_STATE_READ_ANSWER, command, -1, bundle).sendToTarget();
+
+                                                // сбрасываем всё
+                                                packetStart = false;
+                                                typePacketExists = false;
+                                                payloadLengthExists = false;
+                                                payloadLength = 0;
+                                                payloadLenBuffIndex = 0;
+                                                commandExists = false;
+                                                dataIndex = 0;
                                             } else {
-                                                byte tmpData = buffer[parseIndex++];
-                                                if (tmpData == (byte) 0x7E && dataIndex == payloadLength) {
-                                                    // добрались до конца пакета
-                                                    packetEnd = true;
-
-                                                    Bundle bundle = parseCommand(command, data, payloadLength);
-                                                    mHandler.obtainMessage(DRIVER_STATE_READ_ANSWER, command, -1, bundle).sendToTarget();
-
-                                                    // сбрасываем всё
+                                                if (dataIndex >= payloadLength) {
+                                                    // не нашли маркера конца пакета после полезной нагрузки сбрасываем всё
                                                     packetStart = false;
                                                     typePacketExists = false;
                                                     payloadLengthExists = false;
@@ -657,22 +658,8 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
                                                     payloadLenBuffIndex = 0;
                                                     commandExists = false;
                                                     dataIndex = 0;
-                                                    packetEnd = false;
-
                                                 } else {
-                                                    if (dataIndex >= payloadLength) {
-                                                        // не нашли маркера конца пакета после полезной нагрузки сбрасываем всё
-                                                        packetStart = false;
-                                                        typePacketExists = false;
-                                                        payloadLengthExists = false;
-                                                        payloadLength = 0;
-                                                        payloadLenBuffIndex = 0;
-                                                        commandExists = false;
-                                                        dataIndex = 0;
-                                                        packetEnd = false;
-                                                    } else {
-                                                        data[dataIndex++] = tmpData;
-                                                    }
+                                                    data[dataIndex++] = tmpData;
                                                 }
                                             }
                                         } else {
@@ -733,23 +720,22 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
         /**
          * Разбор ответа на отправленную команду.
          *
-         * @param command    Команда на которую получен ответ.
-         * @param data       Данные ответа.
-         * @param dataLength Длина данных ответа.
+         * @param command Команда на которую получен ответ.
+         * @param data    Данные ответа.
          * @return @Bundle
          */
-        private Bundle parseCommand(int command, byte[] data, int dataLength) {
+        private Bundle parseCommand(int command, byte[] data) {
             switch (command) {
                 case RfidDialog.READER_COMMAND_READ_ID:
-                    return parseCommandReadTagId(data, dataLength);
+                    return parseCommandReadTagId(data);
                 case RfidDialog.READER_COMMAND_READ_DATA:
                 case RfidDialog.READER_COMMAND_READ_DATA_ID:
-                    return parseCommandReadData(data, dataLength);
+                    return parseCommandReadData(data);
                 case RfidDialog.READER_COMMAND_WRITE_DATA:
                 case RfidDialog.READER_COMMAND_WRITE_DATA_ID:
-                    return parseCommandWriteData(data, dataLength);
+                    return parseCommandWriteData(data);
                 case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                    return parseCommandReadTagIdMulti(data, dataLength);
+                    return parseCommandReadTagIdMulti(data);
                 default:
                     return null;
             }
@@ -758,11 +744,10 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
         /**
          * Разбор ответа на команду считывания tagId первой попавшейся метки.
          *
-         * @param data       Полученные данные.
-         * @param dataLength Длина полученных данных.
+         * @param data Полученные данные.
          * @return @Bundle
          */
-        private Bundle parseCommandReadTagId(byte[] data, int dataLength) {
+        private Bundle parseCommandReadTagId(byte[] data) {
             Bundle bundle = new Bundle();
             int index = 0;
 
@@ -780,6 +765,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
             for (int i = 0; i < tagIdLength; i++) {
                 tagIdBuffer[i] = data[index++];
             }
+
             String tagId = new String(tagIdBuffer);
             bundle.putString("data", tagId);
             return bundle;
@@ -788,11 +774,10 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
         /**
          * Разбор ответа на команду считывания множества tagId.
          *
-         * @param data       Полученные данные.
-         * @param dataLength Длина полученных данных.
+         * @param data Полученные данные.
          * @return @Bundle  В поле data возвращаем массив строк содержащих считанные tagId.
          */
-        private Bundle parseCommandReadTagIdMulti(byte[] data, int dataLength) {
+        private Bundle parseCommandReadTagIdMulti(byte[] data) {
             Bundle bundle = new Bundle();
             int index = 0;
 
@@ -828,11 +813,10 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
         /**
          * Разбор ответа на команду чтения содержимого метки.
          *
-         * @param data       Полученные данные.
-         * @param dataLength Длина полученных данных.
+         * @param data Полученные данные.
          * @return @Bundle
          */
-        private Bundle parseCommandReadData(byte[] data, int dataLength) {
+        private Bundle parseCommandReadData(byte[] data) {
             Bundle bundle = new Bundle();
             int index = 0;
 
@@ -842,10 +826,12 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
             bundle.putInt("result", result);
 
             // данные
-            byte[] dataBuffer = new byte[dataLength - 1];
-            for (int i = 0; i < dataLength - 1; i++) {
+            int dataLength = data.length - 1;
+            byte[] dataBuffer = new byte[dataLength];
+            for (int i = 0; i < dataLength; i++) {
                 dataBuffer[i] = data[index++];
             }
+
             String tagId = new String(dataBuffer);
             bundle.putString("data", tagId);
             return bundle;
@@ -854,11 +840,10 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
         /**
          * Разбор ответа на команду записи данных в метку.
          *
-         * @param data       Полученные данные.
-         * @param dataLength Длина полученных данных.
+         * @param data Полученные данные.
          * @return @Bundle
          */
-        private Bundle parseCommandWriteData(byte[] data, int dataLength) {
+        private Bundle parseCommandWriteData(byte[] data) {
             Bundle bundle = new Bundle();
             int index = 0;
 

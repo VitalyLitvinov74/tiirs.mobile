@@ -71,12 +71,13 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    String tagId = "0000" + s.toString();
                     switch (command) {
                         case RfidDialog.READER_COMMAND_READ_ID:
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, "0000" + s.toString()).sendToTarget();
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
                             break;
                         case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{"0000" + s.toString()}).sendToTarget();
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
                             break;
                         default:
                             sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();

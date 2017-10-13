@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.preference.PreferenceScreen;
 
 /**
- * @author Dmitriy Logachov
+ * @author Dmitriy Logachev
  * 
  */
 public abstract class RfidDriverBase implements IRfidDriver {

@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * @author Dmitriy Logachov
+ * @author Dmitriy Logachev
  *         <p>
  *         Интерфейс драйвера считывателя RFID
  *         </p>
