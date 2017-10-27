@@ -872,8 +872,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
                     @Override
                     protected String doInBackground(String... params) {
+                        String userName = AuthorizedUser.getInstance().getLogin();
                         String fileElements[] = params[0].split("/");
-                        String url = ToirApplication.serverUrl + "/storage/" + params[0];
+                        String url = ToirApplication.serverUrl + "/storage/" + userName + "/" + params[0];
                         Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(url);
                         try {
                             Response<ResponseBody> r = call1.execute();

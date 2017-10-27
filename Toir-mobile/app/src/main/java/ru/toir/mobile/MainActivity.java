@@ -121,8 +121,6 @@ public class MainActivity extends AppCompatActivity {
     private int cnt = 0;
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
-    //private boolean service_mode = false;
-    private boolean user_changed = false;
     private Realm realmDB;
     private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
         @Override
@@ -232,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
     public void startAuthorise() {
 
         isLogged = false;
-        user_changed = false;
 
         stopLogSend();
 
@@ -298,8 +295,8 @@ public class MainActivity extends AppCompatActivity {
                                         startLogSend();
 
                                         // получаем изображение пользователя
-                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
-                                                .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
+                                        String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
+                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().getFile(url);
                                         callFile.enqueue(new Callback<ResponseBody>() {
                                             @Override
                                             public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
@@ -309,6 +306,11 @@ public class MainActivity extends AppCompatActivity {
                                                 }
 
                                                 File filePath = getExternalFilesDir("/users");
+                                                if (filePath == null) {
+                                                    // нет доступа к внешнему накопителю
+                                                    return;
+                                                }
+
                                                 File file = new File(filePath, fileName);
                                                 if (!file.getParentFile().exists()) {
                                                     if (!file.getParentFile().mkdirs()) {
@@ -338,8 +340,7 @@ public class MainActivity extends AppCompatActivity {
                                     } else {
                                         String message = "Информация о пользователе не получена с сервера.";
                                         addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
-                                        Toast.makeText(getApplicationContext(), message,
-                                                Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     }
 
                                     authorizationDialog.dismiss();
@@ -351,8 +352,7 @@ public class MainActivity extends AppCompatActivity {
                                     // TODO нужен какой-то механизм уведомления о причине не успеха
 //                                    String message = bundle.getString(IServiceProvider.MESSAGE);
                                     String message = "Просто не получили пользователя.";
-                                    Toast.makeText(getApplicationContext(), message,
-                                            Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     authorizationDialog.dismiss();
                                 }
                             });
