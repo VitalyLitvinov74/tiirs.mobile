@@ -261,17 +261,30 @@ public class MainActivity extends AppCompatActivity {
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
+                            AuthorizedUser authUser = AuthorizedUser.getInstance();
                             TokenSrv token = response.body();
                             if (token != null) {
-                                AuthorizedUser user = AuthorizedUser.getInstance();
-                                user.setToken(token.getAccessToken());
+
+                                authUser.setToken(token.getAccessToken());
                                 Toast.makeText(getApplicationContext(),
                                         "Токен получен.", Toast.LENGTH_SHORT).show();
-                                // TODO: здесь нужно сохранить login в базу или в AuthorizedUser
-                                // пока так попробую
-                                user.setLogin(token.getUserName());
+                                // Сохраняем login в AuthorizedUser для дальнейших запросв статики
+                                authUser.setLogin(token.getUserName());
 
+                            } else {
+                                // Токен не получили, пытаемся найти пользователя в локальной базе
+                                Realm realm = Realm.getDefaultInstance();
+                                RealmResults<User> user = realm.where(User.class).equalTo("tagId",
+                                        authUser.getTagId()).findAll();
+                                if (user.size() == 1) {
+                                    authUser.setLogin(user.first().getLogin());
+                                }
+
+                                realm.close();
                             }
+
+                            // TODO: Если не получили инфу с сервера и из локальной базы - что делать?
+                            // ни запросы не сделать, ни логи отправить!
 
                             // запрашиваем актуальную информацию по пользователю
                             Call<User> call = ToirAPIFactory.getUserService().user();
@@ -654,8 +667,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void startGpsTracker(String user_uuid) {
-        LocationManager lm = (LocationManager) getSystemService(
-                Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (lm != null) {
             GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
