@@ -266,9 +266,14 @@ public class MainActivity extends AppCompatActivity {
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
                             TokenSrv token = response.body();
                             if (token != null) {
-                                AuthorizedUser.getInstance().setToken(token.getAccessToken());
+                                AuthorizedUser user = AuthorizedUser.getInstance();
+                                user.setToken(token.getAccessToken());
                                 Toast.makeText(getApplicationContext(),
                                         "Токен получен.", Toast.LENGTH_SHORT).show();
+                                // TODO: здесь нужно сохранить login в базу или в AuthorizedUser
+                                // пока так попробую
+                                user.setLogin(token.getUserName());
+
                             }
 
                             // запрашиваем актуальную информацию по пользователю
@@ -284,7 +289,10 @@ public class MainActivity extends AppCompatActivity {
                                         realm.copyToRealmOrUpdate(user);
                                         realm.commitTransaction();
                                         isLogged = true;
-                                        AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                        // TODO: нужен метод для установки полей объекта из разных объектов (Token, User...)
+                                        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
+                                        authorizedUser.setUuid(user.getUuid());
+                                        authorizedUser.setLogin(user.getLogin());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
                                         startGpsTracker(user.getUuid());
                                         startLogSend();
@@ -355,8 +363,7 @@ public class MainActivity extends AppCompatActivity {
                             // TODO нужен какой-то механизм уведомления о причине не успеха
 //                            String message = bundle.getString(IServiceProvider.MESSAGE);
                             String message = "Просто не получили токен.";
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG)
-                                    .show();
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             // TODO реализовать проверку на то что пользователя нет на сервере
                             // токен не получен, сервер не ответил...
 
@@ -871,8 +878,9 @@ public class MainActivity extends AppCompatActivity {
 
                         realmDB.beginTransaction();
                         RealmResults<User> users = realmDB.where(User.class).findAll();
-                        for (int i = 0; i < users.size(); i++)
+                        for (int i = 0; i < users.size(); i++) {
                             users.get(i).setActive(false);
+                        }
 
                         if (profilesList != null && profilesList.get(cnt) != null) {
                             profilesList.get(cnt).setActive(true);
@@ -880,6 +888,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
                         }
+
                         realmDB.commitTransaction();
                         user.setActive(true);
                     }

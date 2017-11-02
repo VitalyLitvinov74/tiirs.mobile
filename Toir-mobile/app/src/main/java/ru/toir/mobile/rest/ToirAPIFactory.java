@@ -1,5 +1,6 @@
 package ru.toir.mobile.rest;
 
+import io.realm.Realm;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -7,6 +8,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.BuildConfig;
+
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -21,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import retrofit2.Retrofit;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
 import ru.toir.mobile.rest.interfaces.IContragent;
@@ -91,7 +94,14 @@ ToirAPIFactory {
                     Headers origHeaders = origRequest.headers();
                     AuthorizedUser user = AuthorizedUser.getInstance();
                     Headers newHeaders = origHeaders.newBuilder().add("Authorization", user.getBearer()).build();
-                    Request.Builder requestBuilder = origRequest.newBuilder().headers(newHeaders);
+
+                    String login = user.getLogin();
+                    if (login == null) {
+                        login = "";
+                    }
+
+                    HttpUrl url = origRequest.url().newBuilder().addQueryParameter("apiuser", login).build();
+                    Request.Builder requestBuilder = origRequest.newBuilder().headers(newHeaders).url(url);
                     Request newRequest = requestBuilder.build();
                     return chain.proceed(newRequest);
                 }
@@ -103,7 +113,7 @@ ToirAPIFactory {
                         Request request = chain.request();
                         HttpUrl url = request.url()
                                 .newBuilder()
-                                .addQueryParameter("XDEBUG_SESSION_START", "netbeans-xdebug")
+                                .addQueryParameter("XDEBUG_SESSION_START", "xdebug")
                                 .build();
                         Request.Builder requestBuilder = request.newBuilder().url(url);
                         Request newRequest = requestBuilder.build();
