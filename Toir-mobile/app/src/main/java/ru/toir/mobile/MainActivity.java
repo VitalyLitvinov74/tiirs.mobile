@@ -150,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
             aUser.setTagId(savedInstanceState.getString("tagId"));
             aUser.setToken(savedInstanceState.getString("token"));
             aUser.setUuid(savedInstanceState.getString("userUuid"));
+            aUser.setLogin(savedInstanceState.getString("userLogin"));
         }
 
         Log.d(TAG, "onCreate");
@@ -658,6 +659,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),
                     "Пожалуйста зарегистрируйтесь", Toast.LENGTH_LONG).show();
         }
+
         //((ViewGroup) findViewById(R.id.frame_container)).addView(result.getSlider());
         //pager = (ViewPager) findViewById(R.id.pager);
         //pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
@@ -717,6 +719,7 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
             return;
         }
+
         addToJournal("Запущено обновление с сервера " + updateUrl);
         String path = Environment.getExternalStorageDirectory() + "/Download/";
         File file = new File(path);
@@ -781,6 +784,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putString("tagId", AuthorizedUser.getInstance().getTagId());
         outState.putString("token", AuthorizedUser.getInstance().getToken());
         outState.putString("userUuid", AuthorizedUser.getInstance().getUuid());
+        outState.putString("userLogin", AuthorizedUser.getInstance().getLogin());
     }
 
     /*
@@ -937,6 +941,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        AuthorizedUser user = AuthorizedUser.getInstance();
+        if (user.getTagId() == null) {
+            // пользователь не вошел в программу, либо потеряна по каким-то причинам информация
+            // о текущем пользователе, показываем экран входа
+            setContentView(R.layout.start_screen);
+        }
+
         ShowSettings();
     }
 
