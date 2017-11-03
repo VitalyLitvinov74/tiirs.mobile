@@ -336,6 +336,14 @@ public class MainActivity extends AppCompatActivity {
                                                     FileOutputStream fos = new FileOutputStream(file);
                                                     fos.write(fileBody.bytes());
                                                     fos.close();
+                                                    // принудительно масштабируем изображение пользоваетеля
+                                                    String path = filePath + File.separator;
+                                                    Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
+                                                    if (user_bitmap == null) {
+                                                        // По какой-то причине не смогли получить
+                                                        // уменьшенное изображение
+                                                        Log.e(TAG, "Не удалось получить масштабированное изображение.");
+                                                    }
                                                 } catch (Exception e) {
                                                     Log.e(TAG, e.getLocalizedMessage());
                                                 }
