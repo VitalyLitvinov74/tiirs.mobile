@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ru.toir.mobile.rfid;
 
 import android.app.Activity;

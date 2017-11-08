@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -74,6 +75,7 @@ import ru.toir.mobile.rest.SendGPSnLogService;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.rfid.driver.RfidDriverNfc;
 import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.utils.MainFunctions;
 
@@ -988,4 +990,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        String action = intent.getAction();
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+            String hexId = "";
+            for (byte b : id) {
+                hexId += String.format("%2X", b);
+            }
+
+            Intent result = new Intent(RfidDriverNfc.ACTION_NFC);
+            result.putExtra("tagId", hexId);
+            sendBroadcast(result);
+        }
+    }
 }
