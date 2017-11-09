@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -86,6 +87,15 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
             return false;
         }
 
+        try {
+            Class<?>[] arg = new Class[]{Intent.class};
+            activity.getClass().getDeclaredMethod("onNewIntent", arg);
+        } catch (Exception e) {
+            Toast.makeText(activity, "Not implemented \"onNewIntent\" method in parent activity!",
+                    Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(activity, 777, new Intent(activity,
                 activity.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         nfcAdapter.enableForegroundDispatch(activity, pendingIntent, null, null);
@@ -97,8 +107,6 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-//                Toast.makeText(mContext, "RfidDriverNFC: " + intent.getAction(),
-//                        Toast.LENGTH_SHORT).show();
                 String tagId = intent.getStringExtra("tagId");
                 if (tagId == null) {
                     sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
@@ -166,7 +174,9 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
             nfcAdapter.setNdefPushMessage(null, activity);
         }
 
-        mContext.unregisterReceiver(receiver);
+        if (receiver != null) {
+            mContext.unregisterReceiver(receiver);
+        }
     }
 
     @Override
