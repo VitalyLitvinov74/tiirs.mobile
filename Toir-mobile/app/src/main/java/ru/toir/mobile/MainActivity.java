@@ -110,6 +110,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final long LOG_AND_GPS_SEND_INTERVAL = 60000;
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
+     * android.view.KeyEvent)
+     */
+    private static boolean isExitTimerStart = false;
     public int currentFragment = NO_FRAGMENT;
     Bundle savedInstance = null;
     int activeUserID = 0;
@@ -466,15 +473,19 @@ public class MainActivity extends AppCompatActivity {
                 FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                 switch (tabId) {
                     case R.id.menu_user:
+                        currentFragment = FRAGMENT_USERS;
                         tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
                         break;
                     case R.id.menu_orders:
+                        currentFragment = FRAGMENT_TASKS;
                         tr.replace(R.id.frame_container, OrderFragment.newInstance());
                         break;
                     case R.id.menu_equipments:
+                        currentFragment = FRAGMENT_EQUIPMENT;
                         tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
                         break;
                     case R.id.menu_maps:
+                        currentFragment = FRAGMENT_GPS;
                         tr.replace(R.id.frame_container, GPSFragment.newInstance());
                         break;
                 }
@@ -560,8 +571,6 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             tr.commit();
-
-
                         }
 
                         return false;
@@ -810,7 +819,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * Обработчик клика кнопки "Войти"
      *
@@ -941,17 +949,28 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
-     * android.view.KeyEvent)
-     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-//		if (keyCode == KeyEvent.KEYCODE_BACK) {
-//			 return true;
-//		}
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (isExitTimerStart) {
+                return super.onKeyDown(keyCode, event);
+            } else if (currentFragment == FRAGMENT_USERS) {
+                Handler handler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        isExitTimerStart = false;
+                    }
+                };
+                handler.postDelayed(runnable, 5000);
+                Toast.makeText(this, "Нажмите \"назад\" ещё раз для выхода.", Toast.LENGTH_LONG)
+                        .show();
+                isExitTimerStart = true;
+            }
+
+            return true;
+        }
+
         return super.onKeyDown(keyCode, event);
     }
 
