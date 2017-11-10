@@ -461,8 +461,7 @@ public class OrderFragment extends Fragment {
                         selectedOrder.setOrderStatus(orderStatusComplete);
                     }
                 });
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return;
             }
             addToJournal("Закончен наряд " + order.getTitle() + "(" + order.getUuid() + ")");
@@ -763,6 +762,7 @@ public class OrderFragment extends Fragment {
                     return null;
                 }
 
+                String userName = AuthorizedUser.getInstance().getLogin();
                 // список файлов для загрузки
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
@@ -774,7 +774,7 @@ public class OrderFragment extends Fragment {
                         // путь до папки с файлами
                         String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
                         // общий путь до файлов на сервере
-                        String basePath = "/storage/" + equipmentModelUuid + "/";
+                        String basePath = "/storage/" + userName + "/" + equipmentModelUuid + "/";
                         // общий путь до файлов локальный
                         String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
                         // урл изображения задачи
@@ -786,7 +786,7 @@ public class OrderFragment extends Fragment {
                         // урл изображения объекта
                         Objects object = task.getEquipment().getLocation();
                         if (object != null) {
-                            files.add(new FilePath(object.getImage(), "/storage/" + object.getUuid() + "/", "/objects/"));
+                            files.add(new FilePath(object.getImage(), "/storage/" + userName + "/" + object.getUuid() + "/", "/objects/"));
                         }
 
                         List<TaskStages> stages = task.getTaskStages();
@@ -795,9 +795,9 @@ public class OrderFragment extends Fragment {
                             files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
                                     basePath, basePathLocal));
                             if (stage.getEquipment() != null) {
-                                String equipmentPath = "/storage/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
+                                String equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
-                                equipmentPath = "/storage/" + stage.getEquipment().getUuid() + "/";
+                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
                             }
                             List<Operation> operations = stage.getOperations();
@@ -826,7 +826,7 @@ public class OrderFragment extends Fragment {
                                 .findAll();
                         for (Documentation doc : docList) {
                             String docFileName = doc.getPath();
-                            String url = "/storage/";
+                            String url = "/storage/" + userName + "/";
                             String localPath = "/documentation/";
                             if (doc.getEquipment() != null && doc.getEquipmentModel() == null) {
                                 // документация привязана только к оборудованию
