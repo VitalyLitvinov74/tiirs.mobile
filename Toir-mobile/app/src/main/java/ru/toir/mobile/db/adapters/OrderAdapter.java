@@ -140,7 +140,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                     String orderStatusUuid = orderStatus.getUuid();
                     String orderLevelUuid = order.getOrderLevel().getUuid();
                     viewHolder.status.setText(orderStatus.getTitle());
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && orderLevelUuid.equals(OrderLevel.Level.Level1)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
                         viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]");
                     }
@@ -148,11 +148,11 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
                         viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]");
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && orderLevelUuid.equals(OrderLevel.Level.Level5)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_receive);
                         viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]");
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && orderLevelUuid.equals(OrderLevel.Level.Level1)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_work);
                         viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]");
                     }
@@ -160,11 +160,11 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         viewHolder.icon.setImageResource(R.drawable.status_mod_work);
                         viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]");
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && orderLevelUuid.equals(OrderLevel.Level.Level5)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_work);
                         viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]");
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && orderLevelUuid.equals(OrderLevel.Level.Level1)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
                         viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]");
                     }
@@ -172,7 +172,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
                         viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]");
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && orderLevelUuid.equals(OrderLevel.Level.Level5)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_ready);
                         viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]");
                     }

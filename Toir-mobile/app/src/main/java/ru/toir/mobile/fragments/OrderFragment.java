@@ -444,7 +444,8 @@ public class OrderFragment extends Fragment {
             all_complete = false;
         }
 
-        if (complete_operation && all_complete && !order.getOrderStatus().getUuid().equals(OrderStatus.Status.COMPLETE)) {
+//        if (complete_operation && all_complete && !order.getOrderStatus().getUuid().equals(OrderStatus.Status.COMPLETE)) {
+        if (all_complete && !order.getOrderStatus().getUuid().equals(OrderStatus.Status.COMPLETE)) {
             final OrderStatus orderStatusComplete = realmDB.where(OrderStatus.class)
                     .equalTo("uuid", OrderStatus.Status.COMPLETE)
                     .findFirst();
@@ -521,7 +522,8 @@ public class OrderFragment extends Fragment {
             tl_Header.setText(task.getTaskTemplate().getTitle());
         }
 
-        if (complete_operation && all_complete && !task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
+//        if (complete_operation && all_complete && !task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
+        if (all_complete && !task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
             final TaskStatus taskStatusComplete = realmDB.where(TaskStatus.class)
                     .equalTo("uuid", TaskStatus.Status.COMPLETE)
                     .findFirst();
@@ -1829,6 +1831,15 @@ public class OrderFragment extends Fragment {
         @Override
         public void onClick(final View v) {
 
+            if (Level == TASK_LEVEL || Level == ORDER_LEVEL) {
+                initView();
+            }
+
+            if (Level == STAGE_LEVEL) {
+                Level = TASK_LEVEL;
+                fillListViewTasks(selectedOrder, false);
+            }
+
             if (Level == OPERATION_LEVEL) {
                 int completedOperationCount = 0;
                 CheckBox checkBox;
@@ -1890,11 +1901,6 @@ public class OrderFragment extends Fragment {
 
             if (Level == TASK_LEVEL || Level == ORDER_LEVEL) {
                 initView();
-            }
-
-            if (Level == STAGE_LEVEL) {
-                Level = TASK_LEVEL;
-                fillListViewTasks(selectedOrder, false);
             }
         }
     }
