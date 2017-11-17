@@ -48,8 +48,7 @@ public class UserInfoFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View rootView = inflater
-				.inflate(R.layout.user_layout, container, false);
+        View rootView = inflater.inflate(R.layout.user_layout, container, false);
         Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Пользователь");
 

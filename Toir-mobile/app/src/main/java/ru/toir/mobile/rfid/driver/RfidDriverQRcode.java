@@ -27,7 +27,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachev
  *         <p>
  *         Драйвер считывателя RFID который "считывает" содержимое меток из
  *         текстового файла.
@@ -62,12 +62,13 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
                     if (lastScannedCode != null) {
                         Log.d(TAG, "прочитано: " + lastScannedCode);
                         scanText.setText(lastScannedCode);
+                        String tagId = "0000" + lastScannedCode;
                         switch (command) {
                             case RfidDialog.READER_COMMAND_READ_ID:
-                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, "0000" + lastScannedCode).sendToTarget();
+                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
                                 break;
                             case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{"0000" + lastScannedCode}).sendToTarget();
+                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
                                 break;
                             default:
                                 sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();

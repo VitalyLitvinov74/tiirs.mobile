@@ -8,12 +8,15 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -74,6 +77,7 @@ import ru.toir.mobile.rest.SendGPSnLogService;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
+import ru.toir.mobile.rfid.driver.RfidDriverNfc;
 import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.utils.MainFunctions;
 
@@ -107,7 +111,14 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_CONTRAGENTS = 17;
 
     private static final String TAG = "MainActivity";
-    private static final long LOG_AND_GPS_SEND_INTERVAL = 1 * 60 * 1000;
+    private static final long LOG_AND_GPS_SEND_INTERVAL = 60000;
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
+     * android.view.KeyEvent)
+     */
+    private static boolean isExitTimerStart = false;
     public int currentFragment = NO_FRAGMENT;
     Bundle savedInstance = null;
     int activeUserID = 0;
@@ -121,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
     private int cnt = 0;
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
-    //private boolean service_mode = false;
-    private boolean user_changed = false;
     private Realm realmDB;
     private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
         @Override
@@ -152,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
             aUser.setTagId(savedInstanceState.getString("tagId"));
             aUser.setToken(savedInstanceState.getString("token"));
             aUser.setUuid(savedInstanceState.getString("userUuid"));
+            aUser.setLogin(savedInstanceState.getString("userLogin"));
         }
 
         Log.d(TAG, "onCreate");
@@ -232,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
     public void startAuthorise() {
 
         isLogged = false;
-        user_changed = false;
 
         stopLogSend();
 
@@ -264,17 +273,30 @@ public class MainActivity extends AppCompatActivity {
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
+                            AuthorizedUser authUser = AuthorizedUser.getInstance();
                             TokenSrv token = response.body();
                             if (token != null) {
-                                AuthorizedUser user = AuthorizedUser.getInstance();
-                                user.setToken(token.getAccessToken());
+
+                                authUser.setToken(token.getAccessToken());
                                 Toast.makeText(getApplicationContext(),
                                         "Токен получен.", Toast.LENGTH_SHORT).show();
-                                // TODO: здесь нужно сохранить login в базу или в AuthorizedUser
-                                // пока так попробую
-                                user.setLogin(token.getUserName());
+                                // Сохраняем login в AuthorizedUser для дальнейших запросв статики
+                                authUser.setLogin(token.getUserName());
 
+                            } else {
+                                // Токен не получили, пытаемся найти пользователя в локальной базе
+                                Realm realm = Realm.getDefaultInstance();
+                                RealmResults<User> user = realm.where(User.class).equalTo("tagId",
+                                        authUser.getTagId()).findAll();
+                                if (user.size() == 1) {
+                                    authUser.setLogin(user.first().getLogin());
+                                }
+
+                                realm.close();
                             }
+
+                            // TODO: Если не получили инфу с сервера и из локальной базы - что делать?
+                            // ни запросы не сделать, ни логи отправить!
 
                             // запрашиваем актуальную информацию по пользователю
                             Call<User> call = ToirAPIFactory.getUserService().user();
@@ -298,8 +320,8 @@ public class MainActivity extends AppCompatActivity {
                                         startLogSend();
 
                                         // получаем изображение пользователя
-                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload()
-                                                .getFile(ToirApplication.serverUrl + "/storage/" + user.getUuid() + "/" + user.getImage());
+                                        String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
+                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().getFile(url);
                                         callFile.enqueue(new Callback<ResponseBody>() {
                                             @Override
                                             public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
@@ -309,6 +331,11 @@ public class MainActivity extends AppCompatActivity {
                                                 }
 
                                                 File filePath = getExternalFilesDir("/users");
+                                                if (filePath == null) {
+                                                    // нет доступа к внешнему накопителю
+                                                    return;
+                                                }
+
                                                 File file = new File(filePath, fileName);
                                                 if (!file.getParentFile().exists()) {
                                                     if (!file.getParentFile().mkdirs()) {
@@ -320,6 +347,14 @@ public class MainActivity extends AppCompatActivity {
                                                     FileOutputStream fos = new FileOutputStream(file);
                                                     fos.write(fileBody.bytes());
                                                     fos.close();
+                                                    // принудительно масштабируем изображение пользоваетеля
+                                                    String path = filePath + File.separator;
+                                                    Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
+                                                    if (user_bitmap == null) {
+                                                        // По какой-то причине не смогли получить
+                                                        // уменьшенное изображение
+                                                        Log.e(TAG, "Не удалось получить масштабированное изображение.");
+                                                    }
                                                 } catch (Exception e) {
                                                     Log.e(TAG, e.getLocalizedMessage());
                                                 }
@@ -338,8 +373,7 @@ public class MainActivity extends AppCompatActivity {
                                     } else {
                                         String message = "Информация о пользователе не получена с сервера.";
                                         addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
-                                        Toast.makeText(getApplicationContext(), message,
-                                                Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     }
 
                                     authorizationDialog.dismiss();
@@ -351,8 +385,7 @@ public class MainActivity extends AppCompatActivity {
                                     // TODO нужен какой-то механизм уведомления о причине не успеха
 //                                    String message = bundle.getString(IServiceProvider.MESSAGE);
                                     String message = "Просто не получили пользователя.";
-                                    Toast.makeText(getApplicationContext(), message,
-                                            Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     authorizationDialog.dismiss();
                                 }
                             });
@@ -428,8 +461,8 @@ public class MainActivity extends AppCompatActivity {
     //@SuppressWarnings("deprecation")
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
+//        SharedPreferences sp = PreferenceManager
+//                .getDefaultSharedPreferences(getApplicationContext());
         //service_mode = sp.getBoolean("pref_debug_mode_key", false);
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
@@ -439,20 +472,27 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
+                FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                 switch (tabId) {
                     case R.id.menu_user:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                        currentFragment = FRAGMENT_USERS;
+                        tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
                         break;
                     case R.id.menu_orders:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, OrderFragment.newInstance()).commit();
+                        currentFragment = FRAGMENT_TASKS;
+                        tr.replace(R.id.frame_container, OrderFragment.newInstance());
                         break;
                     case R.id.menu_equipments:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
+                        currentFragment = FRAGMENT_EQUIPMENT;
+                        tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
                         break;
                     case R.id.menu_maps:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
+                        currentFragment = FRAGMENT_GPS;
+                        tr.replace(R.id.frame_container, GPSFragment.newInstance());
                         break;
                 }
+
+                tr.commit();
             }
         });
         int new_orders = MainFunctions.getActiveOrdersCount();
@@ -484,33 +524,57 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
-                .withTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white))
+                .withTextColor(ContextCompat.getColor(this, R.color.white))
                 .addProfiles(
-                        new ProfileSettingDrawerItem().withName("Добавить пользователя").withDescription("Добавить пользователя").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_plus)).withIdentifier(PROFILE_ADD),
-                        new ProfileSettingDrawerItem().withName("Редактировать пользователей").withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings)).withIdentifier(PROFILE_SETTINGS)
+                        new ProfileSettingDrawerItem()
+                                .withName("Добавить пользователя")
+                                .withDescription("Добавить пользователя")
+                                .withIcon(String.valueOf(GoogleMaterial.Icon.gmd_plus))
+                                .withIdentifier(PROFILE_ADD),
+                        new ProfileSettingDrawerItem()
+                                .withName("Редактировать пользователей")
+                                .withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings))
+                                .withIdentifier(PROFILE_SETTINGS)
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
-                        if (profile instanceof IDrawerItem && profile.getIdentifier() == PROFILE_ADD) {
-                            currentFragment = FRAGMENT_USER;
-                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentAddUser.newInstance()).commit();
-                        }
-                        if (profile instanceof IDrawerItem && profile.getIdentifier() == PROFILE_SETTINGS) {
-                            currentFragment = FRAGMENT_USER;
-                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile")).commit();
-                        }
-                        if (profile instanceof IDrawerItem && profile.getIdentifier() > PROFILE_SETTINGS) {
-                            int profileId = profile.getIdentifier() - 2;
-                            int profile_pos;
-                            for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++)
-                                if (users_id[profile_pos] == profileId) break;
 
-                            // инициализируем процесс авторизации при смене пользователя
-                            startAuthorise();
-                            currentFragment = FRAGMENT_USER;
-                            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+                        if (profile instanceof IDrawerItem) {
+                            int ident = profile.getIdentifier();
+                            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                            Fragment fr;
+                            switch (ident) {
+                                case PROFILE_ADD:
+                                    currentFragment = FRAGMENT_USER;
+                                    fr = FragmentAddUser.newInstance();
+                                    tr.replace(R.id.frame_container, fr);
+                                    break;
+                                case PROFILE_SETTINGS:
+                                    currentFragment = FRAGMENT_USER;
+                                    fr = FragmentEditUser.newInstance("EditProfile");
+                                    tr.replace(R.id.frame_container, fr);
+                                    break;
+                                default:
+                                    int profileId = profile.getIdentifier() - 2;
+                                    int profile_pos;
+                                    for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++) {
+                                        if (users_id[profile_pos] == profileId) {
+                                            break;
+                                        }
+                                    }
+
+                                    // инициализируем процесс авторизации при смене пользователя
+                                    startAuthorise();
+                                    currentFragment = FRAGMENT_USER;
+                                    fr = UserInfoFragment.newInstance();
+                                    tr.replace(R.id.frame_container, fr);
+                                    break;
+                            }
+
+                            tr.commit();
                         }
+
                         return false;
                     }
                 })
@@ -519,11 +583,17 @@ public class MainActivity extends AppCompatActivity {
 
         fillProfileList();
 
-        PrimaryDrawerItem taskPrimaryDrawerItem;
+        PrimaryDrawerItem taskPrimaryDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_tasks)
+                .withDescription("Текущие задания")
+                .withIcon(GoogleMaterial.Icon.gmd_calendar)
+                .withIdentifier(FRAGMENT_TASKS)
+                .withSelectable(false)
+                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor));
         if (new_orders > 0) {
-            taskPrimaryDrawerItem = new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)).withBadge("" + new_orders).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.red));
-        } else {
-            taskPrimaryDrawerItem = new PrimaryDrawerItem().withName(R.string.menu_tasks).withDescription("Текущие задания").withIcon(GoogleMaterial.Icon.gmd_calendar).withIdentifier(FRAGMENT_TASKS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
+            taskPrimaryDrawerItem
+                    .withBadge("" + new_orders)
+                    .withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.red));
         }
 
         Drawer result = new DrawerBuilder()
@@ -532,32 +602,117 @@ public class MainActivity extends AppCompatActivity {
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.menu_users).withDescription("Информация о пользователе").withIcon(GoogleMaterial.Icon.gmd_account_box).withIdentifier(FRAGMENT_USERS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        //new PrimaryDrawerItem().withName(R.string.menu_camera).withDescription("Проверка камеры").withIcon(GoogleMaterial.Icon.gmd_camera).withIdentifier(FRAGMENT_CAMERA).withSelectable(false),
-                        //new PrimaryDrawerItem().withName(R.string.menu_charts).withDescription("Графический пакет").withIcon(GoogleMaterial.Icon.gmd_chart).withIdentifier(FRAGMENT_CHARTS).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.menu_equipment).withDescription("Справочник оборудования").withIcon(GoogleMaterial.Icon.gmd_devices).withIdentifier(FRAGMENT_EQUIPMENT).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName(R.string.menu_gps).withDescription("Расположение оборудования").withIcon(GoogleMaterial.Icon.gmd_my_location).withIdentifier(FRAGMENT_GPS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_users)
+                                .withDescription("Информация о пользователе")
+                                .withIcon(GoogleMaterial.Icon.gmd_account_box)
+                                .withIdentifier(FRAGMENT_USERS)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+//                        new PrimaryDrawerItem()
+//                                .withName(R.string.menu_camera)
+//                                .withDescription("Проверка камеры")
+//                                .withIcon(GoogleMaterial.Icon.gmd_camera)
+//                                .withIdentifier(FRAGMENT_CAMERA)
+//                                .withSelectable(false),
+//                        new PrimaryDrawerItem()
+//                                .withName(R.string.menu_charts)
+//                                .withDescription("Графический пакет")
+//                                .withIcon(GoogleMaterial.Icon.gmd_chart)
+//                                .withIdentifier(FRAGMENT_CHARTS)
+//                                .withSelectable(false),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_equipment)
+                                .withDescription("Справочник оборудования")
+                                .withIcon(GoogleMaterial.Icon.gmd_devices)
+                                .withIdentifier(FRAGMENT_EQUIPMENT)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_gps)
+                                .withDescription("Расположение оборудования")
+                                .withIcon(GoogleMaterial.Icon.gmd_my_location)
+                                .withIdentifier(FRAGMENT_GPS)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         taskPrimaryDrawerItem,
-                        new PrimaryDrawerItem().withName(R.string.menu_references).withDescription("Дополнительно").withIcon(GoogleMaterial.Icon.gmd_book).withIdentifier(FRAGMENT_REFERENCES).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName("Документация").withDescription("на оборудование").withIcon(GoogleMaterial.Icon.gmd_collection_bookmark).withIdentifier(FRAGMENT_DOCS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName("Объекты").withDescription("Здания и сооружения").withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(FRAGMENT_OBJECTS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName(R.string.contragents).withDescription("Справочник контрагентов").withIcon(GoogleMaterial.Icon.gmd_accounts_alt).withIdentifier(FRAGMENT_CONTRAGENTS).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        //new DividerDrawerItem(),
-                        //new PrimaryDrawerItem().withName("Новые задачи").withDescription("Скачать новые задачи").withIcon(FontAwesome.Icon.faw_plus).withIdentifier(DRAWER_TASKS).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
-                        //new PrimaryDrawerItem().withName("Обновить с сервера").withDescription("Обновить справочники").withIcon(FontAwesome.Icon.faw_check).withIdentifier(DRAWER_DOWNLOAD).withSelectable(false).withSelectable(false).withIconColor(R.color.larisaBlueColor),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_references)
+                                .withDescription("Дополнительно")
+                                .withIcon(GoogleMaterial.Icon.gmd_book)
+                                .withIdentifier(FRAGMENT_REFERENCES)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName("Документация")
+                                .withDescription("на оборудование")
+                                .withIcon(GoogleMaterial.Icon.gmd_collection_bookmark)
+                                .withIdentifier(FRAGMENT_DOCS)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName("Объекты")
+                                .withDescription("Здания и сооружения")
+                                .withIcon(GoogleMaterial.Icon.gmd_home)
+                                .withIdentifier(FRAGMENT_OBJECTS)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.contragents)
+                                .withDescription("Справочник контрагентов")
+                                .withIcon(GoogleMaterial.Icon.gmd_accounts_alt)
+                                .withIdentifier(FRAGMENT_CONTRAGENTS)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+//                        new DividerDrawerItem(),
+//                        new PrimaryDrawerItem()
+//                                .withName("Новые задачи")
+//                                .withDescription("Скачать новые задачи")
+//                                .withIcon(FontAwesome.Icon.faw_plus)
+//                                .withIdentifier(DRAWER_TASKS)
+//                                .withSelectable(false)
+//                                .withSelectable(false)
+//                                .withIconColor(R.color.larisaBlueColor),
+//                        new PrimaryDrawerItem()
+//                                .withName("Обновить с сервера")
+//                                .withDescription("Обновить справочники")
+//                                .withIcon(FontAwesome.Icon.faw_check)
+//                                .withIdentifier(DRAWER_DOWNLOAD)
+//                                .withSelectable(false)
+//                                .withSelectable(false)
+//                                .withIconColor(R.color.larisaBlueColor),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName(R.string.service).withDescription("Журнал и gps трек").withIcon(GoogleMaterial.Icon.gmd_gps).withIdentifier(FRAGMENT_SERVICE).withSelectable(false),
-                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor)),
-                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false).withSelectable(false).withIconColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor))
+                        new PrimaryDrawerItem()
+                                .withName(R.string.service)
+                                .withDescription("Журнал и gps трек")
+                                .withIcon(GoogleMaterial.Icon.gmd_gps)
+                                .withIdentifier(FRAGMENT_SERVICE)
+                                .withSelectable(false),
+                        new PrimaryDrawerItem()
+                                .withName("О программе")
+                                .withDescription("Информация о версии")
+                                .withIcon(FontAwesome.Icon.faw_info)
+                                .withIdentifier(DRAWER_INFO)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName("Выход")
+                                .withIcon(FontAwesome.Icon.faw_undo)
+                                .withIdentifier(DRAWER_EXIT)
+                                .withSelectable(false)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor))
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem != null) {
-                            if (drawerItem.getIdentifier() == FRAGMENT_CHARTS) {
+                            int ident = drawerItem.getIdentifier();
+                            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                            if (ident == FRAGMENT_CHARTS) {
                                 currentFragment = FRAGMENT_CHARTS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ServiceFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == DRAWER_DOWNLOAD) {
+                                tr.replace(R.id.frame_container, ServiceFragment.newInstance());
+                            } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
                                 mProgressDialog = new ProgressDialog(MainActivity.this);
                                 mProgressDialog.setMessage("Синхронизируем данные");
@@ -583,39 +738,42 @@ public class MainActivity extends AppCompatActivity {
                                         });
                                     }
                                 }
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_EQUIPMENT) {
+                            } else if (ident == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, EquipmentsFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_GPS) {
+                                tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
+                            } else if (ident == FRAGMENT_GPS) {
                                 currentFragment = FRAGMENT_GPS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, GPSFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_TASKS) {
+                                tr.replace(R.id.frame_container, GPSFragment.newInstance());
+                            } else if (ident == FRAGMENT_TASKS) {
                                 currentFragment = FRAGMENT_TASKS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, OrderFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_REFERENCES) {
+                                tr.replace(R.id.frame_container, OrderFragment.newInstance());
+                            } else if (ident == FRAGMENT_REFERENCES) {
                                 currentFragment = FRAGMENT_REFERENCES;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReferenceFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_DOCS) {
+                                tr.replace(R.id.frame_container, ReferenceFragment.newInstance());
+                            } else if (ident == FRAGMENT_DOCS) {
                                 currentFragment = FRAGMENT_DOCS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, DocumentationFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_USERS) {
+                                tr.replace(R.id.frame_container, DocumentationFragment.newInstance());
+                            } else if (ident == FRAGMENT_USERS) {
                                 currentFragment = FRAGMENT_USERS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_SERVICE) {
+                                tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
+                            } else if (ident == FRAGMENT_SERVICE) {
                                 currentFragment = FRAGMENT_SERVICE;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ServiceFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_OBJECTS) {
+                                tr.replace(R.id.frame_container, ServiceFragment.newInstance());
+                            } else if (ident == FRAGMENT_OBJECTS) {
                                 currentFragment = FRAGMENT_OBJECTS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ObjectFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == FRAGMENT_CONTRAGENTS) {
+                                tr.replace(R.id.frame_container, ObjectFragment.newInstance());
+                            } else if (ident == FRAGMENT_CONTRAGENTS) {
                                 currentFragment = FRAGMENT_CONTRAGENTS;
-                                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ContragentsFragment.newInstance()).commit();
-                            } else if (drawerItem.getIdentifier() == DRAWER_INFO) {
+                                tr.replace(R.id.frame_container, ContragentsFragment.newInstance());
+                            } else if (ident == DRAWER_INFO) {
                                 startAboutDialog();
-                            } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
+                            } else if (ident == DRAWER_EXIT) {
                                 System.exit(0);
                             }
+
+                            tr.commit();
                         }
+
                         return false;
                     }
                 })
@@ -639,12 +797,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
 
         if (activeUserID <= 0) {
             Toast.makeText(getApplicationContext(),
                     "Пожалуйста зарегистрируйтесь", Toast.LENGTH_LONG).show();
         }
+
         //((ViewGroup) findViewById(R.id.frame_container)).addView(result.getSlider());
         //pager = (ViewPager) findViewById(R.id.pager);
         //pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
@@ -654,14 +814,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void startGpsTracker(String user_uuid) {
-        LocationManager lm = (LocationManager) getSystemService(
-                Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (lm != null) {
             GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
         }
     }
-
 
     /**
      * Обработчик клика кнопки "Войти"
@@ -705,6 +863,7 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
             return;
         }
+
         addToJournal("Запущено обновление с сервера " + updateUrl);
         String path = Environment.getExternalStorageDirectory() + "/Download/";
         File file = new File(path);
@@ -769,6 +928,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putString("tagId", AuthorizedUser.getInstance().getTagId());
         outState.putString("token", AuthorizedUser.getInstance().getToken());
         outState.putString("userUuid", AuthorizedUser.getInstance().getUuid());
+        outState.putString("userLogin", AuthorizedUser.getInstance().getLogin());
     }
 
     /*
@@ -791,17 +951,28 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
-     * android.view.KeyEvent)
-     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-//		if (keyCode == KeyEvent.KEYCODE_BACK) {
-//			 return true;
-//		}
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (isExitTimerStart) {
+                return super.onKeyDown(keyCode, event);
+            } else if (currentFragment == FRAGMENT_USERS) {
+                Handler handler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        isExitTimerStart = false;
+                    }
+                };
+                handler.postDelayed(runnable, 5000);
+                Toast.makeText(this, "Нажмите \"назад\" ещё раз для выхода.", Toast.LENGTH_LONG)
+                        .show();
+                isExitTimerStart = true;
+            }
+
+            return true;
+        }
+
         return super.onKeyDown(keyCode, event);
     }
 
@@ -826,11 +997,18 @@ public class MainActivity extends AppCompatActivity {
         String path = getExternalFilesDir("/users") + File.separator;
         if (item.getChangedAt() != null) {
             Bitmap myBitmap = getResizedBitmap(path, item.getImage(), 0, 600, item.getChangedAt().getTime());
+            new_profile = new ProfileDrawerItem()
+                    .withName(item.getName())
+                    .withEmail(item.getLogin())
+                    // first two elements reserved
+                    .withIdentifier((int) item.get_id() + 2)
+                    .withOnDrawerItemClickListener(onDrawerItemClickListener);
             if (myBitmap != null) {
-                // first two elements reserved
-                new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(myBitmap).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
-            } else
-                new_profile = new ProfileDrawerItem().withName(item.getName()).withEmail(item.getLogin()).withIcon(R.drawable.profile_default_small).withIdentifier((int) item.get_id() + 2).withOnDrawerItemClickListener(onDrawerItemClickListener);
+                new_profile.withIcon(myBitmap);
+            } else {
+                new_profile.withIcon(R.drawable.profile_default_small);
+            }
+
             iprofilelist.add(new_profile);
             headerResult.addProfile(new_profile, headerResult.getProfiles().size());
         }
@@ -914,17 +1092,30 @@ public class MainActivity extends AppCompatActivity {
         }
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
-        if (driver != null)
+        if (driver != null) {
             driver.setText(driverName);
-        if (update_server != null)
+        }
+
+        if (update_server != null) {
             update_server.setText(updateUrl);
-        if (system_server != null)
+        }
+
+        if (system_server != null) {
             system_server.setText(serverUrl);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        AuthorizedUser user = AuthorizedUser.getInstance();
+        if (user.getTagId() == null) {
+            // пользователь не вошел в программу, либо потеряна по каким-то причинам информация
+            // о текущем пользователе, показываем экран входа
+            setContentView(R.layout.login_layout);
+        }
+
         ShowSettings();
     }
 
@@ -935,6 +1126,13 @@ public class MainActivity extends AppCompatActivity {
         if (realmDB != null) {
             realmDB.close();
         }
+
+        // обнуляем пользователя
+        AuthorizedUser user = AuthorizedUser.getInstance();
+        user.setLogin(null);
+        user.setTagId(null);
+        user.setToken(null);
+        user.setUuid(null);
     }
 
     /**
@@ -988,4 +1186,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        String action = intent.getAction();
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+            String hexId = "";
+            for (byte b : id) {
+                hexId += String.format("%2X", b);
+            }
+
+            Intent result = new Intent(RfidDriverNfc.ACTION_NFC);
+            result.putExtra("tagId", hexId);
+            sendBroadcast(result);
+        }
+    }
 }
