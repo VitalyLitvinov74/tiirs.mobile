@@ -46,7 +46,9 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -799,7 +801,7 @@ public class OrderFragment extends Fragment {
                             if (stage.getEquipment() != null) {
                                 String equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
-                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getUuid() + "/";
+                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
                             }
                             List<Operation> operations = stage.getOperations();
@@ -851,39 +853,51 @@ public class OrderFragment extends Fragment {
                     realm.close();
                 }
 
+                Map<String, List<String>> requestList = new HashMap<>();
+                // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
+                for (FilePath item : files) {
+                    String key = item.urlPath + item.fileName;
+                    if (!requestList.containsKey(key)) {
+                        List<String> list = new ArrayList<>();
+                        list.add(item.localPath);
+                        requestList.put(key, list);
+                    } else {
+                        requestList.get(key).add(item.localPath);
+                    }
+                }
+
                 // загружаем файлы
-                // int filesTotal = files.size();
                 int filesCount = 0;
-                for (FilePath path : files) {
-                    Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(ToirApplication.serverUrl + path.urlPath + path.fileName);
+                for (String key : requestList.keySet()) {
+                    Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(ToirApplication.serverUrl + key);
                     try {
                         Response<ResponseBody> r = call1.execute();
                         ResponseBody trueImgBody = r.body();
                         if (trueImgBody == null) {
                             continue;
                         }
-                        //processDialog.setProgress(50+((current_files_cnt*50)/files.size()));
-                        filesCount++;
-                        publishProgress(filesCount);
-                        File file = new File(getContext().getExternalFilesDir(path.localPath), path.fileName);
-                        if (!file.getParentFile().exists()) {
-                            if (!file.getParentFile().mkdirs()) {
-                                Log.e(TAG, "Не удалось создать папку " +
-                                        file.getParentFile().toString() +
-                                        " для сохранения файла изображения!");
-                                continue;
-                            }
-                        }
 
-                        FileOutputStream fos = new FileOutputStream(file);
-                        fos.write(trueImgBody.bytes());
-                        fos.close();
-//                        equipment.setImage(file.getPath());
-//                        equipmentDBAdapter.replace(equipment);
+                        for (String localPath : requestList.get(key)) {
+                            filesCount++;
+                            publishProgress(filesCount);
+                            String fileName = key.substring(key.lastIndexOf("\\") + 1);
+                            File file = new File(getContext().getExternalFilesDir(localPath), fileName);
+                            if (!file.getParentFile().exists()) {
+                                if (!file.getParentFile().mkdirs()) {
+                                    Log.e(TAG, "Не удалось создать папку " +
+                                            file.getParentFile().toString() +
+                                            " для сохранения файла изображения!");
+                                    continue;
+                                }
+                            }
+
+                            FileOutputStream fos = new FileOutputStream(file);
+                            fos.write(trueImgBody.bytes());
+                            fos.close();
+                        }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
-                    //current_files_cnt++;
                 }
 
                 return result;
@@ -1518,12 +1532,7 @@ public class OrderFragment extends Fragment {
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     OperationFile operationFile = new OperationFile();
-                    Number lastId = realm.where(OperationFile.class).max("_id");
-                    if (lastId == null) {
-                        lastId = 0;
-                    }
-
-                    operationFile.set_id(lastId.longValue() + 1);
+                    operationFile.set_id(OperationFile.getLastId() + 1);
                     operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
                     operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
                     realm.copyToRealm(operationFile);

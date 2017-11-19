@@ -32,7 +32,7 @@ public class MainFunctions {
                 @Override
                 public void execute(Realm realm) {
                     Journal record = realmDB.createObject(Journal.class);
-                    long next_id = realm.where(Journal.class).max("_id").intValue() + 1;
+                    long next_id = Journal.getLastId() + 1;
                     record.set_id(next_id);
                     record.setDate(new Date());
                     record.setDescription(description);

@@ -3,6 +3,7 @@ package ru.toir.mobile.db.realm;
 import java.util.Date;
 import java.util.UUID;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
@@ -29,6 +30,18 @@ public class OperationFile extends RealmObject {
         Date createDate = new Date();
         createdAt = createDate;
         changedAt = createDate;
+    }
+
+    public static long getLastId() {
+        Realm realm = Realm.getDefaultInstance();
+
+        Number lastId = realm.where(OperationFile.class).max("_id");
+        if (lastId == null) {
+            lastId = 0;
+        }
+
+        realm.close();
+        return lastId.longValue();
     }
 
     public long get_id() {

@@ -616,7 +616,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     realm.beginTransaction();
                     final Defect defect = realmDB.createObject(Defect.class);
                     UUID uuid = UUID.randomUUID();
-                    long next_id = realm.where(Defect.class).max("_id").intValue() + 1;
+                    long next_id = Defect.getLastId() + 1;
                     defect.set_id(next_id);
                     defect.setUuid(uuid.toString().toUpperCase());
                     defect.setDate(new Date());
