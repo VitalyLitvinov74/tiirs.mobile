@@ -1530,12 +1530,7 @@ public class OrderFragment extends Fragment {
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     OperationFile operationFile = new OperationFile();
-                    Number lastId = realm.where(OperationFile.class).max("_id");
-                    if (lastId == null) {
-                        lastId = 0;
-                    }
-
-                    operationFile.set_id(lastId.longValue() + 1);
+                    operationFile.set_id(OperationFile.getLastId() + 1);
                     operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
                     operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
                     realm.copyToRealm(operationFile);

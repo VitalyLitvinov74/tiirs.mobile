@@ -2,6 +2,7 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
@@ -22,6 +23,18 @@ public class MeasuredValue extends RealmObject {
     private String value;
     private Date createdAt;
     private Date changedAt;
+
+    public static long getLastId() {
+        Realm realm = Realm.getDefaultInstance();
+
+        Number lastId = realm.where(MeasuredValue.class).max("_id");
+        if (lastId == null) {
+            lastId = 0;
+        }
+
+        realm.close();
+        return lastId.longValue();
+    }
 
     public long get_id() {
         return _id;
@@ -94,5 +107,4 @@ public class MeasuredValue extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

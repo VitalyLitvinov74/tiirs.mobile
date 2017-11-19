@@ -101,7 +101,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                     public void execute(Realm realm) {
                         measuredValue = realmDB.createObject(MeasuredValue.class);
                         UUID uuid = UUID.randomUUID();
-                        long next_id = realm.where(MeasuredValue.class).max("_id").longValue() + 1;
+                        long next_id = MeasuredValue.getLastId() + 1;
                         final MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
                         measuredValue.set_id(next_id);
                         measuredValue.setUuid(uuid.toString().toUpperCase());
