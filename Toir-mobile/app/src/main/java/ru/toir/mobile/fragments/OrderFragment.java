@@ -797,7 +797,7 @@ public class OrderFragment extends Fragment {
                             if (stage.getEquipment() != null) {
                                 String equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
-                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getUuid() + "/";
+                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
                             }
                             List<Operation> operations = stage.getOperations();
