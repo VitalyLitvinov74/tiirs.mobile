@@ -15,8 +15,6 @@ import java.util.Set;
 public class C5Callback implements IMultiInventoryCallback {
 
     private final static String TAG = "C5Callback";
-    public static final String DRIVER_NAME = "С5 Callback";
-
     private String[] tagIds;
     private Set<String> foundTagIds;
     private String foundTagId;
