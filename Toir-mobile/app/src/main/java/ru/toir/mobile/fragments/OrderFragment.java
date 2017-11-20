@@ -913,6 +913,11 @@ public class OrderFragment extends Fragment {
                     int count = orders.size();
                     // собщаем количество полученных нарядов
                     if (count > 0) {
+                        // проставляем дату получения нарядов
+                        for (Orders order : orders) {
+                            order.setReceivDate(new Date());
+                        }
+
                         Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(orders);
@@ -1923,6 +1928,12 @@ public class OrderFragment extends Fragment {
                 if (orderAdapter != null) {
                     selectedOrder = orderAdapter.getItem(position);
                     if (selectedOrder != null) {
+                        // устанавливаем дату начала работы с нарядом
+                        selectedOrder.setStartDate(new Date());
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(selectedOrder);
+                        realm.commitTransaction();
                         currentOrderUuid = selectedOrder.getUuid();
                         fillListViewTasks(selectedOrder, false);
                         Level = TASK_LEVEL;
