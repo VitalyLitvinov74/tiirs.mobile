@@ -279,17 +279,18 @@ public class ReferenceFragment extends Fragment {
                 // Journal ???
 
                 // MeasuredValue ???
-                referenceName = MeasuredValue.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<MeasuredValue>> response = ToirAPIFactory.getMeasuredValueService().measuredValue(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<MeasuredValue> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
-                }
+                // TODO: разобраться с тем что при разборе json числовые значения не сохраняются в string !!!
+//                referenceName = MeasuredValue.class.getSimpleName();
+//                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+//                try {
+//                    Response<List<MeasuredValue>> response = ToirAPIFactory.getMeasuredValueService().measuredValue(changedDate).execute();
+//                    if (response.isSuccessful()) {
+//                        List<MeasuredValue> list = response.body();
+//                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+//                    }
+//                } catch (Exception e) {
+//                    Log.e(TAG, e.getLocalizedMessage());
+//                }
 
                 // MeasureType
                 referenceName = MeasureType.class.getSimpleName();

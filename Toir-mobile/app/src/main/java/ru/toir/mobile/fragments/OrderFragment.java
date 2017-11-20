@@ -42,7 +42,10 @@ import android.widget.Toast;
 import com.roughike.bottombar.BottomBar;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -880,7 +883,7 @@ public class OrderFragment extends Fragment {
                         for (String localPath : requestList.get(key)) {
                             filesCount++;
                             publishProgress(filesCount);
-                            String fileName = key.substring(key.lastIndexOf("\\") + 1);
+                            String fileName = key.substring(key.lastIndexOf("/") + 1);
                             File file = new File(getContext().getExternalFilesDir(localPath), fileName);
                             if (!file.getParentFile().exists()) {
                                 if (!file.getParentFile().mkdirs()) {
@@ -913,13 +916,14 @@ public class OrderFragment extends Fragment {
                     int count = orders.size();
                     // собщаем количество полученных нарядов
                     if (count > 0) {
+
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
                         // проставляем дату получения нарядов
                         for (Orders order : orders) {
                             order.setReceivDate(new Date());
                         }
 
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
                         realm.copyToRealmOrUpdate(orders);
                         realm.commitTransaction();
                         realm.close();
@@ -1516,7 +1520,13 @@ public class OrderFragment extends Fragment {
 
                     String toFilePath = builder.toString();
                     File toFile = new File(toFilePath);
-                    if (!fromFile.renameTo(toFile)) {
+                    try {
+                        copyFile(fromFile, toFile);
+                        if (!fromFile.delete()) {
+                            Log.e(TAG, "Не удалось удалить исходный файл фотографии.");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                         return;
                     }
 
@@ -1840,6 +1850,47 @@ public class OrderFragment extends Fragment {
         realmDB.close();
     }
 
+    public void copyFile(File sourceFile, File destFile) throws IOException {
+
+        if (!destFile.exists()) {
+            if (!destFile.createNewFile()) {
+                throw new IOException();
+            }
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+        FileInputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = new FileInputStream(sourceFile);
+            os = new FileOutputStream(destFile);
+            source = is.getChannel();
+            destination = os.getChannel();
+
+            long count = 0;
+            long size = source.size();
+            while ((count += destination.transferFrom(source, count, size - count)) < size) {
+                // весь процесс в условии цикла
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (is != null) {
+                is.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+            if (os != null) {
+                os.close();
+            }
+        }
+    }
+
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
@@ -1929,10 +1980,9 @@ public class OrderFragment extends Fragment {
                     selectedOrder = orderAdapter.getItem(position);
                     if (selectedOrder != null) {
                         // устанавливаем дату начала работы с нарядом
-                        selectedOrder.setStartDate(new Date());
                         Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(selectedOrder);
+                        selectedOrder.setStartDate(new Date());
                         realm.commitTransaction();
                         currentOrderUuid = selectedOrder.getUuid();
                         fillListViewTasks(selectedOrder, false);
