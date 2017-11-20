@@ -2003,7 +2003,7 @@ public class OrderFragment extends Fragment {
                         currentEquipment = selectedTask.getEquipment();
                         final String expectedTagId = currentEquipment.getTagId();
                         boolean ask_tags = sp.getBoolean("without_tags_mode", true);
-                        if (!ask_tags) {
+                        if (!ask_tags && !expectedTagId.equals("")) {
                             runRfidDialog(expectedTagId, TASK_LEVEL);
                         } else {
                             fillListViewTaskStage(selectedTask, false);
@@ -2028,7 +2028,7 @@ public class OrderFragment extends Fragment {
                         if (selectedStage.getEquipment() != null) {
                             expectedTagId = selectedStage.getEquipment().getTagId();
                             boolean ask_tags = sp.getBoolean("without_tags_mode", true);
-                            if (!ask_tags) {
+                            if (!ask_tags && !expectedTagId.equals("")) {
                                 runRfidDialog(expectedTagId, STAGE_LEVEL);
                             } else {
                                 fillListViewOperations(selectedStage);
