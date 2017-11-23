@@ -54,6 +54,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import me.leolin.shortcutbadger.ShortcutBadger;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -498,6 +499,7 @@ public class MainActivity extends AppCompatActivity {
         int new_orders = MainFunctions.getActiveOrdersCount();
         if (new_orders > 0) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
+            ShortcutBadger.applyCount(getApplicationContext(), new_orders);
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
