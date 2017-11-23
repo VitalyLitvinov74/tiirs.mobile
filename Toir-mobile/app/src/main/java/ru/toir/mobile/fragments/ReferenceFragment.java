@@ -279,7 +279,8 @@ public class ReferenceFragment extends Fragment {
                 // Journal ???
 
                 // MeasuredValue ???
-                // TODO: разобраться с тем что при разборе json числовые значения не сохраняются в string !!!
+                // TODO: Решить вопрос с тем что делать если забирать измеренные значения,
+                // а sent не передаётся с сервера (тоже для сделанных нарядов, operation files и т.д.)
 //                referenceName = MeasuredValue.class.getSimpleName();
 //                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
 //                try {

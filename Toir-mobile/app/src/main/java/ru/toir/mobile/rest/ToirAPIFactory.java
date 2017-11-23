@@ -12,12 +12,14 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Retrofit;
@@ -355,12 +357,35 @@ ToirAPIFactory {
         return getRetrofit().create(IFileDownload.class);
     }
 
+    /**
+     * Метод без указания специфической обработки элементов json.
+     *
+     * @return Retrofit
+     */
     @NonNull
     private static Retrofit getRetrofit() {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                .create();
+        return getRetrofit(null);
+    }
+
+    /**
+     * Метод для задания специфической обработки элементов json.
+     *
+     * @param list Список типов и десереализаторов.
+     * @return Retrofit
+     */
+    @NonNull
+    private static Retrofit getRetrofit(List<TypeAdapterParam> list) {
+        GsonBuilder builder = new GsonBuilder();
+
+        if (list != null) {
+            for (TypeAdapterParam param : list) {
+                builder.registerTypeAdapter(param.getTypeClass(), param.getDeserializer());
+            }
+        }
+
+        builder.registerTypeAdapter(Date.class, new DateTypeDeserializer());
+        builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Gson gson = builder.create();
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -368,10 +393,39 @@ ToirAPIFactory {
                 .build();
     }
 
-//    public static final class Actions {
+//        public static final class Actions {
 //        public static final String ACTION_GET_TOKEN = "action_get_token";
 //        public static final String ACTION_GET_USER = "action_get_user";
 //        public static final String ACTION_GET_ALL_REFERENCE = "action_get_all_reference";
 //    }
+
+    /**
+     * Класс для хранения типа и десереализатора к этому типу.
+     */
+    private static class TypeAdapterParam {
+        Class<?> typeClass;
+        JsonDeserializer<?> deserializer;
+
+        TypeAdapterParam(Class<?> c, JsonDeserializer<?> d) {
+            typeClass = c;
+            deserializer = d;
+        }
+
+        public Class<?> getTypeClass() {
+            return typeClass;
+        }
+
+        public void setTypeClass(Class<?> typeClass) {
+            this.typeClass = typeClass;
+        }
+
+        public JsonDeserializer<?> getDeserializer() {
+            return deserializer;
+        }
+
+        public void setDeserializer(JsonDeserializer<?> deserializer) {
+            this.deserializer = deserializer;
+        }
+    }
 
 }
