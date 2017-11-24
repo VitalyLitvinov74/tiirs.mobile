@@ -816,7 +816,7 @@ public class MainActivity extends AppCompatActivity {
     void startGpsTracker(String user_uuid) {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (lm != null) {
-            GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
+            GPSListener tgpsl = new GPSListener(this, user_uuid);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
         }
     }
@@ -974,6 +974,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Нажмите \"назад\" ещё раз для выхода.", Toast.LENGTH_LONG)
                         .show();
                 isExitTimerStart = true;
+            } else if (findViewById(R.id.loginButton) != null) {
+                return super.onKeyDown(keyCode, event);
             }
 
             return true;

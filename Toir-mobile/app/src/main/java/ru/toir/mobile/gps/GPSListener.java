@@ -1,12 +1,14 @@
 package ru.toir.mobile.gps;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -52,14 +54,17 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		if (location != null)
-			RecordGPSData(location.getLatitude(), location.getLongitude());
-	}
+        if (location != null) {
+            RecordGPSData(location.getLatitude(), location.getLongitude());
+        }
+    }
 
 	@Override
 	public void onProviderDisabled(String arg0) {
 		System.out.println("GPS disabled");
-	}
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        context.startActivity(intent);
+    }
 
 	@Override
 	public void onProviderEnabled(String arg0) {
