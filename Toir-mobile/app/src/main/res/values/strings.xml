@@ -167,4 +167,6 @@
 
     <string name="defects">Зафиксированные дефекты</string>
     <string name="defect_user">Обнаружил: </string>
+
+    <string name="debug_nocheck_gps">Не проверять GPS</string>
 </resources>

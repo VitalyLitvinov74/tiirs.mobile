@@ -827,6 +827,12 @@ public class MainActivity extends AppCompatActivity {
      * @param view Event's view
      */
     public void onClickLogin(View view) {
+        if (!isGpsOn()) {
+            Toast.makeText(getApplicationContext(), "GPS must be enabled.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         setEnabledLoginButton(false);
         startAuthorise();
         setEnabledLoginButton(true);
@@ -1202,5 +1208,22 @@ public class MainActivity extends AppCompatActivity {
             result.putExtra("tagId", hexId);
             sendBroadcast(result);
         }
+    }
+
+    /**
+     * Проверка включен ли GPS.
+     *
+     * @return boolean
+     */
+    private boolean isGpsOn() {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        boolean skipCheckGps = sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
+        if (!skipCheckGps) {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            return lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+
+        return true;
     }
 }
