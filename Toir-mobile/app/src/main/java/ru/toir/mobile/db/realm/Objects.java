@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 03.04.17.
  */
-public class Objects extends RealmObject {
+public class Objects extends RealmObject implements IToirDbObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -109,5 +109,10 @@ public class Objects extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getImage();
     }
 }

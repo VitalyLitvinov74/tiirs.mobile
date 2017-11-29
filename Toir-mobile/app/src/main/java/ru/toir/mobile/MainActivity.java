@@ -814,10 +814,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void startGpsTracker(String user_uuid) {
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (lm != null) {
-            GPSListener tgpsl = new GPSListener(this, user_uuid);
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
+        if (!isGpsOn()) {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (lm != null) {
+                GPSListener tgpsl = new GPSListener(this, user_uuid);
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
+            }
         }
     }
 

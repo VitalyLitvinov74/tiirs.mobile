@@ -50,10 +50,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.realm.Realm;
+import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import okhttp3.MediaType;
@@ -74,6 +77,7 @@ import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
@@ -118,15 +122,14 @@ public class OrderFragment extends Fragment {
     private Tasks selectedTask;
     private Orders selectedOrder;
     private TaskStages selectedStage;
-    private Operation selectedOperation;
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
     private StageAdapter taskStageAdapter;
     private OperationAdapter operationAdapter;
-    private String currentOrderUuid = "";
+    //    private String currentOrderUuid = "";
     private String currentTaskUuid = "";
     private String currentOperationUuid = "";
-    private String currentTaskStageUuid = "";
+    //    private String currentTaskStageUuid = "";
     private ListView mainListView;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
@@ -330,7 +333,7 @@ public class OrderFragment extends Fragment {
 
                     if (Level == STAGE_LEVEL) {
                         Level = TASK_LEVEL;
-                        fillListViewTasks(selectedOrder, false);
+                        fillListViewTasks(selectedOrder);
                     }
 
                     if (Level == OPERATION_LEVEL) {
@@ -338,9 +341,9 @@ public class OrderFragment extends Fragment {
                         firstLaunch = true;
                         currentOperationId = 0;
                         if (selectedTask != null) {
-                            currentTaskStageUuid = selectedStage.getUuid();
+//                            currentTaskStageUuid = selectedStage.getUuid();
                             currentTaskUuid = selectedTask.getUuid();
-                            fillListViewTaskStage(selectedTask, true);
+                            fillListViewTaskStage(selectedTask);
                             Level = STAGE_LEVEL;
                             fab_camera.setVisibility(View.INVISIBLE);
                             //fab_check.setVisibility(View.INVISIBLE);
@@ -418,7 +421,7 @@ public class OrderFragment extends Fragment {
     }
 
     // Tasks----------------------------------------------------------------------------------------
-    private void fillListViewTasks(Orders order, boolean complete_operation) {
+    private void fillListViewTasks(Orders order) {
         RealmResults<Tasks> tasks;
         RealmQuery<Tasks> q = realmDB.where(Tasks.class);
         boolean first = true;
@@ -488,7 +491,7 @@ public class OrderFragment extends Fragment {
     }
 
     // TaskStages----------------------------------------------------------------------------------------
-    private void fillListViewTaskStage(Tasks task, boolean complete_operation) {
+    private void fillListViewTaskStage(Tasks task) {
         RealmResults<TaskStages> stages;
         RealmQuery<TaskStages> q = realmDB.where(TaskStages.class);
         toolbar.setSubtitle("Этапы задач");
@@ -541,7 +544,7 @@ public class OrderFragment extends Fragment {
             });
             addToJournal("Закончено выполнение задачи " + task.getTaskTemplate().getTitle() + "(" + task.getUuid() + ")");
             Level = TASK_LEVEL;
-            fillListViewTasks(selectedOrder, true);
+            fillListViewTasks(selectedOrder);
         }
 
         ViewGroup.LayoutParams params = listLayout.getLayoutParams();
@@ -784,40 +787,77 @@ public class OrderFragment extends Fragment {
                         String basePath = "/storage/" + userName + "/" + equipmentModelUuid + "/";
                         // общий путь до файлов локальный
                         String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
+
+                        boolean isNeedDownload;
+
                         // урл изображения задачи
-                        files.add(new FilePath(task.getTaskTemplate().getImage(), basePath, basePathLocal));
+                        isNeedDownload = isNeedDownload(task.getTaskTemplate(), basePathLocal);
+                        if (isNeedDownload) {
+                            files.add(new FilePath(task.getTaskTemplate().getImage(), basePath, basePathLocal));
+                        }
+
                         // урл изображения оборудования
-                        files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
+                        isNeedDownload = isNeedDownload(task.getEquipment(), "/equipment/");
+                        if (isNeedDownload) {
+                            files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
+                        }
+
                         // урл изображения модели оборудования
-                        files.add(new FilePath(task.getEquipment().getEquipmentModel().getImage(), basePath, "/equipment/"));
-                        // урл изображения объекта
+                        isNeedDownload = isNeedDownload(task.getEquipment().getEquipmentModel(), "/equipment/");
+                        if (isNeedDownload) {
+                            files.add(new FilePath(task.getEquipment().getEquipmentModel().getImage(), basePath, "/equipment/"));
+                        }
+
+                        // урл изображения объекта где расположено оборудование
                         Objects object = task.getEquipment().getLocation();
                         if (object != null) {
-                            files.add(new FilePath(object.getImage(), "/storage/" + userName + "/" + object.getUuid() + "/", "/objects/"));
+                            isNeedDownload = isNeedDownload(object, "/objects/");
+                            if (isNeedDownload) {
+                                files.add(new FilePath(object.getImage(),
+                                        "/storage/" + userName + "/" + object.getUuid() + "/",
+                                        "/objects/"));
+                            }
                         }
 
                         List<TaskStages> stages = task.getTaskStages();
                         for (TaskStages stage : stages) {
                             // урл изображения этапа задачи
-                            files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
-                                    basePath, basePathLocal));
-                            if (stage.getEquipment() != null) {
-                                String equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
-                                files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
-                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
-                                files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
+                            isNeedDownload = isNeedDownload(stage.getTaskStageTemplate(), basePathLocal);
+                            if (isNeedDownload) {
+                                files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
+                                        basePath, basePathLocal));
                             }
+
+                            if (stage.getEquipment() != null) {
+                                String equipmentPath;
+                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
+                                isNeedDownload = isNeedDownload(stage.getEquipment().getEquipmentModel(), "/equipment/");
+                                if (isNeedDownload) {
+                                    files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
+                                }
+
+                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
+                                isNeedDownload = isNeedDownload(stage.getEquipment(), "/equipment/");
+                                if (isNeedDownload) {
+                                    files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
+                                }
+                            }
+
                             List<Operation> operations = stage.getOperations();
                             for (Operation operation : operations) {
                                 // урл изображения операции
-                                files.add(new FilePath(operation.getOperationTemplate().getImage(),
-                                        basePath, basePathLocal));
+                                isNeedDownload = isNeedDownload(operation.getOperationTemplate(), basePathLocal);
+                                if (isNeedDownload) {
+                                    files.add(new FilePath(operation.getOperationTemplate().getImage(),
+                                            basePath, basePathLocal));
+                                }
                             }
                         }
                     }
                 }
 
                 // TODO: реализовать получение списка оборудования из операций!!!!
+                /*
                 // список файлов документации
                 for (Orders order : result) {
                     List<Tasks> tasks = order.getTasks();
@@ -855,13 +895,14 @@ public class OrderFragment extends Fragment {
 
                     realm.close();
                 }
+                */
 
-                Map<String, List<String>> requestList = new HashMap<>();
+                Map<String, Set<String>> requestList = new HashMap<>();
                 // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
                 for (FilePath item : files) {
                     String key = item.urlPath + item.fileName;
                     if (!requestList.containsKey(key)) {
-                        List<String> list = new ArrayList<>();
+                        Set<String> list = new HashSet<>();
                         list.add(item.localPath);
                         requestList.put(key, list);
                     } else {
@@ -1625,9 +1666,9 @@ public class OrderFragment extends Fragment {
                         currentOperationId = 0;
 
                         if (selectedTask != null) {
-                            currentTaskStageUuid = selectedStage.getUuid();
+//                            currentTaskStageUuid = selectedStage.getUuid();
                             currentTaskUuid = selectedTask.getUuid();
-                            fillListViewTaskStage(selectedTask, true);
+                            fillListViewTaskStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
                     }
@@ -1815,7 +1856,7 @@ public class OrderFragment extends Fragment {
                         }
 
                         if (level == TASK_LEVEL) {
-                            fillListViewTaskStage(selectedTask, false);
+                            fillListViewTaskStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
 
@@ -1870,8 +1911,8 @@ public class OrderFragment extends Fragment {
 
             long count = 0;
             long size = source.size();
-            while ((count += destination.transferFrom(source, count, size - count)) < size) {
-                // весь процесс в условии цикла
+            while (count < size) {
+                count += destination.transferFrom(source, count, size - count);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1891,6 +1932,38 @@ public class OrderFragment extends Fragment {
         }
     }
 
+    /**
+     * Проверка на необходимость загрузки файла с сервера.
+     *
+     * @param obj       {@link RealmObject} Объект. Должен реализовывать {@link IToirDbObject}
+     * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
+     * @return boolean
+     */
+    private boolean isNeedDownload(RealmObject obj, String localPath) {
+        Realm realm = Realm.getDefaultInstance();
+        String uuid = ((IToirDbObject) obj).getUuid();
+        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
+        long localChangedAt;
+
+        // есть ли локальная запись
+        try {
+            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
+        } catch (Exception e) {
+            return true;
+        } finally {
+            realm.close();
+        }
+
+        // есть ли локально файл
+        File file = new File(getContext().getExternalFilesDir(localPath), ((IToirDbObject) obj).getImageFile());
+        if (!file.exists()) {
+            return true;
+        }
+
+        // есть ли изменения на сервере
+        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
+    }
+
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
@@ -1902,7 +1975,7 @@ public class OrderFragment extends Fragment {
 
             if (Level == STAGE_LEVEL) {
                 Level = TASK_LEVEL;
-                fillListViewTasks(selectedOrder, false);
+                fillListViewTasks(selectedOrder);
             }
 
             if (Level == OPERATION_LEVEL) {
@@ -1951,10 +2024,10 @@ public class OrderFragment extends Fragment {
                     currentOperationId = 0;
 
                     if (selectedStage != null && selectedTask != null) {
-                        currentTaskStageUuid = selectedStage.getUuid();
+//                        currentTaskStageUuid = selectedStage.getUuid();
                         currentTaskUuid = selectedTask.getUuid();
                         Level = STAGE_LEVEL;
-                        fillListViewTaskStage(selectedTask, true);
+                        fillListViewTaskStage(selectedTask);
                     }
 
                 } else {
@@ -1984,8 +2057,8 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
                         selectedOrder.setStartDate(new Date());
                         realm.commitTransaction();
-                        currentOrderUuid = selectedOrder.getUuid();
-                        fillListViewTasks(selectedOrder, false);
+//                        currentOrderUuid = selectedOrder.getUuid();
+                        fillListViewTasks(selectedOrder);
                         Level = TASK_LEVEL;
                         fab_camera.setVisibility(View.INVISIBLE);
                         fab_check.setVisibility(View.INVISIBLE);
@@ -2006,7 +2079,7 @@ public class OrderFragment extends Fragment {
                         if (!ask_tags && !expectedTagId.equals("")) {
                             runRfidDialog(expectedTagId, TASK_LEVEL);
                         } else {
-                            fillListViewTaskStage(selectedTask, false);
+                            fillListViewTaskStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
 
@@ -2024,7 +2097,7 @@ public class OrderFragment extends Fragment {
                     selectedStage = taskStageAdapter.getItem(position);
                     if (selectedStage != null) {
                         final String expectedTagId;
-                        currentTaskStageUuid = selectedStage.getUuid();
+//                        currentTaskStageUuid = selectedStage.getUuid();
                         if (selectedStage.getEquipment() != null) {
                             expectedTagId = selectedStage.getEquipment().getTagId();
                             boolean ask_tags = sp.getBoolean("without_tags_mode", true);
@@ -2047,7 +2120,7 @@ public class OrderFragment extends Fragment {
             // Operation
             if (Level == OPERATION_LEVEL) {
                 if (operationAdapter != null) {
-                    selectedOperation = operationAdapter.getItem(position);
+                    Operation selectedOperation = operationAdapter.getItem(position);
                     if (selectedOperation != null) {
                         operationAdapter.setItemVisibility(position);
                         operationAdapter.notifyDataSetChanged();
@@ -2156,4 +2229,5 @@ public class OrderFragment extends Fragment {
             localPath = local;
         }
     }
+
 }

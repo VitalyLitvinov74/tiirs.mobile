@@ -13,7 +13,7 @@ import io.realm.annotations.PrimaryKey;
  *         Created by koputo on 5/16/17.
  */
 
-public class OperationFile extends RealmObject {
+public class OperationFile extends RealmObject implements IToirDbObject {
     @Index
     private long _id;
     @PrimaryKey
@@ -98,5 +98,10 @@ public class OperationFile extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getFileName();
     }
 }
