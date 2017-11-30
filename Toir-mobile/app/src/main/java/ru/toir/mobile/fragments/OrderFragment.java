@@ -773,6 +773,8 @@ public class OrderFragment extends Fragment {
                 }
 
                 String userName = AuthorizedUser.getInstance().getLogin();
+                // список оборудования в полученных нарядах (для постройки списка документации)
+                Map<String, Equipment> equipmentList = new HashMap<>();
                 // список файлов для загрузки
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
@@ -787,6 +789,9 @@ public class OrderFragment extends Fragment {
                         String basePath = "/storage/" + userName + "/" + equipmentModelUuid + "/";
                         // общий путь до файлов локальный
                         String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
+
+                        // добавляем для получения документации в дальнейшем
+                        equipmentList.put(task.getEquipment().getUuid(), task.getEquipment());
 
                         boolean isNeedDownload;
 
@@ -829,6 +834,9 @@ public class OrderFragment extends Fragment {
                             }
 
                             if (stage.getEquipment() != null) {
+                                // добавляем для получения документации в дальнейшем
+                                equipmentList.put(stage.getEquipment().getUuid(), stage.getEquipment());
+
                                 String equipmentPath;
                                 equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
                                 isNeedDownload = isNeedDownload(stage.getEquipment().getEquipmentModel(), "/equipment/");
@@ -856,46 +864,63 @@ public class OrderFragment extends Fragment {
                     }
                 }
 
-                // TODO: реализовать получение списка оборудования из операций!!!!
-                /*
-                // список файлов документации
-                for (Orders order : result) {
-                    List<Tasks> tasks = order.getTasks();
-                    Realm realm = Realm.getDefaultInstance();
-                    for (Tasks task : tasks) {
-                        String equipmentUuid = task.getEquipment().getUuid();
-                        String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
-                        // TODO добавить загрузку документации для этапов задач
-                        List<Documentation> docList = realm.where(Documentation.class)
-                                //.equalTo("equipment.uuid", equipmentUuid).or()
-                                //.equalTo("equipmentModel.uuid", equipmentModelUuid)
-                                //.equalTo("required", true)
-                                .findAll();
-                        for (Documentation doc : docList) {
-                            String docFileName = doc.getPath();
-                            String url = "/storage/" + userName + "/";
-                            String localPath = "/documentation/";
-                            if (doc.getEquipment() != null && doc.getEquipmentModel() == null) {
-                                // документация привязана только к оборудованию
-                                url += doc.getEquipment().getUuid() + "/";
-                                localPath += doc.getEquipment().getUuid() + "/";
-                                files.add(new FilePath(docFileName, url, localPath));
-                            } else if (doc.getEquipment() == null && doc.getEquipmentModel() != null) {
-                                // документация привязана только к модели оборудования
-                                url += doc.getEquipmentModel().getUuid() + "/";
-                                localPath += doc.getEquipmentModel().getUuid() + "/";
-                                files.add(new FilePath(docFileName, url, localPath));
-                            } else if (doc.getEquipment() != null && doc.getEquipmentModel() != null) {
-                                // документация привязана и к оборудованию и к модели оборудования
-                                files.add(new FilePath(docFileName, url + doc.getEquipment().getUuid() + "/", localPath + doc.getEquipment().getUuid() + "/"));
-                                files.add(new FilePath(docFileName, url + doc.getEquipmentModel().getUuid() + "/", localPath + doc.getEquipmentModel().getUuid() + "/"));
+                Set<String> needEquipmentUuids = new HashSet<>();
+                Set<String> needEquipmentModelUuids = new HashSet<>();
+                for (Map.Entry<String, Equipment> entry : equipmentList.entrySet()) {
+                    needEquipmentUuids.add(entry.getValue().getUuid());
+                    needEquipmentModelUuids.add(entry.getValue().getEquipmentModel().getUuid());
+                }
+
+                Call<List<Documentation>> docCall;
+                docCall = ToirAPIFactory.getDocumentationService().documentationByEquipment(
+                        needEquipmentUuids.toArray(new String[]{}));
+                try {
+                    Response<List<Documentation>> r = docCall.execute();
+                    List<Documentation> list = r.body();
+                    if (list != null) {
+                        for (Documentation doc : list) {
+                            String localPath = "/documentation/" + doc.getEquipment().getUuid() + "/";
+                            if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                                String url = "/storage/" + userName + "/" + doc.getEquipment().getUuid() + "/";
+                                files.add(new FilePath(doc.getPath(), url, localPath));
                             }
                         }
-                    }
 
-                    realm.close();
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        realm.close();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                    e.printStackTrace();
                 }
-                */
+
+                docCall = ToirAPIFactory.getDocumentationService().documentationByEquipmentModel(
+                        needEquipmentModelUuids.toArray(new String[]{}));
+                try {
+                    Response<List<Documentation>> r = docCall.execute();
+                    List<Documentation> list = r.body();
+                    if (list != null) {
+                        for (Documentation doc : list) {
+                            String localPath = "/documentation/" + doc.getEquipmentModel().getUuid() + "/";
+                            if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                                String url = "/storage/" + userName + "/" + doc.getEquipmentModel().getUuid() + "/";
+                                files.add(new FilePath(doc.getPath(), url, localPath));
+                            }
+                        }
+
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        realm.close();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                    e.printStackTrace();
+                }
 
                 Map<String, Set<String>> requestList = new HashMap<>();
                 // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
@@ -1517,15 +1542,18 @@ public class OrderFragment extends Fragment {
 
     public String getLastPhotoFilePath() {
         String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getActivity().managedQuery(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, null);
-        int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToLast();
+        Cursor cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, null);
+        String result;
+        if (cursor != null && cursor.moveToFirst()) {
+            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            result = cursor.getString(column_index_data);
+            cursor.close();
+        } else {
+            result = null;
+        }
 
-        return cursor.getString(column_index_data);
+        return result;
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1551,15 +1579,13 @@ public class OrderFragment extends Fragment {
                         }
                     }
 
-                    StringBuilder builder = new StringBuilder();
-                    builder.append(mediaStorageDir.getPath())
-                            .append(File.separator)
-                            .append(currentOperationUuid)
-                            .append('-')
-                            .append(new Date().getTime() / 1000)
-                            .append(fromFilePath.substring(fromFilePath.lastIndexOf('.')));
-
-                    String toFilePath = builder.toString();
+                    String toFilePath = "";
+                    toFilePath += mediaStorageDir.getPath();
+                    toFilePath += File.separator;
+                    toFilePath += currentOperationUuid;
+                    toFilePath += '-';
+                    toFilePath += new Date().getTime() / 1000;
+                    toFilePath += fromFilePath.substring(fromFilePath.lastIndexOf('.'));
                     File toFile = new File(toFilePath);
                     try {
                         copyFile(fromFile, toFile);
@@ -1955,9 +1981,14 @@ public class OrderFragment extends Fragment {
         }
 
         // есть ли локально файл
-        File file = new File(getContext().getExternalFilesDir(localPath), ((IToirDbObject) obj).getImageFile());
-        if (!file.exists()) {
-            return true;
+        String fileName = ((IToirDbObject) obj).getImageFile();
+        if (fileName != null) {
+            File file = new File(getContext().getExternalFilesDir(localPath), fileName);
+            if (!file.exists()) {
+                return true;
+            }
+        } else {
+            return false;
         }
 
         // есть ли изменения на сервере
