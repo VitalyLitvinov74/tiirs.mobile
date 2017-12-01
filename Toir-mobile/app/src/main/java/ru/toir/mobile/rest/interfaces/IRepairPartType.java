@@ -13,12 +13,21 @@ import ru.toir.mobile.db.realm.RepairPartType;
  */
 
 public interface IRepairPartType {
-    @GET("/api/references/repair-part-type")
-    Call<List<RepairPartType>> repairPartType();
+    @GET("/repair-part-type")
+    Call<List<RepairPartType>> get();
 
-    @GET("/api/references/repair-part-type")
-    Call<List<RepairPartType>> repairPartType(@Query("changedAfter") String changedAfter);
+    @GET("/repair-part-type")
+    Call<List<RepairPartType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/references/repair-part-type")
-    Call<List<RepairPartType>> repairPartTypeById(@Query("id") String id);
+    @GET("/repair-part-type")
+    Call<List<RepairPartType>> getById(@Query("id") String id);
+
+    @GET("/repair-part-type")
+    Call<List<RepairPartType>> getById(@Query("id") String[] id);
+
+    @GET("/repair-part-type")
+    Call<List<RepairPartType>> getByuuid(@Query("uuid") String uuid);
+
+    @GET("/repair-part-type")
+    Call<List<RepairPartType>> getByuuid(@Query("uuid") String[] uuid);
 }

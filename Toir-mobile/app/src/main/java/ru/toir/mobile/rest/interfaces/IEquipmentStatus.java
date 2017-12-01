@@ -12,12 +12,21 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
  *         Created by koputo on 05.10.16.
  */
 public interface IEquipmentStatus {
-    @GET("/api/equipment/status")
-    Call<List<EquipmentStatus>> equipmentStatus();
+    @GET("/equipment-status")
+    Call<List<EquipmentStatus>> get();
 
-    @GET("/api/equipment/status")
-    Call<List<EquipmentStatus>> equipmentStatus(@Query("changedAfter") String changedAfter);
+    @GET("/equipment-status")
+    Call<List<EquipmentStatus>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/equipment/status")
-    Call<List<EquipmentStatus>> equipmentStatusById(@Query("id") String id);
+    @GET("/equipment-status")
+    Call<List<EquipmentStatus>> getById(@Query("id") String id);
+
+    @GET("/equipment-status")
+    Call<List<EquipmentStatus>> getById(@Query("id") String[] id);
+
+    @GET("/equipment-status")
+    Call<List<EquipmentStatus>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/equipment-status")
+    Call<List<EquipmentStatus>> getByUuid(@Query("uuid") String[] uuid);
 }

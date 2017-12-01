@@ -17,25 +17,30 @@ import ru.toir.mobile.db.realm.Orders;
  *         Created by koputo on 17.10.16.
  */
 public interface IOrders {
-    @GET("/api/orders")
-    Call<List<Orders>> orders();
+    @GET("/orders")
+    Call<List<Orders>> get();
 
-    @GET("/api/orders")
-    Call<List<Orders>> orders(@Query("changedAfter") String changedAfter);
+    @GET("/orders")
+    Call<List<Orders>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/orders")
-    Call<List<Orders>> ordersById(@Query("id") String id);
+    @GET("/orders")
+    Call<List<Orders>> getById(@Query("id") String id);
 
-    @GET("/api/orders")
-    Call<List<Orders>> ordersByStatus(@Query("status") String status);
+    @GET("/orders")
+    Call<List<Orders>> getById(@Query("id") String[] id);
 
-    @GET("/api/orders")
-    Call<List<Orders>> ordersByStatus(@Query("status[]") List<String> status);
+    @GET("/orders")
+    Call<List<Orders>> getByUuid(@Query("uuid") String uuid);
 
-    @POST("/api/orders/results")
-    Call<ResponseBody> sendOrders(@Body List<Orders> orders);
+    @GET("/orders")
+    Call<List<Orders>> getByUuid(@Query("uuid") String[] uuid);
 
-    @POST("/api/orders/upload-measured-value")
-    Call<ResponseBody> sendMeasuredValues(@Body List<MeasuredValue> values);
+    @GET("/orders")
+    Call<List<Orders>> getByStatus(@Query("status") String status);
 
+    @GET("/orders")
+    Call<List<Orders>> getByStatus(@Query("status") List<String> status);
+
+    @POST("/orders/results")
+    Call<ResponseBody> send(@Body List<Orders> orders);
 }

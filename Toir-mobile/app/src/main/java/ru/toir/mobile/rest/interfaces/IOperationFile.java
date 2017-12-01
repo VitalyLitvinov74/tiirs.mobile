@@ -17,7 +17,8 @@ import retrofit2.http.Url;
  *         Created by koputo on 3/13/17.
  */
 
-public interface IFileDownload {
-    @GET
-    Call<ResponseBody> get(@Url String url);
+public interface IOperationFile {
+    @Multipart
+    @POST("/operation-file/upload")
+    Call<ResponseBody> upload(@Part("descr") RequestBody descr, @Part List<MultipartBody.Part> files);
 }

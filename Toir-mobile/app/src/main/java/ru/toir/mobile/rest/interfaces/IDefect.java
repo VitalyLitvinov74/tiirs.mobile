@@ -14,12 +14,21 @@ import ru.toir.mobile.db.realm.Documentation;
  */
 
 public interface IDefect {
-    @GET("/api/objects/defect")
-    Call<List<Defect>> defect();
+    @GET("/defect")
+    Call<List<Defect>> get();
 
-    @GET("/api/objects/defect")
-    Call<List<Defect>> defect(@Query("changedAfter") String changedAfter);
+    @GET("/defect")
+    Call<List<Defect>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/objects/defect")
-    Call<List<Defect>> defectById(@Query("id") String id);
+    @GET("/defect")
+    Call<List<Defect>> getById(@Query("id") String id);
+
+    @GET("/defect")
+    Call<List<Defect>> getById(@Query("id") String[] id);
+
+    @GET("/defect")
+    Call<List<Defect>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/defect")
+    Call<List<Defect>> getByUuid(@Query("uuid") String[] uuid);
 }

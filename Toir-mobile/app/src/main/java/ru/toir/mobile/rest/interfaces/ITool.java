@@ -14,20 +14,20 @@ import ru.toir.mobile.db.realm.Tool;
 
 public interface ITool {
     @GET("/tool")
-    Call<List<Tool>> tool();
+    Call<List<Tool>> get();
 
     @GET("/tool")
-    Call<List<Tool>> tool(@Query("changedAfter") String changedAfter);
+    Call<List<Tool>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/tool")
-    Call<List<Tool>> toolById(@Query("id") String id);
+    Call<List<Tool>> getById(@Query("id") String id);
 
     @GET("/tool")
-    Call<List<Tool>> toolById(@Query("id") String[] id);
+    Call<List<Tool>> getById(@Query("id") String[] id);
 
     @GET("/tool")
-    Call<List<Tool>> toolByUuid(@Query("uuid") String uuid);
+    Call<List<Tool>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/tool")
-    Call<List<Tool>> toolByUuid(@Query("uuid") String[] uuid);
+    Call<List<Tool>> getByUuid(@Query("uuid") String[] uuid);
 }

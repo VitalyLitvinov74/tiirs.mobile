@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                     authorizationDialog.show();
 
                     // запрашиваем токен
-                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(tagId, TokenSrv.Type.LABEL);
+                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().getByLabel(tagId, TokenSrv.Type.LABEL);
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
@@ -321,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         // получаем изображение пользователя
                                         String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
-                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().getFile(url);
+                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
                                         callFile.enqueue(new Callback<ResponseBody>() {
                                             @Override
                                             public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {

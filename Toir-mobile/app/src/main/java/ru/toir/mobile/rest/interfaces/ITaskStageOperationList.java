@@ -13,13 +13,21 @@ import ru.toir.mobile.db.realm.TaskStageOperationList;
  */
 
 public interface ITaskStageOperationList {
-    @GET("/api/task-stage/operation-list")
-    Call<List<TaskStageOperationList>> taskStageOperationList();
+    @GET("/task-stage-operation-list")
+    Call<List<TaskStageOperationList>> get();
 
-    @GET("/api/task-stage/operation-list")
-    Call<List<TaskStageOperationList>> taskStageOperationList(@Query("changedAfter") String changedAfter);
+    @GET("/task-stage-operation-list")
+    Call<List<TaskStageOperationList>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/task-stage/operation-list")
-    Call<List<TaskStageOperationList>> taskStageOperationListById(@Query("id") String id);
+    @GET("/task-stage-operation-list")
+    Call<List<TaskStageOperationList>> getById(@Query("id") String id);
 
+    @GET("/task-stage-operation-list")
+    Call<List<TaskStageOperationList>> getById(@Query("id") String[] id);
+
+    @GET("/task-stage-operation-list")
+    Call<List<TaskStageOperationList>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/task-stage-operation-list")
+    Call<List<TaskStageOperationList>> getByUuid(@Query("uuid") String[] uuid);
 }

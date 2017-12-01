@@ -13,20 +13,20 @@ import ru.toir.mobile.db.realm.MeasureType;
  */
 public interface IMeasureType {
     @GET("/measure-type")
-    Call<List<MeasureType>> measureType();
+    Call<List<MeasureType>> get();
 
     @GET("/measure-type")
-    Call<List<MeasureType>> measureType(@Query("changedAfter") String changedAfter);
+    Call<List<MeasureType>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/measure-type")
-    Call<List<MeasureType>> measureTypeById(@Query("id") String id);
+    Call<List<MeasureType>> getById(@Query("id") String id);
 
     @GET("/measure-type")
-    Call<List<MeasureType>> measureTypeById(@Query("id") String[] id);
+    Call<List<MeasureType>> getById(@Query("id") String[] id);
 
     @GET("/measure-type")
-    Call<List<MeasureType>> measureTypeByUuid(@Query("uuid") String uuid);
+    Call<List<MeasureType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/measure-type")
-    Call<List<MeasureType>> measureTypeByUuid(@Query("uuid") String[] uuid);
+    Call<List<MeasureType>> getByUuid(@Query("uuid") String[] uuid);
 }

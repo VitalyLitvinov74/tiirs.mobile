@@ -749,7 +749,7 @@ public class OrderFragment extends Fragment {
                 List<String> args = java.util.Arrays.asList(params[0]);
 
                 // запрашиваем наряды
-                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().ordersByStatus(args);
+                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(args);
                 List<Orders> result;
                 try {
                     Response<List<Orders>> response = call.execute();
@@ -872,7 +872,7 @@ public class OrderFragment extends Fragment {
                 }
 
                 Call<List<Documentation>> docCall;
-                docCall = ToirAPIFactory.getDocumentationService().documentationByEquipment(
+                docCall = ToirAPIFactory.getDocumentationService().getByEquipment(
                         needEquipmentUuids.toArray(new String[]{}));
                 try {
                     Response<List<Documentation>> r = docCall.execute();
@@ -897,7 +897,7 @@ public class OrderFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-                docCall = ToirAPIFactory.getDocumentationService().documentationByEquipmentModel(
+                docCall = ToirAPIFactory.getDocumentationService().getByEquipmentModel(
                         needEquipmentModelUuids.toArray(new String[]{}));
                 try {
                     Response<List<Documentation>> r = docCall.execute();
@@ -938,7 +938,7 @@ public class OrderFragment extends Fragment {
                 // загружаем файлы
                 int filesCount = 0;
                 for (String key : requestList.keySet()) {
-                    Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(ToirApplication.serverUrl + key);
+                    Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
                     try {
                         Response<ResponseBody> r = call1.execute();
                         ResponseBody trueImgBody = r.body();
@@ -1067,7 +1067,7 @@ public class OrderFragment extends Fragment {
                     list.add(MultipartBody.Part.createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
                     // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
                     // объём данных превышающий ограничения на отправку POST запросом на сервере
-                    Call<ResponseBody> call = ToirAPIFactory.getFileDownload().uploadFiles(descr, list);
+                    Call<ResponseBody> call = ToirAPIFactory.getOperationFileService().upload(descr, list);
                     try {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
@@ -1233,7 +1233,7 @@ public class OrderFragment extends Fragment {
             @Override
             protected String doInBackground(Orders[]... lists) {
                 List<Orders> args = Arrays.asList(lists[0]);
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendOrders(args);
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().send(args);
                 try {
                     Response response = call.execute();
                     Log.d(TAG, "response = " + response);
@@ -1260,7 +1260,7 @@ public class OrderFragment extends Fragment {
             @Override
             protected String doInBackground(MeasuredValue[]... lists) {
                 List<MeasuredValue> args = Arrays.asList(lists[0]);
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().sendMeasuredValues(args);
+                Call<ResponseBody> call = ToirAPIFactory.getMeasuredValueService().send(args);
                 try {
                     Response response = call.execute();
                     Log.d(TAG, "response = " + response);

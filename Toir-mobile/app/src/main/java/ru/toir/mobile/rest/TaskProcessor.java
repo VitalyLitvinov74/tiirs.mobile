@@ -732,7 +732,7 @@ public class TaskProcessor {
 
         AuthorizedUser au = AuthorizedUser.getInstance();
         if (au.getToken() == null) {
-            Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(au.getTagId(), TokenSrv.Type.LABEL);
+            Call<TokenSrv> call = ToirAPIFactory.getTokenService().getByLabel(au.getTagId(), TokenSrv.Type.LABEL);
             try {
                 retrofit2.Response<TokenSrv> response = call.execute();
                 TokenSrv token = response.body();

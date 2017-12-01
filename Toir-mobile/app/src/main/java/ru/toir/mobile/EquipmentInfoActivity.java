@@ -875,7 +875,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         String userName = AuthorizedUser.getInstance().getLogin();
                         String fileElements[] = params[0].split("/");
                         String url = ToirApplication.serverUrl + "/storage/" + userName + "/" + params[0];
-                        Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().getFile(url);
+                        Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(url);
                         try {
                             Response<ResponseBody> r = call1.execute();
                             ResponseBody trueImgBody = r.body();

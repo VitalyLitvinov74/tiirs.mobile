@@ -13,20 +13,20 @@ import ru.toir.mobile.db.realm.DocumentationType;
  */
 public interface IDocumentationType {
     @GET("/documentation-type")
-    Call<List<DocumentationType>> documentationType();
+    Call<List<DocumentationType>> get();
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> documentationType(@Query("changedAfter") String changedAfter);
+    Call<List<DocumentationType>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> documentationTypeById(@Query("id") String id);
+    Call<List<DocumentationType>> getById(@Query("id") String id);
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> documentationTypeById(@Query("id") String[] id);
+    Call<List<DocumentationType>> getById(@Query("id") String[] id);
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> documentationTypeByUuid(@Query("uuid") String uuid);
+    Call<List<DocumentationType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> documentationTypeByUuid(@Query("uuid") String[] uuid);
+    Call<List<DocumentationType>> getByUuid(@Query("uuid") String[] uuid);
 }

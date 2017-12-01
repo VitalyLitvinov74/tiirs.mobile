@@ -13,12 +13,21 @@ import ru.toir.mobile.db.realm.StageVerdict;
  */
 
 public interface ITaskStageVerdict {
-    @GET("/api/task-stage/verdict")
-    Call<List<StageVerdict>> taskStageVerdict();
+    @GET("/task-stage-verdict")
+    Call<List<StageVerdict>> get();
 
-    @GET("/api/task-stage/verdict")
-    Call<List<StageVerdict>> taskStageVerdict(@Query("changedAfter") String changedAfter);
+    @GET("/task-stage-verdict")
+    Call<List<StageVerdict>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/task-stage/verdict")
-    Call<List<StageVerdict>> taskStageVerdictById(@Query("id") String id);
+    @GET("/task-stage-verdict")
+    Call<List<StageVerdict>> getById(@Query("id") String id);
+
+    @GET("/task-stage-verdict")
+    Call<List<StageVerdict>> getById(@Query("id") String[] id);
+
+    @GET("/task-stage-verdict")
+    Call<List<StageVerdict>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/task-stage-verdict")
+    Call<List<StageVerdict>> getByUuid(@Query("uuid") String[] uuid);
 }

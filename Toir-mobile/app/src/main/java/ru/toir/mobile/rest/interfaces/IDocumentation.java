@@ -14,32 +14,32 @@ import ru.toir.mobile.db.realm.Documentation;
 
 public interface IDocumentation {
     @GET("/documentation")
-    Call<List<Documentation>> documentation();
+    Call<List<Documentation>> get();
 
     @GET("/documentation")
-    Call<List<Documentation>> documentation(@Query("changedAfter") String changedAfter);
+    Call<List<Documentation>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationById(@Query("id") String id);
+    Call<List<Documentation>> getById(@Query("id") String id);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationById(@Query("id") String[] id);
+    Call<List<Documentation>> getById(@Query("id") String[] id);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationByUuid(@Query("uuid") String uuid);
+    Call<List<Documentation>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationByUuid(@Query("uuid") String[] uuid);
+    Call<List<Documentation>> getByUuid(@Query("uuid") String[] uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationByEquipment(@Query("equipment") String uuid);
+    Call<List<Documentation>> getByEquipment(@Query("equipment") String uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationByEquipment(@Query("equipment") String[] uuid);
+    Call<List<Documentation>> getByEquipment(@Query("equipment") String[] uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationByEquipmentModel(@Query("equipmentModel") String uuid);
+    Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel") String uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> documentationByEquipmentModel(@Query("equipmentModel") String[] uuid);
+    Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel") String[] uuid);
 }

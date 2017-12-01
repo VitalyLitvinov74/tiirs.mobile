@@ -14,21 +14,21 @@ import ru.toir.mobile.db.realm.OperationType;
  */
 public interface IObjectType {
     @GET("/object-type")
-    Call<List<ObjectType>> objectType();
+    Call<List<ObjectType>> get();
 
     @GET("/object-type")
-    Call<List<ObjectType>> objectType(@Query("changedAfter") String changedAfter);
+    Call<List<ObjectType>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/object-type")
-    Call<List<ObjectType>> objectTypeById(@Query("id") String id);
+    Call<List<ObjectType>> getById(@Query("id") String id);
 
     @GET("/object-type")
-    Call<List<ObjectType>> objectTypeById(@Query("id") String[] id);
+    Call<List<ObjectType>> getById(@Query("id") String[] id);
 
     @GET("/object-type")
-    Call<List<ObjectType>> objectTypeByUuid(@Query("uuid") String uuid);
+    Call<List<ObjectType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/object-type")
-    Call<List<ObjectType>> objectTypeByUuid(@Query("uuid") String[] uuid);
+    Call<List<ObjectType>> getByUuid(@Query("uuid") String[] uuid);
 
 }

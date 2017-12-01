@@ -13,12 +13,21 @@ import ru.toir.mobile.db.realm.StageStatus;
  */
 
 public interface ITaskStageStatus {
-    @GET("/api/task-stage/status")
-    Call<List<StageStatus>> taskStageStatus();
+    @GET("/task-stage-status")
+    Call<List<StageStatus>> get();
 
-    @GET("/api/task-stage/status")
-    Call<List<StageStatus>> taskStageStatus(@Query("changedAfter") String changedAfter);
+    @GET("/task-stage-status")
+    Call<List<StageStatus>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/task-stage/status")
-    Call<List<StageStatus>> taskStageStatusById(@Query("id") String id);
+    @GET("/task-stage-status")
+    Call<List<StageStatus>> getById(@Query("id") String id);
+
+    @GET("/task-stage-status")
+    Call<List<StageStatus>> getById(@Query("id") String[] id);
+
+    @GET("/task-stage-status")
+    Call<List<StageStatus>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/task-stage-status")
+    Call<List<StageStatus>> getByUuid(@Query("uuid") String[] uuid);
 }

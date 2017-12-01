@@ -43,6 +43,7 @@ import ru.toir.mobile.rest.interfaces.IMeasuredValue;
 import ru.toir.mobile.rest.interfaces.IObjectType;
 import ru.toir.mobile.rest.interfaces.IObjects;
 import ru.toir.mobile.rest.interfaces.IOperation;
+import ru.toir.mobile.rest.interfaces.IOperationFile;
 import ru.toir.mobile.rest.interfaces.IOperationStatus;
 import ru.toir.mobile.rest.interfaces.IOperationTemplate;
 import ru.toir.mobile.rest.interfaces.IOperationTool;
@@ -215,6 +216,11 @@ ToirAPIFactory {
     @NonNull
     public static IOperation getOperationService() {
         return getRetrofit().create(IOperation.class);
+    }
+
+    @NonNull
+    public static IOperationFile getOperationFileService() {
+        return getRetrofit().create(IOperationFile.class);
     }
 
     @NonNull

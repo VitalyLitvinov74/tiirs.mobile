@@ -337,8 +337,7 @@ public class ReferenceProcessor {
         String referenceName = DocumentationType.class.getSimpleName();
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
-        Call<List<DocumentationType>> call = ToirAPIFactory.getDocumentationTypeService()
-                .documentationType(lastChangedAt);
+        Call<List<DocumentationType>> call = ToirAPIFactory.getDocumentationTypeService().get(lastChangedAt);
         try {
             retrofit2.Response<List<DocumentationType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -649,8 +648,7 @@ public class ReferenceProcessor {
         String referenceName = EquipmentStatus.class.getSimpleName();
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
-        Call<List<EquipmentStatus>> call = ToirAPIFactory.getEquipmentStatusService()
-                .equipmentStatus(lastChangedAt);
+        Call<List<EquipmentStatus>> call = ToirAPIFactory.getEquipmentStatusService().get(lastChangedAt);
         try {
             retrofit2.Response<List<EquipmentStatus>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -685,8 +683,7 @@ public class ReferenceProcessor {
         String referenceName = EquipmentType.class.getSimpleName();
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
-        Call<List<EquipmentType>> call = ToirAPIFactory.getEquipmentTypeService()
-                .equipmentType(lastChangedAt);
+        Call<List<EquipmentType>> call = ToirAPIFactory.getEquipmentTypeService().get(lastChangedAt);
         try {
             retrofit2.Response<List<EquipmentType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -721,8 +718,7 @@ public class ReferenceProcessor {
         String referenceName = MeasureType.class.getSimpleName();
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
-        Call<List<MeasureType>> call = ToirAPIFactory.getMeasureTypeService()
-                .measureType(lastChangedAt);
+        Call<List<MeasureType>> call = ToirAPIFactory.getMeasureTypeService().get(lastChangedAt);
         try {
             retrofit2.Response<List<MeasureType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -758,7 +754,7 @@ public class ReferenceProcessor {
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
         Call<List<OperationStatus>> call = ToirAPIFactory.getOperationStatusService()
-                .operationStatus(lastChangedAt);
+                .get(lastChangedAt);
         try {
             retrofit2.Response<List<OperationStatus>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -794,7 +790,7 @@ public class ReferenceProcessor {
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
         Call<List<OperationType>> call = ToirAPIFactory.getOperationTypeService()
-                .operationType(lastChangedAt);
+                .get(lastChangedAt);
         try {
             retrofit2.Response<List<OperationType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -830,7 +826,7 @@ public class ReferenceProcessor {
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
         Call<List<TaskStatus>> call = ToirAPIFactory.getTaskStatusService()
-                .taskStatus(lastChangedAt);
+                .get(lastChangedAt);
         try {
             retrofit2.Response<List<TaskStatus>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -939,7 +935,7 @@ public class ReferenceProcessor {
         String lastChangedAt = ReferenceUpdate.lastChangedAsStr(referenceName);
         Date updateDate = new Date();
         Call<List<CriticalType>> call = ToirAPIFactory.getCriticalTypeService()
-                .criticalType(lastChangedAt);
+                .get(lastChangedAt);
         try {
             retrofit2.Response<List<CriticalType>> response = call.execute();
             ReferenceUpdate.saveReferenceData(referenceName, response.body(), updateDate);
@@ -1376,7 +1372,8 @@ public class ReferenceProcessor {
 
         AuthorizedUser au = AuthorizedUser.getInstance();
         if (au.getToken() == null) {
-            Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(au.getTagId(), TokenSrv.Type.LABEL);
+            Call<TokenSrv> call = ToirAPIFactory.getTokenService()
+                    .getByLabel(au.getTagId(), TokenSrv.Type.LABEL);
             try {
                 retrofit2.Response<TokenSrv> response = call.execute();
                 TokenSrv token = response.body();
