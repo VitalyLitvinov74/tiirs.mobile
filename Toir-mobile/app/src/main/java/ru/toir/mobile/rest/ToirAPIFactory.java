@@ -299,7 +299,7 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStageStatus getTaskStageStatusService() {
+    public static ITaskStageStatus getStageStatusService() {
         return getRetrofit().create(ITaskStageStatus.class);
     }
 
@@ -309,7 +309,7 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStageVerdict getTaskStageVerdictService() {
+    public static ITaskStageVerdict getStageVerdictService() {
         return getRetrofit().create(ITaskStageVerdict.class);
     }
 

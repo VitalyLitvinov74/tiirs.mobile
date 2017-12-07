@@ -743,7 +743,7 @@ public class OrderFragment extends Fragment {
             @Override
             protected List<Orders> doInBackground(String[]... params) {
                 // обновляем справочники
-                ReferenceFragment.updateReferences(null);
+                ReferenceFragment.updateReferencesForOrders();
                 //int current_files_cnt=0;
 
                 List<String> args = java.util.Arrays.asList(params[0]);
