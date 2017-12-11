@@ -321,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
                                         authorizedUser.setUuid(user.getUuid());
                                         authorizedUser.setLogin(user.getLogin());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-                                        startLogSend();
 
                                         // получаем изображение пользователя
                                         String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
@@ -1160,6 +1159,8 @@ public class MainActivity extends AppCompatActivity {
             _gpsListener = new GPSListener();
             _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, _gpsListener);
         }
+
+        startLogSend();
     }
 
     @Override
@@ -1192,6 +1193,13 @@ public class MainActivity extends AppCompatActivity {
         logNGpsRunnable = new Runnable() {
             @Override
             public void run() {
+                // проверяем наличие данных о пользователе для отправки данных
+                AuthorizedUser user = AuthorizedUser.getInstance();
+                if (user.getToken() == null || user.getLogin() == null) {
+                    setTimer();
+                    return;
+                }
+
                 // получаем данные для отправки
                 Realm realm = Realm.getDefaultInstance();
 
@@ -1217,6 +1225,10 @@ public class MainActivity extends AppCompatActivity {
                 getApplicationContext().startService(serviceIntent);
                 realm.close();
 
+                setTimer();
+            }
+
+            private void setTimer() {
                 // "взводим" отложенный запуск отправки
                 logNGpsHandler.postDelayed(this, LOG_AND_GPS_SEND_INTERVAL);
             }
