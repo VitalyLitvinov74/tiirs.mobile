@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -142,6 +143,10 @@ public class MainActivity extends AppCompatActivity {
     };
     private Handler logNGpsHandler;
     private Runnable logNGpsRunnable;
+
+    private LocationManager _locationManager;
+    private GPSListener _gpsListener;
+    private Thread checkGPSThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -316,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
                                         authorizedUser.setUuid(user.getUuid());
                                         authorizedUser.setLogin(user.getLogin());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-                                        startGpsTracker(user.getUuid());
                                         startLogSend();
 
                                         // получаем изображение пользователя
@@ -414,7 +418,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 AuthorizedUser.getInstance().setUuid(user.getUuid());
                                 addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
-                                startGpsTracker(user.getUuid());
                                 setMainLayout(savedInstance);
                             } else {
                                 Toast.makeText(getApplicationContext(),
@@ -813,25 +816,15 @@ public class MainActivity extends AppCompatActivity {
         //tabs.setViewPager(pager);
     }
 
-    void startGpsTracker(String user_uuid) {
-        if (!isGpsOn()) {
-            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (lm != null) {
-                GPSListener tgpsl = new GPSListener(this, user_uuid);
-                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
-            }
-        }
-    }
-
     /**
      * Обработчик клика кнопки "Войти"
      *
      * @param view Event's view
      */
     public void onClickLogin(View view) {
-        if (!isGpsOn()) {
-            Toast.makeText(getApplicationContext(), "GPS must be enabled.",
-                    Toast.LENGTH_SHORT).show();
+        if (!isSkipGPS() && !isGpsOn()) {
+            Toast.makeText(getApplicationContext(), "GPS must be enabled.", Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
 
@@ -1116,6 +1109,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (checkGPSThread != null) {
+            checkGPSThread.interrupt();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -1127,6 +1128,38 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ShowSettings();
+
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                boolean isRun = true;
+                while (isRun) {
+                    try {
+                        Thread.sleep(5000);
+                        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                        boolean gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                        if (!isSkipGPS()) {
+                            if (!gpsEnabled) {
+                                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivity(intent);
+                                Toast.makeText(getApplicationContext(), "GPS must be enabled.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } catch (Exception e) {
+                        isRun = false;
+                    }
+                }
+            }
+        };
+        checkGPSThread = new Thread(run);
+        checkGPSThread.start();
+
+        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (_locationManager != null) {
+            _gpsListener = new GPSListener();
+            _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, _gpsListener);
+        }
     }
 
     @Override
@@ -1135,6 +1168,12 @@ public class MainActivity extends AppCompatActivity {
         stopLogSend();
         if (realmDB != null) {
             realmDB.close();
+        }
+
+        if (_locationManager != null) {
+            _locationManager.removeUpdates(_gpsListener);
+            _locationManager = null;
+            _gpsListener = null;
         }
 
         // обнуляем пользователя
@@ -1220,14 +1259,16 @@ public class MainActivity extends AppCompatActivity {
      * @return boolean
      */
     private boolean isGpsOn() {
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    /**
+     * Проверка на необходимость GPS
+     */
+    private boolean isSkipGPS() {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-        boolean skipCheckGps = sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
-        if (!skipCheckGps) {
-            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            return lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }
-
-        return true;
+        return sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
     }
 }
