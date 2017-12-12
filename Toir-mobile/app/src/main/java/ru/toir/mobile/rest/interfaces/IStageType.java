@@ -12,7 +12,7 @@ import ru.toir.mobile.db.realm.StageType;
  *         Created by koputo on 01.02.17.
  */
 
-public interface ITaskStageType {
+public interface IStageType {
     @GET("/task-stage-type")
     Call<List<StageType>> get();
 

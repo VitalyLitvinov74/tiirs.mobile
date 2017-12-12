@@ -75,7 +75,7 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
         return taskStageType;
     }
 
-    public void setTaskStageType(StageType taskStageType) {
+    public void setStageType(StageType taskStageType) {
         this.taskStageType = taskStageType;
     }
 

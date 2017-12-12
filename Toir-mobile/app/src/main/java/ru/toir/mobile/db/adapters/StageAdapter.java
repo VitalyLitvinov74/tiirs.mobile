@@ -17,16 +17,16 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.StageStatus;
-import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Stages;
 
 /**
  * @author olejek
  * Created by olejek on 14.09.16.
  */
-public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAdapter {
-    public static final String TABLE_NAME = "TaskStages";
+public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapter {
+    public static final String TABLE_NAME = "Stages";
 
-    public StageAdapter(@NonNull Context context, RealmResults<TaskStages> data) {
+    public StageAdapter(@NonNull Context context, RealmResults<Stages> data) {
         super(context, data);
     }
 
@@ -40,21 +40,21 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
     }
 
     @Override
-    public TaskStages getItem(int position) {
-        TaskStages taskStages;
+    public Stages getItem(int position) {
+        Stages stages;
         if (adapterData != null) {
-            taskStages = adapterData.get(position);
-            return taskStages;
+            stages = adapterData.get(position);
+            return stages;
         }
         return null;
     }
 
     @Override
     public long getItemId(int position) {
-        TaskStages taskStages;
+        Stages stages;
         if (adapterData != null) {
-            taskStages = adapterData.get(position);
-            return taskStages.get_id();
+            stages = adapterData.get(position);
+            return stages.get_id();
         }
         return 0;
     }
@@ -81,14 +81,14 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
             if (position >= adapterData.size())
                 return convertView;
 
-            TaskStages taskStage = adapterData.get(position);
-            StageStatus stageStatus = taskStage.getTaskStageStatus();
-            viewHolder.title.setText(taskStage.getTaskStageTemplate().getTitle());
+            Stages stage = adapterData.get(position);
+            StageStatus stageStatus = stage.getStageStatus();
+            viewHolder.title.setText(stage.getStageTemplate().getTitle());
             if (stageStatus != null) {
-                //viewHolder.status.setText(context.getString(R.string.status, taskStage.getTaskStageStatus().getTitle()));
+                //viewHolder.status.setText(context.getString(R.string.status, stage.getStageStatus().getTitle()));
                 if (!stageStatus.getUuid().equals(StageStatus.Status.NEW)) {
-                    if (taskStage.getStartDate() != null) {
-                        Date lDate = taskStage.getStartDate();
+                    if (stage.getStartDate() != null) {
+                        Date lDate = stage.getStartDate();
                         if (lDate != null && lDate.after(new Date(100000))) {
                             viewHolder.start_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
                         } else {
@@ -96,8 +96,8 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
                         }
                     }
 
-                    if (taskStage.getEndDate() != null) {
-                        Date lDate = taskStage.getEndDate();
+                    if (stage.getEndDate() != null) {
+                        Date lDate = stage.getEndDate();
                         if (lDate != null && lDate.after(new Date(100000))) {
                             viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
                         } else {
@@ -108,30 +108,30 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
                     }
                 }
             }
-            if (taskStage.getEquipment() != null) {
-                viewHolder.equipment.setText(taskStage.getEquipment().getTitle());
+            if (stage.getEquipment() != null) {
+                viewHolder.equipment.setText(stage.getEquipment().getTitle());
             }
 
-            if (stageStatus != null && taskStage.getEquipment() != null && taskStage.getEquipment().getCriticalType()!=null) {
-                String taskStageStatusUuid = stageStatus.getUuid();
-                String criticalTypeUuid = taskStage.getEquipment().getCriticalType().getUuid();
-                if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+            if (stageStatus != null && stage.getEquipment() != null && stage.getEquipment().getCriticalType() != null) {
+                String stageStatusUuid = stageStatus.getUuid();
+                String criticalTypeUuid = stage.getEquipment().getCriticalType().getUuid();
+                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (taskStageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (taskStageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (taskStageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (taskStageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (taskStageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (taskStageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (taskStageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
             }
         }
@@ -145,9 +145,9 @@ public class StageAdapter extends RealmBaseAdapter<TaskStages> implements ListAd
         //TextView description;
         //TextView normative;
         //TextView comment;
-        //TextView taskStageType;
-        //TextView taskStageStatus;
-        //TextView taskStageVerdict;
+        //TextView stageType;
+        //TextView stageStatus;
+        //TextView stageVerdict;
         //TextView status;
         ImageView icon;
         //ImageView image;

@@ -68,7 +68,7 @@ import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
-import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Stages;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
@@ -299,7 +299,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
         String sDate;
-        RealmResults<TaskStages> stages = realmDB.where(TaskStages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
+        RealmResults<Stages> stages = realmDB.where(Stages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
         if (stages.size() > 2) {
             stages.subList(0, 2);
         }

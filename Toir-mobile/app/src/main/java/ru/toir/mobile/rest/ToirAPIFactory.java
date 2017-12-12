@@ -58,11 +58,11 @@ import ru.toir.mobile.rest.interfaces.IRepairPartType;
 import ru.toir.mobile.rest.interfaces.IJournal;
 import ru.toir.mobile.rest.interfaces.ITaskStageList;
 import ru.toir.mobile.rest.interfaces.ITaskStageOperationList;
-import ru.toir.mobile.rest.interfaces.ITaskStageStatus;
-import ru.toir.mobile.rest.interfaces.ITaskStageTemplate;
-import ru.toir.mobile.rest.interfaces.ITaskStageType;
-import ru.toir.mobile.rest.interfaces.ITaskStageVerdict;
-import ru.toir.mobile.rest.interfaces.ITaskStages;
+import ru.toir.mobile.rest.interfaces.IStageStatus;
+import ru.toir.mobile.rest.interfaces.IStageTemplate;
+import ru.toir.mobile.rest.interfaces.IStageType;
+import ru.toir.mobile.rest.interfaces.IStageVerdict;
+import ru.toir.mobile.rest.interfaces.IStages;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITaskTemplate;
 import ru.toir.mobile.rest.interfaces.ITaskType;
@@ -294,23 +294,23 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStages getTaskStagesService() {
-        return getRetrofit().create(ITaskStages.class);
+    public static IStages getStagesService() {
+        return getRetrofit().create(IStages.class);
     }
 
     @NonNull
-    public static ITaskStageStatus getStageStatusService() {
-        return getRetrofit().create(ITaskStageStatus.class);
+    public static IStageStatus getStageStatusService() {
+        return getRetrofit().create(IStageStatus.class);
     }
 
     @NonNull
-    public static ITaskStageTemplate getTaskStageTemplateService() {
-        return getRetrofit().create(ITaskStageTemplate.class);
+    public static IStageTemplate getStageTemplateService() {
+        return getRetrofit().create(IStageTemplate.class);
     }
 
     @NonNull
-    public static ITaskStageVerdict getStageVerdictService() {
-        return getRetrofit().create(ITaskStageVerdict.class);
+    public static IStageVerdict getStageVerdictService() {
+        return getRetrofit().create(IStageVerdict.class);
     }
 
     @NonNull
@@ -319,8 +319,8 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStageType getTaskStageTypeService() {
-        return getRetrofit().create(ITaskStageType.class);
+    public static IStageType getStageTypeService() {
+        return getRetrofit().create(IStageType.class);
     }
 
     @NonNull

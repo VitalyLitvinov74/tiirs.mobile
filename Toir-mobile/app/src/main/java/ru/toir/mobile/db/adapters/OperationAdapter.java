@@ -223,7 +223,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
                     realmDB.close();
 
-                    //String path = getPicturesDirectory(context) + "tasks" + File.separator + taskStageTemplateUuid + File.separator;
                     String path = context.getExternalFilesDir("/tasks") + File.separator + taskTemplateUuid + File.separator;
                     Bitmap image_bitmap = getResizedBitmap(path, operation.getOperationTemplate().getImage(), 500, 0, operation.getChangedAt().getTime());
                     if (image_bitmap != null) {

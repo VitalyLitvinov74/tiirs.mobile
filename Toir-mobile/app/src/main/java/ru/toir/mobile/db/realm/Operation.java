@@ -13,7 +13,7 @@ public class Operation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private TaskStages taskStage;
+    private Stages taskStage;
     private OperationVerdict operationVerdict;
     private OperationStatus operationStatus;
     private OperationTemplate operationTemplate;
@@ -40,12 +40,12 @@ public class Operation extends RealmObject {
         this.uuid = uuid;
     }
 
-    public TaskStages getTaskStage() {
+    public Stages getStage() {
         return taskStage;
     }
 
-    public void setTaskStage(TaskStages taskStage) {
-        this.taskStage = taskStage;
+    public void setStage(Stages stage) {
+        this.taskStage = stage;
     }
 
     public OperationVerdict getOperationVerdict() {

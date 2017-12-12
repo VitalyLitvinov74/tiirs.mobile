@@ -12,7 +12,7 @@ import ru.toir.mobile.db.realm.StageTemplate;
  *         Created by koputo on 01.02.17.
  */
 
-public interface ITaskStageTemplate {
+public interface IStageTemplate {
     @GET("/task-stage-template")
     Call<List<StageTemplate>> get();
 

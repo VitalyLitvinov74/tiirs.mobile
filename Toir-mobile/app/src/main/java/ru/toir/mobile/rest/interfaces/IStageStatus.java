@@ -12,7 +12,7 @@ import ru.toir.mobile.db.realm.StageStatus;
  *         Created by koputo on 01.02.17.
  */
 
-public interface ITaskStageStatus {
+public interface IStageStatus {
     @GET("/task-stage-status")
     Call<List<StageStatus>> get();
 

@@ -72,7 +72,7 @@ import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.TaskStageList;
 import ru.toir.mobile.db.realm.TaskStageOperationList;
-import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Stages;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
@@ -691,20 +691,20 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // TaskStages ???
-                referenceName = TaskStages.class.getSimpleName();
+                // Stages ???
+                referenceName = Stages.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<TaskStages>> response = ToirAPIFactory.getTaskStagesService().get(changedDate).execute();
+                    Response<List<Stages>> response = ToirAPIFactory.getStagesService().get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<TaskStages> list = response.body();
+                        List<Stages> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // TaskStageStatus
+                // StageStatus
                 referenceName = StageStatus.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
@@ -717,11 +717,11 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // TaskStageTemplate ???
+                // StageTemplate ???
                 referenceName = StageTemplate.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<StageTemplate>> response = ToirAPIFactory.getTaskStageTemplateService().get(changedDate).execute();
+                    Response<List<StageTemplate>> response = ToirAPIFactory.getStageTemplateService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageTemplate> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
@@ -730,11 +730,11 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // TaskStageType ???
+                // StageType ???
                 referenceName = StageType.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<StageType>> response = ToirAPIFactory.getTaskStageTypeService().get(changedDate).execute();
+                    Response<List<StageType>> response = ToirAPIFactory.getStageTypeService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageType> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
@@ -743,7 +743,7 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // TaskStageVerdict
+                // StageVerdict
                 referenceName = StageVerdict.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
@@ -956,11 +956,11 @@ public class ReferenceFragment extends Fragment {
         contentListView.setAdapter(taskStatusAdapter);
     }
 
-    private void fillListViewTaskStageStatus() {
-        RealmResults<StageStatus> taskStageStatuses;
-        taskStageStatuses = realmDB.where(StageStatus.class).findAll();
-        StageStatusAdapter taskStageStatusAdapter = new StageStatusAdapter(getActivity().getApplicationContext(), taskStageStatuses);
-        contentListView.setAdapter(taskStageStatusAdapter);
+    private void fillListViewStageStatus() {
+        RealmResults<StageStatus> stageStatuses;
+        stageStatuses = realmDB.where(StageStatus.class).findAll();
+        StageStatusAdapter stageStatusAdapter = new StageStatusAdapter(getActivity().getApplicationContext(), stageStatuses);
+        contentListView.setAdapter(stageStatusAdapter);
     }
 
     private void fillListViewEquipmentStatus() {
@@ -1071,7 +1071,7 @@ public class ReferenceFragment extends Fragment {
                     fillListViewTaskStatus();
                     break;
                 case StageStatusAdapter.TABLE_NAME:
-                    fillListViewTaskStageStatus();
+                    fillListViewStageStatus();
                     break;
                 case EquipmentStatusAdapter.TABLE_NAME:
                     fillListViewEquipmentStatus();

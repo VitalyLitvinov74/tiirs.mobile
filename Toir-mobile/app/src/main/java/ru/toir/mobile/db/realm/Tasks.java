@@ -25,7 +25,7 @@ public class Tasks extends RealmObject {
     private Date endDate;
     private Date createdAt;
     private Date changedAt;
-    private RealmList<TaskStages> taskStages;
+    private RealmList<Stages> taskStages;
 
     public long get_id() {
         return _id;
@@ -131,15 +131,15 @@ public class Tasks extends RealmObject {
         this.changedAt = changedAt;
     }
 
-    public RealmList<TaskStages> getTaskStages() {
+    public RealmList<Stages> getStages() {
         return taskStages;
     }
 
-    public void setTaskStages(RealmList<TaskStages> taskStages) {
-        this.taskStages = taskStages;
+    public void setStages(RealmList<Stages> stages) {
+        this.taskStages = stages;
     }
 
-    public void addTaskStage(TaskStages taskStage) {
+    public void addTaskStage(Stages taskStage) {
         this.taskStages.add(taskStage);
     }
 

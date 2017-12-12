@@ -89,7 +89,7 @@ import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.StageStatus;
-import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Stages;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
@@ -121,15 +121,15 @@ public class OrderFragment extends Fragment {
     private Toolbar toolbar;
     private Tasks selectedTask;
     private Orders selectedOrder;
-    private TaskStages selectedStage;
+    private Stages selectedStage;
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
-    private StageAdapter taskStageAdapter;
+    private StageAdapter stageAdapter;
     private OperationAdapter operationAdapter;
     //    private String currentOrderUuid = "";
     private String currentTaskUuid = "";
     private String currentOperationUuid = "";
-    //    private String currentTaskStageUuid = "";
+    //    private String currentStageUuid = "";
     private ListView mainListView;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
@@ -341,9 +341,9 @@ public class OrderFragment extends Fragment {
                         firstLaunch = true;
                         currentOperationId = 0;
                         if (selectedTask != null) {
-//                            currentTaskStageUuid = selectedStage.getUuid();
+//                            currentStageUuid = selectedStage.getUuid();
                             currentTaskUuid = selectedTask.getUuid();
-                            fillListViewTaskStage(selectedTask);
+                            fillListViewStage(selectedTask);
                             Level = STAGE_LEVEL;
                             fab_camera.setVisibility(View.INVISIBLE);
                             //fab_check.setVisibility(View.INVISIBLE);
@@ -490,17 +490,17 @@ public class OrderFragment extends Fragment {
         fab_check.setVisibility(View.VISIBLE);
     }
 
-    // TaskStages----------------------------------------------------------------------------------------
-    private void fillListViewTaskStage(Tasks task) {
-        RealmResults<TaskStages> stages;
-        RealmQuery<TaskStages> q = realmDB.where(TaskStages.class);
+    // Stages----------------------------------------------------------------------------------------
+    private void fillListViewStage(Tasks task) {
+        RealmResults<Stages> stages;
+        RealmQuery<Stages> q = realmDB.where(Stages.class);
         toolbar.setSubtitle("Этапы задач");
         boolean first = true;
         boolean all_complete = true;
-        if (task.getTaskStages().size() > 0) {
-            for (TaskStages stage : task.getTaskStages()) {
+        if (task.getStages().size() > 0) {
+            for (Stages stage : task.getStages()) {
                 long id = stage.get_id();
-                if (!stage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
+                if (!stage.getStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
                     all_complete = false;
                 }
 
@@ -522,8 +522,8 @@ public class OrderFragment extends Fragment {
             all_complete = false;
         }
 
-        taskStageAdapter = new StageAdapter(getContext(), stages);
-        mainListView.setAdapter(taskStageAdapter);
+        stageAdapter = new StageAdapter(getContext(), stages);
+        mainListView.setAdapter(stageAdapter);
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
@@ -556,7 +556,7 @@ public class OrderFragment extends Fragment {
     }
 
     // Operations----------------------------------------------------------------------------------------
-    private void fillListViewOperations(TaskStages stage) {
+    private void fillListViewOperations(Stages stage) {
         RealmResults<Operation> operations;
         RealmQuery<Operation> q = realmDB.where(Operation.class);
         boolean first = true;
@@ -588,7 +588,7 @@ public class OrderFragment extends Fragment {
         TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
-            tl_Header.setText(stage.getTaskStageTemplate().getTitle());
+            tl_Header.setText(stage.getStageTemplate().getTitle());
         }
 
         fab_camera.setVisibility(View.VISIBLE);
@@ -652,20 +652,20 @@ public class OrderFragment extends Fragment {
         taskTimer.start();
 
         // фиксируем начало работы над этапом задачи (если у него статус получен), меняем его статус на в процессе
-        final StageStatus taskStageStatus;
-        final StageStatus taskStageStatusInWork;
+        final StageStatus stageStatus;
+        final StageStatus stageStatusInWork;
         if (selectedStage != null) {
-            taskStageStatus = selectedStage.getTaskStageStatus();
-            taskStageStatusInWork = realmDB.where(StageStatus.class)
+            stageStatus = selectedStage.getStageStatus();
+            stageStatusInWork = realmDB.where(StageStatus.class)
                     .equalTo("uuid", StageStatus.Status.IN_WORK)
                     .findFirst();
-            if (taskStageStatus != null && taskStageStatusInWork != null)
-                if (taskStageStatus.getUuid().equals(StageStatus.Status.NEW) || taskStageStatus.getUuid().equals(StageStatus.Status.UN_COMPLETE)) {
+            if (stageStatus != null && stageStatusInWork != null)
+                if (stageStatus.getUuid().equals(StageStatus.Status.NEW) || stageStatus.getUuid().equals(StageStatus.Status.UN_COMPLETE)) {
                     realmDB.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             selectedStage.setStartDate(new Date());
-                            selectedStage.setTaskStageStatus(taskStageStatusInWork);
+                            selectedStage.setStageStatus(stageStatusInWork);
                         }
                     });
                 }
@@ -824,12 +824,12 @@ public class OrderFragment extends Fragment {
                             }
                         }
 
-                        List<TaskStages> stages = task.getTaskStages();
-                        for (TaskStages stage : stages) {
+                        List<Stages> stages = task.getStages();
+                        for (Stages stage : stages) {
                             // урл изображения этапа задачи
-                            isNeedDownload = isNeedDownload(stage.getTaskStageTemplate(), basePathLocal);
+                            isNeedDownload = isNeedDownload(stage.getStageTemplate(), basePathLocal);
                             if (isNeedDownload) {
-                                files.add(new FilePath(stage.getTaskStageTemplate().getImage(),
+                                files.add(new FilePath(stage.getStageTemplate().getImage(),
                                         basePath, basePathLocal));
                             }
 
@@ -1310,8 +1310,8 @@ public class OrderFragment extends Fragment {
         for (Orders order : ordersList) {
             List<Tasks> tasks = order.getTasks();
             for (Tasks task : tasks) {
-                List<TaskStages> stages = task.getTaskStages();
-                for (TaskStages stage : stages) {
+                List<Stages> stages = task.getStages();
+                for (Stages stage : stages) {
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
                         operationUuids.add(operation.getUuid());
@@ -1451,7 +1451,7 @@ public class OrderFragment extends Fragment {
         // диалог для отмены операции
         final OrderStatus orderStatusUnComplete;
         final TaskStatus taskStatusUnComplete;
-        final StageStatus taskStageStatusUnComplete;
+        final StageStatus stageStatusUnComplete;
         final OperationStatus operationStatusUnComplete;
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -1467,7 +1467,7 @@ public class OrderFragment extends Fragment {
         orderStatusUnComplete = realmDB.where(OrderStatus.class)
                 .equalTo("uuid", OrderStatus.Status.UN_COMPLETE)
                 .findFirst();
-        taskStageStatusUnComplete = realmDB.where(StageStatus.class)
+        stageStatusUnComplete = realmDB.where(StageStatus.class)
                 .equalTo("uuid", StageStatus.Status.UN_COMPLETE)
                 .findFirst();
         operationStatusUnComplete = realmDB.where(OperationStatus.class)
@@ -1497,14 +1497,14 @@ public class OrderFragment extends Fragment {
                             task.setTaskStatus(taskStatusUnComplete);
                         }
                     });
-                    for (final TaskStages taskStages : task.getTaskStages()) {
+                    for (final Stages stages : task.getStages()) {
                         realmDB.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                taskStages.setTaskStageStatus(taskStageStatusUnComplete);
+                                stages.setStageStatus(stageStatusUnComplete);
                             }
                         });
-                        for (final Operation operation : taskStages.getOperations()) {
+                        for (final Operation operation : stages.getOperations()) {
                             realmDB.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
@@ -1692,9 +1692,9 @@ public class OrderFragment extends Fragment {
                         currentOperationId = 0;
 
                         if (selectedTask != null) {
-//                            currentTaskStageUuid = selectedStage.getUuid();
+//                            currentStageUuid = selectedStage.getUuid();
                             currentTaskUuid = selectedTask.getUuid();
-                            fillListViewTaskStage(selectedTask);
+                            fillListViewStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
                     }
@@ -1882,7 +1882,7 @@ public class OrderFragment extends Fragment {
                         }
 
                         if (level == TASK_LEVEL) {
-                            fillListViewTaskStage(selectedTask);
+                            fillListViewStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
 
@@ -2012,10 +2012,10 @@ public class OrderFragment extends Fragment {
             if (Level == OPERATION_LEVEL) {
                 int completedOperationCount = 0;
                 CheckBox checkBox;
-                final StageStatus taskStageComplete;
+                final StageStatus stageComplete;
                 uncompleteOperationList.clear();
                 // по умолчанию у нас все выполнено
-                taskStageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
+                stageComplete = realmDB.where(StageStatus.class).equalTo("uuid", StageStatus.Status.COMPLETE).findFirst();
 
                 if (operationAdapter != null) {
                     totalOperationCount = operationAdapter.getCount();
@@ -2039,11 +2039,11 @@ public class OrderFragment extends Fragment {
 
                 // все операции выполнены
                 if (totalOperationCount == completedOperationCount) {
-                    if (selectedStage != null && !selectedStage.getTaskStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
+                    if (selectedStage != null && !selectedStage.getStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
                         realmDB.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                selectedStage.setTaskStageStatus(taskStageComplete);
+                                selectedStage.setStageStatus(stageComplete);
                                 selectedStage.setEndDate(new Date());
                             }
                         });
@@ -2055,10 +2055,10 @@ public class OrderFragment extends Fragment {
                     currentOperationId = 0;
 
                     if (selectedStage != null && selectedTask != null) {
-//                        currentTaskStageUuid = selectedStage.getUuid();
+//                        currentStageUuid = selectedStage.getUuid();
                         currentTaskUuid = selectedTask.getUuid();
                         Level = STAGE_LEVEL;
-                        fillListViewTaskStage(selectedTask);
+                        fillListViewStage(selectedTask);
                     }
 
                 } else {
@@ -2110,7 +2110,7 @@ public class OrderFragment extends Fragment {
                         if (!ask_tags && !expectedTagId.equals("")) {
                             runRfidDialog(expectedTagId, TASK_LEVEL);
                         } else {
-                            fillListViewTaskStage(selectedTask);
+                            fillListViewStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
 
@@ -2122,13 +2122,13 @@ public class OrderFragment extends Fragment {
                 return;
             }
 
-            // TaskStage
+            // Stage
             if (Level == STAGE_LEVEL) {
-                if (taskStageAdapter != null) {
-                    selectedStage = taskStageAdapter.getItem(position);
+                if (stageAdapter != null) {
+                    selectedStage = stageAdapter.getItem(position);
                     if (selectedStage != null) {
                         final String expectedTagId;
-//                        currentTaskStageUuid = selectedStage.getUuid();
+//                        currentStageUuid = selectedStage.getUuid();
                         if (selectedStage.getEquipment() != null) {
                             expectedTagId = selectedStage.getEquipment().getTagId();
                             boolean ask_tags = sp.getBoolean("without_tags_mode", true);

@@ -12,7 +12,7 @@ import ru.toir.mobile.db.realm.StageVerdict;
  *         Created by koputo on 01.02.17.
  */
 
-public interface ITaskStageVerdict {
+public interface IStageVerdict {
     @GET("/task-stage-verdict")
     Call<List<StageVerdict>> get();
 
