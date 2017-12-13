@@ -20,6 +20,7 @@ public class Orders extends RealmObject {
     private Contragent customer;
     private Brigade perpetrator;
     private String comment;
+    private String reason;
     private Date receivDate;   // дата получения наряда
     private Date startDate;     // дата назначения наряда
     private Date createdAt;
@@ -189,5 +190,45 @@ public class Orders extends RealmObject {
 
     public void setSent(boolean sent) {
         this.sent = sent;
+    }
+
+    public Contragent getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Contragent customer) {
+        this.customer = customer;
+    }
+
+    public Brigade getPerpetrator() {
+        return perpetrator;
+    }
+
+    public void setPerpetrator(Brigade perpetrator) {
+        this.perpetrator = perpetrator;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public int getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(int updated) {
+        this.updated = updated;
     }
 }

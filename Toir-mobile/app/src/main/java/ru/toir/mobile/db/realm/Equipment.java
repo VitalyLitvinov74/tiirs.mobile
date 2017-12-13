@@ -18,6 +18,7 @@ public class Equipment extends RealmObject implements IToirDbObject {
     private Equipment parentEquipment;
     private String title;
     private String inventoryNumber;
+    private String serialNumber;
     private Objects location;
     private CriticalType criticalType;
     private Date startDate;
@@ -146,6 +147,22 @@ public class Equipment extends RealmObject implements IToirDbObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public Equipment getParentEquipment() {
+        return parentEquipment;
+    }
+
+    public void setParentEquipment(Equipment parentEquipment) {
+        this.parentEquipment = parentEquipment;
     }
 
     @Override
