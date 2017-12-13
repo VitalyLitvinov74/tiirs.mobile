@@ -158,8 +158,18 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 query_epc.query_total = 0;
                 mUhf.setCallBack(mc);
                 boolean result = mUhf.command(CommandType.MULTI_QUERY_TAGS_EPC, query_epc);
-                mUhf.setCallBack(null);
-                mUhf.command(CommandType.STOP_MULTI_QUERY_TAGS_EPC, null);
+                // TODO: придумать как решить этот вопрос
+                /*
+                 * Вопрос в следующем - при чтении кучи меток в поисках одной, диалог могут закрыть.
+                 * При закрытии диалога вызывается метод драйвера close().
+                 * В нём обнуляется mUhf еще до того как текущий поток закончит работу.
+                 * Пока воткнут такой костыль с проверкой на null
+                 */
+                if (mUhf != null) {
+                    mUhf.setCallBack(null);
+                    mUhf.command(CommandType.STOP_MULTI_QUERY_TAGS_EPC, null);
+                }
+
                 if (!result && tagIds.length == 0) {
 //                    Bundle bundle = new Bundle();
 //                    bundle.putStringArray("result", foundTagIds.toArray(new String[]{}));
