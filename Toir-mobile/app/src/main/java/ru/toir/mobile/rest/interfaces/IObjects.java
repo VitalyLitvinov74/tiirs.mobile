@@ -13,12 +13,21 @@ import ru.toir.mobile.db.realm.Objects;
  */
 
 public interface IObjects {
-    @GET("/api/objects/objects")
-    Call<List<Objects>> objects();
+    @GET("/objects")
+    Call<List<Objects>> get();
 
-    @GET("/api/objects/objects")
-    Call<List<Objects>> objects(@Query("changedAfter") String changedAfter);
+    @GET("/objects")
+    Call<List<Objects>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/objects/objects")
-    Call<List<Objects>> objectsById(@Query("id") String id);
+    @GET("/objects")
+    Call<List<Objects>> getById(@Query("id") String id);
+
+    @GET("/objects")
+    Call<List<Objects>> getById(@Query("id") String[] id);
+
+    @GET("/objects")
+    Call<List<Objects>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/objects")
+    Call<List<Objects>> getByUuid(@Query("uuid") String[] uuid);
 }

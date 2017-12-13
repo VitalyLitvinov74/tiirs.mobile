@@ -13,13 +13,21 @@ import ru.toir.mobile.db.realm.Operation;
  */
 
 public interface IOperation {
-    @GET("/api/operation")
-    Call<List<Operation>> operation();
+    @GET("/operation")
+    Call<List<Operation>> get();
 
-    @GET("/api/operation")
-    Call<List<Operation>> operation(@Query("changedAfter") String changedAfter);
+    @GET("/operation")
+    Call<List<Operation>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/operation")
-    Call<List<Operation>> operationById(@Query("id") String id);
+    @GET("/operation")
+    Call<List<Operation>> getById(@Query("id") String id);
 
+    @GET("/operation")
+    Call<List<Operation>> getById(@Query("id") String[] id);
+
+    @GET("/operation")
+    Call<List<Operation>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/operation")
+    Call<List<Operation>> getByUuid(@Query("uuid") String[] uuid);
 }

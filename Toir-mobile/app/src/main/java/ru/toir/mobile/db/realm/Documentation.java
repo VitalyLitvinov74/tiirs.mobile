@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 10.09.16.
  */
-public class Documentation extends RealmObject {
+public class Documentation extends RealmObject implements IToirDbObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -100,5 +100,10 @@ public class Documentation extends RealmObject {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getPath();
     }
 }

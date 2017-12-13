@@ -13,12 +13,21 @@ import ru.toir.mobile.db.realm.TaskStageList;
  */
 
 public interface ITaskStageList {
-    @GET("/api/task-stage/list")
-    Call<List<TaskStageList>> taskStageList();
+    @GET("/task-stage-list")
+    Call<List<TaskStageList>> get();
 
-    @GET("/api/task-stage/list")
-    Call<List<TaskStageList>> taskStageList(@Query("changedAfter") String changedAfter);
+    @GET("/task-stage-list")
+    Call<List<TaskStageList>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/task-stage/list")
-    Call<List<TaskStageList>> taskStageListById(@Query("id") String id);
+    @GET("/task-stage-list")
+    Call<List<TaskStageList>> getById(@Query("id") String id);
+
+    @GET("/task-stage-list")
+    Call<List<TaskStageList>> getById(@Query("id") String[] id);
+
+    @GET("/task-stage-list")
+    Call<List<TaskStageList>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/task-stage-list")
+    Call<List<TaskStageList>> getByUuid(@Query("uuid") String[] uuid);
 }

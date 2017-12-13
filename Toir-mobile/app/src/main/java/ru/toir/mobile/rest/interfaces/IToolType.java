@@ -13,13 +13,21 @@ import ru.toir.mobile.db.realm.ToolType;
  */
 
 public interface IToolType {
-    @GET("/api/references/tool-type")
-    Call<List<ToolType>> toolType();
+    @GET("/tool-type")
+    Call<List<ToolType>> getType();
 
-    @GET("/api/references/tool-type")
-    Call<List<ToolType>> toolType(@Query("changedAfter") String changedAfter);
+    @GET("/tool-type")
+    Call<List<ToolType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/references/tool-type")
-    Call<List<ToolType>> toolTypeById(@Query("id") String id);
+    @GET("/tool-type")
+    Call<List<ToolType>> getById(@Query("id") String id);
 
+    @GET("/tool-type")
+    Call<List<ToolType>> getById(@Query("id") String[] id);
+
+    @GET("/tool-type")
+    Call<List<ToolType>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/tool-type")
+    Call<List<ToolType>> getByUuid(@Query("uuid") String[] uuid);
 }

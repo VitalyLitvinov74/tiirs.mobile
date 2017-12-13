@@ -43,10 +43,10 @@ public class StageStatusAdapter extends RealmBaseAdapter<StageStatus> implements
         ViewHolder viewHolder;
         if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            StageStatus taskStageStatus;
+            StageStatus stageStatus;
             if (adapterData != null) {
-                taskStageStatus = adapterData.get(position);
-                textView.setText(taskStageStatus.getTitle());
+                stageStatus = adapterData.get(position);
+                textView.setText(stageStatus.getTitle());
             }
             return textView;
         }
@@ -60,12 +60,12 @@ public class StageStatusAdapter extends RealmBaseAdapter<StageStatus> implements
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            StageStatus taskStageStatus;
+            StageStatus stageStatus;
             if (adapterData != null) {
-                taskStageStatus = adapterData.get(position);
-                if (taskStageStatus != null) {
-                    viewHolder.title.setText(taskStageStatus.getTitle());
-                    viewHolder.uuid.setText(taskStageStatus.getUuid());
+                stageStatus = adapterData.get(position);
+                if (stageStatus != null) {
+                    viewHolder.title.setText(stageStatus.getTitle());
+                    viewHolder.uuid.setText(stageStatus.getUuid());
                 }
             }
             //TODO сопоставление изображений

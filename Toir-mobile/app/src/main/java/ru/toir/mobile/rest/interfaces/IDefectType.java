@@ -14,12 +14,21 @@ import ru.toir.mobile.db.realm.DocumentationType;
  *         Created by olejek on 15.05.17.
  */
 public interface IDefectType {
-    @GET("/api/objects/defect-type")
-    Call<List<DefectType>> defectType();
+    @GET("/defect-type")
+    Call<List<DefectType>> get();
 
-    @GET("/api/objects/defect-type")
-    Call<List<DefectType>> defectType(@Query("changedAfter") String changedAfter);
+    @GET("/defect-type")
+    Call<List<DefectType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/objects/defect-type")
-    Call<List<DefectType>> defectTypeById(@Query("id") String id);
+    @GET("/defect-type")
+    Call<List<DefectType>> getById(@Query("id") String id);
+
+    @GET("/defect-type")
+    Call<List<DefectType>> getById(@Query("id") String[] id);
+
+    @GET("/defect-type")
+    Call<List<DefectType>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/defect-type")
+    Call<List<DefectType>> getByUuid(@Query("uuid") String[] uuid);
 }

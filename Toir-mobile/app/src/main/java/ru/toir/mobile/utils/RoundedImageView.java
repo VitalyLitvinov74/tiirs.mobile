@@ -122,7 +122,7 @@ public class RoundedImageView extends AppCompatImageView {
             FileOutputStream fOut;
             try {
                 fOut = new FileOutputStream(image);
-                imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                imageBitmap2.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
                 fOut.flush();
                 fOut.close();
                 return imageBitmap2;

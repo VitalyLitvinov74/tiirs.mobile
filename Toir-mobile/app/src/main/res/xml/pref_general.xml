@@ -58,6 +58,9 @@
             <Preference
                 android:key="@string/delete_test_data"
                 android:title="@string/delete_test_data" />
+            <CheckBoxPreference
+                android:key="@string/debug_nocheck_gps"
+                android:title="@string/debug_nocheck_gps" />
         </PreferenceCategory>
     </PreferenceScreen>
 </PreferenceScreen>

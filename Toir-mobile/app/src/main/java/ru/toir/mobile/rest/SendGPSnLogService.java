@@ -36,6 +36,7 @@ public class SendGPSnLogService extends Service {
     /**
      * Метод для выполнения отправки данных на сервер.
      */
+    @SuppressWarnings("unchecked")
     private Runnable task = new Runnable() {
         @Override
         public void run() {
@@ -49,22 +50,30 @@ public class SendGPSnLogService extends Service {
                     data[i] = gpsIds[i];
                 }
 
-                RealmResults<GpsTrack> items = realm.where(GpsTrack.class).in("_id", data).equalTo("sent", false).findAll();
+                RealmResults<GpsTrack> items = realm.where(GpsTrack.class).in("_id", data)
+                        .equalTo("sent", false).findAll();
                 // отправляем данные с координатами
-                call = ToirAPIFactory.getGpsTrackService().sendGpsTrack(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
+                call = ToirAPIFactory.getGpsTrackService()
+                        .send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
                     Response<ToirAPIResponse> response = call.execute();
                     if (response.isSuccessful()) {
                         ToirAPIResponse apiResponse = response.body();
                         realm.beginTransaction();
                         if (!apiResponse.isSuccess()) {
-                            // удаляем из списка не сохраннённые элементы
-                            removeNotSaved(items, (List<String>) apiResponse.getData());
-                        }
+                            List<String> listIds;
+                            try {
+                                listIds = ((List<String>) apiResponse.getData());
+                                // удаляем из списка не сохраннённые элементы
+                                removeNotSaved(items, listIds);
 
-                        // отмечаем отправленные данные
-                        for (GpsTrack item : items) {
-                            item.setSent(true);
+                                // отмечаем отправленные данные
+                                for (GpsTrack item : items) {
+                                    item.setSent(true);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         realm.commitTransaction();
@@ -84,20 +93,26 @@ public class SendGPSnLogService extends Service {
 
                 RealmResults<Journal> items = realm.where(Journal.class).in("_id", data).equalTo("sent", false).findAll();
                 // отправляем данные с логами
-                call = ToirAPIFactory.getJournalService().sendJournal(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
+                call = ToirAPIFactory.getJournalService().send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
                     Response<ToirAPIResponse> response = call.execute();
                     if (response.isSuccessful()) {
                         ToirAPIResponse apiResponse = response.body();
                         realm.beginTransaction();
                         if (!apiResponse.isSuccess()) {
-                            // удаляем из списка не сохраннённые элементы
-                            removeNotSaved(items, (List<String>) apiResponse.getData());
-                        }
+                            List<String> listIds;
+                            try {
+                                listIds = ((List<String>) apiResponse.getData());
+                                // удаляем из списка не сохраннённые элементы
+                                removeNotSaved(items, listIds);
 
-                        // отмечаем отправленные данные
-                        for (Journal item : items) {
-                            item.setSent(true);
+                                // отмечаем отправленные данные
+                                for (Journal item : items) {
+                                    item.setSent(true);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         realm.commitTransaction();

@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -144,6 +145,10 @@ public class MainActivity extends AppCompatActivity {
     private Handler logNGpsHandler;
     private Runnable logNGpsRunnable;
 
+    private LocationManager _locationManager;
+    private GPSListener _gpsListener;
+    private Thread checkGPSThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -270,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
                     authorizationDialog.show();
 
                     // запрашиваем токен
-                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().tokenByLabel(tagId, TokenSrv.Type.LABEL);
+                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().getByLabel(tagId, TokenSrv.Type.LABEL);
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
@@ -317,12 +322,10 @@ public class MainActivity extends AppCompatActivity {
                                         authorizedUser.setUuid(user.getUuid());
                                         authorizedUser.setLogin(user.getLogin());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-                                        startGpsTracker(user.getUuid());
-                                        startLogSend();
 
                                         // получаем изображение пользователя
                                         String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
-                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().getFile(url);
+                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
                                         callFile.enqueue(new Callback<ResponseBody>() {
                                             @Override
                                             public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
@@ -415,7 +418,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 AuthorizedUser.getInstance().setUuid(user.getUuid());
                                 addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
-                                startGpsTracker(user.getUuid());
                                 setMainLayout(savedInstance);
                             } else {
                                 Toast.makeText(getApplicationContext(),
@@ -815,20 +817,18 @@ public class MainActivity extends AppCompatActivity {
         //tabs.setViewPager(pager);
     }
 
-    void startGpsTracker(String user_uuid) {
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (lm != null) {
-            GPSListener tgpsl = new GPSListener(getApplicationContext(), user_uuid);
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, tgpsl);
-        }
-    }
-
     /**
      * Обработчик клика кнопки "Войти"
      *
      * @param view Event's view
      */
     public void onClickLogin(View view) {
+        if (!isSkipGPS() && !isGpsOn()) {
+            Toast.makeText(getApplicationContext(), "GPS must be enabled.", Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
         setEnabledLoginButton(false);
         startAuthorise();
         setEnabledLoginButton(true);
@@ -970,6 +970,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Нажмите \"назад\" ещё раз для выхода.", Toast.LENGTH_LONG)
                         .show();
                 isExitTimerStart = true;
+            } else if (findViewById(R.id.loginButton) != null) {
+                return super.onKeyDown(keyCode, event);
             }
 
             return true;
@@ -1108,6 +1110,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (checkGPSThread != null) {
+            checkGPSThread.interrupt();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -1119,6 +1129,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ShowSettings();
+
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                boolean isRun = true;
+                while (isRun) {
+                    try {
+                        Thread.sleep(5000);
+                        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                        boolean gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                        if (!isSkipGPS()) {
+                            if (!gpsEnabled) {
+                                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivity(intent);
+                                Toast.makeText(getApplicationContext(), "GPS must be enabled.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } catch (Exception e) {
+                        isRun = false;
+                    }
+                }
+            }
+        };
+        checkGPSThread = new Thread(run);
+        checkGPSThread.start();
+
+        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (_locationManager != null) {
+            _gpsListener = new GPSListener();
+            _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, _gpsListener);
+        }
+
+        startLogSend();
     }
 
     @Override
@@ -1127,6 +1171,12 @@ public class MainActivity extends AppCompatActivity {
         stopLogSend();
         if (realmDB != null) {
             realmDB.close();
+        }
+
+        if (_locationManager != null) {
+            _locationManager.removeUpdates(_gpsListener);
+            _locationManager = null;
+            _gpsListener = null;
         }
 
         // обнуляем пользователя
@@ -1145,6 +1195,13 @@ public class MainActivity extends AppCompatActivity {
         logNGpsRunnable = new Runnable() {
             @Override
             public void run() {
+                // проверяем наличие данных о пользователе для отправки данных
+                AuthorizedUser user = AuthorizedUser.getInstance();
+                if (user.getToken() == null || user.getLogin() == null) {
+                    setTimer();
+                    return;
+                }
+
                 // получаем данные для отправки
                 Realm realm = Realm.getDefaultInstance();
 
@@ -1170,6 +1227,10 @@ public class MainActivity extends AppCompatActivity {
                 getApplicationContext().startService(serviceIntent);
                 realm.close();
 
+                setTimer();
+            }
+
+            private void setTimer() {
                 // "взводим" отложенный запуск отправки
                 logNGpsHandler.postDelayed(this, LOG_AND_GPS_SEND_INTERVAL);
             }
@@ -1204,5 +1265,24 @@ public class MainActivity extends AppCompatActivity {
             result.putExtra("tagId", hexId);
             sendBroadcast(result);
         }
+    }
+
+    /**
+     * Проверка включен ли GPS.
+     *
+     * @return boolean
+     */
+    private boolean isGpsOn() {
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    /**
+     * Проверка на необходимость GPS
+     */
+    private boolean isSkipGPS() {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        return sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
     }
 }

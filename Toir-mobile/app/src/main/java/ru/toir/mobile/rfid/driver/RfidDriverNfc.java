@@ -70,10 +70,12 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
         nfcAdapter = NfcAdapter.getDefaultAdapter(mContext);
 
         if (nfcAdapter == null) {
+            Toast.makeText(mContext, "NFC not present.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (!nfcAdapter.isEnabled()) {
+            Toast.makeText(mContext, "NFC disabled. Turn it on before.", Toast.LENGTH_SHORT).show();
             return false;
         }
 

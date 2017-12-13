@@ -13,13 +13,22 @@ import ru.toir.mobile.db.realm.OperationType;
  *         Created by koputo on 05.10.16.
  */
 public interface IObjectType {
-    @GET("/api/objects/object-type")
-    Call<List<ObjectType>> objectType();
+    @GET("/object-type")
+    Call<List<ObjectType>> get();
 
-    @GET("/api/objects/object-type")
-    Call<List<ObjectType>> objectType(@Query("changedAfter") String changedAfter);
+    @GET("/object-type")
+    Call<List<ObjectType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/objects/object-type")
-    Call<List<ObjectType>> objcetTypeById(@Query("id") String id);
+    @GET("/object-type")
+    Call<List<ObjectType>> getById(@Query("id") String id);
+
+    @GET("/object-type")
+    Call<List<ObjectType>> getById(@Query("id") String[] id);
+
+    @GET("/object-type")
+    Call<List<ObjectType>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/object-type")
+    Call<List<ObjectType>> getByUuid(@Query("uuid") String[] uuid);
 
 }

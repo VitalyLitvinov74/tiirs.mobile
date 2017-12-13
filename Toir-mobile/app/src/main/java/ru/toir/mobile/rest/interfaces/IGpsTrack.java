@@ -15,5 +15,5 @@ import ru.toir.mobile.rest.ToirAPIResponse;
 
 public interface IGpsTrack {
     @POST("/gpstrack/create")
-    Call<ToirAPIResponse> sendGpsTrack(@Body List<GpsTrack> data);
+    Call<ToirAPIResponse> send(@Body List<GpsTrack> data);
 }

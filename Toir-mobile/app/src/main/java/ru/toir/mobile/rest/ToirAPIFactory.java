@@ -12,12 +12,14 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Retrofit;
@@ -41,6 +43,7 @@ import ru.toir.mobile.rest.interfaces.IMeasuredValue;
 import ru.toir.mobile.rest.interfaces.IObjectType;
 import ru.toir.mobile.rest.interfaces.IObjects;
 import ru.toir.mobile.rest.interfaces.IOperation;
+import ru.toir.mobile.rest.interfaces.IOperationFile;
 import ru.toir.mobile.rest.interfaces.IOperationStatus;
 import ru.toir.mobile.rest.interfaces.IOperationTemplate;
 import ru.toir.mobile.rest.interfaces.IOperationTool;
@@ -55,11 +58,11 @@ import ru.toir.mobile.rest.interfaces.IRepairPartType;
 import ru.toir.mobile.rest.interfaces.IJournal;
 import ru.toir.mobile.rest.interfaces.ITaskStageList;
 import ru.toir.mobile.rest.interfaces.ITaskStageOperationList;
-import ru.toir.mobile.rest.interfaces.ITaskStageStatus;
-import ru.toir.mobile.rest.interfaces.ITaskStageTemplate;
-import ru.toir.mobile.rest.interfaces.ITaskStageType;
-import ru.toir.mobile.rest.interfaces.ITaskStageVerdict;
-import ru.toir.mobile.rest.interfaces.ITaskStages;
+import ru.toir.mobile.rest.interfaces.IStageStatus;
+import ru.toir.mobile.rest.interfaces.IStageTemplate;
+import ru.toir.mobile.rest.interfaces.IStageType;
+import ru.toir.mobile.rest.interfaces.IStageVerdict;
+import ru.toir.mobile.rest.interfaces.IStages;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITaskTemplate;
 import ru.toir.mobile.rest.interfaces.ITaskType;
@@ -216,6 +219,11 @@ ToirAPIFactory {
     }
 
     @NonNull
+    public static IOperationFile getOperationFileService() {
+        return getRetrofit().create(IOperationFile.class);
+    }
+
+    @NonNull
     public static IOperationStatus getOperationStatusService() {
         return getRetrofit().create(IOperationStatus.class);
     }
@@ -286,23 +294,23 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStages getTaskStagesService() {
-        return getRetrofit().create(ITaskStages.class);
+    public static IStages getStagesService() {
+        return getRetrofit().create(IStages.class);
     }
 
     @NonNull
-    public static ITaskStageStatus getTaskStageStatusService() {
-        return getRetrofit().create(ITaskStageStatus.class);
+    public static IStageStatus getStageStatusService() {
+        return getRetrofit().create(IStageStatus.class);
     }
 
     @NonNull
-    public static ITaskStageTemplate getTaskStageTemplateService() {
-        return getRetrofit().create(ITaskStageTemplate.class);
+    public static IStageTemplate getStageTemplateService() {
+        return getRetrofit().create(IStageTemplate.class);
     }
 
     @NonNull
-    public static ITaskStageVerdict getTaskStageVerdictService() {
-        return getRetrofit().create(ITaskStageVerdict.class);
+    public static IStageVerdict getStageVerdictService() {
+        return getRetrofit().create(IStageVerdict.class);
     }
 
     @NonNull
@@ -311,8 +319,8 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStageType getTaskStageTypeService() {
-        return getRetrofit().create(ITaskStageType.class);
+    public static IStageType getStageTypeService() {
+        return getRetrofit().create(IStageType.class);
     }
 
     @NonNull
@@ -355,12 +363,35 @@ ToirAPIFactory {
         return getRetrofit().create(IFileDownload.class);
     }
 
+    /**
+     * Метод без указания специфической обработки элементов json.
+     *
+     * @return Retrofit
+     */
     @NonNull
     private static Retrofit getRetrofit() {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateTypeDeserializer())
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                .create();
+        return getRetrofit(null);
+    }
+
+    /**
+     * Метод для задания специфической обработки элементов json.
+     *
+     * @param list Список типов и десереализаторов.
+     * @return Retrofit
+     */
+    @NonNull
+    private static Retrofit getRetrofit(List<TypeAdapterParam> list) {
+        GsonBuilder builder = new GsonBuilder();
+
+        if (list != null) {
+            for (TypeAdapterParam param : list) {
+                builder.registerTypeAdapter(param.getTypeClass(), param.getDeserializer());
+            }
+        }
+
+        builder.registerTypeAdapter(Date.class, new DateTypeDeserializer());
+        builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Gson gson = builder.create();
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -368,10 +399,39 @@ ToirAPIFactory {
                 .build();
     }
 
-//    public static final class Actions {
+//        public static final class Actions {
 //        public static final String ACTION_GET_TOKEN = "action_get_token";
 //        public static final String ACTION_GET_USER = "action_get_user";
 //        public static final String ACTION_GET_ALL_REFERENCE = "action_get_all_reference";
 //    }
+
+    /**
+     * Класс для хранения типа и десереализатора к этому типу.
+     */
+    private static class TypeAdapterParam {
+        Class<?> typeClass;
+        JsonDeserializer<?> deserializer;
+
+        TypeAdapterParam(Class<?> c, JsonDeserializer<?> d) {
+            typeClass = c;
+            deserializer = d;
+        }
+
+        public Class<?> getTypeClass() {
+            return typeClass;
+        }
+
+        public void setTypeClass(Class<?> typeClass) {
+            this.typeClass = typeClass;
+        }
+
+        public JsonDeserializer<?> getDeserializer() {
+            return deserializer;
+        }
+
+        public void setDeserializer(JsonDeserializer<?> deserializer) {
+            this.deserializer = deserializer;
+        }
+    }
 
 }
