@@ -114,12 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final long LOG_AND_GPS_SEND_INTERVAL = 60000;
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.support.v4.app.FragmentActivity#onKeyDown(int,
-     * android.view.KeyEvent)
-     */
+
     private static boolean isExitTimerStart = false;
     public int currentFragment = NO_FRAGMENT;
     Bundle savedInstance = null;
@@ -249,8 +244,6 @@ public class MainActivity extends AppCompatActivity {
 
         isLogged = false;
 
-        stopLogSend();
-
         final Handler handler = new Handler(new Handler.Callback() {
 
             @Override
@@ -288,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
                                         "Токен получен.", Toast.LENGTH_SHORT).show();
                                 // Сохраняем login в AuthorizedUser для дальнейших запросв статики
                                 authUser.setLogin(token.getUserName());
-
                             } else {
                                 // Токен не получили, пытаемся найти пользователя в локальной базе
                                 Realm realm = Realm.getDefaultInstance();
@@ -1111,6 +1103,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause()");
         super.onPause();
         if (checkGPSThread != null) {
             checkGPSThread.interrupt();
@@ -1119,6 +1112,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume()");
         super.onResume();
 
         AuthorizedUser user = AuthorizedUser.getInstance();
@@ -1167,6 +1161,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy()");
         super.onDestroy();
         stopLogSend();
         if (realmDB != null) {
