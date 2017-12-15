@@ -779,6 +779,12 @@ public class OrderFragment extends Fragment {
                 List<FilePath> files = new ArrayList<>();
                 // строим список изображений для загрузки
                 for (Orders order : result) {
+                    // если это не новый наряд, ставим флаг sent в true
+                    String orderStatusUuid = order.getOrderStatus().getUuid();
+                    if (!orderStatusUuid.equals(OrderStatus.Status.NEW)) {
+                        order.setSent(true);
+                    }
+
                     List<Tasks> tasks = order.getTasks();
                     for (Tasks task : tasks) {
                         // UUID шаблона задачи
