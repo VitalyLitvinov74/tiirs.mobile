@@ -13,7 +13,7 @@ import io.realm.annotations.PrimaryKey;
  *         Created by koputo on 5/16/17.
  */
 
-public class OperationFile extends RealmObject implements IToirDbObject {
+public class OperationFile extends RealmObject implements IToirDbObject, ISend {
     @Index
     private long _id;
     @PrimaryKey

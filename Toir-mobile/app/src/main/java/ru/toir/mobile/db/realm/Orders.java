@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 07.09.16.
  */
-public class Orders extends RealmObject {
+public class Orders extends RealmObject implements ISend {
     @PrimaryKey
     private long _id;
     private String uuid;

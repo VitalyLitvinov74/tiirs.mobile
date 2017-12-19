@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.LongSparseArray;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,6 +41,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1025,7 +1029,7 @@ public class OrderFragment extends Fragment {
      */
     private void sendFiles(List<OperationFile> files) {
 
-        AsyncTask<OperationFile[], Void, List<String>> task = new AsyncTask<OperationFile[], Void, List<String>>() {
+        AsyncTask<OperationFile[], Void, LongSparseArray<String>> task = new AsyncTask<OperationFile[], Void, LongSparseArray<String>>() {
             @NonNull
             private RequestBody createPartFromString(String descriptionString) {
                 return RequestBody.create(MultipartBody.FORM, descriptionString);
@@ -1046,8 +1050,9 @@ public class OrderFragment extends Fragment {
             }
 
             @Override
-            protected List<String> doInBackground(OperationFile[]... lists) {
-                List<String> sendFiles = new ArrayList<>();
+            protected LongSparseArray<String> doInBackground(OperationFile[]... lists) {
+                LongSparseArray<String> idUuid = new LongSparseArray<>();
+
                 for (OperationFile file : lists[0]) {
                     RequestBody descr = createPartFromString("Photos due execution operation.");
                     Uri uri = null;
@@ -1064,7 +1069,6 @@ public class OrderFragment extends Fragment {
                     String fileUuid = file.getUuid();
                     String formId = "file[" + fileUuid + "]";
                     list.add(prepareFilePart(formId, uri));
-                    // TODO: реализовать отправку дополнительных полей в запросе!!!
                     list.add(MultipartBody.Part.createFormData(formId + "[_id]", String.valueOf(file.get_id())));
                     list.add(MultipartBody.Part.createFormData(formId + "[uuid]", file.getUuid()));
                     list.add(MultipartBody.Part.createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
@@ -1078,28 +1082,39 @@ public class OrderFragment extends Fragment {
                         Response response = call.execute();
                         ResponseBody result = (ResponseBody) response.body();
                         if (response.isSuccessful()) {
-                            Log.d(TAG, "result" + result.contentType());
-                            sendFiles.add(file.getFileName());
+                            JSONObject jObj = new JSONObject(result.string());
+                            // при сохранении данных на сервере произошли ошибки
+                            // данный флаг пока не используем
+//                            boolean success = (boolean) jObj.get("success");
+                            JSONArray data = (JSONArray) jObj.get("data");
+                            for (int idx = 0; idx < data.length(); idx++) {
+                                JSONObject item = (JSONObject) data.get(idx);
+                                Long _id = Long.parseLong(item.get("_id").toString());
+                                String uuid = item.get("uuid").toString();
+                                idUuid.put(_id, uuid);
+                            }
                         }
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
                 }
 
-                return sendFiles;
+                return idUuid;
             }
 
             @Override
-            protected void onPostExecute(List<String> strings) {
-                super.onPostExecute(strings);
-
-                // TODO: нужно придумать более правильный механизм передачи данных для отправки и обработки результата
-                // пока сделано по тупому
+            protected void onPostExecute(LongSparseArray<String> idUuid) {
+                super.onPostExecute(idUuid);
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
-                for (String item : strings) {
-                    OperationFile file = realm.where(OperationFile.class).equalTo("fileName", item).findFirst();
-                    file.setSent(true);
+                for (int idx = 0; idx < idUuid.size(); idx++) {
+                    long id = idUuid.keyAt(idx);
+                    String uuid = idUuid.valueAt(idx);
+                    OperationFile file = realm.where(OperationFile.class).equalTo("_id", id)
+                            .equalTo("uuid", uuid).findFirst();
+                    if (file != null) {
+                        file.setSent(true);
+                    }
                 }
 
                 realm.commitTransaction();
@@ -1235,24 +1250,53 @@ public class OrderFragment extends Fragment {
     }
 
     private void sendOrders(List<Orders> orders) {
-        AsyncTask<Orders[], Void, String> task = new AsyncTask<Orders[], Void, String>() {
+        AsyncTask<Orders[], Void, LongSparseArray<String>> task = new AsyncTask<Orders[], Void, LongSparseArray<String>>() {
             @Override
-            protected String doInBackground(Orders[]... lists) {
+            protected LongSparseArray<String> doInBackground(Orders[]... lists) {
                 List<Orders> args = Arrays.asList(lists[0]);
+                LongSparseArray<String> idUuid = new LongSparseArray<>();
                 Call<ResponseBody> call = ToirAPIFactory.getOrdersService().send(args);
                 try {
                     Response response = call.execute();
-                    Log.d(TAG, "response = " + response);
+                    ResponseBody result = (ResponseBody) response.body();
+                    if (response.isSuccessful()) {
+                        JSONObject jObj = new JSONObject(result.string());
+                        // при сохранении данных на сервере произошли ошибки
+                        // данный флаг пока не используем
+//                            boolean success = (boolean) jObj.get("success");
+                        JSONArray data = (JSONArray) jObj.get("data");
+                        for (int idx = 0; idx < data.length(); idx++) {
+                            JSONObject item = (JSONObject) data.get(idx);
+                            Long _id = Long.parseLong(item.get("_id").toString());
+                            String uuid = item.get("uuid").toString();
+                            idUuid.append(_id, uuid);
+                        }
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                return null;
+                return idUuid;
             }
 
             @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
+            protected void onPostExecute(LongSparseArray<String> idUuid) {
+                super.onPostExecute(idUuid);
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                for (int idx = 0; idx < idUuid.size(); idx++) {
+                    long _id = idUuid.keyAt(idx);
+                    String uuid = idUuid.valueAt(idx);
+                    Orders value = realm.where(Orders.class).equalTo("_id", _id)
+                            .equalTo("uuid", uuid)
+                            .findFirst();
+                    if (value != null) {
+                        value.setSent(true);
+                    }
+                }
+
+                realm.commitTransaction();
+                realm.close();
             }
         };
 
@@ -1262,25 +1306,59 @@ public class OrderFragment extends Fragment {
     }
 
     private void sendMeasuredValues(List<MeasuredValue> values) {
-        AsyncTask<MeasuredValue[], Void, String> task = new AsyncTask<MeasuredValue[], Void, String>() {
+        AsyncTask<MeasuredValue[], Void, LongSparseArray<String>> task = new AsyncTask<MeasuredValue[], Void, LongSparseArray<String>>() {
             @Override
-            protected String doInBackground(MeasuredValue[]... lists) {
+            protected LongSparseArray<String> doInBackground(MeasuredValue[]... lists) {
                 List<MeasuredValue> args = Arrays.asList(lists[0]);
+                LongSparseArray<String> idUuid = new LongSparseArray<>();
                 Call<ResponseBody> call = ToirAPIFactory.getMeasuredValueService().send(args);
                 try {
                     Response response = call.execute();
-                    Log.d(TAG, "response = " + response);
+                    ResponseBody result = (ResponseBody) response.body();
+                    if (response.isSuccessful()) {
+                        JSONObject jObj = new JSONObject(result.string());
+                        // при сохранении данных на сервере произошли ошибки
+                        // данный флаг пока не используем
+//                            boolean success = (boolean) jObj.get("success");
+                        JSONArray data = (JSONArray) jObj.get("data");
+                        for (int idx = 0; idx < data.length(); idx++) {
+                            JSONObject item = (JSONObject) data.get(idx);
+                            Long _id = Long.parseLong(item.get("_id").toString());
+                            String uuid = item.get("uuid").toString();
+                            idUuid.append(_id, uuid);
+                        }
+                    }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    Log.e(TAG, e.getMessage());
+                    e.printStackTrace();
                 }
 
-                return null;
+                return idUuid;
             }
 
             @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                processDialog.dismiss();
+            protected void onPostExecute(LongSparseArray<String> idUuid) {
+                super.onPostExecute(idUuid);
+                if (processDialog != null) {
+                    processDialog.dismiss();
+                }
+
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                for (int idx = 0; idx < idUuid.size(); idx++) {
+                    long _id = idUuid.keyAt(idx);
+                    String uuid = idUuid.valueAt(idx);
+                    MeasuredValue value = realm.where(MeasuredValue.class).equalTo("_id", _id)
+                            .equalTo("uuid", uuid)
+                            .findFirst();
+                    if (value != null) {
+                        value.setSent(true);
+                    }
+                }
+
+                realm.commitTransaction();
+                realm.close();
+
                 Toast.makeText(getContext(), "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
             }
         };
@@ -1296,11 +1374,11 @@ public class OrderFragment extends Fragment {
         AuthorizedUser user = AuthorizedUser.getInstance();
         RealmResults<Orders> ordersList = realmDB.where(Orders.class)
                 .equalTo("user.uuid", user.getUuid())
+                .equalTo("sent", false)
                 .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE).or()
                 .equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE).or()
                 .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or()
-                .equalTo("orderStatus.uuid", OrderStatus.Status.CANCELED).or()
-                .equalTo("sent", false)
+                .equalTo("orderStatus.uuid", OrderStatus.Status.CANCELED)
                 .findAll();
         if (ordersList.size() == 0) {
             Toast.makeText(getActivity(), "Нет результатов для отправки.", Toast.LENGTH_SHORT).show();
@@ -1351,6 +1429,7 @@ public class OrderFragment extends Fragment {
         // получаем все измерения связанные с выполненными операциями
         RealmResults<MeasuredValue> measuredValues = realmDB
                 .where(MeasuredValue.class)
+                .equalTo("sent", false)
                 .in("operation.uuid", opUuidsArray)
                 .findAll();
 
