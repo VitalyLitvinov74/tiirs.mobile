@@ -914,10 +914,20 @@ public class OrderFragment extends Fragment {
                     List<Documentation> list = r.body();
                     if (list != null) {
                         for (Documentation doc : list) {
-                            String localPath = "/documentation/" + doc.getEquipmentModel().getUuid() + "/";
-                            if (isNeedDownload(doc, localPath) && doc.isRequired()) {
-                                String url = "/storage/" + userName + "/" + doc.getEquipmentModel().getUuid() + "/";
-                                files.add(new FilePath(doc.getPath(), url, localPath));
+                            if (doc.getEquipmentModel() != null) {
+                                String localPath = "/documentation/" + doc.getEquipmentModel().getUuid() + "/";
+                                if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                                    String url = "/storage/" + userName + "/" + doc.getEquipmentModel().getUuid() + "/";
+                                    files.add(new FilePath(doc.getPath(), url, localPath));
+                                }
+                            }
+
+                            if (doc.getEquipment() != null) {
+                                String localPath = "/documentation/" + doc.getEquipment().getUuid() + "/";
+                                if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                                    String url = "/storage/" + userName + "/" + doc.getEquipment().getUuid() + "/";
+                                    files.add(new FilePath(doc.getPath(), url, localPath));
+                                }
                             }
                         }
 
@@ -928,7 +938,7 @@ public class OrderFragment extends Fragment {
                         realm.close();
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
+                    Log.e(TAG, "Ошибка при получении документации.");
                     e.printStackTrace();
                 }
 
