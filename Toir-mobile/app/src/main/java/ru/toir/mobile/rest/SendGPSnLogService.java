@@ -4,18 +4,20 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import okhttp3.ResponseBody;
 import retrofit2.*;
 import retrofit2.Response;
 import ru.toir.mobile.db.realm.GpsTrack;
-import ru.toir.mobile.db.realm.ISend;
 import ru.toir.mobile.db.realm.Journal;
 
 /**
@@ -41,7 +43,7 @@ public class SendGPSnLogService extends Service {
         @Override
         public void run() {
             Realm realm = Realm.getDefaultInstance();
-            Call<ToirAPIResponse> call;
+            Call<ResponseBody> call;
 
             if (gpsIds.length > 0) {
                 int count = gpsIds.length;
@@ -56,24 +58,32 @@ public class SendGPSnLogService extends Service {
                 call = ToirAPIFactory.getGpsTrackService()
                         .send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
-                    Response<ToirAPIResponse> response = call.execute();
+                    Response response = call.execute();
+                    ResponseBody result = (ResponseBody) response.body();
                     if (response.isSuccessful()) {
-                        ToirAPIResponse apiResponse = response.body();
-                        realm.beginTransaction();
-                        if (!apiResponse.isSuccess()) {
-                            List<String> listIds;
-                            try {
-                                listIds = ((List<String>) apiResponse.getData());
-                                // удаляем из списка не сохраннённые элементы
-                                removeNotSaved(items, listIds);
+                        LongSparseArray<String> idUuid = new LongSparseArray<>();
+                        JSONObject jObj = new JSONObject(result.string());
+                        // при сохранении данных на сервере произошли ошибки
+                        // данный флаг пока не используем
+//                        boolean success = (boolean) jObj.get("success");
+                        JSONArray jData = (JSONArray) jObj.get("data");
+                        for (int idx = 0; idx < jData.length(); idx++) {
+                            JSONObject item = (JSONObject) jData.get(idx);
+                            Long _id = Long.parseLong(item.get("_id").toString());
+                            String uuid = item.get("uuid").toString();
+                            idUuid.append(_id, uuid);
+                        }
 
-                                // отмечаем отправленные данные
-                                for (GpsTrack item : items) {
-                                    item.setSent(true);
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        // так как на клиенте не используем эту информацию, удаляем
+                        // после успешной отправки и сохранения
+                        realm.beginTransaction();
+                        for (int idx = 0; idx < idUuid.size(); idx++) {
+                            long _id = idUuid.keyAt(idx);
+                            String uuid = idUuid.valueAt(idx);
+                            realm.where(GpsTrack.class).equalTo("_id", _id)
+                                    .equalTo("userUuid", uuid)
+                                    .findFirst()
+                                    .deleteFromRealm();
                         }
 
                         realm.commitTransaction();
@@ -91,28 +101,38 @@ public class SendGPSnLogService extends Service {
                     data[i] = logIds[i];
                 }
 
-                RealmResults<Journal> items = realm.where(Journal.class).in("_id", data).equalTo("sent", false).findAll();
+                RealmResults<Journal> items = realm.where(Journal.class).in("_id", data)
+                        .equalTo("sent", false).findAll();
                 // отправляем данные с логами
-                call = ToirAPIFactory.getJournalService().send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
+                call = ToirAPIFactory.getJournalService()
+                        .send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
                 try {
-                    Response<ToirAPIResponse> response = call.execute();
+                    Response response = call.execute();
+                    ResponseBody result = (ResponseBody) response.body();
                     if (response.isSuccessful()) {
-                        ToirAPIResponse apiResponse = response.body();
-                        realm.beginTransaction();
-                        if (!apiResponse.isSuccess()) {
-                            List<String> listIds;
-                            try {
-                                listIds = ((List<String>) apiResponse.getData());
-                                // удаляем из списка не сохраннённые элементы
-                                removeNotSaved(items, listIds);
+                        LongSparseArray<String> idUuid = new LongSparseArray<>();
+                        JSONObject jObj = new JSONObject(result.string());
+                        // при сохранении данных на сервере произошли ошибки
+                        // данный флаг пока не используем
+//                        boolean success = (boolean) jObj.get("success");
+                        JSONArray jData = (JSONArray) jObj.get("data");
+                        for (int idx = 0; idx < jData.length(); idx++) {
+                            JSONObject item = (JSONObject) jData.get(idx);
+                            Long _id = Long.parseLong(item.get("_id").toString());
+                            String uuid = item.get("uuid").toString();
+                            idUuid.append(_id, uuid);
+                        }
 
-                                // отмечаем отправленные данные
-                                for (Journal item : items) {
-                                    item.setSent(true);
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        // так как на клиенте не используем эту информацию, удаляем
+                        // после успешной отправки и сохранения
+                        realm.beginTransaction();
+                        for (int idx = 0; idx < idUuid.size(); idx++) {
+                            long _id = idUuid.keyAt(idx);
+                            String uuid = idUuid.valueAt(idx);
+                            realm.where(Journal.class).equalTo("_id", _id)
+                                    .equalTo("userUuid", uuid)
+                                    .findFirst()
+                                    .deleteFromRealm();
                         }
 
                         realm.commitTransaction();
@@ -161,32 +181,4 @@ public class SendGPSnLogService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-    /**
-     * Вспомогательный метод для удаления из отправленого списка записей тех которые
-     * не сохранены на сервере.
-     *
-     * @param list Список отправленных записей.
-     * @param data Список id записей которые не сохранили.
-     */
-    private void removeNotSaved(List<? extends ISend> list, List<String> data) {
-
-        if (list == null || data == null) {
-            return;
-        }
-
-        List<Long> ids = new ArrayList<>();
-        for (String item : data) {
-            ids.add(Long.valueOf(item));
-        }
-
-        for (Object item : list) {
-            if (ids.contains(((ISend) item).get_id())) {
-                // удаляем из списка данных для отметки об успешной отправки, те что не сохранил сервер
-                list.remove(item);
-            }
-        }
-    }
-
-
 }
