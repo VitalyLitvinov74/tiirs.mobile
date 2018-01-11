@@ -4,12 +4,10 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Orders;
 
 /**
@@ -43,4 +41,10 @@ public interface IOrders {
 
     @POST("/orders/results")
     Call<ResponseBody> send(@Body List<Orders> orders);
+
+    @POST("/orders/in-work")
+    Call<ResponseBody> setInWork(@Body String uuid);
+
+    @POST("/orders/in-work")
+    Call<ResponseBody> setInWork(@Body List<String> uuid);
 }

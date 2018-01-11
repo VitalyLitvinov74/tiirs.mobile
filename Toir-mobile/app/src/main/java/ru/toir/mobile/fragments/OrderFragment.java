@@ -1010,12 +1010,16 @@ public class OrderFragment extends Fragment {
                     int count = orders.size();
                     // собщаем количество полученных нарядов
                     if (count > 0) {
-
+                        final List<String> uuids = new ArrayList<>();
                         Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
                         // проставляем дату получения нарядов
                         for (Orders order : orders) {
                             order.setReceivDate(new Date());
+
+                            if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.NEW)) {
+                                uuids.add(order.getUuid());
+                            }
                         }
 
                         realm.copyToRealmOrUpdate(orders);
@@ -1023,6 +1027,33 @@ public class OrderFragment extends Fragment {
                         realm.close();
                         addToJournal("Клиент успешно получил " + count + " нарядов");
                         Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+
+                        // если есть новые наряды, отправляем подтверждение о получении
+                        if (!uuids.isEmpty()) {
+                            Runnable runnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    // отправляем запрос на установку статуса IN_WORK на сервере
+                                    // в случае не успеха, ни каких действий для повторной отправки
+                                    // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
+                                    Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setInWork(uuids);
+                                    try {
+                                        Response response = call.execute();
+                                        if (response.code() != 200) {
+                                            // TODO: нужно реализовать механизм повторной попытки установки статуса
+                                            addToJournal("Не удалось отправить запрос на установку статуса нарядов IN_WORK");
+                                        } else {
+                                            addToJournal("Успешно отправили статус для полученных нарядов IN_WORK");
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        addToJournal("Исключение при запросе на установку статуса нарядов IN_WORK");
+                                    }
+                                }
+                            };
+                            Thread thread = new Thread(runnable);
+                            thread.start();
+                        }
                     } else {
                         Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
                     }
