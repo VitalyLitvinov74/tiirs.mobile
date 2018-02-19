@@ -14,7 +14,6 @@ public class RepairPartType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private RepairPartType parentRepairType;
     private Date createdAt;
     private Date changedAt;
 
@@ -40,14 +39,6 @@ public class RepairPartType extends RealmObject {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public RepairPartType getParentRepairType() {
-        return parentRepairType;
-    }
-
-    public void setParentRepairType(RepairPartType parentRepairType) {
-        this.parentRepairType = parentRepairType;
     }
 
     public Date getCreatedAt() {

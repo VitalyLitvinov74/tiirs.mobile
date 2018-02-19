@@ -16,17 +16,17 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
-import ru.toir.mobile.db.realm.Stages;
 
 /**
  * @author olejek
  * Created by olejek on 14.09.16.
  */
-public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapter {
-    public static final String TABLE_NAME = "Stages";
+public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter {
+    public static final String TABLE_NAME = "Stage";
 
-    public StageAdapter(@NonNull Context context, RealmResults<Stages> data) {
+    public StageAdapter(@NonNull Context context, RealmResults<Stage> data) {
         super(context, data);
     }
 
@@ -40,8 +40,8 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
     }
 
     @Override
-    public Stages getItem(int position) {
-        Stages stages;
+    public Stage getItem(int position) {
+        Stage stages;
         if (adapterData != null) {
             stages = adapterData.get(position);
             return stages;
@@ -51,7 +51,7 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
 
     @Override
     public long getItemId(int position) {
-        Stages stages;
+        Stage stages;
         if (adapterData != null) {
             stages = adapterData.get(position);
             return stages.get_id();
@@ -81,7 +81,7 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
             if (position >= adapterData.size())
                 return convertView;
 
-            Stages stage = adapterData.get(position);
+            Stage stage = adapterData.get(position);
             StageStatus stageStatus = stage.getStageStatus();
             viewHolder.title.setText(stage.getStageTemplate().getTitle());
             if (stageStatus != null) {

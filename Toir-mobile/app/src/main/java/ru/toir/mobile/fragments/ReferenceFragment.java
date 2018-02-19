@@ -68,13 +68,11 @@ import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.RepairPart;
 import ru.toir.mobile.db.realm.RepairPartType;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
-import ru.toir.mobile.db.realm.TaskStageList;
-import ru.toir.mobile.db.realm.TaskStageOperationList;
-import ru.toir.mobile.db.realm.Stages;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
@@ -712,42 +710,14 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // TaskStageList ???
-                referenceName = TaskStageList.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<TaskStageList>> response = ToirAPIFactory
-                            .getTaskStageListService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<TaskStageList> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
-                }
-
-                // TaskStageOperationList ???
-                referenceName = TaskStageOperationList.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<TaskStageOperationList>> response = ToirAPIFactory
-                            .getTaskStageOperationListService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<TaskStageOperationList> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
-                }
-
                 // Stages ???
-                referenceName = Stages.class.getSimpleName();
+                referenceName = Stage.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<Stages>> response = ToirAPIFactory.getStagesService()
+                    Response<List<Stage>> response = ToirAPIFactory.getStageService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<Stages> list = response.body();
+                        List<Stage> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {

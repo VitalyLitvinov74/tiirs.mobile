@@ -17,9 +17,6 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     private String description;
     private String image;
     private int normative;
-    private int first_step;
-    private int last_step;
-    private EquipmentModel equipmentModel;
     private OperationType operationType;
     private Date createdAt;
     private Date changedAt;
@@ -70,30 +67,6 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
 
     public void setNormative(int normative) {
         this.normative = normative;
-    }
-
-    public int getFirst_step() {
-        return first_step;
-    }
-
-    public void setFirst_step(int first_step) {
-        this.first_step = first_step;
-    }
-
-    public int getLast_step() {
-        return last_step;
-    }
-
-    public void setLast_step(int last_step) {
-        this.last_step = last_step;
-    }
-
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
-    }
-
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
     }
 
     public OperationType getOperationType() {

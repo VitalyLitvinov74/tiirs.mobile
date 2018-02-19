@@ -17,8 +17,7 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
     private String description;
     private String image;
     private int normative;
-    private EquipmentModel equipmentModel;
-    private StageType taskStageType;
+    private StageType stageType;
     private Date createdAt;
     private Date changedAt;
 
@@ -63,20 +62,12 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
         this.image = image;
     }
 
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
+    public StageType getStageType() {
+        return stageType;
     }
 
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
-    }
-
-    public StageType getTaskStageType() {
-        return taskStageType;
-    }
-
-    public void setStageType(StageType taskStageType) {
-        this.taskStageType = taskStageType;
+    public void setStageType(StageType stageType) {
+        this.stageType = stageType;
     }
 
     public int getNormative() {

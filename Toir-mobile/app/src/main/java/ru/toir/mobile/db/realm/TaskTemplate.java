@@ -17,7 +17,6 @@ public class TaskTemplate extends RealmObject implements IToirDbObject {
     private String description;
     private String image;
     private int normative;
-    private EquipmentModel equipmentModel;
     private TaskType taskType;
     private Date createdAt;
     private Date changedAt;
@@ -61,14 +60,6 @@ public class TaskTemplate extends RealmObject implements IToirDbObject {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
-    }
-
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
     }
 
     public TaskType getTaskType() {

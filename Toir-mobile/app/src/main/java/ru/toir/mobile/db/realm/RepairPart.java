@@ -14,9 +14,7 @@ public class RepairPart extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private EquipmentModel equipmentModel;
     private RepairPartType repairPartType;
-    private int commonRepairPartFlag;
     private Date createdAt;
     private Date changedAt;
 
@@ -44,28 +42,12 @@ public class RepairPart extends RealmObject {
         this.title = title;
     }
 
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
-    }
-
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
-    }
-
     public RepairPartType getRepairPartType() {
         return repairPartType;
     }
 
     public void setRepairPartType(RepairPartType repairPartType) {
         this.repairPartType = repairPartType;
-    }
-
-    public int getCommonRepairPartFlag() {
-        return commonRepairPartFlag;
-    }
-
-    public void setCommonRepairPartFlag(int commonRepairPartFlag) {
-        this.commonRepairPartFlag = commonRepairPartFlag;
     }
 
     public Date getCreatedAt() {

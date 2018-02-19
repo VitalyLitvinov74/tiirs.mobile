@@ -17,6 +17,6 @@ public class Migration27 implements IToirMigration {
     public void migration(DynamicRealm realm) {
         Log.d(this.getClass().getSimpleName(), "from version 26");
         RealmSchema schema = realm.getSchema();
-        schema.get(Operation.class.getSimpleName()).removeField("taskStage");
+        schema.get("Operation").removeField("taskStage");
     }
 }

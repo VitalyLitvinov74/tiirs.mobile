@@ -92,8 +92,8 @@ import ru.toir.mobile.db.realm.OperationVerdict;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
-import ru.toir.mobile.db.realm.Stages;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
@@ -125,7 +125,7 @@ public class OrderFragment extends Fragment {
     private Toolbar toolbar;
     private Tasks selectedTask;
     private Orders selectedOrder;
-    private Stages selectedStage;
+    private Stage selectedStage;
     private OrderAdapter orderAdapter;
     private TaskAdapter taskAdapter;
     private StageAdapter stageAdapter;
@@ -496,13 +496,13 @@ public class OrderFragment extends Fragment {
 
     // Stages----------------------------------------------------------------------------------------
     private void fillListViewStage(Tasks task) {
-        RealmResults<Stages> stages;
-        RealmQuery<Stages> q = realmDB.where(Stages.class);
+        RealmResults<Stage> stages;
+        RealmQuery<Stage> q = realmDB.where(Stage.class);
         toolbar.setSubtitle("Этапы задач");
         boolean first = true;
         boolean all_complete = true;
         if (task.getStages().size() > 0) {
-            for (Stages stage : task.getStages()) {
+            for (Stage stage : task.getStages()) {
                 long id = stage.get_id();
                 if (!stage.getStageStatus().getUuid().equals(StageStatus.Status.COMPLETE)) {
                     all_complete = false;
@@ -560,7 +560,7 @@ public class OrderFragment extends Fragment {
     }
 
     // Operations----------------------------------------------------------------------------------------
-    private void fillListViewOperations(Stages stage) {
+    private void fillListViewOperations(Stage stage) {
         RealmResults<Operation> operations;
         RealmQuery<Operation> q = realmDB.where(Operation.class);
         boolean first = true;
@@ -834,8 +834,8 @@ public class OrderFragment extends Fragment {
                             }
                         }
 
-                        List<Stages> stages = task.getStages();
-                        for (Stages stage : stages) {
+                        List<Stage> stages = task.getStages();
+                        for (Stage stage : stages) {
                             // урл изображения этапа задачи
                             isNeedDownload = isNeedDownload(stage.getStageTemplate(), basePathLocal);
                             if (isNeedDownload) {
@@ -1435,8 +1435,8 @@ public class OrderFragment extends Fragment {
         for (Orders order : ordersList) {
             List<Tasks> tasks = order.getTasks();
             for (Tasks task : tasks) {
-                List<Stages> stages = task.getStages();
-                for (Stages stage : stages) {
+                List<Stage> stages = task.getStages();
+                for (Stage stage : stages) {
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
                         operationUuids.add(operation.getUuid());
@@ -1623,7 +1623,7 @@ public class OrderFragment extends Fragment {
                             task.setTaskStatus(taskStatusUnComplete);
                         }
                     });
-                    for (final Stages stages : task.getStages()) {
+                    for (final Stage stages : task.getStages()) {
                         realmDB.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {

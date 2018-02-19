@@ -103,4 +103,11 @@ public class Operation extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }
