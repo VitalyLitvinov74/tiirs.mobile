@@ -16,17 +16,17 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
-import ru.toir.mobile.db.realm.Tasks;
 
 /**
  * @author olejek
  *         Created by olejek on 13.09.16.
  */
-public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter {
-    public static final String TABLE_NAME = "Tasks";
+public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
+    public static final String TABLE_NAME = "Task";
 
-    public TaskAdapter(@NonNull Context context, RealmResults<Tasks> data) {
+    public TaskAdapter(@NonNull Context context, RealmResults<Task> data) {
         super(context, data);
     }
 
@@ -40,7 +40,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
     }
 
     @Override
-    public Tasks getItem(int position) {
+    public Task getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);
         }
@@ -49,7 +49,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
     @Override
     public long getItemId(int position) {
-        Tasks task;
+        Task task;
         if (adapterData != null) {
             task = adapterData.get(position);
             return task.get_id();
@@ -75,7 +75,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
         if (adapterData != null) {
             if (position >= adapterData.size())
                 return convertView;
-            Tasks task = adapterData.get(position);
+            Task task = adapterData.get(position);
             Date lDate = task.getStartDate();
             if (lDate != null  && lDate.after(new Date(100000))) {
                 String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);

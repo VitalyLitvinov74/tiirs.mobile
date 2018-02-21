@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 12.09.16.
  */
-public class Tasks extends RealmObject {
+public class Task extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -25,7 +25,7 @@ public class Tasks extends RealmObject {
     private Date endDate;
     private Date createdAt;
     private Date changedAt;
-    private RealmList<Stage> taskStages;
+    private RealmList<Stage> stages;
 
     public long get_id() {
         return _id;
@@ -132,15 +132,15 @@ public class Tasks extends RealmObject {
     }
 
     public RealmList<Stage> getStages() {
-        return taskStages;
+        return stages;
     }
 
     public void setStages(RealmList<Stage> stages) {
-        this.taskStages = stages;
+        this.stages = stages;
     }
 
-    public void addTaskStage(Stage taskStage) {
-        this.taskStages.add(taskStage);
+    public void addStage(Stage stage) {
+        this.stages.add(stage);
     }
 
 

@@ -73,11 +73,11 @@ import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
 import ru.toir.mobile.db.realm.TaskVerdict;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.Tool;
 import ru.toir.mobile.db.realm.ToolType;
 import ru.toir.mobile.rest.ToirAPIFactory;
@@ -696,14 +696,14 @@ public class ReferenceFragment extends Fragment {
                     Log.e(TAG, e.getLocalizedMessage());
                 }
 
-                // Tasks ???
-                referenceName = Tasks.class.getSimpleName();
+                // Task ???
+                referenceName = Task.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<Tasks>> response = ToirAPIFactory.getTasksService()
+                    Response<List<Task>> response = ToirAPIFactory.getTasksService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<Tasks> list = response.body();
+                        List<Task> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {

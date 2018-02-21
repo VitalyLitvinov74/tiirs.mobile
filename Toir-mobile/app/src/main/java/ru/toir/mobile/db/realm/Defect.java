@@ -20,7 +20,7 @@ public class Defect extends RealmObject {
     private DefectType defectType;
     private boolean process;
     private String comment;
-    private Tasks task;
+    private Task task;
     private Date createdAt;
     private Date changedAt;
 
@@ -100,11 +100,11 @@ public class Defect extends RealmObject {
         this.comment = comment;
     }
 
-    public Tasks getTask() {
+    public Task getTask() {
         return task;
     }
 
-    public void setTask(Tasks task) {
+    public void setTask(Task task) {
         this.task = task;
     }
 

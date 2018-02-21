@@ -27,11 +27,11 @@ import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.StageStatus;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
 import ru.toir.mobile.db.realm.TaskVerdict;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 
 public class LoadTestData {
@@ -109,10 +109,10 @@ public class LoadTestData {
     private static StageTemplate stageTemplate2;
     private static TaskVerdict taskVerdict;
 
-    private static Tasks task;
-    private static Tasks task2;
-    private static Tasks task3;
-    private static Tasks task4;
+    private static Task task;
+    private static Task task2;
+    private static Task task3;
+    private static Task task4;
 
     private static TaskType taskType;
     private static TaskType taskType2;
@@ -1196,7 +1196,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                task = realmDB.createObject(Tasks.class);
+                task = realmDB.createObject(Task.class);
                 task.set_id(1);
                 task.setUuid(taskUuid);
                 task.setTaskStatus(taskStatus);
@@ -1212,8 +1212,8 @@ public class LoadTestData {
                 task.setComment("Там тепловей шумит сильно, из под него бежит и тепла нет. Следует разобраться.");
                 task.setPrevCode(0);
                 task.setNextCode(2);
-                task.addTaskStage(stage);
-                task.addTaskStage(stage2);
+                task.addStage(stage);
+                task.addStage(stage2);
                 //task.setOrder(order);
             }
         });
@@ -1221,7 +1221,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                task2 = realmDB.createObject(Tasks.class);
+                task2 = realmDB.createObject(Task.class);
                 task2.set_id(2);
                 task2.setUuid(taskUuid2);
                 task2.setTaskStatus(taskStatus);

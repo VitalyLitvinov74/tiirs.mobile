@@ -6,15 +6,17 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Olejek
- *         Created on 07.09.16.
+ * @author Dmitriy Logachev
+ *         Created by koputo on 2/20/18.
  */
-public class OperationStatus extends RealmObject {
 
+public class OperationRepairPart extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private String title;
+    private OperationTemplate operationTemplate;
+    private RepairPart repairPart;
+    private int quantity;
     private Date createdAt;
     private Date changedAt;
 
@@ -34,12 +36,28 @@ public class OperationStatus extends RealmObject {
         this.uuid = uuid;
     }
 
-    public String getTitle() {
-        return title;
+    public OperationTemplate getOperationTemplate() {
+        return operationTemplate;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setOperationTemplate(OperationTemplate operationTemplate) {
+        this.operationTemplate = operationTemplate;
+    }
+
+    public RepairPart getRepairPart() {
+        return repairPart;
+    }
+
+    public void setRepairPart(RepairPart repairPart) {
+        this.repairPart = repairPart;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public Date getCreatedAt() {
@@ -56,13 +74,5 @@ public class OperationStatus extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
-    }
-
-    public class Status {
-        public static final String NEW = "18D3D5D4-336F-4B25-BA2B-00A6C7D5EB6C";
-        public static final String IN_WORK = "78063CCA-4463-45AD-9124-88CEA2B51017";
-        public static final String COMPLETE = "626FC9E9-9F1F-4DE7-937D-74DAD54ED751";
-        public static final String UN_COMPLETE = "0F733A22-B65A-4D96-AF86-34F7E6A62B0B";
-        public static final String CANCELED = "1A277EB1-1A22-400F-9E03-F094E19FEEDE";
     }
 }

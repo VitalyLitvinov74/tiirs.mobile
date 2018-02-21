@@ -94,8 +94,8 @@ import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
@@ -123,7 +123,7 @@ public class OrderFragment extends Fragment {
     FloatingActionButton fab_check;
     FloatingActionButton fab_camera;
     private Toolbar toolbar;
-    private Tasks selectedTask;
+    private Task selectedTask;
     private Orders selectedOrder;
     private Stage selectedStage;
     private OrderAdapter orderAdapter;
@@ -424,15 +424,15 @@ public class OrderFragment extends Fragment {
         fab_check.setVisibility(View.INVISIBLE);
     }
 
-    // Tasks----------------------------------------------------------------------------------------
+    // Task----------------------------------------------------------------------------------------
     private void fillListViewTasks(Orders order) {
-        RealmResults<Tasks> tasks;
-        RealmQuery<Tasks> q = realmDB.where(Tasks.class);
+        RealmResults<Task> tasks;
+        RealmQuery<Task> q = realmDB.where(Task.class);
         boolean first = true;
         boolean all_complete = true;
         toolbar.setSubtitle("Задачи");
         if (order.getTasks().size() > 0) {
-            for (Tasks task : order.getTasks()) {
+            for (Task task : order.getTasks()) {
                 long id = task.get_id();
                 if (!task.getTaskStatus().getUuid().equals(TaskStatus.Status.COMPLETE)) {
                     all_complete = false;
@@ -495,7 +495,7 @@ public class OrderFragment extends Fragment {
     }
 
     // Stages----------------------------------------------------------------------------------------
-    private void fillListViewStage(Tasks task) {
+    private void fillListViewStage(Task task) {
         RealmResults<Stage> stages;
         RealmQuery<Stage> q = realmDB.where(Stage.class);
         toolbar.setSubtitle("Этапы задач");
@@ -789,8 +789,8 @@ public class OrderFragment extends Fragment {
                         order.setSent(true);
                     }
 
-                    List<Tasks> tasks = order.getTasks();
-                    for (Tasks task : tasks) {
+                    List<Task> tasks = order.getTasks();
+                    for (Task task : tasks) {
                         // UUID шаблона задачи
                         String taskTemplateUuid = task.getTaskTemplate().getUuid();
                         // путь до папки с файлами
@@ -1433,8 +1433,8 @@ public class OrderFragment extends Fragment {
         List<String> operationUuids = new ArrayList<>();
 
         for (Orders order : ordersList) {
-            List<Tasks> tasks = order.getTasks();
-            for (Tasks task : tasks) {
+            List<Task> tasks = order.getTasks();
+            for (Task task : tasks) {
                 List<Stage> stages = task.getStages();
                 for (Stage stage : stages) {
                     List<Operation> operations = stage.getOperations();
@@ -1616,7 +1616,7 @@ public class OrderFragment extends Fragment {
                  * закрываем наряд, в зависимости от статуса выполнения
                  * операции выставляем статус наряда
                  */
-                for (final Tasks task : order.getTasks()) {
+                for (final Task task : order.getTasks()) {
                     realmDB.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
@@ -2225,7 +2225,7 @@ public class OrderFragment extends Fragment {
                 return;
             }
 
-            // Tasks
+            // Task
             if (Level == TASK_LEVEL) {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);

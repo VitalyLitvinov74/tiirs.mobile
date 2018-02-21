@@ -420,8 +420,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
 //	private void FillListViewOperations() {
 //        TaskAdapter taskAdapter;
-//        RealmResults<Tasks> tasks;
-//        tasks = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
+//        RealmResults<Task> tasks;
+//        tasks = realmDB.where(Task.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
 //        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
 //        lv.setAdapter(taskAdapter);
 //	}

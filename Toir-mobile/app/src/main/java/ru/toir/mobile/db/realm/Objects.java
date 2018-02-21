@@ -14,7 +14,7 @@ public class Objects extends RealmObject implements IToirDbObject {
     private long _id;
     private String uuid;
     private ObjectType objectType;
-    private Objects parentObject;
+    private Objects parent;
     private String title;
     private String description;
     private double latitude;
@@ -63,12 +63,12 @@ public class Objects extends RealmObject implements IToirDbObject {
         this.objectType = objectType;
     }
 
-    public Object getParentObject() {
-        return parentObject;
+    public Object getParent() {
+        return parent;
     }
 
-    public void setParentObject(Objects parentObject) {
-        this.parentObject = parentObject;
+    public void setParent(Objects parent) {
+        this.parent = parent;
     }
 
     public double getLatitude() {

@@ -43,7 +43,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Orders;
-import ru.toir.mobile.db.realm.Tasks;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -151,9 +151,9 @@ public class GPSFragment extends Fragment {
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         List<Long> eqIdList = new ArrayList<>();
         for (Orders itemOrder : orders) {
-            RealmList<Tasks> tasks = itemOrder.getTasks();
-            //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
-            for (Tasks itemTask : tasks) {
+            RealmList<Task> tasks = itemOrder.getTasks();
+            //tasks = realmDB.where(Task.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
+            for (Task itemTask : tasks) {
                 equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment()
                         .getUuid()).findAll();
                 for (Equipment equipment : equipments) {
