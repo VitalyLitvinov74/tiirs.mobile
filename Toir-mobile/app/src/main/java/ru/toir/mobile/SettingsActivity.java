@@ -391,7 +391,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 return false;
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getLocalizedMessage());
+            e.printStackTrace();
             return false;
         }
 

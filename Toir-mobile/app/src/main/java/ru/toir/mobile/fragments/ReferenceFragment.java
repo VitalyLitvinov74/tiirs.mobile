@@ -145,7 +145,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderStatus
@@ -159,7 +159,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderVerdict
@@ -173,7 +173,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskVerdict
@@ -187,7 +187,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskStatus
@@ -201,7 +201,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentStatus
@@ -215,7 +215,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageVerdict
@@ -229,7 +229,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageStatus
@@ -243,7 +243,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationVerdict
@@ -257,7 +257,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationStatus
@@ -271,7 +271,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // MeasureType
@@ -285,7 +285,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
             }
         };
@@ -320,7 +320,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Contragent
@@ -334,7 +334,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // CriticalType
@@ -348,7 +348,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
                 // DefectType
                 referenceName = DefectType.class.getSimpleName();
@@ -361,7 +361,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Defect
@@ -375,7 +375,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Documentation
@@ -390,7 +390,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // DocumentationType ???
@@ -404,7 +404,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Equipment ???
@@ -418,7 +418,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentModel ???
@@ -432,7 +432,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentStatus
@@ -446,7 +446,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentType ??
@@ -460,7 +460,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // MeasuredValue
@@ -478,7 +478,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // MeasureType
@@ -492,7 +492,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Operation ???
@@ -506,7 +506,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationStatus
@@ -520,7 +520,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationTemplate
@@ -534,7 +534,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationTool
@@ -548,7 +548,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationType
@@ -562,7 +562,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // ObjectType
@@ -576,7 +576,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Objects
@@ -590,7 +590,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationVerdict
@@ -604,7 +604,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderLevel
@@ -618,7 +618,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Orders ???
@@ -637,7 +637,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderStatus
@@ -651,7 +651,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderVerdict
@@ -665,7 +665,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // RepairPart ???
@@ -679,7 +679,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // RepairPartType ???
@@ -693,7 +693,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Task ???
@@ -707,7 +707,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Stages ???
@@ -721,7 +721,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageStatus
@@ -735,7 +735,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageTemplate ???
@@ -749,7 +749,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageType ???
@@ -763,7 +763,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageVerdict
@@ -777,7 +777,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskStatus
@@ -791,7 +791,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskTemplate ???
@@ -805,7 +805,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskType ???
@@ -819,7 +819,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskVerdict
@@ -833,7 +833,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Tool ???
@@ -847,7 +847,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // ToolType ???
@@ -861,7 +861,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // User ???
@@ -882,7 +882,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
 

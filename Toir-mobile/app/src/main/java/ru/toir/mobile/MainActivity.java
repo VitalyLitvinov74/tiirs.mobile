@@ -352,13 +352,13 @@ public class MainActivity extends AppCompatActivity {
                                                         Log.e(TAG, "Не удалось получить масштабированное изображение.");
                                                     }
                                                 } catch (Exception e) {
-                                                    Log.e(TAG, e.getLocalizedMessage());
+                                                    e.printStackTrace();
                                                 }
                                             }
 
                                             @Override
                                             public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
-                                                Log.e(TAG, t.getLocalizedMessage());
+                                                t.printStackTrace();
                                             }
                                         });
                                         setMainLayout(savedInstance);

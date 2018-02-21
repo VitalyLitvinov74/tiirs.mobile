@@ -755,7 +755,7 @@ class ToirRealmMigration implements RealmMigration {
 //                    propsType.put(prop.getName(), prop.getGenericType().toString());
                 }
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
 
             // проверяем количество и названия полей и свойств

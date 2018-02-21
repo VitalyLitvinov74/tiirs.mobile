@@ -60,7 +60,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         try {
             Thread.sleep(500);
         } catch (Exception e) {
-            Log.d(TAG, e.getLocalizedMessage());
+            e.printStackTrace();
         }
 
         Ware ware = new Ware(CommandType.GET_FIRMWARE_VERSION, 0, 0, 0);

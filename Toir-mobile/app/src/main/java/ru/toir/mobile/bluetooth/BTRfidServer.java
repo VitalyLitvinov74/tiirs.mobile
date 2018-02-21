@@ -372,7 +372,7 @@ public class BTRfidServer {
                 socket = mAdapter.listenUsingRfcommWithServiceRecord(BT_SERVICE_RECORD_NAME, BT_SERVICE_RECORD_UUID);
                 Log.d(TAG, "Получили серверный сокет...");
             } catch (IOException e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
 
             mServerSocket = socket;
@@ -394,12 +394,13 @@ public class BTRfidServer {
                     startCommunication(socket);
                     break;
                 } catch (IOException e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                     break;
                 } catch (InterruptedException e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                     break;
                 } catch (NullPointerException e) {
+                    e.printStackTrace();
                     Log.e(TAG, "mServerSocket = null");
                     break;
                 }
@@ -417,7 +418,7 @@ public class BTRfidServer {
             try {
                 mServerSocket.close();
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -444,7 +445,7 @@ public class BTRfidServer {
                 tmpInputStream = socket.getInputStream();
                 tmpOutputStream = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
 
             mInputStream = tmpInputStream;
@@ -457,7 +458,7 @@ public class BTRfidServer {
                 mOutputStream.write(command);
                 Log.d(TAG, "Успешно отправили данные клиенту...");
             } catch (IOException e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
         }
 
@@ -567,7 +568,7 @@ public class BTRfidServer {
                         parseIndex = 0;
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
 
                     // сообщаем что соединение с клиентом потеряно
                     setState(SERVER_STATE_STOPED);
@@ -787,7 +788,7 @@ public class BTRfidServer {
                 mSocket.close();
                 Thread.sleep(2000);
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
         }
     }

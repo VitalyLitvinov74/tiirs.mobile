@@ -898,7 +898,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                             fos.close();
                             return file.getAbsolutePath();
                         } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
+                            e.printStackTrace();
                         }
 
                         return null;

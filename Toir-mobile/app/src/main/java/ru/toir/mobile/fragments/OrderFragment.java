@@ -772,7 +772,7 @@ public class OrderFragment extends Fragment {
                         return null;
                     }
                 } catch (Exception e) {
-                    Log.d(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                     return null;
                 }
 
@@ -985,7 +985,7 @@ public class OrderFragment extends Fragment {
                             fos.close();
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        e.printStackTrace();
                     }
                 }
 
@@ -1103,7 +1103,7 @@ public class OrderFragment extends Fragment {
                                 getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                                 file.getFileName()));
                     } catch (Exception e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        e.printStackTrace();
                     }
 
                     List<MultipartBody.Part> list = new ArrayList<>();
@@ -1136,7 +1136,7 @@ public class OrderFragment extends Fragment {
                             }
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        e.printStackTrace();
                     }
                 }
 
@@ -1314,7 +1314,7 @@ public class OrderFragment extends Fragment {
                         }
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 return idUuid;
