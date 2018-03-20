@@ -23,11 +23,11 @@ public interface IStage {
     Call<List<Stage>> getById(@Query("id") String id);
 
     @GET("/stage")
-    Call<List<Stage>> getById(@Query("id") String[] id);
+    Call<List<Stage>> getById(@Query("id[]") String[] id);
 
     @GET("/stage")
     Call<List<Stage>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/stage")
-    Call<List<Stage>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Stage>> getByUuid(@Query("uuid[]") String[] uuid);
 }

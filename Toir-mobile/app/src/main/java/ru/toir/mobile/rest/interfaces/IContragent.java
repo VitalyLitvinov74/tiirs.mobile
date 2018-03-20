@@ -23,11 +23,11 @@ public interface IContragent {
     Call<List<Contragent>> getById(@Query("id") String id);
 
     @GET("/contragents")
-    Call<List<Contragent>> getById(@Query("id") String[] id);
+    Call<List<Contragent>> getById(@Query("id[]") String[] id);
 
     @GET("/contragents")
     Call<List<Contragent>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/contragents")
-    Call<List<Contragent>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Contragent>> getByUuid(@Query("uuid[]") String[] uuid);
 }

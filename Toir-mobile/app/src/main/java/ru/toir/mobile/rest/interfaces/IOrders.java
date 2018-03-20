@@ -25,19 +25,19 @@ public interface IOrders {
     Call<List<Orders>> getById(@Query("id") String id);
 
     @GET("/orders")
-    Call<List<Orders>> getById(@Query("id") String[] id);
+    Call<List<Orders>> getById(@Query("id[]") String[] id);
 
     @GET("/orders")
     Call<List<Orders>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/orders")
-    Call<List<Orders>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Orders>> getByUuid(@Query("uuid[]") String[] uuid);
 
     @GET("/orders")
     Call<List<Orders>> getByStatus(@Query("status") String status);
 
     @GET("/orders")
-    Call<List<Orders>> getByStatus(@Query("status") List<String> status);
+    Call<List<Orders>> getByStatus(@Query("status[]") List<String> status);
 
     @POST("/orders/results")
     Call<ResponseBody> send(@Body List<Orders> orders);

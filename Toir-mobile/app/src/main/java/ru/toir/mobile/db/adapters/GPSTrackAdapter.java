@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -23,8 +23,8 @@ import ru.toir.mobile.db.realm.GpsTrack;
 public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListAdapter {
     public static final String TABLE_NAME = "GPSTrack";
 
-    public GPSTrackAdapter(@NonNull Context context, RealmResults<GpsTrack> data) {
-        super(context, data);
+    public GPSTrackAdapter(RealmResults<GpsTrack> data) {
+        super(data);
     }
 
     @Override
@@ -65,13 +65,15 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = inflater.inflate(R.layout.row_with_3_columns, parent, false);
-            viewHolder.date = (TextView) convertView.findViewById(R.id.row3_date);
-            viewHolder.latitude = (TextView) convertView.findViewById(R.id.row3_latitude);
-            viewHolder.longitude = (TextView) convertView.findViewById(R.id.row3_longitude);
+            viewHolder.date = convertView.findViewById(R.id.row3_date);
+            viewHolder.latitude = convertView.findViewById(R.id.row3_latitude);
+            viewHolder.longitude = convertView.findViewById(R.id.row3_longitude);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -83,8 +85,8 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
             if (gpsTrack != null) {
                 String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(gpsTrack.getDate());
                 viewHolder.date.setText(sDate);
-                viewHolder.latitude.setText(gpsTrack.getLatitude() + "");
-                viewHolder.longitude.setText(gpsTrack.getLatitude() + "");
+                viewHolder.latitude.setText(String.valueOf(gpsTrack.getLatitude()));
+                viewHolder.longitude.setText(String.valueOf(gpsTrack.getLatitude()));
             }
         }
 

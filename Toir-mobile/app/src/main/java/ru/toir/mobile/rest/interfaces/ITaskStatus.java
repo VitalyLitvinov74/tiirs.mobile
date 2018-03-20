@@ -22,11 +22,11 @@ public interface ITaskStatus {
     Call<List<TaskStatus>> getById(@Query("id") String id);
 
     @GET("/task-status")
-    Call<List<TaskStatus>> getById(@Query("id") String[] id);
+    Call<List<TaskStatus>> getById(@Query("id[]") String[] id);
 
     @GET("/task-status")
     Call<List<TaskStatus>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/task-status")
-    Call<List<TaskStatus>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<TaskStatus>> getByUuid(@Query("uuid[]") String[] uuid);
 }

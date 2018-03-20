@@ -3,8 +3,8 @@ package ru.toir.mobile.db.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,12 +34,12 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
     public static final String TABLE_NAME = "Equipment";
 
-    public EquipmentAdapter(@NonNull Context context, RealmResults<Equipment> data) {
-        super(context, data);
+    public EquipmentAdapter(RealmResults<Equipment> data) {
+        super(data);
     }
 
-    public EquipmentAdapter(@NonNull Context context, RealmList<Equipment> data) {
-        super(context, data);
+    public EquipmentAdapter(RealmList<Equipment> data) {
+        super(data);
     }
 
     @Override
@@ -70,30 +70,32 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             //if (parent.getId() == R.id.gps_listView) {
             if (parent.getId() == R.id.eril_status) {
                 convertView = inflater.inflate(R.layout.equipment_gps_item, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image_critical);
-                viewHolder.equipmentStatus = (TextView) convertView.findViewById(R.id.eril_status);
-                viewHolder.criticalLevel = (TextView) convertView.findViewById(R.id.eril_critical_level);
-                viewHolder.location = (TextView) convertView.findViewById(R.id.eril_place);
-                viewHolder.inventoryNumber = (TextView) convertView.findViewById(R.id.eril_inventory_number);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
+                viewHolder.icon = convertView.findViewById(R.id.eril_image_critical);
+                viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
+                viewHolder.criticalLevel = convertView.findViewById(R.id.eril_critical_level);
+                viewHolder.location = convertView.findViewById(R.id.eril_place);
+                viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
+                viewHolder.title = convertView.findViewById(R.id.eril_title);
                 convertView.setTag(viewHolder);
             } else {
                 convertView = inflater.inflate(R.layout.equipment_reference_item_layout, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.eril_image);
-                viewHolder.equipmentStatus = (TextView) convertView.findViewById(R.id.eril_status);
-                viewHolder.criticalTypeUuid = (TextView) convertView.findViewById(R.id.eril_critical);
-                viewHolder.startDate = (TextView) convertView.findViewById(R.id.eril_last_operation_date);
-                viewHolder.location = (TextView) convertView.findViewById(R.id.eril_location);
-                viewHolder.equipmentModelUuid = (TextView) convertView.findViewById(R.id.eril_type);
-                viewHolder.inventoryNumber = (TextView) convertView.findViewById(R.id.eril_inventory_number);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.eril_title);
+                viewHolder.icon = convertView.findViewById(R.id.eril_image);
+                viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
+                viewHolder.criticalTypeUuid = convertView.findViewById(R.id.eril_critical);
+                viewHolder.startDate = convertView.findViewById(R.id.eril_last_operation_date);
+                viewHolder.location = convertView.findViewById(R.id.eril_location);
+                viewHolder.equipmentModelUuid = convertView.findViewById(R.id.eril_type);
+                viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
+                viewHolder.title = convertView.findViewById(R.id.eril_title);
                 convertView.setTag(viewHolder);
             }
         } else {

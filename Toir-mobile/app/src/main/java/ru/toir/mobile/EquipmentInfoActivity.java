@@ -239,18 +239,18 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         setMainLayout(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
-        tv_equipment_inventory = (TextView) findViewById(R.id.equipment_text_inventory);
-        tv_equipment_uuid = (TextView) findViewById(R.id.equipment_text_uuid);
-        tv_equipment_position = (TextView) findViewById(R.id.equipment_text_location);
-        tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
-        tv_equipment_check_date = (TextView) findViewById(R.id.equipment_text_date2);
-        tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
-        tv_equipment_listview = (ListView) findViewById(R.id.list_view);
-        tv_equipment_docslistview = (ListView) findViewById(R.id.equipment_documentation_listView);
-        tv_equipment_status = (TextView) findViewById(R.id.equipment_text_status);
-        tv_equipment_id = (TextView) findViewById(R.id.equipment_text_id);
-        tv_equipment_defects = (ListView) findViewById(R.id.equipment_defects_listView);
+        tv_equipment_name = findViewById(R.id.equipment_text_name);
+        tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
+        tv_equipment_uuid = findViewById(R.id.equipment_text_uuid);
+        tv_equipment_position = findViewById(R.id.equipment_text_location);
+        tv_equipment_task_date = findViewById(R.id.equipment_text_date);
+        tv_equipment_check_date = findViewById(R.id.equipment_text_date2);
+        tv_equipment_image = findViewById(R.id.equipment_image);
+        tv_equipment_listview = findViewById(R.id.list_view);
+        tv_equipment_docslistview = findViewById(R.id.equipment_documentation_listView);
+        tv_equipment_status = findViewById(R.id.equipment_text_status);
+        tv_equipment_id = findViewById(R.id.equipment_text_id);
+        tv_equipment_defects = findViewById(R.id.equipment_defects_listView);
 
         initView();
     }
@@ -261,25 +261,30 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Неизвестное оборудование!!", Toast.LENGTH_LONG).show();
             return;
         }
+
         EquipmentModel equipmentModel = equipment.getEquipmentModel();
+        String textData;
         tv_equipment_name.setText(equipment.getTitle());
         if (equipmentModel != null) {
-            tv_equipment_inventory.setText(getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle());
+            textData = getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle();
+            tv_equipment_inventory.setText(textData);
         }
+
         tv_equipment_id.setText(getString(R.string.id, equipment.getInventoryNumber()));
         tv_equipment_uuid.setText(equipment.getUuid());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
         if (equipment.getLatitude() > 0) {
-            tv_equipment_position.setText(""
-                    + String.valueOf(equipment.getLatitude()) + " / "
-                    + String.valueOf(equipment.getLongitude()));
+            textData = String.valueOf(equipment.getLatitude()) + " / "
+                    + String.valueOf(equipment.getLongitude());
+            tv_equipment_position.setText(textData);
         } else {
             if (equipment.getLocation() != null) {
-                tv_equipment_position.setText(""
-                        + String.valueOf(equipment.getLocation().getLatitude()) + " / "
-                        + String.valueOf(equipment.getLocation().getLongitude()));
+                textData = String.valueOf(equipment.getLocation().getLatitude()) + " / "
+                        + String.valueOf(equipment.getLocation().getLongitude());
+                tv_equipment_position.setText(textData);
             }
         }
+
         Date date = equipment.getStartDate();
         String startDate;
         if (date != null) {
@@ -303,7 +308,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (stages.size() > 2) {
             stages.subList(0, 2);
         }
-        StageAdapter stageAdapter = new StageAdapter(getApplicationContext(), stages);
+
+        StageAdapter stageAdapter = new StageAdapter(stages);
         if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
             if (date != null && date.after(new Date(100000))) {
@@ -313,13 +319,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
             tv_equipment_check_date.setText(sDate);
         }
+
         tv_equipment_listview.setAdapter(stageAdapter);
 
         RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("date", Sort.DESCENDING);
         if (defects.size() > 2) {
             defects.subList(0, 2);
         }
-        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
+
+        DefectAdapter defectAdapter = new DefectAdapter(defects);
         tv_equipment_defects.setAdapter(defectAdapter);
 
         String path = getExternalFilesDir("/equipment") + File.separator;
@@ -329,13 +337,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
         RealmResults<Documentation> documentation;
-        ListView documentationListView = (ListView) findViewById(R.id.equipment_documentation_listView);
+        ListView documentationListView = findViewById(R.id.equipment_documentation_listView);
         documentation = realmDB.where(Documentation.class)
                 .equalTo("equipment.uuid", equipment.getUuid()).or()
                 .equalTo("equipmentModel.uuid", equipment.getEquipmentModel().getUuid())
                 .findAll();
 //        documentation = realmDB.where(Documentation.class).findAll();
-        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(documentation);
         if (documentationListView != null) {
             documentationListView.setAdapter(documentationAdapter);
             documentationListView.setOnItemClickListener(new ListViewClickListener());
@@ -343,15 +351,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         setListViewHeightBasedOnChildren(tv_equipment_docslistview);
         setListViewHeightBasedOnChildren(tv_equipment_listview);
 
-        rootLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        rootLayout = findViewById(R.id.coordinatorLayout);
 
         //Floating Action Buttons
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
-        fab2 = (FloatingActionButton) findViewById(R.id.fab_2);
-        fab3 = (FloatingActionButton) findViewById(R.id.fab_3);
-        fab4 = (FloatingActionButton) findViewById(R.id.fab_4);
-        fab5 = (FloatingActionButton) findViewById(R.id.fab_5);
+        fab = findViewById(R.id.fab);
+        fab1 = findViewById(R.id.fab_1);
+        fab2 = findViewById(R.id.fab_2);
+        fab3 = findViewById(R.id.fab_3);
+        fab4 = findViewById(R.id.fab_4);
+        fab5 = findViewById(R.id.fab_5);
 
         show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_show);
         hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_hide);
@@ -429,7 +437,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.equipment_layout);
         AccountHeader headerResult;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
         toolbar.setSubtitle("Обслуживание и ремонт");
@@ -566,8 +574,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
 
         RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
-        final Spinner defectTypeSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
-        final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(this, defectType);
+        final Spinner defectTypeSpinner = alertLayout.findViewById(R.id.spinner_defects);
+        final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(defectType);
         defectTypeSpinner.setAdapter(typeSpinnerAdapter);
 
         defectTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -579,8 +587,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     DefectType currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
                     if (currentDefectType != null) {
                         RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("DefectType.uuid", currentDefectType.getUuid()).findAll();
-                        Spinner defectSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
-                        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
+                        Spinner defectSpinner = alertLayout.findViewById(R.id.spinner_defects);
+                        DefectAdapter defectAdapter = new DefectAdapter(defects);
                         defectSpinner.setAdapter(defectAdapter);
                     }
                 }
@@ -606,7 +614,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TextView newDefect = (TextView) alertLayout.findViewById(R.id.add_new_comment);
+                TextView newDefect = alertLayout.findViewById(R.id.add_new_comment);
                 DefectType currentDefectType = null;
                 if (defectTypeSpinner.getSelectedItemPosition() >= 0) {
                     currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
@@ -656,8 +664,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.change_status_dialog, parent, false);
         RealmResults<EquipmentStatus> equipmentStatus = realmDB.where(EquipmentStatus.class).findAll();
-        final Spinner statusSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_status);
-        final EquipmentStatusAdapter equipmentStatusAdapter = new EquipmentStatusAdapter(this, R.id.spinner_status, equipmentStatus);
+        final Spinner statusSpinner = alertLayout.findViewById(R.id.spinner_status);
+        final EquipmentStatusAdapter equipmentStatusAdapter = new EquipmentStatusAdapter(equipmentStatus);
         statusSpinner.setAdapter(equipmentStatusAdapter);
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -682,7 +690,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         });
 
-        TextView statusCurrent = (TextView) alertLayout.findViewById(R.id.current_status);
+        TextView statusCurrent = alertLayout.findViewById(R.id.current_status);
         statusCurrent.setText(equipment.getEquipmentStatus().getTitle());
 
         AlertDialog dialog = alert.create();

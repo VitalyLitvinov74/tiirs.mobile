@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,8 +25,8 @@ import ru.toir.mobile.db.realm.TaskStatus;
 public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
     public static final String TABLE_NAME = "Task";
 
-    public TaskAdapter(@NonNull Context context, RealmResults<Task> data) {
-        super(context, data);
+    public TaskAdapter(RealmResults<Task> data) {
+        super(data);
     }
 
     @Override
@@ -61,25 +60,28 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.task_item, parent, false);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.ti_Name);
-            viewHolder.date = (TextView) convertView.findViewById(R.id.ti_Status);
-            viewHolder.equipment = (TextView) convertView.findViewById(R.id.ti_Equipment);
-            viewHolder.icon = (ImageView) convertView.findViewById(R.id.ti_ImageStatus);
+            viewHolder.title = convertView.findViewById(R.id.ti_Name);
+            viewHolder.date = convertView.findViewById(R.id.ti_Status);
+            viewHolder.equipment = convertView.findViewById(R.id.ti_Equipment);
+            viewHolder.icon = convertView.findViewById(R.id.ti_ImageStatus);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         if (adapterData != null) {
-            if (position >= adapterData.size())
+            if (position >= adapterData.size()) {
                 return convertView;
+            }
+
             Task task = adapterData.get(position);
             Date lDate = task.getStartDate();
             if (lDate != null  && lDate.after(new Date(100000))) {
                 String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
-                viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
+                sDate = "Дата: " + sDate + " " + task.getTaskStatus().getTitle();
+                viewHolder.date.setText(sDate);
             } else {
                 //viewHolder.date.setText("не выполнялся");
             }

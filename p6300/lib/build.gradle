@@ -2,12 +2,12 @@ apply plugin: 'com.android.model.library'
 
 model {
     android {
-        compileSdkVersion = 25
-        buildToolsVersion = "25.0.2"
+        compileSdkVersion = 27
+        buildToolsVersion = "27.0.3"
 
         defaultConfig.with {
             minSdkVersion.apiLevel = 15
-            targetSdkVersion.apiLevel = 25
+            targetSdkVersion.apiLevel = 27
             versionCode = 1
             versionName = "1.0"
         }
@@ -16,7 +16,7 @@ model {
     android.ndk {
         moduleName = "p6300uart"
         ldLibs.add("log")
-        CFlags.add("-std=c99");
+        CFlags.add("-std=c99")
     }
 
     android.buildTypes {
@@ -56,7 +56,7 @@ uploadArchives {
         }
     }
     // TODO: воткнул чтоб избавиться от сообщения "Not all execution paths return a value"
-    return true;
+    return true
 }
 
 dependencies {

@@ -23,11 +23,11 @@ public interface IEquipmentModel {
     Call<List<EquipmentModel>> getById(@Query("id") String id);
 
     @GET("/equipment-model")
-    Call<List<EquipmentModel>> getById(@Query("id") String[] id);
+    Call<List<EquipmentModel>> getById(@Query("id[]") String[] id);
 
     @GET("/equipment-model")
     Call<List<EquipmentModel>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/equipment-model")
-    Call<List<EquipmentModel>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<EquipmentModel>> getByUuid(@Query("uuid[]") String[] uuid);
 }

@@ -2,6 +2,7 @@ package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -16,8 +17,8 @@ import ru.toir.mobile.db.realm.MeasureType;
 public class MeasureTypeAdapter extends RealmBaseAdapter<MeasureType> implements ListAdapter {
     public static final String TABLE_NAME = "MeasureType";
 
-    public MeasureTypeAdapter(@NonNull Context context, RealmResults<MeasureType> data) {
-        super(context, data);
+    public MeasureTypeAdapter(RealmResults<MeasureType> data) {
+        super(data);
     }
 
     @Override
@@ -51,18 +52,20 @@ public class MeasureTypeAdapter extends RealmBaseAdapter<MeasureType> implements
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             if (parent.getId() == R.id.reference_listView) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
                 convertView.setTag(viewHolder);
             }
 
             if (parent.getId() == R.id.simple_spinner) {
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+                viewHolder.title = convertView.findViewById(android.R.id.text1);
                 convertView.setTag(viewHolder);
             }
         } else {

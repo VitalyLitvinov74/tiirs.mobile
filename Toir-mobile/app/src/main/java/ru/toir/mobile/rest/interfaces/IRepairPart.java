@@ -23,11 +23,11 @@ public interface IRepairPart {
     Call<List<RepairPart>> getById(@Query("id") String id);
 
     @GET("/repair-part")
-    Call<List<RepairPart>> getById(@Query("id") String[] id);
+    Call<List<RepairPart>> getById(@Query("id[]") String[] id);
 
     @GET("/repair-part")
     Call<List<RepairPart>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/repair-part")
-    Call<List<RepairPart>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<RepairPart>> getByUuid(@Query("uuid[]") String[] uuid);
 }

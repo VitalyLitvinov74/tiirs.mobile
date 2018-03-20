@@ -23,11 +23,11 @@ public interface ICriticalType {
     Call<List<CriticalType>> getById(@Query("id") String id);
 
     @GET("/critical-type")
-    Call<List<CriticalType>> getById(@Query("id") String[] id);
+    Call<List<CriticalType>> getById(@Query("id[]") String[] id);
 
     @GET("/critical-type")
     Call<List<CriticalType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/critical-type")
-    Call<List<CriticalType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<CriticalType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

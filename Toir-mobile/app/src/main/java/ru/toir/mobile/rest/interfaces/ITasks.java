@@ -23,11 +23,11 @@ public interface ITasks {
     Call<List<Task>> getById(@Query("id") String id);
 
     @GET("/task")
-    Call<List<Task>> getById(@Query("id") String[] id);
+    Call<List<Task>> getById(@Query("id[]") String[] id);
 
     @GET("/task")
     Call<List<Task>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/task")
-    Call<List<Task>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Task>> getByUuid(@Query("uuid[]") String[] uuid);
 }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -35,11 +36,12 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
 
     public static final String TABLE_NAME = "Objects";
 
-    public ObjectAdapter(@NonNull Context context, RealmResults<Objects> data) {
-        super(context, data);
+    public ObjectAdapter(RealmResults<Objects> data) {
+        super(data);
     }
-    public ObjectAdapter(@NonNull Context context, RealmList<Objects> data) {
-        super(context, data);
+
+    public ObjectAdapter(RealmList<Objects> data) {
+        super(data);
     }
 
     @Override
@@ -67,13 +69,15 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.object_reference_item_layout, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.image = (ImageView) convertView.findViewById(R.id.object_image);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.object_title);
-            viewHolder.objectType = (TextView) convertView.findViewById(R.id.object_type);
+            viewHolder.image = convertView.findViewById(R.id.object_image);
+            viewHolder.title = convertView.findViewById(R.id.object_title);
+            viewHolder.objectType = convertView.findViewById(R.id.object_type);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

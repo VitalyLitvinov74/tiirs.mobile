@@ -2,6 +2,7 @@ package ru.toir.mobile.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -42,24 +43,24 @@ public class ContragentsFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.contragent_reference_layout, container, false);
-        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+        Toolbar toolbar = (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Клиенты");
         realmDB = Realm.getDefaultInstance();
 
-        contragentsListView = (ListView) rootView.findViewById(R.id.crl_contragents_listView);
+        contragentsListView = rootView.findViewById(R.id.crl_contragents_listView);
         contragentsListView.setOnItemClickListener(new ListviewClickListener());
         contragentsListView.setTextFilterEnabled(true);
 
         RealmResults<Contragent> contragents;
         contragents = realmDB.where(Contragent.class).findAll();
-        final ContragentAdapter contragentAdapter = new ContragentAdapter(getContext(), contragents);
+        final ContragentAdapter contragentAdapter = new ContragentAdapter(contragents);
         contragentsListView.setAdapter(contragentAdapter);
 
-        final EditText contragentFilter = (EditText) rootView.findViewById(R.id.contragent_filter);
+        final EditText contragentFilter = rootView.findViewById(R.id.contragent_filter);
         contragentFilter.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String text = contragentFilter.getText().toString().toLowerCase(Locale.getDefault());

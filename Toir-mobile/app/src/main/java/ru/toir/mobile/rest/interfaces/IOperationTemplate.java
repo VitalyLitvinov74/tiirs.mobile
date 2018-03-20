@@ -23,11 +23,11 @@ public interface IOperationTemplate {
     Call<List<OperationTemplate>> getById(@Query("id") String id);
 
     @GET("/operation-template")
-    Call<List<OperationTemplate>> getById(@Query("id") String[] id);
+    Call<List<OperationTemplate>> getById(@Query("id[]") String[] id);
 
     @GET("/operation-template")
     Call<List<OperationTemplate>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/operation-template")
-    Call<List<OperationTemplate>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OperationTemplate>> getByUuid(@Query("uuid[]") String[] uuid);
 }

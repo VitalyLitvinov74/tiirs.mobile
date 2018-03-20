@@ -22,11 +22,11 @@ public interface ITaskVerdict {
     Call<List<TaskVerdict>> getById(@Query("id") String id);
 
     @GET("/task-verdict")
-    Call<List<TaskVerdict>> getById(@Query("id") String[] id);
+    Call<List<TaskVerdict>> getById(@Query("id[]") String[] id);
 
     @GET("/task-verdict")
     Call<List<TaskVerdict>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/task-verdict")
-    Call<List<TaskVerdict>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<TaskVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -43,36 +44,34 @@ public class DocumentationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.documentation_layout,
                 container, false);
         realmDB = Realm.getDefaultInstance();
-        Toolbar toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
+        Toolbar toolbar = (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Документация");
 
         // обработчик для выпадающих списков у нас один
         SpinnerListener spinnerListener = new SpinnerListener();
 
         RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
-        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(), documentationType);
+        typeSpinner = rootView.findViewById(R.id.simple_spinner);
+        DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(documentationType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
 
         // настраиваем сортировку по полям
-        sortSpinner = (Spinner) rootView
-                .findViewById(R.id.documentation_spinner_sort);
+        sortSpinner = rootView.findViewById(R.id.documentation_spinner_sort);
         sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item,
                 new ArrayList<SortField>());
         sortSpinner.setAdapter(sortSpinnerAdapter);
         sortSpinner.setOnItemSelectedListener(spinnerListener);
 
-        documentationListView = (ListView) rootView
-                .findViewById(R.id.documentation_listView);
+        documentationListView = rootView.findViewById(R.id.documentation_listView);
 
         documentationListView.setOnItemClickListener(new ListviewClickListener());
 
@@ -116,7 +115,7 @@ public class DocumentationFragment extends Fragment {
             else
                 documentation = realmDB.where(Documentation.class).findAll();
         }
-        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(documentation);
         documentationListView.setAdapter(documentationAdapter);
     }
 

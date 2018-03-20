@@ -23,11 +23,11 @@ public interface IOperationTool {
     Call<List<OperationTool>> getById(@Query("id") String id);
 
     @GET("/operation-tool")
-    Call<List<OperationTool>> getById(@Query("id") String[] id);
+    Call<List<OperationTool>> getById(@Query("id[]") String[] id);
 
     @GET("/operation-tool")
     Call<List<OperationTool>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/operation-tool")
-    Call<List<OperationTool>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OperationTool>> getByUuid(@Query("uuid[]") String[] uuid);
 }

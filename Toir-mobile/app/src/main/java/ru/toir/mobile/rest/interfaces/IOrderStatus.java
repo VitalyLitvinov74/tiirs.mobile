@@ -23,11 +23,11 @@ public interface IOrderStatus {
     Call<List<OrderStatus>> getById(@Query("id") String id);
 
     @GET("/order-status")
-    Call<List<OrderStatus>> getById(@Query("id") String[] id);
+    Call<List<OrderStatus>> getById(@Query("id[]") String[] id);
 
     @GET("/order-status")
     Call<List<OrderStatus>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/order-status")
-    Call<List<OrderStatus>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OrderStatus>> getByUuid(@Query("uuid[]") String[] uuid);
 }

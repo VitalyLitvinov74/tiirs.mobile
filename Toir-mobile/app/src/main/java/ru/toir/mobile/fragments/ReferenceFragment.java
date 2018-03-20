@@ -3,6 +3,7 @@ package ru.toir.mobile.fragments;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -82,41 +83,11 @@ import ru.toir.mobile.db.realm.Tool;
 import ru.toir.mobile.db.realm.ToolType;
 import ru.toir.mobile.rest.ToirAPIFactory;
 
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
-//import android.content.Intent;
-//import android.content.IntentFilter;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.ReferenceServiceHelper;
-
 public class ReferenceFragment extends Fragment {
     private static final String TAG = "ReferenceFragment";
     private Realm realmDB;
 
     private ListView contentListView;
-
-//	private IntentFilter mFilterGetReference = new IntentFilter(ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
-//	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
-//
-//		@Override
-//		public void onReceive(Context context, Intent intent) {
-//			getReferencesDialog.dismiss();
-//			context.unregisterReceiver(mReceiverGetReference);
-//			boolean result = intent.getBooleanExtra(
-//					ProcessorService.Extras.RESULT_EXTRA, false);
-//			Bundle bundle = intent
-//					.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-//			if (result) {
-//				Toast.makeText(context, "Справочники обновлены",
-//						Toast.LENGTH_SHORT).show();
-//			} else {
-//				// сообщаем описание неудачи
-//				String message = bundle.getString(IServiceProvider.MESSAGE);
-//				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-//			}
-//		}
-//	};
 
     public static ReferenceFragment newInstance() {
         return (new ReferenceFragment());
@@ -904,13 +875,13 @@ public class ReferenceFragment extends Fragment {
      * android.view.ViewGroup, android.os.Bundle)
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.reference_layout, container, false);
         realmDB = Realm.getDefaultInstance();
 
-        Spinner referenceSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
+        Spinner referenceSpinner = rootView.findViewById(R.id.simple_spinner);
+        contentListView = rootView.findViewById(R.id.reference_listView);
 
         // получаем список справочников, разбиваем его на ключ:значение
         String[] referenceArray = getResources().getStringArray(R.array.references_array);
@@ -940,96 +911,84 @@ public class ReferenceFragment extends Fragment {
     private void fillListViewDocumentationType() {
         RealmResults<DocumentationType> documentationType;
         documentationType = realmDB.where(DocumentationType.class).findAll();
-        DocumentationTypeAdapter documentationTypeAdapter = new DocumentationTypeAdapter(
-                getActivity().getApplicationContext(), documentationType);
+        DocumentationTypeAdapter documentationTypeAdapter = new DocumentationTypeAdapter(documentationType);
         contentListView.setAdapter(documentationTypeAdapter);
     }
 
     private void fillListViewEquipmentType() {
         RealmResults<EquipmentType> equipmentType;
         equipmentType = realmDB.where(EquipmentType.class).findAll();
-        EquipmentTypeAdapter equipmentTypeAdapter = new EquipmentTypeAdapter(getActivity()
-                .getApplicationContext(), equipmentType);
+        EquipmentTypeAdapter equipmentTypeAdapter = new EquipmentTypeAdapter(equipmentType);
         contentListView.setAdapter(equipmentTypeAdapter);
     }
 
     private void fillListViewCriticalType() {
         RealmResults<CriticalType> criticalType;
         criticalType = realmDB.where(CriticalType.class).findAll();
-        CriticalTypeAdapter criticalTypeAdapter = new CriticalTypeAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, criticalType);
+        CriticalTypeAdapter criticalTypeAdapter = new CriticalTypeAdapter(criticalType);
         contentListView.setAdapter(criticalTypeAdapter);
     }
 
     private void fillListViewAlertType() {
         RealmResults<AlertType> alertType;
         alertType = realmDB.where(AlertType.class).findAll();
-        AlertTypeAdapter alertTypeAdapter = new AlertTypeAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, alertType);
+        AlertTypeAdapter alertTypeAdapter = new AlertTypeAdapter(alertType);
         contentListView.setAdapter(alertTypeAdapter);
     }
 
     private void fillListViewOperationStatus() {
         RealmResults<OperationStatus> operationStatus;
         operationStatus = realmDB.where(OperationStatus.class).findAll();
-        OperationStatusAdapter operationAdapter = new OperationStatusAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, operationStatus);
+        OperationStatusAdapter operationAdapter = new OperationStatusAdapter(operationStatus);
         contentListView.setAdapter(operationAdapter);
     }
 
     private void fillListViewOperationVerdict() {
         RealmResults<OperationVerdict> operationVerdict;
         operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity()
-                .getApplicationContext(), operationVerdict);
+        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(operationVerdict);
         contentListView.setAdapter(operationVerdictAdapter);
     }
 
     private void fillListViewObjectType() {
         RealmResults<ObjectType> objectType;
         objectType = realmDB.where(ObjectType.class).findAll();
-        ObjectTypeAdapter objectAdapter = new ObjectTypeAdapter(getActivity()
-                .getApplicationContext(), objectType);
+        ObjectTypeAdapter objectAdapter = new ObjectTypeAdapter(objectType);
         contentListView.setAdapter(objectAdapter);
     }
 
     private void fillListViewDefectType() {
         RealmResults<DefectType> defectType;
         defectType = realmDB.where(DefectType.class).findAll();
-        DefectTypeAdapter defectAdapter = new DefectTypeAdapter(getActivity()
-                .getApplicationContext(), defectType);
+        DefectTypeAdapter defectAdapter = new DefectTypeAdapter(defectType);
         contentListView.setAdapter(defectAdapter);
     }
 
     private void fillListViewOperationType() {
         RealmResults<OperationType> operationType;
         operationType = realmDB.where(OperationType.class).findAll();
-        OperationTypeAdapter operationAdapter = new OperationTypeAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, operationType);
+        OperationTypeAdapter operationAdapter = new OperationTypeAdapter(operationType);
         contentListView.setAdapter(operationAdapter);
     }
 
     private void fillListViewTaskStatus() {
         RealmResults<TaskStatus> taskStatuses;
         taskStatuses = realmDB.where(TaskStatus.class).findAll();
-        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity()
-                .getApplicationContext(), taskStatuses);
+        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(taskStatuses);
         contentListView.setAdapter(taskStatusAdapter);
     }
 
     private void fillListViewStageStatus() {
         RealmResults<StageStatus> stageStatuses;
         stageStatuses = realmDB.where(StageStatus.class).findAll();
-        StageStatusAdapter stageStatusAdapter = new StageStatusAdapter(getActivity()
-                .getApplicationContext(), stageStatuses);
+        StageStatusAdapter stageStatusAdapter = new StageStatusAdapter(stageStatuses);
         contentListView.setAdapter(stageStatusAdapter);
     }
 
     private void fillListViewEquipmentStatus() {
         RealmResults<EquipmentStatus> equipmentStatuses;
         equipmentStatuses = realmDB.where(EquipmentStatus.class).findAll();
-        EquipmentStatusAdapter equipmentAdapter = new EquipmentStatusAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, equipmentStatuses);
+        EquipmentStatusAdapter equipmentAdapter = new EquipmentStatusAdapter(equipmentStatuses);
         contentListView.setAdapter(equipmentAdapter);
     }
 

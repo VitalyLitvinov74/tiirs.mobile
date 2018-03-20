@@ -20,7 +20,8 @@ public class ToirRealm {
     }
 
     public static void init(Context context, String dbName) {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
+        Realm.init(context);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name(dbName)
                 .schemaVersion(VERSION)
                 .build();

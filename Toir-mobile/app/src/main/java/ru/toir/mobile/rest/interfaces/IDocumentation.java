@@ -35,11 +35,11 @@ public interface IDocumentation {
     Call<List<Documentation>> getByEquipment(@Query("equipment") String uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> getByEquipment(@Query("equipment") String[] uuid);
+    Call<List<Documentation>> getByEquipment(@Query("equipment[]") String[] uuid);
 
     @GET("/documentation")
     Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel") String uuid);
 
     @GET("/documentation")
-    Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel") String[] uuid);
+    Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel[]") String[] uuid);
 }

@@ -85,12 +85,12 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         }
 
         //meas_header = (TextView) findViewById(R.id.meas_header);
-        meas_value = (EditText) findViewById(R.id.meas_value);
-        meas_typeSpinner = (Spinner) findViewById(R.id.simple_spinner);
-        meas_submit = (Button) findViewById(R.id.meas_Button);
+        meas_value = findViewById(R.id.meas_value);
+        meas_typeSpinner = findViewById(R.id.simple_spinner);
+        meas_submit = findViewById(R.id.meas_Button);
 
         RealmResults<MeasureType> measureType = realmDB.where(MeasureType.class).findAll();
-        MeasureTypeAdapter typeSpinnerAdapter = new MeasureTypeAdapter(this, measureType);
+        MeasureTypeAdapter typeSpinnerAdapter = new MeasureTypeAdapter(measureType);
         typeSpinnerAdapter.notifyDataSetChanged();
         meas_typeSpinner.setAdapter(typeSpinnerAdapter);
 
@@ -137,7 +137,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         });
 
 
-        mChart = (BarChart) findViewById(R.id.chart1);
+        mChart = findViewById(R.id.chart1);
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
         mChart.setDescription("");
@@ -240,7 +240,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.measure);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //toolbar.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
         toolbar.setTitleTextColor(Color.WHITE);

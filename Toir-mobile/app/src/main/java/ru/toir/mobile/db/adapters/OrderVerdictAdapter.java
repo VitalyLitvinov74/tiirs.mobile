@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -19,8 +18,9 @@ import ru.toir.mobile.db.realm.OrderVerdict;
  */
 public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implements ListAdapter {
     public static final String TABLE_NAME = "OrderVerdict";
-    public OrderVerdictAdapter(@NonNull Context context, RealmResults<OrderVerdict> data) {
-        super(context, data);
+
+    public OrderVerdictAdapter(RealmResults<OrderVerdict> data) {
+        super(data);
     }
 
     @Override
@@ -53,10 +53,10 @@ public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implemen
         ViewHolder viewHolder;
         if (parent.getId() == R.id.reference_listView) {
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.listview, parent, false);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -70,7 +70,7 @@ public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implemen
             return convertView;
         }
         if (parent.getId() == R.id.simple_spinner || convertView == null) {
-            TextView textView = new TextView(context);
+            TextView textView = new TextView(parent.getContext());
             OrderVerdict orderVerdict;
             if (adapterData != null) {
                 orderVerdict = adapterData.get(position);

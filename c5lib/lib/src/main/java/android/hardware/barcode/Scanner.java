@@ -38,10 +38,10 @@ public class Scanner {
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
 	 * 
 	 * @param nCommand
-	 *            :Scan head mark��ourself scanner id 0x55,MOTOROLA is 0x00
+	 *            :Scan head mark ourself scanner id 0x55,MOTOROLA is 0x00
 	 * @param nCode
-	 *            :Barcode encoding��GB2312 is 1,UTF is 0
-	 * @return ��return the barcode string, If can't get the barocde will show
+	 *            :Barcode encoding GB2312 is 1,UTF is 0
+	 * @return return the barcode string, If can't get the barocde will show
 	 *         none string
 	 */
 	static public native String ReadSCAEx(int nCommand, int nCode);
@@ -51,11 +51,11 @@ public class Scanner {
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
 	 * 
 	 * @param nCommand
-	 *            :Scan head mark��ourself scanner id 0x55,MOTOROLA is 0x00
+	 *            :Scan head mark ourself scanner id 0x55,MOTOROLA is 0x00
 	 * @param buf
 	 *            : store the barcode information, convert the barcode to the
 	 *            string after readed.
-	 * @return ��return the barcode string, If can't get the barocde will show
+	 * @return return the barcode string, If can't get the barocde will show
 	 *         none string
 	 */
 	static public native int ReadDataSCA(int nCommand, byte[] buf);
@@ -65,7 +65,7 @@ public class Scanner {
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
 	 * 
 	 * @param nCommand
-	 *            :Scan head mark��ourself scanner id 0x55,MOTOROLA is 0x00
+	 *            :Scan head mark ourself scanner id 0x55,MOTOROLA is 0x00
 	 * @return :return the scaned barcode information
 	 */
 	static public native byte[] ReadData(int nCommand);
@@ -73,7 +73,7 @@ public class Scanner {
 	/**
 	 * Initializes the device
 	 * 
-	 * @return ��success return 0
+	 * @return success return 0
 	 */
 	static public native int InitSCA();
 
@@ -122,7 +122,7 @@ public class Scanner {
 
 	/**
 	 * 
-	 * The virtual keyboard message,should send the String to the system
+	 * The virtual keyboard message, should send the String to the system
 	 * according the virtual keyboard message
 	 * 
 	 * @param str
@@ -140,7 +140,8 @@ public class Scanner {
 	}
 
 	static {
-		System.loadLibrary("tiny-tools");
+//		System.loadLibrary("tiny-tools");
+		System.loadLibrary("uhf-tools");
 	}
 
 }

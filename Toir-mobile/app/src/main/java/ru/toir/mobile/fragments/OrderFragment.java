@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -21,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.LongSparseArray;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -31,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -42,48 +39,29 @@ import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import io.realm.Realm;
-import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
-import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.MeasuredValue;
-import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationFile;
 import ru.toir.mobile.db.realm.OperationStatus;
@@ -97,20 +75,16 @@ import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.GetOrderAsyncTask;
+import ru.toir.mobile.rest.SendFiles;
+import ru.toir.mobile.rest.SendMeasureValues;
+import ru.toir.mobile.rest.SendOrders;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
 
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
-
-//import android.content.BroadcastReceiver;
-
-//import android.content.BroadcastReceiver;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.TaskServiceProvider;
 
 public class OrderFragment extends Fragment {
     private static final int ORDER_LEVEL = 0;
@@ -120,6 +94,7 @@ public class OrderFragment extends Fragment {
 
     private static final int ACTIVITY_PHOTO = 100;
     private static final int ACTIVITY_MEASURE = 101;
+    private static final String TAG = OrderFragment.class.getSimpleName();
     FloatingActionButton fab_check;
     FloatingActionButton fab_camera;
     private Toolbar toolbar;
@@ -137,7 +112,6 @@ public class OrderFragment extends Fragment {
     private ListView mainListView;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
-    private String TAG = "OrderFragment";
     private Realm realmDB;
     private int Level = ORDER_LEVEL;
     private Equipment currentEquipment;
@@ -157,7 +131,7 @@ public class OrderFragment extends Fragment {
             if (operationAdapter != null && currentOperation != null && currentOperationId < operationAdapter.getCount()) {
                 //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
                 if (!currentOperation.getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
-                    textTime = (TextView) getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
+                    textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
                     textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
                 }
 
@@ -177,7 +151,7 @@ public class OrderFragment extends Fragment {
                 totalOperationCount = operationAdapter.getCount();
                 for (int i = 0; i < totalOperationCount; i++) {
                     if (mainListView.getChildAt(i) != null) {
-                        checkBox = (CheckBox) mainListView.getChildAt(i).findViewById(R.id.operation_status);
+                        checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
                         checkBox.setOnClickListener(new onCheckBoxClickListener(i));
                     }
                 }
@@ -192,85 +166,7 @@ public class OrderFragment extends Fragment {
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
-    //private NumberPicker numberPicker;
-    //private Spinner spinnerSuffix;
-    //private ArrayList<OrderFragment.Suffixes> suffixList;
-    private ProgressDialog processDialog;
     private RfidDialog rfidDialog;
-
-    // фильтр для получения сообщений при получении нарядов с сервера
-//    private IntentFilter mFilterGetTask = new IntentFilter(TaskServiceProvider.Actions.ACTION_GET_TASK);
-    // TODO решить нужны ли фильтры на все возможные варианты отправки состояния/результатов
-    // фильтр для получения сообщений при получении нарядов с сервера
-//    private IntentFilter mFilterSendTask = new IntentFilter(TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
-//    private BroadcastReceiver mReceiverGetTask = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
-//            Log.d(TAG, "" + provider);
-//            if (provider == ProcessorService.Providers.TASK_PROVIDER) {
-//                int method = intent.getIntExtra(ProcessorService.Extras.METHOD_EXTRA, 0);
-//                Log.d(TAG, "" + method);
-//                if (method == TaskServiceProvider.Methods.GET_TASK) {
-//                    boolean result = intent.getBooleanExtra(ProcessorService.Extras.RESULT_EXTRA, false);
-//                    Bundle bundle = intent.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-//                    Log.d(TAG, "boolean result" + result);
-//
-//                    if (result) {
-//                        /*
-//                         * нужно видимо что-то дёрнуть чтоб уведомить о том что
-//						 * наряд(ы) получены вероятно нужно сделать попытку
-//						 * отправить на сервер информацию о полученых нарядах
-//						 * (которые изменили свой статус на "В работе")
-//						 */
-//
-//                        // ообщаем количество полученных нарядов
-//                        int count = bundle.getInt(TaskServiceProvider.Methods.RESULT_GET_TASK_COUNT);
-//                        if (count > 0) {
-//                            Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } else {
-//                        // сообщаем описание неудачи
-//                        String message = bundle.getString(IServiceProvider.MESSAGE);
-//                        Toast.makeText(getActivity(), "Ошибка при получении нарядов." + message, Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    // закрываем диалог получения наряда
-//                    processDialog.dismiss();
-//                    getActivity().unregisterReceiver(mReceiverGetTask);
-//                    initView();
-//                }
-//            }
-//
-//        }
-//    };
-
-//    private BroadcastReceiver mReceiverSendTaskResult = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
-//            Log.d(TAG, "" + provider);
-//            if (provider == ProcessorService.Providers.TASK_PROVIDER) {
-//                int method = intent.getIntExtra(ProcessorService.Extras.METHOD_EXTRA, 0);
-//                Log.d(TAG, "" + method);
-//                if (method == TaskServiceProvider.Methods.TASK_SEND_RESULT) {
-//                    boolean result = intent.getBooleanExtra(ProcessorService.Extras.RESULT_EXTRA, false);
-//                    Log.d(TAG, "" + result);
-//                    if (result) {
-//                        Toast.makeText(getActivity(), "Результаты отправлены.", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Toast.makeText(getActivity(), "Ошибка при отправке результатов.", Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    // закрываем диалог получения наряда
-//                    processDialog.dismiss();
-//                    getActivity().unregisterReceiver(mReceiverSendTaskResult);
-//                }
-//            }
-//        }
-//    };
 
     public static OrderFragment newInstance() {
         return (new OrderFragment());
@@ -293,22 +189,22 @@ public class OrderFragment extends Fragment {
      * android.view.ViewGroup, android.os.Bundle)
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.orders_layout, container, false);
         sp = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
+        toolbar = (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Наряды");
 
         uncompleteOperationList = new ArrayList<>();
 
         realmDB = Realm.getDefaultInstance();
-        listLayout = (LinearLayout) rootView.findViewById(R.id.tl_listview_layout);
-        bottomBar = (BottomBar) (getActivity()).findViewById(R.id.bottomBar);
+        listLayout = rootView.findViewById(R.id.tl_listview_layout);
+        bottomBar = (getActivity()).findViewById(R.id.bottomBar);
 
-        fab_check = (FloatingActionButton) rootView.findViewById(R.id.fab_check);
-        fab_camera = (FloatingActionButton) rootView.findViewById(R.id.fab_photo);
+        fab_check = rootView.findViewById(R.id.fab_check);
+        fab_camera = rootView.findViewById(R.id.fab_photo);
         fab_check.setVisibility(View.INVISIBLE);
         fab_camera.setVisibility(View.INVISIBLE);
 
@@ -320,7 +216,7 @@ public class OrderFragment extends Fragment {
         });
         fab_check.setOnClickListener(new submitOnClickListener());
 
-        mainListView = (ListView) rootView.findViewById(R.id.list_view);
+        mainListView = rootView.findViewById(R.id.list_view);
 
         setHasOptionsMenu(true);
         rootView.setFocusableInTouchMode(true);
@@ -383,6 +279,7 @@ public class OrderFragment extends Fragment {
         fillListViewOrders(null, null);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void fillListViewOrders(String orderStatus, String orderByField) {
         AuthorizedUser authUser = AuthorizedUser.getInstance();
         User user = realmDB.where(User.class)
@@ -403,11 +300,11 @@ public class OrderFragment extends Fragment {
                 orders = query.findAll();
             }
 
-            orderAdapter = new OrderAdapter(getContext(), orders);
+            orderAdapter = new OrderAdapter(orders);
             mainListView.setAdapter(orderAdapter);
         }
 
-        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.GONE);
         }
@@ -482,9 +379,9 @@ public class OrderFragment extends Fragment {
             fillListViewOrders(null, null);
         }
 
-        taskAdapter = new TaskAdapter(getContext(), tasks);
+        taskAdapter = new TaskAdapter(tasks);
         mainListView.setAdapter(taskAdapter);
-        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
@@ -526,9 +423,9 @@ public class OrderFragment extends Fragment {
             all_complete = false;
         }
 
-        stageAdapter = new StageAdapter(getContext(), stages);
+        stageAdapter = new StageAdapter(stages);
         mainListView.setAdapter(stageAdapter);
-        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(task.getTaskTemplate().getTitle());
@@ -589,7 +486,7 @@ public class OrderFragment extends Fragment {
         params.height = 1000;
         listLayout.setLayoutParams(params);
 
-        TextView tl_Header = (TextView) getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(stage.getStageTemplate().getTitle());
@@ -731,10 +628,10 @@ public class OrderFragment extends Fragment {
      *
      * @param status - статус наряда
      */
-    private void getOrdersByStatus(String status) {
+    private void getOrdersByStatus(String status, ProgressDialog dialog) {
         List<String> list = new ArrayList<>();
         list.add(status);
-        getOrdersByStatus(list);
+        getOrdersByStatus(list, dialog);
     }
 
     /**
@@ -742,325 +639,8 @@ public class OrderFragment extends Fragment {
      *
      * @param status - статус наряда
      */
-    private void getOrdersByStatus(List<String> status) {
-        AsyncTask<String[], Integer, List<Orders>> aTask = new AsyncTask<String[], Integer, List<Orders>>() {
-            @Override
-            protected List<Orders> doInBackground(String[]... params) {
-                // обновляем справочники
-                ReferenceFragment.updateReferencesForOrders();
-                //int current_files_cnt=0;
-
-                List<String> args = java.util.Arrays.asList(params[0]);
-
-                // запрашиваем наряды
-                Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(args);
-                List<Orders> result;
-                try {
-                    Response<List<Orders>> response = call.execute();
-                    if (response.code() != 200) {
-                        Toast.makeText(getContext(),
-                                "Ошибка получения нарядов! Код ответа сервера:" + response.code(),
-                                Toast.LENGTH_LONG).show();
-                        return null;
-                    }
-
-                    result = response.body();
-                    if (result == null) {
-                        Toast.makeText(getContext(),
-                                "Ошибка получения нарядов! Содержимого ответа нет.",
-                                Toast.LENGTH_LONG).show();
-                        return null;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-                String userName = AuthorizedUser.getInstance().getLogin();
-                // список оборудования в полученных нарядах (для постройки списка документации)
-                Map<String, Equipment> equipmentList = new HashMap<>();
-                // список файлов для загрузки
-                List<FilePath> files = new ArrayList<>();
-                // строим список изображений для загрузки
-                for (Orders order : result) {
-                    // если это не новый наряд, ставим флаг sent в true
-                    String orderStatusUuid = order.getOrderStatus().getUuid();
-                    if (!orderStatusUuid.equals(OrderStatus.Status.NEW)) {
-                        order.setSent(true);
-                    }
-
-                    List<Task> tasks = order.getTasks();
-                    for (Task task : tasks) {
-                        // UUID шаблона задачи
-                        String taskTemplateUuid = task.getTaskTemplate().getUuid();
-                        // путь до папки с файлами
-                        String equipmentModelUuid = task.getEquipment().getEquipmentModel().getUuid();
-                        // общий путь до файлов на сервере
-                        String basePath = "/storage/" + userName + "/" + equipmentModelUuid + "/";
-                        // общий путь до файлов локальный
-                        String basePathLocal = "/tasks/" + taskTemplateUuid + "/";
-
-                        // добавляем для получения документации в дальнейшем
-                        equipmentList.put(task.getEquipment().getUuid(), task.getEquipment());
-
-                        boolean isNeedDownload;
-
-                        // урл изображения задачи
-                        isNeedDownload = isNeedDownload(task.getTaskTemplate(), basePathLocal);
-                        if (isNeedDownload) {
-                            files.add(new FilePath(task.getTaskTemplate().getImage(), basePath, basePathLocal));
-                        }
-
-                        // урл изображения оборудования
-                        isNeedDownload = isNeedDownload(task.getEquipment(), "/equipment/");
-                        if (isNeedDownload) {
-                            files.add(new FilePath(task.getEquipment().getImage(), basePath, "/equipment/"));
-                        }
-
-                        // урл изображения модели оборудования
-                        isNeedDownload = isNeedDownload(task.getEquipment().getEquipmentModel(), "/equipment/");
-                        if (isNeedDownload) {
-                            files.add(new FilePath(task.getEquipment().getEquipmentModel().getImage(), basePath, "/equipment/"));
-                        }
-
-                        // урл изображения объекта где расположено оборудование
-                        Objects object = task.getEquipment().getLocation();
-                        if (object != null) {
-                            isNeedDownload = isNeedDownload(object, "/objects/");
-                            if (isNeedDownload) {
-                                files.add(new FilePath(object.getImage(),
-                                        "/storage/" + userName + "/" + object.getUuid() + "/",
-                                        "/objects/"));
-                            }
-                        }
-
-                        List<Stage> stages = task.getStages();
-                        for (Stage stage : stages) {
-                            // урл изображения этапа задачи
-                            isNeedDownload = isNeedDownload(stage.getStageTemplate(), basePathLocal);
-                            if (isNeedDownload) {
-                                files.add(new FilePath(stage.getStageTemplate().getImage(),
-                                        basePath, basePathLocal));
-                            }
-
-                            if (stage.getEquipment() != null) {
-                                // добавляем для получения документации в дальнейшем
-                                equipmentList.put(stage.getEquipment().getUuid(), stage.getEquipment());
-
-                                String equipmentPath;
-                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
-                                isNeedDownload = isNeedDownload(stage.getEquipment().getEquipmentModel(), "/equipment/");
-                                if (isNeedDownload) {
-                                    files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(), equipmentPath, "/equipment/"));
-                                }
-
-                                equipmentPath = "/storage/" + userName + "/" + stage.getEquipment().getEquipmentModel().getUuid() + "/";
-                                isNeedDownload = isNeedDownload(stage.getEquipment(), "/equipment/");
-                                if (isNeedDownload) {
-                                    files.add(new FilePath(stage.getEquipment().getImage(), equipmentPath, "/equipment/"));
-                                }
-                            }
-
-                            List<Operation> operations = stage.getOperations();
-                            for (Operation operation : operations) {
-                                // урл изображения операции
-                                isNeedDownload = isNeedDownload(operation.getOperationTemplate(), basePathLocal);
-                                if (isNeedDownload) {
-                                    files.add(new FilePath(operation.getOperationTemplate().getImage(),
-                                            basePath, basePathLocal));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Set<String> needEquipmentUuids = new HashSet<>();
-                Set<String> needEquipmentModelUuids = new HashSet<>();
-                for (Map.Entry<String, Equipment> entry : equipmentList.entrySet()) {
-                    needEquipmentUuids.add(entry.getValue().getUuid());
-                    needEquipmentModelUuids.add(entry.getValue().getEquipmentModel().getUuid());
-                }
-
-                Call<List<Documentation>> docCall;
-                docCall = ToirAPIFactory.getDocumentationService().getByEquipment(
-                        needEquipmentUuids.toArray(new String[]{}));
-                try {
-                    Response<List<Documentation>> r = docCall.execute();
-                    List<Documentation> list = r.body();
-                    if (list != null) {
-                        for (Documentation doc : list) {
-                            String localPath = "/documentation/" + doc.getEquipment().getUuid() + "/";
-                            if (isNeedDownload(doc, localPath) && doc.isRequired()) {
-                                String url = "/storage/" + userName + "/" + doc.getEquipment().getUuid() + "/";
-                                files.add(new FilePath(doc.getPath(), url, localPath));
-                            }
-                        }
-
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        realm.close();
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
-                    e.printStackTrace();
-                }
-
-                docCall = ToirAPIFactory.getDocumentationService().getByEquipmentModel(
-                        needEquipmentModelUuids.toArray(new String[]{}));
-                try {
-                    Response<List<Documentation>> r = docCall.execute();
-                    List<Documentation> list = r.body();
-                    if (list != null) {
-                        for (Documentation doc : list) {
-                            if (doc.getEquipmentModel() != null) {
-                                String localPath = "/documentation/" + doc.getEquipmentModel().getUuid() + "/";
-                                if (isNeedDownload(doc, localPath) && doc.isRequired()) {
-                                    String url = "/storage/" + userName + "/" + doc.getEquipmentModel().getUuid() + "/";
-                                    files.add(new FilePath(doc.getPath(), url, localPath));
-                                }
-                            }
-
-                            if (doc.getEquipment() != null) {
-                                String localPath = "/documentation/" + doc.getEquipment().getUuid() + "/";
-                                if (isNeedDownload(doc, localPath) && doc.isRequired()) {
-                                    String url = "/storage/" + userName + "/" + doc.getEquipment().getUuid() + "/";
-                                    files.add(new FilePath(doc.getPath(), url, localPath));
-                                }
-                            }
-                        }
-
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        realm.close();
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Ошибка при получении документации.");
-                    e.printStackTrace();
-                }
-
-                Map<String, Set<String>> requestList = new HashMap<>();
-                // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
-                for (FilePath item : files) {
-                    String key = item.urlPath + item.fileName;
-                    if (!requestList.containsKey(key)) {
-                        Set<String> list = new HashSet<>();
-                        list.add(item.localPath);
-                        requestList.put(key, list);
-                    } else {
-                        requestList.get(key).add(item.localPath);
-                    }
-                }
-
-                // загружаем файлы
-                int filesCount = 0;
-                for (String key : requestList.keySet()) {
-                    Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
-                    try {
-                        Response<ResponseBody> r = call1.execute();
-                        ResponseBody trueImgBody = r.body();
-                        if (trueImgBody == null) {
-                            continue;
-                        }
-
-                        for (String localPath : requestList.get(key)) {
-                            filesCount++;
-                            publishProgress(filesCount);
-                            String fileName = key.substring(key.lastIndexOf("/") + 1);
-                            File file = new File(getContext().getExternalFilesDir(localPath), fileName);
-                            if (!file.getParentFile().exists()) {
-                                if (!file.getParentFile().mkdirs()) {
-                                    Log.e(TAG, "Не удалось создать папку " +
-                                            file.getParentFile().toString() +
-                                            " для сохранения файла изображения!");
-                                    continue;
-                                }
-                            }
-
-                            FileOutputStream fos = new FileOutputStream(file);
-                            fos.write(trueImgBody.bytes());
-                            fos.close();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(List<Orders> orders) {
-                super.onPostExecute(orders);
-                if (orders == null) {
-                    // сообщаем описание неудачи
-                    Toast.makeText(getActivity(), "Ошибка при получении нарядов.", Toast.LENGTH_LONG).show();
-                } else {
-                    int count = orders.size();
-                    // собщаем количество полученных нарядов
-                    if (count > 0) {
-                        final List<String> uuids = new ArrayList<>();
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        // проставляем дату получения нарядов
-                        for (Orders order : orders) {
-                            order.setReceivDate(new Date());
-
-                            if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.NEW)) {
-                                uuids.add(order.getUuid());
-                            }
-                        }
-
-                        realm.copyToRealmOrUpdate(orders);
-                        realm.commitTransaction();
-                        realm.close();
-                        addToJournal("Клиент успешно получил " + count + " нарядов");
-                        Toast.makeText(getActivity(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
-
-                        // если есть новые наряды, отправляем подтверждение о получении
-                        if (!uuids.isEmpty()) {
-                            Runnable runnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    // отправляем запрос на установку статуса IN_WORK на сервере
-                                    // в случае не успеха, ни каких действий для повторной отправки
-                                    // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
-                                    Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setInWork(uuids);
-                                    try {
-                                        Response response = call.execute();
-                                        if (response.code() != 200) {
-                                            // TODO: нужно реализовать механизм повторной попытки установки статуса
-                                            addToJournal("Не удалось отправить запрос на установку статуса нарядов IN_WORK");
-                                        } else {
-                                            addToJournal("Успешно отправили статус для полученных нарядов IN_WORK");
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        addToJournal("Исключение при запросе на установку статуса нарядов IN_WORK");
-                                    }
-                                }
-                            };
-                            Thread thread = new Thread(runnable);
-                            thread.start();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "Нарядов нет.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                processDialog.dismiss();
-            }
-
-            @Override
-            protected void onProgressUpdate(Integer... values) {
-                super.onProgressUpdate(values);
-                processDialog.setProgress(values[0]);
-            }
-        };
-
+    private void getOrdersByStatus(List<String> status, ProgressDialog dialog) {
+        GetOrderAsyncTask aTask = new GetOrderAsyncTask(dialog, getContext().getExternalFilesDir(""));
         String[] statusArray = status.toArray(new String[]{});
         aTask.execute(statusArray);
     }
@@ -1069,100 +649,7 @@ public class OrderFragment extends Fragment {
      * Метод для отправки файлов созданных во время выполнения операций или привязанных к операции.
      */
     private void sendFiles(List<OperationFile> files) {
-
-        AsyncTask<OperationFile[], Void, LongSparseArray<String>> task = new AsyncTask<OperationFile[], Void, LongSparseArray<String>>() {
-            @NonNull
-            private RequestBody createPartFromString(String descriptionString) {
-                return RequestBody.create(MultipartBody.FORM, descriptionString);
-            }
-
-            @NonNull
-            private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
-                File file = new File(fileUri.getPath());
-                String type = null;
-                String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.getPath());
-                if (extension != null) {
-                    type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-                }
-
-                MediaType mediaType = MediaType.parse(type);
-                RequestBody requestFile = RequestBody.create(mediaType, file);
-                return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-            }
-
-            @Override
-            protected LongSparseArray<String> doInBackground(OperationFile[]... lists) {
-                LongSparseArray<String> idUuid = new LongSparseArray<>();
-
-                for (OperationFile file : lists[0]) {
-                    RequestBody descr = createPartFromString("Photos due execution operation.");
-                    Uri uri = null;
-                    try {
-                        // TODO: нужно добавить полный путь до файла в каталоге Pictures !!!
-                        uri = Uri.fromFile(new File(
-                                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                                file.getFileName()));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    List<MultipartBody.Part> list = new ArrayList<>();
-                    String fileUuid = file.getUuid();
-                    String formId = "file[" + fileUuid + "]";
-                    list.add(prepareFilePart(formId, uri));
-                    list.add(MultipartBody.Part.createFormData(formId + "[_id]", String.valueOf(file.get_id())));
-                    list.add(MultipartBody.Part.createFormData(formId + "[uuid]", file.getUuid()));
-                    list.add(MultipartBody.Part.createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
-                    list.add(MultipartBody.Part.createFormData(formId + "[fileName]", file.getFileName()));
-                    list.add(MultipartBody.Part.createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
-                    list.add(MultipartBody.Part.createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
-                    // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
-                    // объём данных превышающий ограничения на отправку POST запросом на сервере
-                    Call<ResponseBody> call = ToirAPIFactory.getOperationFileService().upload(descr, list);
-                    try {
-                        Response response = call.execute();
-                        ResponseBody result = (ResponseBody) response.body();
-                        if (response.isSuccessful()) {
-                            JSONObject jObj = new JSONObject(result.string());
-                            // при сохранении данных на сервере произошли ошибки
-                            // данный флаг пока не используем
-//                            boolean success = (boolean) jObj.get("success");
-                            JSONArray data = (JSONArray) jObj.get("data");
-                            for (int idx = 0; idx < data.length(); idx++) {
-                                JSONObject item = (JSONObject) data.get(idx);
-                                Long _id = Long.parseLong(item.get("_id").toString());
-                                String uuid = item.get("uuid").toString();
-                                idUuid.put(_id, uuid);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                return idUuid;
-            }
-
-            @Override
-            protected void onPostExecute(LongSparseArray<String> idUuid) {
-                super.onPostExecute(idUuid);
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                for (int idx = 0; idx < idUuid.size(); idx++) {
-                    long id = idUuid.keyAt(idx);
-                    String uuid = idUuid.valueAt(idx);
-                    OperationFile file = realm.where(OperationFile.class).equalTo("_id", id)
-                            .equalTo("uuid", uuid).findFirst();
-                    if (file != null) {
-                        file.setSent(true);
-                    }
-                }
-
-                realm.commitTransaction();
-                realm.close();
-            }
-        };
-
+        SendFiles task = new SendFiles(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
         OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
         task.execute(sendFiles);
     }
@@ -1177,31 +664,29 @@ public class OrderFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(TAG, "Получаем новые наряды.");
-//                TaskServiceHelper tsh = new TaskServiceHelper(getActivity().getApplicationContext(),
-//                        TaskServiceProvider.Actions.ACTION_GET_TASK);
-//                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
-//                tsh.GetTaskNew();
+
+                // создаём диалог
+                ProgressDialog dialog;
+                dialog = new ProgressDialog(getActivity());
 
                 // запускаем поток получения новых нарядов с сервера
-                getOrdersByStatus(OrderStatus.Status.NEW);
+                getOrdersByStatus(OrderStatus.Status.NEW, dialog);
 
                 // показываем диалог получения нарядов
-                processDialog = new ProgressDialog(getActivity());
-                processDialog.setMessage("Получаем наряды");
-                processDialog.setIndeterminate(false);
-                processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                processDialog.setCancelable(false);
-                processDialog.setButton(
+                dialog.setMessage("Получаем наряды");
+                dialog.setIndeterminate(false);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setCancelable(false);
+                dialog.setButton(
                         DialogInterface.BUTTON_NEGATIVE, "Отмена",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-//                                getActivity().unregisterReceiver(mReceiverGetTask);
                                 Toast.makeText(getActivity(), "Получение нарядов отменено",
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
-                processDialog.show();
+                dialog.show();
                 return true;
             }
         });
@@ -1212,35 +697,34 @@ public class OrderFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(TAG, "Получаем сделанные наряды.");
-//                TaskServiceHelper tsh = new TaskServiceHelper( getActivity().getApplicationContext(),
-//                        TaskServiceProvider.Actions.ACTION_GET_TASK);
-//                getActivity().registerReceiver(mReceiverGetTask, mFilterGetTask);
-//                tsh.GetTaskDone();
 
                 // запускаем поток получения выполненных, невыполненных, отменнённых нарядов с сервера
                 List<String> stUuids = new ArrayList<>();
                 stUuids.add(OrderStatus.Status.CANCELED);
                 stUuids.add(OrderStatus.Status.COMPLETE);
                 stUuids.add(OrderStatus.Status.UN_COMPLETE);
-                getOrdersByStatus(stUuids);
+
+                // создаём диалог
+                ProgressDialog dialog;
+                dialog = new ProgressDialog(getActivity());
+
+                getOrdersByStatus(stUuids, dialog);
 
                 // показываем диалог получения наряда
-                processDialog = new ProgressDialog(getActivity());
-                processDialog.setMessage("Получаем наряды");
-                processDialog.setIndeterminate(true);
-                processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                processDialog.setCancelable(false);
-                processDialog.setButton(
+                dialog.setMessage("Получаем наряды");
+                dialog.setIndeterminate(true);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setCancelable(false);
+                dialog.setButton(
                         DialogInterface.BUTTON_NEGATIVE, "Отмена",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-//                                        getActivity().unregisterReceiver(mReceiverGetTask);
                                 Toast.makeText(getActivity(), "Получение нарядов отменено",
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
-                processDialog.show();
+                dialog.show();
                 return true;
             }
         });
@@ -1291,119 +775,14 @@ public class OrderFragment extends Fragment {
     }
 
     private void sendOrders(List<Orders> orders) {
-        AsyncTask<Orders[], Void, LongSparseArray<String>> task = new AsyncTask<Orders[], Void, LongSparseArray<String>>() {
-            @Override
-            protected LongSparseArray<String> doInBackground(Orders[]... lists) {
-                List<Orders> args = Arrays.asList(lists[0]);
-                LongSparseArray<String> idUuid = new LongSparseArray<>();
-                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().send(args);
-                try {
-                    Response response = call.execute();
-                    ResponseBody result = (ResponseBody) response.body();
-                    if (response.isSuccessful()) {
-                        JSONObject jObj = new JSONObject(result.string());
-                        // при сохранении данных на сервере произошли ошибки
-                        // данный флаг пока не используем
-//                            boolean success = (boolean) jObj.get("success");
-                        JSONArray data = (JSONArray) jObj.get("data");
-                        for (int idx = 0; idx < data.length(); idx++) {
-                            JSONObject item = (JSONObject) data.get(idx);
-                            Long _id = Long.parseLong(item.get("_id").toString());
-                            String uuid = item.get("uuid").toString();
-                            idUuid.append(_id, uuid);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                return idUuid;
-            }
-
-            @Override
-            protected void onPostExecute(LongSparseArray<String> idUuid) {
-                super.onPostExecute(idUuid);
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                for (int idx = 0; idx < idUuid.size(); idx++) {
-                    long _id = idUuid.keyAt(idx);
-                    String uuid = idUuid.valueAt(idx);
-                    Orders value = realm.where(Orders.class).equalTo("_id", _id)
-                            .equalTo("uuid", uuid)
-                            .findFirst();
-                    if (value != null) {
-                        value.setSent(true);
-                    }
-                }
-
-                realm.commitTransaction();
-                realm.close();
-            }
-        };
-
+        SendOrders task = new SendOrders();
         addToJournal("Отправляем выполненные наряды на сервер");
         Orders[] ordersArray = orders.toArray(new Orders[]{});
         task.execute(ordersArray);
     }
 
-    private void sendMeasuredValues(List<MeasuredValue> values) {
-        AsyncTask<MeasuredValue[], Void, LongSparseArray<String>> task = new AsyncTask<MeasuredValue[], Void, LongSparseArray<String>>() {
-            @Override
-            protected LongSparseArray<String> doInBackground(MeasuredValue[]... lists) {
-                List<MeasuredValue> args = Arrays.asList(lists[0]);
-                LongSparseArray<String> idUuid = new LongSparseArray<>();
-                Call<ResponseBody> call = ToirAPIFactory.getMeasuredValueService().send(args);
-                try {
-                    Response response = call.execute();
-                    ResponseBody result = (ResponseBody) response.body();
-                    if (response.isSuccessful()) {
-                        JSONObject jObj = new JSONObject(result.string());
-                        // при сохранении данных на сервере произошли ошибки
-                        // данный флаг пока не используем
-//                            boolean success = (boolean) jObj.get("success");
-                        JSONArray data = (JSONArray) jObj.get("data");
-                        for (int idx = 0; idx < data.length(); idx++) {
-                            JSONObject item = (JSONObject) data.get(idx);
-                            Long _id = Long.parseLong(item.get("_id").toString());
-                            String uuid = item.get("uuid").toString();
-                            idUuid.append(_id, uuid);
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
-                    e.printStackTrace();
-                }
-
-                return idUuid;
-            }
-
-            @Override
-            protected void onPostExecute(LongSparseArray<String> idUuid) {
-                super.onPostExecute(idUuid);
-                if (processDialog != null) {
-                    processDialog.dismiss();
-                }
-
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                for (int idx = 0; idx < idUuid.size(); idx++) {
-                    long _id = idUuid.keyAt(idx);
-                    String uuid = idUuid.valueAt(idx);
-                    MeasuredValue value = realm.where(MeasuredValue.class).equalTo("_id", _id)
-                            .equalTo("uuid", uuid)
-                            .findFirst();
-                    if (value != null) {
-                        value.setSent(true);
-                    }
-                }
-
-                realm.commitTransaction();
-                realm.close();
-
-                Toast.makeText(getContext(), "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
-            }
-        };
-
+    private void sendMeasuredValues(List<MeasuredValue> values, ProgressDialog dialog) {
+        SendMeasureValues task = new SendMeasureValues(dialog);
         MeasuredValue[] valuesArray = values.toArray(new MeasuredValue[]{});
         task.execute(valuesArray);
     }
@@ -1474,30 +853,27 @@ public class OrderFragment extends Fragment {
                 .in("operation.uuid", opUuidsArray)
                 .findAll();
 
-        sendMeasuredValues(realmDB.copyFromRealm(measuredValues));
+        // создаём диалог
+        ProgressDialog dialog;
+        dialog = new ProgressDialog(getActivity());
+
+        sendMeasuredValues(realmDB.copyFromRealm(measuredValues), dialog);
         addToJournal("Наряды отправлены на сервер");
 
-//        getActivity().registerReceiver(mReceiverSendTaskResult, mFilterSendTask);
-//        TaskServiceHelper tsh = new TaskServiceHelper(getActivity(), TaskServiceProvider.Actions.ACTION_TASK_SEND_RESULT);
-//        tsh.SendTaskResult(sendTaskUuids);
-
-
         // показываем диалог отправки результатов
-        processDialog = new ProgressDialog(getActivity());
-        processDialog.setMessage("Отправляем результаты");
-        processDialog.setIndeterminate(true);
-        processDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        processDialog.setCancelable(false);
-        processDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
+        dialog.setMessage("Отправляем результаты");
+        dialog.setIndeterminate(true);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(false);
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//                        getActivity().unregisterReceiver(mReceiverGetTask);
                         Toast.makeText(getActivity(), "Отправка результатов отменена",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
-        processDialog.show();
+        dialog.show();
     }
 
     public View getViewByPosition(int pos, ListView listView) {
@@ -1528,8 +904,8 @@ public class OrderFragment extends Fragment {
         final Spinner operationVerdictSpinner;
         // список статусов операций в выпадающем списке для выбора
         RealmResults<OperationVerdict> operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-        operationVerdictSpinner = (Spinner) myView.findViewById(R.id.simple_spinner);
-        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getContext(), operationVerdict);
+        operationVerdictSpinner = myView.findViewById(R.id.simple_spinner);
+        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(operationVerdict);
         operationVerdictAdapter.notifyDataSetChanged();
         operationVerdictSpinner.setAdapter(operationVerdictAdapter);
 
@@ -1585,8 +961,8 @@ public class OrderFragment extends Fragment {
         View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
         // список статусов нарядов в выпадающем списке для выбора
         RealmResults<OrderVerdict> orderVerdict = realmDB.where(OrderVerdict.class).findAll();
-        orderVerdictSpinner = (Spinner) myView.findViewById(R.id.simple_spinner);
-        OrderVerdictAdapter orderVerdictAdapter = new OrderVerdictAdapter(getContext(), orderVerdict);
+        orderVerdictSpinner = myView.findViewById(R.id.simple_spinner);
+        OrderVerdictAdapter orderVerdictAdapter = new OrderVerdictAdapter(orderVerdict);
         orderVerdictAdapter.notifyDataSetChanged();
         orderVerdictSpinner.setAdapter(orderVerdictAdapter);
 
@@ -1755,7 +1131,8 @@ public class OrderFragment extends Fragment {
                     if (data != null) {
                         value = data.getStringExtra("value");
                     }
-                    CheckBox checkBox = (CheckBox) mainListView.getChildAt(currentOperationId).findViewById(R.id.operation_status);
+
+                    CheckBox checkBox = mainListView.getChildAt(currentOperationId).findViewById(R.id.operation_status);
                     checkBox.setChecked(true);
                     CompleteCurrentOperation(currentOperationId, value);
                 }
@@ -1779,12 +1156,12 @@ public class OrderFragment extends Fragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View myView = inflater.inflate(R.layout.operation_dialog_cancel, parent, false);
 
-        final ListView listView = (ListView) myView.findViewById(R.id.odc_list_view);
-        CheckBox checkBoxAll = (CheckBox) myView.findViewById(R.id.odc_main_status);
-        Spinner mainSpinner = (Spinner) myView.findViewById(R.id.simple_spinner);
+        final ListView listView = myView.findViewById(R.id.odc_list_view);
+        CheckBox checkBoxAll = myView.findViewById(R.id.odc_main_status);
+        Spinner mainSpinner = myView.findViewById(R.id.simple_spinner);
 
         RealmResults<OperationVerdict> operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-        final OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getContext(), operationVerdict);
+        final OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(operationVerdict);
         operationVerdictAdapter.notifyDataSetChanged();
         mainSpinner.setAdapter(operationVerdictAdapter);
 
@@ -1798,8 +1175,8 @@ public class OrderFragment extends Fragment {
                         CheckBox checkBox;
                         Spinner spinner;
                         for (int i = 0; i < uncompleteOperationList.size(); i++) {
-                            checkBox = (CheckBox) getViewByPosition(i, listView).findViewById(R.id.operation_status);
-                            spinner = (Spinner) getViewByPosition(i, listView).findViewById(R.id.operation_verdict_spinner);
+                            checkBox = getViewByPosition(i, listView).findViewById(R.id.operation_status);
+                            spinner = getViewByPosition(i, listView).findViewById(R.id.operation_verdict_spinner);
                             final OperationVerdict operationVerdict = operationVerdictAdapter.getItem(spinner.getSelectedItemPosition());
                             final Operation operation = uncompleteOperationList.get(i);
                             if (operation != null && checkBox.isChecked()) {
@@ -1838,9 +1215,9 @@ public class OrderFragment extends Fragment {
             public void onClick(View v) {
                 CheckBox checkBox;
                 CheckBox checkBoxAll;
-                checkBoxAll = (CheckBox) v.findViewById(R.id.odc_main_status);
+                checkBoxAll = v.findViewById(R.id.odc_main_status);
                 for (int i = 0; i < uncompleteOperationList.size(); i++) {
-                    checkBox = (CheckBox) getViewByPosition(i, listView).findViewById(R.id.operation_status);
+                    checkBox = getViewByPosition(i, listView).findViewById(R.id.operation_status);
                     checkBox.setChecked(checkBoxAll.isChecked());
                 }
             }
@@ -1850,7 +1227,7 @@ public class OrderFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Spinner spinner;
                 for (int j = 0; j < uncompleteOperationList.size(); j++) {
-                    spinner = (Spinner) getViewByPosition(j, listView).findViewById(R.id.operation_verdict_spinner);
+                    spinner = getViewByPosition(j, listView).findViewById(R.id.operation_verdict_spinner);
                     spinner.setSelection(i);
                 }
             }
@@ -1908,15 +1285,16 @@ public class OrderFragment extends Fragment {
 
         if (operationAdapter != null) {
             if (mainListView.getChildAt(currentOperationId) != null) {
-                textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
+                textTime = mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
                 if (textTime != null) {
                     textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
                 } else {
                     Log.d(TAG, "Операции с индексом {currentOperationId} нет в списке");
                 }
             }
+
             if (measureValue != null) {
-                textValue = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_measure_value);
+                textValue = mainListView.getChildAt(currentOperationId).findViewById(R.id.op_measure_value);
                 textValue.setText(measureValue);
             }
 
@@ -2084,43 +1462,6 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    /**
-     * Проверка на необходимость загрузки файла с сервера.
-     *
-     * @param obj       {@link RealmObject} Объект. Должен реализовывать {@link IToirDbObject}
-     * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
-     * @return boolean
-     */
-    private boolean isNeedDownload(RealmObject obj, String localPath) {
-        Realm realm = Realm.getDefaultInstance();
-        String uuid = ((IToirDbObject) obj).getUuid();
-        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
-        long localChangedAt;
-
-        // есть ли локальная запись
-        try {
-            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
-        } catch (Exception e) {
-            return true;
-        } finally {
-            realm.close();
-        }
-
-        // есть ли локально файл
-        String fileName = ((IToirDbObject) obj).getImageFile();
-        if (fileName != null) {
-            File file = new File(getContext().getExternalFilesDir(localPath), fileName);
-            if (!file.exists()) {
-                return true;
-            }
-        } else {
-            return false;
-        }
-
-        // есть ли изменения на сервере
-        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
-    }
-
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
@@ -2148,7 +1489,7 @@ public class OrderFragment extends Fragment {
                 }
 
                 for (int i = 0; i < totalOperationCount; i++) {
-                    checkBox = (CheckBox) getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
+                    checkBox = getViewByPosition(i, mainListView).findViewById(R.id.operation_status);
                     final Operation operation = operationAdapter.getItem(i);
                     if (operation != null) {
                         if (checkBox != null) {
@@ -2372,18 +1713,6 @@ public class OrderFragment extends Fragment {
             }
 
             return true;
-        }
-    }
-
-    private class FilePath {
-        String fileName;
-        String urlPath;
-        String localPath;
-
-        FilePath(String name, String url, String local) {
-            fileName = name;
-            urlPath = url;
-            localPath = local;
         }
     }
 

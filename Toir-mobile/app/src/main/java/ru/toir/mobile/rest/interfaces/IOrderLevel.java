@@ -23,11 +23,11 @@ public interface IOrderLevel {
     Call<List<OrderLevel>> getById(@Query("id") String id);
 
     @GET("/order-level")
-    Call<List<OrderLevel>> getById(@Query("id") String[] id);
+    Call<List<OrderLevel>> getById(@Query("id[]") String[] id);
 
     @GET("/order-level")
     Call<List<OrderLevel>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/order-level")
-    Call<List<OrderLevel>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OrderLevel>> getByUuid(@Query("uuid[]") String[] uuid);
 }

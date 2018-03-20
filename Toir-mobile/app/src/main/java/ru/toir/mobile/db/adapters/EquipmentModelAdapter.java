@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,8 +30,8 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> implements ListAdapter {
     public static final String TABLE_NAME = "EquipmentModel";
 
-    public EquipmentModelAdapter(@NonNull Context context, RealmResults<EquipmentModel> data) {
-        super(context, data);
+    public EquipmentModelAdapter(RealmResults<EquipmentModel> data) {
+        super(data);
     }
 
     @Override
@@ -62,20 +63,22 @@ public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> impl
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
           viewHolder = new ViewHolder();
           if (parent.getId() == R.id.reference_listView) {
               convertView = inflater.inflate(R.layout.equipment_model_item_layout, parent, false);
-              viewHolder.title = (TextView) convertView.findViewById(R.id.emi_title);
-              viewHolder.uuid = (TextView) convertView.findViewById(R.id.emi_uuid);
-              viewHolder.image = (ImageView) convertView.findViewById(R.id.emi_image);
-              viewHolder.type = (TextView) convertView.findViewById(R.id.emi_type);
+              viewHolder.title = convertView.findViewById(R.id.emi_title);
+              viewHolder.uuid = convertView.findViewById(R.id.emi_uuid);
+              viewHolder.image = convertView.findViewById(R.id.emi_image);
+              viewHolder.type = convertView.findViewById(R.id.emi_type);
               convertView.setTag(viewHolder);
             }
           if (parent.getId() == R.id.simple_spinner) {
               convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
-              viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+              viewHolder.title = convertView.findViewById(android.R.id.text1);
               convertView.setTag(viewHolder);
             }
          } else {

@@ -1,7 +1,10 @@
 package ru.toir.mobile.utils;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
 import java.io.File;
@@ -17,28 +20,41 @@ import ru.toir.mobile.db.realm.User;
 
 public class MainFunctions {
 
-    private Realm realmDB;
-
+    /**
+     * Хз зачем было реализовано.
+     *
+     * @param context Context
+     * @return String | null
+     */
     public static String getIMEI(Context context) {
         TelephonyManager mngr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        return mngr.getDeviceId();
+        if (mngr == null) {
+            return null;
+        }
+
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            return mngr.getDeviceId();
+        } else {
+            return null;
+        }
+
     }
 
     public static void addToJournal(final String description) {
-        final Realm realmDB = Realm.getDefaultInstance();
-        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        Realm realmDB = Realm.getDefaultInstance();
+        User user = realmDB.where(User.class)
+                .equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user != null) {
-            realmDB.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    Journal record = realmDB.createObject(Journal.class);
-                    long next_id = Journal.getLastId() + 1;
-                    record.set_id(next_id);
-                    record.setDate(new Date());
-                    record.setDescription(description);
-                    record.setUserUuid(user.getUuid());
-                }
-            });
+            realmDB.beginTransaction();
+            Journal record = new Journal();
+            long next_id = Journal.getLastId() + 1;
+            record.set_id(next_id);
+            record.setDate(new Date());
+            record.setDescription(description);
+            record.setUserUuid(user.getUuid());
+            realmDB.copyToRealm(record);
+            realmDB.commitTransaction();
         }
 
         realmDB.close();
@@ -66,7 +82,7 @@ public class MainFunctions {
     }
 
     public static String getPicturesDirectory(Context context) {
-        String filename = Environment.getExternalStorageDirectory().getAbsolutePath()
+        return Environment.getExternalStorageDirectory().getAbsolutePath()
                 + File.separator
                 + "Android"
                 + File.separator
@@ -74,7 +90,6 @@ public class MainFunctions {
                 + File.separator
                 + context.getPackageName()
                 + File.separator;
-        return filename;
     }
 
     //  функция возвращает путь до фотографии оборудования

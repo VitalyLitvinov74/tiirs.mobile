@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -19,8 +18,8 @@ import ru.toir.mobile.db.realm.TaskStatus;
 public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements ListAdapter {
     public static final String TABLE_NAME = "TaskStatus";
 
-    public TaskStatusAdapter(@NonNull Context context, RealmResults<TaskStatus> data) {
-        super(context, data);
+    public TaskStatusAdapter(RealmResults<TaskStatus> data) {
+        super(data);
     }
 
     @Override
@@ -40,9 +39,10 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         ViewHolder viewHolder;
         if (parent.getId() == R.id.simple_spinner) {
-            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
+            TextView textView = (TextView) View.inflate(parent.getContext(), android.R.layout.simple_spinner_item, null);
             TaskStatus taskStatus;
             if (adapterData != null) {
                 taskStatus = adapterData.get(position);
@@ -52,10 +52,10 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
         }
         if (parent.getId() == R.id.reference_listView) {
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.listview, parent, false);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

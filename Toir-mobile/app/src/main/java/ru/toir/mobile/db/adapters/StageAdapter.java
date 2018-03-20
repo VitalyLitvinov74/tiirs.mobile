@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,8 +25,8 @@ import ru.toir.mobile.db.realm.StageStatus;
 public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter {
     public static final String TABLE_NAME = "Stage";
 
-    public StageAdapter(@NonNull Context context, RealmResults<Stage> data) {
-        super(context, data);
+    public StageAdapter(RealmResults<Stage> data) {
+        super(data);
     }
 
     @Override
@@ -63,14 +62,14 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.taskstage_item, parent, false);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.icon = (ImageView) convertView.findViewById(R.id.ts_ImageStatus);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
-            viewHolder.equipment = (TextView) convertView.findViewById(R.id.ts_Equipment);
+            viewHolder.icon = convertView.findViewById(R.id.ts_ImageStatus);
+            viewHolder.title = convertView.findViewById(R.id.ts_Name);
+            viewHolder.equipment = convertView.findViewById(R.id.ts_Equipment);
             //viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
-            viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);
-            viewHolder.end_date = (TextView) convertView.findViewById(R.id.ts_EndDate);
+            viewHolder.start_date = convertView.findViewById(R.id.ts_StartDate);
+            viewHolder.end_date = convertView.findViewById(R.id.ts_EndDate);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

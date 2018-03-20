@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -46,7 +47,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     private boolean[] completed = new boolean[MAX_OPERATIONS];
 
     public OperationAdapter(@NonNull Context context, RealmResults<Operation> data, String taskTemplateUuid) {
-        super(context, data);
+        super(data);
         this.context = context;
         this.taskTemplateUuid = taskTemplateUuid;
     }
@@ -120,24 +121,24 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         operation = adapterData.get(position);
         if (convertView == null) {
             if (parent.getId() == R.id.list_view) {
-                convertView = inflater.inflate(R.layout.operation_item, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
-                viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
-                viewHolder.verdict = (ImageView) convertView.findViewById(R.id.operation_verdict);
-                viewHolder.start_date = (TextView) convertView.findViewById(R.id.operation_startDate);
-                viewHolder.end_date = (TextView) convertView.findViewById(R.id.operation_endDate);
-                viewHolder.description = (TextView) convertView.findViewById(R.id.op_description);
-                viewHolder.normative = (TextView) convertView.findViewById(R.id.op_normative);
-                viewHolder.measure = (TextView) convertView.findViewById(R.id.op_measure_label);
-                viewHolder.measure_value = (TextView) convertView.findViewById(R.id.op_measure_value);
-                viewHolder.time = (TextView) convertView.findViewById(R.id.op_time);
-                viewHolder.image = (ImageView) convertView.findViewById(R.id.op_image);
-                viewHolder.description_layout = (RelativeLayout) convertView.findViewById(R.id.operation_description_layout);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.operation_item, parent, false);
+                viewHolder.title = convertView.findViewById(R.id.operation_title);
+                viewHolder.status = convertView.findViewById(R.id.operation_status);
+                viewHolder.verdict = convertView.findViewById(R.id.operation_verdict);
+                viewHolder.start_date = convertView.findViewById(R.id.operation_startDate);
+                viewHolder.end_date = convertView.findViewById(R.id.operation_endDate);
+                viewHolder.description = convertView.findViewById(R.id.op_description);
+                viewHolder.normative = convertView.findViewById(R.id.op_normative);
+                viewHolder.measure = convertView.findViewById(R.id.op_measure_label);
+                viewHolder.measure_value = convertView.findViewById(R.id.op_measure_value);
+                viewHolder.time = convertView.findViewById(R.id.op_time);
+                viewHolder.image = convertView.findViewById(R.id.op_image);
+                viewHolder.description_layout = convertView.findViewById(R.id.operation_description_layout);
             } else {
-                convertView = inflater.inflate(R.layout.operation_cancel_item, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.operation_title);
-                viewHolder.status = (CheckBox) convertView.findViewById(R.id.operation_status);
-                viewHolder.spinner = (Spinner) convertView.findViewById(R.id.operation_verdict_spinner);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.operation_cancel_item, parent, false);
+                viewHolder.title = convertView.findViewById(R.id.operation_title);
+                viewHolder.status = convertView.findViewById(R.id.operation_status);
+                viewHolder.spinner = convertView.findViewById(R.id.operation_verdict_spinner);
             }
 
             convertView.setTag(viewHolder);
@@ -215,7 +216,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     Realm realmDB = Realm.getDefaultInstance();
                     MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid", operation.getUuid()).findFirst();
                     if (lastValue != null) {
-                        viewHolder.measure_value.setText(lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")");
+                        String result = lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")";
+                        viewHolder.measure_value.setText(result);
                     } else {
                         viewHolder.measure.setVisibility(View.GONE);
                         viewHolder.measure_value.setVisibility(View.GONE);
@@ -237,7 +239,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     viewHolder.title.setText(operation.getOperationTemplate().getTitle());
                     RealmResults<OperationVerdict> operationVerdict;
                     operationVerdict = realm.where(OperationVerdict.class).findAll();
-                    OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(context, operationVerdict);
+                    OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(operationVerdict);
                     viewHolder.spinner.setAdapter(operationVerdictAdapter);
                     realm.close();
                 }

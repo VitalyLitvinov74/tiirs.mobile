@@ -22,11 +22,11 @@ public interface IDocumentationType {
     Call<List<DocumentationType>> getById(@Query("id") String id);
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> getById(@Query("id") String[] id);
+    Call<List<DocumentationType>> getById(@Query("id[]") String[] id);
 
     @GET("/documentation-type")
     Call<List<DocumentationType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/documentation-type")
-    Call<List<DocumentationType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<DocumentationType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

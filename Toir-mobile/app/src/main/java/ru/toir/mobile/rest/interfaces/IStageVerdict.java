@@ -23,11 +23,11 @@ public interface IStageVerdict {
     Call<List<StageVerdict>> getById(@Query("id") String id);
 
     @GET("/stage-verdict")
-    Call<List<StageVerdict>> getById(@Query("id") String[] id);
+    Call<List<StageVerdict>> getById(@Query("id[]") String[] id);
 
     @GET("/stage-verdict")
     Call<List<StageVerdict>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/stage-verdict")
-    Call<List<StageVerdict>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<StageVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }
