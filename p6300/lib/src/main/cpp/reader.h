@@ -5,12 +5,6 @@
 #ifndef P6300LIB_READER_H
 #define P6300LIB_READER_H
 
-#include <jni.h>
-#include <fcntl.h>
-#include <android/log.h>
-#include <termios.h>
-#include <sys/stat.h>
-
 const char *TAG = "P6300Scanner";
 
 JNIEXPORT jint JNICALL
