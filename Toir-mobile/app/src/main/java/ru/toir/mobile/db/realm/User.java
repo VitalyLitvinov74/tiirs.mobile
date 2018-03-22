@@ -26,6 +26,10 @@ public class User extends RealmObject implements IToirDbObject {
     private Date createdAt;
     private Date changedAt;
 
+    public static String getImageRoot() {
+        return "users";
+    }
+
     public long get_id() {
         return _id;
     }
@@ -141,5 +145,17 @@ public class User extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String dir;
+        dir = getImageRoot();
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

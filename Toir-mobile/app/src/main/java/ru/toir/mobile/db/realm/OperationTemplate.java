@@ -24,6 +24,10 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     private RealmList<OperationTool> operationTools;
     private RealmList<OperationRepairPart> operationRepairParts;
 
+    public static String getImageRoot() {
+        return "otype";
+    }
+
     public long get_id() {
         return _id;
     }
@@ -115,5 +119,21 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
 
     public void setOperationRepairParts(RealmList<OperationRepairPart> operationRepairParts) {
         this.operationRepairParts = operationRepairParts;
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = operationType.getUuid();
+        dir = imageRoot + "/" + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

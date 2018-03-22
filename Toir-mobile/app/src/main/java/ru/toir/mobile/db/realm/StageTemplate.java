@@ -21,6 +21,9 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
     private Date createdAt;
     private Date changedAt;
 
+    public static String getImageRoot() {
+        return "stype";
+    }
 
     public long get_id() {
         return _id;
@@ -97,5 +100,21 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = stageType.getUuid();
+        dir = imageRoot + '/' + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

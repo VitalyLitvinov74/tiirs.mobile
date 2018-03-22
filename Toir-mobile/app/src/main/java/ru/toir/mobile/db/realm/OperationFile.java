@@ -44,6 +44,10 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
         return lastId.longValue();
     }
 
+    public static String getImageRoot() {
+        return null;
+    }
+
     public long get_id() {
         return _id;
     }
@@ -103,5 +107,16 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
     @Override
     public String getImageFile() {
         return getFileName();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        return null;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return null;
     }
 }

@@ -159,7 +159,7 @@ public class UserInfoFragment extends Fragment {
                 });
             }
 
-            String path = getActivity().getExternalFilesDir("/users") + File.separator;
+            String path = getActivity().getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
             Bitmap user_bitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
             if (user_bitmap != null) {
                 user_image.setImageBitmap(user_bitmap);

@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         // получаем изображение пользователя
                                         if (needDownloadImage) {
-                                            String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/users/" + user.getImage();
+                                            String url = ToirApplication.serverUrl + "/" + user.getImageFileUrl(user.getLogin()) + "/" + user.getImage();
                                             Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
                                             callFile.enqueue(new Callback<ResponseBody>() {
                                                 @Override
@@ -342,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
                                                         return;
                                                     }
 
-                                                    File filePath = getExternalFilesDir("/users");
+                                                    File filePath = getExternalFilesDir("/" + User.getImageRoot());
                                                     if (filePath == null) {
                                                         // нет доступа к внешнему накопителю
                                                         return;
@@ -1008,7 +1008,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addProfile(User item) {
         IProfile new_profile;
-        String path = getExternalFilesDir("/users") + File.separator;
+        String path = getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
         if (item.getChangedAt() != null) {
             Bitmap myBitmap = getResizedBitmap(path, item.getImage(), 0, 600, item.getChangedAt().getTime());
             new_profile = new ProfileDrawerItem()

@@ -23,13 +23,17 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
+import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Stage;
+import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.Task;
+import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.fragments.ReferenceFragment;
 
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
@@ -93,70 +97,63 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 order.setSent(true);
             }
 
-            // общий путь до файлов на сервере
-            String basePath = "/storage/" + userName;
             // путь до файлов локальный
             String basePathLocal;
 
             List<Task> tasks = order.getTasks();
             for (Task task : tasks) {
-                // UUID типа задачи
-                String taskTypeUuid = task.getTaskTemplate().getTaskType().getUuid();
-
                 boolean isNeedDownload;
 
                 // урл изображения задачи
-                basePathLocal = "/ttype/" + taskTypeUuid + "/";
-                isNeedDownload = isNeedDownload(task.getTaskTemplate(), basePathLocal);
+                TaskTemplate taskTemplate = task.getTaskTemplate();
+                basePathLocal = taskTemplate.getImageFilePath() + "/";
+                isNeedDownload = isNeedDownload(taskTemplate, basePathLocal);
                 if (isNeedDownload) {
-                    files.add(new FilePath(task.getTaskTemplate().getImage(),
-                            basePath + basePathLocal, basePathLocal));
+                    String url = taskTemplate.getImageFileUrl(userName) + "/";
+                    files.add(new FilePath(taskTemplate.getImage(), url, basePathLocal));
                 }
 
                 List<Stage> stages = task.getStages();
                 for (Stage stage : stages) {
-                    // UUID типа этапа
-                    String stageTypeUuid = stage.getStageTemplate().getStageType().getUuid();
                     // урл изображения этапа задачи
-                    basePathLocal = "/stype/" + stageTypeUuid + "/";
-                    isNeedDownload = isNeedDownload(stage.getStageTemplate(), basePathLocal);
+                    StageTemplate stageTemplate = stage.getStageTemplate();
+                    basePathLocal = stageTemplate.getImageFilePath() + "/";
+                    isNeedDownload = isNeedDownload(stageTemplate, basePathLocal);
                     if (isNeedDownload) {
-                        files.add(new FilePath(stage.getStageTemplate().getImage(),
-                                basePath + basePathLocal, basePathLocal));
+                        String url = stageTemplate.getImageFileUrl(userName) + "/";
+                        files.add(new FilePath(stageTemplate.getImage(), url, basePathLocal));
                     }
 
-                    // UUID модели оборудования
-                    String equipmentModelUuid = stage.getEquipment().getEquipmentModel().getUuid();
                     // урл изображения оборудования
-                    basePathLocal = "/equipment/" + equipmentModelUuid + "/";
-                    if (!stage.getEquipment().getImage().equals("")) {
-                        isNeedDownload = isNeedDownload(stage.getEquipment(), basePathLocal);
+                    Equipment equipment = stage.getEquipment();
+                    basePathLocal = equipment.getImageFilePath() + "/";
+                    if (!equipment.getImage().equals("")) {
+                        isNeedDownload = isNeedDownload(equipment, basePathLocal);
                         if (isNeedDownload) {
-                            files.add(new FilePath(stage.getEquipment().getImage(),
-                                    basePath + basePathLocal, basePathLocal));
+                            String url = equipment.getImageFileUrl(userName) + "/";
+                            files.add(new FilePath(equipment.getImage(), url, basePathLocal));
                         }
                     }
 
-                    // UUID типа оборудования
-                    String equipmentTypeUuid = stage.getEquipment().getEquipmentModel().getEquipmentType().getUuid();
                     // урл изображения модели оборудования
-                    basePathLocal = "/etype/" + equipmentTypeUuid + "/";
-                    if (!stage.getEquipment().getEquipmentModel().getImage().equals("")) {
-                        isNeedDownload = isNeedDownload(stage.getEquipment().getEquipmentModel(), basePathLocal);
+                    EquipmentModel equipmentModel = stage.getEquipment().getEquipmentModel();
+                    basePathLocal = equipmentModel.getImageFilePath() + "/";
+                    if (!equipmentModel.getImage().equals("")) {
+                        isNeedDownload = isNeedDownload(equipmentModel, basePathLocal);
                         if (isNeedDownload) {
-                            files.add(new FilePath(stage.getEquipment().getEquipmentModel().getImage(),
-                                    basePath + basePathLocal, basePathLocal));
+                            String url = equipmentModel.getImageFileUrl(userName) + "/";
+                            files.add(new FilePath(equipmentModel.getImage(), url, basePathLocal));
                         }
                     }
 
                     // урл изображения объекта где расположено оборудование
                     Objects object = stage.getEquipment().getLocation();
                     if (object != null) {
-                        basePathLocal = "/object/";
+                        basePathLocal = object.getImageFilePath() + "/";
                         isNeedDownload = isNeedDownload(object, basePathLocal);
                         if (isNeedDownload) {
-                            files.add(new FilePath(object.getImage(),
-                                    basePath + basePathLocal, basePathLocal));
+                            String url = object.getImageFileUrl(userName) + "/";
+                            files.add(new FilePath(object.getImage(), url, basePathLocal));
                         }
                     }
 
@@ -165,12 +162,13 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
 
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
-                        basePathLocal = "/otype/" + operation.getOperationTemplate().getOperationType().getUuid() + "/";
+                        OperationTemplate operationTemplate = operation.getOperationTemplate();
+                        basePathLocal = operationTemplate.getImageFilePath() + "/";
                         // урл изображения операции
-                        isNeedDownload = isNeedDownload(operation.getOperationTemplate(), basePathLocal);
+                        isNeedDownload = isNeedDownload(operationTemplate, basePathLocal);
                         if (isNeedDownload) {
-                            files.add(new FilePath(operation.getOperationTemplate().getImage(),
-                                    basePath + basePathLocal, basePathLocal));
+                            String url = operationTemplate.getImageFileUrl(userName) + "/";
+                            files.add(new FilePath(operationTemplate.getImage(), url, basePathLocal));
                         }
                     }
                 }
@@ -194,10 +192,9 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             List<Documentation> list = r.body();
             if (list != null) {
                 for (Documentation doc : list) {
-                    String equipmentModelUuid = doc.getEquipment().getEquipmentModel().getUuid();
-                    String localPath = "/doc/" + equipmentModelUuid + "/";
+                    String localPath = doc.getImageFilePath() + "/";
                     if (isNeedDownload(doc, localPath) && doc.isRequired()) {
-                        String url = "/storage/" + userName + "/doc/" + equipmentModelUuid + "/";
+                        String url = doc.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(doc.getPath(), url, localPath));
                     }
                 }
@@ -223,10 +220,9 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             List<Documentation> list = r.body();
             if (list != null) {
                 for (Documentation doc : list) {
-                    String equipmentModelUuid = doc.getEquipmentModel().getUuid();
-                    String localPath = "/doc/" + equipmentModelUuid + "/";
+                    String localPath = doc.getImageFilePath() + "/";
                     if (isNeedDownload(doc, localPath) && doc.isRequired()) {
-                        String url = "/storage/" + userName + "/doc/" + equipmentModelUuid + "/";
+                        String url = doc.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(doc.getPath(), url, localPath));
                     }
                 }

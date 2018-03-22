@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,7 +43,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,9 +52,6 @@ import java.util.UUID;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DefectAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
@@ -70,7 +65,7 @@ import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.GetDocumentationAsyncTask;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
@@ -129,8 +124,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private ListView tv_equipment_defects;
     // диалог для работы с rfid считывателем
     private RfidDialog rfidDialog;
-    // диалог при загрузке файла документации
-    private ProgressDialog loadDocumentationDialog;
     private boolean FAB_Status = false;
 
 
@@ -197,31 +190,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-    /**
-     * Показываем документ из базы во внешнем приложении.
-     *
-     * @param file - файл
-     */
-    private void showDocument(File file) {
-        MimeTypeMap mt = MimeTypeMap.getSingleton();
-        String[] patternList = file.getName().split("\\.");
-        String extension = patternList[patternList.length - 1];
-
-        if (mt.hasExtension(extension)) {
-            String mimeType = mt.getMimeTypeFromExtension(extension);
-            Intent target = new Intent(Intent.ACTION_VIEW);
-            target.setDataAndType(Uri.fromFile(file), mimeType);
-            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-            Intent viewFileIntent = Intent.createChooser(target, "Open File");
-            try {
-                startActivity(viewFileIntent);
-            } catch (ActivityNotFoundException e) {
-                // сообщить пользователю установить подходящее приложение
-            }
-        }
-    }
-
     /*
      * (non-Javadoc)
      *
@@ -234,7 +202,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         realmDB = Realm.getDefaultInstance();
         Bundle b = getIntent().getExtras();
-        equipment_uuid = b.getString("equipment_uuid");
+        if (b != null && b.getString("equipment_uuid") == null) {
+            equipment_uuid = b.getString("equipment_uuid");
+        } else {
+            finish();
+            return;
+        }
+
         //setContentView(R.layout.equipment_layout);
         setMainLayout(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -845,111 +819,78 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         realmDB.close();
     }
 
+    public void showDocument(File file) {
+        MimeTypeMap mt = MimeTypeMap.getSingleton();
+        String[] patternList = file.getName().split("\\.");
+        String extension = patternList[patternList.length - 1];
+
+        if (mt.hasExtension(extension)) {
+            String mimeType = mt.getMimeTypeFromExtension(extension);
+            Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(file), mimeType);
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            Intent viewFileIntent = Intent.createChooser(target, "Open File");
+            try {
+                startActivity(viewFileIntent);
+            } catch (ActivityNotFoundException e) {
+                // сообщить пользователю установить подходящее приложение
+            }
+        }
+    }
+
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            String path;
-            String objUuid;
             Documentation documentation = (Documentation) parent.getItemAtPosition(position);
-            // TODO: как все таки пути к файлу формируем
-            if (documentation.getEquipment() != null && documentation.getEquipmentModel() == null) {
-                objUuid = documentation.getEquipment().getUuid();
-            } else if (documentation.getEquipment() == null && documentation.getEquipmentModel() != null) {
-                objUuid = documentation.getEquipmentModel().getUuid();
-            } else if (documentation.getEquipment() != null && documentation.getEquipmentModel() != null) {
-                objUuid = documentation.getEquipment().getUuid();
-            } else {
-                return;
-            }
 
-            path = "/documentation/" + objUuid + "/";
-            File file = new File(getExternalFilesDir(path), documentation.getPath());
+            final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
+                    documentation.getPath());
             if (file.exists()) {
                 showDocument(file);
             } else {
                 // либо сказать что файла нет, либо предложить скачать с сервера
                 Log.d(TAG, "Получаем файл документации.");
-//				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getApplicationContext(),
-//						ReferenceServiceProvider.Actions.ACTION_GET_DOCUMENTATION_FILE);
-//				registerReceiver(mReceiverGetDocumentationFile, mFilterGetDocumentationFile);
-//				rsh.getDocumentationFile(new String[] { documentation.getUuid() });
 
-                // запускаем поток получения файла с сервера
-                AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
-                    @Override
-                    protected String doInBackground(String... params) {
-                        String userName = AuthorizedUser.getInstance().getLogin();
-                        String fileElements[] = params[0].split("/");
-                        String url = ToirApplication.serverUrl + "/storage/" + userName + "/" + params[0];
-                        Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(url);
-                        try {
-                            Response<ResponseBody> r = call1.execute();
-                            ResponseBody trueImgBody = r.body();
-                            if (trueImgBody == null) {
-                                return null;
-                            }
-
-                            File file = new File(getApplicationContext().getExternalFilesDir("/documentation/" + fileElements[0]), fileElements[1]);
-                            if (!file.getParentFile().exists()) {
-                                if (!file.getParentFile().mkdirs()) {
-                                    Log.e(TAG, "Не удалось создать папку " +
-                                            file.getParentFile().toString() +
-                                            " для сохранения файла изображения!");
-                                    return null;
-                                }
-                            }
-
-                            FileOutputStream fos = new FileOutputStream(file);
-                            fos.write(trueImgBody.bytes());
-                            fos.close();
-                            return file.getAbsolutePath();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String filePath) {
-                        super.onPostExecute(filePath);
-                        loadDocumentationDialog.dismiss();
-                        if (filePath != null) {
-                            Toast.makeText(getApplicationContext(),
-                                    "Файл загружен успешно и готов к просмотру.",
-                                    Toast.LENGTH_LONG).show();
-                            showDocument(new File(filePath));
-                        } else {
-                            // сообщаем описание неудачи
-                            Toast.makeText(getApplicationContext(), "Ошибка при получении файла.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                };
-                task.execute(objUuid + "/" + documentation.getPath());
-
-                // показываем диалог получения наряда
-                loadDocumentationDialog = new ProgressDialog(EquipmentInfoActivity.this);
-                loadDocumentationDialog.setMessage("Получаем файл документации");
-                loadDocumentationDialog.setIndeterminate(true);
-                loadDocumentationDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                loadDocumentationDialog.setCancelable(false);
-                loadDocumentationDialog.setButton(
+                // диалог при загрузке файла документации
+                ProgressDialog dialog;
+                dialog = new ProgressDialog(EquipmentInfoActivity.this);
+                dialog.setMessage("Получаем файл документации");
+                dialog.setIndeterminate(true);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setCancelable(false);
+                dialog.setButton(
                         DialogInterface.BUTTON_NEGATIVE, "Отмена",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-//								unregisterReceiver(mReceiverGetDocumentationFile);
                                 Toast.makeText(getApplicationContext(),
                                         "Получение файла отменено",
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
-                loadDocumentationDialog.show();
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        // открываем загруженный документ (если он загрузился)
+                        if (file.exists()) {
+                            showDocument(file);
+                        } else {
+                            Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+
+                // запускаем поток получения файла с сервера
+                GetDocumentationAsyncTask task = new GetDocumentationAsyncTask(dialog,
+                        getBaseContext().getExternalFilesDir(""));
+                String userName = AuthorizedUser.getInstance().getLogin();
+                task.execute(documentation.getPath(), documentation.getImageFilePath(), documentation.getImageFileUrl(userName));
             }
         }
-
     }
 }
