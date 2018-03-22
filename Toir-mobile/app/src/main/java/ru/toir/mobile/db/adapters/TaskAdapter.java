@@ -64,7 +64,6 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
             viewHolder = new ViewHolder();
             viewHolder.title = convertView.findViewById(R.id.ti_Name);
             viewHolder.date = convertView.findViewById(R.id.ti_Status);
-            viewHolder.equipment = convertView.findViewById(R.id.ti_Equipment);
             viewHolder.icon = convertView.findViewById(R.id.ti_ImageStatus);
             convertView.setTag(viewHolder);
         } else {
@@ -78,7 +77,7 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
 
             Task task = adapterData.get(position);
             Date lDate = task.getStartDate();
-            if (lDate != null  && lDate.after(new Date(100000))) {
+            if (lDate != null && lDate.after(new Date(100000))) {
                 String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
                 sDate = "Дата: " + sDate + " " + task.getTaskStatus().getTitle();
                 viewHolder.date.setText(sDate);
@@ -86,15 +85,7 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
                 //viewHolder.date.setText("не выполнялся");
             }
 
-            viewHolder.equipment.setText(task.getEquipment().getTitle());
             viewHolder.title.setText(task.getTaskTemplate().getTitle());
-
-            String taskStatusUuid = task.getTaskStatus().getUuid();
-            CriticalType criticalType=task.getEquipment().getCriticalType();
-            if (criticalType!=null) {
-                String criticalTypeUuid = criticalType.getUuid();
-                viewHolder.icon.setImageResource(getIconForStatusAndCriticalType(taskStatusUuid, criticalTypeUuid));
-            }
         }
 
         return convertView;
@@ -150,7 +141,6 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
     }
 
     private static class ViewHolder {
-        TextView equipment;
         TextView title;
         TextView date;
         //TextView status;

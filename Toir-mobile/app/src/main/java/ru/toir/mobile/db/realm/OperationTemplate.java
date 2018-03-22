@@ -2,6 +2,7 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -20,6 +21,8 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     private OperationType operationType;
     private Date createdAt;
     private Date changedAt;
+    private RealmList<OperationTool> operationTools;
+    private RealmList<OperationRepairPart> operationRepairParts;
 
     public long get_id() {
         return _id;
@@ -96,5 +99,21 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getImage();
+    }
+
+    public RealmList<OperationTool> getOperationTools() {
+        return operationTools;
+    }
+
+    public void setOperationTools(RealmList<OperationTool> operationTools) {
+        this.operationTools = operationTools;
+    }
+
+    public RealmList<OperationRepairPart> getOperationRepairParts() {
+        return operationRepairParts;
+    }
+
+    public void setOperationRepairParts(RealmList<OperationRepairPart> operationRepairParts) {
+        this.operationRepairParts = operationRepairParts;
     }
 }

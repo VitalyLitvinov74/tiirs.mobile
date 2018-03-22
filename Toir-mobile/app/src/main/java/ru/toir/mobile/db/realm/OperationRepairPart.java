@@ -14,7 +14,7 @@ public class OperationRepairPart extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private OperationTemplate operationTemplate;
+    private String operationTemplateUuid;
     private RepairPart repairPart;
     private int quantity;
     private Date createdAt;
@@ -36,12 +36,12 @@ public class OperationRepairPart extends RealmObject {
         this.uuid = uuid;
     }
 
-    public OperationTemplate getOperationTemplate() {
-        return operationTemplate;
+    public String getOperationTemplateUuid() {
+        return operationTemplateUuid;
     }
 
-    public void setOperationTemplate(OperationTemplate operationTemplate) {
-        this.operationTemplate = operationTemplate;
+    public void setOperationTemplateUuid(String operationTemplateUuid) {
+        this.operationTemplateUuid = operationTemplateUuid;
     }
 
     public RepairPart getRepairPart() {

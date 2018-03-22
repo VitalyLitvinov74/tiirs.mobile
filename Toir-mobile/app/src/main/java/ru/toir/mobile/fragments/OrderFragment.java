@@ -1357,7 +1357,6 @@ public class OrderFragment extends Fragment {
 //        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
         final String expectedTagUuid = expectedTagId;
 
-        currentEquipment = selectedTask.getEquipment();
         Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -1571,16 +1570,8 @@ public class OrderFragment extends Fragment {
                 if (taskAdapter != null) {
                     selectedTask = taskAdapter.getItem(position);
                     if (selectedTask != null) {
-                        currentEquipment = selectedTask.getEquipment();
-                        final String expectedTagId = currentEquipment.getTagId();
-                        boolean ask_tags = sp.getBoolean("without_tags_mode", true);
-                        if (!ask_tags && !expectedTagId.equals("")) {
-                            runRfidDialog(expectedTagId, TASK_LEVEL);
-                        } else {
-                            fillListViewStage(selectedTask);
-                            Level = STAGE_LEVEL;
-                        }
-
+                        fillListViewStage(selectedTask);
+                        Level = STAGE_LEVEL;
                         fab_camera.setVisibility(View.INVISIBLE);
                         //fab_check.setVisibility(View.INVISIBLE);
                     }

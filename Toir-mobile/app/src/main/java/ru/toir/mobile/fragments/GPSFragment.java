@@ -48,6 +48,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 
@@ -159,13 +160,12 @@ public class GPSFragment extends Fragment {
 
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         List<Long> eqIdList = new ArrayList<>();
-        for (Orders itemOrder : orders) {
-            RealmList<Task> tasks = itemOrder.getTasks();
-            //tasks = realmDB.where(Task.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
-            for (Task itemTask : tasks) {
-                equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment()
-                        .getUuid()).findAll();
-                for (Equipment equipment : equipments) {
+        for (Orders order : orders) {
+            RealmList<Task> tasks = order.getTasks();
+            for (Task task : tasks) {
+                for (Stage stage : task.getStages()) {
+                    Equipment equipment = stage.getEquipment();
+
                     eqIdList.add(equipment.get_id());
                     curLatitude = equipment.getLatitude();
                     curLongitude = equipment.getLongitude();

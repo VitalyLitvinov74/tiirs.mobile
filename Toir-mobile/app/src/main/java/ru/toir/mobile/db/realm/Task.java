@@ -15,7 +15,6 @@ public class Task extends RealmObject {
     private long _id;
     private String uuid;
     private String comment;
-    private Equipment equipment;
     private TaskVerdict taskVerdict;
     private TaskStatus taskStatus;
     private TaskTemplate taskTemplate;
@@ -49,14 +48,6 @@ public class Task extends RealmObject {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
     }
 
     public TaskVerdict getTaskVerdict() {

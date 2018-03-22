@@ -210,7 +210,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 realm.close();
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "Ошибка при получении документации.");
             e.printStackTrace();
         }
 

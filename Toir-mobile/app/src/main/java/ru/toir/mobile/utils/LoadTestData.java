@@ -1207,7 +1207,7 @@ public class LoadTestData {
                 //task.setTaskVerdictUuid(taskVerdictUuid);
                 task.setTaskTemplate(taskTemplate);
                 //task.setTaskTemplateUuid(taskTemplateUuid);
-                task.setEquipment(equipment);
+                //task.setEquipment(equipment);
                 //task.setEquipmentUuid(equipmentUuid);
                 task.setComment("Там тепловей шумит сильно, из под него бежит и тепла нет. Следует разобраться.");
                 task.setPrevCode(0);
@@ -1232,7 +1232,7 @@ public class LoadTestData {
                 //task2.setTaskVerdictUuid(taskVerdictUuid);
                 task2.setTaskTemplate(taskTemplate2);
                 //task2.setTaskTemplateUuid(taskTemplateUuid2);
-                task2.setEquipment(equipment2);
+                //task2.setEquipment(equipment2);
                 //task2.setEquipmentUuid(equipmentUuid2);
                 task2.setComment("Горелка котла в котельной не горит. Требуется починить.");
                 task2.setPrevCode(0);
