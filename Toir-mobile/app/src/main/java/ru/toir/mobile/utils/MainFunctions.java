@@ -3,16 +3,13 @@ package ru.toir.mobile.utils;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
-import java.io.File;
 import java.util.Date;
 
 import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
@@ -81,31 +78,6 @@ public class MainFunctions {
         return count;
     }
 
-    public static String getPicturesDirectory(Context context) {
-        return Environment.getExternalStorageDirectory().getAbsolutePath()
-                + File.separator
-                + "Android"
-                + File.separator
-                + "data"
-                + File.separator
-                + context.getPackageName()
-                + File.separator;
-    }
-
-    //  функция возвращает путь до фотографии оборудования
-    public static String getEquipmentImage(String path, Equipment equipment) {
-        if (equipment != null) {
-            if (equipment.getImage() != null && equipment.getImage().length() > 5) {
-                return equipment.getImage();
-            }
-
-            if (equipment.getEquipmentModel() != null) {
-                return equipment.getEquipmentModel().getImage();
-            }
-        }
-
-        return null;
-    }
 }
 
 

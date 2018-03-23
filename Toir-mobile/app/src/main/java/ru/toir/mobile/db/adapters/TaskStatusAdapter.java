@@ -24,7 +24,11 @@ public class TaskStatusAdapter extends RealmBaseAdapter<TaskStatus> implements L
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        }
+
+        return 0;
     }
 
     @Override

@@ -71,7 +71,6 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
 
-import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 //import android.content.BroadcastReceiver;
@@ -202,7 +201,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         realmDB = Realm.getDefaultInstance();
         Bundle b = getIntent().getExtras();
-        if (b != null && b.getString("equipment_uuid") == null) {
+        if (b != null && b.getString("equipment_uuid") != null) {
             equipment_uuid = b.getString("equipment_uuid");
         } else {
             finish();
@@ -291,6 +290,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             } else {
                 sDate = "не обслуживалось";
             }
+
             tv_equipment_check_date.setText(sDate);
         }
 
@@ -304,10 +304,17 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         DefectAdapter defectAdapter = new DefectAdapter(defects);
         tv_equipment_defects.setAdapter(defectAdapter);
 
-        String path = getExternalFilesDir("/equipment") + File.separator;
-        Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(), equipment), 0, 300, equipment.getChangedAt().getTime());
-        if (image_bitmap != null) {
-            tv_equipment_image.setImageBitmap(image_bitmap);
+        String imgPath = equipment.getAnyImageFilePath();
+        String fileName = equipment.getAnyImage();
+        if (imgPath != null && fileName != null) {
+            File path = getExternalFilesDir(imgPath);
+            if (path != null) {
+                Bitmap tmpBitmap = getResizedBitmap(path + File.separator,
+                        fileName, 300, 0, equipment.getChangedAt().getTime());
+                if (tmpBitmap != null) {
+                    tv_equipment_image.setImageBitmap(tmpBitmap);
+                }
+            }
         }
 
         RealmResults<Documentation> documentation;
@@ -322,6 +329,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             documentationListView.setAdapter(documentationAdapter);
             documentationListView.setOnItemClickListener(new ListViewClickListener());
         }
+
         setListViewHeightBasedOnChildren(tv_equipment_docslistview);
         setListViewHeightBasedOnChildren(tv_equipment_listview);
 
@@ -400,14 +408,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     }
 
-//	private void FillListViewOperations() {
-//        TaskAdapter taskAdapter;
-//        RealmResults<Task> tasks;
-//        tasks = realmDB.where(Task.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
-//        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-//        lv.setAdapter(taskAdapter);
-//	}
-
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.equipment_layout);
         AccountHeader headerResult;
@@ -447,6 +447,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                                 System.exit(0);
                             }
                         }
+
                         return false;
                     }
                 })
@@ -593,10 +594,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 if (defectTypeSpinner.getSelectedItemPosition() >= 0) {
                     currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
                 }
+
                 if (newDefect != null) {
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    final Defect defect = realmDB.createObject(Defect.class);
+                    final Defect defect = realm.createObject(Defect.class);
                     UUID uuid = UUID.randomUUID();
                     long next_id = Defect.getLastId() + 1;
                     defect.set_id(next_id);
@@ -614,7 +616,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     }
 
                     AuthorizedUser authUser = AuthorizedUser.getInstance();
-                    User user = realmDB.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                    User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
                     if (user != null) {
                         defect.setUser(user);
                     } else {
