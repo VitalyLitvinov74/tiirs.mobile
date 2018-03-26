@@ -2,6 +2,7 @@ package ru.toir.mobile;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -187,6 +188,26 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
+    }
+
+    public static void showDocument(Context context, File file) {
+        MimeTypeMap mt = MimeTypeMap.getSingleton();
+        String[] patternList = file.getName().split("\\.");
+        String extension = patternList[patternList.length - 1];
+
+        if (mt.hasExtension(extension)) {
+            String mimeType = mt.getMimeTypeFromExtension(extension);
+            Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(file), mimeType);
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            Intent viewFileIntent = Intent.createChooser(target, "Open File");
+            try {
+                context.startActivity(viewFileIntent);
+            } catch (ActivityNotFoundException e) {
+                // сообщить пользователю установить подходящее приложение
+            }
+        }
     }
 
     /*
@@ -821,26 +842,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         realmDB.close();
     }
 
-    public void showDocument(File file) {
-        MimeTypeMap mt = MimeTypeMap.getSingleton();
-        String[] patternList = file.getName().split("\\.");
-        String extension = patternList[patternList.length - 1];
-
-        if (mt.hasExtension(extension)) {
-            String mimeType = mt.getMimeTypeFromExtension(extension);
-            Intent target = new Intent(Intent.ACTION_VIEW);
-            target.setDataAndType(Uri.fromFile(file), mimeType);
-            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-            Intent viewFileIntent = Intent.createChooser(target, "Open File");
-            try {
-                startActivity(viewFileIntent);
-            } catch (ActivityNotFoundException e) {
-                // сообщить пользователю установить подходящее приложение
-            }
-        }
-    }
-
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -851,7 +852,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
                     documentation.getPath());
             if (file.exists()) {
-                showDocument(file);
+                showDocument(getApplicationContext(), file);
             } else {
                 // либо сказать что файла нет, либо предложить скачать с сервера
                 Log.d(TAG, "Получаем файл документации.");
@@ -878,7 +879,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     public void onDismiss(DialogInterface dialog) {
                         // открываем загруженный документ (если он загрузился)
                         if (file.exists()) {
-                            showDocument(file);
+                            showDocument(getApplicationContext(), file);
                         } else {
                             Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
                                     Toast.LENGTH_LONG).show();

@@ -77,6 +77,8 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             if (result == null) {
                 message = "Ошибка получения нарядов! Содержимого ответа нет.";
                 return null;
+            } else if (result.size() == 0) {
+                return result;
             }
         } catch (Exception e) {
             e.printStackTrace();

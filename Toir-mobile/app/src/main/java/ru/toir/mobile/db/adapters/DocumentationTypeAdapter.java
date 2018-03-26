@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +29,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
         if (adapterData != null) {
             return adapterData.size();
         }
+
         return 0;
     }
 
@@ -45,6 +45,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
         if (adapterData != null) {
             return adapterData.get(position);
         }
+
         return null;
     }
 
@@ -55,6 +56,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
             documentationType = adapterData.get(position);
             return documentationType.get_id();
         }
+
         return 0;
     }
 
@@ -70,6 +72,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
                 viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
                 convertView.setTag(viewHolder);
             }
+
             if (parent.getId() == R.id.simple_spinner) {
                 //convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
@@ -83,21 +86,26 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
         DocumentationType documentationType;
         if (adapterData != null && viewHolder.title != null) {
             documentationType = adapterData.get(position);
-            if (documentationType != null)
+            if (documentationType != null) {
                 viewHolder.title.setText(documentationType.getTitle());
+            }
         }
 
         if (convertView == null) {
             TextView textView = new TextView(context);
             if (adapterData != null) {
                 documentationType = adapterData.get(position);
-                if (documentationType != null)
+                if (documentationType != null) {
                     textView.setText(documentationType.getTitle());
+                }
+
                 textView.setTextSize(16);
                 textView.setPadding(5, 5, 5, 5);
             }
+
             return textView;
         }
+
         return convertView;
     }
 
