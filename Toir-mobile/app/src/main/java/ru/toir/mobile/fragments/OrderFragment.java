@@ -3,6 +3,8 @@ package ru.toir.mobile.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -105,10 +107,7 @@ public class OrderFragment extends Fragment {
     private TaskAdapter taskAdapter;
     private StageAdapter stageAdapter;
     private OperationAdapter operationAdapter;
-    //    private String currentOrderUuid = "";
-    private String currentTaskUuid = "";
     private String currentOperationUuid = "";
-    //    private String currentStageUuid = "";
     private ListView mainListView;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
@@ -125,17 +124,20 @@ public class OrderFragment extends Fragment {
         @Override
         public void onTick(long millisUntilFinished) {
             Log.d(TAG, "Тик таймера...");
-            TextView textTime;
-            long currentTime = System.currentTimeMillis();
-            currentOperation = operationAdapter.getItem(currentOperationId);
-            if (operationAdapter != null && currentOperation != null && currentOperationId < operationAdapter.getCount()) {
-                //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                if (!currentOperation.getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
-                    textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
-                    textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
-                }
-
+            if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
+                //  && currentOperation != null
+                currentOperation = operationAdapter.getItem(currentOperationId);
                 if (currentOperation != null) {
+                    //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
+                    if (!currentOperation.getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
+                        // TODO: вместо прямого изменения отображения в ListView счётчик
+                        // нужно отображать в отдельном View!!!
+                        TextView textTime;
+                        long currentTime = System.currentTimeMillis();
+                        textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
+                        //textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
+                    }
+
                     currentOperationUuid = currentOperation.getUuid();
                     if (firstLaunch) {
                         firstLaunch();
@@ -155,6 +157,7 @@ public class OrderFragment extends Fragment {
                         checkBox.setOnClickListener(new onCheckBoxClickListener(i));
                     }
                 }
+
                 firstLaunch = false;
             }
         }
@@ -193,16 +196,18 @@ public class OrderFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.orders_layout, container, false);
-        sp = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        toolbar = (getActivity()).findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Наряды");
+        Activity activity = getActivity();
+        if (activity != null) {
+            toolbar = activity.findViewById(R.id.toolbar);
+            toolbar.setSubtitle("Наряды");
+            sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+            bottomBar = activity.findViewById(R.id.bottomBar);
+        }
 
         uncompleteOperationList = new ArrayList<>();
 
         realmDB = Realm.getDefaultInstance();
         listLayout = rootView.findViewById(R.id.tl_listview_layout);
-        bottomBar = (getActivity()).findViewById(R.id.bottomBar);
-
         fab_check = rootView.findViewById(R.id.fab_check);
         fab_camera = rootView.findViewById(R.id.fab_photo);
         fab_check.setVisibility(View.INVISIBLE);
@@ -241,8 +246,6 @@ public class OrderFragment extends Fragment {
                         firstLaunch = true;
                         currentOperationId = 0;
                         if (selectedTask != null) {
-//                            currentStageUuid = selectedStage.getUuid();
-                            currentTaskUuid = selectedTask.getUuid();
                             fillListViewStage(selectedTask);
                             Level = STAGE_LEVEL;
                             fab_camera.setVisibility(View.INVISIBLE);
@@ -270,7 +273,10 @@ public class OrderFragment extends Fragment {
     private void initView() {
 
         Level = ORDER_LEVEL;
-        toolbar.setSubtitle("Наряды");
+        if (toolbar != null) {
+            toolbar.setSubtitle("Наряды");
+        }
+
         fillListViewOrders();
     }
 
@@ -282,11 +288,17 @@ public class OrderFragment extends Fragment {
     @SuppressWarnings("SameParameterValue")
     private void fillListViewOrders(String orderStatus, String orderByField) {
         AuthorizedUser authUser = AuthorizedUser.getInstance();
+        Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
         User user = realmDB.where(User.class)
                 .equalTo("tagId", authUser.getTagId())
                 .findFirst();
         if (user == null) {
-            Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
             RealmQuery<Orders> query = realmDB.where(Orders.class).equalTo("user.uuid", authUser.getUuid());
             if (orderStatus != null) {
@@ -304,7 +316,7 @@ public class OrderFragment extends Fragment {
             mainListView.setAdapter(orderAdapter);
         }
 
-        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = activity.findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.GONE);
         }
@@ -314,7 +326,7 @@ public class OrderFragment extends Fragment {
         listLayout.setLayoutParams(params);
 
         int new_orders = MainFunctions.getActiveOrdersCount();
-        if (new_orders > 0) {
+        if (new_orders > 0 && bottomBar != null) {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
         }
 
@@ -327,7 +339,16 @@ public class OrderFragment extends Fragment {
         RealmQuery<Task> q = realmDB.where(Task.class);
         boolean first = true;
         boolean all_complete = true;
-        toolbar.setSubtitle("Задачи");
+        Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
+        if (toolbar != null) {
+            toolbar.setSubtitle("Задачи");
+        }
+
         if (order.getTasks().size() > 0) {
             for (Task task : order.getTasks()) {
                 long id = task.get_id();
@@ -381,7 +402,7 @@ public class OrderFragment extends Fragment {
 
         taskAdapter = new TaskAdapter(tasks);
         mainListView.setAdapter(taskAdapter);
-        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = activity.findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(order.getTitle());
@@ -394,10 +415,20 @@ public class OrderFragment extends Fragment {
     // Stages----------------------------------------------------------------------------------------
     private void fillListViewStage(Task task) {
         RealmResults<Stage> stages;
-        RealmQuery<Stage> q = realmDB.where(Stage.class);
-        toolbar.setSubtitle("Этапы задач");
         boolean first = true;
         boolean all_complete = true;
+        Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
+        RealmQuery<Stage> q = realmDB.where(Stage.class);
+
+        if (toolbar != null) {
+            toolbar.setSubtitle("Этапы задач");
+        }
+
         if (task.getStages().size() > 0) {
             for (Stage stage : task.getStages()) {
                 long id = stage.get_id();
@@ -425,7 +456,7 @@ public class OrderFragment extends Fragment {
 
         stageAdapter = new StageAdapter(stages);
         mainListView.setAdapter(stageAdapter);
-        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = activity.findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(task.getTaskTemplate().getTitle());
@@ -459,9 +490,19 @@ public class OrderFragment extends Fragment {
     // Operations----------------------------------------------------------------------------------------
     private void fillListViewOperations(Stage stage) {
         RealmResults<Operation> operations;
+        Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
         RealmQuery<Operation> q = realmDB.where(Operation.class);
         boolean first = true;
-        toolbar.setSubtitle("Операции");
+
+        if (toolbar != null) {
+            toolbar.setSubtitle("Операции");
+        }
+
         if (stage.getOperations().size() > 0) {
             for (Operation operation : stage.getOperations()) {
                 long id = operation.get_id();
@@ -478,7 +519,7 @@ public class OrderFragment extends Fragment {
             operations = null;
         }
 
-        operationAdapter = new OperationAdapter(getContext(), operations, selectedTask.getTaskTemplate().getUuid());
+        operationAdapter = new OperationAdapter(operations);
         mainListView.setAdapter(operationAdapter);
         //resultButtonLayout.setVisibility(View.VISIBLE);
         //makePhotoButton.setVisibility(View.VISIBLE);
@@ -486,7 +527,7 @@ public class OrderFragment extends Fragment {
         params.height = 1000;
         listLayout.setLayoutParams(params);
 
-        TextView tl_Header = getActivity().findViewById(R.id.tl_Header);
+        TextView tl_Header = activity.findViewById(R.id.tl_Header);
         if (tl_Header != null) {
             tl_Header.setVisibility(View.VISIBLE);
             tl_Header.setText(stage.getStageTemplate().getTitle());
@@ -503,7 +544,8 @@ public class OrderFragment extends Fragment {
         // запрещаем все операции кроме первой не законченной
         if (operationAdapter != null) {
             totalOperationCount = operationAdapter.getCount();
-            // нет решительно никакой возможности выполнять выполненные операции по сто раз только если сбросить все
+            // нет решительно никакой возможности выполнять выполненные операции по сто раз,
+            // только если сбросить все
             for (int i = 0; i < totalOperationCount; i++) {
                 final Operation operation = operationAdapter.getItem(i);
                 if (operation != null) {
@@ -530,7 +572,8 @@ public class OrderFragment extends Fragment {
                             isMeasure = true;
                         }
 
-                        // если эта операция имеет статус любой кроме закончена или отменена, то начинаем с нее
+                        // если эта операция имеет статус любой кроме закончена или отменена,
+                        // то начинаем с нее
                         if (operationStatus.getUuid().equals(OperationStatus.Status.IN_WORK) ||
                                 operationStatus.getUuid().equals(OperationStatus.Status.NEW) ||
                                 operationStatus.getUuid().equals(OperationStatus.Status.UN_COMPLETE)) {
@@ -571,6 +614,7 @@ public class OrderFragment extends Fragment {
                     });
                 }
         }
+
         // фиксируем начало работы над задачей (если у нее статус получен), меняем ее статус на в процессе
         final TaskStatus taskStatus;
         final TaskStatus taskStatusInWork;
@@ -590,6 +634,7 @@ public class OrderFragment extends Fragment {
                     });
                 }
         }
+
         // фиксируем начало работы над нарядом (если у него статус получен), меняем его статус на в процессе
         final OrderStatus orderStatus;
         final OrderStatus orderStatusInWork;
@@ -609,6 +654,7 @@ public class OrderFragment extends Fragment {
                     });
                 }
         }
+
         if (operationAdapter != null && isMeasure) {
             currentOperationId = 0;
             currentOperation = operationAdapter.getItem(currentOperationId);
@@ -640,18 +686,25 @@ public class OrderFragment extends Fragment {
      * @param status - статус наряда
      */
     private void getOrdersByStatus(List<String> status, ProgressDialog dialog) {
-        GetOrderAsyncTask aTask = new GetOrderAsyncTask(dialog, getContext().getExternalFilesDir(""));
-        String[] statusArray = status.toArray(new String[]{});
-        aTask.execute(statusArray);
+        Context context = getContext();
+        if (context != null) {
+            GetOrderAsyncTask aTask = new GetOrderAsyncTask(dialog, context.getExternalFilesDir(""));
+            String[] statusArray = status.toArray(new String[]{});
+            aTask.execute(statusArray);
+        }
     }
 
     /**
      * Метод для отправки файлов созданных во время выполнения операций или привязанных к операции.
      */
     private void sendFiles(List<OperationFile> files) {
-        SendFiles task = new SendFiles(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-        OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
-        task.execute(sendFiles);
+        Context context = getContext();
+        if (context != null) {
+            File extDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            SendFiles task = new SendFiles(extDir);
+            OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
+            task.execute(sendFiles);
+        }
     }
 
     @Override
@@ -833,12 +886,14 @@ public class OrderFragment extends Fragment {
                 .equalTo("sent", false)
                 .findAll();
 
-        for (OperationFile item : operationFiles) {
-            File operationFile = new File(
-                    getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                    item.getFileName());
-            if (operationFile.exists()) {
-                filesToSend.add(realmDB.copyFromRealm(item));
+        Context context = getContext();
+        if (context != null) {
+            File extDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            for (OperationFile item : operationFiles) {
+                File operationFile = new File(extDir, item.getFileName());
+                if (operationFile.exists()) {
+                    filesToSend.add(realmDB.copyFromRealm(item));
+                }
             }
         }
 
@@ -895,11 +950,17 @@ public class OrderFragment extends Fragment {
      */
     private void closeOperationManual(final Operation operation, AdapterView<?> parent) {
         final OperationStatus operationStatusUnComplete;
+        Activity activity = getActivity();
+        if (activity == null) {
+            // какое-то сообщение пользователю что не смогли показать диалог?
+            return;
+        }
+
         operationStatusUnComplete = realmDB.where(OperationStatus.class).equalTo("uuid", OperationStatus.Status.UN_COMPLETE).findFirst();
 
         // диалог для отмены операции
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        LayoutInflater inflater = activity.getLayoutInflater();
         View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
         final Spinner operationVerdictSpinner;
         // список статусов операций в выпадающем списке для выбора
@@ -956,8 +1017,14 @@ public class OrderFragment extends Fragment {
         final StageStatus stageStatusUnComplete;
         final OperationStatus operationStatusUnComplete;
 
+        Activity activity = getActivity();
+        if (activity == null) {
+            // какое-то сообщение пользователю что не смогли показать диалог?
+            return;
+        }
+
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        LayoutInflater inflater = activity.getLayoutInflater();
         View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
         // список статусов нарядов в выпадающем списке для выбора
         RealmResults<OrderVerdict> orderVerdict = realmDB.where(OrderVerdict.class).findAll();
@@ -1043,8 +1110,16 @@ public class OrderFragment extends Fragment {
     }
 
     public String getLastPhotoFilePath() {
+        Activity activity = getActivity();
+
+        if (activity == null) {
+            return null;
+        }
+
         String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, null);
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        ContentResolver resolver = activity.getContentResolver();
+        Cursor cursor = resolver.query(uri, projection, null, null, null);
         String result;
         if (cursor != null && cursor.moveToFirst()) {
             int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -1063,12 +1138,20 @@ public class OrderFragment extends Fragment {
         switch (requestCode) {
             case ACTIVITY_PHOTO:
                 if (resultCode == Activity.RESULT_OK) {
+                    Activity activity = getActivity();
+                    if (activity == null) {
+                        // какое-то сообщение пользователю что не смогли "сохранить" результат
+                        // фотофиксации?
+                        return;
+                    }
+
                     // получаем штатными средствами последний снятый кадр в системе
                     String fromFilePath = getLastPhotoFilePath();
                     File fromFile = new File(fromFilePath);
 
                     File mediaStorageDir;
-                    File picDir = getActivity().getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                    File picDir = activity.getApplicationContext()
+                            .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
                     if (picDir == null) {
                         return;
                     }
@@ -1100,15 +1183,15 @@ public class OrderFragment extends Fragment {
                     }
 
                     Uri fileUri = Uri.fromFile(toFile);
-                    //getActivity().getContentResolver().notifyChange(selectedImage, null);
-                    //ContentResolver cr = getActivity().getContentResolver();
+                    //activity.getContentResolver().notifyChange(selectedImage, null);
+                    //ContentResolver cr = activity.getContentResolver();
                     //Bitmap bitmap;
                     try {
                         //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
-                        String path = getContext().getExternalFilesDir("/Pictures") + File.separator;
+                        String path = activity.getExternalFilesDir("/Pictures") + File.separator;
                         getResizedBitmap(path, fileUri.getPath().replace(path, ""), 1024, 0, new Date().getTime());
                     } catch (Exception e) {
-                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
                     }
 
@@ -1149,11 +1232,17 @@ public class OrderFragment extends Fragment {
      */
     private void setOperationsVerdict(ViewGroup parent) {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-
         final OperationStatus operationStatusUnComplete;
+
+        Activity activity = getActivity();
+        if (activity == null) {
+            // какое-то сообщение пользователю что не смогли показать диалог?
+            return;
+        }
+
         operationStatusUnComplete = realmDB.where(OperationStatus.class).findFirst();
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        LayoutInflater inflater = activity.getLayoutInflater();
         View myView = inflater.inflate(R.layout.operation_dialog_cancel, parent, false);
 
         final ListView listView = myView.findViewById(R.id.odc_list_view);
@@ -1195,8 +1284,6 @@ public class OrderFragment extends Fragment {
                         currentOperationId = 0;
 
                         if (selectedTask != null) {
-//                            currentStageUuid = selectedStage.getUuid();
-                            currentTaskUuid = selectedTask.getUuid();
                             fillListViewStage(selectedTask);
                             Level = STAGE_LEVEL;
                         }
@@ -1252,10 +1339,11 @@ public class OrderFragment extends Fragment {
                 q = q.or().equalTo("_id", id);
             }
         }
+
         operations = q.findAll();
 
         OperationAdapter uncompleteOperationAdapter;
-        uncompleteOperationAdapter = new OperationAdapter(getContext(), operations, currentTaskUuid);
+        uncompleteOperationAdapter = new OperationAdapter(operations);
         listView.setAdapter(uncompleteOperationAdapter);
     }
 
@@ -1356,14 +1444,17 @@ public class OrderFragment extends Fragment {
     private void runRfidDialog(String expectedTagId, final int level) {
 //        Toast.makeText(getContext(), "Нужно поднести метку", Toast.LENGTH_LONG).show();
         final String expectedTagUuid = expectedTagId;
+        final Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
 
         Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-//                    Bundle bundle = message.getData();
-//                    String[] tagIds = bundle.getStringArray("result");
                     String[] tagIds = (String[]) message.obj;
                     if (tagIds == null) {
                         Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
@@ -1373,9 +1464,14 @@ public class OrderFragment extends Fragment {
                     String tagId = tagIds[0].substring(4);
                     Log.d(TAG, "Ид метки получили: " + tagId);
                     if (expectedTagUuid.equals(tagId)) {
-                        boolean run_ar_content = sp.getBoolean("run_ar_content_key", false);
+                        boolean run_ar_content = false;
+                        if (sp != null) {
+                            run_ar_content = sp.getBoolean("run_ar_content_key", false);
+                        }
+
                         if (run_ar_content) {
-                            Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
+                            Intent intent = activity.getPackageManager()
+                                    .getLaunchIntentForPackage("ru.shtrm.toir");
                             if (intent != null) {
                                 intent.putExtra("hardwareUUID", currentEquipment.getUuid());
                                 startActivity(intent);
@@ -1411,7 +1507,7 @@ public class OrderFragment extends Fragment {
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
         rfidDialog.readMultiTagId(expectedTagId);
-        rfidDialog.show(getActivity().getFragmentManager(), TAG);
+        rfidDialog.show(activity.getFragmentManager(), TAG);
     }
 
     @Override
@@ -1521,17 +1617,13 @@ public class OrderFragment extends Fragment {
                     currentOperationId = 0;
 
                     if (selectedStage != null && selectedTask != null) {
-//                        currentStageUuid = selectedStage.getUuid();
-                        currentTaskUuid = selectedTask.getUuid();
                         Level = STAGE_LEVEL;
                         fillListViewStage(selectedTask);
                     }
-
                 } else {
                     Log.d("order", "dialog");
                     setOperationsVerdict((ViewGroup) v.getParent());
                 }
-
             }
 
             if (Level == TASK_LEVEL || Level == ORDER_LEVEL) {
@@ -1554,7 +1646,6 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
                         selectedOrder.setStartDate(new Date());
                         realm.commitTransaction();
-//                        currentOrderUuid = selectedOrder.getUuid();
                         fillListViewTasks(selectedOrder);
                         Level = TASK_LEVEL;
                         fab_camera.setVisibility(View.INVISIBLE);
@@ -1586,19 +1677,15 @@ public class OrderFragment extends Fragment {
                     selectedStage = stageAdapter.getItem(position);
                     if (selectedStage != null) {
                         final String expectedTagId;
-//                        currentStageUuid = selectedStage.getUuid();
-                        if (selectedStage.getEquipment() != null) {
-                            expectedTagId = selectedStage.getEquipment().getTagId();
-                            boolean ask_tags = sp.getBoolean("without_tags_mode", true);
-                            if (!ask_tags && !expectedTagId.equals("")) {
-                                runRfidDialog(expectedTagId, STAGE_LEVEL);
-                            } else {
-                                fillListViewOperations(selectedStage);
-                                Level = OPERATION_LEVEL;
-                                startOperations();
-                            }
+                        currentEquipment = selectedStage.getEquipment();
+                        expectedTagId = currentEquipment.getTagId();
+                        boolean ask_tags = sp.getBoolean("without_tags_mode", true);
+                        if (!ask_tags && !expectedTagId.equals("")) {
+                            runRfidDialog(expectedTagId, STAGE_LEVEL);
                         } else {
-                            Log.d(TAG, "этапу задач не указано оборудование");
+                            fillListViewOperations(selectedStage);
+                            Level = OPERATION_LEVEL;
+                            startOperations();
                         }
                     }
                 }
