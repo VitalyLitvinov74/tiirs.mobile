@@ -46,9 +46,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -107,7 +109,6 @@ public class OrderFragment extends Fragment {
     private TaskAdapter taskAdapter;
     private StageAdapter stageAdapter;
     private OperationAdapter operationAdapter;
-    private String currentOperationUuid = "";
     private ListView mainListView;
     private LinearLayout listLayout;
     private BottomBar bottomBar;
@@ -125,20 +126,17 @@ public class OrderFragment extends Fragment {
         public void onTick(long millisUntilFinished) {
             Log.d(TAG, "Тик таймера...");
             if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
-                //  && currentOperation != null
                 currentOperation = operationAdapter.getItem(currentOperationId);
                 if (currentOperation != null) {
-                    //textTime = (TextView) mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                    if (!currentOperation.getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
-                        // TODO: вместо прямого изменения отображения в ListView счётчик
-                        // нужно отображать в отдельном View!!!
-                        TextView textTime;
-                        long currentTime = System.currentTimeMillis();
-                        textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
-                        //textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
-                    }
+                    // TODO: вместо прямого изменения отображения в ListView счётчик
+                    // нужно отображать в отдельном View!!!
+//                    if (!currentOperation.getOperationStatus().getUuid().equals(OperationStatus.Status.COMPLETE)) {
+//                        TextView textTime;
+//                        long currentTime = System.currentTimeMillis();
+//                        textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
+//                        textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
+//                    }
 
-                    currentOperationUuid = currentOperation.getUuid();
                     if (firstLaunch) {
                         firstLaunch();
                     }
@@ -1149,47 +1147,46 @@ public class OrderFragment extends Fragment {
                     String fromFilePath = getLastPhotoFilePath();
                     File fromFile = new File(fromFilePath);
 
-                    File mediaStorageDir;
+                    // имя файла для сохранения
+                    SimpleDateFormat format = new SimpleDateFormat("HHmmss", Locale.US);
+                    StringBuilder fileName = new StringBuilder();
+                    fileName.append(currentOperation.getUuid());
+                    fileName.append('-');
+                    fileName.append(format.format(new Date()));
+                    String extension = fromFilePath.substring(fromFilePath.lastIndexOf('.'));
+                    fileName.append(extension);
+
+                    // создаём объект файла фотографии для операции
+                    OperationFile operationFile = new OperationFile();
+                    operationFile.set_id(OperationFile.getLastId() + 1);
+                    operationFile.setOperation(currentOperation);
+                    operationFile.setFileName(fileName.toString());
+
                     File picDir = activity.getApplicationContext()
-                            .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                            .getExternalFilesDir(operationFile.getImageFilePath());
                     if (picDir == null) {
+                        // какое-то сообщение пользователю что не смогли "сохранить" результат
+                        // фотофиксации?
                         return;
                     }
 
-                    mediaStorageDir = new File(picDir.getAbsolutePath());
-                    if (!mediaStorageDir.exists()) {
-                        if (!mediaStorageDir.mkdirs()) {
+                    if (!picDir.exists()) {
+                        if (!picDir.mkdirs()) {
                             Log.d(TAG, "Required media storage does not exist");
                             return;
                         }
                     }
 
-                    String toFilePath = "";
-                    toFilePath += mediaStorageDir.getPath();
-                    toFilePath += File.separator;
-                    toFilePath += currentOperationUuid;
-                    toFilePath += '-';
-                    toFilePath += new Date().getTime() / 1000;
-                    toFilePath += fromFilePath.substring(fromFilePath.lastIndexOf('.'));
-                    File toFile = new File(toFilePath);
+                    File toFile = new File(picDir, operationFile.getFileName());
                     try {
                         copyFile(fromFile, toFile);
-                        if (!fromFile.delete()) {
-                            Log.e(TAG, "Не удалось удалить исходный файл фотографии.");
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         return;
                     }
 
-                    Uri fileUri = Uri.fromFile(toFile);
-                    //activity.getContentResolver().notifyChange(selectedImage, null);
-                    //ContentResolver cr = activity.getContentResolver();
-                    //Bitmap bitmap;
                     try {
-                        //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, fileUri);
-                        String path = activity.getExternalFilesDir("/Pictures") + File.separator;
-                        getResizedBitmap(path, fileUri.getPath().replace(path, ""), 1024, 0, new Date().getTime());
+                        getResizedBitmap(toFile.getParent(), toFile.getName(), 1024, 0, new Date().getTime());
                     } catch (Exception e) {
                         Toast.makeText(activity, "Failed to load", Toast.LENGTH_SHORT).show();
                         Log.e("Camera", e.toString());
@@ -1198,10 +1195,6 @@ public class OrderFragment extends Fragment {
                     // добавляем запись о полученном файле
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    OperationFile operationFile = new OperationFile();
-                    operationFile.set_id(OperationFile.getLastId() + 1);
-                    operationFile.setOperation(realm.where(Operation.class).equalTo("uuid", currentOperationUuid).findFirst());
-                    operationFile.setFileName(toFilePath.substring(toFilePath.lastIndexOf('/') + 1));
                     realm.copyToRealm(operationFile);
                     realm.commitTransaction();
                     realm.close();

@@ -90,8 +90,8 @@ public class RoundedImageView extends AppCompatImageView {
         float scaleWidth;
         float scaleHeight;
         // /storage/sdcard1/Android/data/ru.toir.mobile/users/4CD4A64F-F6CB-4A7C-B5A6-42936E656F31.jpg
-        File image = new File(path + filename.replace(".", "_m."));
-        File image_full = new File(path + filename);
+        File image = new File(path, filename.replace(".", "_m."));
+        File image_full = new File(path, filename);
 
         Long last_modified = image.lastModified();
         if (image.exists() && changedAt <= last_modified) {

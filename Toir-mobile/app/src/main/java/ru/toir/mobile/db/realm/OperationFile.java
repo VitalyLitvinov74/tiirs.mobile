@@ -45,7 +45,7 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
     }
 
     public static String getImageRoot() {
-        return null;
+        return "photo";
     }
 
     public long get_id() {
@@ -112,11 +112,31 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
     @Override
     public String getImageFilePath() {
         String imageRoot = getImageRoot();
-        return null;
+        String dir = null;
+        Stage stage = getStage();
+
+        if (stage != null) {
+            dir = imageRoot + '/' + getStage().getEquipment().getUuid();
+        }
+
+        return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return null;
+        return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    private Stage getStage() {
+        if (operation == null) {
+            return null;
+        }
+
+        Realm realm = Realm.getDefaultInstance();
+        Stage stage = realm.where(Stage.class).equalTo("uuid", operation.getStageUuid())
+                .findFirst();
+        realm.close();
+
+        return stage;
     }
 }
