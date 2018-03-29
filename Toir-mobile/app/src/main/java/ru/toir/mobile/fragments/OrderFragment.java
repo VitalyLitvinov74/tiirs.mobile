@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -698,7 +697,7 @@ public class OrderFragment extends Fragment {
     private void sendFiles(List<OperationFile> files) {
         Context context = getContext();
         if (context != null) {
-            File extDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File extDir = context.getExternalFilesDir("");
             SendFiles task = new SendFiles(extDir);
             OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
             task.execute(sendFiles);
@@ -875,7 +874,6 @@ public class OrderFragment extends Fragment {
             }
         }
 
-        // предполагаем что все файлы мы сохраняем в папку приложения DIRECTORY_PICTURES
         // строим список файлов связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
         List<OperationFile> filesToSend = new ArrayList<>();
@@ -886,8 +884,8 @@ public class OrderFragment extends Fragment {
 
         Context context = getContext();
         if (context != null) {
-            File extDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
             for (OperationFile item : operationFiles) {
+                File extDir = context.getExternalFilesDir(item.getImageFilePath());
                 File operationFile = new File(extDir, item.getFileName());
                 if (operationFile.exists()) {
                     filesToSend.add(realmDB.copyFromRealm(item));
@@ -910,8 +908,13 @@ public class OrderFragment extends Fragment {
         ProgressDialog dialog;
         dialog = new ProgressDialog(getActivity());
 
-        sendMeasuredValues(realmDB.copyFromRealm(measuredValues), dialog);
-        addToJournal("Наряды отправлены на сервер");
+        // если нет измеренных значений на отправку, то диалог отображающий процесс не будет закрыт!
+        // TODO: реализовать отправку данных "пакетом"
+        // TODO: реализовать "правильную" работу с диалоговым окном
+        if (measuredValues.size() > 0) {
+            sendMeasuredValues(realmDB.copyFromRealm(measuredValues), dialog);
+            addToJournal("Наряды отправлены на сервер");
+        }
 
         // показываем диалог отправки результатов
         dialog.setMessage("Отправляем результаты");
@@ -1114,10 +1117,18 @@ public class OrderFragment extends Fragment {
             return null;
         }
 
-        String[] projection = {MediaStore.Images.Media.DATA};
+        String[] projection = {
+                MediaStore.Images.Media.DATA,
+//                MediaStore.Images.Media._ID,
+//                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+//                MediaStore.Images.Media.DATE_TAKEN
+        };
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         ContentResolver resolver = activity.getContentResolver();
-        Cursor cursor = resolver.query(uri, projection, null, null, null);
+        String orderBy = android.provider.MediaStore.Video.Media.DATE_TAKEN + " DESC";
+        Cursor cursor = resolver.query(uri, projection, null, null, orderBy);
+        // TODO: реализовать удаление записи о фотке котрую мы "забрали"
+        //resolver.delete(uri,);
         String result;
         if (cursor != null && cursor.moveToFirst()) {
             int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);

@@ -35,11 +35,6 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
     }
 
     @NonNull
-    private RequestBody createPartFromString(String descriptionString) {
-        return RequestBody.create(MultipartBody.FORM, descriptionString);
-    }
-
-    @NonNull
     private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
         File file = new File(fileUri.getPath());
         String type = null;
@@ -56,27 +51,37 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
     @Override
     protected LongSparseArray<String> doInBackground(OperationFile[]... lists) {
         LongSparseArray<String> idUuid = new LongSparseArray<>();
+        Realm realm = Realm.getDefaultInstance();
+        RequestBody descr = RequestBody.create(MultipartBody.FORM, "Photos due execution operation.");
 
         for (OperationFile file : lists[0]) {
-            RequestBody descr = createPartFromString("Photos due execution operation.");
-            Uri uri = null;
+            List<MultipartBody.Part> list = new ArrayList<>();
+
             try {
-                // TODO: нужно добавить полный путь до файла в каталоге Pictures !!!
-                uri = Uri.fromFile(new File(extDir.getAbsolutePath() + '/', file.getFileName()));
+                File path = new File(extDir.getAbsolutePath() + '/' + file.getImageFilePath(),
+                        file.getFileName());
+                Uri uri = Uri.fromFile(path);
+                String fileUuid = file.getUuid();
+                String formId = "file[" + fileUuid + "]";
+
+                list.add(prepareFilePart(formId, uri));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[_id]", String.valueOf(file.get_id())));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[uuid]", fileUuid));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[fileName]", file.getFileName()));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
             } catch (Exception e) {
                 e.printStackTrace();
+                continue;
             }
 
-            List<MultipartBody.Part> list = new ArrayList<>();
-            String fileUuid = file.getUuid();
-            String formId = "file[" + fileUuid + "]";
-            list.add(prepareFilePart(formId, uri));
-            list.add(MultipartBody.Part.createFormData(formId + "[_id]", String.valueOf(file.get_id())));
-            list.add(MultipartBody.Part.createFormData(formId + "[uuid]", file.getUuid()));
-            list.add(MultipartBody.Part.createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
-            list.add(MultipartBody.Part.createFormData(formId + "[fileName]", file.getFileName()));
-            list.add(MultipartBody.Part.createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
-            list.add(MultipartBody.Part.createFormData(formId + "[changedAt]", String.valueOf(file.getChangedAt())));
             // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
             // объём данных превышающий ограничения на отправку POST запросом на сервере
             Call<ResponseBody> call = ToirAPIFactory.getOperationFileService().upload(descr, list);
@@ -100,6 +105,8 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
                 e.printStackTrace();
             }
         }
+
+        realm.close();
 
         return idUuid;
     }
