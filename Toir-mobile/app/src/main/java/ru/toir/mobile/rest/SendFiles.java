@@ -1,8 +1,11 @@
 package ru.toir.mobile.rest;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.LongSparseArray;
 import android.webkit.MimeTypeMap;
 
@@ -10,8 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import okhttp3.MediaType;
@@ -29,9 +34,13 @@ import ru.toir.mobile.db.realm.OperationFile;
 public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<String>> {
 
     private File extDir;
+    private WeakReference<Context> context;
+    private AtomicInteger count;
 
-    public SendFiles(File e) {
+    public SendFiles(File e, @NonNull Context context, AtomicInteger count) {
         extDir = e;
+        this.context = new WeakReference<>(context);
+        this.count = count;
     }
 
     @NonNull
@@ -114,6 +123,12 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
     @Override
     protected void onPostExecute(LongSparseArray<String> idUuid) {
         super.onPostExecute(idUuid);
+
+        if (count.decrementAndGet() <= 0) {
+            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context.get());
+            broadcastManager.sendBroadcast(new Intent("all_task_have_complete"));
+        }
+
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         for (int idx = 0; idx < idUuid.size(); idx++) {

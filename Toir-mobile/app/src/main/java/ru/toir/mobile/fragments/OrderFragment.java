@@ -3,10 +3,12 @@ package ru.toir.mobile.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -21,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -50,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -167,6 +171,27 @@ public class OrderFragment extends Fragment {
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
     private RfidDialog rfidDialog;
+    private AtomicInteger taskCounter;
+    private ProgressDialog dialog;
+    BroadcastReceiver taskDoneReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive:" + intent.getAction());
+            String action = intent.getAction();
+            if (action == null) {
+                return;
+            } else if (!intent.getAction().equals("all_task_have_complete")) {
+                return;
+            }
+
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+
+            Toast.makeText(context, "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
+            addToJournal("Наряды отправлены на сервер");
+        }
+    };
 
     public static OrderFragment newInstance() {
         return (new OrderFragment());
@@ -688,6 +713,8 @@ public class OrderFragment extends Fragment {
             GetOrderAsyncTask aTask = new GetOrderAsyncTask(dialog, context.getExternalFilesDir(""));
             String[] statusArray = status.toArray(new String[]{});
             aTask.execute(statusArray);
+        } else {
+            Log.e(TAG, "Не удалось запустить задачу получения нарядов!");
         }
     }
 
@@ -698,9 +725,11 @@ public class OrderFragment extends Fragment {
         Context context = getContext();
         if (context != null) {
             File extDir = context.getExternalFilesDir("");
-            SendFiles task = new SendFiles(extDir);
+            SendFiles task = new SendFiles(extDir, getContext(), taskCounter);
             OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
             task.execute(sendFiles);
+        } else {
+            Log.e(TAG, "Не удалось запустить задачу отправки фотографий!");
         }
     }
 
@@ -825,16 +854,26 @@ public class OrderFragment extends Fragment {
     }
 
     private void sendOrders(List<Orders> orders) {
-        SendOrders task = new SendOrders();
-        addToJournal("Отправляем выполненные наряды на сервер");
-        Orders[] ordersArray = orders.toArray(new Orders[]{});
-        task.execute(ordersArray);
+        Context context = getContext();
+        if (context != null) {
+            SendOrders task = new SendOrders(context, taskCounter);
+            addToJournal("Отправляем выполненные наряды на сервер");
+            Orders[] ordersArray = orders.toArray(new Orders[]{});
+            task.execute(ordersArray);
+        } else {
+            Log.e(TAG, "Не удалось запустить задачу отправки нарядов!");
+        }
     }
 
-    private void sendMeasuredValues(List<MeasuredValue> values, ProgressDialog dialog) {
-        SendMeasureValues task = new SendMeasureValues(dialog);
-        MeasuredValue[] valuesArray = values.toArray(new MeasuredValue[]{});
-        task.execute(valuesArray);
+    private void sendMeasuredValues(List<MeasuredValue> values) {
+        Context context = getContext();
+        if (context != null) {
+            SendMeasureValues task = new SendMeasureValues(context, taskCounter);
+            MeasuredValue[] valuesArray = values.toArray(new MeasuredValue[]{});
+            task.execute(valuesArray);
+        } else {
+            Log.e(TAG, "Не удалось запустить задачу отправки измеренных значений!");
+        }
     }
 
     /**
@@ -854,6 +893,24 @@ public class OrderFragment extends Fragment {
             Toast.makeText(getActivity(), "Нет результатов для отправки.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // создаём диалог
+        dialog = new ProgressDialog(getActivity());
+        dialog.setMessage("Отправляем результаты");
+        dialog.setIndeterminate(true);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(false);
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getActivity(), "Отправка результатов отменена",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        dialog.show();
+
+        taskCounter = new AtomicInteger(3);
 
         // отправляем результат
         sendOrders(realmDB.copyFromRealm(ordersList));
@@ -904,32 +961,7 @@ public class OrderFragment extends Fragment {
                 .in("operation.uuid", opUuidsArray)
                 .findAll();
 
-        // создаём диалог
-        ProgressDialog dialog;
-        dialog = new ProgressDialog(getActivity());
-
-        // если нет измеренных значений на отправку, то диалог отображающий процесс не будет закрыт!
-        // TODO: реализовать отправку данных "пакетом"
-        // TODO: реализовать "правильную" работу с диалоговым окном
-        if (measuredValues.size() > 0) {
-            sendMeasuredValues(realmDB.copyFromRealm(measuredValues), dialog);
-            addToJournal("Наряды отправлены на сервер");
-        }
-
-        // показываем диалог отправки результатов
-        dialog.setMessage("Отправляем результаты");
-        dialog.setIndeterminate(true);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setCancelable(false);
-        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), "Отправка результатов отменена",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-        dialog.show();
+        sendMeasuredValues(realmDB.copyFromRealm(measuredValues));
     }
 
     public View getViewByPosition(int pos, ListView listView) {
@@ -1561,6 +1593,28 @@ public class OrderFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // регистрация получения сообщения
+        Context context = getContext();
+        if (context != null) {
+            LocalBroadcastManager mgr = LocalBroadcastManager.getInstance(context);
+            mgr.registerReceiver(taskDoneReceiver, new IntentFilter("all_task_have_complete"));
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // удаление приёмника
+        Context context = getContext();
+        if (context != null) {
+            LocalBroadcastManager mgr = LocalBroadcastManager.getInstance(context);
+            mgr.unregisterReceiver(taskDoneReceiver);
+        }
+    }
+
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
@@ -1797,5 +1851,4 @@ public class OrderFragment extends Fragment {
             return true;
         }
     }
-
 }

@@ -1,14 +1,19 @@
 package ru.toir.mobile.rest;
 
-import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.LongSparseArray;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import okhttp3.ResponseBody;
@@ -22,10 +27,12 @@ import ru.toir.mobile.db.realm.MeasuredValue;
 
 public class SendMeasureValues extends AsyncTask<MeasuredValue[], Void, LongSparseArray<String>> {
 
-    private ProgressDialog dialog;
+    private AtomicInteger count;
+    private WeakReference<Context> context;
 
-    public SendMeasureValues(ProgressDialog d) {
-        dialog = d;
+    public SendMeasureValues(@NonNull Context context, AtomicInteger count) {
+        this.context = new WeakReference<>(context);
+        this.count = count;
     }
 
     @Override
@@ -59,8 +66,10 @@ public class SendMeasureValues extends AsyncTask<MeasuredValue[], Void, LongSpar
     @Override
     protected void onPostExecute(LongSparseArray<String> idUuid) {
         super.onPostExecute(idUuid);
-        if (dialog != null) {
-            dialog.dismiss();
+
+        if (count.decrementAndGet() <= 0) {
+            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context.get());
+            broadcastManager.sendBroadcast(new Intent("all_task_have_complete"));
         }
 
         Realm realm = Realm.getDefaultInstance();
@@ -78,12 +87,5 @@ public class SendMeasureValues extends AsyncTask<MeasuredValue[], Void, LongSpar
 
         realm.commitTransaction();
         realm.close();
-
-        // TODO: решить что делать!
-        // это сообщение связанно с логикой отправки результатов на сервер
-        // т.е. этот процесс запускается последним, и по его завершению сообщаем пользователю
-        // что всё отправлено
-        // TODO: нужно избавиться от такого поведения, сообщение выдавать в подходящем месте!!!
-//        Toast.makeText(context, "Результаты отправлены на сервер.", Toast.LENGTH_SHORT).show();
     }
 }
