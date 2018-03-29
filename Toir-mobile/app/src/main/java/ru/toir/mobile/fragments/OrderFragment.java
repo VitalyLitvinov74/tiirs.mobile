@@ -58,6 +58,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
@@ -86,6 +88,7 @@ import ru.toir.mobile.rest.GetOrderAsyncTask;
 import ru.toir.mobile.rest.SendFiles;
 import ru.toir.mobile.rest.SendMeasureValues;
 import ru.toir.mobile.rest.SendOrders;
+import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
@@ -417,9 +420,36 @@ public class OrderFragment extends Fragment {
             } catch (Exception e) {
                 return;
             }
+
             addToJournal("Закончен наряд " + order.getTitle() + "(" + order.getUuid() + ")");
             Level = ORDER_LEVEL;
             fillListViewOrders(null, null);
+
+            // отправляем сообщение о изменении статуса на сервер
+            final String uuid = order.getUuid();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    // отправляем запрос на установку статуса COMPLETE на сервере
+                    // в случае не успеха, ни каких действий для повторной отправки
+                    // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
+                    Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setComplete(uuid);
+                    try {
+                        retrofit2.Response response = call.execute();
+                        if (response.code() != 200) {
+                            // TODO: нужно реализовать механизм повторной попытки установки статуса
+                            addToJournal("Не удалось отправить запрос на установку статуса нарядов COMPLETE");
+                        } else {
+                            addToJournal("Успешно отправили статус для полученных нарядов COMPLETE");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        addToJournal("Исключение при запросе на установку статуса нарядов COMPLETE");
+                    }
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
         }
 
         taskAdapter = new TaskAdapter(tasks);
@@ -658,24 +688,24 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над нарядом (если у него статус получен), меняем его статус на в процессе
-        final OrderStatus orderStatus;
-        final OrderStatus orderStatusInWork;
-        if (selectedOrder != null) {
-            orderStatus = selectedOrder.getOrderStatus();
-            orderStatusInWork = realmDB.where(OrderStatus.class)
-                    .equalTo("uuid", OrderStatus.Status.IN_WORK)
-                    .findFirst();
-            if (orderStatus != null && orderStatusInWork != null)
-                if (orderStatus.getUuid().equals(OrderStatus.Status.NEW) || orderStatus.getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            selectedOrder.setOpenDate(new Date());
-                            selectedOrder.setOrderStatus(orderStatusInWork);
-                        }
-                    });
-                }
-        }
+//        final OrderStatus orderStatus;
+//        final OrderStatus orderStatusInWork;
+//        if (selectedOrder != null) {
+//            orderStatus = selectedOrder.getOrderStatus();
+//            orderStatusInWork = realmDB.where(OrderStatus.class)
+//                    .equalTo("uuid", OrderStatus.Status.IN_WORK)
+//                    .findFirst();
+//            if (orderStatus != null && orderStatusInWork != null)
+//                if (orderStatus.getUuid().equals(OrderStatus.Status.NEW) || orderStatus.getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
+//                    realmDB.executeTransaction(new Realm.Transaction() {
+//                        @Override
+//                        public void execute(Realm realm) {
+//                            selectedOrder.setOpenDate(new Date());
+//                            selectedOrder.setOrderStatus(orderStatusInWork);
+//                        }
+//                    });
+//                }
+//        }
 
         if (operationAdapter != null && isMeasure) {
             currentOperationId = 0;
@@ -1129,6 +1159,32 @@ public class OrderFragment extends Fragment {
                 });
                 //fillListViewTask(null, null);
                 dialog.dismiss();
+
+                final String uuid = order.getUuid();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        // отправляем запрос на установку статуса COMPLETE на сервере
+                        // в случае не успеха, ни каких действий для повторной отправки
+                        // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
+                        Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setUnComplete(uuid);
+                        try {
+                            retrofit2.Response response = call.execute();
+                            if (response.code() != 200) {
+                                // TODO: нужно реализовать механизм повторной попытки установки статуса
+                                addToJournal("Не удалось отправить запрос на установку статуса нарядов UN_COMPLETE");
+                            } else {
+                                addToJournal("Успешно отправили статус для полученных нарядов UN_COMPLETE");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            addToJournal("Исключение при запросе на установку статуса нарядов UN_COMPLETE");
+                        }
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
+
             }
         });
 

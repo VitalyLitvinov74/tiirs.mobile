@@ -47,4 +47,16 @@ public interface IOrders {
 
     @POST("/orders/in-work")
     Call<ResponseBody> setInWork(@Body List<String> uuid);
+
+    @POST("/orders/complete")
+    Call<ResponseBody> setComplete(@Body String uuid);
+
+    @POST("/orders/complete")
+    Call<ResponseBody> setComplete(@Body List<String> uuid);
+
+    @POST("/orders/un-complete")
+    Call<ResponseBody> setUnComplete(@Body String uuid);
+
+    @POST("/orders/un-complete")
+    Call<ResponseBody> setUnComplete(@Body List<String> uuid);
 }
