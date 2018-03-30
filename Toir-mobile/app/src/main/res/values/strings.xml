@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Toir-mobile</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">ТОиРУС</string>
     <string name="action_settings">Настройки приложения</string>
     <string name="action_about">О программе</string>
     <string name="pleasePutTag">Поднесите метку</string>
@@ -131,7 +130,7 @@
     <string name="sec">сек.</string>
     <string name="sec_with_value">%1$d сек.</string>
     <string name="input_value">введите данные</string>
-    <string name="program_version">TOiR Mobile v1.0.5\n ООО "ТЭС"\n (tourus.ru) (&#169;)2017</string>
+    <string name="program_version">TOiR Mobile v1.5\n "ТЭС"\n (tourus.ru) (&#169;)2017</string>
 
     <string name="gps_track">GPS трек</string>
     <string name="journal">Журнал</string>
@@ -181,4 +180,8 @@
     <string name="order_reason">Основание наряда: %1$s</string>
 
     <string name="debug_nocheck_gps">Не проверять GPS</string>
+    <string name="receive_telegram">Оповещать через Telegram</string>
+    <string name="receive_viber">Оповещать через Viber</string>
+    <string name="telegram_chat_id">Идентификатор чата</string>
+    <string name="telegram_chat_id_value">0</string>
 </resources>

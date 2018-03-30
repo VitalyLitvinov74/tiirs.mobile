@@ -84,6 +84,7 @@ public class ToirPreferences extends PreferenceActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         getDelegate().onConfigurationChanged(newConfig);
+
     }
 
     @Override

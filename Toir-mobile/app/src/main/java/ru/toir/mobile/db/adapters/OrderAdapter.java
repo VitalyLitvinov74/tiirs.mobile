@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -53,7 +54,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         int j = 0;
         Date currentDate = new Date();
         Date separateDate;
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         separates.clear();
 
         if (adapterData != null)

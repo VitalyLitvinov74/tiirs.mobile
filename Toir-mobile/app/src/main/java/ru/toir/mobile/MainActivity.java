@@ -167,25 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate");
 
-        if (!splashShown) {
-            // показываем приветствие
-            setContentView(R.layout.start_screen);
-
-            // запускаем таймер для показа экрана входа
-            Handler h = new Handler();
-            h.postDelayed(new Runnable() {
-                public void run() {
-                    splashShown = true;
-
-                    if (isLogged) {
-                        setMainLayout(savedInstance);
-                    } else {
-                        setContentView(R.layout.login_layout);
-                        ShowSettings();
-                    }
-                }
-            }, 3000);
-        } else {
+        if (splashShown) {
             if (isLogged) {
                 setMainLayout(savedInstanceState);
             } else {
@@ -193,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
                 ShowSettings();
             }
         }
-
     }
 
     /**
@@ -289,7 +270,6 @@ public class MainActivity extends AppCompatActivity {
                                 if (user.size() == 1) {
                                     authUser.setLogin(user.first().getLogin());
                                 }
-
                                 realm.close();
                             }
 
@@ -314,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
                                         authorizedUser.setUuid(user.getUuid());
                                         authorizedUser.setLogin(user.getLogin());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
+                                        //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
 
                                         // получаем изображение пользователя
                                         String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
@@ -695,7 +676,6 @@ public class MainActivity extends AppCompatActivity {
                                 .withName("Выход")
                                 .withIcon(FontAwesome.Icon.faw_undo)
                                 .withIdentifier(DRAWER_EXIT)
-                                .withSelectable(false)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor))
                 )
@@ -1115,14 +1095,34 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onResume()");
         super.onResume();
 
+        if (!splashShown) {
+            // показываем приветствие
+            setContentView(R.layout.start_screen);
+
+            // запускаем таймер для показа экрана входа
+            Handler h = new Handler();
+            h.postDelayed(new Runnable() {
+                public void run() {
+                    splashShown = true;
+
+                    if (isLogged) {
+                        setMainLayout(savedInstance);
+                    } else {
+                        setContentView(R.layout.login_layout);
+                        ShowSettings();
+                    }
+                }
+            }, 3000);
+        }
+
+        /*
         AuthorizedUser user = AuthorizedUser.getInstance();
         if (user.getTagId() == null) {
             // пользователь не вошел в программу, либо потеряна по каким-то причинам информация
             // о текущем пользователе, показываем экран входа
             setContentView(R.layout.login_layout);
         }
-
-        ShowSettings();
+        ShowSettings();*/
 
         Runnable run = new Runnable() {
             @Override

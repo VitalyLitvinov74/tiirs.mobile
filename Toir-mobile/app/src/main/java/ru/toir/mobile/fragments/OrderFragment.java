@@ -69,6 +69,7 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -408,7 +409,7 @@ public class OrderFragment extends Fragment {
             if (orderByField != null) {
                 orders = query.findAllSorted(orderByField);
             } else {
-                orders = query.findAll();
+                orders = query.findAllSorted("startDate", Sort.DESCENDING);
             }
 
             orderAdapter = new OrderAdapter(getContext(), orders);
