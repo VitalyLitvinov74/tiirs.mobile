@@ -130,7 +130,7 @@
     <string name="sec">сек.</string>
     <string name="sec_with_value">%1$d сек.</string>
     <string name="input_value">введите данные</string>
-    <string name="program_version">TOiR Mobile v1.5\n "ТЭС"\n (tourus.ru) (&#169;)2017</string>
+    <string name="program_version">TOiR Mobile v1.0.5\n ООО "ТЭС"\n (tourus.ru) (&#169;)2017</string>
 
     <string name="gps_track">GPS трек</string>
     <string name="journal">Журнал</string>

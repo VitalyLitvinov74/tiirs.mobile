@@ -39,7 +39,8 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     private List<Long> separates = new ArrayList<>();
 
     public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
-        super(context, data);
+        //super(context, data);
+        super(data);
         makeSeparates();
     }
 
