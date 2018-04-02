@@ -2,12 +2,12 @@ package ru.toir.mobile;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,7 +44,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,9 +53,6 @@ import java.util.UUID;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DefectAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
@@ -68,15 +64,14 @@ import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
-import ru.toir.mobile.db.realm.Stages;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.User;
-import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.GetDocumentationAsyncTask;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
 
-import static ru.toir.mobile.utils.MainFunctions.getEquipmentImage;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 //import android.content.BroadcastReceiver;
@@ -129,8 +124,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private ListView tv_equipment_defects;
     // диалог для работы с rfid считывателем
     private RfidDialog rfidDialog;
-    // диалог при загрузке файла документации
-    private ProgressDialog loadDocumentationDialog;
     private boolean FAB_Status = false;
 
 
@@ -197,12 +190,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-    /**
-     * Показываем документ из базы во внешнем приложении.
-     *
-     * @param file - файл
-     */
-    private void showDocument(File file) {
+    public static void showDocument(Context context, File file) {
         MimeTypeMap mt = MimeTypeMap.getSingleton();
         String[] patternList = file.getName().split("\\.");
         String extension = patternList[patternList.length - 1];
@@ -215,7 +203,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
             Intent viewFileIntent = Intent.createChooser(target, "Open File");
             try {
-                startActivity(viewFileIntent);
+                context.startActivity(viewFileIntent);
             } catch (ActivityNotFoundException e) {
                 // сообщить пользователю установить подходящее приложение
             }
@@ -234,23 +222,29 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         realmDB = Realm.getDefaultInstance();
         Bundle b = getIntent().getExtras();
-        equipment_uuid = b.getString("equipment_uuid");
+        if (b != null && b.getString("equipment_uuid") != null) {
+            equipment_uuid = b.getString("equipment_uuid");
+        } else {
+            finish();
+            return;
+        }
+
         //setContentView(R.layout.equipment_layout);
         setMainLayout(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        tv_equipment_name = (TextView) findViewById(R.id.equipment_text_name);
-        tv_equipment_inventory = (TextView) findViewById(R.id.equipment_text_inventory);
-        tv_equipment_uuid = (TextView) findViewById(R.id.equipment_text_uuid);
-        tv_equipment_position = (TextView) findViewById(R.id.equipment_text_location);
-        tv_equipment_task_date = (TextView) findViewById(R.id.equipment_text_date);
-        tv_equipment_check_date = (TextView) findViewById(R.id.equipment_text_date2);
-        tv_equipment_image = (ImageView) findViewById(R.id.equipment_image);
-        tv_equipment_listview = (ListView) findViewById(R.id.list_view);
-        tv_equipment_docslistview = (ListView) findViewById(R.id.equipment_documentation_listView);
-        tv_equipment_status = (TextView) findViewById(R.id.equipment_text_status);
-        tv_equipment_id = (TextView) findViewById(R.id.equipment_text_id);
-        tv_equipment_defects = (ListView) findViewById(R.id.equipment_defects_listView);
+        tv_equipment_name = findViewById(R.id.equipment_text_name);
+        tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
+        tv_equipment_uuid = findViewById(R.id.equipment_text_uuid);
+        tv_equipment_position = findViewById(R.id.equipment_text_location);
+        tv_equipment_task_date = findViewById(R.id.equipment_text_date);
+        tv_equipment_check_date = findViewById(R.id.equipment_text_date2);
+        tv_equipment_image = findViewById(R.id.equipment_image);
+        tv_equipment_listview = findViewById(R.id.list_view);
+        tv_equipment_docslistview = findViewById(R.id.equipment_documentation_listView);
+        tv_equipment_status = findViewById(R.id.equipment_text_status);
+        tv_equipment_id = findViewById(R.id.equipment_text_id);
+        tv_equipment_defects = findViewById(R.id.equipment_defects_listView);
 
         initView();
     }
@@ -261,25 +255,30 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Неизвестное оборудование!!", Toast.LENGTH_LONG).show();
             return;
         }
+
         EquipmentModel equipmentModel = equipment.getEquipmentModel();
+        String textData;
         tv_equipment_name.setText(equipment.getTitle());
         if (equipmentModel != null) {
-            tv_equipment_inventory.setText(getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle());
+            textData = getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle();
+            tv_equipment_inventory.setText(textData);
         }
+
         tv_equipment_id.setText(getString(R.string.id, equipment.getInventoryNumber()));
         tv_equipment_uuid.setText(equipment.getUuid());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
         if (equipment.getLatitude() > 0) {
-            tv_equipment_position.setText(""
-                    + String.valueOf(equipment.getLatitude()) + " / "
-                    + String.valueOf(equipment.getLongitude()));
+            textData = String.valueOf(equipment.getLatitude()) + " / "
+                    + String.valueOf(equipment.getLongitude());
+            tv_equipment_position.setText(textData);
         } else {
             if (equipment.getLocation() != null) {
-                tv_equipment_position.setText(""
-                        + String.valueOf(equipment.getLocation().getLatitude()) + " / "
-                        + String.valueOf(equipment.getLocation().getLongitude()));
+                textData = String.valueOf(equipment.getLocation().getLatitude()) + " / "
+                        + String.valueOf(equipment.getLocation().getLongitude());
+                tv_equipment_position.setText(textData);
             }
         }
+
         Date date = equipment.getStartDate();
         String startDate;
         if (date != null) {
@@ -299,11 +298,12 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
         String sDate;
-        RealmResults<Stages> stages = realmDB.where(Stages.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
+        RealmResults<Stage> stages = realmDB.where(Stage.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
         if (stages.size() > 2) {
             stages.subList(0, 2);
         }
-        StageAdapter stageAdapter = new StageAdapter(getApplicationContext(), stages);
+
+        StageAdapter stageAdapter = new StageAdapter(stages);
         if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
             if (date != null && date.after(new Date(100000))) {
@@ -311,47 +311,58 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             } else {
                 sDate = "не обслуживалось";
             }
+
             tv_equipment_check_date.setText(sDate);
         }
+
         tv_equipment_listview.setAdapter(stageAdapter);
 
         RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("date", Sort.DESCENDING);
         if (defects.size() > 2) {
             defects.subList(0, 2);
         }
-        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
+
+        DefectAdapter defectAdapter = new DefectAdapter(defects);
         tv_equipment_defects.setAdapter(defectAdapter);
 
-        String path = getExternalFilesDir("/equipment") + File.separator;
-        Bitmap image_bitmap = getResizedBitmap(path, getEquipmentImage(equipment.getImage(), equipment), 0, 300, equipment.getChangedAt().getTime());
-        if (image_bitmap != null) {
-            tv_equipment_image.setImageBitmap(image_bitmap);
+        String imgPath = equipment.getAnyImageFilePath();
+        String fileName = equipment.getAnyImage();
+        if (imgPath != null && fileName != null) {
+            File path = getExternalFilesDir(imgPath);
+            if (path != null) {
+                Bitmap tmpBitmap = getResizedBitmap(path + File.separator,
+                        fileName, 300, 0, equipment.getChangedAt().getTime());
+                if (tmpBitmap != null) {
+                    tv_equipment_image.setImageBitmap(tmpBitmap);
+                }
+            }
         }
 
         RealmResults<Documentation> documentation;
-        ListView documentationListView = (ListView) findViewById(R.id.equipment_documentation_listView);
+        ListView documentationListView = findViewById(R.id.equipment_documentation_listView);
         documentation = realmDB.where(Documentation.class)
                 .equalTo("equipment.uuid", equipment.getUuid()).or()
                 .equalTo("equipmentModel.uuid", equipment.getEquipmentModel().getUuid())
                 .findAll();
 //        documentation = realmDB.where(Documentation.class).findAll();
-        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getApplicationContext(), documentation);
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(documentation);
         if (documentationListView != null) {
             documentationListView.setAdapter(documentationAdapter);
             documentationListView.setOnItemClickListener(new ListViewClickListener());
         }
+
         setListViewHeightBasedOnChildren(tv_equipment_docslistview);
         setListViewHeightBasedOnChildren(tv_equipment_listview);
 
-        rootLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        rootLayout = findViewById(R.id.coordinatorLayout);
 
         //Floating Action Buttons
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
-        fab2 = (FloatingActionButton) findViewById(R.id.fab_2);
-        fab3 = (FloatingActionButton) findViewById(R.id.fab_3);
-        fab4 = (FloatingActionButton) findViewById(R.id.fab_4);
-        fab5 = (FloatingActionButton) findViewById(R.id.fab_5);
+        fab = findViewById(R.id.fab);
+        fab1 = findViewById(R.id.fab_1);
+        fab2 = findViewById(R.id.fab_2);
+        fab3 = findViewById(R.id.fab_3);
+        fab4 = findViewById(R.id.fab_4);
+        fab5 = findViewById(R.id.fab_5);
 
         show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_show);
         hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_hide);
@@ -418,18 +429,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     }
 
-//	private void FillListViewOperations() {
-//        TaskAdapter taskAdapter;
-//        RealmResults<Tasks> tasks;
-//        tasks = realmDB.where(Tasks.class).equalTo("equipmentUuid", equipment_uuid).findAllSorted("startDate");
-//        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-//        lv.setAdapter(taskAdapter);
-//	}
-
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.equipment_layout);
         AccountHeader headerResult;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
         toolbar.setSubtitle("Обслуживание и ремонт");
@@ -465,6 +468,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                                 System.exit(0);
                             }
                         }
+
                         return false;
                     }
                 })
@@ -566,8 +570,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
 
         RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
-        final Spinner defectTypeSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
-        final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(this, defectType);
+        final Spinner defectTypeSpinner = alertLayout.findViewById(R.id.spinner_defects);
+        final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(defectType);
         defectTypeSpinner.setAdapter(typeSpinnerAdapter);
 
         defectTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -579,8 +583,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     DefectType currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
                     if (currentDefectType != null) {
                         RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("DefectType.uuid", currentDefectType.getUuid()).findAll();
-                        Spinner defectSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_defects);
-                        DefectAdapter defectAdapter = new DefectAdapter(getApplicationContext(), defects);
+                        Spinner defectSpinner = alertLayout.findViewById(R.id.spinner_defects);
+                        DefectAdapter defectAdapter = new DefectAdapter(defects);
                         defectSpinner.setAdapter(defectAdapter);
                     }
                 }
@@ -606,15 +610,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TextView newDefect = (TextView) alertLayout.findViewById(R.id.add_new_comment);
+                TextView newDefect = alertLayout.findViewById(R.id.add_new_comment);
                 DefectType currentDefectType = null;
                 if (defectTypeSpinner.getSelectedItemPosition() >= 0) {
                     currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
                 }
+
                 if (newDefect != null) {
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    final Defect defect = realmDB.createObject(Defect.class);
+                    final Defect defect = realm.createObject(Defect.class);
                     UUID uuid = UUID.randomUUID();
                     long next_id = Defect.getLastId() + 1;
                     defect.set_id(next_id);
@@ -632,7 +637,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     }
 
                     AuthorizedUser authUser = AuthorizedUser.getInstance();
-                    User user = realmDB.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                    User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
                     if (user != null) {
                         defect.setUser(user);
                     } else {
@@ -656,8 +661,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.change_status_dialog, parent, false);
         RealmResults<EquipmentStatus> equipmentStatus = realmDB.where(EquipmentStatus.class).findAll();
-        final Spinner statusSpinner = (Spinner) alertLayout.findViewById(R.id.spinner_status);
-        final EquipmentStatusAdapter equipmentStatusAdapter = new EquipmentStatusAdapter(this, R.id.spinner_status, equipmentStatus);
+        final Spinner statusSpinner = alertLayout.findViewById(R.id.spinner_status);
+        final EquipmentStatusAdapter equipmentStatusAdapter = new EquipmentStatusAdapter(equipmentStatus);
         statusSpinner.setAdapter(equipmentStatusAdapter);
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -682,7 +687,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         });
 
-        TextView statusCurrent = (TextView) alertLayout.findViewById(R.id.current_status);
+        TextView statusCurrent = alertLayout.findViewById(R.id.current_status);
         statusCurrent.setText(equipment.getEquipmentStatus().getTitle());
 
         AlertDialog dialog = alert.create();
@@ -842,106 +847,53 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            String path;
-            String objUuid;
             Documentation documentation = (Documentation) parent.getItemAtPosition(position);
-            // TODO: как все таки пути к файлу формируем
-            if (documentation.getEquipment() != null && documentation.getEquipmentModel() == null) {
-                objUuid = documentation.getEquipment().getUuid();
-            } else if (documentation.getEquipment() == null && documentation.getEquipmentModel() != null) {
-                objUuid = documentation.getEquipmentModel().getUuid();
-            } else if (documentation.getEquipment() != null && documentation.getEquipmentModel() != null) {
-                objUuid = documentation.getEquipment().getUuid();
-            } else {
-                return;
-            }
 
-            path = "/documentation/" + objUuid + "/";
-            File file = new File(getExternalFilesDir(path), documentation.getPath());
+            final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
+                    documentation.getPath());
             if (file.exists()) {
-                showDocument(file);
+                showDocument(getApplicationContext(), file);
             } else {
                 // либо сказать что файла нет, либо предложить скачать с сервера
                 Log.d(TAG, "Получаем файл документации.");
-//				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getApplicationContext(),
-//						ReferenceServiceProvider.Actions.ACTION_GET_DOCUMENTATION_FILE);
-//				registerReceiver(mReceiverGetDocumentationFile, mFilterGetDocumentationFile);
-//				rsh.getDocumentationFile(new String[] { documentation.getUuid() });
 
-                // запускаем поток получения файла с сервера
-                AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
-                    @Override
-                    protected String doInBackground(String... params) {
-                        String userName = AuthorizedUser.getInstance().getLogin();
-                        String fileElements[] = params[0].split("/");
-                        String url = ToirApplication.serverUrl + "/storage/" + userName + "/" + params[0];
-                        Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(url);
-                        try {
-                            Response<ResponseBody> r = call1.execute();
-                            ResponseBody trueImgBody = r.body();
-                            if (trueImgBody == null) {
-                                return null;
-                            }
-
-                            File file = new File(getApplicationContext().getExternalFilesDir("/documentation/" + fileElements[0]), fileElements[1]);
-                            if (!file.getParentFile().exists()) {
-                                if (!file.getParentFile().mkdirs()) {
-                                    Log.e(TAG, "Не удалось создать папку " +
-                                            file.getParentFile().toString() +
-                                            " для сохранения файла изображения!");
-                                    return null;
-                                }
-                            }
-
-                            FileOutputStream fos = new FileOutputStream(file);
-                            fos.write(trueImgBody.bytes());
-                            fos.close();
-                            return file.getAbsolutePath();
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getLocalizedMessage());
-                        }
-
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String filePath) {
-                        super.onPostExecute(filePath);
-                        loadDocumentationDialog.dismiss();
-                        if (filePath != null) {
-                            Toast.makeText(getApplicationContext(),
-                                    "Файл загружен успешно и готов к просмотру.",
-                                    Toast.LENGTH_LONG).show();
-                            showDocument(new File(filePath));
-                        } else {
-                            // сообщаем описание неудачи
-                            Toast.makeText(getApplicationContext(), "Ошибка при получении файла.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                };
-                task.execute(objUuid + "/" + documentation.getPath());
-
-                // показываем диалог получения наряда
-                loadDocumentationDialog = new ProgressDialog(EquipmentInfoActivity.this);
-                loadDocumentationDialog.setMessage("Получаем файл документации");
-                loadDocumentationDialog.setIndeterminate(true);
-                loadDocumentationDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                loadDocumentationDialog.setCancelable(false);
-                loadDocumentationDialog.setButton(
+                // диалог при загрузке файла документации
+                ProgressDialog dialog;
+                dialog = new ProgressDialog(EquipmentInfoActivity.this);
+                dialog.setMessage("Получаем файл документации");
+                dialog.setIndeterminate(true);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setCancelable(false);
+                dialog.setButton(
                         DialogInterface.BUTTON_NEGATIVE, "Отмена",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-//								unregisterReceiver(mReceiverGetDocumentationFile);
                                 Toast.makeText(getApplicationContext(),
                                         "Получение файла отменено",
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
-                loadDocumentationDialog.show();
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        // открываем загруженный документ (если он загрузился)
+                        if (file.exists()) {
+                            showDocument(getApplicationContext(), file);
+                        } else {
+                            Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+
+                // запускаем поток получения файла с сервера
+                GetDocumentationAsyncTask task = new GetDocumentationAsyncTask(dialog,
+                        getBaseContext().getExternalFilesDir(""));
+                String userName = AuthorizedUser.getInstance().getLogin();
+                task.execute(documentation.getPath(), documentation.getImageFilePath(), documentation.getImageFileUrl(userName));
             }
         }
-
     }
 }

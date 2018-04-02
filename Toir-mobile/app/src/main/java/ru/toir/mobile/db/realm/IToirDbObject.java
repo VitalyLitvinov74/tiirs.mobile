@@ -12,6 +12,10 @@ public interface IToirDbObject {
 
     String getImageFile();
 
+    String getImageFilePath();
+
+    String getImageFileUrl(String userName);
+
     Date getCreatedAt();
 
     Date getChangedAt();

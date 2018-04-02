@@ -56,13 +56,11 @@ import ru.toir.mobile.rest.interfaces.IOrders;
 import ru.toir.mobile.rest.interfaces.IRepairPart;
 import ru.toir.mobile.rest.interfaces.IRepairPartType;
 import ru.toir.mobile.rest.interfaces.IJournal;
-import ru.toir.mobile.rest.interfaces.ITaskStageList;
-import ru.toir.mobile.rest.interfaces.ITaskStageOperationList;
 import ru.toir.mobile.rest.interfaces.IStageStatus;
 import ru.toir.mobile.rest.interfaces.IStageTemplate;
 import ru.toir.mobile.rest.interfaces.IStageType;
 import ru.toir.mobile.rest.interfaces.IStageVerdict;
-import ru.toir.mobile.rest.interfaces.IStages;
+import ru.toir.mobile.rest.interfaces.IStage;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITaskTemplate;
 import ru.toir.mobile.rest.interfaces.ITaskType;
@@ -284,18 +282,8 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static ITaskStageList getTaskStageListService() {
-        return getRetrofit().create(ITaskStageList.class);
-    }
-
-    @NonNull
-    public static ITaskStageOperationList getTaskStageOperationListService() {
-        return getRetrofit().create(ITaskStageOperationList.class);
-    }
-
-    @NonNull
-    public static IStages getStagesService() {
-        return getRetrofit().create(IStages.class);
+    public static IStage getStageService() {
+        return getRetrofit().create(IStage.class);
     }
 
     @NonNull

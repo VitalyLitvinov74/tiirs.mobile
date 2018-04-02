@@ -1,16 +1,15 @@
 package ru.toir.mobile.fragments;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.net.Uri;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -20,7 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
@@ -43,36 +44,40 @@ public class DocumentationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.documentation_layout,
-                container, false);
+        View rootView = inflater.inflate(R.layout.documentation_layout, container, false);
+
+        Activity activity = getActivity();
+        if (activity != null) {
+            Toolbar toolbar = activity.findViewById(R.id.toolbar);
+            if (toolbar != null) {
+                toolbar.setSubtitle("Документация");
+            }
+        }
+
         realmDB = Realm.getDefaultInstance();
-        Toolbar toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Документация");
 
         // обработчик для выпадающих списков у нас один
         SpinnerListener spinnerListener = new SpinnerListener();
 
         RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
-        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(getContext(), documentationType);
+        typeSpinner = rootView.findViewById(R.id.simple_spinner);
+        DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(documentationType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
 
         // настраиваем сортировку по полям
-        sortSpinner = (Spinner) rootView
-                .findViewById(R.id.documentation_spinner_sort);
-        sortSpinnerAdapter = new ArrayAdapter<>(getContext(),
+        sortSpinner = rootView.findViewById(R.id.documentation_spinner_sort);
+        sortSpinnerAdapter = new ArrayAdapter<>(rootView.getContext(),
                 android.R.layout.simple_spinner_dropdown_item,
                 new ArrayList<SortField>());
         sortSpinner.setAdapter(sortSpinnerAdapter);
         sortSpinner.setOnItemSelectedListener(spinnerListener);
 
-        documentationListView = (ListView) rootView
-                .findViewById(R.id.documentation_listView);
+        documentationListView = rootView.findViewById(R.id.documentation_listView);
 
         documentationListView.setOnItemClickListener(new ListviewClickListener());
 
@@ -95,28 +100,32 @@ public class DocumentationFragment extends Fragment {
     private void fillSortFieldSpinner() {
 
         sortSpinnerAdapter.clear();
-        sortSpinnerAdapter.add(new SortField("Сортировка", null));
-        sortSpinnerAdapter.add(new SortField("По типу",
-                "documentationTypeUuid"));
-        sortSpinnerAdapter.add(new SortField("По оборудованию",
-                "equipmentUuid"));
+        sortSpinnerAdapter.add(new SortField("Без сортировки", null));
+        sortSpinnerAdapter.add(new SortField("По типу", "documentationType.title"));
+        sortSpinnerAdapter.add(new SortField("По оборудованию", "equipment.title"));
+        sortSpinnerAdapter.add(new SortField("По модели", "equipmentModel.title"));
 
     }
 
     private void FillListViewDocumentation(String documentationTypeUuid, String sort) {
         RealmResults<Documentation> documentation;
+        RealmQuery<Documentation> query = realmDB.where(Documentation.class);
         if (documentationTypeUuid != null) {
-            if (sort != null)
-                documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAllSorted(sort);
-            else
-                documentation = realmDB.where(Documentation.class).equalTo("documentationType.uuid", documentationTypeUuid).findAll();
+            query.equalTo("documentationType.uuid", documentationTypeUuid);
+            if (sort != null) {
+                documentation = query.findAllSorted(sort);
+            } else {
+                documentation = query.findAll();
+            }
         } else {
-            if (sort != null)
-                documentation = realmDB.where(Documentation.class).findAllSorted(sort);
-            else
-                documentation = realmDB.where(Documentation.class).findAll();
+            if (sort != null) {
+                documentation = query.findAllSorted(sort);
+            } else {
+                documentation = query.findAll();
+            }
         }
-        DocumentationAdapter documentationAdapter = new DocumentationAdapter(getContext(), documentation);
+
+        DocumentationAdapter documentationAdapter = new DocumentationAdapter(documentation);
         documentationListView.setAdapter(documentationAdapter);
     }
 
@@ -141,27 +150,16 @@ public class DocumentationFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parentView,
                                 View selectedItemView, int position, long id) {
-            Documentation documentation = (Documentation) parentView.getItemAtPosition(position);
-            MimeTypeMap mt = MimeTypeMap.getSingleton();
-            // TODO добавить путь
-            File file = new File(documentation.getUuid());
-            String[] patternList = file.getName().split("\\.");
-            String extension = patternList[patternList.length - 1];
+            Context context = getContext();
+            if (context != null) {
+                Documentation documentation = (Documentation) parentView.getItemAtPosition(position);
+                File file = new File(context.getExternalFilesDir(documentation.getImageFilePath()),
+                        documentation.getPath());
+                if (file.exists()) {
+                    EquipmentInfoActivity.showDocument(context, file);
+                } else {
+                    // TODO: либо сообщить что файла нет, либо запустить какой-то процесс его получения
 
-            if (mt.hasExtension(extension)) {
-                String mimeType = mt.getMimeTypeFromExtension(extension);
-                Intent target = new Intent(Intent.ACTION_VIEW);
-                target.setDataAndType(Uri.fromFile(new File(documentation.getUuid())),
-                        mimeType);
-                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-                Intent viewFileIntent = Intent.createChooser(target,
-                        "Open File");
-                try {
-                    startActivity(viewFileIntent);
-                } catch (ActivityNotFoundException e) {
-                    // сообщить пользователю установить подходящее
-                    // приложение
                 }
             }
         }
@@ -179,17 +177,20 @@ public class DocumentationFragment extends Fragment {
             String type = null;
             String orderBy = null;
 
-            DocumentationType typeSelected = (DocumentationType) typeSpinner
-                    .getSelectedItem();
-            if (typeSelected != null) {
-                type = typeSelected.getUuid();
-                // временно неопределенный тип
-                if (typeSelected.get_id() == 1) type = null;
+            DocumentationType typeSelected = (DocumentationType) typeSpinner.getSelectedItem();
+            // так как список построен по данным из базы, в выборке нет "Все типы"
+            // по этому, принудительно, при выборе первого элемента, показываем все данные из базы
+            if (typeSpinner.getSelectedItemPosition() != 0) {
+                if (typeSelected != null) {
+                    type = typeSelected.getUuid();
+                }
             }
 
+            // сортировка указывается, даже работает, но в самом списке с файлами документации
+            // не отображаются поля по которым идёт сортировка.
             SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
             if (fieldSelected != null) {
-                //orderBy = fieldSelected.getField();
+                orderBy = fieldSelected.getField();
             }
 
             FillListViewDocumentation(type, orderBy);

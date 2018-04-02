@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -19,8 +19,8 @@ import ru.toir.mobile.db.realm.Documentation;
 public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implements ListAdapter {
     public static final String TABLE_NAME = "Documentation";
 
-    public DocumentationAdapter(@NonNull Context context, RealmResults<Documentation> data) {
-        super(context, data);
+    public DocumentationAdapter(RealmResults<Documentation> data) {
+        super(data);
     }
 
     @Override
@@ -55,12 +55,14 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.listview, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.information = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+            viewHolder.information = convertView.findViewById(R.id.lv_secondLine);
+            viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

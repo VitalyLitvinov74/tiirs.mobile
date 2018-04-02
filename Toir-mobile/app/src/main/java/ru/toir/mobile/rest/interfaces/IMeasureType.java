@@ -22,11 +22,11 @@ public interface IMeasureType {
     Call<List<MeasureType>> getById(@Query("id") String id);
 
     @GET("/measure-type")
-    Call<List<MeasureType>> getById(@Query("id") String[] id);
+    Call<List<MeasureType>> getById(@Query("id[]") String[] id);
 
     @GET("/measure-type")
     Call<List<MeasureType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/measure-type")
-    Call<List<MeasureType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<MeasureType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

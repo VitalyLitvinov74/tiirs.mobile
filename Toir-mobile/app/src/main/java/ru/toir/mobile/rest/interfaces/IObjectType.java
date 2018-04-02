@@ -23,12 +23,12 @@ public interface IObjectType {
     Call<List<ObjectType>> getById(@Query("id") String id);
 
     @GET("/object-type")
-    Call<List<ObjectType>> getById(@Query("id") String[] id);
+    Call<List<ObjectType>> getById(@Query("id[]") String[] id);
 
     @GET("/object-type")
     Call<List<ObjectType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/object-type")
-    Call<List<ObjectType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<ObjectType>> getByUuid(@Query("uuid[]") String[] uuid);
 
 }

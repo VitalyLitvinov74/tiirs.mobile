@@ -2,21 +2,22 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Olejek
- *         Created on 2.05.17.
+ * @author Dmitriy Logachev
+ *         Created by koputo on 2/20/18.
  */
-public class TaskRepairPart extends RealmObject {
+
+public class TaskEquipmentStage extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private Tasks task;
-    private RepairPart repairPart;
-    private MeasureType measureType;
-    private int quantity;
+    private TaskTemplate taskTemplate;
+    private RealmList<EquipmentStage> equipmentStages;
+    private String period;
     private Date createdAt;
     private Date changedAt;
 
@@ -36,36 +37,28 @@ public class TaskRepairPart extends RealmObject {
         this.uuid = uuid;
     }
 
-    public Tasks getTask() {
-        return task;
+    public TaskTemplate getTaskTemplate() {
+        return taskTemplate;
     }
 
-    public void setTask(Tasks task) {
-        this.task = task;
+    public void setTaskTemplate(TaskTemplate taskTemplate) {
+        this.taskTemplate = taskTemplate;
     }
 
-    public RepairPart getRepairPart() {
-        return repairPart;
+    public RealmList<EquipmentStage> getEquipmentStages() {
+        return equipmentStages;
     }
 
-    public void setRepairPart (RepairPart repairPart) {
-        this.repairPart = repairPart;
+    public void setEquipmentStages(RealmList<EquipmentStage> equipmentStages) {
+        this.equipmentStages = equipmentStages;
     }
 
-    public MeasureType getMeasureType() {
-        return measureType;
+    public String getPeriod() {
+        return period;
     }
 
-    public void setMeasureType (MeasureType measureType) {
-        this.measureType = measureType;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setPeriod(String period) {
+        this.period = period;
     }
 
     public Date getCreatedAt() {
@@ -83,5 +76,4 @@ public class TaskRepairPart extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

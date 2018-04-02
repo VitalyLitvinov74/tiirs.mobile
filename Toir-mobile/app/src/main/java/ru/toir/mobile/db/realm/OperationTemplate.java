@@ -2,6 +2,7 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -17,12 +18,15 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     private String description;
     private String image;
     private int normative;
-    private int first_step;
-    private int last_step;
-    private EquipmentModel equipmentModel;
     private OperationType operationType;
     private Date createdAt;
     private Date changedAt;
+    private RealmList<OperationTool> operationTools;
+    private RealmList<OperationRepairPart> operationRepairParts;
+
+    public static String getImageRoot() {
+        return "otype";
+    }
 
     public long get_id() {
         return _id;
@@ -72,30 +76,6 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
         this.normative = normative;
     }
 
-    public int getFirst_step() {
-        return first_step;
-    }
-
-    public void setFirst_step(int first_step) {
-        this.first_step = first_step;
-    }
-
-    public int getLast_step() {
-        return last_step;
-    }
-
-    public void setLast_step(int last_step) {
-        this.last_step = last_step;
-    }
-
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
-    }
-
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
-    }
-
     public OperationType getOperationType() {
         return operationType;
     }
@@ -123,5 +103,37 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getImage();
+    }
+
+    public RealmList<OperationTool> getOperationTools() {
+        return operationTools;
+    }
+
+    public void setOperationTools(RealmList<OperationTool> operationTools) {
+        this.operationTools = operationTools;
+    }
+
+    public RealmList<OperationRepairPart> getOperationRepairParts() {
+        return operationRepairParts;
+    }
+
+    public void setOperationRepairParts(RealmList<OperationRepairPart> operationRepairParts) {
+        this.operationRepairParts = operationRepairParts;
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = operationType.getUuid();
+        dir = imageRoot + "/" + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

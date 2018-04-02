@@ -61,7 +61,7 @@ public class EquipmentsFragment extends Fragment {
 
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
         typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(), equipmentType);
+        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -144,7 +144,8 @@ public class EquipmentsFragment extends Fragment {
                 equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).findAll();
             }
         }
-        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
+
+        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(equipments);
         equipmentListView.setAdapter(equipmentAdapter);
     }
 

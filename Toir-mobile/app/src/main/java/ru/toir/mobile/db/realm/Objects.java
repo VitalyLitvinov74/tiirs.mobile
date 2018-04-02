@@ -14,7 +14,7 @@ public class Objects extends RealmObject implements IToirDbObject {
     private long _id;
     private String uuid;
     private ObjectType objectType;
-    private Objects parentObject;
+    private Objects parent;
     private String title;
     private String description;
     private double latitude;
@@ -22,6 +22,10 @@ public class Objects extends RealmObject implements IToirDbObject {
     private String photo;
     private Date createdAt;
     private Date changedAt;
+
+    public static String getImageRoot() {
+        return "object";
+    }
 
     public long get_id() {
         return _id;
@@ -63,12 +67,12 @@ public class Objects extends RealmObject implements IToirDbObject {
         this.objectType = objectType;
     }
 
-    public Object getParentObject() {
-        return parentObject;
+    public Object getParent() {
+        return parent;
     }
 
-    public void setParentObject(Objects parentObject) {
-        this.parentObject = parentObject;
+    public void setParent(Objects parent) {
+        this.parent = parent;
     }
 
     public double getLatitude() {
@@ -114,5 +118,19 @@ public class Objects extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String dir;
+
+        dir = imageRoot;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

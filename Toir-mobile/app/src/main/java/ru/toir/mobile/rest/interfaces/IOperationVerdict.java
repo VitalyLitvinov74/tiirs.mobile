@@ -23,11 +23,11 @@ public interface IOperationVerdict {
     Call<List<OperationVerdict>> getById(@Query("id") String id);
 
     @GET("/operation-verdict")
-    Call<List<OperationVerdict>> getById(@Query("id") String[] id);
+    Call<List<OperationVerdict>> getById(@Query("id[]") String[] id);
 
     @GET("/operation-verdict")
     Call<List<OperationVerdict>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/operation-verdict")
-    Call<List<OperationVerdict>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OperationVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }

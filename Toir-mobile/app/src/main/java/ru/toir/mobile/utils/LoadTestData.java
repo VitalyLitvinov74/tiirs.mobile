@@ -22,24 +22,21 @@ import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
-import ru.toir.mobile.db.realm.Stages;
-import ru.toir.mobile.db.realm.TaskStageList;
-import ru.toir.mobile.db.realm.TaskStageOperationList;
 import ru.toir.mobile.db.realm.StageStatus;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
 import ru.toir.mobile.db.realm.TaskVerdict;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 
 public class LoadTestData {
     public static Equipment equipment;
     public static EquipmentType equipmentType;
-    public static TaskStatus taskStatusUncomplete;
     private static Equipment equipment2;
     private static Equipment equipment3;
     private static Equipment equipment4;
@@ -103,21 +100,19 @@ public class LoadTestData {
     private static OperationTemplate operationTemplate2;
     private static OperationTemplate operationTemplate3;
     private static StageVerdict stageVerdict;
-    private static Stages stage;
-    private static Stages stage2;
+    private static Stage stage;
+    private static Stage stage2;
     private static StageType stageType;
     private static StageType stageType2;
     private static StageType stageType3;
-    private static TaskStageList taskStageList;
-    private static TaskStageOperationList taskStageOperationList;
     private static StageTemplate stageTemplate;
     private static StageTemplate stageTemplate2;
     private static TaskVerdict taskVerdict;
 
-    private static Tasks task;
-    private static Tasks task2;
-    private static Tasks task3;
-    private static Tasks task4;
+    private static Task task;
+    private static Task task2;
+    private static Task task3;
+    private static Task task4;
 
     private static TaskType taskType;
     private static TaskType taskType2;
@@ -892,15 +887,11 @@ public class LoadTestData {
                 operationTemplate = realmDB.createObject(OperationTemplate.class);
                 operationTemplate.set_id(1);
                 operationTemplate.setUuid(operationTemplateUuid);
-                operationTemplate.setEquipmentModel(equipmentModel);
                 operationTemplate.setTitle("Снять заднюю крышку");
                 operationTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
-                operationTemplate.setFirst_step(1);
                 operationTemplate.setImage("");
                 //operationTemplate.setEquipmentModelUuid(equipmentModelUuid);
-                operationTemplate.setEquipmentModel(equipmentModel);
                 operationTemplate.setNormative(180);
-                operationTemplate.setLast_step(0);
                 operationTemplate.setOperationType(operationType);
                 //operationTemplate.setOperationTypeUuid(operationTypeUuid);
             }
@@ -911,15 +902,11 @@ public class LoadTestData {
                 operationTemplate2 = realmDB.createObject(OperationTemplate.class);
                 operationTemplate2.set_id(2);
                 operationTemplate2.setUuid(operationTemplateUuid2);
-                operationTemplate2.setEquipmentModel(equipmentModel);
                 operationTemplate2.setTitle("Убрать заднюю крышку");
                 operationTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
-                operationTemplate2.setFirst_step(0);
                 operationTemplate2.setImage("");
                 //operationTemplate2.setEquipmentModelUuid(equipmentModelUuid);
-                operationTemplate2.setEquipmentModel(equipmentModel);
                 operationTemplate2.setNormative(100);
-                operationTemplate2.setLast_step(0);
                 operationTemplate2.setOperationType(operationType2);
                 //operationTemplate2.setOperationTypeUuid(operationTypeUuid2);
             }
@@ -932,15 +919,11 @@ public class LoadTestData {
                 operationTemplate3 = realmDB.createObject(OperationTemplate.class);
                 operationTemplate3.set_id(3);
                 operationTemplate3.setUuid(operationTemplateUuid3);
-                operationTemplate3.setEquipmentModel(equipmentModel);
                 operationTemplate3.setTitle("Осмотреть накопитель");
                 operationTemplate3.setDescription("Осмотреть накопитель на предмет утечек");
-                operationTemplate3.setFirst_step(0);
                 operationTemplate3.setImage("");
                 //operationTemplate3.setEquipmentModelUuid(equipmentModelUuid);
-                operationTemplate3.setEquipmentModel(equipmentModel);
                 operationTemplate3.setNormative(110);
-                operationTemplate3.setLast_step(0);
                 operationTemplate3.setOperationType(operationType3);
                 //operationTemplate3.setOperationTypeUuid(operationTypeUuid3);
             }
@@ -1068,12 +1051,10 @@ public class LoadTestData {
                 stageTemplate = realmDB.createObject(StageTemplate.class);
                 stageTemplate.set_id(1);
                 stageTemplate.setUuid(stageTemplateUuid);
-                stageTemplate.setEquipmentModel(equipmentModel);
                 stageTemplate.setTitle("Снять заднюю крышку");
                 stageTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
                 stageTemplate.setImage("");
                 //stageTemplate.setEquipmentModelUuid(equipmentModelUuid);
-                stageTemplate.setEquipmentModel(equipmentModel);
                 stageTemplate.setNormative(480);
                 stageTemplate.setStageType(stageType);
             }
@@ -1085,12 +1066,10 @@ public class LoadTestData {
                 stageTemplate2 = realmDB.createObject(StageTemplate.class);
                 stageTemplate2.set_id(2);
                 stageTemplate2.setUuid(stageTemplateUuid2);
-                stageTemplate2.setEquipmentModel(equipmentModel);
                 stageTemplate2.setTitle("Убрать заднюю крышку");
                 stageTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
                 stageTemplate2.setImage("");
                 //stageTemplate2.setEquipmentModelUuid(equipmentModelUuid);
-                stageTemplate2.setEquipmentModel(equipmentModel);
                 stageTemplate2.setNormative(300);
                 stageTemplate2.setStageType(stageType2);
             }
@@ -1100,7 +1079,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                stage = realmDB.createObject(Stages.class);
+                stage = realmDB.createObject(Stage.class);
                 stage.set_id(1);
                 stage.setUuid(stageUuid);
                 stage.setStageStatus(stageStatusUncomplete);
@@ -1121,7 +1100,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                stage2 = realmDB.createObject(Stages.class);
+                stage2 = realmDB.createObject(Stage.class);
                 stage2.set_id(2);
                 stage2.setUuid(stageUuid2);
                 stage2.setStageStatus(stageStatusUncomplete);
@@ -1136,29 +1115,6 @@ public class LoadTestData {
             }
         });
 
-        // TaskStageList -----------------
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageList = realmDB.createObject(TaskStageList.class);
-                taskStageList.set_id(1);
-                taskStageList.setUuid(taskStageListUuid);
-                taskStageList.setFlowOrder(1);
-                taskStageList.setTaskTemplate(taskTemplate);
-                taskStageList.setTaskStageTemplate(stageTemplate);
-            }
-        });
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageList = realmDB.createObject(TaskStageList.class);
-                taskStageList.set_id(2);
-                taskStageList.setUuid(taskStageListUuid2);
-                taskStageList.setFlowOrder(2);
-                taskStageList.setTaskTemplate(taskTemplate);
-                taskStageList.setTaskStageTemplate(stageTemplate2);
-            }
-        });
         // ---------------------------------------------------------------------------------------------
         // TaskVerdict -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
@@ -1210,12 +1166,10 @@ public class LoadTestData {
                 taskTemplate = realmDB.createObject(TaskTemplate.class);
                 taskTemplate.set_id(1);
                 taskTemplate.setUuid(taskTemplateUuid);
-                taskTemplate.setEquipmentModel(equipmentModel);
                 taskTemplate.setTitle("Осмотр генератора Тепловея");
                 taskTemplate.setDescription("Проверка на работоспособность и утечки");
                 taskTemplate.setImage("");
                 //taskTemplate.setEquipmentModelUuid(equipmentModelUuid);
-                taskTemplate.setEquipmentModel(equipmentModel);
                 taskTemplate.setNormative(1480);
                 taskTemplate.setTaskType(taskType);
                 //taskTemplate.setTaskTypeUuid(taskTypeUuid);
@@ -1228,38 +1182,13 @@ public class LoadTestData {
                 taskTemplate2 = realmDB.createObject(TaskTemplate.class);
                 taskTemplate2.set_id(2);
                 taskTemplate2.setUuid(stageTemplateUuid2);
-                taskTemplate2.setEquipmentModel(equipmentModel);
                 taskTemplate2.setTitle("Ремонт генератора Тепловей-250");
                 taskTemplate2.setDescription("Ремонт компрессора теплогенератора");
                 taskTemplate2.setImage("");
                 //taskTemplate2.setEquipmentModelUuid(equipmentModelUuid);
-                taskTemplate2.setEquipmentModel(equipmentModel);
                 taskTemplate2.setNormative(7300);
                 taskTemplate2.setTaskType(taskType2);
                 //taskTemplate2.setTaskTypeUuid(taskTypeUuid2);
-            }
-        });
-        // TaskStageOperationList -----------------
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageOperationList = realmDB.createObject(TaskStageOperationList.class);
-                taskStageOperationList.set_id(1);
-                taskStageOperationList.setUuid(taskStageOperationListUuid);
-                taskStageOperationList.setFlowOrder(1);
-                taskStageOperationList.setTaskStageTemplate(stageTemplate);
-                taskStageOperationList.setOperationTemplate(operationTemplate);
-            }
-        });
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageOperationList = realmDB.createObject(TaskStageOperationList.class);
-                taskStageOperationList.set_id(2);
-                taskStageOperationList.setUuid(taskStageOperationListUuid2);
-                taskStageOperationList.setFlowOrder(2);
-                taskStageOperationList.setTaskStageTemplate(stageTemplate);
-                taskStageOperationList.setOperationTemplate(operationTemplate2);
             }
         });
 
@@ -1267,7 +1196,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                task = realmDB.createObject(Tasks.class);
+                task = realmDB.createObject(Task.class);
                 task.set_id(1);
                 task.setUuid(taskUuid);
                 task.setTaskStatus(taskStatus);
@@ -1278,13 +1207,13 @@ public class LoadTestData {
                 //task.setTaskVerdictUuid(taskVerdictUuid);
                 task.setTaskTemplate(taskTemplate);
                 //task.setTaskTemplateUuid(taskTemplateUuid);
-                task.setEquipment(equipment);
+                //task.setEquipment(equipment);
                 //task.setEquipmentUuid(equipmentUuid);
                 task.setComment("Там тепловей шумит сильно, из под него бежит и тепла нет. Следует разобраться.");
                 task.setPrevCode(0);
                 task.setNextCode(2);
-                task.addTaskStage(stage);
-                task.addTaskStage(stage2);
+                task.addStage(stage);
+                task.addStage(stage2);
                 //task.setOrder(order);
             }
         });
@@ -1292,7 +1221,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                task2 = realmDB.createObject(Tasks.class);
+                task2 = realmDB.createObject(Task.class);
                 task2.set_id(2);
                 task2.setUuid(taskUuid2);
                 task2.setTaskStatus(taskStatus);
@@ -1303,7 +1232,7 @@ public class LoadTestData {
                 //task2.setTaskVerdictUuid(taskVerdictUuid);
                 task2.setTaskTemplate(taskTemplate2);
                 //task2.setTaskTemplateUuid(taskTemplateUuid2);
-                task2.setEquipment(equipment2);
+                //task2.setEquipment(equipment2);
                 //task2.setEquipmentUuid(equipmentUuid2);
                 task2.setComment("Горелка котла в котельной не горит. Требуется починить.");
                 task2.setPrevCode(0);

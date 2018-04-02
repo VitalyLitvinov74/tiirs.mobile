@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "reader.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 // данные названия не отражают суть, т.к. не известно,
 // что именно делают эти команды

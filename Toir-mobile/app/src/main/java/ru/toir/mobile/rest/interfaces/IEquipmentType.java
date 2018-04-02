@@ -22,12 +22,12 @@ public interface IEquipmentType {
     Call<List<EquipmentType>> getById(@Query("id") String id);
 
     @GET("/equipment-type")
-    Call<List<EquipmentType>> getById(@Query("id") String[] id);
+    Call<List<EquipmentType>> getById(@Query("id[]") String[] id);
 
     @GET("/equipment-type")
     Call<List<EquipmentType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/equipment-type")
-    Call<List<EquipmentType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<EquipmentType>> getByUuid(@Query("uuid[]") String[] uuid);
 
 }

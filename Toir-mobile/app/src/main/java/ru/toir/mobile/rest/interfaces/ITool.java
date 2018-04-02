@@ -23,11 +23,11 @@ public interface ITool {
     Call<List<Tool>> getById(@Query("id") String id);
 
     @GET("/tool")
-    Call<List<Tool>> getById(@Query("id") String[] id);
+    Call<List<Tool>> getById(@Query("id[]") String[] id);
 
     @GET("/tool")
     Call<List<Tool>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/tool")
-    Call<List<Tool>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Tool>> getByUuid(@Query("uuid[]") String[] uuid);
 }

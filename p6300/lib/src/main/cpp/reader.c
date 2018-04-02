@@ -1,12 +1,20 @@
 //
 // Created by koputo on 28.10.16.
 //
+#include <jni.h>
+#include <fcntl.h>
+#include <android/log.h>
+#include <termios.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 #include "reader.h"
 
 /**
  * Открываем порт через который работаем с RFID считывателем.
  */
-JNIEXPORT jint JNICALL
+jint JNICALL
 Java_android_hardware_p6300_jni_Linuxc_openUart(JNIEnv *env, jclass jc, jstring jPath) {
     JNIEnv e = *env;
     const char *path = e->GetStringUTFChars(env, jPath, NULL);

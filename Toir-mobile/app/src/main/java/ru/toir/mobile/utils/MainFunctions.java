@@ -1,9 +1,12 @@
 package ru.toir.mobile.utils;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -43,26 +46,41 @@ public class MainFunctions {
     //private Realm realmDB;
     private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
 
+    /**
+     * Хз зачем было реализовано.
+     *
+     * @param context Context
+     * @return String | null
+     */
     public static String getIMEI(Context context) {
         TelephonyManager mngr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        return mngr.getDeviceId();
+        if (mngr == null) {
+            return null;
+        }
+
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            return mngr.getDeviceId();
+        } else {
+            return null;
+        }
+
     }
 
     public static void addToJournal(final String description) {
-        final Realm realmDB = Realm.getDefaultInstance();
-        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        Realm realmDB = Realm.getDefaultInstance();
+        User user = realmDB.where(User.class)
+                .equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user != null) {
-            realmDB.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    Journal record = realmDB.createObject(Journal.class);
-                    long next_id = Journal.getLastId() + 1;
-                    record.set_id(next_id);
-                    record.setDate(new Date());
-                    record.setDescription(description);
-                    record.setUserUuid(user.getUuid());
-                }
-            });
+            realmDB.beginTransaction();
+            Journal record = new Journal();
+            long next_id = Journal.getLastId() + 1;
+            record.set_id(next_id);
+            record.setDate(new Date());
+            record.setDescription(description);
+            record.setUserUuid(user.getUuid());
+            realmDB.copyToRealm(record);
+            realmDB.commitTransaction();
         }
 
         realmDB.close();

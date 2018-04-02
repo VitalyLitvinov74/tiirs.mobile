@@ -26,7 +26,7 @@ public interface IMeasuredValue {
     Call<List<MeasuredValue>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/measured-value")
-    Call<List<MeasuredValue>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<MeasuredValue>> getByUuid(@Query("uuid[]") String[] uuid);
 
     @POST("/measured-value/upload-measured-value")
     Call<ResponseBody> send(@Body List<MeasuredValue> values);

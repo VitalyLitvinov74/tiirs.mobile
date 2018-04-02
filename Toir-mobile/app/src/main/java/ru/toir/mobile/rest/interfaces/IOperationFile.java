@@ -30,5 +30,5 @@ public interface IOperationFile {
     Call<List<OperationFile>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/operation-file")
-    Call<List<OperationFile>> get(@Query("id") List<String> id, @Query("uuid") List<String> uuid);
+    Call<List<OperationFile>> get(@Query("id[]") List<String> id, @Query("uuid[]") List<String> uuid);
 }

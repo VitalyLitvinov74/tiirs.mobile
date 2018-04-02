@@ -87,7 +87,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
                     outputStream.write(rawData);
                     outputStream.close();
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                     sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                 }
             }
@@ -98,7 +98,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
                 in = mContext.openFileInput(tagId);
                 int rc = in.read(rawData, address, count);
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
                 sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
             }
 
@@ -135,7 +135,7 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
                 out.write(rawData, address, rawData.length);
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
             sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
         } else {

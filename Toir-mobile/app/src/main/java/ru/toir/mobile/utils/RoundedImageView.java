@@ -1,9 +1,5 @@
 package ru.toir.mobile.utils;
 
-/**
- * Created by Shtrm on 01.11.2016.
- */
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -21,11 +17,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+/**
+ * @author olejek
+ *         Created by Shtrm on 01.11.2016.
+ */
 
 public class RoundedImageView extends AppCompatImageView {
 
@@ -90,8 +90,8 @@ public class RoundedImageView extends AppCompatImageView {
         float scaleWidth;
         float scaleHeight;
         // /storage/sdcard1/Android/data/ru.toir.mobile/users/4CD4A64F-F6CB-4A7C-B5A6-42936E656F31.jpg
-        File image = new File(path + filename.replace(".", "_m."));
-        File image_full = new File(path + filename);
+        File image = new File(path, filename.replace(".", "_m."));
+        File image_full = new File(path, filename);
 
         Long last_modified = image.lastModified();
         if (image.exists() && changedAt <= last_modified) {

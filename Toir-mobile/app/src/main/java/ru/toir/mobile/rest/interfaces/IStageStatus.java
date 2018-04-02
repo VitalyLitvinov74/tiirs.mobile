@@ -23,11 +23,11 @@ public interface IStageStatus {
     Call<List<StageStatus>> getById(@Query("id") String id);
 
     @GET("/stage-status")
-    Call<List<StageStatus>> getById(@Query("id") String[] id);
+    Call<List<StageStatus>> getById(@Query("id[]") String[] id);
 
     @GET("/stage-status")
     Call<List<StageStatus>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/stage-status")
-    Call<List<StageStatus>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<StageStatus>> getByUuid(@Query("uuid[]") String[] uuid);
 }

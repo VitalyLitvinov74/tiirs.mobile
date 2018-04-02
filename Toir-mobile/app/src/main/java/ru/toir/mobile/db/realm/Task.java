@@ -10,12 +10,11 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 12.09.16.
  */
-public class Tasks extends RealmObject {
+public class Task extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String comment;
-    private Equipment equipment;
     private TaskVerdict taskVerdict;
     private TaskStatus taskStatus;
     private TaskTemplate taskTemplate;
@@ -25,7 +24,7 @@ public class Tasks extends RealmObject {
     private Date endDate;
     private Date createdAt;
     private Date changedAt;
-    private RealmList<Stages> taskStages;
+    private RealmList<Stage> stages;
 
     public long get_id() {
         return _id;
@@ -49,14 +48,6 @@ public class Tasks extends RealmObject {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
     }
 
     public TaskVerdict getTaskVerdict() {
@@ -131,16 +122,16 @@ public class Tasks extends RealmObject {
         this.changedAt = changedAt;
     }
 
-    public RealmList<Stages> getStages() {
-        return taskStages;
+    public RealmList<Stage> getStages() {
+        return stages;
     }
 
-    public void setStages(RealmList<Stages> stages) {
-        this.taskStages = stages;
+    public void setStages(RealmList<Stage> stages) {
+        this.stages = stages;
     }
 
-    public void addTaskStage(Stages taskStage) {
-        this.taskStages.add(taskStage);
+    public void addStage(Stage stage) {
+        this.stages.add(stage);
     }
 
 

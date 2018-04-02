@@ -1,10 +1,12 @@
 package ru.toir.mobile;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
@@ -52,6 +54,7 @@ import com.roughike.bottombar.OnTabSelectListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -285,6 +288,18 @@ public class MainActivity extends AppCompatActivity {
                                     if (user != null) {
                                         final String fileName = user.getImage();
                                         Realm realm = Realm.getDefaultInstance();
+                                        // проверям необходимость запрашивать файл изображения с сервера
+                                        String tagId = AuthorizedUser.getInstance().getTagId();
+                                        User localUser = realm.where(User.class).equalTo("tagId", tagId).findFirst();
+                                        boolean needDownloadImage = false;
+                                        if (localUser != null) {
+                                            Date serverDate = user.getChangedAt();
+                                            Date localDate = localUser.getChangedAt();
+                                            if (localDate.getTime() < serverDate.getTime()) {
+                                                needDownloadImage = true;
+                                            }
+                                        }
+
                                         realm.beginTransaction();
                                         realm.copyToRealmOrUpdate(user);
                                         realm.commitTransaction();
@@ -297,51 +312,54 @@ public class MainActivity extends AppCompatActivity {
                                         //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
 
                                         // получаем изображение пользователя
-                                        String url = ToirApplication.serverUrl + "/storage/" + user.getLogin() + "/" + user.getUuid() + "/" + user.getImage();
-                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
-                                        callFile.enqueue(new Callback<ResponseBody>() {
-                                            @Override
-                                            public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
-                                                ResponseBody fileBody = response.body();
-                                                if (fileBody == null) {
-                                                    return;
-                                                }
-
-                                                File filePath = getExternalFilesDir("/users");
-                                                if (filePath == null) {
-                                                    // нет доступа к внешнему накопителю
-                                                    return;
-                                                }
-
-                                                File file = new File(filePath, fileName);
-                                                if (!file.getParentFile().exists()) {
-                                                    if (!file.getParentFile().mkdirs()) {
+                                        if (needDownloadImage) {
+                                            String url = ToirApplication.serverUrl + "/" + user.getImageFileUrl(user.getLogin()) + "/" + user.getImage();
+                                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
+                                            callFile.enqueue(new Callback<ResponseBody>() {
+                                                @Override
+                                                public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
+                                                    ResponseBody fileBody = response.body();
+                                                    if (fileBody == null) {
                                                         return;
                                                     }
-                                                }
 
-                                                try {
-                                                    FileOutputStream fos = new FileOutputStream(file);
-                                                    fos.write(fileBody.bytes());
-                                                    fos.close();
-                                                    // принудительно масштабируем изображение пользоваетеля
-                                                    String path = filePath + File.separator;
-                                                    Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
-                                                    if (user_bitmap == null) {
-                                                        // По какой-то причине не смогли получить
-                                                        // уменьшенное изображение
-                                                        Log.e(TAG, "Не удалось получить масштабированное изображение.");
+                                                    File filePath = getExternalFilesDir("/" + User.getImageRoot());
+                                                    if (filePath == null) {
+                                                        // нет доступа к внешнему накопителю
+                                                        return;
                                                     }
-                                                } catch (Exception e) {
-                                                    Log.e(TAG, e.getLocalizedMessage());
-                                                }
-                                            }
 
-                                            @Override
-                                            public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
-                                                Log.e(TAG, t.getLocalizedMessage());
-                                            }
-                                        });
+                                                    File file = new File(filePath, fileName);
+                                                    if (!file.getParentFile().exists()) {
+                                                        if (!file.getParentFile().mkdirs()) {
+                                                            return;
+                                                        }
+                                                    }
+
+                                                    try {
+                                                        FileOutputStream fos = new FileOutputStream(file);
+                                                        fos.write(fileBody.bytes());
+                                                        fos.close();
+                                                        // принудительно масштабируем изображение пользоваетеля
+                                                        String path = filePath + File.separator;
+                                                        Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
+                                                        if (user_bitmap == null) {
+                                                            // По какой-то причине не смогли получить
+                                                            // уменьшенное изображение
+                                                            Log.e(TAG, "Не удалось получить масштабированное изображение.");
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
+                                                    t.printStackTrace();
+                                                }
+                                            });
+                                        }
+
                                         setMainLayout(savedInstance);
                                         //user_changed = true;
                                         changeActiveProfile(user);
@@ -426,7 +444,7 @@ public class MainActivity extends AppCompatActivity {
      * @param enable Режим.
      */
     private void setEnabledLoginButton(boolean enable) {
-        Button loginButton = (Button) findViewById(R.id.loginButton);
+        Button loginButton = findViewById(R.id.loginButton);
         loginButton.setEnabled(enable);
         loginButton.setClickable(enable);
     }
@@ -443,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 
-        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        BottomBar bottomBar = findViewById(R.id.bottomBar);
         assert bottomBar != null;
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
@@ -477,7 +495,7 @@ public class MainActivity extends AppCompatActivity {
             ShortcutBadger.applyCount(getApplicationContext(), new_orders);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar == null) {
             return;
         }
@@ -970,7 +988,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addProfile(User item) {
         IProfile new_profile;
-        String path = getExternalFilesDir("/users") + File.separator;
+        String path = getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
         if (item.getChangedAt() != null) {
             Bitmap myBitmap = getResizedBitmap(path, item.getImage(), 0, 600, item.getChangedAt().getTime());
             new_profile = new ProfileDrawerItem()
@@ -1053,9 +1071,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void ShowSettings() {
         TextView driver, update_server, system_server;
-        driver = (TextView) findViewById(R.id.login_current_driver);
-        update_server = (TextView) findViewById(R.id.login_current_update_server);
-        system_server = (TextView) findViewById(R.id.login_current_system_server);
+        driver = findViewById(R.id.login_current_driver);
+        update_server = findViewById(R.id.login_current_update_server);
+        system_server = findViewById(R.id.login_current_system_server);
 
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
@@ -1132,8 +1150,8 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Thread.sleep(5000);
                         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                        boolean gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
                         if (!isSkipGPS()) {
+                            boolean gpsEnabled = lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
                             if (!gpsEnabled) {
                                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 startActivity(intent);
@@ -1151,7 +1169,8 @@ public class MainActivity extends AppCompatActivity {
         checkGPSThread.start();
 
         _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (_locationManager != null) {
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (_locationManager != null && permission == PackageManager.PERMISSION_GRANTED) {
             _gpsListener = new GPSListener();
             _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, _gpsListener);
         }
@@ -1257,13 +1276,13 @@ public class MainActivity extends AppCompatActivity {
                 || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
             byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
-            String hexId = "";
+            StringBuilder hexId = new StringBuilder();
             for (byte b : id) {
-                hexId += String.format("%2X", b);
+                hexId.append(String.format("%2X", b));
             }
 
             Intent result = new Intent(RfidDriverNfc.ACTION_NFC);
-            result.putExtra("tagId", hexId);
+            result.putExtra("tagId", hexId.toString());
             sendBroadcast(result);
         }
     }
@@ -1275,7 +1294,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private boolean isGpsOn() {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     /**

@@ -6,16 +6,16 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Olejek
- *         Created on 2.05.17.
+ * @author Dmitriy Logachev
+ *         Created by koputo on 2/20/18.
  */
-public class TaskTemplateRepairPart extends RealmObject {
+
+public class OperationRepairPart extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private TaskTemplate taskTemplate;
+    private String operationTemplateUuid;
     private RepairPart repairPart;
-    private MeasureType measureType;
     private int quantity;
     private Date createdAt;
     private Date changedAt;
@@ -36,28 +36,20 @@ public class TaskTemplateRepairPart extends RealmObject {
         this.uuid = uuid;
     }
 
-    public TaskTemplate getTaskTemplate() {
-        return taskTemplate;
+    public String getOperationTemplateUuid() {
+        return operationTemplateUuid;
     }
 
-    public void setTaskTemplate(TaskTemplate taskTemplate) {
-        this.taskTemplate = taskTemplate;
+    public void setOperationTemplateUuid(String operationTemplateUuid) {
+        this.operationTemplateUuid = operationTemplateUuid;
     }
 
     public RepairPart getRepairPart() {
         return repairPart;
     }
 
-    public void setRepairPart (RepairPart repairPart) {
+    public void setRepairPart(RepairPart repairPart) {
         this.repairPart = repairPart;
-    }
-
-    public MeasureType getMeasureType() {
-        return measureType;
-    }
-
-    public void setMeasureType (MeasureType measureType) {
-        this.measureType = measureType;
     }
 
     public int getQuantity() {
@@ -83,5 +75,4 @@ public class TaskTemplateRepairPart extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

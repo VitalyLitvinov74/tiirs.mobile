@@ -13,6 +13,7 @@ public class Operation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
+    private String stageUuid;
     private OperationVerdict operationVerdict;
     private OperationStatus operationStatus;
     private OperationTemplate operationTemplate;
@@ -103,4 +104,19 @@ public class Operation extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getStageUuid() {
+        return stageUuid;
+    }
+
+    public void setStageUuid(String stageUuid) {
+        this.stageUuid = stageUuid;
+    }
 }

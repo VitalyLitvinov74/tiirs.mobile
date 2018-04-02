@@ -15,7 +15,6 @@ public class OperationStatus extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String icon;
     private Date createdAt;
     private Date changedAt;
 
@@ -33,14 +32,6 @@ public class OperationStatus extends RealmObject {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
     }
 
     public String getTitle() {

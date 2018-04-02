@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,18 +15,18 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
-import ru.toir.mobile.db.realm.Tasks;
 
 /**
  * @author olejek
  *         Created by olejek on 13.09.16.
  */
-public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter {
-    public static final String TABLE_NAME = "Tasks";
+public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
+    public static final String TABLE_NAME = "Task";
 
-    public TaskAdapter(@NonNull Context context, RealmResults<Tasks> data) {
-        super(context, data);
+    public TaskAdapter(RealmResults<Task> data) {
+        super(data);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
     }
 
     @Override
-    public Tasks getItem(int position) {
+    public Task getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);
         }
@@ -49,7 +48,7 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
 
     @Override
     public long getItemId(int position) {
-        Tasks task;
+        Task task;
         if (adapterData != null) {
             task = adapterData.get(position);
             return task.get_id();
@@ -61,38 +60,32 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.task_item, parent, false);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.ti_Name);
-            viewHolder.date = (TextView) convertView.findViewById(R.id.ti_Status);
-            viewHolder.equipment = (TextView) convertView.findViewById(R.id.ti_Equipment);
-            viewHolder.icon = (ImageView) convertView.findViewById(R.id.ti_ImageStatus);
+            viewHolder.title = convertView.findViewById(R.id.ti_Name);
+            viewHolder.date = convertView.findViewById(R.id.ti_Status);
+            viewHolder.icon = convertView.findViewById(R.id.ti_ImageStatus);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         if (adapterData != null) {
-            if (position >= adapterData.size())
+            if (position >= adapterData.size()) {
                 return convertView;
-            Tasks task = adapterData.get(position);
+            }
+
+            Task task = adapterData.get(position);
             Date lDate = task.getStartDate();
-            if (lDate != null  && lDate.after(new Date(100000))) {
+            if (lDate != null && lDate.after(new Date(100000))) {
                 String sDate = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(lDate);
-                viewHolder.date.setText("Дата: " + sDate + " " + task.getTaskStatus().getTitle());
+                sDate = "Дата: " + sDate + " " + task.getTaskStatus().getTitle();
+                viewHolder.date.setText(sDate);
             } else {
                 //viewHolder.date.setText("не выполнялся");
             }
 
-            viewHolder.equipment.setText(task.getEquipment().getTitle());
             viewHolder.title.setText(task.getTaskTemplate().getTitle());
-
-            String taskStatusUuid = task.getTaskStatus().getUuid();
-            CriticalType criticalType=task.getEquipment().getCriticalType();
-            if (criticalType!=null) {
-                String criticalTypeUuid = criticalType.getUuid();
-                viewHolder.icon.setImageResource(getIconForStatusAndCriticalType(taskStatusUuid, criticalTypeUuid));
-            }
         }
 
         return convertView;
@@ -148,7 +141,6 @@ public class TaskAdapter extends RealmBaseAdapter<Tasks> implements ListAdapter 
     }
 
     private static class ViewHolder {
-        TextView equipment;
         TextView title;
         TextView date;
         //TextView status;

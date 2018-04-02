@@ -23,11 +23,11 @@ public interface ITaskTemplate {
     Call<List<TaskTemplate>> getById(@Query("id") String id);
 
     @GET("/task-template")
-    Call<List<TaskTemplate>> getById(@Query("id") String[] id);
+    Call<List<TaskTemplate>> getById(@Query("id[]") String[] id);
 
     @GET("/task-template")
     Call<List<TaskTemplate>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/task-template")
-    Call<List<TaskTemplate>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<TaskTemplate>> getByUuid(@Query("uuid[]") String[] uuid);
 }

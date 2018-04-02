@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,18 +15,18 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.CriticalType;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
-import ru.toir.mobile.db.realm.Stages;
 
 /**
  * @author olejek
  * Created by olejek on 14.09.16.
  */
-public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapter {
-    public static final String TABLE_NAME = "Stages";
+public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter {
+    public static final String TABLE_NAME = "Stage";
 
-    public StageAdapter(@NonNull Context context, RealmResults<Stages> data) {
-        super(context, data);
+    public StageAdapter(RealmResults<Stage> data) {
+        super(data);
     }
 
     @Override
@@ -40,8 +39,8 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
     }
 
     @Override
-    public Stages getItem(int position) {
-        Stages stages;
+    public Stage getItem(int position) {
+        Stage stages;
         if (adapterData != null) {
             stages = adapterData.get(position);
             return stages;
@@ -51,7 +50,7 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
 
     @Override
     public long getItemId(int position) {
-        Stages stages;
+        Stage stages;
         if (adapterData != null) {
             stages = adapterData.get(position);
             return stages.get_id();
@@ -63,14 +62,14 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.taskstage_item, parent, false);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.icon = (ImageView) convertView.findViewById(R.id.ts_ImageStatus);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.ts_Name);
-            viewHolder.equipment = (TextView) convertView.findViewById(R.id.ts_Equipment);
+            viewHolder.icon = convertView.findViewById(R.id.ts_ImageStatus);
+            viewHolder.title = convertView.findViewById(R.id.ts_Name);
+            viewHolder.equipment = convertView.findViewById(R.id.ts_Equipment);
             //viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
-            viewHolder.start_date = (TextView) convertView.findViewById(R.id.ts_StartDate);
-            viewHolder.end_date = (TextView) convertView.findViewById(R.id.ts_EndDate);
+            viewHolder.start_date = convertView.findViewById(R.id.ts_StartDate);
+            viewHolder.end_date = convertView.findViewById(R.id.ts_EndDate);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -81,7 +80,7 @@ public class StageAdapter extends RealmBaseAdapter<Stages> implements ListAdapte
             if (position >= adapterData.size())
                 return convertView;
 
-            Stages stage = adapterData.get(position);
+            Stage stage = adapterData.get(position);
             StageStatus stageStatus = stage.getStageStatus();
             viewHolder.title.setText(stage.getStageTemplate().getTitle());
             if (stageStatus != null) {

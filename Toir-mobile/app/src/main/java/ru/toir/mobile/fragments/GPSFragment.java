@@ -1,6 +1,8 @@
 package ru.toir.mobile.fragments;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -8,8 +10,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +48,8 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Orders;
-import ru.toir.mobile.db.realm.Tasks;
+import ru.toir.mobile.db.realm.Stage;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.gps.TaskItemizedOverlay;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -72,11 +78,15 @@ public class GPSFragment extends Fragment {
      * android.view.ViewGroup, android.os.Bundle)
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        FragmentActivity activity = getActivity();
+        if (activity == null) {
+            return null;
+        }
 
         View rootView = inflater.inflate(R.layout.gps_layout, container, false);
-        Toolbar toolbar = (Toolbar) (getActivity()).findViewById(R.id.toolbar);
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
         EquipmentAdapter equipmentAdapter;
         ListView equipmentListView;
 
@@ -87,8 +97,8 @@ public class GPSFragment extends Fragment {
 //        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-
-        if (lm != null) {
+        int permission = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (lm != null && permission == PackageManager.PERMISSION_GRANTED) {
             //GPSListener tgpsl = new GPSListener(getActivity().getApplicationContext(), user.getUuid());
             //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, tgpsl);
             location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -120,7 +130,7 @@ public class GPSFragment extends Fragment {
             */
         }
 
-        final MapView mapView = (MapView) rootView.findViewById(R.id.gps_mapview);
+        final MapView mapView = rootView.findViewById(R.id.gps_mapview);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(true);
         IMapController mapController = mapView.getController();
@@ -139,7 +149,7 @@ public class GPSFragment extends Fragment {
         mapView.getOverlays().add(aItemizedIconOverlay);
 
         //!!!!
-        equipmentListView = (ListView) rootView.findViewById(R.id.gps_listView);
+        equipmentListView = rootView.findViewById(R.id.gps_listView);
 
         //orders = realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         RealmQuery<Equipment> q = realmDB.where(Equipment.class);
@@ -150,13 +160,12 @@ public class GPSFragment extends Fragment {
 
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         List<Long> eqIdList = new ArrayList<>();
-        for (Orders itemOrder : orders) {
-            RealmList<Tasks> tasks = itemOrder.getTasks();
-            //tasks = realmDB.where(Tasks.class).equalTo("orderUuid", realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll()).findAll();
-            for (Tasks itemTask : tasks) {
-                equipments = realmDB.where(Equipment.class).equalTo("uuid", itemTask.getEquipment()
-                        .getUuid()).findAll();
-                for (Equipment equipment : equipments) {
+        for (Orders order : orders) {
+            RealmList<Task> tasks = order.getTasks();
+            for (Task task : tasks) {
+                for (Stage stage : task.getStages()) {
+                    Equipment equipment = stage.getEquipment();
+
                     eqIdList.add(equipment.get_id());
                     curLatitude = equipment.getLatitude();
                     curLongitude = equipment.getLongitude();
@@ -182,9 +191,11 @@ public class GPSFragment extends Fragment {
             }
         }
 
-        equipments = q.in("_id", eqIdList.toArray(new Long[]{})).findAll();
-        equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
-        equipmentListView.setAdapter(equipmentAdapter);
+        if (!eqIdList.isEmpty()) {
+            equipments = q.in("_id", eqIdList.toArray(new Long[]{})).findAll();
+            equipmentAdapter = new EquipmentAdapter(equipments);
+            equipmentListView.setAdapter(equipmentAdapter);
+        }
 
         equipmentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
@@ -275,19 +286,26 @@ public class GPSFragment extends Fragment {
     }
 
     private Location getLastKnownLocation() {
-        LocationManager mLocationManager;
-        mLocationManager = (LocationManager) getActivity().getApplicationContext()
-                .getSystemService(LOCATION_SERVICE);
-        List<String> providers = mLocationManager.getProviders(true);
+        FragmentActivity activity = getActivity();
         Location bestLocation = null;
-        for (String provider : providers) {
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
-            }
 
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                bestLocation = l;
+        if (activity != null) {
+            LocationManager mLocationManager;
+            mLocationManager = (LocationManager) activity.getApplicationContext()
+                    .getSystemService(LOCATION_SERVICE);
+            int permission = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (mLocationManager != null && permission == PackageManager.PERMISSION_GRANTED) {
+                List<String> providers = mLocationManager.getProviders(true);
+                for (String provider : providers) {
+                    Location l = mLocationManager.getLastKnownLocation(provider);
+                    if (l == null) {
+                        continue;
+                    }
+
+                    if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                        bestLocation = l;
+                    }
+                }
             }
         }
 

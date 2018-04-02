@@ -3,6 +3,7 @@ package ru.toir.mobile.fragments;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -68,57 +69,25 @@ import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.RepairPart;
 import ru.toir.mobile.db.realm.RepairPartType;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
-import ru.toir.mobile.db.realm.TaskStageList;
-import ru.toir.mobile.db.realm.TaskStageOperationList;
-import ru.toir.mobile.db.realm.Stages;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
 import ru.toir.mobile.db.realm.TaskVerdict;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.Tool;
 import ru.toir.mobile.db.realm.ToolType;
 import ru.toir.mobile.rest.ToirAPIFactory;
-
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
-//import android.content.Intent;
-//import android.content.IntentFilter;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.ReferenceServiceHelper;
 
 public class ReferenceFragment extends Fragment {
     private static final String TAG = "ReferenceFragment";
     private Realm realmDB;
 
     private ListView contentListView;
-
-//	private IntentFilter mFilterGetReference = new IntentFilter(ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
-//	private BroadcastReceiver mReceiverGetReference = new BroadcastReceiver() {
-//
-//		@Override
-//		public void onReceive(Context context, Intent intent) {
-//			getReferencesDialog.dismiss();
-//			context.unregisterReceiver(mReceiverGetReference);
-//			boolean result = intent.getBooleanExtra(
-//					ProcessorService.Extras.RESULT_EXTRA, false);
-//			Bundle bundle = intent
-//					.getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-//			if (result) {
-//				Toast.makeText(context, "Справочники обновлены",
-//						Toast.LENGTH_SHORT).show();
-//			} else {
-//				// сообщаем описание неудачи
-//				String message = bundle.getString(IServiceProvider.MESSAGE);
-//				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-//			}
-//		}
-//	};
 
     public static ReferenceFragment newInstance() {
         return (new ReferenceFragment());
@@ -147,7 +116,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderStatus
@@ -161,7 +130,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderVerdict
@@ -175,7 +144,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskVerdict
@@ -189,7 +158,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskStatus
@@ -203,7 +172,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentStatus
@@ -217,7 +186,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageVerdict
@@ -231,7 +200,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageStatus
@@ -245,7 +214,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationVerdict
@@ -259,7 +228,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationStatus
@@ -273,7 +242,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // MeasureType
@@ -287,7 +256,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
             }
         };
@@ -322,7 +291,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Contragent
@@ -336,7 +305,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // CriticalType
@@ -350,7 +319,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
                 // DefectType
                 referenceName = DefectType.class.getSimpleName();
@@ -363,7 +332,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Defect
@@ -377,7 +346,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Documentation
@@ -392,7 +361,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // DocumentationType ???
@@ -406,7 +375,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Equipment ???
@@ -420,7 +389,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentModel ???
@@ -434,7 +403,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentStatus
@@ -448,7 +417,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // EquipmentType ??
@@ -462,7 +431,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // MeasuredValue
@@ -480,7 +449,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // MeasureType
@@ -494,7 +463,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Operation ???
@@ -508,7 +477,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationStatus
@@ -522,7 +491,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationTemplate
@@ -536,7 +505,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationTool
@@ -550,7 +519,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationType
@@ -564,7 +533,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // ObjectType
@@ -578,7 +547,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Objects
@@ -592,7 +561,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OperationVerdict
@@ -606,7 +575,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderLevel
@@ -620,7 +589,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Orders ???
@@ -639,7 +608,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderStatus
@@ -653,7 +622,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // OrderVerdict
@@ -667,7 +636,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // RepairPart ???
@@ -681,7 +650,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // RepairPartType ???
@@ -695,63 +664,35 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
-                // Tasks ???
-                referenceName = Tasks.class.getSimpleName();
+                // Task ???
+                referenceName = Task.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<Tasks>> response = ToirAPIFactory.getTasksService()
+                    Response<List<Task>> response = ToirAPIFactory.getTasksService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<Tasks> list = response.body();
+                        List<Task> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
-                }
-
-                // TaskStageList ???
-                referenceName = TaskStageList.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<TaskStageList>> response = ToirAPIFactory
-                            .getTaskStageListService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<TaskStageList> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
-                }
-
-                // TaskStageOperationList ???
-                referenceName = TaskStageOperationList.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<TaskStageOperationList>> response = ToirAPIFactory
-                            .getTaskStageOperationListService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<TaskStageOperationList> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Stages ???
-                referenceName = Stages.class.getSimpleName();
+                referenceName = Stage.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<Stages>> response = ToirAPIFactory.getStagesService()
+                    Response<List<Stage>> response = ToirAPIFactory.getStageService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<Stages> list = response.body();
+                        List<Stage> list = response.body();
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageStatus
@@ -765,7 +706,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageTemplate ???
@@ -779,7 +720,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageType ???
@@ -793,7 +734,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // StageVerdict
@@ -807,7 +748,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskStatus
@@ -821,7 +762,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskTemplate ???
@@ -835,7 +776,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskType ???
@@ -849,7 +790,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // TaskVerdict
@@ -863,7 +804,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // Tool ???
@@ -877,7 +818,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // ToolType ???
@@ -891,7 +832,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
                 // User ???
@@ -912,7 +853,7 @@ public class ReferenceFragment extends Fragment {
                         ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
 
 
@@ -934,13 +875,13 @@ public class ReferenceFragment extends Fragment {
      * android.view.ViewGroup, android.os.Bundle)
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.reference_layout, container, false);
         realmDB = Realm.getDefaultInstance();
 
-        Spinner referenceSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        contentListView = (ListView) rootView.findViewById(R.id.reference_listView);
+        Spinner referenceSpinner = rootView.findViewById(R.id.simple_spinner);
+        contentListView = rootView.findViewById(R.id.reference_listView);
 
         // получаем список справочников, разбиваем его на ключ:значение
         String[] referenceArray = getResources().getStringArray(R.array.references_array);
@@ -970,96 +911,84 @@ public class ReferenceFragment extends Fragment {
     private void fillListViewDocumentationType() {
         RealmResults<DocumentationType> documentationType;
         documentationType = realmDB.where(DocumentationType.class).findAll();
-        DocumentationTypeAdapter documentationTypeAdapter = new DocumentationTypeAdapter(
-                getActivity().getApplicationContext(), documentationType);
+        DocumentationTypeAdapter documentationTypeAdapter = new DocumentationTypeAdapter(documentationType);
         contentListView.setAdapter(documentationTypeAdapter);
     }
 
     private void fillListViewEquipmentType() {
         RealmResults<EquipmentType> equipmentType;
         equipmentType = realmDB.where(EquipmentType.class).findAll();
-        EquipmentTypeAdapter equipmentTypeAdapter = new EquipmentTypeAdapter(getActivity()
-                .getApplicationContext(), equipmentType);
+        EquipmentTypeAdapter equipmentTypeAdapter = new EquipmentTypeAdapter(equipmentType);
         contentListView.setAdapter(equipmentTypeAdapter);
     }
 
     private void fillListViewCriticalType() {
         RealmResults<CriticalType> criticalType;
         criticalType = realmDB.where(CriticalType.class).findAll();
-        CriticalTypeAdapter criticalTypeAdapter = new CriticalTypeAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, criticalType);
+        CriticalTypeAdapter criticalTypeAdapter = new CriticalTypeAdapter(criticalType);
         contentListView.setAdapter(criticalTypeAdapter);
     }
 
     private void fillListViewAlertType() {
         RealmResults<AlertType> alertType;
         alertType = realmDB.where(AlertType.class).findAll();
-        AlertTypeAdapter alertTypeAdapter = new AlertTypeAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, alertType);
+        AlertTypeAdapter alertTypeAdapter = new AlertTypeAdapter(alertType);
         contentListView.setAdapter(alertTypeAdapter);
     }
 
     private void fillListViewOperationStatus() {
         RealmResults<OperationStatus> operationStatus;
         operationStatus = realmDB.where(OperationStatus.class).findAll();
-        OperationStatusAdapter operationAdapter = new OperationStatusAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, operationStatus);
+        OperationStatusAdapter operationAdapter = new OperationStatusAdapter(operationStatus);
         contentListView.setAdapter(operationAdapter);
     }
 
     private void fillListViewOperationVerdict() {
         RealmResults<OperationVerdict> operationVerdict;
         operationVerdict = realmDB.where(OperationVerdict.class).findAll();
-        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(getActivity()
-                .getApplicationContext(), operationVerdict);
+        OperationVerdictAdapter operationVerdictAdapter = new OperationVerdictAdapter(operationVerdict);
         contentListView.setAdapter(operationVerdictAdapter);
     }
 
     private void fillListViewObjectType() {
         RealmResults<ObjectType> objectType;
         objectType = realmDB.where(ObjectType.class).findAll();
-        ObjectTypeAdapter objectAdapter = new ObjectTypeAdapter(getActivity()
-                .getApplicationContext(), objectType);
+        ObjectTypeAdapter objectAdapter = new ObjectTypeAdapter(objectType);
         contentListView.setAdapter(objectAdapter);
     }
 
     private void fillListViewDefectType() {
         RealmResults<DefectType> defectType;
         defectType = realmDB.where(DefectType.class).findAll();
-        DefectTypeAdapter defectAdapter = new DefectTypeAdapter(getActivity()
-                .getApplicationContext(), defectType);
+        DefectTypeAdapter defectAdapter = new DefectTypeAdapter(defectType);
         contentListView.setAdapter(defectAdapter);
     }
 
     private void fillListViewOperationType() {
         RealmResults<OperationType> operationType;
         operationType = realmDB.where(OperationType.class).findAll();
-        OperationTypeAdapter operationAdapter = new OperationTypeAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, operationType);
+        OperationTypeAdapter operationAdapter = new OperationTypeAdapter(operationType);
         contentListView.setAdapter(operationAdapter);
     }
 
     private void fillListViewTaskStatus() {
         RealmResults<TaskStatus> taskStatuses;
         taskStatuses = realmDB.where(TaskStatus.class).findAll();
-        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(getActivity()
-                .getApplicationContext(), taskStatuses);
+        TaskStatusAdapter taskStatusAdapter = new TaskStatusAdapter(taskStatuses);
         contentListView.setAdapter(taskStatusAdapter);
     }
 
     private void fillListViewStageStatus() {
         RealmResults<StageStatus> stageStatuses;
         stageStatuses = realmDB.where(StageStatus.class).findAll();
-        StageStatusAdapter stageStatusAdapter = new StageStatusAdapter(getActivity()
-                .getApplicationContext(), stageStatuses);
+        StageStatusAdapter stageStatusAdapter = new StageStatusAdapter(stageStatuses);
         contentListView.setAdapter(stageStatusAdapter);
     }
 
     private void fillListViewEquipmentStatus() {
         RealmResults<EquipmentStatus> equipmentStatuses;
         equipmentStatuses = realmDB.where(EquipmentStatus.class).findAll();
-        EquipmentStatusAdapter equipmentAdapter = new EquipmentStatusAdapter(getActivity()
-                .getApplicationContext(), R.id.reference_listView, equipmentStatuses);
+        EquipmentStatusAdapter equipmentAdapter = new EquipmentStatusAdapter(equipmentStatuses);
         contentListView.setAdapter(equipmentAdapter);
     }
 

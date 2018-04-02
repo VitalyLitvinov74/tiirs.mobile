@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -23,8 +23,8 @@ import ru.toir.mobile.db.realm.Journal;
 public class JournalAdapter extends RealmBaseAdapter<Journal> implements ListAdapter {
     public static final String TABLE_NAME = "Journal";
 
-    public JournalAdapter(@NonNull Context context, RealmResults<Journal> data) {
-        super(context, data);
+    public JournalAdapter(RealmResults<Journal> data) {
+        super(data);
     }
 
     @Override
@@ -62,12 +62,14 @@ public class JournalAdapter extends RealmBaseAdapter<Journal> implements ListAda
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = inflater.inflate(R.layout.row_with_2_columns, parent, false);
-            viewHolder.date = (TextView) convertView.findViewById(R.id.row2_date);
-            viewHolder.descr = (TextView) convertView.findViewById(R.id.row2_description);
+            viewHolder.date = convertView.findViewById(R.id.row2_date);
+            viewHolder.descr = convertView.findViewById(R.id.row2_description);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -88,13 +90,17 @@ public class JournalAdapter extends RealmBaseAdapter<Journal> implements ListAda
             TextView textView = new TextView(context);
             if (adapterData != null) {
                 journal = adapterData.get(position);
-                if (journal != null)
+                if (journal != null) {
                     textView.setText(journal.getDate().toString());
+                }
+
                 textView.setTextSize(16);
                 textView.setPadding(5, 5, 5, 5);
             }
+
             return textView;
         }
+
         return convertView;
     }
 

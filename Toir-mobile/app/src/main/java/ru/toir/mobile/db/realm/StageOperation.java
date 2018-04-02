@@ -6,16 +6,16 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Olejek
- *         Created on 27.09.16.
+ * @author Dmitriy Logachev
+ *         Created by koputo on 2/20/18.
  */
-public class TaskStageOperationList extends RealmObject {
+
+public class StageOperation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private StageTemplate taskStageTemplate;
+    private StageTemplate stageTemplate;
     private OperationTemplate operationTemplate;
-    private int flowOrder ;
     private Date createdAt;
     private Date changedAt;
 
@@ -35,12 +35,12 @@ public class TaskStageOperationList extends RealmObject {
         this.uuid = uuid;
     }
 
-    public StageTemplate getTaskStageTemplate() {
-        return taskStageTemplate;
+    public StageTemplate getStageTemplate() {
+        return stageTemplate;
     }
 
-    public void setTaskStageTemplate(StageTemplate taskStageTemplate) {
-        this.taskStageTemplate = taskStageTemplate;
+    public void setStageTemplate(StageTemplate stageTemplate) {
+        this.stageTemplate = stageTemplate;
     }
 
     public OperationTemplate getOperationTemplate() {
@@ -49,14 +49,6 @@ public class TaskStageOperationList extends RealmObject {
 
     public void setOperationTemplate(OperationTemplate operationTemplate) {
         this.operationTemplate = operationTemplate;
-    }
-
-    public int getFlowOrder() {
-        return flowOrder;
-    }
-
-    public void setFlowOrder(int flowOrder) {
-        this.flowOrder = flowOrder;
     }
 
     public Date getCreatedAt() {
@@ -74,5 +66,4 @@ public class TaskStageOperationList extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

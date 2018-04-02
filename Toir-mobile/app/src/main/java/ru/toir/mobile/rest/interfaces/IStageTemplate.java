@@ -23,11 +23,11 @@ public interface IStageTemplate {
     Call<List<StageTemplate>> getById(@Query("id") String id);
 
     @GET("/stage-template")
-    Call<List<StageTemplate>> getById(@Query("id") String[] id);
+    Call<List<StageTemplate>> getById(@Query("id[]") String[] id);
 
     @GET("/stage-template")
     Call<List<StageTemplate>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/stage-template")
-    Call<List<StageTemplate>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<StageTemplate>> getByUuid(@Query("uuid[]") String[] uuid);
 }

@@ -24,11 +24,11 @@ public interface IDefect {
     Call<List<Defect>> getById(@Query("id") String id);
 
     @GET("/defect")
-    Call<List<Defect>> getById(@Query("id") String[] id);
+    Call<List<Defect>> getById(@Query("id[]") String[] id);
 
     @GET("/defect")
     Call<List<Defect>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/defect")
-    Call<List<Defect>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Defect>> getByUuid(@Query("uuid[]") String[] uuid);
 }

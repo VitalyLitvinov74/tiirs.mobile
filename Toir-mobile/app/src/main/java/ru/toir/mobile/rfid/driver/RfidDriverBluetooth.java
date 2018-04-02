@@ -97,14 +97,14 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
                 try {
                     socket = mDevice.createRfcommSocketToServiceRecord(BTRfidServer.BT_SERVICE_RECORD_UUID);
                 } catch (IOException e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                     return false;
                 }
 
                 try {
                     socket.connect();
                 } catch (IOException e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    e.printStackTrace();
                     return false;
                 }
 
@@ -592,7 +592,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
                 tmpInputStream = socket.getInputStream();
                 tmpOutputStream = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
 
             mInputStream = tmpInputStream;
@@ -860,7 +860,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
             try {
                 mSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
         }
 
@@ -869,7 +869,7 @@ public class RfidDriverBluetooth extends RfidDriverBase implements IRfidDriver {
             try {
                 mOutputStream.write(command);
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
         }
     }

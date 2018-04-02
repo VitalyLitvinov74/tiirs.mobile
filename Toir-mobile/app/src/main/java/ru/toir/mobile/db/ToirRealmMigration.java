@@ -25,6 +25,10 @@ import io.realm.exceptions.RealmException;
 import ru.toir.mobile.db.migration.Migration26;
 import ru.toir.mobile.db.migration.Migration27;
 import ru.toir.mobile.db.migration.Migration28;
+import ru.toir.mobile.db.migration.Migration29;
+import ru.toir.mobile.db.migration.Migration30;
+import ru.toir.mobile.db.migration.Migration31;
+import ru.toir.mobile.db.migration.Migration32;
 
 /**
  * @author Dmitriy Logachev
@@ -335,6 +339,26 @@ class ToirRealmMigration implements RealmMigration {
 
         if (oldVersion == 27) {
             new Migration28().migration(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 28) {
+            new Migration29().migration(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 29) {
+            new Migration30().migration(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 30) {
+            new Migration31().migration(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 31) {
+            new Migration32().migration(realm);
             oldVersion++;
         }
 
@@ -743,7 +767,7 @@ class ToirRealmMigration implements RealmMigration {
 //                    propsType.put(prop.getName(), prop.getGenericType().toString());
                 }
             } catch (Exception e) {
-                Log.e(TAG, e.getLocalizedMessage());
+                e.printStackTrace();
             }
 
             // проверяем количество и названия полей и свойств

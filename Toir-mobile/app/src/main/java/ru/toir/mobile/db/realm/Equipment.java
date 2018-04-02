@@ -29,6 +29,10 @@ public class Equipment extends RealmObject implements IToirDbObject {
     private Date createdAt;
     private Date changedAt;
 
+    public static String getImageRoot() {
+        return "equipment";
+    }
+
     public long get_id() {
         return _id;
     }
@@ -168,5 +172,49 @@ public class Equipment extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = equipmentModel.getUuid();
+        dir = imageRoot + "/" + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public String getAnyImageFilePath() {
+        String dir = null;
+
+        if (!image.equals("")) {
+            dir = getImageFilePath();
+        } else {
+            if (!equipmentModel.getImage().equals("")) {
+                dir = equipmentModel.getImageFilePath();
+            }
+        }
+
+        return dir;
+    }
+
+    public String getAnyImage() {
+        String file = null;
+
+        if (!image.equals("")) {
+            file = getImage();
+        } else {
+            if (!equipmentModel.getImage().equals("")) {
+                file = equipmentModel.getImage();
+            }
+        }
+
+        return file;
     }
 }

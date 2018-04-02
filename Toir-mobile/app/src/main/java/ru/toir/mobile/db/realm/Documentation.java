@@ -1,5 +1,12 @@
 package ru.toir.mobile.db.realm;
 
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.webkit.MimeTypeMap;
+
+import java.io.File;
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -21,6 +28,10 @@ public class Documentation extends RealmObject implements IToirDbObject {
     private Date createdAt;
     private Date changedAt;
     private boolean required;
+
+    public static String getImageRoot() {
+        return "doc";
+    }
 
     public long get_id() {
         return _id;
@@ -105,5 +116,28 @@ public class Documentation extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFile() {
         return getPath();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        if (equipmentModel != null) {
+            typeUuid = equipmentModel.getUuid();
+        } else if (equipment.getEquipmentModel() != null) {
+            typeUuid = equipment.getEquipmentModel().getUuid();
+        } else {
+            return null;
+        }
+
+        dir = imageRoot + '/' + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

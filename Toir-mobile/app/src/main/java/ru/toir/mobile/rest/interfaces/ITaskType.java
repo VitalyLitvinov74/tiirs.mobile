@@ -23,11 +23,11 @@ public interface ITaskType {
     Call<List<TaskType>> getById(@Query("id") String id);
 
     @GET("/task-type")
-    Call<List<TaskType>> getById(@Query("id") String[] id);
+    Call<List<TaskType>> getById(@Query("id[]") String[] id);
 
     @GET("/task-type")
     Call<List<TaskType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/task-type")
-    Call<List<TaskType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<TaskType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

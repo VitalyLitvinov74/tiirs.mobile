@@ -31,7 +31,7 @@ import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 public class FragmentEditUser extends Fragment implements View.OnClickListener {
     private static final int PICK_PHOTO_FOR_AVATAR = 1;
     private ImageView iView;
-    private EditText name,login,pass;
+    private EditText name, login, pass;
     private String image_name;
     private Realm realmDB;
 
@@ -63,21 +63,21 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         //UsersDBAdapter users = new UsersDBAdapter(
         //        new ToirDatabaseContext(getActivity().getApplicationContext()));
         //user = users.getActiveUser();
-        if (user==null) {
+        if (user == null) {
             Toast.makeText(getActivity().getApplicationContext(), "Пользователь не выбран, пожалуйста выберите или содайте профиль", Toast.LENGTH_LONG).show();
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentWelcome.newInstance()).commit();
         }
 
-        if (user!=null) {
+        if (user != null) {
             pass.setText(user.getPass());
             login.setText(user.getLogin());
             name.setText(user.getName());
             image_name = user.getImage();
 
-            String path = getActivity().getExternalFilesDir("/users") + File.separator;
-            if (user.getChangedAt()!=null) {
+            String path = getActivity().getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
+            if (user.getChangedAt() != null) {
                 Bitmap myBitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
-                if (myBitmap!=null) {
+                if (myBitmap != null) {
                     iView.setImageBitmap(myBitmap);
                 }
             }
@@ -102,7 +102,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
             try {
                 InputStream inputStream = getActivity().getApplicationContext().getContentResolver().openInputStream(data.getData());
                 Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
-                if (myBitmap!=null) {
+                if (myBitmap != null) {
                     int height = (int) (200 * (float) myBitmap.getHeight() / (float) myBitmap.getWidth());
                     if (height > 0) {
                         Bitmap myBitmap2 = Bitmap.createScaledBitmap(myBitmap, 200, height, false);
@@ -128,12 +128,11 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.profile_button_submit:
-                if (name.getText().toString().length()<2 || login.getText().toString().length()<2 || pass.getText().toString().length()<2)
-                    {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Вы должны заполнить все поля!", Toast.LENGTH_LONG).show();
-                        break;
-                    }
+                if (name.getText().toString().length() < 2 || login.getText().toString().length() < 2 || pass.getText().toString().length() < 2) {
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Вы должны заполнить все поля!", Toast.LENGTH_LONG).show();
+                    break;
+                }
                 try {
                     // название файла аватара не меняется
                     storeImage(image_name);
@@ -151,7 +150,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
 
             case R.id.profile_button_delete:
                 user = realmDB.where(User.class).equalTo("active", true).findFirst();
-                ((MainActivity)getActivity()).deleteProfile((int) user.get_id());
+                ((MainActivity) getActivity()).deleteProfile((int) user.get_id());
                 realmDB.beginTransaction();
                 user.deleteFromRealm();
                 realmDB.commitTransaction();
@@ -168,7 +167,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         Bitmap bmp;
         File sd_card = Environment.getExternalStorageDirectory();
         String target_filename = sd_card.getAbsolutePath() + File.separator + "Android" + File.separator + "data" + File.separator + getActivity().getPackageName() + File.separator + "img" + File.separator + name;
-        File target_file = new File (target_filename);
+        File target_file = new File(target_filename);
         if (!target_file.getParentFile().exists()) {
             target_file.getParentFile().mkdirs();
         }
@@ -176,7 +175,7 @@ public class FragmentEditUser extends Fragment implements View.OnClickListener {
         iView.buildDrawingCache();
         bmp = iView.getDrawingCache();
         FileOutputStream out = new FileOutputStream(target_file);
-        if (bmp!=null) {
+        if (bmp != null) {
             //Bitmap.createScaledBitmap(bmp, 100, 100, false);
             bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
         }

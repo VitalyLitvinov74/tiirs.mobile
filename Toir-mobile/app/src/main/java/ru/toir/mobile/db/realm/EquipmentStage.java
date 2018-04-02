@@ -2,20 +2,21 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Olejek
- *         Created on 15.09.16.
+ * @author Dmitriy Logachev
+ *         Created by koputo on 2/20/18.
  */
-public class TaskStageList extends RealmObject {
+
+public class EquipmentStage extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private TaskTemplate taskTemplate;
-    private StageTemplate taskStageTemplate;
-    private int flowOrder ;
+    private Equipment equipment;
+    private RealmList<StageOperation> stageOperations;
     private Date createdAt;
     private Date changedAt;
 
@@ -35,28 +36,20 @@ public class TaskStageList extends RealmObject {
         this.uuid = uuid;
     }
 
-    public TaskTemplate getTaskTemplate() {
-        return taskTemplate;
+    public Equipment getEquipment() {
+        return equipment;
     }
 
-    public void setTaskTemplate(TaskTemplate taskTemplate) {
-        this.taskTemplate = taskTemplate;
+    public void setEquipment(Equipment equipment) {
+        this.equipment = equipment;
     }
 
-    public StageTemplate getTaskStageTemplate() {
-        return taskStageTemplate;
+    public RealmList<StageOperation> getStageOperations() {
+        return stageOperations;
     }
 
-    public void setTaskStageTemplate(StageTemplate taskStageTemplate) {
-        this.taskStageTemplate = taskStageTemplate;
-    }
-
-    public int getFlowOrder() {
-        return flowOrder;
-    }
-
-    public void setFlowOrder(int flowOrder) {
-        this.flowOrder = flowOrder;
+    public void setStageOperations(RealmList<StageOperation> stageOperations) {
+        this.stageOperations = stageOperations;
     }
 
     public Date getCreatedAt() {
@@ -74,5 +67,4 @@ public class TaskStageList extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

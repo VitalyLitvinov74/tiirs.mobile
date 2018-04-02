@@ -5,7 +5,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.toir.mobile.db.realm.Tasks;
+import ru.toir.mobile.db.realm.Task;
 
 /**
  * @author Dmitriy Logachev
@@ -14,20 +14,20 @@ import ru.toir.mobile.db.realm.Tasks;
 
 public interface ITasks {
     @GET("/task")
-    Call<List<Tasks>> get();
+    Call<List<Task>> get();
 
     @GET("/task")
-    Call<List<Tasks>> get(@Query("changedAfter") String changedAfter);
+    Call<List<Task>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/task")
-    Call<List<Tasks>> getById(@Query("id") String id);
+    Call<List<Task>> getById(@Query("id") String id);
 
     @GET("/task")
-    Call<List<Tasks>> getById(@Query("id") String[] id);
+    Call<List<Task>> getById(@Query("id[]") String[] id);
 
     @GET("/task")
-    Call<List<Tasks>> getByUuid(@Query("uuid") String uuid);
+    Call<List<Task>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/task")
-    Call<List<Tasks>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<Task>> getByUuid(@Query("uuid[]") String[] uuid);
 }

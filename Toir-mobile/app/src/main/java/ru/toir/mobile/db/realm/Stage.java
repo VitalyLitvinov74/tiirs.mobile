@@ -10,16 +10,16 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 14.09.16.
  */
-public class Stages extends RealmObject {
+public class Stage extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String comment;
     private String taskUuid;
     private Equipment equipment;
-    private StageVerdict taskStageVerdict;
-    private StageStatus taskStageStatus;
-    private StageTemplate taskStageTemplate;
+    private StageVerdict stageVerdict;
+    private StageStatus stageStatus;
+    private StageTemplate stageTemplate;
     private Date startDate;
     private Date endDate;
     private int flowOrder;
@@ -68,27 +68,27 @@ public class Stages extends RealmObject {
     }
 
     public StageVerdict getStageVerdict() {
-        return taskStageVerdict;
+        return stageVerdict;
     }
 
     public void setStageVerdict(StageVerdict stageVerdict) {
-        this.taskStageVerdict = stageVerdict;
+        this.stageVerdict = stageVerdict;
     }
 
     public StageStatus getStageStatus() {
-        return taskStageStatus;
+        return stageStatus;
     }
 
     public void setStageStatus(StageStatus stageStatus) {
-        this.taskStageStatus = stageStatus;
+        this.stageStatus = stageStatus;
     }
 
     public StageTemplate getStageTemplate() {
-        return taskStageTemplate;
+        return stageTemplate;
     }
 
     public void setStageTemplate(StageTemplate stageTemplate) {
-        this.taskStageTemplate = stageTemplate;
+        this.stageTemplate = stageTemplate;
     }
 
     public int getFlowOrder() {

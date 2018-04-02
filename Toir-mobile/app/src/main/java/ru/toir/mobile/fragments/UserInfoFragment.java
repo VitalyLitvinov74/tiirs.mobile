@@ -1,16 +1,22 @@
 package ru.toir.mobile.fragments;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,109 +45,121 @@ public class UserInfoFragment extends Fragment {
     }
 
     /*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * 
 	 * @see
 	 * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
 	 * android.view.ViewGroup, android.os.Bundle)
 	 */
-	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_layout, container, false);
-        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Пользователь");
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            Toolbar toolbar = activity.findViewById(R.id.toolbar);
+            toolbar.setSubtitle("Пользователь");
 
-        realmDB = Realm.getDefaultInstance();
-		initView(rootView);
+            realmDB = Realm.getDefaultInstance();
+            initView(rootView);
 
-		rootView.setFocusableInTouchMode(true);
-		rootView.requestFocus();
+            rootView.setFocusableInTouchMode(true);
+            rootView.requestFocus();
 
-		return rootView;
-	}
+            return rootView;
+        } else {
+            return null;
+        }
+    }
 
-	private void initView(View view) {
-        TextView tv_user_name;
-        TextView tv_user_id;
-        TextView tv_user_type;
-        TextView tv_user_gps;
-        ImageView user_image;
-        ImageView edit_image;
-        ImageView call_image;
-        Switch user_status_gps;
-        Switch user_status_gprs;
-        TextView tv_user_date;
-        TextView tv_user_boss;
-
-		tv_user_id = (TextView) view.findViewById(R.id.user_text_uuid);
-		tv_user_name = (TextView) view.findViewById(R.id.user_text_name);
-		tv_user_type = (TextView) view.findViewById(R.id.user_text_type);
-		tv_user_gps = (TextView) view.findViewById(R.id.user_text_location);
-        user_image = (ImageView) view.findViewById(R.id.user_image);
-        edit_image = (ImageView) view.findViewById(R.id.user_edit_image);
-        call_image = (ImageView) view.findViewById(R.id.user_boss_contact);
-        tv_user_date = (TextView) view.findViewById(R.id.user_text_date);
-        tv_user_boss = (TextView) view.findViewById(R.id.user_text_boss);
-        user_status_gps = (Switch) view.findViewById(R.id.user_status_gps_switch);
-        user_status_gprs = (Switch) view.findViewById(R.id.user_status_gprs_switch);
+    private void initView(View view) {
+        TextView tv_user_name = view.findViewById(R.id.user_text_name);
+        TextView tv_user_id = view.findViewById(R.id.user_text_uuid);
+        TextView tv_user_type = view.findViewById(R.id.user_text_type);
+        TextView tv_user_gps = view.findViewById(R.id.user_text_location);
+        ImageView user_image = view.findViewById(R.id.user_image);
+        ImageView edit_image = view.findViewById(R.id.user_edit_image);
+        ImageView call_image = view.findViewById(R.id.user_boss_contact);
+        Switch user_status_gps = view.findViewById(R.id.user_status_gps_switch);
+        Switch user_status_gprs = view.findViewById(R.id.user_status_gprs_switch);
+        TextView tv_user_date = view.findViewById(R.id.user_text_date);
+        TextView tv_user_boss = view.findViewById(R.id.user_text_boss);
 
         edit_image.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile")).commit();
+                FragmentActivity activity = getActivity();
+                if (activity != null) {
+                    activity.getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile"))
+                            .commit();
+                }
             }
         });
 
-		// !!!!!
-        final User user = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findFirst();
-		//final User user = realmDB.where(User.class).findFirst();
+        // !!!!!
+        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        //final User user = realmDB.where(User.class).findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
             //if (user.getTagId().length() > 20) tv_user_id.setText("ID: " + user.getTagId().substring(4, 24));
             tv_user_id.setText(getString(R.string.id, user.getTagId()));
-			tv_user_name.setText(user.getName());
-			tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
-			tv_user_boss.setText(user.getContact());
-			tv_user_type.setText(user.getWhoIs());
+            tv_user_name.setText(user.getName());
+            tv_user_date.setText(DateFormat.getDateTimeInstance().format(new Date()));
+            tv_user_boss.setText(user.getContact());
+            tv_user_type.setText(user.getWhoIs());
 
-            LocationManager manager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            if (manager != null) {
-                boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                if (statusOfGPS && manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)) != null) {
-                    user_status_gps.setChecked(true);
-                    tv_user_gps.setText(String.valueOf(manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)).getLongitude()) + ", " + String.valueOf(manager.getLastKnownLocation(manager.getBestProvider(new Criteria(), false)).getLatitude()));
-                } else {
-                    user_status_gps.setChecked(false);
-                    tv_user_gps.setText("не определено");
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                LocationManager manager = (LocationManager) activity.getApplicationContext()
+                        .getSystemService(Context.LOCATION_SERVICE);
+                int permission = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
+                if (manager != null && permission == PackageManager.PERMISSION_GRANTED) {
+                    boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                    String provider = manager.getBestProvider(new Criteria(), false);
+                    Location location = manager.getLastKnownLocation(provider);
+                    if (statusOfGPS && location != null) {
+                        user_status_gps.setChecked(true);
+                        String result = String.valueOf(location.getLongitude()) + ", " + String.valueOf(location.getLatitude());
+                        tv_user_gps.setText(result);
+                    } else {
+                        user_status_gps.setChecked(false);
+                        tv_user_gps.setText("не определено");
+                    }
                 }
             }
-            ConnectivityManager cm = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            if (activeNetwork != null) { // connected to the internet
-                if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                    // connected to wifi
-                    user_status_gprs.setChecked(true);
-                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                    // connected to the mobile provider's data plan
-                    user_status_gprs.setChecked(false);
+
+            if (activity != null) {
+                ConnectivityManager cm = (ConnectivityManager) activity.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (cm != null) {
+                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                    if (activeNetwork != null) { // connected to the internet
+                        if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                            // connected to wifi
+                            user_status_gprs.setChecked(true);
+                        } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                            // connected to the mobile provider's data plan
+                            user_status_gprs.setChecked(false);
+                        }
+                    } else {
+                        user_status_gprs.setChecked(false);
+                    }
                 }
-            } else {
-                user_status_gprs.setChecked(false);
             }
 
             if (user.getContact() != null) {
                 call_image.setOnClickListener(new View.OnClickListener() {
-                  @Override
-                  public void onClick(View v) {
-                      Intent intent = new Intent(Intent.ACTION_CALL);
-                      intent.setData(Uri.parse("tel:" + user.getContact()));
-                      startActivity(intent);
-                  }
-              });
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_CALL);
+                        intent.setData(Uri.parse("tel:" + user.getContact()));
+                        startActivity(intent);
+                    }
+                });
             }
 
-            String path = getActivity().getExternalFilesDir("/users") + File.separator;
+            String path = getActivity().getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
             Bitmap user_bitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
             if (user_bitmap != null) {
                 user_image.setImageBitmap(user_bitmap);

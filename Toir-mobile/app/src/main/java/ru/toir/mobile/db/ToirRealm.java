@@ -13,14 +13,15 @@ import io.realm.RealmConfiguration;
  */
 public class ToirRealm {
     // версия схемы базы данных приложения
-    private static final int VERSION = 28;
+    private static final int VERSION = 32;
 
     public static void init(Context context) {
         init(context, "toir.realm");
     }
 
     public static void init(Context context, String dbName) {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
+        Realm.init(context);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name(dbName)
                 .schemaVersion(VERSION)
                 .build();

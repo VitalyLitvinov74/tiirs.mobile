@@ -33,7 +33,7 @@ public class Orders extends RealmObject implements ISend {
     private Date attemptSendDate;
     private int attemptCount;
     private int updated;
-    private RealmList<Tasks> tasks;
+    private RealmList<Task> tasks;
     private boolean sent;
 
     public long get_id() {
@@ -172,15 +172,15 @@ public class Orders extends RealmObject implements ISend {
         this.changedAt = changedAt;
     }
 
-    public RealmList<Tasks> getTasks() {
+    public RealmList<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(RealmList<Tasks> tasks) {
+    public void setTasks(RealmList<Task> tasks) {
         this.tasks = tasks;
     }
 
-    public void addTask(Tasks task) {
+    public void addTask(Task task) {
         this.tasks.add(task);
     }
 

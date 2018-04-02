@@ -23,12 +23,12 @@ public interface IOrderVerdict {
     Call<List<OrderVerdict>> getById(@Query("id") String id);
 
     @GET("/order-verdict")
-    Call<List<OrderVerdict>> getById(@Query("id") String[] id);
+    Call<List<OrderVerdict>> getById(@Query("id[]") String[] id);
 
     @GET("/order-verdict")
     Call<List<OrderVerdict>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/order-verdict")
-    Call<List<OrderVerdict>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OrderVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }
 

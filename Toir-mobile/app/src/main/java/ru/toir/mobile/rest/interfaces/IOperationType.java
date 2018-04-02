@@ -22,11 +22,11 @@ public interface IOperationType {
     Call<List<OperationType>> getById(@Query("id") String id);
 
     @GET("/operation-type")
-    Call<List<OperationType>> getById(@Query("id") String[] id);
+    Call<List<OperationType>> getById(@Query("id[]") String[] id);
 
     @GET("/operation-type")
     Call<List<OperationType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/operation-type")
-    Call<List<OperationType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<OperationType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

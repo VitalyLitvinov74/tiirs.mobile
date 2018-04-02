@@ -23,11 +23,11 @@ public interface IAlertType {
     Call<List<AlertType>> getById(@Query("id") String id);
 
     @GET("/alert-type")
-    Call<List<AlertType>> getById(@Query("id") String[] id);
+    Call<List<AlertType>> getById(@Query("id[]") String[] id);
 
     @GET("/alert-type")
     Call<List<AlertType>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/alert-type")
-    Call<List<AlertType>> getByUuid(@Query("uuid") String[] uuid);
+    Call<List<AlertType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

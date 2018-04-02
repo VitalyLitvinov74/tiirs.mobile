@@ -2,6 +2,7 @@ package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,12 +24,12 @@ import ru.toir.mobile.db.realm.Contragent;
 public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements ListAdapter {
     public static final String TABLE_NAME = "Contragent";
 
-    public ContragentAdapter(@NonNull Context context, RealmResults<Contragent> data) {
-        super(context, data);
+    public ContragentAdapter(RealmResults<Contragent> data) {
+        super(data);
     }
 
-    public ContragentAdapter(@NonNull Context context, RealmList<Contragent> data) {
-        super(context, data);
+    public ContragentAdapter(RealmList<Contragent> data) {
+        super(data);
     }
 
     @Override
@@ -66,24 +67,26 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             //if (parent.getId() == R.id.gps_listView) {
             if (parent.getId() == R.id.crl_contragents_listView) {
                 convertView = inflater.inflate(R.layout.contragent_reference_item_layout, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.cril_image);
-                viewHolder.name = (TextView) convertView.findViewById(R.id.cril_title);
-                viewHolder.type = (TextView) convertView.findViewById(R.id.cril_type);
-                viewHolder.phone = (TextView) convertView.findViewById(R.id.cril_phone);
+                viewHolder.icon = convertView.findViewById(R.id.cril_image);
+                viewHolder.name = convertView.findViewById(R.id.cril_title);
+                viewHolder.type = convertView.findViewById(R.id.cril_type);
+                viewHolder.phone = convertView.findViewById(R.id.cril_phone);
                 convertView.setTag(viewHolder);
             } else {
                 convertView = inflater.inflate(R.layout.contragent_reference_item_layout, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.cril_image);
-                viewHolder.name = (TextView) convertView.findViewById(R.id.cril_title);
-                viewHolder.type = (TextView) convertView.findViewById(R.id.cril_type);
-                viewHolder.phone = (TextView) convertView.findViewById(R.id.cril_phone);
+                viewHolder.icon = convertView.findViewById(R.id.cril_image);
+                viewHolder.name = convertView.findViewById(R.id.cril_title);
+                viewHolder.type = convertView.findViewById(R.id.cril_type);
+                viewHolder.phone = convertView.findViewById(R.id.cril_phone);
                 convertView.setTag(viewHolder);
             }
         } else {
