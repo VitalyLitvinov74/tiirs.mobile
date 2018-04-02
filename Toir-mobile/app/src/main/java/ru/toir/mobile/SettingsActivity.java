@@ -510,18 +510,20 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 String jsonString = result.toString();
                 JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray res = jsonObject.getJSONArray("result");
-                JSONObject res0 = res.getJSONObject(0);
-                JSONObject message = res0.getJSONObject("message");
-                JSONObject chat = message.getJSONObject("chat");
-                int chat_id = chat.getInt("id");
-                if (chat_id > 0) {
-                    // store chat id
-                    SharedPreferences sharedPreferences = getSharedPreferences("messendgers", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(getString(R.string.telegram_chat_id),""+chat_id);
-                    editor.apply();
+                if (res.length() > 0) {
+                    JSONObject res0 = res.getJSONObject(0);
+                    JSONObject message = res0.getJSONObject("message");
+                    JSONObject chat = message.getJSONObject("chat");
+                    int chat_id = chat.getInt("id");
+                    if (chat_id > 0) {
+                        // store chat id
+                        SharedPreferences sharedPreferences = getSharedPreferences("messendgers", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(getString(R.string.telegram_chat_id), "" + chat_id);
+                        editor.apply();
+                    }
+                    return chat_id+"";
                 }
-                return chat_id+"";
             } catch (Exception e) {
                 e.printStackTrace();
             }
