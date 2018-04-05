@@ -1054,12 +1054,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void mOnClickMethod(View view) {
-        //openOptionsMenu();
-        //Intent i = new Intent(MainActivity.this, ToirPreferences.class);
         Intent i = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(i);
     }
-
 
     public void changeActiveProfile(User user) {
         if (iprofilelist != null) {
@@ -1188,7 +1185,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (_locationManager != null) {
-            _locationManager.removeUpdates(_gpsListener);
+            if (_gpsListener != null) {
+                _locationManager.removeUpdates(_gpsListener);
+            }
+
             _locationManager = null;
             _gpsListener = null;
         }

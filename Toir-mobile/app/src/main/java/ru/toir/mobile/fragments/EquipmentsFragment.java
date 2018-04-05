@@ -1,7 +1,9 @@
 package ru.toir.mobile.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -35,11 +37,16 @@ public class EquipmentsFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.equipment_reference_layout, container, false);
-        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+        Activity activity = getActivity();
+        if (activity == null) {
+            return null;
+        }
+
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
         toolbar.setSubtitle("Оборудование");
         realmDB = Realm.getDefaultInstance();
 
@@ -56,11 +63,10 @@ public class EquipmentsFragment extends Fragment {
 		sortSpinner.setAdapter(sortSpinnerAdapter);
 		sortSpinner.setOnItemSelectedListener(spinnerListener);
 */
-        equipmentListView = (ListView) rootView.findViewById(R.id.erl_equipment_listView);
-
+        equipmentListView = rootView.findViewById(R.id.erl_equipment_listView);
 
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
-        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
+        typeSpinner = rootView.findViewById(R.id.simple_spinner);
         EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
@@ -172,13 +178,17 @@ public class EquipmentsFragment extends Fragment {
                                 View selectedItemView, int position, long id) {
             Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
             if (equipment != null) {
+                Activity activity = getActivity();
+                if (activity == null) {
+                    return;
+                }
+
                 String equipment_uuid = equipment.getUuid();
-                Intent equipmentInfo = new Intent(getActivity(),
-                        EquipmentInfoActivity.class);
+                Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("equipment_uuid", equipment_uuid);
                 equipmentInfo.putExtras(bundle);
-                getActivity().startActivity(equipmentInfo);
+                activity.startActivity(equipmentInfo);
             }
         }
     }

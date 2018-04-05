@@ -40,21 +40,17 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
-import dalvik.system.DexFile;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
 
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
-    private static String appVersion;
     private PreferenceScreen basicSettingScr;
     private PreferenceScreen driverSettingScr;
 
-    @SuppressWarnings("deprecation")
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
@@ -69,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(bar, 0);
         } else {
-            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+            ViewGroup root = findViewById(android.R.id.content);
             ListView content = (ListView) root.getChildAt(0);
             root.removeAllViews();
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
@@ -96,42 +92,27 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         });
 
+        String appVersion;
         try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageManager pm = getPackageManager();
+            String packageName = getPackageName();
+            getApplicationContext().getClassLoader();
+
+            PackageInfo pInfo = pm.getPackageInfo(packageName, 0);
             appVersion = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             appVersion = "unknown";
         }
+
+        Log.d(TAG, "version:" + appVersion);
+
         setupSimplePreferencesScreen();
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
 
-        // получаем список драйверов по имени класса
-        List<String> driverClassList = new ArrayList<>();
-        try {
-            DexFile df = new DexFile(getApplicationContext().getPackageCodePath());
-            Enumeration<String> iter = df.entries();
-            while (iter.hasMoreElements()) {
-                String classPath = iter.nextElement();
-
-                if (classPath.contains("ru.toir.mobile.rfid.driver") && !classPath.contains("$")) {
-                    try {
-                        Class<?> driverClass = Class.forName(classPath);
-                        Constructor<?> constructor = driverClass.getConstructor();
-                        Object o = constructor.newInstance();
-                        if (o instanceof RfidDriverBase) {
-                            driverClassList.add(classPath);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        // получаем список драйверов
+        String[] driverClassList = RfidDriverBase.getDriverClassList();
         // строим список драйверов с именами и классами
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
@@ -201,7 +182,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void setupSimplePreferencesScreen() {
         addPreferencesFromResource(R.xml.pref_general);
     }
@@ -211,15 +191,17 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // Allow super to try and create a view first
         final View result = super.onCreateView(name, context, attrs);
         if (result != null) {
-            Log.d("AA","bb");
+            Log.d("AA", "bb");
             return result;
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             //toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
             //toolbar.setSubtitle("Обслуживание и ремонт");
             toolbar.setTitleTextColor(Color.WHITE);
         }
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // If we're running pre-L, we need to 'inject' our tint aware Views in place of the
             // standard framework versions
@@ -244,7 +226,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.onConfigurationChanged(newConfig);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         super.onPreferenceTreeClick(preferenceScreen, preference);
@@ -275,14 +256,14 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         AppBarLayout appBar;
 
         View listRoot = dialog.findViewById(android.R.id.list);
-        ViewGroup mRootView = (ViewGroup) dialog.findViewById(android.R.id.content);
+        ViewGroup mRootView = dialog.findViewById(android.R.id.content);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+            LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+            LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else {
@@ -439,5 +420,10 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
 
         return true;
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return super.isValidFragment(fragmentName);
     }
 }

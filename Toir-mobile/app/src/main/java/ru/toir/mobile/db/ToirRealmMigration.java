@@ -810,6 +810,7 @@ class ToirRealmMigration implements RealmMigration {
             }
         }
 
+        // TODO: реализовать загрузку classes.dex и поиск в нём <Lru.toir.mobile.db.realm.*;>
         // получаем список классов объектов которые выступают в роли таблиц
         Set<String> classList = new HashSet<>();
         try {
