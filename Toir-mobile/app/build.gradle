@@ -121,4 +121,5 @@ dependencies {
     compile 'junit:junit:4.12'
     compile 'com.jayway.android.robotium:robotium-solo:5.6.3'
     compile 'me.leolin:ShortcutBadger:1.1.19@aar'
+    compile 'com.rabbitmq:amqp-client:4.4.1'
 }

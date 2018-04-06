@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Toir-mobile</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">ТОиРУС</string>
     <string name="action_settings">Настройки приложения</string>
     <string name="action_about">О программе</string>
     <string name="pleasePutTag">Поднесите метку</string>
@@ -168,5 +167,21 @@
     <string name="defects">Зафиксированные дефекты</string>
     <string name="defect_user">Обнаружил: </string>
 
+    <string name="order_title">[#%1$d] %2$s</string>
+    <string name="order_author">Автор наряда: %1$s</string>
+    <string name="order_worker">Исполнитель: %1$s</string>
+    <string name="order_recieved">Получен: %1$s</string>
+    <string name="order_start">Назначен на: %1$s</string>
+    <string name="order_open">Начат: %1$s</string>
+    <string name="order_close">Закрыт: %1$s</string>
+    <string name="order_status">Статус: %1$s</string>
+    <string name="order_verdict">Вердикт: %1$s</string>
+    <string name="order_comment">Коментарий: %1$s</string>
+    <string name="order_reason">Основание наряда: %1$s</string>
+
     <string name="debug_nocheck_gps">Не проверять GPS</string>
+    <string name="receive_telegram">Оповещать через Telegram</string>
+    <string name="receive_viber">Оповещать через Viber</string>
+    <string name="telegram_chat_id">Идентификатор чата</string>
+    <string name="telegram_chat_id_value">0</string>
 </resources>
