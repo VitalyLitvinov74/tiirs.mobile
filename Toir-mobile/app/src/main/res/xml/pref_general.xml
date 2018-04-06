@@ -8,14 +8,14 @@
         android:title="@string/pref_cat_main">
 
         <EditTextPreference
-            android:defaultValue="http://toir.server.loc"
+            android:defaultValue="https://api.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_update_url_dialog_title"
             android:icon="@drawable/pref_server"
             android:key="@string/updateUrl"
             android:title="@string/pref_update_url" />
 
         <EditTextPreference
-            android:defaultValue="http://toir.server.loc"
+            android:defaultValue="https://api.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_server_url_dialog_title"
             android:icon="@drawable/pref_server"
             android:key="@string/serverUrl"
@@ -61,6 +61,15 @@
             <CheckBoxPreference
                 android:key="@string/debug_nocheck_gps"
                 android:title="@string/debug_nocheck_gps" />
+            <CheckBoxPreference
+                android:key="@string/receive_telegram"
+                android:title="@string/receive_telegram" />
+            <CheckBoxPreference
+                android:key="@string/receive_viber"
+                android:title="@string/receive_viber" />
+            <Preference
+                android:key="@string/telegram_chat_id"
+                android:title="@string/telegram_chat_id_value" />
         </PreferenceCategory>
     </PreferenceScreen>
 </PreferenceScreen>

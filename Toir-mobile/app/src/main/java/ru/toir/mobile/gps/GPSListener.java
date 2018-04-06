@@ -11,18 +11,25 @@ import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.db.realm.GpsTrack;
 
+import static java.lang.Math.abs;
+
 public class GPSListener implements LocationListener, GpsStatus.Listener {
 
     private String userUuid = null;
-
+    private Location prevLocation = null;
     @Override
     public void onGpsStatusChanged(int event) {
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        if (prevLocation != null) {
+            if (abs(prevLocation.getLatitude()-location.getLatitude())>0.001 || abs(prevLocation.getLongitude()-location.getLongitude())>0.001)
+                RecordGPSData(location.getLatitude(), location.getLongitude());
+        }
         if (location != null) {
-            RecordGPSData(location.getLatitude(), location.getLongitude());
+            prevLocation = location;
+            //RecordGPSData(location.getLatitude(), location.getLongitude());
         }
     }
 

@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -24,7 +25,7 @@ import ru.toir.mobile.db.realm.Orders;
  * @author olejek
  * Created by olejek on 12.09.16.
  */
-public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
+public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter, View.OnClickListener {
     public static final String TABLE_NAME = "Orders";
     private static final int TYPE_SEPARATOR = -1;
     private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
@@ -52,7 +53,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         int j = 0;
         Date currentDate = new Date();
         Date separateDate;
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         separates.clear();
 
         if (adapterData != null)
@@ -197,6 +198,16 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 }
         }
         return convertView;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.order_ImageStatus:
+                break;
+            default:
+                break;
+        }
     }
 
     private static class ViewHolder {

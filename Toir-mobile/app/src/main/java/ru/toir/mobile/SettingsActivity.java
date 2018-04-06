@@ -1,15 +1,19 @@
 package ru.toir.mobile;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -35,21 +39,40 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+import ru.toir.mobile.rest.Response;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
+import ru.toir.mobile.utils.MainFunctions;
 
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
     private PreferenceScreen basicSettingScr;
     private PreferenceScreen driverSettingScr;
+
+    private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
+    private static final int ACTIVITY_TELEGRAM = 1;
 
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -168,6 +191,25 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 LoadTestData.DeleteSomeData();
+                return true;
+            }
+        });
+
+        //https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
+        SharedPreferences sharedPref = getSharedPreferences("messendgers",Context.MODE_PRIVATE);
+        String chat_id = sharedPref.getString(getString(R.string.telegram_chat_id), "0");
+        Preference telegramChatId = (Preference) findPreference(getString(R.string.telegram_chat_id));
+        telegramChatId.setTitle("Идентификатор чата " + chat_id);
+
+        Preference telegramPreference = (Preference) findPreference(getString(R.string.receive_telegram));
+        telegramPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Toast.makeText(getApplication(), "Пожалуйста отправьте любое сообщение боту toirus", Toast.LENGTH_SHORT).show();
+                Intent telegramIntent = new Intent(Intent.ACTION_VIEW);
+                telegramIntent.setData(Uri.parse("http://telegram.me/toirus_bot"));
+                //startActivity(telegramIntent);
+                startActivityForResult(telegramIntent, ACTIVITY_TELEGRAM);
                 return true;
             }
         });
@@ -425,5 +467,68 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected boolean isValidFragment(String fragmentName) {
         return super.isValidFragment(fragmentName);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case ACTIVITY_TELEGRAM:
+                // https://api.telegram.org/bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY/getUpdates
+                new AsyncRequest().execute();
+        }
+    }
+}
+
+    class AsyncRequest extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... arg) {
+            HttpURLConnection urlConnection = null;
+            StringBuilder result = new StringBuilder();
+            try {
+                URL url = new URL("https://api.telegram.org/" + BOT + "/getUpdates");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                String jsonString = result.toString();
+                JSONObject jsonObject = new JSONObject(jsonString);
+                JSONArray res = jsonObject.getJSONArray("result");
+                if (res.length() > 0) {
+                    JSONObject res0 = res.getJSONObject(0);
+                    JSONObject message = res0.getJSONObject("message");
+                    JSONObject chat = message.getJSONObject("chat");
+                    int chat_id = chat.getInt("id");
+                    if (chat_id > 0) {
+                        // store chat id
+                        SharedPreferences sharedPreferences = getSharedPreferences("messendgers", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(getString(R.string.telegram_chat_id), "" + chat_id);
+                        editor.apply();
+                    }
+                    return chat_id+"";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (urlConnection!=null) {
+                try {
+                    urlConnection.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            new MainFunctions().sendMessageToTelegram(getApplicationContext(),"Система Тоирус привествует Вас! Теперь Вы будете получать уведомления в этом чате"+s);
+        }
     }
 }

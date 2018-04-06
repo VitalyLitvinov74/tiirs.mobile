@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -35,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -48,16 +51,25 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
@@ -173,6 +185,12 @@ public class OrderFragment extends Fragment {
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
+    private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
+
+    //private NumberPicker numberPicker;
+    //private Spinner spinnerSuffix;
+    //private ArrayList<OrderFragment.Suffixes> suffixList;
+    private ProgressDialog processDialog;
     private RfidDialog rfidDialog;
     private AtomicInteger taskCounter;
     private ProgressDialog dialog;
@@ -287,7 +305,7 @@ public class OrderFragment extends Fragment {
 
         // так как обработчики пока одни на всё, ставим их один раз
         mainListView.setOnItemClickListener(mainListViewClickListener);
-        mainListView.setOnItemLongClickListener(mainListViewLongClickListener);
+        mainListView.setOnItemLongClickListener(infoListViewLongClickListener);
 
         mainListView.setLongClickable(true);
 
@@ -334,7 +352,7 @@ public class OrderFragment extends Fragment {
             if (orderByField != null) {
                 orders = query.findAllSorted(orderByField);
             } else {
-                orders = query.findAll();
+                orders = query.findAllSorted("startDate", Sort.DESCENDING);
             }
 
             orderAdapter = new OrderAdapter(orders);
@@ -1671,6 +1689,85 @@ public class OrderFragment extends Fragment {
         }
     }
 
+    /**
+     * Диалог с общей информацией по наряду/задаче/этапу/операции
+     */
+    private void showInformation(int type, long id, AdapterView parent) {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        TextView level,status,title,reason,author,worker,recieve,start,open,close,comment,verdict;
+        View myView = inflater.inflate(R.layout.order_full_information, parent, false);
+        DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
+            @Override
+            public String[] getMonths() {
+                return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
+                        "июля", "августа", "сентября", "октября", "ноября", "декабря"};
+            }
+        };
+        String sDate = "неизвестно";
+        if (type==ORDER_LEVEL) {
+            myView = inflater.inflate(R.layout.order_full_information, parent, false);
+            level = (TextView) myView.findViewById(R.id.order_dialog_level);
+            status = (TextView) myView.findViewById(R.id.order_dialog_status);
+            title = (TextView) myView.findViewById(R.id.order_dialog_title);
+            reason = (TextView) myView.findViewById(R.id.order_dialog_reason);
+            author = (TextView) myView.findViewById(R.id.order_dialog_author);
+            worker = (TextView) myView.findViewById(R.id.order_dialog_worker);
+            recieve = (TextView) myView.findViewById(R.id.order_dialog_recieve);
+            start = (TextView) myView.findViewById(R.id.order_dialog_start);
+            open = (TextView) myView.findViewById(R.id.order_dialog_open);
+            close = (TextView) myView.findViewById(R.id.order_dialog_close);
+            comment = (TextView) myView.findViewById(R.id.order_dialog_comment);
+            verdict = (TextView) myView.findViewById(R.id.order_dialog_verdict);
+
+            Orders order = realmDB.where(Orders.class).equalTo("_id", id).findFirst();
+            if (order!=null) {
+                if (order.getOrderLevel()!=null) {
+                    level.setText(order.getOrderLevel().getTitle());
+                    ((GradientDrawable)level.getBackground()).setColor(Color.GREEN);
+                }
+                else
+                    level.setText(order.getOrderLevel().getTitle());
+                if (order.getOrderStatus()!=null) {
+                    status.setText(order.getOrderStatus().getTitle());
+                    ((GradientDrawable)status.getBackground()).setColor(Color.BLUE);
+                }
+                else {
+                    status.setText(order.getOrderStatus().getTitle());
+                }
+                title.setText(getString(R.string.order_title, order.get_id(),order.getTitle()));
+                reason.setText(getString(R.string.order_reason, order.getReason()));
+                author.setText(getString(R.string.order_author, order.getAuthor().getName()));
+                worker.setText(getString(R.string.order_worker,order.getUser().getName()));
+                if (order.getStartDate().getTime()>10000)
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getStartDate());
+                else
+                    sDate = "не назначен";
+                start.setText(getString(R.string.order_start,sDate));
+                if (order.getReceivDate().getTime()>10000)
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getReceivDate());
+                else
+                    sDate = "не получен";
+                recieve.setText(getString(R.string.order_recieved,sDate));
+                if (order.getOpenDate().getTime()>10000)
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getOpenDate());
+                else
+                    sDate = "не начат";
+                open.setText(getString(R.string.order_open,sDate));
+                if (order.getCloseDate().getTime()>10000)
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getCloseDate());
+                else
+                    sDate = "не закрыт";
+                close.setText(getString(R.string.order_close,sDate));
+                comment.setText(getString(R.string.order_comment,order.getComment()));
+                verdict.setText(getString(R.string.order_verdict,order.getOrderVerdict().getTitle()));
+            }
+        }
+
+        dialog.setView(myView);
+        dialog.show();
+    }
+
     // обработчик кнопки "завершить все операции"
     private class submitOnClickListener implements View.OnClickListener {
         @Override
@@ -1766,7 +1863,6 @@ public class OrderFragment extends Fragment {
                         fab_check.setVisibility(View.INVISIBLE);
                     }
                 }
-
                 return;
             }
 
@@ -1873,11 +1969,14 @@ public class OrderFragment extends Fragment {
                     dialog.show();
                 }
             } else if (Level == ORDER_LEVEL) {
+
                 // находимся на экране с нарядами
                 Orders order = orderAdapter.getItem(position);
                 OrderStatus orderStatus;
+
+                showInformation(ORDER_LEVEL, order.get_id(), parent);
                 // проверяем статус наряда
-                if (order != null) {
+                if (false && order != null) {
                     orderStatus = order.getOrderStatus();
                     if (orderStatus != null) {
                         if (orderStatus.getUuid().equals(OrderStatus.Status.COMPLETE)
