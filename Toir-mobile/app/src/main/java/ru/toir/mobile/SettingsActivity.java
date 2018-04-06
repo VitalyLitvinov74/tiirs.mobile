@@ -1,6 +1,5 @@
 package ru.toir.mobile;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -42,12 +41,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
@@ -56,7 +53,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
@@ -65,11 +61,10 @@ import ru.toir.mobile.utils.MainFunctions;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
-    private PreferenceScreen basicSettingScr;
-    private PreferenceScreen driverSettingScr;
-
     private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
     private static final int ACTIVITY_TELEGRAM = 1;
+    private PreferenceScreen basicSettingScr;
+    private PreferenceScreen driverSettingScr;
 
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
