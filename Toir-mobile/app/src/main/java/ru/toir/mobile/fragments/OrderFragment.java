@@ -1695,7 +1695,7 @@ public class OrderFragment extends Fragment {
     private void showInformation(int type, long id, AdapterView parent) {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        TextView level,status,title,reason,author,worker,recieve,start,open,close,comment,verdict;
+        TextView level, status, title, reason, author, worker, recieve, start, open, close, comment, verdict;
         View myView = inflater.inflate(R.layout.order_full_information, parent, false);
         DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
             @Override
@@ -1705,7 +1705,7 @@ public class OrderFragment extends Fragment {
             }
         };
         String sDate = "неизвестно";
-        if (type==ORDER_LEVEL) {
+        if (type == ORDER_LEVEL) {
             myView = inflater.inflate(R.layout.order_full_information, parent, false);
             level = (TextView) myView.findViewById(R.id.order_dialog_level);
             status = (TextView) myView.findViewById(R.id.order_dialog_status);
@@ -1721,46 +1721,44 @@ public class OrderFragment extends Fragment {
             verdict = (TextView) myView.findViewById(R.id.order_dialog_verdict);
 
             Orders order = realmDB.where(Orders.class).equalTo("_id", id).findFirst();
-            if (order!=null) {
-                if (order.getOrderLevel()!=null) {
+            if (order != null) {
+                if (order.getOrderLevel() != null) {
                     level.setText(order.getOrderLevel().getTitle());
-                    ((GradientDrawable)level.getBackground()).setColor(Color.GREEN);
-                }
-                else
+                    ((GradientDrawable) level.getBackground()).setColor(Color.GREEN);
+                } else
                     level.setText(order.getOrderLevel().getTitle());
-                if (order.getOrderStatus()!=null) {
+                if (order.getOrderStatus() != null) {
                     status.setText(order.getOrderStatus().getTitle());
-                    ((GradientDrawable)status.getBackground()).setColor(Color.BLUE);
-                }
-                else {
+                    ((GradientDrawable) status.getBackground()).setColor(Color.BLUE);
+                } else {
                     status.setText(order.getOrderStatus().getTitle());
                 }
-                title.setText(getString(R.string.order_title, order.get_id(),order.getTitle()));
+                title.setText(getString(R.string.order_title, order.get_id(), order.getTitle()));
                 reason.setText(getString(R.string.order_reason, order.getReason()));
                 author.setText(getString(R.string.order_author, order.getAuthor().getName()));
-                worker.setText(getString(R.string.order_worker,order.getUser().getName()));
-                if (order.getStartDate().getTime()>10000)
+                worker.setText(getString(R.string.order_worker, order.getUser().getName()));
+                if (order.getStartDate().getTime() > 10000)
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getStartDate());
                 else
                     sDate = "не назначен";
-                start.setText(getString(R.string.order_start,sDate));
-                if (order.getReceivDate().getTime()>10000)
+                start.setText(getString(R.string.order_start, sDate));
+                if (order.getReceivDate().getTime() > 10000)
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getReceivDate());
                 else
                     sDate = "не получен";
-                recieve.setText(getString(R.string.order_recieved,sDate));
-                if (order.getOpenDate().getTime()>10000)
+                recieve.setText(getString(R.string.order_recieved, sDate));
+                if (order.getOpenDate().getTime() > 10000)
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getOpenDate());
                 else
                     sDate = "не начат";
-                open.setText(getString(R.string.order_open,sDate));
-                if (order.getCloseDate().getTime()>10000)
+                open.setText(getString(R.string.order_open, sDate));
+                if (order.getCloseDate().getTime() > 10000)
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getCloseDate());
                 else
                     sDate = "не закрыт";
-                close.setText(getString(R.string.order_close,sDate));
-                comment.setText(getString(R.string.order_comment,order.getComment()));
-                verdict.setText(getString(R.string.order_verdict,order.getOrderVerdict().getTitle()));
+                close.setText(getString(R.string.order_close, sDate));
+                comment.setText(getString(R.string.order_comment, order.getComment()));
+                verdict.setText(getString(R.string.order_verdict, order.getOrderVerdict().getTitle()));
             }
         }
 

@@ -1,6 +1,5 @@
 package ru.toir.mobile;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -42,12 +41,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
@@ -55,14 +52,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.prefs.Preferences;
 
-import dalvik.system.DexFile;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-import ru.toir.mobile.rest.Response;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
 import ru.toir.mobile.utils.MainFunctions;
@@ -70,14 +61,11 @@ import ru.toir.mobile.utils.MainFunctions;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
-    private static String appVersion;
+    private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
+    private static final int ACTIVITY_TELEGRAM = 1;
     private PreferenceScreen basicSettingScr;
     private PreferenceScreen driverSettingScr;
 
-    private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
-    private static final int ACTIVITY_TELEGRAM = 1;
-
-    @SuppressWarnings("deprecation")
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
@@ -92,7 +80,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(bar, 0);
         } else {
-            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+            ViewGroup root = findViewById(android.R.id.content);
             ListView content = (ListView) root.getChildAt(0);
             root.removeAllViews();
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
@@ -119,42 +107,27 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         });
 
+        String appVersion;
         try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageManager pm = getPackageManager();
+            String packageName = getPackageName();
+            getApplicationContext().getClassLoader();
+
+            PackageInfo pInfo = pm.getPackageInfo(packageName, 0);
             appVersion = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             appVersion = "unknown";
         }
+
+        Log.d(TAG, "version:" + appVersion);
+
         setupSimplePreferencesScreen();
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
 
-        // получаем список драйверов по имени класса
-        List<String> driverClassList = new ArrayList<>();
-        try {
-            DexFile df = new DexFile(getApplicationContext().getPackageCodePath());
-            Enumeration<String> iter = df.entries();
-            while (iter.hasMoreElements()) {
-                String classPath = iter.nextElement();
-
-                if (classPath.contains("ru.toir.mobile.rfid.driver") && !classPath.contains("$")) {
-                    try {
-                        Class<?> driverClass = Class.forName(classPath);
-                        Constructor<?> constructor = driverClass.getConstructor();
-                        Object o = constructor.newInstance();
-                        if (o instanceof RfidDriverBase) {
-                            driverClassList.add(classPath);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        // получаем список драйверов
+        String[] driverClassList = RfidDriverBase.getDriverClassList();
         // строим список драйверов с именами и классами
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
@@ -215,12 +188,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         });
 
         //https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
-        SharedPreferences sharedPref = getSharedPreferences("messendgers",Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("messendgers", Context.MODE_PRIVATE);
         String chat_id = sharedPref.getString(getString(R.string.telegram_chat_id), "0");
-        Preference telegramChatId = (Preference) findPreference(getString(R.string.telegram_chat_id));
+        Preference telegramChatId = findPreference(getString(R.string.telegram_chat_id));
         telegramChatId.setTitle("Идентификатор чата " + chat_id);
 
-        Preference telegramPreference = (Preference) findPreference(getString(R.string.receive_telegram));
+        Preference telegramPreference = findPreference(getString(R.string.receive_telegram));
         telegramPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -243,7 +216,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void setupSimplePreferencesScreen() {
         addPreferencesFromResource(R.xml.pref_general);
     }
@@ -256,12 +228,14 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             Log.d("AA", "bb");
             return result;
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             //toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
             //toolbar.setSubtitle("Обслуживание и ремонт");
             toolbar.setTitleTextColor(Color.WHITE);
         }
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // If we're running pre-L, we need to 'inject' our tint aware Views in place of the
             // standard framework versions
@@ -286,7 +260,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.onConfigurationChanged(newConfig);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         super.onPreferenceTreeClick(preferenceScreen, preference);
@@ -303,6 +276,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                         }
                     }
                 }
+
                 setUpNestedScreen((PreferenceScreen) preference);
             }
         }
@@ -316,14 +290,14 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         AppBarLayout appBar;
 
         View listRoot = dialog.findViewById(android.R.id.list);
-        ViewGroup mRootView = (ViewGroup) dialog.findViewById(android.R.id.content);
+        ViewGroup mRootView = dialog.findViewById(android.R.id.content);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+            LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+            LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else {
@@ -483,6 +457,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     }
 
     @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return super.isValidFragment(fragmentName);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
@@ -522,12 +501,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                         editor.putString(getString(R.string.telegram_chat_id), "" + chat_id);
                         editor.apply();
                     }
-                    return chat_id+"";
+                    return chat_id + "";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (urlConnection!=null) {
+            if (urlConnection != null) {
                 try {
                     urlConnection.disconnect();
                 } catch (Exception e) {
@@ -540,7 +519,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            new MainFunctions().sendMessageToTelegram(getApplicationContext(),"Система Тоирус привествует Вас! Теперь Вы будете получать уведомления в этом чате"+s);
+            new MainFunctions().sendMessageToTelegram(getApplicationContext(), "Система Тоирус привествует Вас! Теперь Вы будете получать уведомления в этом чате" + s);
         }
     }
 }
+

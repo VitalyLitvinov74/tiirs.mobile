@@ -45,6 +45,8 @@ public class MainFunctions {
 
     //private Realm realmDB;
     private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
+    private BlockingDeque<String> queue = new LinkedBlockingDeque<>();
+    private ConnectionFactory factory = new ConnectionFactory();
 
     /**
      * Хз зачем было реализовано.
@@ -151,8 +153,7 @@ public class MainFunctions {
             jsonObject.put("messageText", message);
             jsonObject.put("user", currentUser.getName());
             jsonObject.put("messageType", messageType);
-        }
-        catch (JSONException ex){
+        } catch (JSONException ex) {
             ex.printStackTrace();
         }
         String jsonString = jsonObject.toString();
@@ -160,50 +161,15 @@ public class MainFunctions {
         return 0;
     }
 
-    private class AsyncRequest extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... arg) {
-            HttpURLConnection urlConnection = null;
-            StringBuilder result = new StringBuilder();
-            try {
-                //https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
-                URL url = new URL("https://api.telegram.org/" + BOT + "/sendMessage?chat_id=" + arg[0] + "&text=" + arg[1]);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
-                }
-                String jsonString = result.toString();
-                if (result.length()>0) {
-                    JSONObject jsonObject = new JSONObject(jsonString);
-                    JSONArray res = jsonObject.getJSONArray("result");
-                    JSONObject res0 = res.getJSONObject(0);
-                    JSONObject message = res0.getJSONObject("message");
-                    JSONObject chat = message.getJSONObject("chat");
-                }
-                return "";
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (urlConnection!=null)
-                urlConnection.disconnect();
-            return "";
-        }
-    }
-
-    private BlockingDeque<String> queue = new LinkedBlockingDeque <>();
     private void publishMessage(String message) {
         try {
-            Log.d("","[q] " + message);
+            Log.d("", "[q] " + message);
             queue.putLast(message);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private ConnectionFactory factory = new ConnectionFactory();
     private void setupConnectionFactory() {
         String uri = "amqp://root:root@192.168.1.71";
         try {
@@ -215,13 +181,12 @@ public class MainFunctions {
         }
     }
 
-    private void publishToAMQP(final String channel)
-    {
+    private void publishToAMQP(final String channel) {
         Thread publishThread;
         publishThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     try {
                         Connection connection = factory.newConnection();
                         Channel ch = connection.createChannel();
@@ -232,13 +197,13 @@ public class MainFunctions {
 
                         while (true) {
                             String message = queue.takeFirst();
-                            try{
+                            try {
                                 //ch.basicPublish("amq.fanout", "chat", null, message.getBytes());
                                 ch.basicPublish(channel, "chat", null, message.getBytes());
                                 //ch.basicPublish("", channel, null, message.getBytes());
                                 //Log.d("", "[s][" + channel + "] " + message);
                                 //ch.waitForConfirmsOrDie();
-                            } catch (Exception e){
+                            } catch (Exception e) {
                                 //Log.d("","[f] " + message);
                                 queue.putFirst(message);
                                 throw e;
@@ -258,6 +223,39 @@ public class MainFunctions {
             }
         });
         publishThread.start();
+    }
+
+    private class AsyncRequest extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... arg) {
+            HttpURLConnection urlConnection = null;
+            StringBuilder result = new StringBuilder();
+            try {
+                //https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
+                URL url = new URL("https://api.telegram.org/" + BOT + "/sendMessage?chat_id=" + arg[0] + "&text=" + arg[1]);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                String jsonString = result.toString();
+                if (result.length() > 0) {
+                    JSONObject jsonObject = new JSONObject(jsonString);
+                    JSONArray res = jsonObject.getJSONArray("result");
+                    JSONObject res0 = res.getJSONObject(0);
+                    JSONObject message = res0.getJSONObject("message");
+                    JSONObject chat = message.getJSONObject("chat");
+                }
+                return "";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (urlConnection != null)
+                urlConnection.disconnect();
+            return "";
+        }
     }
 }
 

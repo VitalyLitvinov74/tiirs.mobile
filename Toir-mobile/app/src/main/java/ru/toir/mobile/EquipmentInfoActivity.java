@@ -53,6 +53,9 @@ import java.util.UUID;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DefectAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
@@ -67,20 +70,13 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetDocumentationAsyncTask;
+import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
-
-//import android.content.BroadcastReceiver;
-//import android.content.Context;
-//import android.content.IntentFilter;
-//import ru.toir.mobile.rest.IServiceProvider;
-//import ru.toir.mobile.rest.ProcessorService;
-//import ru.toir.mobile.rest.ReferenceServiceHelper;
-//import ru.toir.mobile.rest.ReferenceServiceProvider;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
     private final static String TAG = "EquipmentInfoActivity";
@@ -89,25 +85,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     //private static final int DIALOG_SET_DEFECT = 1;
     //private static final int DIALOG_SET_STATUS = 2;
-    FloatingActionButton fab;
-    FloatingActionButton fab1;
-    FloatingActionButton fab2;
-    FloatingActionButton fab3;
-    FloatingActionButton fab4;
-    FloatingActionButton fab5;
     CoordinatorLayout rootLayout;
-    Animation show_fab_1;
-    Animation hide_fab_1;
-    Animation show_fab_2;
-    Animation hide_fab_2;
-    Animation show_fab_3;
-    Animation hide_fab_3;
-    Animation show_fab_4;
 
     //Spinner defectTypeSpinner;
-    Animation hide_fab_4;
-    Animation show_fab_5;
-    Animation hide_fab_5;
+
     private Realm realmDB;
     private String equipment_uuid;
     private TextView tv_equipment_name;
@@ -126,50 +107,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private RfidDialog rfidDialog;
     private boolean FAB_Status = false;
 
-
-    // фильтр для получения сообщений при получении файлов документации с сервера
-//	private IntentFilter mFilterGetDocumentationFile = new IntentFilter(
-//			ReferenceServiceProvider.Actions.ACTION_GET_DOCUMENTATION_FILE);
-//	private BroadcastReceiver mReceiverGetDocumentationFile = new BroadcastReceiver() {
-//		@Override
-//		public void onReceive(Context context, Intent intent) {
-//			int provider = intent.getIntExtra(ProcessorService.Extras.PROVIDER_EXTRA, 0);
-//			Log.d(TAG, "" + provider);
-//			if (provider == ProcessorService.Providers.REFERENCE_PROVIDER) {
-//				int method = intent.getIntExtra( ProcessorService.Extras.METHOD_EXTRA, 0);
-//				Log.d(TAG, "" + method);
-//				if (method == ReferenceServiceProvider.Methods.GET_DOCUMENTATION_FILE) {
-//					boolean result = intent.getBooleanExtra( ProcessorService.Extras.RESULT_EXTRA, false);
-//					Bundle bundle = intent .getBundleExtra(ProcessorService.Extras.RESULT_BUNDLE);
-//					Log.d(TAG, "boolean result" + result);
-//
-//					if (result) {
-//						Toast.makeText(getApplicationContext(),
-//								"Файл загружен успешно и готов к просмотру.",
-//								Toast.LENGTH_LONG).show();
-//                        //Documentation<Documentation> documentation = realmDB.where(Documentation.class).equalTo("equipmentUuid",);
-//						// показываем только первый файл, по идее он один и должен быть
-//						String[] uuids = bundle
-//								.getStringArray(ReferenceServiceProvider.Methods.RESULT_GET_DOCUMENTATION_FILE_UUID);
-//						if (uuids != null) {
-//							showDocument(uuids[0]);
-//						}
-//					} else {
-//						// сообщаем описание неудачи
-//						String message = bundle.getString(IServiceProvider.MESSAGE);
-//						Toast.makeText(getApplicationContext(),
-//								"Ошибка при файла. " + message,
-//								Toast.LENGTH_LONG).show();
-//					}
-//
-//					// закрываем диалог
-//					loadDocumentationDialog.dismiss();
-//					unregisterReceiver(mReceiverGetDocumentationFile);
-//				}
-//			}
-//
-//		}
-//	};
+    private Context context;
 
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
@@ -220,6 +158,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
+
         realmDB = Realm.getDefaultInstance();
         Bundle b = getIntent().getExtras();
         if (b != null && b.getString("equipment_uuid") != null) {
@@ -356,26 +297,87 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         rootLayout = findViewById(R.id.coordinatorLayout);
 
+        findViewById(R.id.chg_eq_tag_id).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+                alert.setTitle("Изменение метки оборудования");
+                alert.setMessage("Вы действительно хотите изменить метку?");
+                DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Handler handler = new Handler(new Handler.Callback() {
+
+                            @Override
+                            public boolean handleMessage(Message msg) {
+                                Log.d(TAG, "Получили сообщение из драйвера.");
+
+                                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                                    final String tagId = ((String) msg.obj).substring(4);
+                                    Log.d(TAG, tagId);
+                                    Toast.makeText(getApplicationContext(),
+                                            "Чтение метки успешно.", Toast.LENGTH_SHORT)
+                                            .show();
+
+                                    Call<Boolean> callSetTagId = ToirAPIFactory.getEquipmentService()
+                                            .setTagId(equipment.getUuid(), tagId);
+                                    Callback<Boolean> callback = new Callback<Boolean>() {
+                                        @Override
+                                        public void onResponse(Call<Boolean> responseBodyCall, Response<Boolean> response) {
+                                            boolean result = response.body();
+                                            if (result) {
+                                                Realm realm = Realm.getDefaultInstance();
+                                                realm.beginTransaction();
+                                                equipment.setTagId(tagId);
+                                                realm.commitTransaction();
+                                                realm.close();
+                                                Toast.makeText(context, "Метка изменена.", Toast.LENGTH_LONG).show();
+                                            } else {
+                                                Toast.makeText(context, "Не удалось изменить метку.", Toast.LENGTH_LONG).show();
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Boolean> responseBodyCall, Throwable t) {
+                                            Toast.makeText(context, "Не удалось изменить метку.", Toast.LENGTH_LONG).show();
+                                            t.printStackTrace();
+                                        }
+                                    };
+                                    callSetTagId.enqueue(callback);
+
+                                } else {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Не удалось считать метку.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                                // закрываем диалог
+                                rfidDialog.dismiss();
+                                return true;
+                            }
+                        });
+
+                        rfidDialog = new RfidDialog();
+                        rfidDialog.setHandler(handler);
+                        rfidDialog.readTagId();
+                        rfidDialog.show(getFragmentManager(), TAG);
+                    }
+                };
+                alert.setPositiveButton("OK", clickListener);
+                alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alert.show();
+            }
+        });
+
         //Floating Action Buttons
-        fab = findViewById(R.id.fab);
-        fab1 = findViewById(R.id.fab_1);
-        fab2 = findViewById(R.id.fab_2);
-        fab3 = findViewById(R.id.fab_3);
-        fab4 = findViewById(R.id.fab_4);
-        fab5 = findViewById(R.id.fab_5);
-
-        show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_show);
-        hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_hide);
-        show_fab_2 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab2_show);
-        hide_fab_2 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab2_hide);
-        show_fab_3 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab3_show);
-        hide_fab_3 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab3_hide);
-        show_fab_4 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab4_show);
-        hide_fab_4 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab4_hide);
-        show_fab_5 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab5_show);
-        hide_fab_5 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab5_hide);
-
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -389,21 +391,21 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         });
 
-        fab1.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialogDefect(equipment, (ViewGroup) v.getParent());
             }
         });
 
-        fab2.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialogStatus(equipment, (ViewGroup) v.getParent());
             }
         });
 
-        fab3.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
@@ -413,14 +415,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         });
 
-        fab4.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 readRFIDTag(equipment);
             }
         });
 
-        fab5.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 writeRFIDTag(equipment);
@@ -490,79 +492,43 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     }
 
     private void expandFAB() {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin += (int) (fab1.getWidth() * 2.3);
-        layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.05);
-        fab1.setLayoutParams(layoutParams);
-        fab1.startAnimation(show_fab_1);
-        fab1.setClickable(true);
+        showFloatingActionButton(R.id.fab_1, R.anim.fab1_show, 2.3, 0.05);
+        showFloatingActionButton(R.id.fab_2, R.anim.fab2_show, 2, 2);
+        showFloatingActionButton(R.id.fab_3, R.anim.fab3_show, 0.05, 2.3);
+        showFloatingActionButton(R.id.fab_4, R.anim.fab4_show, 1.7, 0.9);
+        showFloatingActionButton(R.id.fab_5, R.anim.fab5_show, 0.9, 1.7);
+        showFloatingActionButton(R.id.chg_eq_tag_id, R.anim.chg_eq_tag_id_show, 0.05, 1.5);
+    }
 
-        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin += (fab2.getWidth() * 2);
-        layoutParams2.bottomMargin += (fab2.getHeight() * 2);
-        fab2.setLayoutParams(layoutParams2);
-        fab2.startAnimation(show_fab_2);
-        fab2.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
-        layoutParams3.rightMargin += (int) (fab3.getWidth() * 0.05);
-        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 2.3);
-        fab3.setLayoutParams(layoutParams3);
-        fab3.startAnimation(show_fab_3);
-        fab3.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
-        layoutParams4.rightMargin += (int) (fab4.getWidth() * 1.7);
-        layoutParams4.bottomMargin += (int) (fab4.getHeight() * 0.9);
-        fab4.setLayoutParams(layoutParams4);
-        fab4.startAnimation(show_fab_4);
-        fab4.setClickable(true);
-
-        FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
-        layoutParams5.rightMargin += (int) (fab5.getWidth() * 0.9);
-        layoutParams5.bottomMargin += (int) (fab5.getHeight() * 1.7);
-        fab5.setLayoutParams(layoutParams5);
-        fab5.startAnimation(show_fab_5);
-        fab5.setClickable(true);
+    private void showFloatingActionButton(int buttonId, int animationId, double kw, double kh) {
+        FloatingActionButton fab = findViewById(buttonId);
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) fab.getLayoutParams();
+        lp.rightMargin += (int) (fab.getWidth() * kw);
+        lp.bottomMargin += (int) (fab.getHeight() * kh);
+        fab.setLayoutParams(lp);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), animationId);
+        fab.startAnimation(animation);
+        fab.setClickable(true);
     }
 
     private void hideFAB() {
+        hideFloatingActionButton(R.id.fab_1, R.anim.fab1_hide, 2.3, 0.05);
+        hideFloatingActionButton(R.id.fab_2, R.anim.fab2_hide, 2, 2);
+        hideFloatingActionButton(R.id.fab_3, R.anim.fab3_hide, 0.05, 2.3);
+        hideFloatingActionButton(R.id.fab_4, R.anim.fab4_hide, 1.7, 0.9);
+        hideFloatingActionButton(R.id.fab_5, R.anim.fab5_hide, 0.9, 1.7);
+        hideFloatingActionButton(R.id.chg_eq_tag_id, R.anim.chg_eq_tag_id_hide, 0.05, 1.5);
+    }
 
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin -= (int) (fab1.getWidth() * 2.3);
-        layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.05);
-        fab1.setLayoutParams(layoutParams);
-        fab1.startAnimation(hide_fab_1);
-        fab1.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin -= (fab2.getWidth() * 2);
-        layoutParams2.bottomMargin -= (fab2.getHeight() * 2);
-        fab2.setLayoutParams(layoutParams2);
-        fab2.startAnimation(hide_fab_2);
-        fab2.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams3 = (FrameLayout.LayoutParams) fab3.getLayoutParams();
-        layoutParams3.rightMargin -= (int) (fab3.getWidth() * 0.05);
-        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 2.3);
-        fab3.setLayoutParams(layoutParams3);
-        fab3.startAnimation(hide_fab_3);
-        fab3.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams4 = (FrameLayout.LayoutParams) fab4.getLayoutParams();
-        layoutParams4.rightMargin -= (int) (fab4.getWidth() * 1.7);
-        layoutParams4.bottomMargin -= (int) (fab4.getHeight() * 0.9);
-        fab4.setLayoutParams(layoutParams4);
-        fab4.startAnimation(hide_fab_4);
-        fab4.setClickable(false);
-
-        FrameLayout.LayoutParams layoutParams5 = (FrameLayout.LayoutParams) fab5.getLayoutParams();
-        layoutParams5.rightMargin -= (int) (fab5.getWidth() * 0.9);
-        layoutParams5.bottomMargin -= (int) (fab5.getHeight() * 1.7);
-        fab5.setLayoutParams(layoutParams5);
-        fab5.startAnimation(hide_fab_5);
-        fab5.setClickable(false);
-
+    private void hideFloatingActionButton(int buttonId, int animationId, double kw, double kh) {
+        FloatingActionButton fab = findViewById(buttonId);
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) fab.getLayoutParams();
+        lp.rightMargin -= (int) (fab.getWidth() * kw);
+        lp.bottomMargin -= (int) (fab.getHeight() * kh);
+        fab.setLayoutParams(lp);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), animationId);
+        fab.startAnimation(animation);
+        fab.setClickable(false);
     }
 
     public void showDialogDefect(final Equipment equipment, ViewGroup parent) {

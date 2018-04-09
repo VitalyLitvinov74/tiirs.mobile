@@ -3,18 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="5dip"
-    android:paddingBottom="5dip"
     android:background="@color/material_drawer_background"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="5dip">
 
     <TextView
         android:id="@+id/order_dialog_level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="5dip"
         android:layout_marginRight="5dip"
         android:layout_marginTop="5dip"
-        android:layout_alignParentLeft="true"
         android:background="@drawable/rounded_corner"
         android:textColor="@color/black"
         android:textSize="16sp" />
@@ -23,117 +23,117 @@
         android:id="@+id/order_dialog_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_marginLeft="5dip"
         android:layout_marginRight="5dip"
         android:layout_marginTop="5dip"
-        android:layout_alignParentRight="true"
-        android:textColor="@color/black"
         android:background="@drawable/rounded_corner"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/order_dialog_level"
         android:layout_marginLeft="5dp"
+        android:text="@string/order_title"
         android:textColor="#222222"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_below="@+id/order_dialog_level"
-        android:text="@string/order_title" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/order_dialog_reason"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
-        android:maxLines="2"
         android:layout_below="@+id/order_dialog_title"
-        android:text="@string/order_reason" />
+        android:layout_marginLeft="5dp"
+        android:maxLines="2"
+        android:text="@string/order_reason"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_reason"
-        android:text="@string/order_author" />
+        android:layout_marginLeft="5dp"
+        android:text="@string/order_author"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_worker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_author"
-        android:text="@string/order_worker" />
+        android:layout_marginLeft="5dp"
+        android:text="@string/order_worker"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_recieve"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_worker"
-        android:text="@string/order_recieved" />
+        android:layout_marginLeft="5dp"
+        android:text="@string/order_recieved"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_recieve"
-        android:text="@string/order_start" />
+        android:layout_marginLeft="5dp"
+        android:text="@string/order_start"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_start"
-        android:text="@string/order_open" />
+        android:layout_marginLeft="5dp"
+        android:text="@string/order_open"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_open"
-        android:text="@string/order_close" />
+        android:layout_marginLeft="5dp"
+        android:text="@string/order_close"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
-        android:maxLines="4"
         android:layout_below="@+id/order_dialog_close"
-        android:text="@string/order_comment" />
+        android:layout_marginLeft="5dp"
+        android:maxLines="4"
+        android:text="@string/order_comment"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/order_dialog_verdict"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:padding="5dp"
-        android:textColor="#222222"
-        android:textSize="16sp"
         android:layout_below="@+id/order_dialog_comment"
+        android:layout_marginLeft="5dp"
         android:background="@drawable/rounded_corner"
-        android:text="@string/order_verdict" />
+        android:padding="5dp"
+        android:text="@string/order_verdict"
+        android:textColor="#222222"
+        android:textSize="16sp" />
 
 </RelativeLayout>

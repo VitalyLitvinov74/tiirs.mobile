@@ -17,8 +17,8 @@
         android:drawableTop="@drawable/service"
         android:gravity="center_vertical|center_horizontal"
         android:padding="5dp"
-        android:textColor="#000000"
         android:text="@string/application_full_name"
+        android:textColor="#000000"
         android:textSize="24sp" />
     
 </LinearLayout>

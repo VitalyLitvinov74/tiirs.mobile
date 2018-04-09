@@ -24,7 +24,7 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
     @Override
     public void onLocationChanged(Location location) {
         if (prevLocation != null) {
-            if (abs(prevLocation.getLatitude()-location.getLatitude())>0.001 || abs(prevLocation.getLongitude()-location.getLongitude())>0.001)
+            if (abs(prevLocation.getLatitude() - location.getLatitude()) > 0.001 || abs(prevLocation.getLongitude() - location.getLongitude()) > 0.001)
                 RecordGPSData(location.getLatitude(), location.getLongitude());
         }
         if (location != null) {

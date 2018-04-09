@@ -76,8 +76,8 @@ public class RfidDialog extends DialogFragment {
         driverClassName = sp.getString(getActivity().getApplicationContext()
                 .getString(R.string.rfidDriverListPrefKey), null);
 
-        if (driverClassName==null) {
-            Toast.makeText(getActivity(),"Пожалуйста выберите драйвер в меню и укажите сервер!",
+        if (driverClassName == null) {
+            Toast.makeText(getActivity(), "Пожалуйста выберите драйвер в меню и укажите сервер!",
                     Toast.LENGTH_LONG).show();
             return null;
         }
@@ -350,7 +350,7 @@ public class RfidDialog extends DialogFragment {
     public void onDestroyView() {
 
         super.onDestroyView();
-        if (driver!=null)
+        if (driver != null)
             driver.close();
         driver = null;
     }

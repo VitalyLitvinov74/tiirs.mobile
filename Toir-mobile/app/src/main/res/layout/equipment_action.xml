@@ -57,4 +57,16 @@
         android:visibility="invisible"
         app:backgroundTint="@color/md_red_400"
         app:fabSize="mini" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/chg_eq_tag_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="10dp"
+        android:src="@android:drawable/ic_dialog_info"
+        android:visibility="invisible"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="mini" />
+
 </FrameLayout>

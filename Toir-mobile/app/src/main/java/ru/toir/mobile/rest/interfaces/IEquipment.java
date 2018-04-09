@@ -30,4 +30,7 @@ public interface IEquipment {
 
     @GET("/equipment")
     Call<List<Equipment>> getByUuid(@Query("uuid[]") String[] uuid);
+
+    @GET("/equipment/set-tag")
+    Call<Boolean> setTagId(@Query("uuid") String uuid, @Query("tagId") String tagId);
 }
