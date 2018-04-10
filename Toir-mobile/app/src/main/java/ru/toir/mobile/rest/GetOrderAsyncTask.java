@@ -1,7 +1,12 @@
 package ru.toir.mobile.rest;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +25,8 @@ import io.realm.RealmObject;
 import okhttp3.ResponseBody;
 import retrofit2.*;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.MainActivity;
+import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
@@ -294,10 +301,16 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
     @Override
     protected void onPostExecute(List<Orders> orders) {
         super.onPostExecute(orders);
+
+        Context context = null;
+        if (dialog != null) {
+            context = dialog.getContext();
+        }
+
         if (orders == null) {
             // сообщаем описание неудачи
-            if (dialog != null && message != null) {
-                Toast.makeText(dialog.getContext(), message, Toast.LENGTH_LONG).show();
+            if (context != null && message != null) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         } else {
             int count = orders.size();
@@ -323,8 +336,29 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 realm.commitTransaction();
                 realm.close();
                 addToJournal("Клиент успешно получил " + count + " нарядов");
-                if (dialog != null) {
-                    Toast.makeText(dialog.getContext(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                if (context != null) {
+                    Toast.makeText(context, "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                }
+
+                // тестовая реализация штатного уведомления
+                NotificationManager notificationManager = null;
+                if (context != null) {
+                    notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                }
+
+                if (notificationManager != null) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.putExtra("action", "orderFragment");
+                    NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
+                            .setSmallIcon(R.drawable.toir_notify)
+                            .setAutoCancel(true)
+                            .setTicker("Получены новые наряды")
+                            .setContentText("Полученно " + count + " нарядов.")
+                            .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("Тоирус")
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+                    notificationManager.notify(1, nb.build());
                 }
 
                 // если есть новые наряды, отправляем подтверждение о получении
