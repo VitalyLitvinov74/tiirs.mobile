@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -104,6 +105,7 @@ public class ReferenceFragment extends Fragment {
                 final Date currentDate = new Date();
                 String changedDate;
                 String referenceName;
+                Realm realm = Realm.getDefaultInstance();
 
                 // OrderLevel
                 referenceName = OrderLevel.class.getSimpleName();
@@ -113,7 +115,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderLevel> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -127,7 +132,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -141,7 +149,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -155,7 +166,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -169,7 +183,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -183,7 +200,10 @@ public class ReferenceFragment extends Fragment {
                             .getEquipmentStatusService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<EquipmentStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -197,7 +217,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -211,7 +234,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -225,7 +251,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationVerdictService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -239,7 +268,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationStatusService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -253,17 +285,21 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<MeasureType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                realm.close();
             }
         };
         Thread thread = new Thread(runnable);
         thread.start();
     }
-
 
     /**
      * Обновляет тупо все справочники без разбора необходимости.
@@ -279,6 +315,7 @@ public class ReferenceFragment extends Fragment {
                 final Date currentDate = new Date();
                 String changedDate;
                 String referenceName;
+                Realm realm = Realm.getDefaultInstance();
 
                 // AlertType
                 referenceName = AlertType.class.getSimpleName();
@@ -288,7 +325,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<AlertType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -302,7 +342,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Contragent> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -316,7 +359,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<CriticalType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -329,7 +375,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<DefectType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -343,7 +392,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Defect> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -358,7 +410,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Documentation> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -372,7 +427,10 @@ public class ReferenceFragment extends Fragment {
                             .getDocumentationTypeService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<DocumentationType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -386,7 +444,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Equipment> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -400,7 +461,10 @@ public class ReferenceFragment extends Fragment {
                             .getEquipmentModelService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<EquipmentModel> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -414,7 +478,10 @@ public class ReferenceFragment extends Fragment {
                             .getEquipmentStatusService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<EquipmentStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -428,7 +495,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<EquipmentType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -446,7 +516,11 @@ public class ReferenceFragment extends Fragment {
                         for (MeasuredValue value : list) {
                             value.setSent(true);
                         }
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -460,7 +534,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<MeasureType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -474,7 +551,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Operation> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -488,7 +568,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationStatusService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -502,7 +585,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationTemplateService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationTemplate> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -516,7 +602,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationToolService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationTool> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -530,7 +619,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationTypeService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -544,7 +636,10 @@ public class ReferenceFragment extends Fragment {
                             .getObjectTypeService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<ObjectType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -558,7 +653,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Objects> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -572,7 +670,10 @@ public class ReferenceFragment extends Fragment {
                             .getOperationVerdictService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -586,7 +687,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderLevel> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -605,7 +709,10 @@ public class ReferenceFragment extends Fragment {
                             order.setSent(true);
                         }
 
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -619,7 +726,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -633,7 +743,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -647,7 +760,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<RepairPart> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -661,7 +777,10 @@ public class ReferenceFragment extends Fragment {
                             .getRepairPartTypeService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<RepairPartType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -675,7 +794,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Task> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -689,7 +811,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Stage> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -703,7 +828,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -717,7 +845,10 @@ public class ReferenceFragment extends Fragment {
                             .getStageTemplateService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageTemplate> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -731,7 +862,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -745,7 +879,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -759,7 +896,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskStatus> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -773,7 +913,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskTemplate> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -787,7 +930,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -801,7 +947,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskVerdict> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -815,7 +964,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<Tool> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -829,7 +981,10 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<ToolType> list = response.body();
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -850,7 +1005,10 @@ public class ReferenceFragment extends Fragment {
                             file.setSent(true);
                         }
 
-                        ReferenceUpdate.saveReferenceData(referenceName, list, currentDate);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -862,6 +1020,7 @@ public class ReferenceFragment extends Fragment {
                     dialog.dismiss();
                 }
 
+                realm.close();
             }
         });
         thread.start();
@@ -894,12 +1053,15 @@ public class ReferenceFragment extends Fragment {
             referenceList.add(item);
         }
 
-        ArrayAdapter<SortField> referenceSpinnerAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item, referenceList);
+        Activity activity = getActivity();
+        if (activity != null) {
+            ArrayAdapter<SortField> referenceSpinnerAdapter = new ArrayAdapter<>(activity,
+                    android.R.layout.simple_spinner_dropdown_item, referenceList);
 
-        referenceSpinner.setAdapter(referenceSpinnerAdapter);
-        ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
-        referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
+            referenceSpinner.setAdapter(referenceSpinnerAdapter);
+            ReferenceSpinnerListener referenceSpinnerListener = new ReferenceSpinnerListener();
+            referenceSpinner.setOnItemSelectedListener(referenceSpinnerListener);
+        }
 
         setHasOptionsMenu(true);
         rootView.setFocusableInTouchMode(true);
