@@ -22,6 +22,9 @@ public class ToirApplication extends Application {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         serverUrl = preferences.getString(getString(R.string.serverUrl), "");
 
+        // инициализируем синглтон с данными о активном пользователе на уровне приложения
+        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
+
         // инициализируем базу данных Realm
         ToirRealm.init(this);
     }

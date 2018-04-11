@@ -917,10 +917,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
         outState.putBoolean("isLogged", isLogged);
         outState.putBoolean("splashShown", splashShown);
-        outState.putString("tagId", AuthorizedUser.getInstance().getTagId());
-        outState.putString("token", AuthorizedUser.getInstance().getToken());
-        outState.putString("userUuid", AuthorizedUser.getInstance().getUuid());
-        outState.putString("userLogin", AuthorizedUser.getInstance().getLogin());
+        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
+        outState.putString("tagId", authorizedUser.getTagId());
+        outState.putString("token", authorizedUser.getToken());
+        outState.putString("userUuid", authorizedUser.getUuid());
+        outState.putString("userLogin", authorizedUser.getLogin());
     }
 
     /*
