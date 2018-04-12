@@ -35,10 +35,10 @@ public class SendGPSnLogService extends Service {
     private Thread thread;
     private long[] gpsIds;
     private long[] logIds;
+
     /**
      * Метод для выполнения отправки данных на сервер.
      */
-    @SuppressWarnings("unchecked")
     private Runnable task = new Runnable() {
         @Override
         public void run() {
@@ -102,7 +102,7 @@ public class SendGPSnLogService extends Service {
                 }
 
                 RealmResults<Journal> items = realm.where(Journal.class).in("_id", data)
-                        .equalTo("sent", false).findAll();
+                        .findAll();
                 // отправляем данные с логами
                 call = ToirAPIFactory.getJournalService()
                         .send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
@@ -160,7 +160,7 @@ public class SendGPSnLogService extends Service {
         }
 
         if (!isRuning) {
-            Log.d(TAG, "Запускаем поток отправки данных на сервер...");
+            Log.d(TAG, "Запускаем поток отправки логов и координат на сервер...");
             isRuning = true;
             gpsIds = intent.getLongArrayExtra(GPS_IDS);
             logIds = intent.getLongArrayExtra(LOG_IDS);

@@ -63,8 +63,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.toir.mobile.db.realm.GpsTrack;
-import ru.toir.mobile.db.realm.Journal;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ContragentsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
@@ -78,7 +76,6 @@ import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.ServiceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
-import ru.toir.mobile.rest.SendGPSnLogService;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -116,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_CONTRAGENTS = 17;
 
     private static final String TAG = "MainActivity";
-    private static final long LOG_AND_GPS_SEND_INTERVAL = 60000;
 
     private static boolean isExitTimerStart = false;
     public int currentFragment = NO_FRAGMENT;
@@ -140,9 +136,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
-    private Handler logNGpsHandler;
-    private Runnable logNGpsRunnable;
-
     private LocationManager _locationManager;
     private GPSListener _gpsListener;
     private Thread checkGPSThread;
@@ -1172,15 +1165,12 @@ public class MainActivity extends AppCompatActivity {
             _gpsListener = new GPSListener();
             _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, _gpsListener);
         }
-
-        startLogSend();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
-        stopLogSend();
         if (realmDB != null) {
             realmDB.close();
         }
@@ -1200,74 +1190,6 @@ public class MainActivity extends AppCompatActivity {
         user.setTagId(null);
         user.setToken(null);
         user.setUuid(null);
-    }
-
-    /**
-     * Стартуем периодический отложенный запуск сервиса отправки логов и координат GPS.
-     */
-    private void startLogSend() {
-        Log.d(TAG, "startLogSend()");
-        logNGpsRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // проверяем наличие данных о пользователе для отправки данных
-                AuthorizedUser user = AuthorizedUser.getInstance();
-                if (user.getToken() == null || user.getLogin() == null) {
-                    setTimer();
-                    return;
-                }
-
-                // получаем данные для отправки
-                Realm realm = Realm.getDefaultInstance();
-
-                RealmResults<GpsTrack> gpsItems = realm.where(GpsTrack.class)
-                        .equalTo("sent", false)
-                        .equalTo("userUuid", user.getUuid())
-                        .findAll();
-                long[] gpsIds = new long[gpsItems.size()];
-                for (int i = 0; i < gpsItems.size(); i++) {
-                    gpsIds[i] = gpsItems.get(i).get_id();
-                }
-
-                RealmResults<Journal> logItems = realm.where(Journal.class)
-                        .equalTo("sent", false)
-                        .equalTo("userUuid", user.getUuid())
-                        .findAll();
-                long[] logIds = new long[logItems.size()];
-                for (int i = 0; i < logItems.size(); i++) {
-                    logIds[i] = logItems.get(i).get_id();
-                }
-
-                // стартуем сервис отправки данных на сервер
-                Intent serviceIntent = new Intent(getApplicationContext(), SendGPSnLogService.class);
-                serviceIntent.setAction(SendGPSnLogService.ACTION);
-                Bundle bundle = new Bundle();
-                bundle.putLongArray(SendGPSnLogService.GPS_IDS, gpsIds);
-                bundle.putLongArray(SendGPSnLogService.LOG_IDS, logIds);
-                serviceIntent.putExtras(bundle);
-                getApplicationContext().startService(serviceIntent);
-                realm.close();
-
-                setTimer();
-            }
-
-            private void setTimer() {
-                // "взводим" отложенный запуск отправки
-                logNGpsHandler.postDelayed(this, LOG_AND_GPS_SEND_INTERVAL);
-            }
-        };
-        logNGpsHandler = new Handler();
-        logNGpsHandler.postDelayed(logNGpsRunnable, LOG_AND_GPS_SEND_INTERVAL);
-    }
-
-    /**
-     * Останавливаем периодический процесс отправки логов и координат GPS.
-     */
-    private void stopLogSend() {
-        Log.d(TAG, "stopLogSend()");
-        if (logNGpsHandler != null) {
-            logNGpsHandler.removeCallbacks(logNGpsRunnable);
-        }
     }
 
     @Override
