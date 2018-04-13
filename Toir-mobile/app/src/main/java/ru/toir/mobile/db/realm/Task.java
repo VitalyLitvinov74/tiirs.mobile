@@ -14,6 +14,7 @@ public class Task extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
+    private String orderUuid;
     private String comment;
     private TaskVerdict taskVerdict;
     private TaskStatus taskStatus;
@@ -134,5 +135,11 @@ public class Task extends RealmObject {
         this.stages.add(stage);
     }
 
+    public String getOrderUuid() {
+        return orderUuid;
+    }
 
+    public void setOrderUuid(String orderUuid) {
+        this.orderUuid = orderUuid;
+    }
 }

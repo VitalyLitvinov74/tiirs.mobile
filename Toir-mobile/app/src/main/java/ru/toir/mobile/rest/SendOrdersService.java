@@ -106,8 +106,54 @@ public class SendOrdersService extends Service {
             // отмечаем успешно отправленные измерения
             setSendMeasuredValues(idUuid);
 
-            // TODO: реализовать отправку ранее по каким либо причинам не отправленных файлов
-            // и результатов измерений текущего пользователя!!!
+            // выбираем все неотправленные по каким-то причинам ранее файлы
+            // (не обязательно входящие в наряды которые сейчас отправляем)
+            List<OperationFile> sendOldFiles = new ArrayList<>();
+            RealmResults<OperationFile> oldFiles = realm.where(OperationFile.class)
+                    .equalTo("sent", false).findAll();
+            for (OperationFile file : oldFiles) {
+                Stage stage = realm.where(Stage.class)
+                        .equalTo("uuid", file.getOperation().getStageUuid()).findFirst();
+                Task task = realm.where(Task.class).equalTo("uuid", stage.getTaskUuid())
+                        .findFirst();
+                Orders order = realm.where(Orders.class).equalTo("uuid", task.getOrderUuid())
+                        .findFirst();
+                if (user.getUuid().equals(order.getUser().getUuid())) {
+                    sendOldFiles.add(file);
+                }
+            }
+
+            if (sendOldFiles.size() > 0) {
+                // отправляем файлы на сервер
+                idUuid = sendOperationFiles(sendOldFiles);
+                // отмечаем успешно отправленные файлы
+                setSendOperationFiles(idUuid);
+            }
+
+            // выбираем все неотправленные по каким-то причинам ранее измерения
+            // (не обязательно входящие в наряды которые сейчас отправляем)
+            List<MeasuredValue> sendOldMeasuredValues = new ArrayList<>();
+            RealmResults<MeasuredValue> oldMeasuredValues = realm.where(MeasuredValue.class)
+                    .equalTo("sent", false).findAll();
+            for (MeasuredValue measuredValue : oldMeasuredValues) {
+                String stageUuid = measuredValue.getOperation().getStageUuid();
+                Stage stage = realm.where(Stage.class).equalTo("uuid", stageUuid)
+                        .findFirst();
+                Task task = realm.where(Task.class).equalTo("uuid", stage.getTaskUuid())
+                        .findFirst();
+                Orders order = realm.where(Orders.class).equalTo("uuid", task.getOrderUuid())
+                        .findFirst();
+                if (user.getUuid().equals(order.getUser().getUuid())) {
+                    sendOldMeasuredValues.add(measuredValue);
+                }
+            }
+
+            if (sendOldMeasuredValues.size() > 0) {
+                // отправляем измерения на сервер
+                idUuid = sendMeasuredValues(sendOldMeasuredValues);
+                // отмечаем успешно отправленные измерения
+                setSendMeasuredValues(idUuid);
+            }
 
             stopSelf();
         }
