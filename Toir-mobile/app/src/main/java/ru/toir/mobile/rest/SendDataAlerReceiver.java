@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.AuthorizedUser;
@@ -77,6 +79,17 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                     // задержка перед запуском будильника
                     long startTime = SystemClock.elapsedRealtime() + 25 * 1000;
                     // раз в минуту будем принудительно запускать сервис отправки данных
+                    long frequency = 60 * 1000;
+                    riseAlarm(context, alarmManager, alarmIntent, startTime, frequency);
+                }
+
+                // Взводим будильник при включении устройства для получения нарядов
+                alarmIntent = new Intent(context, SendDataAlerReceiver.class);
+                alarmIntent.setAction(GetOrdersService.ACTION);
+                if (!isAlarmRun(context, alarmIntent)) {
+                    // задержка перед запуском будильника
+                    long startTime = SystemClock.elapsedRealtime() + 45 * 1000;
+                    // раз в минуту будем принудительно запускать сервис получения нарядов
                     long frequency = 60 * 1000;
                     riseAlarm(context, alarmManager, alarmIntent, startTime, frequency);
                 }
@@ -164,6 +177,25 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 serviceIntent.putExtras(bundle);
                 context.startService(serviceIntent);
                 realm.close();
+                break;
+
+            case GetOrdersService.ACTION:
+                Log.d(TAG, GetOrdersService.ACTION);
+                if (!isValidUser) {
+                    Log.d(TAG, "Нет активного пользователя для получения нарядов.");
+                    break;
+                }
+
+                ArrayList<String> statusUuids = new ArrayList<>();
+                statusUuids.add(OrderStatus.Status.NEW);
+
+                // стартуем сервис отправки данных на сервер
+                serviceIntent = new Intent(context, GetOrdersService.class);
+                serviceIntent.setAction(GetOrdersService.ACTION);
+                bundle = new Bundle();
+                bundle.putStringArrayList(GetOrdersService.ORDER_STATUS_UUIDS, statusUuids);
+                serviceIntent.putExtras(bundle);
+                context.startService(serviceIntent);
                 break;
 
             default:

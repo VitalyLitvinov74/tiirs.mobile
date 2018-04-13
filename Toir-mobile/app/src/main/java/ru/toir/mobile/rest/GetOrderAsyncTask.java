@@ -62,6 +62,43 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         extDir = e;
     }
 
+    /**
+     * Проверка на необходимость загрузки файла с сервера.
+     *
+     * @param obj       {@link RealmObject} Объект. Должен реализовывать {@link IToirDbObject}
+     * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
+     * @return boolean
+     */
+    public static boolean isNeedDownload(File extDir, RealmObject obj, String localPath) {
+        Realm realm = Realm.getDefaultInstance();
+        String uuid = ((IToirDbObject) obj).getUuid();
+        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
+        long localChangedAt;
+
+        // есть ли локальная запись
+        try {
+            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
+        } catch (Exception e) {
+            return true;
+        } finally {
+            realm.close();
+        }
+
+        // есть ли локально файл
+        String fileName = ((IToirDbObject) obj).getImageFile();
+        if (fileName != null) {
+            File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
+            if (!file.exists()) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+
+        // есть ли изменения на сервере
+        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
+    }
+
     @Override
     protected List<Orders> doInBackground(String[]... params) {
         // обновляем справочники
@@ -116,7 +153,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 // урл изображения задачи
                 TaskTemplate taskTemplate = task.getTaskTemplate();
                 basePathLocal = taskTemplate.getImageFilePath() + "/";
-                isNeedDownload = isNeedDownload(taskTemplate, basePathLocal);
+                isNeedDownload = isNeedDownload(extDir, taskTemplate, basePathLocal);
                 if (isNeedDownload) {
                     String url = taskTemplate.getImageFileUrl(userName) + "/";
                     files.add(new FilePath(taskTemplate.getImage(), url, basePathLocal));
@@ -127,7 +164,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     // урл изображения этапа задачи
                     StageTemplate stageTemplate = stage.getStageTemplate();
                     basePathLocal = stageTemplate.getImageFilePath() + "/";
-                    isNeedDownload = isNeedDownload(stageTemplate, basePathLocal);
+                    isNeedDownload = isNeedDownload(extDir, stageTemplate, basePathLocal);
                     if (isNeedDownload) {
                         String url = stageTemplate.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(stageTemplate.getImage(), url, basePathLocal));
@@ -137,7 +174,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     Equipment equipment = stage.getEquipment();
                     basePathLocal = equipment.getImageFilePath() + "/";
                     if (!equipment.getImage().equals("")) {
-                        isNeedDownload = isNeedDownload(equipment, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, equipment, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipment.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(equipment.getImage(), url, basePathLocal));
@@ -148,7 +185,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     EquipmentModel equipmentModel = stage.getEquipment().getEquipmentModel();
                     basePathLocal = equipmentModel.getImageFilePath() + "/";
                     if (!equipmentModel.getImage().equals("")) {
-                        isNeedDownload = isNeedDownload(equipmentModel, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, equipmentModel, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipmentModel.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(equipmentModel.getImage(), url, basePathLocal));
@@ -159,7 +196,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     Objects object = stage.getEquipment().getLocation();
                     if (object != null) {
                         basePathLocal = object.getImageFilePath() + "/";
-                        isNeedDownload = isNeedDownload(object, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, object, basePathLocal);
                         if (isNeedDownload) {
                             String url = object.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(object.getImage(), url, basePathLocal));
@@ -174,7 +211,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                         OperationTemplate operationTemplate = operation.getOperationTemplate();
                         basePathLocal = operationTemplate.getImageFilePath() + "/";
                         // урл изображения операции
-                        isNeedDownload = isNeedDownload(operationTemplate, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, operationTemplate, basePathLocal);
                         if (isNeedDownload) {
                             String url = operationTemplate.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(operationTemplate.getImage(), url, basePathLocal));
@@ -202,7 +239,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             if (list != null) {
                 for (Documentation doc : list) {
                     String localPath = doc.getImageFilePath() + "/";
-                    if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                    if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                         String url = doc.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(doc.getPath(), url, localPath));
                     }
@@ -230,7 +267,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             if (list != null) {
                 for (Documentation doc : list) {
                     String localPath = doc.getImageFilePath() + "/";
-                    if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                    if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                         String url = doc.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(doc.getPath(), url, localPath));
                     }
@@ -409,44 +446,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         }
     }
 
-    /**
-     * Проверка на необходимость загрузки файла с сервера.
-     *
-     * @param obj       {@link RealmObject} Объект. Должен реализовывать {@link IToirDbObject}
-     * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
-     * @return boolean
-     */
-    private boolean isNeedDownload(RealmObject obj, String localPath) {
-        Realm realm = Realm.getDefaultInstance();
-        String uuid = ((IToirDbObject) obj).getUuid();
-        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
-        long localChangedAt;
-
-        // есть ли локальная запись
-        try {
-            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
-        } catch (Exception e) {
-            return true;
-        } finally {
-            realm.close();
-        }
-
-        // есть ли локально файл
-        String fileName = ((IToirDbObject) obj).getImageFile();
-        if (fileName != null) {
-            File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
-            if (!file.exists()) {
-                return true;
-            }
-        } else {
-            return false;
-        }
-
-        // есть ли изменения на сервере
-        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
-    }
-
-    private class FilePath {
+    public static class FilePath {
         String fileName;
         String urlPath;
         String localPath;
