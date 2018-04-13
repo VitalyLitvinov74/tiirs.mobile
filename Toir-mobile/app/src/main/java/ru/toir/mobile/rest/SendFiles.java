@@ -60,7 +60,6 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
     @Override
     protected LongSparseArray<String> doInBackground(OperationFile[]... lists) {
         LongSparseArray<String> idUuid = new LongSparseArray<>();
-        Realm realm = Realm.getDefaultInstance();
         RequestBody descr = RequestBody.create(MultipartBody.FORM, "Photos due execution operation.");
 
         for (OperationFile file : lists[0]) {
@@ -114,8 +113,6 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
                 e.printStackTrace();
             }
         }
-
-        realm.close();
 
         return idUuid;
     }

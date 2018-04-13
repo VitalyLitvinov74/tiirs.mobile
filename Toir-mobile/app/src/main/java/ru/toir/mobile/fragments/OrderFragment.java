@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,7 +36,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -53,13 +51,9 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,9 +61,6 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
@@ -190,7 +181,7 @@ public class OrderFragment extends Fragment {
     //private NumberPicker numberPicker;
     //private Spinner spinnerSuffix;
     //private ArrayList<OrderFragment.Suffixes> suffixList;
-    private ProgressDialog processDialog;
+
     private RfidDialog rfidDialog;
     private AtomicInteger taskCounter;
     private ProgressDialog dialog;
@@ -773,7 +764,7 @@ public class OrderFragment extends Fragment {
         Context context = getContext();
         if (context != null) {
             File extDir = context.getExternalFilesDir("");
-            SendFiles task = new SendFiles(extDir, getContext(), taskCounter);
+            SendFiles task = new SendFiles(extDir, context, taskCounter);
             OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
             task.execute(sendFiles);
         } else {
@@ -982,8 +973,9 @@ public class OrderFragment extends Fragment {
         // строим список файлов связанных с выполненными операциями
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
         List<OperationFile> filesToSend = new ArrayList<>();
+        String[] opUuidsArray = operationUuids.toArray(new String[]{});
         RealmResults<OperationFile> operationFiles = realmDB.where(OperationFile.class)
-                .in("operation.uuid", operationUuids.toArray(new String[]{}))
+                .in("operation.uuid", opUuidsArray)
                 .equalTo("sent", false)
                 .findAll();
 
@@ -999,8 +991,6 @@ public class OrderFragment extends Fragment {
         }
 
         sendFiles(filesToSend);
-
-        String[] opUuidsArray = operationUuids.toArray(new String[]{});
 
         // получаем все измерения связанные с выполненными операциями
         RealmResults<MeasuredValue> measuredValues = realmDB
@@ -1693,8 +1683,13 @@ public class OrderFragment extends Fragment {
      * Диалог с общей информацией по наряду/задаче/этапу/операции
      */
     private void showInformation(int type, long id, AdapterView parent) {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        LayoutInflater inflater = activity.getLayoutInflater();
         TextView level, status, title, reason, author, worker, recieve, start, open, close, comment, verdict;
         View myView = inflater.inflate(R.layout.order_full_information, parent, false);
         DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
@@ -1707,18 +1702,18 @@ public class OrderFragment extends Fragment {
         String sDate = "неизвестно";
         if (type == ORDER_LEVEL) {
             myView = inflater.inflate(R.layout.order_full_information, parent, false);
-            level = (TextView) myView.findViewById(R.id.order_dialog_level);
-            status = (TextView) myView.findViewById(R.id.order_dialog_status);
-            title = (TextView) myView.findViewById(R.id.order_dialog_title);
-            reason = (TextView) myView.findViewById(R.id.order_dialog_reason);
-            author = (TextView) myView.findViewById(R.id.order_dialog_author);
-            worker = (TextView) myView.findViewById(R.id.order_dialog_worker);
-            recieve = (TextView) myView.findViewById(R.id.order_dialog_recieve);
-            start = (TextView) myView.findViewById(R.id.order_dialog_start);
-            open = (TextView) myView.findViewById(R.id.order_dialog_open);
-            close = (TextView) myView.findViewById(R.id.order_dialog_close);
-            comment = (TextView) myView.findViewById(R.id.order_dialog_comment);
-            verdict = (TextView) myView.findViewById(R.id.order_dialog_verdict);
+            level = myView.findViewById(R.id.order_dialog_level);
+            status = myView.findViewById(R.id.order_dialog_status);
+            title = myView.findViewById(R.id.order_dialog_title);
+            reason = myView.findViewById(R.id.order_dialog_reason);
+            author = myView.findViewById(R.id.order_dialog_author);
+            worker = myView.findViewById(R.id.order_dialog_worker);
+            recieve = myView.findViewById(R.id.order_dialog_recieve);
+            start = myView.findViewById(R.id.order_dialog_start);
+            open = myView.findViewById(R.id.order_dialog_open);
+            close = myView.findViewById(R.id.order_dialog_close);
+            comment = myView.findViewById(R.id.order_dialog_comment);
+            verdict = myView.findViewById(R.id.order_dialog_verdict);
 
             Orders order = realmDB.where(Orders.class).equalTo("_id", id).findFirst();
             if (order != null) {
@@ -1737,25 +1732,37 @@ public class OrderFragment extends Fragment {
                 reason.setText(getString(R.string.order_reason, order.getReason()));
                 author.setText(getString(R.string.order_author, order.getAuthor().getName()));
                 worker.setText(getString(R.string.order_worker, order.getUser().getName()));
-                if (order.getStartDate().getTime() > 10000)
-                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getStartDate());
-                else
+                if (order.getStartDate().getTime() > 10000) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                            .format(order.getStartDate());
+                } else {
                     sDate = "не назначен";
+                }
+
                 start.setText(getString(R.string.order_start, sDate));
-                if (order.getReceivDate().getTime() > 10000)
-                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getReceivDate());
-                else
+                if (order.getReceivDate().getTime() > 10000) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                            .format(order.getReceivDate());
+                } else {
                     sDate = "не получен";
+                }
+
                 recieve.setText(getString(R.string.order_recieved, sDate));
-                if (order.getOpenDate().getTime() > 10000)
-                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getOpenDate());
-                else
+                if (order.getOpenDate().getTime() > 10000) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                            .format(order.getOpenDate());
+                } else {
                     sDate = "не начат";
+                }
+
                 open.setText(getString(R.string.order_open, sDate));
-                if (order.getCloseDate().getTime() > 10000)
-                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH).format(order.getCloseDate());
-                else
+                if (order.getCloseDate().getTime() > 10000) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                            .format(order.getCloseDate());
+                } else {
                     sDate = "не закрыт";
+                }
+
                 close.setText(getString(R.string.order_close, sDate));
                 comment.setText(getString(R.string.order_comment, order.getComment()));
                 verdict.setText(getString(R.string.order_verdict, order.getOrderVerdict().getTitle()));
@@ -1931,6 +1938,7 @@ public class OrderFragment extends Fragment {
             if (!operationAdapter.getItemEnable(currentOperationId)) {
                 return;
             }
+
             CompleteCurrentOperation(currentOperationId, null);
         }
     }
