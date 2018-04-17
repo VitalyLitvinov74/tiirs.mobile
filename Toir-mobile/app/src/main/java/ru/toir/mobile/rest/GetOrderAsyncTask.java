@@ -69,7 +69,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
      * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
      * @return boolean
      */
-    public static boolean isNeedDownload(File extDir, RealmObject obj, String localPath) {
+    static boolean isNeedDownload(File extDir, RealmObject obj, String localPath) {
         Realm realm = Realm.getDefaultInstance();
         String uuid = ((IToirDbObject) obj).getUuid();
         RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
@@ -446,7 +446,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         }
     }
 
-    public static class FilePath {
+    static class FilePath {
         String fileName;
         String urlPath;
         String localPath;

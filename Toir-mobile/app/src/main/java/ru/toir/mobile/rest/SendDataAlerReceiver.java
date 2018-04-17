@@ -31,6 +31,7 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive()");
         String action = "";
         Realm realm;
         long[] ids;
@@ -152,21 +153,25 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 // получаем данные для отправки
                 realm = Realm.getDefaultInstance();
                 RealmResults<Orders> orders = realm.where(Orders.class)
+                        .beginGroup()
                         .equalTo("user.uuid", user.getUuid())
                         .equalTo("sent", false)
+                        .endGroup()
+                        .beginGroup()
                         .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE).or()
                         .equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE).or()
-                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or()
+//                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or()
                         .equalTo("orderStatus.uuid", OrderStatus.Status.CANCELED)
+                        .endGroup()
                         .findAll();
                 if (orders.size() == 0) {
                     Log.d(TAG, "Нет нарядов для отправки.");
-                    break;
-                }
-
-                ids = new long[orders.size()];
-                for (int i = 0; i < orders.size(); i++) {
-                    ids[i] = orders.get(i).get_id();
+                    ids = null;
+                } else {
+                    ids = new long[orders.size()];
+                    for (int i = 0; i < orders.size(); i++) {
+                        ids[i] = orders.get(i).get_id();
+                    }
                 }
 
                 // стартуем сервис отправки данных на сервер

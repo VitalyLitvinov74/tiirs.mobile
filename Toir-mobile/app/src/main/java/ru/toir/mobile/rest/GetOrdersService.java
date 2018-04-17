@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -24,7 +25,6 @@ import io.realm.Realm;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.Documentation;
@@ -39,6 +39,7 @@ import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskTemplate;
+import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ReferenceFragment;
 
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
@@ -54,7 +55,6 @@ public class GetOrdersService extends Service {
     private static final String TAG = GetOrdersService.class.getSimpleName();
     private boolean isRuning;
     private Thread thread;
-    private Realm realm;
     private List<String> statusUuids;
     private Context context;
 
@@ -124,11 +124,19 @@ public class GetOrdersService extends Service {
 
                 // путь до файлов локальный
                 String basePathLocal;
+                boolean isNeedDownload;
+
+                // изображение пользователя создавшего наряд
+                User orderAuthor = order.getAuthor();
+                basePathLocal = orderAuthor.getImageFilePath() + "/";
+                isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, orderAuthor, basePathLocal);
+                if (isNeedDownload) {
+                    String url = orderAuthor.getImageFileUrl(userName) + "/";
+                    files.add(new GetOrderAsyncTask.FilePath(orderAuthor.getImage(), url, basePathLocal));
+                }
 
                 List<Task> tasks = order.getTasks();
                 for (Task task : tasks) {
-                    boolean isNeedDownload;
-
                     // урл изображения задачи
                     TaskTemplate taskTemplate = task.getTaskTemplate();
                     basePathLocal = taskTemplate.getImageFilePath() + "/";
@@ -338,18 +346,23 @@ public class GetOrdersService extends Service {
             }
 
             if (notificationManager != null) {
-                Intent intent = new Intent(context, MainActivity.class);
-                intent.putExtra("action", "orderFragment");
-                NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
-                        .setSmallIcon(R.drawable.toir_notify)
-                        .setAutoCancel(true)
-                        .setTicker("Получены новые наряды")
-                        .setContentText("Полученно " + count + " нарядов.")
-                        .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
-                        .setWhen(System.currentTimeMillis())
-                        .setContentTitle("Тоирус")
-                        .setDefaults(NotificationCompat.DEFAULT_ALL);
-                notificationManager.notify(1, nb.build());
+                PackageManager pm = getPackageManager();
+                Intent intent = pm.getLaunchIntentForPackage("ru.toir.mobile");
+                if (intent != null) {
+                    intent.putExtra("action", "orderFragment");
+
+                    PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, 0);
+                    NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
+                            .setSmallIcon(R.drawable.toir_notify)
+                            .setAutoCancel(true)
+                            .setTicker("Получены новые наряды")
+                            .setContentText("Полученно " + count + " нарядов.")
+                            .setContentIntent(contentIntent)
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("Тоирус")
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+                    notificationManager.notify(1, nb.build());
+                }
             }
 
             // если есть новые наряды, отправляем подтверждение о получении
@@ -379,7 +392,6 @@ public class GetOrdersService extends Service {
         isRuning = false;
         context = getApplicationContext();
         thread = new Thread(task);
-        realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -402,7 +414,6 @@ public class GetOrdersService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isRuning = false;
-        realm.close();
     }
 
     @Nullable

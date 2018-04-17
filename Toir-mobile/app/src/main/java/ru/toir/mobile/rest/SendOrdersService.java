@@ -46,7 +46,6 @@ public class SendOrdersService extends Service {
     private Thread thread;
     private long[] ids;
     private Context context;
-    private Realm realm;
 
     /**
      * Метод для выполнения отправки данных на сервер.
@@ -61,50 +60,50 @@ public class SendOrdersService extends Service {
                 return;
             }
 
-            if (ids == null || ids.length == 0) {
-                stopSelf();
-                return;
-            }
-
-            int count = ids.length;
-            Long[] ordersIds = new Long[count];
-            for (int i = 0; i < count; i++) {
-                ordersIds[i] = ids[i];
-            }
-
             // массив в который сохраним ид успешно переданных записей (наряды, файлы, измерения)
             LongSparseArray<String> idUuid;
 
             // выбираем все наряды для отправки
-            RealmResults<Orders> orders = realm.where(Orders.class).in("_id", ordersIds)
-                    .findAll();
-            // отправляем наряды
-            idUuid = sendOrders(orders);
-            // отмечаем успешно отправленные наряды
-            setSendOrders(idUuid);
+            Realm realm = Realm.getDefaultInstance();
 
-            // список всех uuid операций во всех нарядах
-            String[] operationUuids = getAllOperations(orders).toArray(new String[]{});
+            if (ids != null && ids.length > 0) {
 
-            // получаем список всех файлов связанных с операциями
-            RealmResults<OperationFile> operationFiles = realm.where(OperationFile.class)
-                    .in("operation.uuid", operationUuids)
-                    .equalTo("sent", false)
-                    .findAll();
-            // отправляем файлы на сервер
-            idUuid = sendOperationFiles(operationFiles);
-            // отмечаем успешно отправленные файлы
-            setSendOperationFiles(idUuid);
+                int count = ids.length;
+                Long[] ordersIds = new Long[count];
+                for (int i = 0; i < count; i++) {
+                    ordersIds[i] = ids[i];
+                }
 
-            // получаем все измерения связанные с выполненными операциями
-            RealmResults<MeasuredValue> measuredValues = realm.where(MeasuredValue.class)
-                    .equalTo("sent", false)
-                    .in("operation.uuid", operationUuids)
-                    .findAll();
-            // отправляем данные на сервер
-            idUuid = sendMeasuredValues(measuredValues);
-            // отмечаем успешно отправленные измерения
-            setSendMeasuredValues(idUuid);
+                RealmResults<Orders> orders = realm.where(Orders.class).in("_id", ordersIds)
+                        .findAll();
+                // отправляем наряды
+                idUuid = sendOrders(realm.copyFromRealm(orders));
+                // отмечаем успешно отправленные наряды
+                setSendOrders(idUuid, realm);
+
+                // список всех uuid операций во всех нарядах
+                String[] operationUuids = getAllOperations(orders).toArray(new String[]{});
+
+                // получаем список всех файлов связанных с операциями
+                RealmResults<OperationFile> operationFiles = realm.where(OperationFile.class)
+                        .in("operation.uuid", operationUuids)
+                        .equalTo("sent", false)
+                        .findAll();
+                // отправляем файлы на сервер
+                idUuid = sendOperationFiles(realm.copyFromRealm(operationFiles));
+                // отмечаем успешно отправленные файлы
+                setSendOperationFiles(idUuid, realm);
+
+                // получаем все измерения связанные с выполненными операциями
+                RealmResults<MeasuredValue> measuredValues = realm.where(MeasuredValue.class)
+                        .equalTo("sent", false)
+                        .in("operation.uuid", operationUuids)
+                        .findAll();
+                // отправляем данные на сервер
+                idUuid = sendMeasuredValues(realm.copyFromRealm(measuredValues));
+                // отмечаем успешно отправленные измерения
+                setSendMeasuredValues(idUuid, realm);
+            }
 
             // выбираем все неотправленные по каким-то причинам ранее файлы
             // (не обязательно входящие в наряды которые сейчас отправляем)
@@ -118,8 +117,10 @@ public class SendOrdersService extends Service {
                         .findFirst();
                 Orders order = realm.where(Orders.class).equalTo("uuid", task.getOrderUuid())
                         .findFirst();
-                if (user.getUuid().equals(order.getUser().getUuid())) {
-                    sendOldFiles.add(file);
+                // для того чтобы не отправлялись данные по выполняемым прямо сейчас нарядам
+                // дополнительно проверяем что наряд уже был отправлен
+                if (user.getUuid().equals(order.getUser().getUuid()) && order.isSent()) {
+                    sendOldFiles.add(realm.copyFromRealm(file));
                 }
             }
 
@@ -127,7 +128,7 @@ public class SendOrdersService extends Service {
                 // отправляем файлы на сервер
                 idUuid = sendOperationFiles(sendOldFiles);
                 // отмечаем успешно отправленные файлы
-                setSendOperationFiles(idUuid);
+                setSendOperationFiles(idUuid, realm);
             }
 
             // выбираем все неотправленные по каким-то причинам ранее измерения
@@ -143,8 +144,10 @@ public class SendOrdersService extends Service {
                         .findFirst();
                 Orders order = realm.where(Orders.class).equalTo("uuid", task.getOrderUuid())
                         .findFirst();
-                if (user.getUuid().equals(order.getUser().getUuid())) {
-                    sendOldMeasuredValues.add(measuredValue);
+                // для того чтобы не отправлялись данные по выполняемым прямо сейчас нарядам
+                // дополнительно проверяем что наряд уже был отправлен
+                if (user.getUuid().equals(order.getUser().getUuid()) && order.isSent()) {
+                    sendOldMeasuredValues.add(realm.copyFromRealm(measuredValue));
                 }
             }
 
@@ -152,8 +155,10 @@ public class SendOrdersService extends Service {
                 // отправляем измерения на сервер
                 idUuid = sendMeasuredValues(sendOldMeasuredValues);
                 // отмечаем успешно отправленные измерения
-                setSendMeasuredValues(idUuid);
+                setSendMeasuredValues(idUuid, realm);
             }
+
+            realm.close();
 
             stopSelf();
         }
@@ -164,7 +169,6 @@ public class SendOrdersService extends Service {
         isRuning = false;
         thread = new Thread(task);
         context = getApplicationContext();
-        realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -187,7 +191,6 @@ public class SendOrdersService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isRuning = false;
-        realm.close();
     }
 
     @Nullable
@@ -287,7 +290,7 @@ public class SendOrdersService extends Service {
      *
      * @param idUuid LondSparseArray<String>
      */
-    private void setSendOperationFiles(LongSparseArray<String> idUuid) {
+    private void setSendOperationFiles(LongSparseArray<String> idUuid, Realm realm) {
         realm.beginTransaction();
         for (int idx = 0; idx < idUuid.size(); idx++) {
             long id = idUuid.keyAt(idx);
@@ -339,7 +342,7 @@ public class SendOrdersService extends Service {
      *
      * @param idUuid LongSparseArray<String>
      */
-    private void setSendMeasuredValues(LongSparseArray<String> idUuid) {
+    private void setSendMeasuredValues(LongSparseArray<String> idUuid, Realm realm) {
         realm.beginTransaction();
         for (int idx = 0; idx < idUuid.size(); idx++) {
             long _id = idUuid.keyAt(idx);
@@ -363,7 +366,7 @@ public class SendOrdersService extends Service {
      */
     private LongSparseArray<String> sendOrders(List<Orders> items) {
         LongSparseArray<String> idUuid = new LongSparseArray<>();
-        Call<ResponseBody> call = ToirAPIFactory.getOrdersService().send(realm.copyFromRealm(items));
+        Call<ResponseBody> call = ToirAPIFactory.getOrdersService().send(items);
         try {
             retrofit2.Response response = call.execute();
             ResponseBody result = (ResponseBody) response.body();
@@ -392,7 +395,7 @@ public class SendOrdersService extends Service {
      *
      * @param idUuid LongSparseArray<String>
      */
-    private void setSendOrders(LongSparseArray<String> idUuid) {
+    private void setSendOrders(LongSparseArray<String> idUuid, Realm realm) {
         realm.beginTransaction();
         for (int idx = 0; idx < idUuid.size(); idx++) {
             long _id = idUuid.keyAt(idx);

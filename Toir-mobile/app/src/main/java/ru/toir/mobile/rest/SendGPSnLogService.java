@@ -45,7 +45,7 @@ public class SendGPSnLogService extends Service {
             Realm realm = Realm.getDefaultInstance();
             Call<ResponseBody> call;
 
-            if (gpsIds.length > 0) {
+            if (gpsIds != null && gpsIds.length > 0) {
                 int count = gpsIds.length;
                 Long[] data = new Long[count];
                 for (int i = 0; i < count; i++) {
@@ -94,7 +94,7 @@ public class SendGPSnLogService extends Service {
                 }
             }
 
-            if (logIds.length > 0) {
+            if (logIds != null && logIds.length > 0) {
                 int count = logIds.length;
                 Long[] data = new Long[count];
                 for (int i = 0; i < count; i++) {

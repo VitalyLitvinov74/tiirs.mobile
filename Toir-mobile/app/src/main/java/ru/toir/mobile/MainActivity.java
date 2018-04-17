@@ -76,6 +76,7 @@ import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.ServiceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
+import ru.toir.mobile.rest.SendDataAlerReceiver;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -181,6 +182,12 @@ public class MainActivity extends AppCompatActivity {
             // принудительное обновление приложения
             finish();
         }
+
+        // принудительно взводим будильники
+        Intent intent = new Intent(this, SendDataAlerReceiver.class);
+        intent.setAction(Intent.ACTION_BOOT_COMPLETED);
+        SendDataAlerReceiver receiver = new SendDataAlerReceiver();
+        receiver.onReceive(this, intent);
     }
 
     public boolean initDB() {
@@ -281,16 +288,21 @@ public class MainActivity extends AppCompatActivity {
                                     if (user != null) {
                                         final String fileName = user.getImage();
                                         Realm realm = Realm.getDefaultInstance();
-                                        // проверям необходимость запрашивать файл изображения с сервера
+                                        // проверяем необходимость запрашивать файл изображения с сервера
                                         String tagId = AuthorizedUser.getInstance().getTagId();
                                         User localUser = realm.where(User.class).equalTo("tagId", tagId).findFirst();
+                                        File localImageFile;
                                         boolean needDownloadImage = false;
                                         if (localUser != null) {
                                             Date serverDate = user.getChangedAt();
                                             Date localDate = localUser.getChangedAt();
-                                            if (localDate.getTime() < serverDate.getTime()) {
+                                            File fileDir = getExternalFilesDir(localUser.getImageFilePath() + "/");
+                                            localImageFile = new File(fileDir, localUser.getImage());
+                                            if (localDate.getTime() < serverDate.getTime() || !localImageFile.exists()) {
                                                 needDownloadImage = true;
                                             }
+                                        } else {
+                                            needDownloadImage = true;
                                         }
 
                                         realm.beginTransaction();
