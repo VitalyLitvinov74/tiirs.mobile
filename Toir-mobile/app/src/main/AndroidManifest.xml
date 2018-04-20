@@ -72,8 +72,9 @@
         <service android:name=".rest.SendGPSnLogService" />
         <service android:name=".rest.SendOrdersService" />
         <service android:name=".rest.GetOrdersService" />
+        <service android:name=".rest.ForegroundService" />
 
-        <receiver android:name=".rest.SendDataAlerReceiver">
+        <receiver android:name=".rest.SendDataAlertReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />

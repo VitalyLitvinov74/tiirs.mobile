@@ -21,13 +21,12 @@ import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 
 /**
- * Created by koputo on 6/1/17.
- *
  * @author Logachev Dmitriy
+ *         Created by koputo on 6/1/17.
  */
 
-public class SendDataAlerReceiver extends BroadcastReceiver {
-    private static final String TAG = SendDataAlerReceiver.class.getSimpleName();
+public class SendDataAlertReceiver extends BroadcastReceiver {
+    private static final String TAG = SendDataAlertReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -63,7 +62,7 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 }
 
                 // Взводим будильник при включении устройства для отправки логов и координат
-                alarmIntent = new Intent(context, SendDataAlerReceiver.class);
+                alarmIntent = new Intent(context, SendDataAlertReceiver.class);
                 alarmIntent.setAction(SendGPSnLogService.ACTION);
                 if (!isAlarmRun(context, alarmIntent)) {
                     // задержка перед запуском будильника
@@ -74,7 +73,7 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 }
 
                 // Взводим будильник при включении устройства для отправки нарядов
-                alarmIntent = new Intent(context, SendDataAlerReceiver.class);
+                alarmIntent = new Intent(context, SendDataAlertReceiver.class);
                 alarmIntent.setAction(SendOrdersService.ACTION);
                 if (!isAlarmRun(context, alarmIntent)) {
                     // задержка перед запуском будильника
@@ -85,7 +84,7 @@ public class SendDataAlerReceiver extends BroadcastReceiver {
                 }
 
                 // Взводим будильник при включении устройства для получения нарядов
-                alarmIntent = new Intent(context, SendDataAlerReceiver.class);
+                alarmIntent = new Intent(context, SendDataAlertReceiver.class);
                 alarmIntent.setAction(GetOrdersService.ACTION);
                 if (!isAlarmRun(context, alarmIntent)) {
                     // задержка перед запуском будильника

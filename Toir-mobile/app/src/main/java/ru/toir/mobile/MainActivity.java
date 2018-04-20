@@ -76,7 +76,7 @@ import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.ServiceFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
-import ru.toir.mobile.rest.SendDataAlerReceiver;
+import ru.toir.mobile.rest.ForegroundService;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -183,11 +183,9 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        // принудительно взводим будильники
-        Intent intent = new Intent(this, SendDataAlerReceiver.class);
-        intent.setAction(Intent.ACTION_BOOT_COMPLETED);
-        SendDataAlerReceiver receiver = new SendDataAlerReceiver();
-        receiver.onReceive(this, intent);
+        // запускаем сервис который будет в фоне заниматься получением/отправкой данных
+        Intent intent = new Intent(this, ForegroundService.class);
+        startService(intent);
     }
 
     public boolean initDB() {
