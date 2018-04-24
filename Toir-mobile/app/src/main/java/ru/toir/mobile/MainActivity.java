@@ -178,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
      * Инициализация приложения при запуске
      */
     public void init() {
+        // обнуляем текущего активного пользователя
+        AuthorizedUser.getInstance().reset();
+
         if (!initDB()) {
             // принудительное обновление приложения
             finish();
@@ -1193,13 +1196,6 @@ public class MainActivity extends AppCompatActivity {
             _locationManager = null;
             _gpsListener = null;
         }
-
-        // обнуляем пользователя
-        AuthorizedUser user = AuthorizedUser.getInstance();
-        user.setLogin(null);
-        user.setTagId(null);
-        user.setToken(null);
-        user.setUuid(null);
     }
 
     @Override

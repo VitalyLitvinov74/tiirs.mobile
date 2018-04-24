@@ -9,7 +9,7 @@ public class AuthorizedUser {
     private String mUuid;
     private String mTagId;
     private String mToken;
-    private String login;
+    private String mLogin;
 
     public static synchronized AuthorizedUser getInstance() {
         if (mInstance == null) {
@@ -19,11 +19,11 @@ public class AuthorizedUser {
     }
 
     public String getLogin() {
-        return login;
+        return mLogin;
     }
 
     public void setLogin(String login) {
-        this.login = login;
+        this.mLogin = login;
     }
 
     /**
@@ -73,5 +73,15 @@ public class AuthorizedUser {
      */
     public String getBearer() {
         return "bearer " + mToken;
+    }
+
+    /**
+     * Обнуляем информацию о текущем пользователе.
+     */
+    public void reset() {
+        mLogin = null;
+        mTagId = null;
+        mToken = null;
+        mUuid = null;
     }
 }

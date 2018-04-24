@@ -2,14 +2,25 @@ package ru.toir.mobile.rest;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.realm.GpsTrack;
+import ru.toir.mobile.db.realm.Journal;
+import ru.toir.mobile.db.realm.OrderStatus;
+import ru.toir.mobile.db.realm.Orders;
 
 /**
  * @author Logachev Dmitriy
@@ -69,7 +80,59 @@ public class ForegroundService extends Service {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                long[] ids;
+                Intent serviceIntent;
+                Bundle bundle = null;
+
                 Log.d(TAG, "startSendLog()");
+
+                if (!isValidUser()) {
+                    Log.d(TAG, "Нет активного пользователя для отправки логов и координат на сервер.");
+                    // взводим следующий запуск
+                    sendLog.postDelayed(this, START_INTERVAL);
+                    return;
+                }
+
+                // получаем данные для отправки
+                Realm realm = Realm.getDefaultInstance();
+                RealmResults<GpsTrack> gpsItems = realm.where(GpsTrack.class)
+                        .equalTo("sent", false).findAll();
+                if (gpsItems.size() > 0) {
+                    ids = new long[gpsItems.size()];
+                    for (int i = 0; i < gpsItems.size(); i++) {
+                        ids[i] = gpsItems.get(i).get_id();
+                    }
+
+                    bundle = new Bundle();
+                    bundle.putLongArray(SendGPSnLogService.GPS_IDS, ids);
+                }
+
+                RealmResults<Journal> logItems = realm.where(Journal.class)
+                        .equalTo("sent", false).findAll();
+                if (logItems.size() > 0) {
+                    ids = new long[logItems.size()];
+                    for (int i = 0; i < logItems.size(); i++) {
+                        ids[i] = logItems.get(i).get_id();
+                    }
+
+                    if (bundle == null) {
+                        bundle = new Bundle();
+                        bundle.putLongArray(SendGPSnLogService.LOG_IDS, ids);
+                    }
+                }
+
+                // стартуем сервис отправки данных на сервер
+                Context context = getApplicationContext();
+                if (bundle != null) {
+                    serviceIntent = new Intent(context, SendGPSnLogService.class);
+                    serviceIntent.setAction(SendGPSnLogService.ACTION);
+                    serviceIntent.putExtras(bundle);
+                    context.startService(serviceIntent);
+                }
+
+                realm.close();
+
+                // взводим следующий запуск
                 sendLog.postDelayed(this, START_INTERVAL);
             }
         };
@@ -84,7 +147,54 @@ public class ForegroundService extends Service {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                long[] ids;
+                Intent serviceIntent;
+
                 Log.d(TAG, "startSendResult()");
+
+                if (!isValidUser()) {
+                    Log.d(TAG, "Нет активного пользователя для отправки нарядов на сервер.");
+                    // взводим следующий запуск
+                    sendResult.postDelayed(this, START_INTERVAL);
+                    return;
+                }
+
+                // получаем данные для отправки
+                AuthorizedUser user = AuthorizedUser.getInstance();
+                Realm realm = Realm.getDefaultInstance();
+                RealmResults<Orders> orders = realm.where(Orders.class)
+                        .beginGroup()
+                        .equalTo("user.uuid", user.getUuid())
+                        .equalTo("sent", false)
+                        .endGroup()
+                        .beginGroup()
+                        .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE).or()
+                        .equalTo("orderStatus.uuid", OrderStatus.Status.UN_COMPLETE).or()
+//                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or()
+                        .equalTo("orderStatus.uuid", OrderStatus.Status.CANCELED)
+                        .endGroup()
+                        .findAll();
+                if (orders.size() == 0) {
+                    Log.d(TAG, "Нет нарядов для отправки.");
+                    ids = null;
+                } else {
+                    ids = new long[orders.size()];
+                    for (int i = 0; i < orders.size(); i++) {
+                        ids[i] = orders.get(i).get_id();
+                    }
+                }
+
+                // стартуем сервис отправки данных на сервер
+                Context context = getApplicationContext();
+                serviceIntent = new Intent(context, SendOrdersService.class);
+                serviceIntent.setAction(SendOrdersService.ACTION);
+                Bundle bundle = new Bundle();
+                bundle.putLongArray(SendOrdersService.ORDERS_IDS, ids);
+                serviceIntent.putExtras(bundle);
+                context.startService(serviceIntent);
+                realm.close();
+
+                // взводим следующий запуск
                 sendResult.postDelayed(this, START_INTERVAL);
             }
         };
@@ -100,12 +210,40 @@ public class ForegroundService extends Service {
             @Override
             public void run() {
                 Log.d(TAG, "startGetOrder()");
+
+                if (!isValidUser()) {
+                    Log.d(TAG, "Нет активного пользователя для получения нарядов.");
+                    // взводим следующий запуск
+                    getOrder.postDelayed(this, START_INTERVAL);
+                    return;
+                }
+
+                ArrayList<String> statusUuids = new ArrayList<>();
+                statusUuids.add(OrderStatus.Status.NEW);
+
+                // стартуем сервис получения новых нарядов с сервера
+                Context context = getApplicationContext();
+                Intent serviceIntent = new Intent(context, GetOrdersService.class);
+                serviceIntent.setAction(GetOrdersService.ACTION);
+                Bundle bundle = new Bundle();
+                bundle.putStringArrayList(GetOrdersService.ORDER_STATUS_UUIDS, statusUuids);
+                serviceIntent.putExtras(bundle);
+                context.startService(serviceIntent);
+
+                // взводим следующий запуск
                 getOrder.postDelayed(this, START_INTERVAL);
             }
         };
         getOrder = new Handler();
         getOrder.postDelayed(runnable, START_INTERVAL);
     }
+
+    private boolean isValidUser() {
+        AuthorizedUser user = AuthorizedUser.getInstance();
+        boolean isValidUser = user.getLogin() != null && user.getToken() != null;
+        return isValidUser;
+    }
+
 
     @Nullable
     @Override
