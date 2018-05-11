@@ -142,4 +142,28 @@ public class Task extends RealmObject {
     public void setOrderUuid(String orderUuid) {
         this.orderUuid = orderUuid;
     }
+
+    public TaskStatus getStatus() {
+        return taskStatus;
+    }
+
+    public boolean isNew() {
+        return getStatus().getUuid().equals(TaskStatus.Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return getStatus().getUuid().equals(TaskStatus.Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return getStatus().getUuid().equals(TaskStatus.Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return getStatus().getUuid().equals(TaskStatus.Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return getStatus().getUuid().equals(TaskStatus.Status.CANCELED);
+    }
 }

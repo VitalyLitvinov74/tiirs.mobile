@@ -82,8 +82,12 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         }
     }
 
-    public void setItemVisibility(int position) {
-        visibility[position] = !visibility[position];
+    public void setItemVisibility(int position, boolean visible) {
+        visibility[position] = visible;
+    }
+
+    public boolean getItemVisibility(int position) {
+        return visibility[position];
     }
 
     public void setItemEnable(int position, boolean enable) {
@@ -92,7 +96,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         }
     }
 
-    public boolean getItemEnable(int position) {
+    public boolean isItemEnabled(int position) {
         return completed[position];
     }
 
@@ -166,17 +170,17 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             }
 
             if (operationStatus != null) {
-                if (operationStatus.getUuid().equals(OperationStatus.Status.NEW)) {
+                if (operationStatus.isNew()) {
                     viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
                     viewHolder.status.setChecked(false);
                 }
 
-                if (operationStatus.getUuid().equals(OperationStatus.Status.IN_WORK)) {
+                if (operationStatus.isInWork()) {
                     viewHolder.verdict.setImageResource(R.drawable.status_easy_work);
                     viewHolder.status.setChecked(false);
                 }
 
-                if (operationStatus.getUuid().equals(OperationStatus.Status.COMPLETE)) {
+                if (operationStatus.isComplete()) {
                     viewHolder.status.setChecked(true);
                     viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
                 }

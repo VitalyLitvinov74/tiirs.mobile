@@ -66,6 +66,26 @@ public class TaskStatus extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public boolean isNew() {
+        return uuid.equals(Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return uuid.equals(Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return uuid.equals(Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return uuid.equals(Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return uuid.equals(Status.CANCELED);
+    }
+
     public class Status {
         public static final String NEW = "1E9B4D73-044C-471B-A08D-26F36EBB22BA";
         public static final String IN_WORK = "07EDBDD8-097C-4E76-A27B-5B567927426B";

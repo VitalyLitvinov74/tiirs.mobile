@@ -58,6 +58,26 @@ public class OperationStatus extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public boolean isNew() {
+        return uuid.equals(Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return uuid.equals(Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return uuid.equals(Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return uuid.equals(Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return uuid.equals(Status.CANCELED);
+    }
+
     public class Status {
         public static final String NEW = "18D3D5D4-336F-4B25-BA2B-00A6C7D5EB6C";
         public static final String IN_WORK = "78063CCA-4463-45AD-9124-88CEA2B51017";

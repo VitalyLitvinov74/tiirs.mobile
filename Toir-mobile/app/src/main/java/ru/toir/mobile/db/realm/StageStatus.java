@@ -66,6 +66,26 @@ public class StageStatus extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public boolean isNew() {
+        return uuid.equals(Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return uuid.equals(Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return uuid.equals(Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return uuid.equals(Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return uuid.equals(Status.CANCELED);
+    }
+
     public class Status {
         public static final String NEW = "193BA468-AF86-4A8E-888D-65B99106B3AB";
         public static final String IN_WORK = "58F136B8-8532-44BC-8599-8293D21CF1C1";

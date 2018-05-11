@@ -142,4 +142,28 @@ public class Stage extends RealmObject {
     public void addOperations(Operation operation) {
         this.operations.add(operation);
     }
+
+    public StageStatus getStatus() {
+        return stageStatus;
+    }
+
+    public boolean isNew() {
+        return getStatus().getUuid().equals(StageStatus.Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return getStatus().getUuid().equals(StageStatus.Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return getStatus().getUuid().equals(StageStatus.Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return getStatus().getUuid().equals(StageStatus.Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return getStatus().getUuid().equals(StageStatus.Status.CANCELED);
+    }
 }
