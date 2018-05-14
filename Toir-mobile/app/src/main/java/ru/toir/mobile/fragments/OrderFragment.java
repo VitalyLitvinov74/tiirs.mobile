@@ -157,12 +157,13 @@ public class OrderFragment extends Fragment {
         void firstLaunch() {
             Log.d(TAG, "Инициализация вьюх для отображения секунд...");
             CheckBox checkBox;
+            OnCheckBoxClickListener listener = new OnCheckBoxClickListener();
             if (operationAdapter != null && mainListView != null) {
                 totalOperationCount = operationAdapter.getCount();
                 for (int i = 0; i < totalOperationCount; i++) {
                     if (mainListView.getChildAt(i) != null) {
                         checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
-                        checkBox.setOnClickListener(new onCheckBoxClickListener(i));
+                        checkBox.setOnClickListener(listener);
                     }
                 }
 
@@ -1253,7 +1254,7 @@ public class OrderFragment extends Fragment {
                     CheckBox checkBox = mainListView.getChildAt(currentOperationId)
                             .findViewById(R.id.operation_status);
                     checkBox.setChecked(true);
-                    CompleteCurrentOperation(currentOperationId, value);
+                    CompleteCurrentOperation(value);
                 }
 
                 break;
@@ -1376,100 +1377,97 @@ public class OrderFragment extends Fragment {
         listView.setAdapter(uncompleteOperationAdapter);
     }
 
-    void CompleteCurrentOperation(int position, String measureValue) {
-        TextView textTime = null;
+    void CompleteCurrentOperation(String measureValue) {
+        TextView textTime;
         TextView textValue;
-        final long currentTime = System.currentTimeMillis();
-        final OperationStatus operationStatusCompleted;
-        final OperationVerdict operationVerdictCompleted;
-        if (position >= operationAdapter.getCount() || currentOperationId >= operationAdapter.getCount()) {
+        long currentTime = System.currentTimeMillis();
+
+        if (operationAdapter == null) {
+            return;
+        }
+
+        if (currentOperationId >= operationAdapter.getCount()) {
             Log.d(TAG, "Неверный индекс операции");
+            return;
         }
 
-        operationStatusCompleted = realmDB.where(OperationStatus.class)
-                .equalTo("uuid", OperationStatus.Status.COMPLETE)
-                .findFirst();
-        if (operationStatusCompleted == null) {
-            Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
+        View operationView = mainListView.getChildAt(currentOperationId);
+        if (operationView == null) {
+            Log.d(TAG, "Операции с индексом {currentOperationId} нет в списке");
+            return;
         }
 
-        operationVerdictCompleted = realmDB.where(OperationVerdict.class)
-                .equalTo("uuid", OperationVerdict.Verdict.COMPLETE)
-                .findFirst();
-        if (operationVerdictCompleted == null) {
-            Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
+        if (measureValue != null) {
+            textValue = operationView.findViewById(R.id.op_measure_value);
+            textValue.setText(measureValue);
         }
 
-        if (operationAdapter != null) {
-            if (mainListView.getChildAt(currentOperationId) != null) {
-                textTime = mainListView.getChildAt(currentOperationId).findViewById(R.id.op_time);
-                if (textTime != null) {
-                    textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
-                } else {
-                    Log.d(TAG, "Операции с индексом {currentOperationId} нет в списке");
-                }
-            }
+        // "сворачиваем" текущую операцию
+        operationAdapter.setItemVisibility(currentOperationId, false);
+        // "отключаем" текущую операцию
+        operationAdapter.setItemEnable(currentOperationId, false);
 
-            if (measureValue != null) {
-                textValue = mainListView.getChildAt(currentOperationId).findViewById(R.id.op_measure_value);
-                textValue.setText(measureValue);
-            }
+        int nextOperationId = currentOperationId + 1;
+        if (nextOperationId < operationAdapter.getCount()) {
+            // "включаем" следующую операцию
+            operationAdapter.setItemEnable(nextOperationId, true);
 
-            int nextOperationId = currentOperationId + 1;
-            if (nextOperationId < operationAdapter.getCount()) {
-                operationAdapter.setItemEnable(nextOperationId, true);
-                operationAdapter.setItemVisibility(currentOperationId,
-                        !operationAdapter.getItemVisibility(currentOperationId));
-                operationAdapter.setItemVisibility(nextOperationId,
-                        !operationAdapter.getItemVisibility(nextOperationId));
-                startTime = System.currentTimeMillis();
-                currentOperationId = nextOperationId;
-
-                // фиксируем начало работы над следующей операцией (если у нее нет статуса закончена), меняем ее статус на в процессе
-                final Operation operation = operationAdapter.getItem(currentOperationId);
-                final OperationStatus operationStatusInWork;
-                operationStatusInWork = realmDB.where(OperationStatus.class)
+            // фиксируем начало работы над следующей операцией (если у нее нет статуса закончена),
+            // меняем ее статус на "в процессе"
+            Operation operation = operationAdapter.getItem(nextOperationId);
+            if (operation != null && !operation.isComplete()) {
+                OperationStatus operationStatusInWork = realmDB.where(OperationStatus.class)
                         .equalTo("uuid", OperationStatus.Status.IN_WORK)
                         .findFirst();
-                if (operation != null) {
-                    if (!operation.isComplete()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                operation.setStartDate(new Date());
-                                operation.setOperationStatus(operationStatusInWork);
-                            }
-                        });
-                    }
-                }
-            }
-
-            final Operation operation = operationAdapter.getItem(position);
-            // если операция уже завершена - то ни статус, ни дату не меняем
-            if (operation != null && !operation.isComplete()) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        operation.setEndDate(new Date(currentTime));
-                        //operation.setStartDate(new Date(startTime));
-                        operation.setOperationStatus(operationStatusCompleted);
-                        operation.setOperationVerdict(operationVerdictCompleted);
-                    }
-                });
-
-                if (textTime != null) {
-                    if (((currentTime - startTime) / 1000) <= operation.getOperationTemplate().getNormative()) {
-                        textTime.setBackgroundColor(Color.GREEN);
-                    } else {
-                        textTime.setBackgroundColor(Color.RED);
-                    }
-                }
-
-                // перезапоминаем таймер
-                startTime = System.currentTimeMillis();
-                operationAdapter.setItemEnable(position, false);
+                realmDB.beginTransaction();
+                operation.setStartDate(new Date(currentTime));
+                operation.setOperationStatus(operationStatusInWork);
+                realmDB.commitTransaction();
             }
         }
+
+        Operation operation = operationAdapter.getItem(currentOperationId);
+        // если операция уже завершена - то ни статус, ни дату не меняем
+        if (operation != null && !operation.isComplete()) {
+            OperationStatus operationStatusCompleted = realmDB.where(OperationStatus.class)
+                    .equalTo("uuid", OperationStatus.Status.COMPLETE)
+                    .findFirst();
+            if (operationStatusCompleted == null) {
+                Log.d(TAG, "Статус: операция завершена отсутствует в словаре!");
+            }
+
+            OperationVerdict operationVerdictCompleted = realmDB.where(OperationVerdict.class)
+                    .equalTo("uuid", OperationVerdict.Verdict.COMPLETE)
+                    .findFirst();
+            if (operationVerdictCompleted == null) {
+                Log.d(TAG, "Вердикт: операция завершена отсутствует в словаре!");
+            }
+
+            realmDB.beginTransaction();
+            operation.setEndDate(new Date(currentTime));
+            //operation.setStartDate(new Date(startTime));
+            operation.setOperationStatus(operationStatusCompleted);
+            operation.setOperationVerdict(operationVerdictCompleted);
+            realmDB.commitTransaction();
+
+            textTime = operationView.findViewById(R.id.op_time);
+            if (textTime != null) {
+                int workTime = (int) (currentTime - startTime) / 1000;
+                textTime.setText(getString(R.string.sec_with_value, workTime));
+                if (workTime <= operation.getOperationTemplate().getNormative()) {
+                    textTime.setBackgroundColor(Color.GREEN);
+                } else {
+                    textTime.setBackgroundColor(Color.RED);
+                }
+            } else {
+                Log.d(TAG, "Во view операции нет элемента op_time!");
+            }
+
+            // перезапоминаем таймер
+            startTime = currentTime;
+        }
+
+        currentOperationId = nextOperationId;
     }
 
     private void runRfidDialog(String expectedTagId, final int level) {
@@ -1856,25 +1854,15 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    private class onCheckBoxClickListener implements View.OnClickListener {
-        int pos;
-
-        onCheckBoxClickListener(int position) {
-            this.pos = position;
-        }
+    private class OnCheckBoxClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View arg) {
-            /*if (pos != currentOperationId) {
-                // показываем меню предупреждения о пропуске операций
-                return;
-            }*/
-
             if (!operationAdapter.isItemEnabled(currentOperationId)) {
                 return;
             }
 
-            CompleteCurrentOperation(currentOperationId, null);
+            CompleteCurrentOperation(null);
         }
     }
 
