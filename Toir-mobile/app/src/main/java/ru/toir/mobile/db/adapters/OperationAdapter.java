@@ -130,23 +130,14 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.time = convertView.findViewById(R.id.op_time);
             viewHolder.image = convertView.findViewById(R.id.op_image);
             viewHolder.description_layout = convertView.findViewById(R.id.operation_description_layout);
-            convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         viewHolder.status.setEnabled(completed[position]);
-        if (visibility[position]) {
-            viewHolder.description_layout.setVisibility(View.VISIBLE);
-            convertView.setTag(viewHolder);
-            viewHolder = (ViewHolder) convertView.getTag();
-            //notifyDataSetChanged();
-        } else {
-            viewHolder.description_layout.setVisibility(View.GONE);
-            convertView.setTag(viewHolder);
-            viewHolder = (ViewHolder) convertView.getTag();
-            //notifyDataSetChanged();
-        }
+
+        int showMode = visibility[position] ? View.VISIBLE : View.GONE;
+        viewHolder.description_layout.setVisibility(showMode);
 
         if (operation != null) {
             String sDate;
@@ -220,6 +211,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 }
             }
         }
+
+        convertView.setTag(viewHolder);
 
         return convertView;
     }
