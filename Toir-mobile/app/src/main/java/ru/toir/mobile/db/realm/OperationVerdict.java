@@ -2,6 +2,7 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -17,6 +18,28 @@ public class OperationVerdict extends RealmObject {
     private String icon;
     private Date createdAt;
     private Date changedAt;
+
+    private static OperationVerdict getStatusObject(Realm realm, String verdictUuid) {
+        return realm.where(OperationVerdict.class)
+                .equalTo("uuid", verdictUuid)
+                .findFirst();
+    }
+
+    public static OperationVerdict getObjectNotDefined(Realm realm) {
+        return getStatusObject(realm, Verdict.NOT_DEFINED);
+    }
+
+    public static OperationVerdict getObjectComplete(Realm realm) {
+        return getStatusObject(realm, Verdict.COMPLETE);
+    }
+
+    public static OperationVerdict getObjectUnComplete(Realm realm) {
+        return getStatusObject(realm, Verdict.UN_COMPLETE);
+    }
+
+    public static OperationVerdict getObjectCanceled(Realm realm) {
+        return getStatusObject(realm, Verdict.CANCELED);
+    }
 
     public long get_id() {
         return _id;

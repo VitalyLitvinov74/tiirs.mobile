@@ -2,6 +2,7 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -17,6 +18,32 @@ public class OperationStatus extends RealmObject {
     private String title;
     private Date createdAt;
     private Date changedAt;
+
+    private static OperationStatus getStatusObject(Realm realm, String statusUuid) {
+        return realm.where(OperationStatus.class)
+                .equalTo("uuid", statusUuid)
+                .findFirst();
+    }
+
+    public static OperationStatus getObjectNew(Realm realm) {
+        return getStatusObject(realm, Status.NEW);
+    }
+
+    public static OperationStatus getObjectInWork(Realm realm) {
+        return getStatusObject(realm, Status.IN_WORK);
+    }
+
+    public static OperationStatus getObjectComplete(Realm realm) {
+        return getStatusObject(realm, Status.COMPLETE);
+    }
+
+    public static OperationStatus getObjectUnComplete(Realm realm) {
+        return getStatusObject(realm, Status.UN_COMPLETE);
+    }
+
+    public static OperationStatus getObjectCanceled(Realm realm) {
+        return getStatusObject(realm, Status.CANCELED);
+    }
 
     public long get_id() {
         return _id;
