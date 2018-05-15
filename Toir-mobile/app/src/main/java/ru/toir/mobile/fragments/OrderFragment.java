@@ -138,14 +138,12 @@ public class OrderFragment extends Fragment {
             if (operationAdapter != null && currentOperationId < operationAdapter.getCount()) {
                 currentOperation = operationAdapter.getItem(currentOperationId);
                 if (currentOperation != null) {
-                    // TODO: вместо прямого изменения отображения в ListView счётчик
-                    // нужно отображать в отдельном View!!!
-//                    if (!currentOperation.isComplete()) {
-//                        TextView textTime;
-//                        long currentTime = System.currentTimeMillis();
-//                        textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
-//                        textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
-//                    }
+                    if (!currentOperation.isComplete()) {
+                        TextView textTime;
+                        long currentTime = System.currentTimeMillis();
+                        textTime = getViewByPosition(currentOperationId, mainListView).findViewById(R.id.op_time);
+                        textTime.setText(getString(R.string.sec_with_value, (int) (currentTime - startTime) / 1000));
+                    }
 
                     if (firstLaunch) {
                         firstLaunch();
@@ -177,7 +175,6 @@ public class OrderFragment extends Fragment {
     };
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
-    private ListViewLongClickListener mainListViewLongClickListener = new ListViewLongClickListener();
     private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
 
     //private NumberPicker numberPicker;
@@ -1377,6 +1374,11 @@ public class OrderFragment extends Fragment {
         listView.setAdapter(uncompleteOperationAdapter);
     }
 
+    /**
+     * Метод завершения операции по событию "Операция выполнена"
+     *
+     * @param measureValue Измеренное значение.
+     */
     void CompleteCurrentOperation(String measureValue) {
         TextView textTime;
         TextView textValue;
