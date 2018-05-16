@@ -9,7 +9,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
@@ -103,7 +102,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Operation operation;
 
         if (adapterData == null) {
             return convertView;
@@ -114,7 +112,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             return convertView;
         }
 
-        operation = adapterData.get(position);
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.operation_item, parent, false);
@@ -134,12 +131,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.status.setEnabled(completed[position]);
-
-        int showMode = visibility[position] ? View.VISIBLE : View.GONE;
-        viewHolder.description_layout.setVisibility(showMode);
-
+        Operation operation = adapterData.get(position);
         if (operation != null) {
+            viewHolder.status.setEnabled(completed[position]);
+
+            int showMode = visibility[position] ? View.VISIBLE : View.GONE;
+            viewHolder.description_layout.setVisibility(showMode);
+
             String sDate;
             OperationStatus operationStatus;
             operationStatus = operation.getOperationStatus();
@@ -220,7 +218,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     public static class ViewHolder {
         TextView title;
         CheckBox status;
-        Spinner spinner;
         ImageView verdict;
         TextView start_date;
         TextView end_date;
@@ -232,12 +229,4 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         ImageView image;
         RelativeLayout description_layout;
     }
-
-    public class Status {
-        public static final String NEW = "1e9b4d73-044c-471b-a08d-26f36ebb22ba";
-        public static final String IN_WORK = "9f980db5-934c-4ddb-999a-04c6c3daca59";
-        public static final String COMPLETE = "dc6dca37-2cc9-44da-aff9-19bf143e611a";
-        public static final String UN_COMPLETE = "363c08ec-89d9-47df-b7cf-63a05d56594c";
-    }
-
 }
