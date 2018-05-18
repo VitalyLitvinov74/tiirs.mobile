@@ -19,26 +19,26 @@ public class OperationVerdict extends RealmObject {
     private Date createdAt;
     private Date changedAt;
 
-    private static OperationVerdict getStatusObject(Realm realm, String verdictUuid) {
+    private static OperationVerdict getVerdictObject(Realm realm, String verdictUuid) {
         return realm.where(OperationVerdict.class)
                 .equalTo("uuid", verdictUuid)
                 .findFirst();
     }
 
     public static OperationVerdict getObjectNotDefined(Realm realm) {
-        return getStatusObject(realm, Verdict.NOT_DEFINED);
+        return getVerdictObject(realm, Verdict.NOT_DEFINED);
     }
 
     public static OperationVerdict getObjectComplete(Realm realm) {
-        return getStatusObject(realm, Verdict.COMPLETE);
+        return getVerdictObject(realm, Verdict.COMPLETE);
     }
 
     public static OperationVerdict getObjectUnComplete(Realm realm) {
-        return getStatusObject(realm, Verdict.UN_COMPLETE);
+        return getVerdictObject(realm, Verdict.UN_COMPLETE);
     }
 
     public static OperationVerdict getObjectCanceled(Realm realm) {
-        return getStatusObject(realm, Verdict.CANCELED);
+        return getVerdictObject(realm, Verdict.CANCELED);
     }
 
     public long get_id() {
@@ -89,10 +89,27 @@ public class OperationVerdict extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public boolean isNotDefined() {
+        return uuid.equals(Verdict.NOT_DEFINED);
+    }
+
+    public boolean isComplete() {
+        return uuid.equals(Verdict.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return uuid.equals(Verdict.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return uuid.equals(Verdict.CANCELED);
+    }
+
     public class Verdict {
         public static final String NOT_DEFINED = "5205B8B3-E32B-46D0-9B67-1C47A346168F";
         public static final String COMPLETE = "4B72A9A1-01AA-45E5-BA8A-C4C2F586E8FD";
         public static final String UN_COMPLETE = "17BF9E6F-F9AF-4FA8-8814-C9ED00378D48";
         public static final String CANCELED = "0102D95B-F8CF-4779-8021-0327EC66ED16";
     }
+
 }
