@@ -54,7 +54,6 @@ public class GetOrdersService extends Service {
     public static final String ORDER_STATUS_UUIDS = "orderStatusUuids";
     private static final String TAG = GetOrdersService.class.getSimpleName();
     private boolean isRuning;
-    private Thread thread;
     private List<String> statusUuids;
     private Context context;
 
@@ -65,16 +64,17 @@ public class GetOrdersService extends Service {
         @Override
         public void run() {
 
+            Log.d(TAG, "run() started...");
             AuthorizedUser user = AuthorizedUser.getInstance();
             boolean isValidUser = user.getLogin() != null && user.getToken() != null;
             if (!isValidUser) {
-                stopSelf();
+                finishService();
                 return;
             }
 
             File extDir = context.getExternalFilesDir("");
             if (extDir == null) {
-                stopSelf();
+                finishService();
                 return;
             }
 
@@ -89,23 +89,23 @@ public class GetOrdersService extends Service {
                 if (response.code() != 200) {
                     // сообщаем что произошло
                     addToJournal("Ошибка получения нарядов! Код ответа сервера:" + response.code());
-                    stopSelf();
+                    finishService();
                     return;
                 }
 
                 orders = response.body();
                 if (orders == null) {
                     addToJournal("Ошибка получения нарядов! Содержимого ответа нет.");
-                    stopSelf();
+                    finishService();
                     return;
                 } else if (orders.size() == 0) {
-                    stopSelf();
+                    finishService();
                     return;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 addToJournal("Exception");
-                stopSelf();
+                finishService();
                 return;
             }
 
@@ -117,8 +117,7 @@ public class GetOrdersService extends Service {
             // строим список изображений для загрузки
             for (Orders order : orders) {
                 // если это не новый наряд, ставим флаг sent в true
-                String orderStatusUuid = order.getOrderStatus().getUuid();
-                if (!orderStatusUuid.equals(OrderStatus.Status.NEW)) {
+                if (!order.isNew()) {
                     order.setSent(true);
                 }
 
@@ -324,12 +323,10 @@ public class GetOrdersService extends Service {
             for (Orders order : orders) {
                 order.setReceivDate(new Date());
 
-                if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.NEW)) {
+                if (order.isNew()) {
                     uuids.add(order.getUuid());
                     // устанавливаем статус "В работе"
-                    OrderStatus inWorkStatus = realm.where(OrderStatus.class)
-                            .equalTo("uuid", OrderStatus.Status.IN_WORK).findFirst();
-                    order.setOrderStatus(inWorkStatus);
+                    order.setOrderStatus(OrderStatus.getObjectInWork(realm));
                 }
             }
 
@@ -384,6 +381,9 @@ public class GetOrdersService extends Service {
                     addToJournal("Исключение при запросе на установку статуса нарядов IN_WORK");
                 }
             }
+
+            Log.d(TAG, "run() ended...");
+            finishService();
         }
     };
 
@@ -391,7 +391,6 @@ public class GetOrdersService extends Service {
     public void onCreate() {
         isRuning = false;
         context = getApplicationContext();
-        thread = new Thread(task);
     }
 
     @Override
@@ -404,7 +403,7 @@ public class GetOrdersService extends Service {
             Log.d(TAG, "Запускаем поток получения нарядов с сервера...");
             statusUuids = intent.getStringArrayListExtra(ORDER_STATUS_UUIDS);
             isRuning = true;
-            thread.start();
+            new Thread(task).start();
         }
 
         return START_STICKY;
@@ -412,6 +411,7 @@ public class GetOrdersService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy()");
         super.onDestroy();
         isRuning = false;
     }
@@ -420,5 +420,10 @@ public class GetOrdersService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    private void finishService() {
+        Log.d(TAG, "finishService()");
+        stopSelf();
     }
 }
