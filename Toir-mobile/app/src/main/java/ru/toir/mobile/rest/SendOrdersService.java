@@ -43,7 +43,6 @@ public class SendOrdersService extends Service {
     public static final String ACTION = "ru.toir.mobile.rest.SEND_ORDERS";
     private static final String TAG = SendOrdersService.class.getSimpleName();
     private boolean isRuning;
-    private Thread thread;
     private long[] ids;
     private Context context;
 
@@ -167,7 +166,6 @@ public class SendOrdersService extends Service {
     @Override
     public void onCreate() {
         isRuning = false;
-        thread = new Thread(task);
         context = getApplicationContext();
     }
 
@@ -181,7 +179,7 @@ public class SendOrdersService extends Service {
             Log.d(TAG, "Запускаем поток отправки нарядов на сервер...");
             isRuning = true;
             ids = intent.getLongArrayExtra(ORDERS_IDS);
-            thread.start();
+            new Thread(task).start();
         }
 
         return START_STICKY;

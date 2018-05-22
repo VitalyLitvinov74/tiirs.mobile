@@ -32,7 +32,6 @@ public class SendGPSnLogService extends Service {
     public static final String ACTION = "ru.toir.mobile.rest.SEND_GPS_AND_LOG";
     private static final String TAG = "SendGPSnLog";
     private boolean isRuning;
-    private Thread thread;
     private long[] gpsIds;
     private long[] logIds;
 
@@ -150,7 +149,6 @@ public class SendGPSnLogService extends Service {
     @Override
     public void onCreate() {
         isRuning = false;
-        thread = new Thread(task);
     }
 
     @Override
@@ -164,7 +162,7 @@ public class SendGPSnLogService extends Service {
             isRuning = true;
             gpsIds = intent.getLongArrayExtra(GPS_IDS);
             logIds = intent.getLongArrayExtra(LOG_IDS);
-            thread.start();
+            new Thread(task).start();
         }
 
         return START_STICKY;
