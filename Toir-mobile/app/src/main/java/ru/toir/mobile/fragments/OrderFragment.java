@@ -474,8 +474,7 @@ public class OrderFragment extends Fragment {
         for (int i = 0; i < totalOperationCount; i++) {
             final Operation operation = operationAdapter.getItem(i);
             if (operation != null) {
-                OperationStatus operationStatus = operation.getOperationStatus();
-                if (operationStatus != null) {
+                if (operation.getOperationStatus() != null) {
                     // фиксируем начало работы над первой операцией (статус "новая"),
                     // меняем ее статус на в процессе
 //                    if (operation.isNew() || operation.isCanceled() || operation.isUnComplete()) {
@@ -490,9 +489,10 @@ public class OrderFragment extends Fragment {
                     }
 
                     // если эта операция имеет статус "в работе", то начинаем с нее
-                    if (operationStatus.isInWork()) {
+                    if (operation.isInWork()) {
                         operationAdapter.setItemEnable(i, true);
                         currentOperationPosition = i;
+                        currentOperation = operationAdapter.getItem(currentOperationPosition);
 
                         // время начала работы (приступаем к первой операции и нехрен тормозить)
                         startTime = System.currentTimeMillis();
@@ -501,15 +501,7 @@ public class OrderFragment extends Fragment {
 
                         OperationType operationType = operation.getOperationTemplate().getOperationType();
                         if (operationType.isMeasure()) {
-                            currentOperation = operationAdapter.getItem(currentOperationPosition);
-
-                            Intent measure = new Intent(getActivity(), MeasureActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("operationUuid", currentOperation.getUuid());
-                            bundle.putString("equipmentUuid", currentEquipment.getUuid());
-                            measure.putExtras(bundle);
-                            //getActivity().startActivity (measure);
-                            startActivityForResult(measure, ACTIVITY_MEASURE);
+                            startMeasure();
                         }
 
                         break;
@@ -1318,6 +1310,7 @@ public class OrderFragment extends Fragment {
         TextView textTime;
         TextView textValue;
         final long currentTime = System.currentTimeMillis();
+        boolean isMeasure = false;
 
         if (operationAdapter == null) {
             return;
@@ -1344,35 +1337,16 @@ public class OrderFragment extends Fragment {
         // "отключаем" текущую операцию
         operationAdapter.setItemEnable(currentOperationPosition, false);
 
-        int nextOperationPosition = currentOperationPosition + 1;
-        if (nextOperationPosition < operationAdapter.getCount()) {
-            // "включаем" следующую операцию
-            operationAdapter.setItemEnable(nextOperationPosition, true);
-
-            // фиксируем начало работы над следующей операцией (если у нее нет статуса закончена),
-            // меняем ее статус на "в процессе"
-            final Operation operation = operationAdapter.getItem(nextOperationPosition);
-            if (operation != null && !operation.isComplete()) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        operation.setStartDate(new Date(currentTime));
-                        operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
-                    }
-                });
-            }
-        }
-
-        final Operation operation = operationAdapter.getItem(currentOperationPosition);
+        final Operation operationFinished = operationAdapter.getItem(currentOperationPosition);
         // если операция уже завершена - то ни статус, ни дату не меняем
-        if (operation != null && !operation.isComplete()) {
+        if (operationFinished != null && !operationFinished.isComplete()) {
             realmDB.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    operation.setEndDate(new Date(currentTime));
+                    operationFinished.setEndDate(new Date(currentTime));
                     //operation.setStartDate(new Date(startTime));
-                    operation.setOperationStatus(OperationStatus.getObjectComplete(realm));
-                    operation.setOperationVerdict(OperationVerdict.getObjectComplete(realm));
+                    operationFinished.setOperationStatus(OperationStatus.getObjectComplete(realm));
+                    operationFinished.setOperationVerdict(OperationVerdict.getObjectComplete(realm));
                 }
             });
 
@@ -1380,7 +1354,7 @@ public class OrderFragment extends Fragment {
             if (textTime != null) {
                 int workTime = (int) (currentTime - startTime) / 1000;
                 textTime.setText(getString(R.string.sec_with_value, workTime));
-                if (workTime <= operation.getOperationTemplate().getNormative()) {
+                if (workTime <= operationFinished.getOperationTemplate().getNormative()) {
                     textTime.setBackgroundColor(Color.GREEN);
                 } else {
                     textTime.setBackgroundColor(Color.RED);
@@ -1393,7 +1367,44 @@ public class OrderFragment extends Fragment {
             startTime = currentTime;
         }
 
-        currentOperationPosition = nextOperationPosition;
+        final Operation operationStarted;
+        int nextOperationPosition = currentOperationPosition + 1;
+        if (nextOperationPosition < operationAdapter.getCount()) {
+            // "включаем" следующую операцию
+            operationAdapter.setItemEnable(nextOperationPosition, true);
+
+            // фиксируем начало работы над следующей операцией (если у нее нет статуса закончена),
+            // меняем ее статус на "в процессе"
+            operationStarted = operationAdapter.getItem(nextOperationPosition);
+            if (operationStarted != null && !operationStarted.isComplete()) {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        operationStarted.setStartDate(new Date(currentTime));
+                        operationStarted.setOperationStatus(OperationStatus.getObjectInWork(realm));
+                    }
+                });
+
+                isMeasure = operationStarted.getOperationTemplate().getOperationType().isMeasure();
+            }
+
+            currentOperationPosition = nextOperationPosition;
+            currentOperation = operationAdapter.getItem(currentOperationPosition);
+
+            if (isMeasure) {
+                startMeasure();
+            }
+        }
+    }
+
+    private void startMeasure() {
+        Intent measure = new Intent(getActivity(), MeasureActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("operationUuid", currentOperation.getUuid());
+        bundle.putString("equipmentUuid", currentEquipment.getUuid());
+        measure.putExtras(bundle);
+        //getActivity().startActivity (measure);
+        startActivityForResult(measure, ACTIVITY_MEASURE);
     }
 
     private void runRfidDialog(String expectedTagId, final int level) {

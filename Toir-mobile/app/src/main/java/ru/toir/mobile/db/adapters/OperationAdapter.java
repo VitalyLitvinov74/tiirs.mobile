@@ -65,8 +65,10 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     public Operation getItem(int position) {
         Operation operation;
         if (adapterData != null) {
-            operation = adapterData.get(position);
-            return operation;
+            if (position < getCount()) {
+                operation = adapterData.get(position);
+                return operation;
+            }
         }
 
         return null;
