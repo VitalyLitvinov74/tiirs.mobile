@@ -80,7 +80,8 @@ public class JournalAdapter extends RealmBaseAdapter<Journal> implements ListAda
             String sDate;
             journal = adapterData.get(position);
             if (journal != null) {
-                sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(journal.getDate());
+                sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US)
+                        .format(journal.getDate());
                 viewHolder.date.setText(sDate);
                 viewHolder.descr.setText(journal.getDescription());
             }

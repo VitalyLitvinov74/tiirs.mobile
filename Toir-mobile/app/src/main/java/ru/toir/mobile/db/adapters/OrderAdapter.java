@@ -56,18 +56,23 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         separates.clear();
 
-        if (adapterData != null)
-        for(Orders order : adapterData) {
-            separateDate = order.getOpenDate();
-            if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
-                currentDate = order.getCloseDate();
-                separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
-                j++;
-                separates.add(i + j, Long.valueOf(i));
-            } else {
-                separates.add(i + j, Long.valueOf(i));
+        if (adapterData != null) {
+            for (Orders order : adapterData) {
+                separateDate = order.getOpenDate();
+                if (separateDate == null) {
+                    separateDate = new Date();
+                }
+
+                if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
+                    currentDate = order.getCloseDate();
+                    separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
+                    j++;
+                    separates.add(i + j, Long.valueOf(i));
+                } else {
+                    separates.add(i + j, Long.valueOf(i));
+                }
+                i++;
             }
-            i++;
         }
     }
 
@@ -129,8 +134,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 OrderStatus orderStatus;
                 orderStatus = order.getOrderStatus();
                 lDate = order.getOpenDate();
-                if (lDate != null && lDate.after(new Date(100000))) {
-                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
+                if (lDate != null) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols)
+                            .format(lDate);
                     viewHolder.created.setText(sDate);
                 }
                 else {

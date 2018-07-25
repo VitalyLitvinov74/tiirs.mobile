@@ -543,24 +543,19 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над нарядом (если у него статус получен), меняем его статус на в процессе
-//        final OrderStatus orderStatus;
-//        final OrderStatus orderStatusInWork;
-//        if (selectedOrder != null) {
-//            orderStatus = selectedOrder.getOrderStatus();
-//            orderStatusInWork = realmDB.where(OrderStatus.class)
-//                    .equalTo("uuid", OrderStatus.Status.IN_WORK)
-//                    .findFirst();
-//            if (orderStatus != null && orderStatusInWork != null)
-//                if (orderStatus.getUuid().equals(OrderStatus.Status.NEW) || orderStatus.getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
-//                    realmDB.executeTransaction(new Realm.Transaction() {
-//                        @Override
-//                        public void execute(Realm realm) {
-//                            selectedOrder.setOpenDate(new Date());
-//                            selectedOrder.setOrderStatus(orderStatusInWork);
-//                        }
-//                    });
-//                }
-//        }
+        if (selectedOrder != null) {
+            if (selectedOrder.isInWork() || selectedOrder.isUnComplete()) {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        if (selectedOrder.getOpenDate() == null) {
+                            selectedOrder.setOpenDate(new Date());
+                        }
+//                        selectedOrder.setOrderStatus(OrderStatus.getObjectInWork(realm));
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -1601,38 +1596,45 @@ public class OrderFragment extends Fragment {
                 reason.setText(getString(R.string.order_reason, order.getReason()));
                 author.setText(getString(R.string.order_author, order.getAuthor().getName()));
                 worker.setText(getString(R.string.order_worker, order.getUser().getName()));
-                if (order.getStartDate().getTime() > 10000) {
+                Date startDate = order.getStartDate();
+                if (startDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
-                            .format(order.getStartDate());
+                            .format(startDate);
                 } else {
                     sDate = "не назначен";
                 }
 
                 start.setText(getString(R.string.order_start, sDate));
-                if (order.getReceivDate().getTime() > 10000) {
+                Date receivDate = order.getReceivDate();
+                if (receivDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
-                            .format(order.getReceivDate());
+                            .format(receivDate);
                 } else {
                     sDate = "не получен";
                 }
 
                 recieve.setText(getString(R.string.order_recieved, sDate));
-                if (order.getOpenDate().getTime() > 10000) {
+
+                Date openDate = order.getOpenDate();
+                if (openDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
-                            .format(order.getOpenDate());
+                            .format(openDate);
                 } else {
                     sDate = "не начат";
                 }
 
                 open.setText(getString(R.string.order_open, sDate));
-                if (order.getCloseDate().getTime() > 10000) {
+
+                Date closeDate = order.getCloseDate();
+                if (closeDate != null) {
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
-                            .format(order.getCloseDate());
+                            .format(closeDate);
                 } else {
                     sDate = "не закрыт";
                 }
 
                 close.setText(getString(R.string.order_close, sDate));
+
                 comment.setText(getString(R.string.order_comment, order.getComment()));
                 verdict.setText(getString(R.string.order_verdict, order.getOrderVerdict().getTitle()));
             }

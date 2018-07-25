@@ -178,6 +178,15 @@ public class MainActivity extends AppCompatActivity {
      * Инициализация приложения при запуске
      */
     public void init() {
+
+        // значение по умолчанию для драйвера rfid
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String optionValue = sp.getString(getString(R.string.rfidDriverListPrefKey), null);
+        if (optionValue == null) {
+            optionValue = ru.toir.mobile.rfid.driver.RfidDriverQRcode.class.getCanonicalName();
+            sp.edit().putString(getString(R.string.rfidDriverListPrefKey), optionValue).apply();
+        }
+
         // обнуляем текущего активного пользователя
         AuthorizedUser.getInstance().reset();
 

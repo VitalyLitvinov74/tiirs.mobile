@@ -58,7 +58,6 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
 import ru.toir.mobile.utils.MainFunctions;
 
-
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
     private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
@@ -144,6 +143,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // элемент интерфейса со списком драйверов считывателей
         ListPreference drvList = (ListPreference) this.findPreference(getResources().getString(
                 R.string.rfidDriverListPrefKey));
+
         basicSettingScr = (PreferenceScreen) this.findPreference("preferenceBasicScreen");
         driverSettingScr = (PreferenceScreen) this.findPreference(getResources()
                 .getString(R.string.rfidDrvSettingKey));
@@ -467,11 +467,30 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         switch (requestCode) {
             case ACTIVITY_TELEGRAM:
                 // https://api.telegram.org/bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY/getUpdates
-                new AsyncRequest().execute();
+                AsyncRequest ar = new AsyncRequest();
+                ar.setListener(new AsyncRequest.Listener() {
+                    @Override
+                    public void onSuccess(String chat_id) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("messendgers",
+                                Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(getResources().getString(R.string.telegram_chat_id), chat_id);
+                        editor.apply();
+
+                        String msg = "Система Тоирус привествует Вас!"
+                                + " Теперь Вы будете получать уведомления в этом чате"
+                                + " " + chat_id;
+                        new MainFunctions().sendMessageToTelegram(getApplicationContext(), msg);
+                    }
+                });
+                ar.execute();
+                break;
         }
     }
 
-    class AsyncRequest extends AsyncTask<String, Integer, String> {
+    static class AsyncRequest extends AsyncTask<String, Integer, String> {
+
+        private Listener listener;
 
         @Override
         protected String doInBackground(String... arg) {
@@ -486,6 +505,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 while ((line = reader.readLine()) != null) {
                     result.append(line);
                 }
+
                 String jsonString = result.toString();
                 JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray res = jsonObject.getJSONArray("result");
@@ -496,16 +516,15 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                     int chat_id = chat.getInt("id");
                     if (chat_id > 0) {
                         // store chat id
-                        SharedPreferences sharedPreferences = getSharedPreferences("messendgers", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(getString(R.string.telegram_chat_id), "" + chat_id);
-                        editor.apply();
+                        return String.valueOf(chat_id);
                     }
-                    return chat_id + "";
+
+                    return "";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             if (urlConnection != null) {
                 try {
                     urlConnection.disconnect();
@@ -513,13 +532,24 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                     e.printStackTrace();
                 }
             }
+
             return "";
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            new MainFunctions().sendMessageToTelegram(getApplicationContext(), "Система Тоирус привествует Вас! Теперь Вы будете получать уведомления в этом чате" + s);
+            if (listener != null) {
+                listener.onSuccess(s);
+            }
+        }
+
+        void setListener(Listener listener) {
+            this.listener = listener;
+        }
+
+        interface Listener {
+            void onSuccess(String object);
         }
     }
 }

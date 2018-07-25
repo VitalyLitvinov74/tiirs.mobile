@@ -242,7 +242,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         StageAdapter stageAdapter = new StageAdapter(stages);
         if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
-            if (date != null && date.after(new Date(100000))) {
+            if (date != null) {
                 sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
             } else {
                 sDate = "не обслуживалось";

@@ -153,7 +153,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             }
 
             lDate = operation.getEndDate();
-            if (lDate != null && lDate.after(new Date(100000))) {
+            if (lDate != null) {
                 sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(lDate);
                 viewHolder.end_date.setText(sDate);
             } else {
@@ -185,14 +185,21 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             OperationTemplate operationTemplate;
             operationTemplate = operation.getOperationTemplate();
             viewHolder.normative.setText(String.valueOf(operationTemplate.getNormative()));
-            if (operation.getEndDate().getTime() > 0 && operation.getStartDate().getTime() > 0) {
-                viewHolder.time.setText(convertView.getContext().getString(R.string.sec_with_value, (int) (operation.getEndDate().getTime() - operation.getStartDate().getTime()) / 1000));
+            Date startDate = operation.getStartDate();
+            Date endDate = operation.getEndDate();
+            if (startDate != null && endDate != null) {
+                int diffTime = (int) (endDate.getTime() - startDate.getTime());
+                viewHolder.time.setText(convertView.getContext().getString(R.string.sec_with_value,
+                        diffTime / 1000));
             }
 
             Realm realmDB = Realm.getDefaultInstance();
-            MeasuredValue lastValue = realmDB.where(MeasuredValue.class).equalTo("operation.uuid", operation.getUuid()).findFirst();
+            MeasuredValue lastValue = realmDB.where(MeasuredValue.class)
+                    .equalTo("operation.uuid", operation.getUuid()).findFirst();
             if (lastValue != null) {
-                String result = lastValue.getValue() + " (" + new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate()) + ")";
+                String result = lastValue.getValue() + " (" +
+                        new SimpleDateFormat("dd.MM.yy HH:ss", Locale.US).format(lastValue.getDate())
+                        + ")";
                 viewHolder.measure_value.setText(result);
             } else {
                 viewHolder.measure.setVisibility(View.GONE);

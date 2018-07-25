@@ -83,7 +83,8 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
         if (adapterData != null && viewHolder.date != null) {
             gpsTrack = adapterData.get(position);
             if (gpsTrack != null) {
-                String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US).format(gpsTrack.getDate());
+                String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US)
+                        .format(gpsTrack.getDate());
                 viewHolder.date.setText(sDate);
                 viewHolder.latitude.setText(String.valueOf(gpsTrack.getLatitude()));
                 viewHolder.longitude.setText(String.valueOf(gpsTrack.getLatitude()));
