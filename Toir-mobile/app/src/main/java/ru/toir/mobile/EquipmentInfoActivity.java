@@ -1,7 +1,6 @@
 package ru.toir.mobile;
 
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -128,7 +127,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-    public static void showDocument(Context context, File file) {
+    public static Intent showDocument(File file) {
         MimeTypeMap mt = MimeTypeMap.getSingleton();
         String[] patternList = file.getName().split("\\.");
         String extension = patternList[patternList.length - 1];
@@ -138,13 +137,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             Intent target = new Intent(Intent.ACTION_VIEW);
             target.setDataAndType(Uri.fromFile(file), mimeType);
             target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-            Intent viewFileIntent = Intent.createChooser(target, "Open File");
-            try {
-                context.startActivity(viewFileIntent);
-            } catch (ActivityNotFoundException e) {
-                // сообщить пользователю установить подходящее приложение
-            }
+            return Intent.createChooser(target, "Open File");
+        } else {
+            return null;
         }
     }
 
@@ -247,7 +242,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         StageAdapter stageAdapter = new StageAdapter(stages);
         if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
-            if (date != null && date.after(new Date(100000))) {
+            if (date != null) {
                 sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
             } else {
                 sDate = "не обслуживалось";
@@ -818,7 +813,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
                     documentation.getPath());
             if (file.exists()) {
-                showDocument(getApplicationContext(), file);
+                Intent intent = showDocument(file);
+                if (intent != null) {
+                    startActivity(intent);
+                }
             } else {
                 // либо сказать что файла нет, либо предложить скачать с сервера
                 Log.d(TAG, "Получаем файл документации.");
@@ -845,7 +843,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     public void onDismiss(DialogInterface dialog) {
                         // открываем загруженный документ (если он загрузился)
                         if (file.exists()) {
-                            showDocument(getApplicationContext(), file);
+                            showDocument(file);
                         } else {
                             Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
                                     Toast.LENGTH_LONG).show();

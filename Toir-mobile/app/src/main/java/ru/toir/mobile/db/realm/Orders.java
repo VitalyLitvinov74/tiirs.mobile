@@ -231,4 +231,25 @@ public class Orders extends RealmObject implements ISend {
     public void setUpdated(int updated) {
         this.updated = updated;
     }
+
+    public boolean isNew() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.CANCELED);
+    }
+
 }

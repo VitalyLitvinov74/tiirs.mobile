@@ -90,10 +90,4 @@ public class OrderVerdictAdapter extends RealmBaseAdapter<OrderVerdict> implemen
         TextView uuid;
         TextView title;
     }
-
-    public class Status {
-        public static final String COMPLETE = "886dca37-2cc9-44da-aff9-19bf143e611a";
-        public static final String UN_COMPLETE = "883c08ec-89d9-47df-b7cf-63a05d56594c";
-        public static final String CANNOT_COMPLETE = "893c08ec-89d9-47df-b7cf-63a05d56594c";
-    }
 }

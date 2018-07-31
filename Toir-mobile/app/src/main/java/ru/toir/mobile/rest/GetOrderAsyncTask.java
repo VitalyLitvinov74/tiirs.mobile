@@ -1,7 +1,12 @@
 package ru.toir.mobile.rest;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +25,8 @@ import io.realm.RealmObject;
 import okhttp3.ResponseBody;
 import retrofit2.*;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.MainActivity;
+import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
@@ -53,6 +60,43 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
     public GetOrderAsyncTask(ProgressDialog d, File e) {
         dialog = d;
         extDir = e;
+    }
+
+    /**
+     * Проверка на необходимость загрузки файла с сервера.
+     *
+     * @param obj       {@link RealmObject} Объект. Должен реализовывать {@link IToirDbObject}
+     * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
+     * @return boolean
+     */
+    static boolean isNeedDownload(File extDir, RealmObject obj, String localPath) {
+        Realm realm = Realm.getDefaultInstance();
+        String uuid = ((IToirDbObject) obj).getUuid();
+        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
+        long localChangedAt;
+
+        // есть ли локальная запись
+        try {
+            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
+        } catch (Exception e) {
+            return true;
+        } finally {
+            realm.close();
+        }
+
+        // есть ли локально файл
+        String fileName = ((IToirDbObject) obj).getImageFile();
+        if (fileName != null) {
+            File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
+            if (!file.exists()) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+
+        // есть ли изменения на сервере
+        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
     }
 
     @Override
@@ -109,7 +153,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 // урл изображения задачи
                 TaskTemplate taskTemplate = task.getTaskTemplate();
                 basePathLocal = taskTemplate.getImageFilePath() + "/";
-                isNeedDownload = isNeedDownload(taskTemplate, basePathLocal);
+                isNeedDownload = isNeedDownload(extDir, taskTemplate, basePathLocal);
                 if (isNeedDownload) {
                     String url = taskTemplate.getImageFileUrl(userName) + "/";
                     files.add(new FilePath(taskTemplate.getImage(), url, basePathLocal));
@@ -120,7 +164,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     // урл изображения этапа задачи
                     StageTemplate stageTemplate = stage.getStageTemplate();
                     basePathLocal = stageTemplate.getImageFilePath() + "/";
-                    isNeedDownload = isNeedDownload(stageTemplate, basePathLocal);
+                    isNeedDownload = isNeedDownload(extDir, stageTemplate, basePathLocal);
                     if (isNeedDownload) {
                         String url = stageTemplate.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(stageTemplate.getImage(), url, basePathLocal));
@@ -130,7 +174,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     Equipment equipment = stage.getEquipment();
                     basePathLocal = equipment.getImageFilePath() + "/";
                     if (!equipment.getImage().equals("")) {
-                        isNeedDownload = isNeedDownload(equipment, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, equipment, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipment.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(equipment.getImage(), url, basePathLocal));
@@ -141,7 +185,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     EquipmentModel equipmentModel = stage.getEquipment().getEquipmentModel();
                     basePathLocal = equipmentModel.getImageFilePath() + "/";
                     if (!equipmentModel.getImage().equals("")) {
-                        isNeedDownload = isNeedDownload(equipmentModel, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, equipmentModel, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipmentModel.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(equipmentModel.getImage(), url, basePathLocal));
@@ -152,7 +196,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     Objects object = stage.getEquipment().getLocation();
                     if (object != null) {
                         basePathLocal = object.getImageFilePath() + "/";
-                        isNeedDownload = isNeedDownload(object, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, object, basePathLocal);
                         if (isNeedDownload) {
                             String url = object.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(object.getImage(), url, basePathLocal));
@@ -167,7 +211,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                         OperationTemplate operationTemplate = operation.getOperationTemplate();
                         basePathLocal = operationTemplate.getImageFilePath() + "/";
                         // урл изображения операции
-                        isNeedDownload = isNeedDownload(operationTemplate, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, operationTemplate, basePathLocal);
                         if (isNeedDownload) {
                             String url = operationTemplate.getImageFileUrl(userName) + "/";
                             files.add(new FilePath(operationTemplate.getImage(), url, basePathLocal));
@@ -195,7 +239,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             if (list != null) {
                 for (Documentation doc : list) {
                     String localPath = doc.getImageFilePath() + "/";
-                    if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                    if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                         String url = doc.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(doc.getPath(), url, localPath));
                     }
@@ -223,7 +267,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             if (list != null) {
                 for (Documentation doc : list) {
                     String localPath = doc.getImageFilePath() + "/";
-                    if (isNeedDownload(doc, localPath) && doc.isRequired()) {
+                    if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                         String url = doc.getImageFileUrl(userName) + "/";
                         files.add(new FilePath(doc.getPath(), url, localPath));
                     }
@@ -294,10 +338,16 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
     @Override
     protected void onPostExecute(List<Orders> orders) {
         super.onPostExecute(orders);
+
+        Context context = null;
+        if (dialog != null) {
+            context = dialog.getContext();
+        }
+
         if (orders == null) {
             // сообщаем описание неудачи
-            if (dialog != null && message != null) {
-                Toast.makeText(dialog.getContext(), message, Toast.LENGTH_LONG).show();
+            if (context != null && message != null) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         } else {
             int count = orders.size();
@@ -323,8 +373,29 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 realm.commitTransaction();
                 realm.close();
                 addToJournal("Клиент успешно получил " + count + " нарядов");
-                if (dialog != null) {
-                    Toast.makeText(dialog.getContext(), "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                if (context != null) {
+                    Toast.makeText(context, "Количество нарядов " + count, Toast.LENGTH_SHORT).show();
+                }
+
+                // тестовая реализация штатного уведомления
+                NotificationManager notificationManager = null;
+                if (context != null) {
+                    notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                }
+
+                if (notificationManager != null) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.putExtra("action", "orderFragment");
+                    NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
+                            .setSmallIcon(R.drawable.toir_notify)
+                            .setAutoCancel(true)
+                            .setTicker("Получены новые наряды")
+                            .setContentText("Полученно " + count + " нарядов.")
+                            .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("Тоирус")
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+                    notificationManager.notify(1, nb.build());
                 }
 
                 // если есть новые наряды, отправляем подтверждение о получении
@@ -375,44 +446,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         }
     }
 
-    /**
-     * Проверка на необходимость загрузки файла с сервера.
-     *
-     * @param obj       {@link RealmObject} Объект. Должен реализовывать {@link IToirDbObject}
-     * @param localPath {@link String} Локальный путь к файлу. Относительно папки /files
-     * @return boolean
-     */
-    private boolean isNeedDownload(RealmObject obj, String localPath) {
-        Realm realm = Realm.getDefaultInstance();
-        String uuid = ((IToirDbObject) obj).getUuid();
-        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
-        long localChangedAt;
-
-        // есть ли локальная запись
-        try {
-            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
-        } catch (Exception e) {
-            return true;
-        } finally {
-            realm.close();
-        }
-
-        // есть ли локально файл
-        String fileName = ((IToirDbObject) obj).getImageFile();
-        if (fileName != null) {
-            File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
-            if (!file.exists()) {
-                return true;
-            }
-        } else {
-            return false;
-        }
-
-        // есть ли изменения на сервере
-        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
-    }
-
-    private class FilePath {
+    static class FilePath {
         String fileName;
         String urlPath;
         String localPath;

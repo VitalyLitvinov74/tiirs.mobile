@@ -119,4 +119,28 @@ public class Operation extends RealmObject {
     public void setStageUuid(String stageUuid) {
         this.stageUuid = stageUuid;
     }
+
+    public OperationStatus getStatus() {
+        return operationStatus;
+    }
+
+    public boolean isNew() {
+        return getStatus().getUuid().equals(OperationStatus.Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return getStatus().getUuid().equals(OperationStatus.Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return getStatus().getUuid().equals(OperationStatus.Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return getStatus().getUuid().equals(OperationStatus.Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return getStatus().getUuid().equals(OperationStatus.Status.CANCELED);
+    }
 }

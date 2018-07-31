@@ -57,6 +57,10 @@ public class OperationType extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public boolean isMeasure() {
+        return uuid.equals(Type.MEASURE);
+    }
+
     public class Type {
         public static final String MEASURE = "6B4A9362-BBD8-4A17-9721-04728781F449";
     }

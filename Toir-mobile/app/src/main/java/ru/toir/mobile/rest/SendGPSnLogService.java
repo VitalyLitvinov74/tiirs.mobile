@@ -32,20 +32,19 @@ public class SendGPSnLogService extends Service {
     public static final String ACTION = "ru.toir.mobile.rest.SEND_GPS_AND_LOG";
     private static final String TAG = "SendGPSnLog";
     private boolean isRuning;
-    private Thread thread;
     private long[] gpsIds;
     private long[] logIds;
+
     /**
      * Метод для выполнения отправки данных на сервер.
      */
-    @SuppressWarnings("unchecked")
     private Runnable task = new Runnable() {
         @Override
         public void run() {
             Realm realm = Realm.getDefaultInstance();
             Call<ResponseBody> call;
 
-            if (gpsIds.length > 0) {
+            if (gpsIds != null && gpsIds.length > 0) {
                 int count = gpsIds.length;
                 Long[] data = new Long[count];
                 for (int i = 0; i < count; i++) {
@@ -94,7 +93,7 @@ public class SendGPSnLogService extends Service {
                 }
             }
 
-            if (logIds.length > 0) {
+            if (logIds != null && logIds.length > 0) {
                 int count = logIds.length;
                 Long[] data = new Long[count];
                 for (int i = 0; i < count; i++) {
@@ -102,7 +101,7 @@ public class SendGPSnLogService extends Service {
                 }
 
                 RealmResults<Journal> items = realm.where(Journal.class).in("_id", data)
-                        .equalTo("sent", false).findAll();
+                        .findAll();
                 // отправляем данные с логами
                 call = ToirAPIFactory.getJournalService()
                         .send(new CopyOnWriteArrayList<>(realm.copyFromRealm(items)));
@@ -150,7 +149,6 @@ public class SendGPSnLogService extends Service {
     @Override
     public void onCreate() {
         isRuning = false;
-        thread = new Thread(task);
     }
 
     @Override
@@ -160,11 +158,11 @@ public class SendGPSnLogService extends Service {
         }
 
         if (!isRuning) {
-            Log.d(TAG, "Запускаем поток отправки данных на сервер...");
+            Log.d(TAG, "Запускаем поток отправки логов и координат на сервер...");
             isRuning = true;
             gpsIds = intent.getLongArrayExtra(GPS_IDS);
             logIds = intent.getLongArrayExtra(LOG_IDS);
-            thread.start();
+            new Thread(task).start();
         }
 
         return START_STICKY;

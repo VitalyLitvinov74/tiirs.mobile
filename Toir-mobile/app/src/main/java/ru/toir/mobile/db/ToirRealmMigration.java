@@ -29,6 +29,7 @@ import ru.toir.mobile.db.migration.Migration29;
 import ru.toir.mobile.db.migration.Migration30;
 import ru.toir.mobile.db.migration.Migration31;
 import ru.toir.mobile.db.migration.Migration32;
+import ru.toir.mobile.db.migration.Migration33;
 
 /**
  * @author Dmitriy Logachev
@@ -359,6 +360,11 @@ class ToirRealmMigration implements RealmMigration {
 
         if (oldVersion == 31) {
             new Migration32().migration(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 32) {
+            new Migration33().migration(realm);
             oldVersion++;
         }
 

@@ -2,6 +2,7 @@ package ru.toir.mobile.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -156,7 +157,10 @@ public class DocumentationFragment extends Fragment {
                 File file = new File(context.getExternalFilesDir(documentation.getImageFilePath()),
                         documentation.getPath());
                 if (file.exists()) {
-                    EquipmentInfoActivity.showDocument(context, file);
+                    Intent intent = EquipmentInfoActivity.showDocument(file);
+                    if (intent != null) {
+                        startActivity(intent);
+                    }
                 } else {
                     // TODO: либо сообщить что файла нет, либо запустить какой-то процесс его получения
 

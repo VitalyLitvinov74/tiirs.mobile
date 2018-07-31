@@ -95,13 +95,10 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                         }
                     }
 
-                    if (stage.getEndDate() != null) {
-                        Date lDate = stage.getEndDate();
-                        if (lDate != null && lDate.after(new Date(100000))) {
-                            viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(lDate));
-                        } else {
-                            viewHolder.end_date.setText(R.string.not_finished);
-                        }
+                    Date endDate = stage.getEndDate();
+                    if (endDate != null) {
+                        viewHolder.end_date.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
+                                .format(endDate));
                     } else {
                         viewHolder.end_date.setText("не закончен");
                     }
