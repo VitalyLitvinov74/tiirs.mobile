@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import java.util.Locale;
 
@@ -23,11 +22,7 @@ import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.ContragentAdapter;
-import ru.toir.mobile.db.adapters.EquipmentAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Contragent;
-import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.EquipmentType;
 
 public class ContragentsFragment extends Fragment {
     private Realm realmDB;

@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -460,8 +461,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setEnabledLoginButton(boolean enable) {
         Button loginButton = findViewById(R.id.loginButton);
-        loginButton.setEnabled(enable);
-        loginButton.setClickable(enable);
+        if (loginButton!=null) {
+            loginButton.setEnabled(enable);
+            loginButton.setClickable(enable);
+        }
     }
 
     /**

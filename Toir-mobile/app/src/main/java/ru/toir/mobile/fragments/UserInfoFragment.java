@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -78,7 +79,7 @@ public class UserInfoFragment extends Fragment {
         TextView tv_user_type = view.findViewById(R.id.user_text_type);
         TextView tv_user_gps = view.findViewById(R.id.user_text_location);
         ImageView user_image = view.findViewById(R.id.user_image);
-        ImageView edit_image = view.findViewById(R.id.user_edit_image);
+        FloatingActionButton edit_image = view.findViewById(R.id.user_edit_image);
         ImageView call_image = view.findViewById(R.id.user_boss_contact);
         Switch user_status_gps = view.findViewById(R.id.user_status_gps_switch);
         Switch user_status_gprs = view.findViewById(R.id.user_status_gprs_switch);
