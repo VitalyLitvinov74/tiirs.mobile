@@ -141,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager _locationManager;
     private GPSListener _gpsListener;
     private Thread checkGPSThread;
+    private String locationBestProvider = LocationManager.GPS_PROVIDER;
+    private boolean GPSPresent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1165,10 +1167,8 @@ public class MainActivity extends AppCompatActivity {
                 while (isRun) {
                     try {
                         Thread.sleep(5000);
-                        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                         if (!isSkipGPS()) {
-                            boolean gpsEnabled = lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                            if (!gpsEnabled) {
+                            if (!isGpsOn()) {
                                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 startActivity(intent);
                                 Toast.makeText(getApplicationContext(), "GPS must be enabled.",
@@ -1188,7 +1188,18 @@ public class MainActivity extends AppCompatActivity {
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
         if (_locationManager != null && permission == PackageManager.PERMISSION_GRANTED) {
             _gpsListener = new GPSListener();
-            _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, _gpsListener);
+            try {
+                _locationManager.requestLocationUpdates(locationBestProvider, 10000, 10, _gpsListener);
+                GPSPresent = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                GPSPresent = false;
+            }
+
+            if (!GPSPresent) {
+                Toast.makeText(this, "Устройство не оборудовано приёмником GPS!",
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -1234,8 +1245,12 @@ public class MainActivity extends AppCompatActivity {
      * @return boolean
      */
     private boolean isGpsOn() {
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (GPSPresent) {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            return lm != null && lm.isProviderEnabled(locationBestProvider);
+        } else {
+            return true;
+        }
     }
 
     /**
