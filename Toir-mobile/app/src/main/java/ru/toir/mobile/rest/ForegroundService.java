@@ -1,9 +1,14 @@
 package ru.toir.mobile.rest;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -40,7 +45,14 @@ public class ForegroundService extends Service {
         super.onCreate();
         Log.d(TAG, "onCreate()");
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "toir")
+        String channelId;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channelId = createNotificationChannel();
+        } else {
+            channelId = "sman";
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.toir_notify)
                 .setContentText("Сервис ТОИРУС")
                 .setSubText("Получение/отправка данных");
@@ -71,6 +83,22 @@ public class ForegroundService extends Service {
                 startGetOrder();
             }
         }, 40000);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel() {
+        String channelId = "sman";
+        String channelName = "My Background Service";
+        NotificationChannel channel = new NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_NONE);
+        channel.setLightColor(Color.BLUE);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager service = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (service != null) {
+            service.createNotificationChannel(channel);
+        }
+
+        return channelId;
     }
 
     /**
