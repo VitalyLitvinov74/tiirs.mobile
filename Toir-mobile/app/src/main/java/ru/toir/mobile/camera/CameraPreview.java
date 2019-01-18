@@ -24,7 +24,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private PreviewCallback previewCallback;
     private AutoFocusCallback autoFocusCallback;
-    private byte[] cameraBuffer;
+
+    public CameraPreview(Context context) {
+        this(context, null, null, null);
+    }
 
     public CameraPreview(Context context, Camera camera,
                          PreviewCallback previewCb,
@@ -73,6 +76,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        byte[] cameraBuffer;
         /*
          * If your preview can change or rotate, take care of those events here.
          * Make sure to stop the preview before resizing or reformatting it.
@@ -81,6 +85,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // preview surface does not exist
             return;
         }
+
         if (mCamera != null) {
             // stop preview before making changes
             try {
