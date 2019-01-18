@@ -10,14 +10,18 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 07.09.16.
  */
-public class Orders extends RealmObject {
+public class Orders extends RealmObject implements ISend {
     @PrimaryKey
     private long _id;
     private String uuid;
     private String title;
     private User author;
     private User user;
-    private Date receiveDate;   // дата получения наряда
+    private Contragent customer;
+    private Brigade perpetrator;
+    private String comment;
+    private String reason;
+    private Date receivDate;   // дата получения наряда
     private Date startDate;     // дата назначения наряда
     private Date createdAt;
     private Date changedAt;
@@ -29,7 +33,7 @@ public class Orders extends RealmObject {
     private Date attemptSendDate;
     private int attemptCount;
     private int updated;
-    private RealmList<Tasks> tasks;
+    private RealmList<Task> tasks;
     private boolean sent;
 
     public long get_id() {
@@ -72,12 +76,12 @@ public class Orders extends RealmObject {
         this.user = user;
     }
 
-    public Date getReceiveDate() {
-        return receiveDate;
+    public Date getReceivDate() {
+        return receivDate;
     }
 
-    public void setReceiveDate(Date receiveDate) {
-        this.receiveDate = receiveDate;
+    public void setReceivDate(Date receivDate) {
+        this.receivDate = receivDate;
     }
 
     public Date getStartDate() {
@@ -168,15 +172,15 @@ public class Orders extends RealmObject {
         this.changedAt = changedAt;
     }
 
-    public RealmList<Tasks> getTasks() {
+    public RealmList<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(RealmList<Tasks> tasks) {
+    public void setTasks(RealmList<Task> tasks) {
         this.tasks = tasks;
     }
 
-    public void addTask(Tasks task) {
+    public void addTask(Task task) {
         this.tasks.add(task);
     }
 
@@ -187,4 +191,65 @@ public class Orders extends RealmObject {
     public void setSent(boolean sent) {
         this.sent = sent;
     }
+
+    public Contragent getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Contragent customer) {
+        this.customer = customer;
+    }
+
+    public Brigade getPerpetrator() {
+        return perpetrator;
+    }
+
+    public void setPerpetrator(Brigade perpetrator) {
+        this.perpetrator = perpetrator;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public int getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(int updated) {
+        this.updated = updated;
+    }
+
+    public boolean isNew() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return orderStatus.getUuid().equals(OrderStatus.Status.CANCELED);
+    }
+
 }

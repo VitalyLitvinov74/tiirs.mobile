@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -20,19 +20,15 @@ import ru.toir.mobile.db.realm.CriticalType;
 public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implements ListAdapter {
     public static final String TABLE_NAME = "CriticalType";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-    }
-
-    public CriticalTypeAdapter(@NonNull Context context, int resId, RealmResults<CriticalType> data) {
-        super(context, data);
+    public CriticalTypeAdapter(RealmResults<CriticalType> data) {
+        super(data);
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<CriticalType> rows = realm.where(CriticalType.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -48,6 +44,8 @@ public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implemen
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
@@ -59,8 +57,8 @@ public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implemen
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -71,5 +69,10 @@ public class CriticalTypeAdapter extends RealmBaseAdapter<CriticalType> implemen
             return convertView;
         }
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
     }
 }

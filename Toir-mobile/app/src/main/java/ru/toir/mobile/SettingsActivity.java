@@ -4,18 +4,21 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.design.widget.AppBarLayout;
@@ -31,39 +34,44 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
-import dalvik.system.DexFile;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
-
+import ru.toir.mobile.utils.MainFunctions;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceClickListener {
     private static final String TAG = "ToirSettings";
+    private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
+    private static final int ACTIVITY_TELEGRAM = 1;
+    private PreferenceScreen basicSettingScr;
+    private PreferenceScreen driverSettingScr;
 
-    private PreferenceScreen drvSettingScr;
-    private PreferenceCategory drvSettingCategory;
-
-    private static String appVersion;
-
-    @SuppressWarnings("deprecation")
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
         AppBarLayout bar;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent();
+            LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(bar, 0);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -71,7 +79,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(bar, 0);
         } else {
-            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+            ViewGroup root = findViewById(android.R.id.content);
             ListView content = (ListView) root.getChildAt(0);
             root.removeAllViews();
             bar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
@@ -98,34 +106,27 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         });
 
+        String appVersion;
         try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageManager pm = getPackageManager();
+            String packageName = getPackageName();
+            getApplicationContext().getClassLoader();
+
+            PackageInfo pInfo = pm.getPackageInfo(packageName, 0);
             appVersion = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             appVersion = "unknown";
         }
+
+        Log.d(TAG, "version:" + appVersion);
+
         setupSimplePreferencesScreen();
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
 
-        // получаем список драйверов по имени класса
-        List<String> driverClassList = new ArrayList<>();
-        try {
-            DexFile df = new DexFile(getApplicationContext()
-                    .getPackageCodePath());
-            for (Enumeration<String> iter = df.entries(); iter
-                    .hasMoreElements(); ) {
-                String classPath = iter.nextElement();
-                if (classPath.contains("ru.toir.mobile.rfid.driver")
-                        && !classPath.contains("$")) {
-                    driverClassList.add(classPath);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        // получаем список драйверов
+        String[] driverClassList = RfidDriverBase.getDriverClassList();
         // строим список драйверов с именами и классами
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
@@ -139,38 +140,26 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         }
 
-        // категория с экраном настроек драйвера
-        drvSettingCategory = (PreferenceCategory) SettingsActivity.this.findPreference("drvSettingsCategory");
-
         // элемент интерфейса со списком драйверов считывателей
         ListPreference drvList = (ListPreference) this.findPreference(getResources().getString(
                 R.string.rfidDriverListPrefKey));
-        drvSettingScr = (PreferenceScreen) this.findPreference(getResources()
+
+        basicSettingScr = (PreferenceScreen) this.findPreference("preferenceBasicScreen");
+        driverSettingScr = (PreferenceScreen) this.findPreference(getResources()
                 .getString(R.string.rfidDrvSettingKey));
 
         // указываем названия и значения для элементов списка
         drvList.setEntries(drvNames.toArray(new String[]{""}));
         drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
 
-        // при изменении драйвера, включаем дополнительный экран с
-        // настройками драйвера
+        // при изменении драйвера, включаем дополнительный экран с настройками драйвера
         drvList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
             @Override
-            public boolean onPreferenceChange(Preference preference,
-                                              Object newValue) {
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
 
                 String value = (String) newValue;
-                PreferenceScreen screen = getDrvSettingsScreen(value,
-                        drvSettingScr);
-
-                // проверяем есть ли настройки у драйвера
-                if (screen != null) {
-                    drvSettingCategory.setEnabled(true);
-                } else {
-                    drvSettingCategory.setEnabled(false);
-                }
-
+                showRfidDriverScreen(value);
                 return true;
             }
         });
@@ -178,27 +167,55 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // проверяем есть ли настройки у драйвера
         String currentDrv = preferences.getString(
                 getResources().getString(R.string.rfidDriverListPrefKey), null);
-        if (currentDrv != null) {
-            if (getDrvSettingsScreen(currentDrv, drvSettingScr) != null) {
-                drvSettingCategory.setEnabled(true);
-            } else {
-                drvSettingCategory.setEnabled(false);
-            }
-        } else {
-            drvSettingCategory.setEnabled(false);
-        }
+        showRfidDriverScreen(currentDrv);
 
         Preference button = this.findPreference(getString(R.string.load_test_data));
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                LoadTestData.LoadAllTestData();
+                LoadTestData.LoadAllTestData2();
+                return true;
+            }
+        });
+
+        Preference button2 = this.findPreference(getString(R.string.delete_test_data));
+        button2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                LoadTestData.DeleteSomeData();
+                return true;
+            }
+        });
+
+        //https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
+        SharedPreferences sharedPref = getSharedPreferences("messendgers", Context.MODE_PRIVATE);
+        String chat_id = sharedPref.getString(getString(R.string.telegram_chat_id), "0");
+        Preference telegramChatId = findPreference(getString(R.string.telegram_chat_id));
+        telegramChatId.setTitle("Идентификатор чата " + chat_id);
+
+        Preference telegramPreference = findPreference(getString(R.string.receive_telegram));
+        telegramPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Toast.makeText(getApplication(), "Пожалуйста отправьте любое сообщение боту toirus", Toast.LENGTH_SHORT).show();
+                Intent telegramIntent = new Intent(Intent.ACTION_VIEW);
+                telegramIntent.setData(Uri.parse("http://telegram.me/toirus_bot"));
+                //startActivity(telegramIntent);
+                startActivityForResult(telegramIntent, ACTIVITY_TELEGRAM);
                 return true;
             }
         });
     }
 
-    @SuppressWarnings("deprecation")
+    void showRfidDriverScreen(String value) {
+        // проверяем есть ли настройки у драйвера
+        if (value != null && isDriverSettingsScreen(value, driverSettingScr)) {
+            basicSettingScr.addPreference(driverSettingScr);
+        } else {
+            basicSettingScr.removePreference(driverSettingScr);
+        }
+    }
+
     private void setupSimplePreferencesScreen() {
         addPreferencesFromResource(R.xml.pref_general);
     }
@@ -208,14 +225,17 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // Allow super to try and create a view first
         final View result = super.onCreateView(name, context, attrs);
         if (result != null) {
+            Log.d("AA", "bb");
             return result;
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             //toolbar.setBackgroundColor(getResources().getColor(R.color.larisaBlueColor));
             //toolbar.setSubtitle("Обслуживание и ремонт");
             toolbar.setTitleTextColor(Color.WHITE);
         }
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // If we're running pre-L, we need to 'inject' our tint aware Views in place of the
             // standard framework versions
@@ -240,17 +260,24 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.onConfigurationChanged(newConfig);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         super.onPreferenceTreeClick(preferenceScreen, preference);
 
         if (preference != null) {
             if (preference instanceof PreferenceScreen) {
-                if (((PreferenceScreen) preference).getDialog() != null) {
-                    ((PreferenceScreen) preference).getDialog().getWindow().getDecorView().setBackgroundDrawable(this.getWindow().getDecorView().getBackground().getConstantState().newDrawable());
-                    setUpNestedScreen((PreferenceScreen) preference);
+                Dialog dialog = ((PreferenceScreen) preference).getDialog();
+                if (dialog != null) {
+                    Window window = dialog.getWindow();
+                    if (window != null) {
+                        Drawable.ConstantState constantState = this.getWindow().getDecorView().getBackground().getConstantState();
+                        if (constantState != null) {
+                            window.getDecorView().setBackgroundDrawable(constantState.newDrawable());
+                        }
+                    }
                 }
+
+                setUpNestedScreen((PreferenceScreen) preference);
             }
         }
 
@@ -263,14 +290,14 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         AppBarLayout appBar;
 
         View listRoot = dialog.findViewById(android.R.id.list);
-        ViewGroup mRootView = (ViewGroup) dialog.findViewById(android.R.id.content);
+        ViewGroup mRootView = dialog.findViewById(android.R.id.content);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent().getParent();
+            LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+            LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);
         } else {
@@ -357,8 +384,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.onResume();
     }
 
-    private PreferenceScreen getDrvSettingsScreen(String classPath,
-                                                  PreferenceScreen rootScreen) {
+    private boolean isDriverSettingsScreen(String classPath, PreferenceScreen rootScreen) {
 
         Class<?> driverClass;
         PreferenceScreen screen;
@@ -376,13 +402,15 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
             // пытаемся вызвать метод
             screen = driver.getSettingsScreen(rootScreen);
-
-            // возвращаем результат
-            return screen;
+            if (screen == null) {
+                return false;
+            }
         } catch (Exception e) {
-            Log.e(TAG, e.getLocalizedMessage());
-            return null;
+            e.printStackTrace();
+            return false;
         }
+
+        return true;
     }
 
 
@@ -411,6 +439,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                                     errorMessage = null;
                                 }
                             }
+
                             EditText edit = URLPreference.getEditText();
                             if (errorMessage == null) {
                                 edit.setError(null);
@@ -423,6 +452,105 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                         }
                     });
         }
+
         return true;
     }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return super.isValidFragment(fragmentName);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case ACTIVITY_TELEGRAM:
+                // https://api.telegram.org/bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY/getUpdates
+                AsyncRequest ar = new AsyncRequest();
+                ar.setListener(new AsyncRequest.Listener() {
+                    @Override
+                    public void onSuccess(String chat_id) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("messendgers",
+                                Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(getResources().getString(R.string.telegram_chat_id), chat_id);
+                        editor.apply();
+
+                        String msg = "Система Тоирус привествует Вас!"
+                                + " Теперь Вы будете получать уведомления в этом чате"
+                                + " " + chat_id;
+                        new MainFunctions().sendMessageToTelegram(getApplicationContext(), msg);
+                    }
+                });
+                ar.execute();
+                break;
+        }
+    }
+
+    static class AsyncRequest extends AsyncTask<String, Integer, String> {
+
+        private Listener listener;
+
+        @Override
+        protected String doInBackground(String... arg) {
+            HttpURLConnection urlConnection = null;
+            StringBuilder result = new StringBuilder();
+            try {
+                URL url = new URL("https://api.telegram.org/" + BOT + "/getUpdates");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                String jsonString = result.toString();
+                JSONObject jsonObject = new JSONObject(jsonString);
+                JSONArray res = jsonObject.getJSONArray("result");
+                if (res.length() > 0) {
+                    JSONObject res0 = res.getJSONObject(0);
+                    JSONObject message = res0.getJSONObject("message");
+                    JSONObject chat = message.getJSONObject("chat");
+                    int chat_id = chat.getInt("id");
+                    if (chat_id > 0) {
+                        // store chat id
+                        return String.valueOf(chat_id);
+                    }
+
+                    return "";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (urlConnection != null) {
+                try {
+                    urlConnection.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (listener != null) {
+                listener.onSuccess(s);
+            }
+        }
+
+        void setListener(Listener listener) {
+            this.listener = listener;
+        }
+
+        interface Listener {
+            void onSuccess(String object);
+        }
+    }
 }
+

@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,55 +21,87 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
 public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> implements ListAdapter {
     public static final String TABLE_NAME = "EquipmentStatus";
 
-    private static class ViewHolder{
-        TextView uuid;
-        TextView title;
-        ImageView icon;
+    public EquipmentStatusAdapter(RealmResults<EquipmentStatus> data) {
+        super(data);
     }
 
-    public EquipmentStatusAdapter(@NonNull Context context, int resId, RealmResults<EquipmentStatus> data) {
-        super(context, data);
+    @Override
+    public EquipmentStatus getItem(int position) {
+        EquipmentStatus equipmentStatus = null;
+        if (adapterData != null) {
+            equipmentStatus = adapterData.get(position);
+        }
+        return equipmentStatus;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        EquipmentStatus equipmentStatus;
+        if (adapterData != null) {
+            equipmentStatus = adapterData.get(position);
+            return equipmentStatus.get_id();
+        }
+        return 0;
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<EquipmentStatus> rows = realm.where(EquipmentStatus.class).findAll();
+        realm.close();
         return rows.size();
     }
 
     @Override
-    public EquipmentStatus getItem(int position) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
-        if (parent.getId() == R.id.simple_spinner) {
-            TextView textView = (TextView) View.inflate(context, android.R.layout.simple_spinner_item, null);
-            EquipmentStatus equipmentStatus = adapterData.get(position);
-            textView.setText(equipmentStatus.getTitle());
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            if (parent.getId() == R.id.reference_listView) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                convertView.setTag(viewHolder);
+            }
+            if (parent.getId() == R.id.simple_spinner || parent.getId() == R.id.spinner_status) {
+                convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+                viewHolder.title = convertView.findViewById(android.R.id.text1);
+                convertView.setTag(viewHolder);
+            }
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        EquipmentStatus equipmentStatus;
+        if (adapterData != null && viewHolder.title != null) {
+            equipmentStatus = adapterData.get(position);
+            if (equipmentStatus != null)
+                viewHolder.title.setText(equipmentStatus.getTitle());
+        }
+
+        if (convertView == null) {
+            TextView textView = new TextView(context);
+            if (adapterData != null) {
+                equipmentStatus = adapterData.get(position);
+                if (equipmentStatus != null)
+                    textView.setText(equipmentStatus.getTitle());
+                    textView.setTextSize(18);
+                    textView.setPadding(5, 5, 5, 5);
+            }
             return textView;
         }
-        if (parent.getId() == R.id.reference_listView) {
-            if (convertView == null) {
-                convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-            EquipmentStatus equipmentStatus = adapterData.get(position);
-            viewHolder.title.setText(equipmentStatus.getTitle());
-            return convertView;
-        }
         return convertView;
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return getView(position, null, parent);
+    }
+
+    private static class ViewHolder {
+        TextView uuid;
+        TextView title;
+        ImageView icon;
     }
 }

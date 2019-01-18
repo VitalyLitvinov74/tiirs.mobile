@@ -9,19 +9,23 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 03.04.17.
  */
-public class Objects extends RealmObject {
+public class Objects extends RealmObject implements IToirDbObject {
     @PrimaryKey
     private long _id;
     private String uuid;
     private ObjectType objectType;
-    private Objects parentObject;
+    private Objects parent;
     private String title;
-    private String descr;
+    private String description;
     private double latitude;
     private double longitude;
     private String photo;
     private Date createdAt;
     private Date changedAt;
+
+    public static String getImageRoot() {
+        return "object";
+    }
 
     public long get_id() {
         return _id;
@@ -47,12 +51,12 @@ public class Objects extends RealmObject {
         this.title = title;
     }
 
-    public String getDescr() {
-        return descr;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescr(String descr) {
-        this.descr = descr;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public ObjectType getObjectType() {
@@ -63,12 +67,12 @@ public class Objects extends RealmObject {
         this.objectType = objectType;
     }
 
-    public Object getParentObject() {
-        return parentObject;
+    public Object getParent() {
+        return parent;
     }
 
-    public void setParentObject(Objects parentObject) {
-        this.parentObject = parentObject;
+    public void setParent(Objects parent) {
+        this.parent = parent;
     }
 
     public double getLatitude() {
@@ -109,5 +113,24 @@ public class Objects extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String dir;
+
+        dir = imageRoot;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

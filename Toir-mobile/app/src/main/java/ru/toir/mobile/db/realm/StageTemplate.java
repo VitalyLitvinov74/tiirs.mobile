@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 14.09.16.
  */
-public class StageTemplate extends RealmObject {
+public class StageTemplate extends RealmObject implements IToirDbObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -17,11 +17,13 @@ public class StageTemplate extends RealmObject {
     private String description;
     private String image;
     private int normative;
-    private EquipmentModel equipmentModel;
-    private StageType taskStageType;
+    private StageType stageType;
     private Date createdAt;
     private Date changedAt;
 
+    public static String getImageRoot() {
+        return "stype";
+    }
 
     public long get_id() {
         return _id;
@@ -63,20 +65,12 @@ public class StageTemplate extends RealmObject {
         this.image = image;
     }
 
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
+    public StageType getStageType() {
+        return stageType;
     }
 
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
-    }
-
-    public StageType getTaskStageType() {
-        return taskStageType;
-    }
-
-    public void setTaskStageType(StageType taskStageType) {
-        this.taskStageType = taskStageType;
+    public void setStageType(StageType stageType) {
+        this.stageType = stageType;
     }
 
     public int getNormative() {
@@ -101,5 +95,26 @@ public class StageTemplate extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = stageType.getUuid();
+        dir = imageRoot + '/' + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

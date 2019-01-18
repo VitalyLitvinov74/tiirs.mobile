@@ -47,13 +47,23 @@
                 android:textColor="#ffffff"
                 android:textSize="15sp" />
 
+            <ImageView
+                android:id="@+id/user_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_text_uuid"
+                android:layout_marginLeft="15dp"
+                android:contentDescription="@string/image_description"
+                android:src="@drawable/user_32" />
+
             <TextView
                 android:id="@+id/user_text_type"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_uuid"
+                android:layout_toRightOf="@+id/user_icon"
                 android:background="#FAFAFA"
-                android:paddingLeft="48dp"
+                android:paddingLeft="10dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
@@ -62,8 +72,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_type"
+                android:layout_toRightOf="@+id/user_icon"
                 android:background="#FAFAFA"
-                android:paddingLeft="48dp"
+                android:paddingLeft="10dp"
                 android:text="@string/whois"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
@@ -185,6 +196,7 @@
                 android:layout_height="50dp"
                 android:layout_alignRight="@+id/user_boss_contact"
                 android:layout_below="@+id/user_divider"
+                android:enabled="false"
                 android:gravity="center_vertical"
                 android:text="" />
 

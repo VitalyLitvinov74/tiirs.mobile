@@ -2,6 +2,7 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -15,9 +16,34 @@ public class OperationStatus extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String icon;
     private Date createdAt;
     private Date changedAt;
+
+    private static OperationStatus getStatusObject(Realm realm, String statusUuid) {
+        return realm.where(OperationStatus.class)
+                .equalTo("uuid", statusUuid)
+                .findFirst();
+    }
+
+    public static OperationStatus getObjectNew(Realm realm) {
+        return getStatusObject(realm, Status.NEW);
+    }
+
+    public static OperationStatus getObjectInWork(Realm realm) {
+        return getStatusObject(realm, Status.IN_WORK);
+    }
+
+    public static OperationStatus getObjectComplete(Realm realm) {
+        return getStatusObject(realm, Status.COMPLETE);
+    }
+
+    public static OperationStatus getObjectUnComplete(Realm realm) {
+        return getStatusObject(realm, Status.UN_COMPLETE);
+    }
+
+    public static OperationStatus getObjectCanceled(Realm realm) {
+        return getStatusObject(realm, Status.CANCELED);
+    }
 
     public long get_id() {
         return _id;
@@ -33,14 +59,6 @@ public class OperationStatus extends RealmObject {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
     }
 
     public String getTitle() {
@@ -65,6 +83,26 @@ public class OperationStatus extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public boolean isNew() {
+        return uuid.equals(Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return uuid.equals(Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return uuid.equals(Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return uuid.equals(Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return uuid.equals(Status.CANCELED);
     }
 
     public class Status {

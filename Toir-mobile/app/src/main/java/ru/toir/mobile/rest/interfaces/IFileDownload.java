@@ -19,9 +19,5 @@ import retrofit2.http.Url;
 
 public interface IFileDownload {
     @GET
-    Call<ResponseBody> getFile(@Url String url);
-
-    @Multipart
-    @POST("/api/orders/upload")
-    Call<ResponseBody> uploadFiles(@Part("descr") RequestBody descr, @Part List<MultipartBody.Part> files);
+    Call<ResponseBody> get(@Url String url);
 }

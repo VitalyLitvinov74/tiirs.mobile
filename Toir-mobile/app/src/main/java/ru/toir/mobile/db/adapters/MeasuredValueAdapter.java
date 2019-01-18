@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -16,14 +16,15 @@ import ru.toir.mobile.db.realm.MeasureType;
 public class MeasuredValueAdapter extends RealmBaseAdapter<MeasureType> implements ListAdapter {
     public static final String TABLE_NAME = "MeasureType";
 
-    public MeasuredValueAdapter(@NonNull Context context, RealmResults<MeasureType> data) {
-        super(context, data);
+    public MeasuredValueAdapter(RealmResults<MeasureType> data) {
+        super(data);
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<MeasureType> rows = realm.where(MeasureType.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -33,6 +34,7 @@ public class MeasuredValueAdapter extends RealmBaseAdapter<MeasureType> implemen
         if (adapterData != null) {
             measureType = adapterData.get(position);
         }
+
         return measureType;
     }
 
@@ -43,46 +45,55 @@ public class MeasuredValueAdapter extends RealmBaseAdapter<MeasureType> implemen
             measureType = adapterData.get(position);
             return measureType.get_id();
         }
+
         return 0;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
-          viewHolder = new ViewHolder();
-          if (parent.getId() == R.id.reference_listView) {
-              convertView = inflater.inflate(R.layout.listview, parent, false);
-              viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-              convertView.setTag(viewHolder);
+            viewHolder = new ViewHolder();
+            if (parent.getId() == R.id.reference_listView) {
+                convertView = inflater.inflate(R.layout.listview, parent, false);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                convertView.setTag(viewHolder);
             }
-          if (parent.getId() == R.id.simple_spinner) {
-              convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
-              viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
-              convertView.setTag(viewHolder);
+
+            if (parent.getId() == R.id.simple_spinner) {
+                convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+                viewHolder.title = convertView.findViewById(android.R.id.text1);
+                convertView.setTag(viewHolder);
             }
-         } else {
-         viewHolder = (ViewHolder) convertView.getTag();
-       }
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
 
         MeasureType measureType;
-        if (adapterData != null && viewHolder.title !=null) {
-                measureType = adapterData.get(position);
-                if (measureType != null)
-                    viewHolder.title.setText(measureType.getTitle());
+        if (adapterData != null && viewHolder.title != null) {
+            measureType = adapterData.get(position);
+            if (measureType != null) {
+                viewHolder.title.setText(measureType.getTitle());
             }
+        }
 
         if (convertView == null) {
             TextView textView = new TextView(context);
             if (adapterData != null) {
                 measureType = adapterData.get(position);
-                if (measureType != null)
+                if (measureType != null) {
                     textView.setText(measureType.getTitle());
+                }
+
                 textView.setTextSize(16);
-                textView.setPadding(5,5,5,5);
+                textView.setPadding(5, 5, 5, 5);
             }
+
             return textView;
         }
+
         return convertView;
     }
 

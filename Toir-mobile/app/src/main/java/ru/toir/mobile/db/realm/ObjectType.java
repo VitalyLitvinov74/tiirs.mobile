@@ -14,7 +14,7 @@ public class ObjectType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String descr;
+    private String description;
     private String icon;
     private Date createdAt;
     private Date changedAt;
@@ -43,12 +43,12 @@ public class ObjectType extends RealmObject {
         this.title = title;
     }
 
-    public String getDescr() {
-        return descr;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescr(String descr) {
-        this.descr = descr;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getIcon() {

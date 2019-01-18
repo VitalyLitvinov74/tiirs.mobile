@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -25,7 +25,7 @@ import ru.toir.mobile.db.realm.Orders;
  * @author olejek
  * Created by olejek on 12.09.16.
  */
-public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
+public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter, View.OnClickListener {
     public static final String TABLE_NAME = "Orders";
     private static final int TYPE_SEPARATOR = -1;
     private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
@@ -37,8 +37,8 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     };
     private List<Long> separates = new ArrayList<>();
 
-    public OrderAdapter(@NonNull Context context, RealmResults<Orders> data) {
-        super(context, data);
+    public OrderAdapter(RealmResults<Orders> data) {
+        super(data);
         makeSeparates();
     }
 
@@ -53,21 +53,26 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         int j = 0;
         Date currentDate = new Date();
         Date separateDate;
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         separates.clear();
 
-        if (adapterData != null)
-        for(Orders order : adapterData) {
-            separateDate = order.getOpenDate();
-            if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
-                currentDate = order.getCloseDate();
-                separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
-                j++;
-                separates.add(i + j, Long.valueOf(i));
-            } else {
-                separates.add(i + j, Long.valueOf(i));
+        if (adapterData != null) {
+            for (Orders order : adapterData) {
+                separateDate = order.getStartDate();
+                if (separateDate == null) {
+                    separateDate = new Date();
+                }
+
+                if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
+                    currentDate = separateDate;
+                    separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
+                    j++;
+                    separates.add(i + j, Long.valueOf(i));
+                } else {
+                    separates.add(i + j, Long.valueOf(i));
+                }
+                i++;
             }
-            i++;
         }
     }
 
@@ -100,10 +105,11 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         String sDate = "неизвестно";
         viewHolder = new ViewHolder();
         long type = separates.get(position);
+        String textData;
         switch ((int)type) {
             case TYPE_SEPARATOR:
-                convertView = inflater.inflate(R.layout.order_item_divider, null);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.order_date_divider);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_item_divider, null);
+                viewHolder.title = convertView.findViewById(R.id.order_date_divider);
                 convertView.setTag(viewHolder);
                 long id = separates.get(position + 1);
                 if (adapterData == null) break;
@@ -117,68 +123,97 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 }
                 break;
             default:
-                convertView = inflater.inflate(R.layout.order_item, parent, false);
-                viewHolder.created = (TextView) convertView.findViewById(R.id.order_Create);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.order_Name);
-                viewHolder.status = (TextView) convertView.findViewById(R.id.order_status);
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.order_ImageStatus);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_item, parent, false);
+                viewHolder.created = convertView.findViewById(R.id.order_Create);
+                viewHolder.title = convertView.findViewById(R.id.order_Name);
+                viewHolder.status = convertView.findViewById(R.id.order_status);
+                viewHolder.icon = convertView.findViewById(R.id.order_ImageStatus);
                 convertView.setTag(viewHolder);
                 Orders order = getItem(position);
                 if (order == null) break;
                 OrderStatus orderStatus;
                 orderStatus = order.getOrderStatus();
                 lDate = order.getOpenDate();
-                if (lDate != null && lDate.after(new Date(100000))) {
-                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols).format(lDate);
+                if (lDate != null) {
+                    sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols)
+                            .format(lDate);
                     viewHolder.created.setText(sDate);
                 }
                 else {
                     viewHolder.created.setText(R.string.not_started);
                 }
+
                 viewHolder.title.setText(order.getTitle());
                 if (orderStatus != null) {
                     String orderStatusUuid = orderStatus.getUuid();
                     String orderLevelUuid = order.getOrderLevel().getUuid();
                     viewHolder.status.setText(orderStatus.getTitle());
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && orderLevelUuid.equals(OrderLevel.Level.Level1)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                        viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]");
+                        textData = sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
+
                     if (orderStatusUuid.equals(OrderStatus.Status.NEW) && orderLevelUuid.equals(OrderLevel.Level.Level3)) {
                         viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                        viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]");
+                        textData = sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && orderLevelUuid.equals(OrderLevel.Level.Level5)) {
+
+                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                        viewHolder.created.setText(sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]");
+                        textData = sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && orderLevelUuid.equals(OrderLevel.Level.Level1)) {
+
+                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                        viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]");
+                        textData = sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
+
                     if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && orderLevelUuid.equals(OrderLevel.Level.Level3)) {
                         viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                        viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]");
+                        textData = sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && orderLevelUuid.equals(OrderLevel.Level.Level5)) {
+
+                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                        viewHolder.created.setText(sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]");
+                        textData = sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && orderLevelUuid.equals(OrderLevel.Level.Level1)) {
+
+                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                        viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]");
+                        textData = sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
+
                     if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && orderLevelUuid.equals(OrderLevel.Level.Level3)) {
                         viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                        viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]");
+                        textData = sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && orderLevelUuid.equals(OrderLevel.Level.Level5)) {
+
+                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_ready);
-                        viewHolder.created.setText(sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]");
+                        textData = sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]";
+                        viewHolder.created.setText(textData);
                     }
                 }
         }
         return convertView;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.order_ImageStatus:
+                break;
+            default:
+                break;
+        }
     }
 
     private static class ViewHolder {

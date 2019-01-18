@@ -13,12 +13,21 @@ import ru.toir.mobile.db.realm.AlertType;
  */
 
 public interface IAlertType {
-    @GET("/api/references/alert-type")
-    Call<List<AlertType>> alertType();
+    @GET("/alert-type")
+    Call<List<AlertType>> get();
 
-    @GET("/api/references/alert-type")
-    Call<List<AlertType>> alertType(@Query("changedAfter") String changedAfter);
+    @GET("/alert-type")
+    Call<List<AlertType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/references/alert-type")
-    Call<List<AlertType>> alertTypeById(@Query("id") String id);
+    @GET("/alert-type")
+    Call<List<AlertType>> getById(@Query("id") String id);
+
+    @GET("/alert-type")
+    Call<List<AlertType>> getById(@Query("id[]") String[] id);
+
+    @GET("/alert-type")
+    Call<List<AlertType>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/alert-type")
+    Call<List<AlertType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

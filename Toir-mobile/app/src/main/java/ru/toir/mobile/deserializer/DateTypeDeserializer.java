@@ -34,15 +34,20 @@ public class DateTypeDeserializer implements JsonDeserializer<Date> {
     @Override
     public Date deserialize(JsonElement jsonElement, Type typeOF,
                             JsonDeserializationContext context) throws JsonParseException {
+
         String dateString = jsonElement.getAsString();
+        if (dateString.equals("") || dateString.equalsIgnoreCase("null")) {
+            return null;
+        }
+
         for (String format : DATE_FORMATS) {
             try {
-                Date date = new SimpleDateFormat(format, Locale.US).parse(dateString);
-                return date;
+                return new SimpleDateFormat(format, Locale.US).parse(dateString);
             } catch (ParseException e) {
                 // do noting
             }
         }
+
         throw new JsonParseException("Unparseable date: \"" + jsonElement.getAsString()
                 + "\". Supported formats: \n" + Arrays.toString(DATE_FORMATS));
     }

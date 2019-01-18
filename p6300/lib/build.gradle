@@ -1,37 +1,50 @@
-apply plugin: 'com.android.model.library'
+apply plugin: 'com.android.library'
 
-model {
-    android {
-        compileSdkVersion = 25
-        buildToolsVersion = "25.0.0"
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
-        defaultConfig.with {
-            minSdkVersion.apiLevel = 15
-            targetSdkVersion.apiLevel = 25
-            versionCode = 1
-            versionName = "1.0"
+    defaultConfig.with {
+        minSdkVersion 15
+        targetSdkVersion 27
+        versionCode = 1
+        versionName = "1.0"
+
+        externalNativeBuild {
+            cmake {
+                // explicitly build libs
+                targets 'p6300uart'
+                cFlags '-llog'
+                cFlags '-std=c99'
+            }
         }
     }
 
-    android.ndk {
-        moduleName = "p6300uart"
-        ldLibs.add("log")
-        CFlags.add("-std=c99");
-    }
-
-    android.buildTypes {
+    buildTypes {
         release {
             minifyEnabled = false
-            proguardFiles.add(file('proguard-rules.pro'))
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
-    android.productFlavors {
-        create("arm") {
-            ndk.abiFilters.add("armeabi")
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
         }
     }
 }
+
+//android.ndk {
+//    moduleName = "p6300uart"
+//    ldLibs.add("log")
+//    CFlags.add("-std=c99")
+//}
+
+//android.productFlavors {
+//        create("arm") {
+//            ndk.abiFilters.add("armeabi")
+//        }
+//}
 
 def rootDir = property('rootDir')
 
@@ -39,8 +52,8 @@ apply plugin: 'maven'
 
 artifacts {
     // TODO: здесь нужно что-то более универсальное
-    def coreAarFile = file("build/outputs/aar/${archivesBaseName}-arm-release.aar")
-    archives coreAarFile
+//    def coreAarFile = file("build/outputs/aar/${archivesBaseName}-arm-release.aar")
+//    archives coreAarFile
 }
 
 uploadArchives {
@@ -56,10 +69,10 @@ uploadArchives {
         }
     }
     // TODO: воткнул чтоб избавиться от сообщения "Not all execution paths return a value"
-    return true;
+    return true
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+//    testCompile 'junit:junit:4.12'
 }

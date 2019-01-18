@@ -1,7 +1,9 @@
 package ru.toir.mobile.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -28,16 +30,23 @@ public class EquipmentsFragment extends Fragment {
 	private Spinner typeSpinner;
 	private ListView equipmentListView;
 
+    private String object_uuid;
+
     public static EquipmentsFragment newInstance() {
 		return new EquipmentsFragment();
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater,
-			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.equipment_reference_layout, container, false);
-        Toolbar toolbar = (Toolbar)(getActivity()).findViewById(R.id.toolbar);
+        Activity activity = getActivity();
+        if (activity == null) {
+            return null;
+        }
+
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
         toolbar.setSubtitle("Оборудование");
         realmDB = Realm.getDefaultInstance();
 
@@ -54,12 +63,11 @@ public class EquipmentsFragment extends Fragment {
 		sortSpinner.setAdapter(sortSpinnerAdapter);
 		sortSpinner.setOnItemSelectedListener(spinnerListener);
 */
-        equipmentListView = (ListView) rootView.findViewById(R.id.erl_equipment_listView);
-
+        equipmentListView = rootView.findViewById(R.id.erl_equipment_listView);
 
         RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
-        typeSpinner = (Spinner) rootView.findViewById(R.id.simple_spinner);
-        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(getContext(), equipmentType);
+        typeSpinner = rootView.findViewById(R.id.simple_spinner);
+        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -124,17 +132,28 @@ public class EquipmentsFragment extends Fragment {
 
 	}
 */
-	private void FillListViewEquipments(String equipmentModelUuid) {
+	private void FillListViewEquipments(String equipmentTypeUuid) {
         RealmResults<Equipment> equipments;
-        if (equipmentModelUuid != null) {
-            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.uuid", equipmentModelUuid).findAll();
+        //String object_uuid = intent.getStringExtra("object_uuid");
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            object_uuid = bundle.getString("object_uuid");
         }
-        else {
+        if (equipmentTypeUuid != null) {
+            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
+            if (object_uuid != null) {
+                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
+            }
+        } else {
             equipments = realmDB.where(Equipment.class).findAll();
+            if (object_uuid != null) {
+                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).findAll();
+            }
         }
-        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(getContext(), equipments);
+
+        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(equipments);
         equipmentListView.setAdapter(equipmentAdapter);
-	}
+    }
 
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -145,6 +164,12 @@ public class EquipmentsFragment extends Fragment {
 		}
 	}
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realmDB.close();
+    }
+
     private class ListviewClickListener implements
             AdapterView.OnItemClickListener {
 
@@ -153,13 +178,17 @@ public class EquipmentsFragment extends Fragment {
                                 View selectedItemView, int position, long id) {
             Equipment equipment = (Equipment)parentView.getItemAtPosition(position);
             if (equipment != null) {
+                Activity activity = getActivity();
+                if (activity == null) {
+                    return;
+                }
+
                 String equipment_uuid = equipment.getUuid();
-                Intent equipmentInfo = new Intent(getActivity(),
-                        EquipmentInfoActivity.class);
+                Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("equipment_uuid", equipment_uuid);
                 equipmentInfo.putExtras(bundle);
-                getActivity().startActivity(equipmentInfo);
+                activity.startActivity(equipmentInfo);
             }
         }
     }
@@ -180,7 +209,7 @@ public class EquipmentsFragment extends Fragment {
             EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
             if (typeSelected != null) {
                 type = typeSelected.getUuid();
-                if (typeSelected.get_id() == 1) type = null;
+                //if (typeSelected.get_id() == 1) type = null;
             }
 
             FillListViewEquipments(type);

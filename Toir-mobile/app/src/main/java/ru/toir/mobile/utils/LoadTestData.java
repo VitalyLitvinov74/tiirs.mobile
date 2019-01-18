@@ -4,6 +4,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import ru.toir.mobile.db.realm.AlertType;
+import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
@@ -21,24 +22,21 @@ import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
-import ru.toir.mobile.db.realm.TaskStageList;
-import ru.toir.mobile.db.realm.TaskStageOperationList;
 import ru.toir.mobile.db.realm.StageStatus;
-import ru.toir.mobile.db.realm.TaskStages;
+import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskType;
 import ru.toir.mobile.db.realm.TaskVerdict;
-import ru.toir.mobile.db.realm.Tasks;
 import ru.toir.mobile.db.realm.User;
 
 public class LoadTestData {
     public static Equipment equipment;
     public static EquipmentType equipmentType;
-    public static TaskStatus taskStatusUncomplete;
     private static Equipment equipment2;
     private static Equipment equipment3;
     private static Equipment equipment4;
@@ -53,8 +51,8 @@ public class LoadTestData {
     private static OrderStatus orderStatusUncomplete;
     private static OperationStatus operationStatusUncomplete;
     private static OperationStatus operationStatusComplete;
-    private static StageStatus taskStageStatusComplete;
-    private static StageStatus taskStageStatusUncomplete;
+    private static StageStatus stageStatusComplete;
+    private static StageStatus stageStatusUncomplete;
     private static TaskStatus taskStatus;
     private static User profile;
     private static EquipmentStatus equipmentStatus;
@@ -101,22 +99,20 @@ public class LoadTestData {
     private static OperationTemplate operationTemplate;
     private static OperationTemplate operationTemplate2;
     private static OperationTemplate operationTemplate3;
-    private static StageVerdict taskStageVerdict;
-    private static TaskStages taskStage;
-    private static TaskStages taskStage2;
-    private static StageType taskStageType;
-    private static StageType taskStageType2;
-    private static StageType taskStageType3;
-    private static TaskStageList taskStageList;
-    private static TaskStageOperationList taskStageOperationList;
-    private static StageTemplate taskStageTemplate;
-    private static StageTemplate taskStageTemplate2;
+    private static StageVerdict stageVerdict;
+    private static Stage stage;
+    private static Stage stage2;
+    private static StageType stageType;
+    private static StageType stageType2;
+    private static StageType stageType3;
+    private static StageTemplate stageTemplate;
+    private static StageTemplate stageTemplate2;
     private static TaskVerdict taskVerdict;
 
-    private static Tasks task;
-    private static Tasks task2;
-    private static Tasks task3;
-    private static Tasks task4;
+    private static Task task;
+    private static Task task2;
+    private static Task task3;
+    private static Task task4;
 
     private static TaskType taskType;
     private static TaskType taskType2;
@@ -127,6 +123,17 @@ public class LoadTestData {
     private static TaskTemplate taskTemplate2;
     private static TaskTemplate taskTemplate3;
     private static TaskTemplate taskTemplate4;
+    private static Contragent contragent;
+    private static Contragent contragent2;
+    private long _id;
+    private String uuid;
+    private String name;
+    private String description;
+    private String phone;
+    private int contragentType;
+    private Contragent parentContragent;
+    private Date createdAt;
+    private Date changedAt;
 
     public static void LoadAllTestData() {
 
@@ -213,24 +220,24 @@ public class LoadTestData {
         final String operationTemplateUuid2 = "8ee8a4f8-5c98-5555-86ed-888911188911";
         final String operationTemplateUuid3 = "8ee9a4f8-5c98-5555-86ed-888911188911";
 
-        final String taskStageStatusUuid = "8ee8a4f8-5c98-4444-86ed-133923132922";
-        final String taskStageStatusUuid2 = "8ee8a4f8-5c98-4444-86ed-133923132322";
-        final String taskStageVerdictUuid = "8ee8a4f8-5c98-1255-86ed-888923188922";
+        final String stageStatusUuid = "8ee8a4f8-5c98-4444-86ed-133923132922";
+        final String stageStatusUuid2 = "8ee8a4f8-5c98-4444-86ed-133923132322";
+        final String stageVerdictUuid = "8ee8a4f8-5c98-1255-86ed-888923188922";
 
         final String taskStageListUuid = "8ee8a4f8-ff98-4444-86ed-133923132922";
         final String taskStageListUuid2 = "8ee8a6f8-ff98-4444-86ed-133923132922";
         final String taskStageOperationListUuid = "8ee8a4f8-5c98-1255-8764-888923188922";
         final String taskStageOperationListUuid2 = "8ee8a4f8-5c98-1255-8764-888923188922";
 
-        final String taskStageUuid = "8ee8a4f8-5c98-4444-86ed-777923188922";
-        final String taskStageUuid2 = "8ee8a4f8-5c98-4444-86ed-888532188924";
+        final String stageUuid = "8ee8a4f8-5c98-4444-86ed-777923188922";
+        final String stageUuid2 = "8ee8a4f8-5c98-4444-86ed-888532188924";
 
-        final String taskStageTypeUuid = "8ee8a4f8-5c98-3124-86ed-888923188922";
-        final String taskStageTypeUuid2 = "8ee8a4f8-5c98-4214-86ed-888923188924";
-        final String taskStageTypeUuid3 = "8ee8a4f8-5c38-4364-86ed-888923188926";
+        final String stageTypeUuid = "8ee8a4f8-5c98-3124-86ed-888923188922";
+        final String stageTypeUuid2 = "8ee8a4f8-5c98-4214-86ed-888923188924";
+        final String stageTypeUuid3 = "8ee8a4f8-5c38-4364-86ed-888923188926";
 
-        final String taskStageTemplateUuid = "8ee8a4f8-5c98-5555-86ed-888911188922";
-        final String taskStageTemplateUuid2 = "8ee8a4f8-5c98-5555-86ed-888922288911";
+        final String stageTemplateUuid = "8ee8a4f8-5c98-5555-86ed-888911188922";
+        final String stageTemplateUuid2 = "8ee8a4f8-5c98-5555-86ed-888922288911";
 
         final String taskStatusUuid = "8ee8a4f8-5c98-4444-86ed-253923132922";
         final String taskVerdictUuid = "8ee8a4f8-5c98-1255-86ed-887923188922";
@@ -555,7 +562,7 @@ public class LoadTestData {
                 equipment.setTitle("Теплогенератор Тепловей-250А");
                 equipment.setTagId("1234-5678-9101112");
                 //equipment.setUserUuid(userTestUuid);
-                equipment.setLocation("Цех изоляторов ПФИ");
+                //equipment.setLocation("Цех изоляторов ПФИ");
                 equipment.setLatitude((float) 55.343);
                 equipment.setLongitude((float) 55.234);
                 equipment.setStartDate(new Date());
@@ -579,7 +586,7 @@ public class LoadTestData {
                 equipment2.setTitle("Газовый котел Unical");
                 equipment2.setTagId("02345567");
                 //equipment2.setUserUuid(userTestUuid);
-                equipment2.setLocation("Котельная №3");
+                //equipment2.setLocation("Котельная №3");
                 equipment2.setLatitude((float) 55.5311);
                 equipment2.setLongitude((float) 55.1222);
                 equipment2.setStartDate(new Date());
@@ -603,7 +610,7 @@ public class LoadTestData {
                 equipment3.setTitle("Счетчик газа ВК-G10T");
                 equipment3.setTagId("2321232-22322-74341");
                 //equipment3.setUserUuid(userTestUuid2);
-                equipment3.setLocation("Теплопункт");
+                //equipment3.setLocation("Теплопункт");
                 equipment3.setLatitude((float) 55.222143);
                 equipment3.setLongitude((float) 55.212134);
                 equipment3.setStartDate(new Date());
@@ -627,7 +634,7 @@ public class LoadTestData {
                 equipment4.setTitle("Датчик давления YSO-04");
                 equipment4.setTagId("19532-09021123-2562293");
                 //equipment4.setUserUuid(userTestUuid);
-                equipment4.setLocation("Котельная №2");
+                //equipment4.setLocation("Котельная №2");
                 equipment4.setLatitude((float) 55.53121);
                 equipment4.setLongitude((float) 55.12222);
                 equipment4.setStartDate(new Date());
@@ -880,15 +887,11 @@ public class LoadTestData {
                 operationTemplate = realmDB.createObject(OperationTemplate.class);
                 operationTemplate.set_id(1);
                 operationTemplate.setUuid(operationTemplateUuid);
-                operationTemplate.setEquipmentModel(equipmentModel);
                 operationTemplate.setTitle("Снять заднюю крышку");
                 operationTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
-                operationTemplate.setFirst_step(1);
                 operationTemplate.setImage("");
                 //operationTemplate.setEquipmentModelUuid(equipmentModelUuid);
-                operationTemplate.setEquipmentModel(equipmentModel);
                 operationTemplate.setNormative(180);
-                operationTemplate.setLast_step(0);
                 operationTemplate.setOperationType(operationType);
                 //operationTemplate.setOperationTypeUuid(operationTypeUuid);
             }
@@ -899,15 +902,11 @@ public class LoadTestData {
                 operationTemplate2 = realmDB.createObject(OperationTemplate.class);
                 operationTemplate2.set_id(2);
                 operationTemplate2.setUuid(operationTemplateUuid2);
-                operationTemplate2.setEquipmentModel(equipmentModel);
                 operationTemplate2.setTitle("Убрать заднюю крышку");
                 operationTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
-                operationTemplate2.setFirst_step(0);
                 operationTemplate2.setImage("");
                 //operationTemplate2.setEquipmentModelUuid(equipmentModelUuid);
-                operationTemplate2.setEquipmentModel(equipmentModel);
                 operationTemplate2.setNormative(100);
-                operationTemplate2.setLast_step(0);
                 operationTemplate2.setOperationType(operationType2);
                 //operationTemplate2.setOperationTypeUuid(operationTypeUuid2);
             }
@@ -920,15 +919,11 @@ public class LoadTestData {
                 operationTemplate3 = realmDB.createObject(OperationTemplate.class);
                 operationTemplate3.set_id(3);
                 operationTemplate3.setUuid(operationTemplateUuid3);
-                operationTemplate3.setEquipmentModel(equipmentModel);
                 operationTemplate3.setTitle("Осмотреть накопитель");
                 operationTemplate3.setDescription("Осмотреть накопитель на предмет утечек");
-                operationTemplate3.setFirst_step(0);
                 operationTemplate3.setImage("");
                 //operationTemplate3.setEquipmentModelUuid(equipmentModelUuid);
-                operationTemplate3.setEquipmentModel(equipmentModel);
                 operationTemplate3.setNormative(110);
-                operationTemplate3.setLast_step(0);
                 operationTemplate3.setOperationType(operationType3);
                 //operationTemplate3.setOperationTypeUuid(operationTypeUuid3);
             }
@@ -949,7 +944,6 @@ public class LoadTestData {
                 operation.setOperationVerdict(operationVerdict);
                 //operation.setOperationVerdictUuid(operationVerdictUuid);
                 operation.setOperationTemplate(operationTemplate);
-                //operation.setTaskStageUuid(taskStageUuid);
             }
         });
 
@@ -967,7 +961,6 @@ public class LoadTestData {
                 operation2.setOperationVerdict(operationVerdict);
                 //operation2.setOperationVerdictUuid(operationVerdictUuid);
                 operation2.setOperationTemplate(operationTemplate2);
-                //operation2.setTaskStageUuid(taskStageUuid);
             }
         });
 
@@ -985,179 +978,143 @@ public class LoadTestData {
                 operation3.setOperationVerdict(operationVerdict);
                 //operation3.setOperationVerdictUuid(operationVerdictUuid);
                 operation3.setOperationTemplate(operationTemplate3);
-                //operation3.setTaskStageUuid(taskStageUuid);
             }
         });
         // ---------------------------------------------------------------------------------------------
-        // TaskStageVerdict -----------------
+        // StageVerdict -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageVerdict = realmDB.createObject(StageVerdict.class);
-                taskStageVerdict.set_id(1);
-                taskStageVerdict.setUuid(taskStageVerdictUuid);
-                taskStageVerdict.setTitle("Выполнен");
+                stageVerdict = realmDB.createObject(StageVerdict.class);
+                stageVerdict.set_id(1);
+                stageVerdict.setUuid(stageVerdictUuid);
+                stageVerdict.setTitle("Выполнен");
             }
         });
 
-        // TaskStageType -----------------
+        // StageType -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageType = realmDB.createObject(StageType.class);
-                taskStageType.set_id(1);
-                taskStageType.setUuid(taskStageTypeUuid);
-                taskStageType.setTitle("Снятие крышки");
-            }
-        });
-
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageType2 = realmDB.createObject(StageType.class);
-                taskStageType2.set_id(2);
-                taskStageType2.setUuid(taskStageTypeUuid2);
-                taskStageType2.setTitle("Демонтаж экрана");
+                stageType = realmDB.createObject(StageType.class);
+                stageType.set_id(1);
+                stageType.setUuid(stageTypeUuid);
+                stageType.setTitle("Снятие крышки");
             }
         });
 
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageType3 = realmDB.createObject(StageType.class);
-                taskStageType3.set_id(3);
-                taskStageType3.setUuid(taskStageTypeUuid3);
-                taskStageType3.setTitle("Осмотр горелки");
-            }
-        });
-
-        // TaskStageStatus -----------------
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageStatusUncomplete = realmDB.createObject(StageStatus.class);
-                taskStageStatusUncomplete.set_id(1);
-                taskStageStatusUncomplete.setUuid(taskStageStatusUuid);
-                taskStageStatusUncomplete.setTitle("Не выполнен");
+                stageType2 = realmDB.createObject(StageType.class);
+                stageType2.set_id(2);
+                stageType2.setUuid(stageTypeUuid2);
+                stageType2.setTitle("Демонтаж экрана");
             }
         });
 
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageStatusComplete = realmDB.createObject(StageStatus.class);
-                taskStageStatusComplete.set_id(2);
-                taskStageStatusComplete.setUuid(taskStageStatusUuid2);
-                taskStageStatusComplete.setTitle("Выполнен");
+                stageType3 = realmDB.createObject(StageType.class);
+                stageType3.set_id(3);
+                stageType3.setUuid(stageTypeUuid3);
+                stageType3.setTitle("Осмотр горелки");
             }
         });
 
-        // TaskStageTemplate -----------------
+        // StageStatus -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageTemplate = realmDB.createObject(StageTemplate.class);
-                taskStageTemplate.set_id(1);
-                taskStageTemplate.setUuid(taskStageTemplateUuid);
-                taskStageTemplate.setEquipmentModel(equipmentModel);
-                taskStageTemplate.setTitle("Снять заднюю крышку");
-                taskStageTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
-                taskStageTemplate.setImage("");
-                //taskStageTemplate.setEquipmentModelUuid(equipmentModelUuid);
-                taskStageTemplate.setEquipmentModel(equipmentModel);
-                taskStageTemplate.setNormative(480);
-                taskStageTemplate.setTaskStageType(taskStageType);
-                //taskStageTemplate.setTaskStageTypeUuid(taskStageTypeUuid);
+                stageStatusUncomplete = realmDB.createObject(StageStatus.class);
+                stageStatusUncomplete.set_id(1);
+                stageStatusUncomplete.setUuid(stageStatusUuid);
+                stageStatusUncomplete.setTitle("Не выполнен");
             }
         });
 
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageTemplate2 = realmDB.createObject(StageTemplate.class);
-                taskStageTemplate2.set_id(2);
-                taskStageTemplate2.setUuid(taskStageTemplateUuid2);
-                taskStageTemplate2.setEquipmentModel(equipmentModel);
-                taskStageTemplate2.setTitle("Убрать заднюю крышку");
-                taskStageTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
-                taskStageTemplate2.setImage("");
-                //taskStageTemplate2.setEquipmentModelUuid(equipmentModelUuid);
-                taskStageTemplate2.setEquipmentModel(equipmentModel);
-                taskStageTemplate2.setNormative(300);
-                taskStageTemplate2.setTaskStageType(taskStageType2);
-                //taskStageTemplate2.setTaskStageTypeUuid(taskStageTypeUuid2);
+                stageStatusComplete = realmDB.createObject(StageStatus.class);
+                stageStatusComplete.set_id(2);
+                stageStatusComplete.setUuid(stageStatusUuid2);
+                stageStatusComplete.setTitle("Выполнен");
             }
         });
 
-        // TaskStage -----------------
+        // StageTemplate -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStage = realmDB.createObject(TaskStages.class);
-                taskStage.set_id(1);
-                taskStage.setUuid(taskStageUuid);
-                taskStage.setTaskStageStatus(taskStageStatusUncomplete);
-//            taskStage.setTaskStageStatusUuid(taskStageStatusUuid);
-                taskStage.setEndDate(new Date());
-                taskStage.setFlowOrder(1);
-                taskStage.setStartDate(new Date());
-                taskStage.setEquipment(equipment);
-//            taskStage.setEquipmentUuid(equipmentUuid);
-                taskStage.setTaskStageVerdict(taskStageVerdict);
-//            taskStage.setTaskStageVerdictUuid(taskStageVerdictUuid);
-                taskStage.setTaskStageTemplate(taskStageTemplate);
-//            taskStage.setTaskStageTemplateUuid(taskStageTemplateUuid);
-//            taskStage.setTaskUuid(taskUuid);
-                taskStage.addOperations(operation);
-                taskStage.addOperations(operation2);
-                taskStage.addOperations(operation3);
+                stageTemplate = realmDB.createObject(StageTemplate.class);
+                stageTemplate.set_id(1);
+                stageTemplate.setUuid(stageTemplateUuid);
+                stageTemplate.setTitle("Снять заднюю крышку");
+                stageTemplate.setDescription("Открутить четыре болта по краям ключом на 12");
+                stageTemplate.setImage("");
+                //stageTemplate.setEquipmentModelUuid(equipmentModelUuid);
+                stageTemplate.setNormative(480);
+                stageTemplate.setStageType(stageType);
             }
         });
 
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStage2 = realmDB.createObject(TaskStages.class);
-                taskStage2.set_id(2);
-                taskStage2.setUuid(taskStageUuid2);
-                taskStage2.setTaskStageStatus(taskStageStatusUncomplete);
-//            taskStage2.setTaskStageStatusUuid(taskStageStatusUuid);
-                taskStage2.setEndDate(new Date());
-                taskStage2.setFlowOrder(2);
-                taskStage2.setStartDate(new Date());
-                taskStage2.setEquipment(equipment2);
-//            taskStage2.setEquipmentUuid(equipmentUuid2);
-                taskStage2.setTaskStageVerdict(taskStageVerdict);
-//            taskStage2.setTaskStageVerdictUuid(taskStageVerdictUuid);
-                taskStage2.setTaskStageTemplate(taskStageTemplate2);
-//            taskStage2.setTaskStageTemplateUuid(taskStageTemplateUuid2);
-//            taskStage2.setTaskUuid(taskUuid);
+                stageTemplate2 = realmDB.createObject(StageTemplate.class);
+                stageTemplate2.set_id(2);
+                stageTemplate2.setUuid(stageTemplateUuid2);
+                stageTemplate2.setTitle("Убрать заднюю крышку");
+                stageTemplate2.setDescription("Снять заднюю крышку и отставить ее в сторону");
+                stageTemplate2.setImage("");
+                //stageTemplate2.setEquipmentModelUuid(equipmentModelUuid);
+                stageTemplate2.setNormative(300);
+                stageTemplate2.setStageType(stageType2);
             }
         });
 
-        // TaskStageList -----------------
+        // Stage -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageList = realmDB.createObject(TaskStageList.class);
-                taskStageList.set_id(1);
-                taskStageList.setUuid(taskStageListUuid);
-                taskStageList.setFlowOrder(1);
-                taskStageList.setTaskTemplate(taskTemplate);
-                taskStageList.setTaskStageTemplate(taskStageTemplate);
+                stage = realmDB.createObject(Stage.class);
+                stage.set_id(1);
+                stage.setUuid(stageUuid);
+                stage.setStageStatus(stageStatusUncomplete);
+                stage.setEndDate(new Date());
+                stage.setFlowOrder(1);
+                stage.setStartDate(new Date());
+                stage.setEquipment(equipment);
+//            stage.setEquipmentUuid(equipmentUuid);
+                stage.setStageVerdict(stageVerdict);
+                stage.setStageTemplate(stageTemplate);
+//            stage.setTaskUuid(taskUuid);
+                stage.addOperations(operation);
+                stage.addOperations(operation2);
+                stage.addOperations(operation3);
             }
         });
+
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                taskStageList = realmDB.createObject(TaskStageList.class);
-                taskStageList.set_id(2);
-                taskStageList.setUuid(taskStageListUuid2);
-                taskStageList.setFlowOrder(2);
-                taskStageList.setTaskTemplate(taskTemplate);
-                taskStageList.setTaskStageTemplate(taskStageTemplate2);
+                stage2 = realmDB.createObject(Stage.class);
+                stage2.set_id(2);
+                stage2.setUuid(stageUuid2);
+                stage2.setStageStatus(stageStatusUncomplete);
+                stage2.setEndDate(new Date());
+                stage2.setFlowOrder(2);
+                stage2.setStartDate(new Date());
+                stage2.setEquipment(equipment2);
+//            stage2.setEquipmentUuid(equipmentUuid2);
+                stage2.setStageVerdict(stageVerdict);
+                stage2.setStageTemplate(stageTemplate2);
+//            stage2.setTaskUuid(taskUuid);
             }
         });
+
         // ---------------------------------------------------------------------------------------------
         // TaskVerdict -----------------
         realmDB.executeTransaction(new Realm.Transaction() {
@@ -1209,12 +1166,10 @@ public class LoadTestData {
                 taskTemplate = realmDB.createObject(TaskTemplate.class);
                 taskTemplate.set_id(1);
                 taskTemplate.setUuid(taskTemplateUuid);
-                taskTemplate.setEquipmentModel(equipmentModel);
                 taskTemplate.setTitle("Осмотр генератора Тепловея");
                 taskTemplate.setDescription("Проверка на работоспособность и утечки");
                 taskTemplate.setImage("");
                 //taskTemplate.setEquipmentModelUuid(equipmentModelUuid);
-                taskTemplate.setEquipmentModel(equipmentModel);
                 taskTemplate.setNormative(1480);
                 taskTemplate.setTaskType(taskType);
                 //taskTemplate.setTaskTypeUuid(taskTypeUuid);
@@ -1226,39 +1181,14 @@ public class LoadTestData {
             public void execute(Realm realm) {
                 taskTemplate2 = realmDB.createObject(TaskTemplate.class);
                 taskTemplate2.set_id(2);
-                taskTemplate2.setUuid(taskStageTemplateUuid2);
-                taskTemplate2.setEquipmentModel(equipmentModel);
+                taskTemplate2.setUuid(stageTemplateUuid2);
                 taskTemplate2.setTitle("Ремонт генератора Тепловей-250");
                 taskTemplate2.setDescription("Ремонт компрессора теплогенератора");
                 taskTemplate2.setImage("");
                 //taskTemplate2.setEquipmentModelUuid(equipmentModelUuid);
-                taskTemplate2.setEquipmentModel(equipmentModel);
                 taskTemplate2.setNormative(7300);
                 taskTemplate2.setTaskType(taskType2);
                 //taskTemplate2.setTaskTypeUuid(taskTypeUuid2);
-            }
-        });
-        // TaskStageOperationList -----------------
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageOperationList = realmDB.createObject(TaskStageOperationList.class);
-                taskStageOperationList.set_id(1);
-                taskStageOperationList.setUuid(taskStageOperationListUuid);
-                taskStageOperationList.setFlowOrder(1);
-                taskStageOperationList.setTaskStageTemplate(taskStageTemplate);
-                taskStageOperationList.setOperationTemplate(operationTemplate);
-            }
-        });
-        realmDB.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                taskStageOperationList = realmDB.createObject(TaskStageOperationList.class);
-                taskStageOperationList.set_id(2);
-                taskStageOperationList.setUuid(taskStageOperationListUuid2);
-                taskStageOperationList.setFlowOrder(2);
-                taskStageOperationList.setTaskStageTemplate(taskStageTemplate);
-                taskStageOperationList.setOperationTemplate(operationTemplate2);
             }
         });
 
@@ -1266,7 +1196,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                task = realmDB.createObject(Tasks.class);
+                task = realmDB.createObject(Task.class);
                 task.set_id(1);
                 task.setUuid(taskUuid);
                 task.setTaskStatus(taskStatus);
@@ -1277,13 +1207,13 @@ public class LoadTestData {
                 //task.setTaskVerdictUuid(taskVerdictUuid);
                 task.setTaskTemplate(taskTemplate);
                 //task.setTaskTemplateUuid(taskTemplateUuid);
-                task.setEquipment(equipment);
+                //task.setEquipment(equipment);
                 //task.setEquipmentUuid(equipmentUuid);
                 task.setComment("Там тепловей шумит сильно, из под него бежит и тепла нет. Следует разобраться.");
                 task.setPrevCode(0);
                 task.setNextCode(2);
-                task.addTaskStage(taskStage);
-                task.addTaskStage(taskStage2);
+                task.addStage(stage);
+                task.addStage(stage2);
                 //task.setOrder(order);
             }
         });
@@ -1291,7 +1221,7 @@ public class LoadTestData {
         realmDB.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                task2 = realmDB.createObject(Tasks.class);
+                task2 = realmDB.createObject(Task.class);
                 task2.set_id(2);
                 task2.setUuid(taskUuid2);
                 task2.setTaskStatus(taskStatus);
@@ -1302,7 +1232,7 @@ public class LoadTestData {
                 //task2.setTaskVerdictUuid(taskVerdictUuid);
                 task2.setTaskTemplate(taskTemplate2);
                 //task2.setTaskTemplateUuid(taskTemplateUuid2);
-                task2.setEquipment(equipment2);
+                //task2.setEquipment(equipment2);
                 //task2.setEquipmentUuid(equipmentUuid2);
                 task2.setComment("Горелка котла в котельной не горит. Требуется починить.");
                 task2.setPrevCode(0);
@@ -1381,7 +1311,7 @@ public class LoadTestData {
 //                order3.setAuthorUuid(userTestUuid);
                 order3.setAuthor(user);
                 order3.setCloseDate(new Date());
-                order3.setReceiveDate(new Date());
+                order3.setReceivDate(new Date());
                 order3.setStartDate(new Date());
                 order3.setOpenDate(new Date());
                 //order3.setOrderStatusUuid(orderStatusUuid3);
@@ -1418,6 +1348,63 @@ public class LoadTestData {
                 order4.addTask(task2);
             }
         });
+
+        realmDB.close();
     }
 
+    public static void LoadAllTestData2() {
+
+        final Realm realmDB;
+        realmDB = Realm.getDefaultInstance();
+
+        final String contragentTestUuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
+        final String contragentTestUuid2 = "5562ed77-9bf0-4542-b127-f4ecefce49da";
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                contragent = realmDB.createObject(Contragent.class);
+                contragent.set_id(1);
+                contragent.setUuid(contragentTestUuid);
+                contragent.setName("ООО Дюккерхофф Коркино Цемент");
+                contragent.setDescription("Компания");
+                contragent.setPhone("+89112121200");
+                contragent.setContragentType(1);
+                contragent.setParentContragent(null);
+                contragent.setChangedAt(new Date());
+                contragent.setCreatedAt(new Date());
+            }
+        });
+
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                contragent2 = realmDB.createObject(Contragent.class);
+                contragent2.set_id(2);
+                contragent2.setUuid(contragentTestUuid2);
+                contragent2.setName("ООО Модуль-М");
+                contragent2.setDescription("Компания-подрядчик работ");
+                contragent2.setPhone("+89112121200");
+                contragent2.setContragentType(2);
+                contragent2.setParentContragent(null);
+                contragent2.setChangedAt(new Date());
+                contragent2.setCreatedAt(new Date());
+            }
+        });
+
+        realmDB.close();
+    }
+
+    public static void DeleteSomeData() {
+        final Realm realmDB;
+        realmDB = Realm.getDefaultInstance();
+        realmDB.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realmDB.where(Equipment.class).findAll().deleteAllFromRealm();
+            }
+        });
+
+        realmDB.close();
+    }
 }

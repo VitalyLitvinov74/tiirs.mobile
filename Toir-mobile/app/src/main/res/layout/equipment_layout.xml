@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true"
+    tools:context=".EquipmentInfoActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -18,14 +21,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FAFAFA"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical">
 
         <RelativeLayout
             android:id="@+id/equipment_info_common"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
-        <ImageView
+            <ImageView
                 android:id="@+id/equipment_image"
                 android:layout_width="fill_parent"
                 android:layout_height="200dp"
@@ -33,7 +36,7 @@
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/kotel" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_name"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
@@ -45,7 +48,8 @@
                 android:scaleType="centerCrop"
                 android:textColor="#ffffff"
                 android:textSize="20sp" />
-        <TextView
+
+            <TextView
                 android:id="@+id/equipment_text_inventory"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
@@ -58,7 +62,7 @@
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_uuid"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
@@ -69,28 +73,37 @@
                 android:textColor="#000000"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/equipment_text_id"
+                android:layout_width="fill_parent"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_text_uuid"
+                android:background="#FAFAFA"
+                android:paddingLeft="45dp"
+                android:textColor="#000000"
+                android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/equipment_location_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_below="@+id/equipment_text_uuid"
+                android:layout_below="@+id/equipment_text_id"
                 android:layout_marginLeft="15dp"
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/location" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:layout_below="@+id/equipment_text_uuid"
+                android:layout_below="@+id/equipment_text_id"
                 android:layout_toRightOf="@+id/equipment_location_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
-        <TextView
+            <TextView
                 android:id="@+id/equipment_text_location_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
@@ -102,7 +115,7 @@
                 android:textColor="#757575"
                 android:textSize="14sp" />
 
-        <ImageView
+            <ImageView
                 android:id="@+id/equipment_date_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
@@ -130,6 +143,38 @@
                 android:layout_toRightOf="@+id/equipment_date_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:text="@string/regular_date"
+                android:textColor="#757575"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/equipment_date_icon2"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_date_label"
+                android:layout_marginLeft="15dp"
+                android:contentDescription="@string/image_description"
+                android:src="@drawable/calendar" />
+
+            <TextView
+                android:id="@+id/equipment_text_date2"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_date_label"
+                android:layout_toRightOf="@+id/equipment_date_icon2"
+                android:background="#FAFAFA"
+                android:paddingLeft="10dp"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_date_label2"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_date2"
+                android:layout_toRightOf="@+id/equipment_date_icon2"
+                android:background="#FAFAFA"
+                android:paddingLeft="10dp"
                 android:text="@string/last_date"
                 android:textColor="#757575"
                 android:textSize="14sp" />
@@ -138,7 +183,7 @@
                 android:id="@+id/equipment_status_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_below="@+id/equipment_text_date_label"
+                android:layout_below="@+id/equipment_text_date_label2"
                 android:layout_marginLeft="15dp"
                 android:contentDescription="@string/image_description"
                 android:src="@drawable/equipment_status_repair" />
@@ -147,7 +192,7 @@
                 android:id="@+id/equipment_text_status"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:layout_below="@+id/equipment_text_date_label"
+                android:layout_below="@+id/equipment_text_date_label2"
                 android:layout_toRightOf="@+id/equipment_status_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
@@ -173,40 +218,38 @@
                 android:layout_below="@+id/equipment_text_status_label"
                 android:background="#777777" />
 
+            <ImageView
+                android:id="@+id/equipment_information_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_divider1"
+                android:contentDescription="@string/image_description"
+                android:maxHeight="32dp"
+                android:src="@drawable/ic_icon_tools" />
+
             <TextView
                 android:id="@+id/equipment_text_operation_list"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_below="@+id/equipment_divider1"
                 android:background="#FAFAFA"
+                android:layout_marginRight="25dp"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:text="@string/operation_list"
+                android:layout_toRightOf="@+id/equipment_information_icon"
                 android:textColor="#757575"
                 android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/equipment_information_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/equipment_divider1"
-                android:layout_marginRight="25dp"
-                android:layout_toRightOf="@+id/equipment_text_operation_list"
-                android:contentDescription="@string/image_description"
-                android:maxHeight="32dp"
-                android:src="@drawable/ic_icon_tools" />
-
             <ListView
-                    android:id="@+id/list_view"
-                    android:layout_width="match_parent"
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/equipment_text_operation_list"
-                    android:divider="#333333"
-                    android:dividerHeight="1px"
-                android:paddingBottom="10dp"
-                android:scrollbarAlwaysDrawVerticalTrack="true">
-            </ListView>
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:layout_marginBottom="10dp"
+                android:paddingBottom="10dp" />
 
             <View
                 android:id="@+id/equipment_divider2"
@@ -215,14 +258,25 @@
                 android:layout_below="@+id/list_view"
                 android:background="#777777" />
 
+            <ImageView
+                android:id="@+id/equipment_documentation_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_divider2"
+                android:contentDescription="@string/image_description"
+                android:maxHeight="32dp"
+                android:src="@drawable/ic_icon_tasks2" />
+
             <TextView
                 android:id="@+id/equipment_text_documentation"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_below="@+id/equipment_divider2"
                 android:background="#FAFAFA"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/equipment_documentation_icon"
                 android:text="@string/documentation"
                 android:textColor="#757575"
                 android:textSize="16sp" />
@@ -231,32 +285,65 @@
                 android:id="@+id/equipment_documentation_listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/equipment_text_documentation">
-            </ListView>
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp"
+                android:layout_below="@+id/equipment_text_documentation" />
+
+            <View
+                android:id="@+id/equipment_divider3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/equipment_documentation_listView"
+                android:background="#777777" />
 
             <ImageView
-                android:id="@+id/overlapImageWriteTag"
+                android:id="@+id/equipment_defects_icon"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_below="@+id/equipment_text_name"
-                android:layout_toLeftOf="@+id/overlapImageReadTag"
-                android:adjustViewBounds="true"
-                android:clickable="false"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_divider3"
                 android:contentDescription="@string/image_description"
-                android:paddingRight="10dp"
-                android:src="@drawable/circle2" />
+                android:maxHeight="32dp"
+                android:paddingLeft="5dp"
+                android:src="@drawable/ic_icon_warnings" />
 
-            <ImageView
-                android:id="@+id/overlapImageReadTag"
+            <TextView
+                android:id="@+id/equipment_text_defects"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/equipment_text_name"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/image_description"
-                android:paddingRight="10dp"
-                android:src="@drawable/circle" />
+                android:layout_height="40dp"
+                android:layout_below="@+id/equipment_divider3"
+                android:background="#FAFAFA"
+                android:paddingLeft="20dp"
+                android:paddingTop="5dp"
+                android:layout_toRightOf="@+id/equipment_defects_icon"
+                android:text="@string/defects"
+                android:textColor="#757575"
+                android:textSize="16sp" />
+
+            <ListView
+                android:id="@+id/equipment_defects_listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp"
+                android:layout_below="@+id/equipment_text_defects" />
 
         </RelativeLayout>
-</ScrollView>
-</LinearLayout>
+
+    </ScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:src="@drawable/ic_plus_white_36dp"
+        app:fabSize="normal"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="15dp"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:layout_behavior="ru.toir.mobile.utils.ScrollAwareFABBehavior"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <include layout="@layout/equipment_action" />
+
+</android.support.design.widget.CoordinatorLayout>

@@ -12,12 +12,21 @@ import ru.toir.mobile.db.realm.MeasureType;
  *         Created by koputo on 05.10.16.
  */
 public interface IMeasureType {
-    @GET("/api/objects/measure-type")
-    Call<List<MeasureType>> measureType();
+    @GET("/measure-type")
+    Call<List<MeasureType>> get();
 
-    @GET("/api/objects/measure-type")
-    Call<List<MeasureType>> measureType(@Query("changedAfter") String changedAfter);
+    @GET("/measure-type")
+    Call<List<MeasureType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/objects/measure-type")
-    Call<List<MeasureType>> measureTypeById(@Query("id") String id);
+    @GET("/measure-type")
+    Call<List<MeasureType>> getById(@Query("id") String id);
+
+    @GET("/measure-type")
+    Call<List<MeasureType>> getById(@Query("id[]") String[] id);
+
+    @GET("/measure-type")
+    Call<List<MeasureType>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/measure-type")
+    Call<List<MeasureType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

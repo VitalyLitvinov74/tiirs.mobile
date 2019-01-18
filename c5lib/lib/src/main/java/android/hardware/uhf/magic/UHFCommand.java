@@ -8,7 +8,9 @@ package android.hardware.uhf.magic;
 public class UHFCommand {
     public static final class Command {
         public static final byte ERROR = (byte) 0xFF;
-        public static final byte READ_TAG_ID = (byte) 0x22;
+        public static final byte INVENTORY = (byte) 0x22;
+        public static final byte MULTI_INVENTORY = (byte) 0x27;
+        public static final byte STOP_MULTI_INVENTORY = (byte) 0x28;
         public static final byte READ_TAG_DATA = (byte) 0x39;
         public static final byte WRITE_TAG_DATA = (byte) 0x49;
         public static final byte LOCK_TAG = (byte) 0x82;

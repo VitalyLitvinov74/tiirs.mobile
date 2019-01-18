@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Toir-mobile</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">ТОиРУС</string>
     <string name="action_settings">Настройки приложения</string>
     <string name="action_about">О программе</string>
     <string name="pleasePutTag">Поднесите метку</string>
@@ -15,6 +14,8 @@
     <string name="pref_debug_mode">Отладочный режим</string>
     <string name="pref_autonome_mode">Работать автономно</string>
     <string name="load_test_data">Загрузить тестовые данные</string>
+    <string name="delete_test_data">Удалить справочники</string>
+
     <string name="pref_update_url">Сервер обновления</string>
     <string name="pref_update_url_dialog_title">Введите URL сервера обновления</string>
     <string name="pref_server_url">Сервер системы</string>
@@ -42,13 +43,13 @@
     <string name="ok">ОК</string>
     <string name="make_photo">Снять</string>
     <string name="image_description">изображение</string>
-    <string name="description">описание</string>
-    <string name="id">ID</string>
+    <string name="description"> </string>
+    <string name="id">Идентификатор: %1$s</string>
     <string name="whois">Должность</string>
     <string name="current_location">Текущие координаты</string>
     <string name="no_gps_data">Нет данных GPS</string>
     <string name="current_status">Текущий статус</string>
-    <string name="operation_list">Список операций</string>
+    <string name="operation_list">Список последних операций</string>
     <string name="gps_status">Состояние GPS</string>
     <string name="gprs_status">Связь GPRS</string>
     <string name="server_date_connect">Дата связи с сервером</string>
@@ -58,8 +59,9 @@
     <string name="service">Сервис:</string>
     <string name="critical">Критичность:</string>
     <string name="last_date">Дата обслуживания</string>
+    <string name="regular_date">Следующая поверка</string>
     <string name="last_result">Результат обслуживания:</string>
-    <string name="documentation">Документация:</string>
+    <string name="documentation">Документация</string>
     <string name="pleaseScanImg">Наведите камеру на код</string>
     <string name="scan_process">Процесс сканирования</string>
     <string name="empty"></string>
@@ -145,4 +147,41 @@
     <string name="pref_autonome_mode_key">auto_mode</string>
     <string name="not_started">не начинался</string>
     <string name="not_finished">не закончен</string>
+    <string name="dont_ask_text_tags">Не спрашивать текстовые теги</string>
+    <string name="ask_text_tags_key">without_tags_mode</string>
+    <string name="model">Модель: %1$s</string>
+
+    <string name="choose_defect">Выберите дефект</string>
+    <string name="add_new_defect">или введите новый</string>
+    <string name="choose_defect_category">Категория дефекта</string>
+    <string name="defects_category_all">Все категории</string>
+    <string name="defects_category_non_specific">Не специфические дефекты</string>
+    <string name="action_save">Записать</string>
+    <string name="new_status">Сменить статус на</string>
+    <string name="contragents">Клиенты</string>
+    <string name="input_contragents_name">Введите название клиента</string>
+
+    <string name="client_type">Тип контрагента: $1$s</string>
+    <string name="client_phone">Телефон: %1$s</string>
+
+    <string name="defects">Зафиксированные дефекты</string>
+    <string name="defect_user">Обнаружил: </string>
+
+    <string name="order_title">[#%1$d] %2$s</string>
+    <string name="order_author">Автор наряда: %1$s</string>
+    <string name="order_worker">Исполнитель: %1$s</string>
+    <string name="order_recieved">Получен: %1$s</string>
+    <string name="order_start">Назначен на: %1$s</string>
+    <string name="order_open">Начат: %1$s</string>
+    <string name="order_close">Закрыт: %1$s</string>
+    <string name="order_status">Статус: %1$s</string>
+    <string name="order_verdict">Вердикт: %1$s</string>
+    <string name="order_comment">Коментарий: %1$s</string>
+    <string name="order_reason">Основание наряда: %1$s</string>
+
+    <string name="debug_nocheck_gps">Не проверять GPS</string>
+    <string name="receive_telegram">Оповещать через Telegram</string>
+    <string name="receive_viber">Оповещать через Viber</string>
+    <string name="telegram_chat_id">Идентификатор чата</string>
+    <string name="telegram_chat_id_value">0</string>
 </resources>

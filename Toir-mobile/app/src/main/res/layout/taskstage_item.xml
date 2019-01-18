@@ -27,11 +27,10 @@
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/ts_Status"
-        android:layout_width="fill_parent"
+        android:id="@+id/ts_Equipment"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dip"
-        android:layout_alignParentRight="true"
         android:background="#FAFAFA"
         android:textColor="#454545"
         android:layout_below="@+id/ts_Name"
@@ -50,9 +49,9 @@
         android:background="#FAFAFA"
         android:textColor="#454545"
         android:layout_marginRight="10dip"
-        android:layout_below="@+id/ts_Status"
+        android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
-        android:text="@string/description"
+        android:text="@string/not_started"
         android:textSize="12sp" />
 
     <TextView
@@ -64,7 +63,7 @@
         android:layout_toRightOf="@id/ts_StartDate"
         android:background="#FAFAFA"
         android:textColor="#454545"
-        android:layout_below="@+id/ts_Status"
+        android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
         android:text="@string/tire"
         android:textSize="12sp" />
@@ -80,9 +79,9 @@
         android:textColor="#454545"
         android:layout_marginTop="0dip"
         android:layout_marginLeft="10dip"
-        android:layout_below="@+id/ts_Status"
+        android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
-        android:text="@string/description"
+        android:text="@string/not_finished"
         android:textSize="12sp" />
 
 </RelativeLayout>

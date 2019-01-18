@@ -14,7 +14,6 @@ public class ToolType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String parentUuid;
     private Date createdAt;
     private Date changedAt;
 
@@ -40,14 +39,6 @@ public class ToolType extends RealmObject {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getParentUuid() {
-        return parentUuid;
-    }
-
-    public void setParentUuid(String parentUuid) {
-        this.parentUuid = parentUuid;
     }
 
     public Date getCreatedAt() {

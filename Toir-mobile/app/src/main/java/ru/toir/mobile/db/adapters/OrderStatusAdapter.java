@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -20,14 +19,15 @@ import ru.toir.mobile.db.realm.OrderStatus;
 public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements ListAdapter {
     public static final String TABLE_NAME = "OrderStatus";
 
-    public OrderStatusAdapter(@NonNull Context context, RealmResults<OrderStatus> data) {
-        super(context, data);
+    public OrderStatusAdapter(RealmResults<OrderStatus> data) {
+        super(data);
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OrderStatus> rows = realm.where(OrderStatus.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -56,10 +56,10 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
         ViewHolder viewHolder;
         if (parent.getId() == R.id.reference_listView) {
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.listview, parent, false);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -76,7 +76,7 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
         }
 
         if (parent.getId() == R.id.simple_spinner || convertView == null) {
-            TextView textView = new TextView(context);
+            TextView textView = new TextView(parent.getContext());
             OrderStatus orderStatus;
             if (adapterData != null) {
                 orderStatus = adapterData.get(position);

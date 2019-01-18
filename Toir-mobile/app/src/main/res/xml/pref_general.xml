@@ -3,18 +3,19 @@
 
     <PreferenceScreen
         android:icon="@drawable/pref_basic"
+        android:key="preferenceBasicScreen"
         android:theme="@style/PreferenceScreen"
         android:title="@string/pref_cat_main">
 
         <EditTextPreference
-            android:defaultValue="http://toir.server.loc"
+            android:defaultValue="https://api.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_update_url_dialog_title"
             android:icon="@drawable/pref_server"
             android:key="@string/updateUrl"
             android:title="@string/pref_update_url" />
 
         <EditTextPreference
-            android:defaultValue="http://toir.server.loc"
+            android:defaultValue="https://api.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_server_url_dialog_title"
             android:icon="@drawable/pref_server"
             android:key="@string/serverUrl"
@@ -25,11 +26,16 @@
             android:key="@string/rfidDriverListPrefKey"
             android:title="@string/pref_rfid_driver" />
 
+        <PreferenceScreen
+            android:icon="@drawable/pref_rfid"
+            android:key="@string/rfidDrvSettingKey"
+            android:title="Настройки драйвера RFID" />
+
     </PreferenceScreen>
     <PreferenceScreen
         android:icon="@drawable/pref_check"
         android:title="Отображение и данные">
-        <PreferenceCategory android:title="@string/pref_cat_show" >
+        <PreferenceCategory android:title="@string/pref_cat_show">
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="@string/pref_debug_mode_key"
@@ -42,24 +48,28 @@
                 android:defaultValue="false"
                 android:key="@string/run_ar_content_key"
                 android:title="@string/run_ar_content" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="without_tags_mode"
+                android:title="@string/dont_ask_text_tags" />
             <Preference
                 android:key="@string/load_test_data"
                 android:title="@string/load_test_data" />
+            <Preference
+                android:key="@string/delete_test_data"
+                android:title="@string/delete_test_data" />
+            <CheckBoxPreference
+                android:key="@string/debug_nocheck_gps"
+                android:title="@string/debug_nocheck_gps" />
+            <CheckBoxPreference
+                android:key="@string/receive_telegram"
+                android:title="@string/receive_telegram" />
+            <CheckBoxPreference
+                android:key="@string/receive_viber"
+                android:title="@string/receive_viber" />
+            <Preference
+                android:key="@string/telegram_chat_id"
+                android:title="@string/telegram_chat_id_value" />
         </PreferenceCategory>
-    </PreferenceScreen>
-    <PreferenceScreen
-        android:icon="@drawable/pref_rfid"
-        android:title="Настройки считывателя">
-
-        <PreferenceCategory
-            android:key="drvSettingsCategory"
-            android:title="Настройки драйверов" >
-
-            <PreferenceScreen
-                android:key="@string/rfidDrvSettingKey"
-                android:title="Настройки драйвера RFID" >
-            </PreferenceScreen>
-        </PreferenceCategory>
-
     </PreferenceScreen>
 </PreferenceScreen>

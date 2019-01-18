@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * @author Dmitriy Logachov
+ * @author Dmitriy Logachev
  *         <p>
  *         Драйвер считывателя RFID который ни чего не делает.
  *         </p>
@@ -27,7 +27,12 @@ public class RfidDriverNull extends RfidDriverBase {
 	}
 
 	@Override
-	public void close() {
+    public void readMultiplyTagId(final String[] tagIds) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
+
+    @Override
+    public void close() {
 	}
 
 	@Override

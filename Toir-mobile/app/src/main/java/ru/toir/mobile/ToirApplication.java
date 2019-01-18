@@ -20,7 +20,16 @@ public class ToirApplication extends Application {
 		super.onCreate();
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        serverUrl = preferences.getString(getString(R.string.serverUrl), "");
+        serverUrl = preferences.getString(getString(R.string.serverUrl), null);
+        if (serverUrl == null) {
+            String defaultUrl = "https://api.toir.tehnosber.ru";
+            serverUrl = defaultUrl;
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            sp.edit().putString(getString(R.string.serverUrl), defaultUrl).apply();
+        }
+
+        // инициализируем синглтон с данными о активном пользователе на уровне приложения
+        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
 
         // инициализируем базу данных Realm
         ToirRealm.init(this);

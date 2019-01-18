@@ -17,6 +17,7 @@ public class StageVerdict extends RealmObject {
     private String icon;
     private Date createdAt;
     private Date changedAt;
+    private StageType stageType;
 
     public long get_id() {
         return _id;
@@ -66,4 +67,11 @@ public class StageVerdict extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public StageType getStageType() {
+        return stageType;
+    }
+
+    public void setStageType(StageType stageType) {
+        this.stageType = stageType;
+    }
 }

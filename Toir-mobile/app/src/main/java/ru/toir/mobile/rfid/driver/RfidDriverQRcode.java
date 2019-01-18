@@ -5,10 +5,13 @@ import net.sourceforge.zbar.Image;
 import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
+
 import ru.toir.mobile.R;
 import ru.toir.mobile.camera.CameraPreview;
+import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.IRfidDriver;
 import ru.toir.mobile.rfid.RfidDriverBase;
+
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -24,7 +27,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
- * @author koputo
+ * @author Dmitriy Logachev
  *         <p>
  *         Драйвер считывателя RFID который "считывает" содержимое меток из
  *         текстового файла.
@@ -32,154 +35,166 @@ import android.widget.TextView;
  */
 public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
-	public static final String DRIVER_NAME = "Драйвер QR кодов";
-	private String TAG = "RFIDQRcode";
-	private Camera mCamera;
-	private CameraPreview mPreview;
-	private Handler autoFocusHandler;
-	private TextView scanText;
-	private ImageScanner scanner;
-	private FrameLayout preview;
-	private Image codeImage;
-	private String lastScannedCode;
-	private Context mContext;
+    public static final String DRIVER_NAME = "Драйвер QR кодов";
 
-	static {
-		System.loadLibrary("iconv");
-	}
+    static {
+        System.loadLibrary("iconv");
+    }
 
-	@Override
-	public boolean init() {
-		return true;
-	}
+    private String TAG = "RFIDQRcode";
+    private Camera mCamera;
+    private CameraPreview mPreview;
+    private Handler autoFocusHandler;
+    private TextView scanText;
+    private ImageScanner scanner;
+    private FrameLayout preview;
+    private Image codeImage;
+    private String lastScannedCode;
+    private int command;
+    PreviewCallback previewCb = new PreviewCallback() {
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            codeImage.setData(data);
+            int result = scanner.scanImage(codeImage);
+            if (result != 0) {
+                SymbolSet syms = scanner.getResults();
+                for (Symbol sym : syms) {
+                    lastScannedCode = sym.getData();
+                    if (lastScannedCode != null) {
+                        Log.d(TAG, "прочитано: " + lastScannedCode);
+                        scanText.setText(lastScannedCode);
+                        String tagId = "0000" + lastScannedCode;
+                        switch (command) {
+                            case RfidDialog.READER_COMMAND_READ_ID:
+                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
+                                break;
+                            case RfidDialog.READER_COMMAND_READ_MULTI_ID:
+                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
+                                break;
+                            default:
+                                sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+                                break;
+                        }
+                        releaseCamera();
+                    }
+                }
+            }
+            camera.addCallbackBuffer(data);
+        }
+    };
+    private Context mContext;
+    private Runnable doAutoFocus = new Runnable() {
+        public void run() {
+            if (mCamera != null) {
+                mCamera.autoFocus(autoFocusCB);
+            }
+        }
+    };
+    // Mimic continuous auto-focusing
+    final AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
+        public void onAutoFocus(boolean success, Camera camera) {
+            autoFocusHandler.postDelayed(doAutoFocus, 1000);
+        }
+    };
 
-	@Override
-	public void readTagId() {
-		releaseCamera();
-		resumeCamera();
-	}
+    public static Camera getCameraInstance() {
+        Camera c = null;
+        try {
+            c = Camera.open();
+        } catch (Exception e) {
+        }
 
-	@Override
-	public void close() {
+        return c;
+    }
 
-	}
+    @Override
+    public boolean init() {
+        return true;
+    }
 
-	private void releaseCamera() {
-		if (mCamera != null) {
-			mCamera.cancelAutoFocus();
-			mCamera.setPreviewCallback(null);
-			mCamera.stopPreview();
-			mCamera.release();
-			mCamera = null;
-		}
-	}
+    @Override
+    public void readTagId() {
+        command = RfidDialog.READER_COMMAND_READ_ID;
+        releaseCamera();
+        resumeCamera();
+    }
 
-	private void resumeCamera() {
-		autoFocusHandler = new Handler();
+    @Override
+    public void readMultiplyTagId(final String[] tagIds) {
+        command = RfidDialog.READER_COMMAND_READ_MULTI_ID;
+        releaseCamera();
+        resumeCamera();
+    }
 
-		// Instance barcode scanner
-		scanner = new ImageScanner();
-		scanner.setConfig(0, Config.X_DENSITY, 3);
-		scanner.setConfig(0, Config.Y_DENSITY, 3);
-		mCamera = getCameraInstance();
-		mPreview = new CameraPreview(mContext, mCamera, previewCb, autoFocusCB);
-		preview.removeAllViews();
-		preview.addView(mPreview);
-		if (mCamera != null) {
-			Camera.Parameters parameters = mCamera.getParameters();
-			Size size = parameters.getPreviewSize();
-			codeImage = new Image(size.width, size.height, "Y800");
-			mPreview.refreshDrawableState();
-		}
-	}
+    @Override
+    public void close() {
 
-	public static Camera getCameraInstance() {
-		Camera c = null;
-		try {
-			c = Camera.open();
-		} catch (Exception e) {
-		}
+    }
 
-		return c;
-	}
+    private void releaseCamera() {
+        if (mCamera != null) {
+            mCamera.cancelAutoFocus();
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+    }
 
-	PreviewCallback previewCb = new PreviewCallback() {
-		public void onPreviewFrame(byte[] data, Camera camera) {
-			codeImage.setData(data);
-			int result = scanner.scanImage(codeImage);
-			if (result != 0) {
-				SymbolSet syms = scanner.getResults();
-				for (Symbol sym : syms) {
-					lastScannedCode = sym.getData();
-					if (lastScannedCode != null) {
-						Log.d(TAG, "прочитано: " + lastScannedCode);
-						scanText.setText("Результат сканирования: "
-								+ lastScannedCode);
-						sHandler.obtainMessage(RESULT_RFID_SUCCESS,
-								lastScannedCode).sendToTarget();
-						releaseCamera();
-					}
-				}
-			}
-			camera.addCallbackBuffer(data);
-		}
-	};
+    private void resumeCamera() {
+        autoFocusHandler = new Handler();
 
-	private Runnable doAutoFocus = new Runnable() {
-		public void run() {
-			if (mCamera != null) {
-				mCamera.autoFocus(autoFocusCB);
-			}
-		}
-	};
+        // Instance barcode scanner
+        scanner = new ImageScanner();
+        scanner.setConfig(0, Config.X_DENSITY, 3);
+        scanner.setConfig(0, Config.Y_DENSITY, 3);
+        mCamera = getCameraInstance();
+        mPreview = new CameraPreview(mContext, mCamera, previewCb, autoFocusCB);
+        preview.removeAllViews();
+        preview.addView(mPreview);
+        if (mCamera != null) {
+            Camera.Parameters parameters = mCamera.getParameters();
+            Size size = parameters.getPreviewSize();
+            codeImage = new Image(size.width, size.height, "Y800");
+            mPreview.refreshDrawableState();
+        }
+    }
 
-	// Mimic continuous auto-focusing
-	final AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
-		public void onAutoFocus(boolean success, Camera camera) {
-			autoFocusHandler.postDelayed(doAutoFocus, 1000);
-		}
-	};
+    @Override
+    public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
+        mContext = inflater.getContext();
+        View view = inflater.inflate(R.layout.qr_read, viewGroup);
 
-	@Override
-	public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
-		mContext = inflater.getContext();
-		View view = inflater.inflate(R.layout.qr_read, viewGroup);
+        Button button = (Button) view.findViewById(R.id.cancelButton);
+        button.setOnClickListener(new View.OnClickListener() {
 
-		Button button = (Button) view.findViewById(R.id.cancelButton);
-		button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+            }
+        });
 
-			@Override
-			public void onClick(View v) {
-				sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
-			}
-		});
+        preview = (FrameLayout) view.findViewById(R.id.cameraPreview);
+        scanText = (TextView) view.findViewById(R.id.code_from_bar);
+        return view;
+    }
 
-		preview = (FrameLayout) view.findViewById(R.id.cameraPreview);
-		scanText = (TextView) view.findViewById(R.id.code_from_bar);
-		return view;
-	}
+    @Override
+    public void readTagData(String password, int memoryBank, int address, int count) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
 
-	@Override
-	public void readTagData(String password, int memoryBank, int address,
-			int count) {
-		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-	}
+    @Override
+    public void readTagData(String password, String tagId, int memoryBank, int address, int count) {
+        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+    }
 
-	@Override
-	public void readTagData(String password, String tagId, int memoryBank,
-			int address, int count) {
-		sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-	}
+    @Override
+    public void writeTagData(String password, int memoryBank, int address, String data) {
+        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+    }
 
-	@Override
-	public void writeTagData(String password, int memoryBank, int address,
-			String data) {
-		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-	}
-
-	@Override
-	public void writeTagData(String password, String tagId, int memoryBank,
-			int address, String data) {
-		sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
-	}
+    @Override
+    public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
+        sHandler.obtainMessage(RESULT_RFID_WRITE_ERROR).sendToTarget();
+    }
 }

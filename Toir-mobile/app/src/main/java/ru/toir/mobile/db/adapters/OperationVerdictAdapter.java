@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -20,14 +20,15 @@ import ru.toir.mobile.db.realm.OperationVerdict;
 public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> implements ListAdapter {
     public static final String TABLE_NAME = "OperationVerdict";
 
-    public OperationVerdictAdapter(@NonNull Context context, RealmResults<OperationVerdict> data) {
-        super(context, data);
+    public OperationVerdictAdapter(RealmResults<OperationVerdict> data) {
+        super(data);
     }
 
     @Override
     public int getCount() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<OperationVerdict> rows = realm.where(OperationVerdict.class).findAll();
+        realm.close();
         return rows.size();
     }
 
@@ -52,18 +53,20 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
             if (parent.getId() == R.id.reference_listView) {
                 convertView = inflater.inflate(R.layout.listview, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
-                viewHolder.uuid = (TextView) convertView.findViewById(R.id.lv_secondLine);
+                viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
+                viewHolder.uuid = convertView.findViewById(R.id.lv_secondLine);
                 convertView.setTag(viewHolder);
             }
             if (parent.getId() == R.id.simple_spinner || parent.getId() == R.id.operation_verdict_spinner) {
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
-                viewHolder.title = (TextView) convertView.findViewById(android.R.id.text1);
+                viewHolder.title = convertView.findViewById(android.R.id.text1);
                 convertView.setTag(viewHolder);
             }
         } else {

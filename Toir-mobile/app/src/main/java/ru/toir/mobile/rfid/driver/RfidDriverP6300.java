@@ -2,15 +2,23 @@ package ru.toir.mobile.rfid.driver;
 
 import android.hardware.p6300.jni.Linuxc;
 import android.hardware.p6300.uhf.api.CommandType;
+import android.hardware.p6300.uhf.api.MultiLableCallBack;
+import android.hardware.p6300.uhf.api.Multi_query_epc;
 import android.hardware.p6300.uhf.api.Query_epc;
 import android.hardware.p6300.uhf.api.ShareData;
 import android.hardware.p6300.uhf.api.Tags_data;
 import android.hardware.p6300.uhf.api.UHF;
 import android.hardware.p6300.uhf.api.Ware;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import ru.toir.mobile.R;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.ShellUtils;
@@ -28,10 +36,9 @@ public class RfidDriverP6300 extends RfidDriverBase {
     // к этому свойству обращаемся не на прямую
     public static final String DRIVER_NAME = "Драйвер UHF P6300";
     private static final String TAG = "RfidDriverP6300";
-    private UHF mUhf;
-
     private static final int EPC = 0;
     private static final int TID = 1;
+    private UHF mUhf;
 
     @Override
     public boolean init() {
@@ -44,7 +51,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
 
         mUhf = new UHF("/dev/ttysWK2", Linuxc.BAUD_RATE_115200, 1, 0);
         mUhf.com_fd = mUhf.transfer_open(mUhf);
-        if(mUhf.com_fd < 0) {
+        if (mUhf.com_fd < 0) {
             powerOff();
             return false;
         }
@@ -53,7 +60,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
         try {
             Thread.sleep(500);
         } catch (Exception e) {
-            Log.d(TAG, e.getLocalizedMessage());
+            e.printStackTrace();
         }
 
         Ware ware = new Ware(CommandType.GET_FIRMWARE_VERSION, 0, 0, 0);
@@ -94,8 +101,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 if (result) {
                     StringBuilder sb = new StringBuilder();
                     sb.append(String.format("%02X%02X", query_epc.epc.pc_msb, query_epc.epc.pc_lsb));
-                    for(char c : query_epc.epc.epc) {
-                        sb.append(String.format("%02X", (int)c));
+                    for (char c : query_epc.epc.epc) {
+                        sb.append(String.format("%02X", (int) c));
                     }
 
                     Log.d(TAG, "EPC len = " + query_epc.epc.epc_len + ", tagId = " + sb.toString());
@@ -111,6 +118,73 @@ public class RfidDriverP6300 extends RfidDriverBase {
     }
 
     @Override
+    public void readMultiplyTagId(final String[] tagIds) {
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Set<String> foundTagIds = new HashSet<>();
+
+                MultiLableCallBack mc = new MultiLableCallBack() {
+                    @Override
+                    public void method(char[] chars) {
+                        StringBuilder sb = new StringBuilder();
+                        for (char c : chars) {
+                            sb.append(String.format("%02X", (int) c));
+                        }
+
+                        String readedTagId = sb.toString().substring(0, 28);
+                        String tagIdCheck = readedTagId.substring(4);
+
+                        // ищем метку среди переданных
+                        if (tagIds.length > 0) {
+                            for (String tagId : tagIds) {
+                                if (tagIdCheck.equals(tagId)) {
+                                    Log.d(TAG, tagIdCheck + " tagId found!!!");
+                                    // останавливаем поток разбора ответов от считывателя
+                                    CommandType.CommandOK = true;
+                                    CommandType.CommandResend = false;
+                                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{readedTagId}).sendToTarget();
+                                }
+                            }
+                        } else {
+                            // просто добавляем все уникальные найденные метки в список
+                            foundTagIds.add(readedTagId);
+                        }
+                    }
+                };
+
+                Multi_query_epc query_epc = new Multi_query_epc();
+                query_epc.query_total = 0;
+                mUhf.setCallBack(mc);
+                boolean result = mUhf.command(CommandType.MULTI_QUERY_TAGS_EPC, query_epc);
+                // TODO: придумать как решить этот вопрос
+                /*
+                 * Вопрос в следующем - при чтении кучи меток в поисках одной, диалог могут закрыть.
+                 * При закрытии диалога вызывается метод драйвера close().
+                 * В нём обнуляется mUhf еще до того как текущий поток закончит работу.
+                 * Пока воткнут такой костыль с проверкой на null
+                 */
+                if (mUhf != null) {
+                    mUhf.setCallBack(null);
+                    mUhf.command(CommandType.STOP_MULTI_QUERY_TAGS_EPC, null);
+                }
+
+                if (!result && tagIds.length == 0) {
+//                    Bundle bundle = new Bundle();
+//                    bundle.putStringArray("result", foundTagIds.toArray(new String[]{}));
+                    Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, foundTagIds.toArray(new String[]{}));
+//                    message.setData(bundle);
+                    message.sendToTarget();
+                } else {
+                    sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+                }
+            }
+        });
+        thread.start();
+    }
+
+    @Override
     public void readTagData(final String password, final int memoryBank, final int address,
                             final int count) {
         Thread thread = new Thread(new Runnable() {
@@ -122,8 +196,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 boolean result = mUhf.command(CommandType.SINGLE_QUERY_TAGS_EPC, query_epc);
                 if (result) {
                     StringBuilder sb = new StringBuilder();
-                    for(char c : query_epc.epc.epc) {
-                        sb.append(String.format("%02X", (int)c));
+                    for (char c : query_epc.epc.epc) {
+                        sb.append(String.format("%02X", (int) c));
                     }
 
                     Log.d(TAG, "EPC len = " + query_epc.epc.epc_len + ", tagId = " + sb.toString());
@@ -228,8 +302,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 boolean result = mUhf.command(CommandType.SINGLE_QUERY_TAGS_EPC, query_epc);
                 if (result) {
                     StringBuilder sb = new StringBuilder();
-                    for(char c : query_epc.epc.epc) {
-                        sb.append(String.format("%02X", (int)c));
+                    for (char c : query_epc.epc.epc) {
+                        sb.append(String.format("%02X", (int) c));
                     }
 
                     Log.d(TAG, "EPC len = " + query_epc.epc.epc_len + ", tagId = " + sb.toString());
@@ -446,8 +520,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
     private boolean checkVersion(Ware ware) {
 
         if (ware.major_version == 1) {
-            if (ware.minor_version >=0 && ware.minor_version <=3) {
-                if (ware.revision_version >=0 && ware.revision_version <=9) {
+            if (ware.minor_version >= 0 && ware.minor_version <= 3) {
+                if (ware.revision_version >= 0 && ware.revision_version <= 9) {
                     return true;
                 }
             }
@@ -459,7 +533,7 @@ public class RfidDriverP6300 extends RfidDriverBase {
     private String charsToString(char[] chars) {
         StringBuilder sb = new StringBuilder();
         for (char elem : chars) {
-            sb.append(String.format("%02X", (int)elem));
+            sb.append(String.format("%02X", (int) elem));
         }
 
         return sb.toString();

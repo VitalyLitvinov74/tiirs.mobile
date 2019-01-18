@@ -1,7 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -14,13 +14,13 @@ import ru.toir.mobile.db.realm.Documentation;
 
 /**
  * @author koputo
- * Created by koputo on 08.09.16.
+ *         Created by koputo on 08.09.16.
  */
 public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implements ListAdapter {
     public static final String TABLE_NAME = "Documentation";
 
-    public DocumentationAdapter(@NonNull Context context, RealmResults<Documentation> data) {
-        super(context, data);
+    public DocumentationAdapter(RealmResults<Documentation> data) {
+        super(data);
     }
 
     @Override
@@ -29,6 +29,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         if (adapterData != null) {
             return adapterData.size();
         }
+
         return 0;
     }
 
@@ -37,6 +38,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         if (adapterData != null) {
             return adapterData.get(position);
         }
+
         return null;
     }
 
@@ -47,17 +49,20 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
             documentation = adapterData.get(position);
             return documentation.get_id();
         }
+
         return 0;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.listview, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.information = (TextView) convertView.findViewById(R.id.lv_secondLine);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.lv_firstLine);
+            viewHolder.information = convertView.findViewById(R.id.lv_secondLine);
+            viewHolder.title = convertView.findViewById(R.id.lv_firstLine);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -66,7 +71,7 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
         Documentation Documentation;
         if (adapterData != null) {
             Documentation = adapterData.get(position);
-            String information="";
+            String information = "";
             if (Documentation != null) {
                 viewHolder.title.setText(Documentation.getTitle());
                 if (Documentation.getDocumentationType() != null) {
@@ -75,16 +80,18 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
                     if (Documentation.getEquipmentModel() != null) {
                         information = information.concat(Documentation.getEquipmentModel().getTitle());
                     }
+
                     if (Documentation.getEquipment() != null) {
                         information = information.concat(Documentation.getEquipment().getTitle());
                     }
-                }
-                else {
+                } else {
                     information = information.concat("не определена");
                 }
+
                 viewHolder.information.setText(information);
             }
         }
+
         return convertView;
     }
 

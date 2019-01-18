@@ -7,16 +7,20 @@ import android.util.Log;
 
 public class Scanner {
 
-	private final static String TAG = "Scanner";
 	static public final int BARCODE_READ = 10;
 	static public final int BARCODE_NOREAD = 12;
-	static Boolean m_bASYC = false;
+	private final static String TAG = "Scanner";
 	static public Handler m_handler = null;
+	static Boolean m_bASYC = false;
+
+	static {
+		System.loadLibrary("tiny-tools");
+	}
 
 	/**
 	 * It can scan 1D/2D barcode, If scan can't get anything, will wait for
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
-	 * 
+	 *
 	 * @return :return the barcode string, If can't get the barocde will show
 	 *         none string
 	 */
@@ -25,7 +29,7 @@ public class Scanner {
 	/**
 	 * It can scan 1D/2D barcode, If scan can't get anything, will wait for
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
-	 * 
+	 *
 	 * @param nCode
 	 *            :can head mark,urself scanner id 0x55,MOTOROLA is 0x00,
 	 * @return :return the barcode string, If can't get the barocde will show
@@ -36,12 +40,12 @@ public class Scanner {
 	/**
 	 * It can scan 1D/2D barcode, If scan can't get anything, will wait for
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
-	 * 
+	 *
 	 * @param nCommand
-	 *            :Scan head mark��ourself scanner id 0x55,MOTOROLA is 0x00
+	 *            :Scan head mark ourself scanner id 0x55,MOTOROLA is 0x00
 	 * @param nCode
-	 *            :Barcode encoding��GB2312 is 1,UTF is 0
-	 * @return ��return the barcode string, If can't get the barocde will show
+	 *            :Barcode encoding GB2312 is 1,UTF is 0
+	 * @return return the barcode string, If can't get the barocde will show
 	 *         none string
 	 */
 	static public native String ReadSCAEx(int nCommand, int nCode);
@@ -49,13 +53,13 @@ public class Scanner {
 	/**
 	 * It can scan 1D/2D barcode, If scan can't get anything, will wait for
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
-	 * 
+	 *
 	 * @param nCommand
-	 *            :Scan head mark��ourself scanner id 0x55,MOTOROLA is 0x00
+	 *            :Scan head mark ourself scanner id 0x55,MOTOROLA is 0x00
 	 * @param buf
 	 *            : store the barcode information, convert the barcode to the
 	 *            string after readed.
-	 * @return ��return the barcode string, If can't get the barocde will show
+	 * @return return the barcode string, If can't get the barocde will show
 	 *         none string
 	 */
 	static public native int ReadDataSCA(int nCommand, byte[] buf);
@@ -63,19 +67,26 @@ public class Scanner {
 	/**
 	 * It can scan 1D/2D barcode, If scan can't get anything, will wait for
 	 * sometime, ourself scanner if wait for 10sec. MOTOROLA is wait for 10sec.
-	 * 
+	 *
 	 * @param nCommand
-	 *            :Scan head mark��ourself scanner id 0x55,MOTOROLA is 0x00
+	 *            :Scan head mark ourself scanner id 0x55,MOTOROLA is 0x00
 	 * @return :return the scaned barcode information
 	 */
 	static public native byte[] ReadData(int nCommand);
 
 	/**
 	 * Initializes the device
-	 * 
-	 * @return ��success return 0
+	 *
+	 * @return success return 0
 	 */
 	static public native int InitSCA();
+
+	/**
+	 * Close the device
+	 *
+	 * @return success return 0
+	 */
+	static public native int CloseSCA();
 
 	/**
 	 * Asynchronous scanning, call this function will create a Thread to scan,
@@ -121,10 +132,10 @@ public class Scanner {
 	}
 
 	/**
-	 * 
-	 * The virtual keyboard message,should send the String to the system
+	 *
+	 * The virtual keyboard message, should send the String to the system
 	 * according the virtual keyboard message
-	 * 
+	 *
 	 * @param str
 	 *            : the sending String
 	 */
@@ -137,10 +148,6 @@ public class Scanner {
 			e.printStackTrace();
 			Log.i("run", e.toString());
 		}
-	}
-
-	static {
-		System.loadLibrary("tiny-tools");
 	}
 
 }

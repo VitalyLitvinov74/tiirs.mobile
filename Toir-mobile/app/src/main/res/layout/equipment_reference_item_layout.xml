@@ -94,17 +94,6 @@
         android:layout_toRightOf="@+id/eril_image" />
 
     <TextView
-        android:id="@+id/eril_critical_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/eril_image"
-        android:textColor="#454545"
-        android:textSize="14sp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginBottom="5dp"
-        android:text="" />
-
-    <TextView
         android:id="@+id/eril_critical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -112,10 +101,9 @@
         android:background="#ff0000"
         android:textColor="#eeeeee"
         android:textSize="14sp"
-        android:layout_marginLeft="3dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_toRightOf="@+id/eril_critical_label" />
+        android:layout_marginBottom="5dp" />
 
     <TextView
         android:id="@+id/eril_status"

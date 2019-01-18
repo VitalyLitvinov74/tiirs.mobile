@@ -13,13 +13,14 @@ public class Operation extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private TaskStages taskStage;
+    private String stageUuid;
     private OperationVerdict operationVerdict;
     private OperationStatus operationStatus;
     private OperationTemplate operationTemplate;
     private Date startDate;
     private Date endDate;
     private int flowOrder;
+    private String comment;
     private Date createdAt;
     private Date changedAt;
 
@@ -37,14 +38,6 @@ public class Operation extends RealmObject {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public TaskStages getTaskStage() {
-        return taskStage;
-    }
-
-    public void setTaskStage(TaskStages taskStage) {
-        this.taskStage = taskStage;
     }
 
     public OperationVerdict getOperationVerdict() {
@@ -111,4 +104,43 @@ public class Operation extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getStageUuid() {
+        return stageUuid;
+    }
+
+    public void setStageUuid(String stageUuid) {
+        this.stageUuid = stageUuid;
+    }
+
+    public OperationStatus getStatus() {
+        return operationStatus;
+    }
+
+    public boolean isNew() {
+        return getStatus().getUuid().equals(OperationStatus.Status.NEW);
+    }
+
+    public boolean isInWork() {
+        return getStatus().getUuid().equals(OperationStatus.Status.IN_WORK);
+    }
+
+    public boolean isComplete() {
+        return getStatus().getUuid().equals(OperationStatus.Status.COMPLETE);
+    }
+
+    public boolean isUnComplete() {
+        return getStatus().getUuid().equals(OperationStatus.Status.UN_COMPLETE);
+    }
+
+    public boolean isCanceled() {
+        return getStatus().getUuid().equals(OperationStatus.Status.CANCELED);
+    }
 }

@@ -14,7 +14,6 @@ public class OperationType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
-    private String icon;
     private Date createdAt;
     private Date changedAt;
 
@@ -42,14 +41,6 @@ public class OperationType extends RealmObject {
         this.title = title;
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -64,6 +55,10 @@ public class OperationType extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public boolean isMeasure() {
+        return uuid.equals(Type.MEASURE);
     }
 
     public class Type {

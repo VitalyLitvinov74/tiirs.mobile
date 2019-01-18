@@ -1,9 +1,5 @@
 package ru.toir.mobile.utils;
 
-/**
- * Created by Shtrm on 01.11.2016.
- */
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -19,17 +15,19 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import ru.toir.mobile.db.realm.Equipment;
+/**
+ * @author olejek
+ *         Created by Shtrm on 01.11.2016.
+ */
 
-public class RoundedImageView extends ImageView {
+public class RoundedImageView extends AppCompatImageView {
 
     public RoundedImageView(Context context) {
         super(context);
@@ -92,22 +90,26 @@ public class RoundedImageView extends ImageView {
         float scaleWidth;
         float scaleHeight;
         // /storage/sdcard1/Android/data/ru.toir.mobile/users/4CD4A64F-F6CB-4A7C-B5A6-42936E656F31.jpg
-        File image = new File(path+filename.replace(".", "_m."));
-        File image_full = new File(path+filename);
-        // не смогли создать копию
-        if (image == null) return null;
-        Long last_modified=image.lastModified();
-        if (image.exists() && changedAt<=last_modified) {
-             // файл есть, преобразовывать не нужно
-             imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
-             if (imageBitmap2 != null) return imageBitmap2;
+        File image = new File(path, filename.replace(".", "_m."));
+        File image_full = new File(path, filename);
+
+        Long last_modified = image.lastModified();
+        if (image.exists() && changedAt <= last_modified) {
+            // файл есть, преобразовывать не нужно
+            imageBitmap2 = BitmapFactory.decodeFile(image.getAbsolutePath());
+            if (imageBitmap2 != null) {
+                return imageBitmap2;
             }
+        }
 
         imageBitmap = BitmapFactory.decodeFile(image_full.getAbsolutePath());
         if (imageBitmap != null) {
             int width = imageBitmap.getWidth();
             int height = imageBitmap.getHeight();
-            if ((newWidth==0) && (newHeight==0)) return null;
+            if ((newWidth == 0) && (newHeight == 0)) {
+                return null;
+            }
+
             if (newWidth > 0) {
                 scaleWidth = (float) newWidth / (float) width;
                 newHeight = (int) (height * scaleWidth);
@@ -117,19 +119,18 @@ public class RoundedImageView extends ImageView {
             }
 
             imageBitmap2 = Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, false);
-            FileOutputStream fOut = null;
+            FileOutputStream fOut;
             try {
                 fOut = new FileOutputStream(image);
-                imageBitmap2.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                imageBitmap2.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
                 fOut.flush();
                 fOut.close();
                 return imageBitmap2;
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         return null;
     }
 

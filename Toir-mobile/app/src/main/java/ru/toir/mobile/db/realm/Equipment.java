@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 07.09.16.
  */
-public class Equipment extends RealmObject {
+public class Equipment extends RealmObject implements IToirDbObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -18,7 +18,8 @@ public class Equipment extends RealmObject {
     private Equipment parentEquipment;
     private String title;
     private String inventoryNumber;
-    private String location;
+    private String serialNumber;
+    private Objects location;
     private CriticalType criticalType;
     private Date startDate;
     private float latitude;
@@ -27,6 +28,10 @@ public class Equipment extends RealmObject {
     private String image;
     private Date createdAt;
     private Date changedAt;
+
+    public static String getImageRoot() {
+        return "equipment";
+    }
 
     public long get_id() {
         return _id;
@@ -76,11 +81,11 @@ public class Equipment extends RealmObject {
         this.inventoryNumber = inventoryNumber;
     }
 
-    public String getLocation() {
+    public Objects getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Objects location) {
         this.location = location;
     }
 
@@ -146,5 +151,70 @@ public class Equipment extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public Equipment getParentEquipment() {
+        return parentEquipment;
+    }
+
+    public void setParentEquipment(Equipment parentEquipment) {
+        this.parentEquipment = parentEquipment;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = equipmentModel.getUuid();
+        dir = imageRoot + "/" + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public String getAnyImageFilePath() {
+        String dir = null;
+
+        if (!image.equals("")) {
+            dir = getImageFilePath();
+        } else {
+            if (!equipmentModel.getImage().equals("")) {
+                dir = equipmentModel.getImageFilePath();
+            }
+        }
+
+        return dir;
+    }
+
+    public String getAnyImage() {
+        String file = null;
+
+        if (!image.equals("")) {
+            file = getImage();
+        } else {
+            if (!equipmentModel.getImage().equals("")) {
+                file = equipmentModel.getImage();
+            }
+        }
+
+        return file;
     }
 }

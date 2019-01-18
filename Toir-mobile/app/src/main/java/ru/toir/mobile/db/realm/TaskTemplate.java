@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 13.09.16.
  */
-public class TaskTemplate extends RealmObject {
+public class TaskTemplate extends RealmObject implements IToirDbObject {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -17,11 +17,13 @@ public class TaskTemplate extends RealmObject {
     private String description;
     private String image;
     private int normative;
-    private EquipmentModel equipmentModel;
     private TaskType taskType;
     private Date createdAt;
     private Date changedAt;
 
+    public static String getImageRoot() {
+        return "ttype";
+    }
 
     public long get_id() {
         return _id;
@@ -63,14 +65,6 @@ public class TaskTemplate extends RealmObject {
         this.image = image;
     }
 
-    public EquipmentModel getEquipmentModel() {
-        return equipmentModel;
-    }
-
-    public void setEquipmentModel(EquipmentModel equipmentModel) {
-        this.equipmentModel = equipmentModel;
-    }
-
     public TaskType getTaskType() {
         return taskType;
     }
@@ -101,5 +95,26 @@ public class TaskTemplate extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    @Override
+    public String getImageFile() {
+        return getImage();
+    }
+
+    @Override
+    public String getImageFilePath() {
+        String imageRoot = getImageRoot();
+        String typeUuid;
+        String dir;
+
+        typeUuid = taskType.getUuid();
+        dir = imageRoot + '/' + typeUuid;
+        return dir;
+    }
+
+    @Override
+    public String getImageFileUrl(String userName) {
+        return "/storage/" + userName + "/" + getImageFilePath();
     }
 }

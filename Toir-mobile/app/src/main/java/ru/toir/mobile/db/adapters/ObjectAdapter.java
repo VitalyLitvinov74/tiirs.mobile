@@ -2,9 +2,7 @@ package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,39 +10,38 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.CriticalType;
-import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.Objects;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
-import static ru.toir.mobile.utils.RoundedImageView.getRoundedBitmap;
 
 /**
  * @author olejek
- * Created by olejek on 03.04.17.
+ *         Created by olejek on 03.04.17.
  */
 public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdapter {
 
     public static final String TABLE_NAME = "Objects";
 
-    public ObjectAdapter(@NonNull Context context, RealmResults<Objects> data) {
-        super(context, data);
+    public ObjectAdapter(RealmResults<Objects> data) {
+        super(data);
     }
-    public ObjectAdapter(@NonNull Context context, RealmList<Objects> data) {
-        super(context, data);
+
+    public ObjectAdapter(RealmList<Objects> data) {
+        super(data);
     }
 
     @Override
     public int getCount() {
-        return adapterData.size();
+        if (adapterData != null) {
+            return adapterData.size();
+        }
+
+        return 0;
     }
 
     @Override
@@ -67,13 +64,15 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.object_reference_item_layout, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.image = (ImageView) convertView.findViewById(R.id.object_image);
-            viewHolder.title = (TextView) convertView.findViewById(R.id.object_title);
-            viewHolder.objectType = (TextView) convertView.findViewById(R.id.object_type);
+            viewHolder.image = convertView.findViewById(R.id.object_image);
+            viewHolder.title = convertView.findViewById(R.id.object_title);
+            viewHolder.objectType = convertView.findViewById(R.id.object_type);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -84,18 +83,26 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
             object = adapterData.get(position);
             if (object != null) {
                 viewHolder.title.setText(object.getTitle());
-                String path = context.getExternalFilesDir("/objects") + File.separator;
-                Bitmap image_bitmap = getResizedBitmap(path, object.getImage(), 300, 0, object.getChangedAt().getTime());
-                if (image_bitmap != null) {
-                    viewHolder.image.setImageBitmap(image_bitmap);
-                } else {
-                    viewHolder.image.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image));
+
+                String imgPath = object.getImageFilePath();
+                String fileName = object.getImage();
+                if (imgPath != null && fileName != null) {
+                    File path = context.getExternalFilesDir(imgPath);
+                    if (path != null) {
+                        Bitmap tmpBitmap = getResizedBitmap(path + File.separator,
+                                fileName, 300, 0, object.getChangedAt().getTime());
+                        if (tmpBitmap != null) {
+                            viewHolder.image.setImageBitmap(tmpBitmap);
+                        }
+                    }
                 }
+
                 viewHolder.title.setText(object.getTitle());
                 if (object.getObjectType() != null) {
                     viewHolder.objectType.setText(object.getObjectType().getTitle());
                 }
-                //viewHolder.descr.setText(object.getDescr());
+
+                //viewHolder.descr.setText(object.getDescription());
                 //viewHolder.latitude.setText(String.valueOf(object.getLatitude()));
                 //viewHolder.longitude.setText(String.valueOf(object.getLongitude()));
             }

@@ -13,13 +13,21 @@ import ru.toir.mobile.db.realm.OrderStatus;
  */
 
 public interface IOrderStatus {
-    @GET("/api/orders/status")
-    Call<List<OrderStatus>> orderStatus();
+    @GET("/order-status")
+    Call<List<OrderStatus>> get();
 
-    @GET("/api/orders/status")
-    Call<List<OrderStatus>> orderStatus(@Query("changedAfter") String changedAfter);
+    @GET("/order-status")
+    Call<List<OrderStatus>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/api/orders/status")
-    Call<List<OrderStatus>> orderStatusById(@Query("id") String id);
+    @GET("/order-status")
+    Call<List<OrderStatus>> getById(@Query("id") String id);
 
+    @GET("/order-status")
+    Call<List<OrderStatus>> getById(@Query("id[]") String[] id);
+
+    @GET("/order-status")
+    Call<List<OrderStatus>> getByUuid(@Query("uuid") String uuid);
+
+    @GET("/order-status")
+    Call<List<OrderStatus>> getByUuid(@Query("uuid[]") String[] uuid);
 }

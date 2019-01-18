@@ -14,8 +14,9 @@ public class OperationTool extends RealmObject {
     @PrimaryKey
     private long _id;
     private String uuid;
-    private OperationTemplate operationTemplate;
+    private String operationTemplateUuid;
     private Tool tool;
+    private int quantity;
     private Date createdAt;
     private Date changedAt;
 
@@ -35,12 +36,12 @@ public class OperationTool extends RealmObject {
         this.uuid = uuid;
     }
 
-    public OperationTemplate getOperationTemplate() {
-        return operationTemplate;
+    public String getOperationTemplateUuid() {
+        return operationTemplateUuid;
     }
 
-    public void setOperationTemplate(OperationTemplate operationTemplate) {
-        this.operationTemplate = operationTemplate;
+    public void setOperationTemplateUuid(String operationTemplate) {
+        this.operationTemplateUuid = operationTemplate;
     }
 
     public Tool getTool() {
@@ -65,5 +66,13 @@ public class OperationTool extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

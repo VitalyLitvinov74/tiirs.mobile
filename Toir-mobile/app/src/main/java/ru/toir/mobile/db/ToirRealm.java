@@ -10,26 +10,27 @@ import io.realm.RealmConfiguration;
 
 /**
  * @author Dmitriy Logachev
- *
  */
 public class ToirRealm {
     // версия схемы базы данных приложения
-    public static final int VERSION = 16;
+    private static final int VERSION = 33;
 
     public static void init(Context context) {
         init(context, "toir.realm");
     }
 
     public static void init(Context context, String dbName) {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
+        Realm.init(context);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name(dbName)
                 .schemaVersion(VERSION)
                 .build();
         try {
-            Realm.migrateRealm(realmConfig, new ToirRealmMigration());
+            Realm.migrateRealm(realmConfig, new ToirRealmMigration(context));
         } catch (Exception e) {
-            // ни чего не делаем
+            e.printStackTrace();
         }
+
 
         Realm.setDefaultConfiguration(realmConfig);
 
@@ -39,9 +40,5 @@ public class ToirRealm {
                         .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(context).build())
                         .build());
-    }
-
-    public static boolean isDBActual() {
-        return Realm.getDefaultInstance().getVersion() == Realm.getDefaultInstance().getVersion();
     }
 }

@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -55,80 +54,99 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     private Realm realmDB;
     private EditText meas_value;
     private Spinner meas_typeSpinner;
-    private Button meas_submit;
-    private MeasuredValue measuredValue;
     private Typeface mTf;
-
-    private String equipmentUuid = "";
     private Equipment currentEquipment;
     private Operation currentOperation;
 
-        @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String operationUuid;
+        String equipmentUuid;
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            operationUuid = bundle.getString("operationUuid", null);
+            equipmentUuid = bundle.getString("equipmentUuid", null);
+            if (operationUuid == null || equipmentUuid == null) {
+                return;
+            }
+        } else {
+            return;
+        }
+
         realmDB = Realm.getDefaultInstance();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setMainLayout(savedInstanceState);
 
-        Bundle b = getIntent().getExtras();
-            String operationUuid = b.getString("operationUuid");
-        equipmentUuid = b.getString("equipmentUuid");
+        final RealmResults<Equipment> equipment = realmDB.where(Equipment.class)
+                .equalTo("uuid", equipmentUuid)
+                .findAll();
+        if (equipment.size() > 0) {
+            currentEquipment = equipment.first();
+        } else {
+            return;
+        }
 
-        final RealmResults<Equipment> equipment = realmDB.where(Equipment.class).equalTo("uuid", equipmentUuid).findAll();
-        if(equipment.size()>0) {
-                currentEquipment = equipment.first();
-            }
-        RealmResults<Operation> operations = realmDB.where(Operation.class).equalTo("uuid", operationUuid).findAll();
-        if(operations.size()>0) {
-                currentOperation = operations.first();
+        RealmResults<Operation> operations = realmDB.where(Operation.class)
+                .equalTo("uuid", operationUuid)
+                .findAll();
+        if (operations.size() > 0) {
+            currentOperation = operations.first();
+        } else {
+            return;
         }
 
         //meas_header = (TextView) findViewById(R.id.meas_header);
-        meas_value = (EditText) findViewById(R.id.meas_value);
-        meas_typeSpinner= (Spinner) findViewById(R.id.simple_spinner);
-        meas_submit = (Button) findViewById(R.id.meas_Button);
+        meas_value = findViewById(R.id.meas_value);
+        meas_typeSpinner = findViewById(R.id.simple_spinner);
 
         RealmResults<MeasureType> measureType = realmDB.where(MeasureType.class).findAll();
-        MeasureTypeAdapter typeSpinnerAdapter = new MeasureTypeAdapter(this, measureType);
+        MeasureTypeAdapter typeSpinnerAdapter = new MeasureTypeAdapter(measureType);
         typeSpinnerAdapter.notifyDataSetChanged();
         meas_typeSpinner.setAdapter(typeSpinnerAdapter);
 
-            meas_submit.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            measuredValue = realmDB.createObject(MeasuredValue.class);
-                            UUID uuid = UUID.randomUUID();
-                            long next_id = realm.where(MeasuredValue.class).max("_id").intValue() + 1;
-                            final MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
-                            measuredValue.set_id(next_id);
-                            measuredValue.setUuid(uuid.toString().toUpperCase());
-                            measuredValue.setMeasureType(measureType);
-                            measuredValue.setDate(new Date());
-                            measuredValue.setChangedAt(new Date());
-                            measuredValue.setCreatedAt(new Date());
-                            if (meas_value.getText().toString().equals(""))
-                                measuredValue.setValue("0");
-                            else measuredValue.setValue(meas_value.getText().toString());
-                            if (currentEquipment!=null) measuredValue.setEquipment(currentEquipment);
-                            if (currentOperation!=null) measuredValue.setOperation(currentOperation);
+        findViewById(R.id.meas_Button).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        MeasuredValue measuredValue = new MeasuredValue();
+                        UUID uuid = UUID.randomUUID();
+                        long next_id = MeasuredValue.getLastId() + 1;
+                        MeasureType measureType = (MeasureType) meas_typeSpinner.getSelectedItem();
+                        measuredValue.set_id(next_id);
+                        measuredValue.setUuid(uuid.toString().toUpperCase());
+                        measuredValue.setMeasureType(measureType);
+                        measuredValue.setEquipment(currentEquipment);
+                        measuredValue.setOperation(currentOperation);
+                        measuredValue.setDate(new Date());
+                        measuredValue.setChangedAt(new Date());
+                        measuredValue.setCreatedAt(new Date());
+                        if (meas_value.getText().toString().equals("")) {
+                            measuredValue.setValue("0");
+                        } else {
+                            measuredValue.setValue(meas_value.getText().toString());
                         }
-                    });
-                    setData();
-                    Intent data = new Intent();
-                    data.putExtra("value", meas_value.getText().toString());
-                    if (getParent() == null) {
-                        setResult(Activity.RESULT_OK, data);
-                    } else {
-                        getParent().setResult(Activity.RESULT_OK, data);
+
+                        realm.copyToRealm(measuredValue);
                     }
-                    finish();
+                });
+                setData();
+                Intent data = new Intent();
+                data.putExtra("value", meas_value.getText().toString());
+                if (getParent() == null) {
+                    setResult(Activity.RESULT_OK, data);
+                } else {
+                    getParent().setResult(Activity.RESULT_OK, data);
                 }
-            });
+
+                finish();
+            }
+        });
 
 
-        mChart = (BarChart) findViewById(R.id.chart1);
+        mChart = findViewById(R.id.chart1);
         mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
         mChart.setDescription("");
@@ -176,23 +194,31 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         int count;
         ArrayList<String> xVals = new ArrayList<>();
         // TODO сделать выбор нужных значений по шаблону операции
-        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class).equalTo("equipment.uuid",equipmentUuid).findAll();
+        RealmResults<MeasuredValue> measuredValues = realmDB.where(MeasuredValue.class)
+                .equalTo("equipment.uuid", currentEquipment.getUuid())
+                .findAll();
 
         count = measuredValues.size();
         for (int i = 0; i < count; i++) {
             // add measured value
-            if (measuredValues.get(i)!=null) {
-                xVals.add(measuredValues.get(i).getDate().toString());
+            MeasuredValue val = measuredValues.get(i);
+            if (val != null) {
+                Date dateVal = val.getDate();
+                if (dateVal != null) {
+                    xVals.add(dateVal.toString());
+                } else {
+                    xVals.add("0000-00-00 00:00:01");
+                }
             }
         }
         //RealmResults<Operation> operations = realmDB.where(Operation.class).findAll();
         //for (Operation operation : operations) {
-            //if (operation.getOperationTemplate().getUuid().equals(currentOperation.getOperationTemplateUuid()))
+        //if (operation.getOperationTemplate().getUuid().equals(currentOperation.getOperationTemplateUuid()))
         //}
 
         ArrayList<BarEntry> yVals1 = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            if (measuredValues.get(i).getValue()!=null) {
+            if (measuredValues.get(i).getValue() != null) {
                 yVals1.add(new BarEntry(Float.parseFloat(measuredValues.get(i).getValue()), i));
             }
         }
@@ -225,7 +251,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.measure);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //toolbar.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
         toolbar.setTitleTextColor(Color.WHITE);
@@ -283,4 +309,9 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realmDB.close();
+    }
 }
