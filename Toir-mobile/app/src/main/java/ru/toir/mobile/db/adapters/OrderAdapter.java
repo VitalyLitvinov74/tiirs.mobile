@@ -58,13 +58,13 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
         if (adapterData != null) {
             for (Orders order : adapterData) {
-                separateDate = order.getOpenDate();
+                separateDate = order.getStartDate();
                 if (separateDate == null) {
                     separateDate = new Date();
                 }
 
                 if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
-                    currentDate = order.getCloseDate();
+                    currentDate = separateDate;
                     separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
                     j++;
                     separates.add(i + j, Long.valueOf(i));

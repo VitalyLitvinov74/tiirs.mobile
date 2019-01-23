@@ -64,6 +64,11 @@ android {
     dexOptions {
         jumboMode true
     }
+
+    packagingOptions{
+        doNotStrip '*/mips/*.so'
+        doNotStrip '*/mips64/*.so'
+    }
 }
 
 

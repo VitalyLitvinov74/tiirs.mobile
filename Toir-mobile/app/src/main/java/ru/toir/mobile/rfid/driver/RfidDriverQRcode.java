@@ -14,10 +14,8 @@ import ru.toir.mobile.rfid.RfidDriverBase;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,30 +27,30 @@ import android.widget.TextView;
 /**
  * @author Dmitriy Logachev
  *         <p>
- *         Драйвер считывателя RFID который "считывает" содержимое меток из
- *         текстового файла.
+ *         Драйвер считывателя RFID который "считывает" содержимое меток из QR кода.
  *         </p>
  */
 public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
+    @SuppressWarnings("unused")
     public static final String DRIVER_NAME = "Драйвер QR кодов";
+    private static final String TAG = "RFIDQRcode";
 
     static {
         System.loadLibrary("iconv");
     }
 
-    private String TAG = "RFIDQRcode";
     private Camera mCamera;
-    private CameraPreview mPreview;
-    private Handler autoFocusHandler;
+    private Context mContext;
     private TextView scanText;
     private ImageScanner scanner;
     private FrameLayout preview;
     private Image codeImage;
-    private String lastScannedCode;
     private int command;
-    PreviewCallback previewCb = new PreviewCallback() {
+    private PreviewCallback previewCb = new PreviewCallback() {
         public void onPreviewFrame(byte[] data, Camera camera) {
+            String lastScannedCode;
+
             codeImage.setData(data);
             int result = scanner.scanImage(codeImage);
             if (result != 0) {
@@ -81,26 +79,13 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
             camera.addCallbackBuffer(data);
         }
     };
-    private Context mContext;
-    private Runnable doAutoFocus = new Runnable() {
-        public void run() {
-            if (mCamera != null) {
-                mCamera.autoFocus(autoFocusCB);
-            }
-        }
-    };
-    // Mimic continuous auto-focusing
-    final AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
-        public void onAutoFocus(boolean success, Camera camera) {
-            autoFocusHandler.postDelayed(doAutoFocus, 1000);
-        }
-    };
 
-    public static Camera getCameraInstance() {
+    private Camera getCameraInstance() {
         Camera c = null;
         try {
             c = Camera.open();
         } catch (Exception e) {
+            //
         }
 
         return c;
@@ -127,7 +112,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
     @Override
     public void close() {
-
+        releaseCamera();
     }
 
     private void releaseCamera() {
@@ -141,21 +126,22 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
     }
 
     private void resumeCamera() {
-        autoFocusHandler = new Handler();
+        CameraPreview cameraSurface;
 
         // Instance barcode scanner
         scanner = new ImageScanner();
         scanner.setConfig(0, Config.X_DENSITY, 3);
         scanner.setConfig(0, Config.Y_DENSITY, 3);
         mCamera = getCameraInstance();
-        mPreview = new CameraPreview(mContext, mCamera, previewCb, autoFocusCB);
+        cameraSurface = new CameraPreview(mContext, mCamera, previewCb, null);
+
         preview.removeAllViews();
-        preview.addView(mPreview);
+        preview.addView(cameraSurface);
         if (mCamera != null) {
             Camera.Parameters parameters = mCamera.getParameters();
             Size size = parameters.getPreviewSize();
             codeImage = new Image(size.width, size.height, "Y800");
-            mPreview.refreshDrawableState();
+            cameraSurface.refreshDrawableState();
         }
     }
 
@@ -164,7 +150,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
         mContext = inflater.getContext();
         View view = inflater.inflate(R.layout.qr_read, viewGroup);
 
-        Button button = (Button) view.findViewById(R.id.cancelButton);
+        Button button = view.findViewById(R.id.cancelButton);
         button.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -173,8 +159,8 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
             }
         });
 
-        preview = (FrameLayout) view.findViewById(R.id.cameraPreview);
-        scanText = (TextView) view.findViewById(R.id.code_from_bar);
+        preview = view.findViewById(R.id.cameraPreview);
+        scanText = view.findViewById(R.id.code_from_bar);
         return view;
     }
 
