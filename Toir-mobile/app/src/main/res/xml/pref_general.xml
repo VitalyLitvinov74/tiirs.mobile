@@ -34,6 +34,7 @@
     </PreferenceScreen>
     <PreferenceScreen
         android:icon="@drawable/pref_check"
+        android:theme="@style/CustomTheme"
         android:title="Отображение и данные">
         <PreferenceCategory android:title="@string/pref_cat_show">
             <CheckBoxPreference

@@ -389,7 +389,6 @@ public class BTRfidServer {
                     BluetoothSocket socket = mServerSocket.accept();
                     Log.d(TAG, "Входящее соединение получено...");
                     Thread.sleep(1000);
-
                     // запускаем поток сервера, ожидающего команды
                     startCommunication(socket);
                     break;

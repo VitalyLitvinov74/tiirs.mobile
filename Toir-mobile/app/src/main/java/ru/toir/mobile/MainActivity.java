@@ -537,6 +537,7 @@ public class MainActivity extends AppCompatActivity {
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
                 .withTextColor(ContextCompat.getColor(this, R.color.white))
+/*
                 .addProfiles(
                         new ProfileSettingDrawerItem()
                                 .withName("Добавить пользователя")
@@ -548,6 +549,7 @@ public class MainActivity extends AppCompatActivity {
                                 .withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings))
                                 .withIdentifier(PROFILE_SETTINGS)
                 )
+*/
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
