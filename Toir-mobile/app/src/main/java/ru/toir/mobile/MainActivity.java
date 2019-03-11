@@ -1148,6 +1148,10 @@ public class MainActivity extends AppCompatActivity {
             }, 3000);
         }
 
+        if (splashShown && !isLogged) {
+            ShowSettings();
+        }
+
         /*
         AuthorizedUser user = AuthorizedUser.getInstance();
         if (user.getTagId() == null) {
@@ -1227,7 +1231,7 @@ public class MainActivity extends AppCompatActivity {
             byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
             StringBuilder hexId = new StringBuilder();
             for (byte b : id) {
-                hexId.append(String.format("%2X", b));
+                hexId.append(String.format("%02X", b));
             }
 
             Intent result = new Intent(RfidDriverNfc.ACTION_NFC);

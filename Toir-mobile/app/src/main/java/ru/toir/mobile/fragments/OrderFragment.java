@@ -49,7 +49,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -440,6 +439,7 @@ public class OrderFragment extends Fragment {
 
         if (stage.getOperations() != null && stage.getOperations().size() > 0) {
             operationAdapter = new OperationAdapter(stage.getOperations().sort("_id"));
+            currentOperation = operationAdapter.getItem(0);
             mainListView.setAdapter(operationAdapter);
             //resultButtonLayout.setVisibility(View.VISIBLE);
             //makePhotoButton.setVisibility(View.VISIBLE);
@@ -1161,7 +1161,7 @@ public class OrderFragment extends Fragment {
     /**
      * Построение диалога если не выполнены некоторые операции
      *
-     * @param uncompleteOperationList
+     * @param uncompleteOperationList Список не выполненных операций
      */
     private void setOperationsVerdict(final List<Operation> uncompleteOperationList) {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -1279,8 +1279,8 @@ public class OrderFragment extends Fragment {
     /**
      * Метод заполнения списка для диалога установки вердикта незаконченных операций
      *
-     * @param listView
-     * @param uncompleteOperationList
+     * @param listView                Список для отображения незаконченных операций
+     * @param uncompleteOperationList Список не законченных операций
      */
     private void fillListViewUncompleteOperations(ListView listView, List<Operation> uncompleteOperationList) {
         RealmResults<Operation> operations;
@@ -1556,14 +1556,14 @@ public class OrderFragment extends Fragment {
         LayoutInflater inflater = activity.getLayoutInflater();
         TextView level, status, title, reason, author, worker, recieve, start, open, close, comment, verdict;
         View myView = inflater.inflate(R.layout.order_full_information, parent, false);
-        DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
-            @Override
-            public String[] getMonths() {
-                return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
-                        "июля", "августа", "сентября", "октября", "ноября", "декабря"};
-            }
-        };
-        String sDate = "неизвестно";
+//        DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
+//            @Override
+//            public String[] getMonths() {
+//                return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
+//                        "июля", "августа", "сентября", "октября", "ноября", "декабря"};
+//            }
+//        };
+        String sDate;
         if (type == ORDER_LEVEL) {
             myView = inflater.inflate(R.layout.order_full_information, parent, false);
             level = myView.findViewById(R.id.order_dialog_level);
@@ -1647,7 +1647,7 @@ public class OrderFragment extends Fragment {
     /**
      * Возвращает список невыполненных операций в текущем выполняемом этапе.
      *
-     * @return
+     * @return List<Operation>
      */
     List<Operation> getUncompleteOperations() {
 //        int totalOperationCount = operationAdapter.getCount();
@@ -1688,7 +1688,7 @@ public class OrderFragment extends Fragment {
     /**
      * Возвращает список невыполненных этапов в текущей выполняемой задаче.
      *
-     * @return
+     * @return List<Stage>
      */
     List<Stage> getUncompleteStages() {
         List<Stage> uncompleteList = new ArrayList<>();
@@ -1714,7 +1714,7 @@ public class OrderFragment extends Fragment {
     /**
      * Возвращает список невыполненных задач в текущем выполняемом наряде.
      *
-     * @return
+     * @return List<Task>
      */
     List<Task> getUncompleteTasks() {
         List<Task> uncompleteList = new ArrayList<>();
@@ -1866,7 +1866,7 @@ public class OrderFragment extends Fragment {
     /**
      * Заполняем список элементами в зависимости от уровня на котором находимся.
      *
-     * @param level
+     * @param level Уровень на который переключаемся
      */
     private void fillListView(int level) {
         switch (level) {
@@ -2019,11 +2019,14 @@ public class OrderFragment extends Fragment {
                 // находимся на экране с нарядами
                 Orders order = orderAdapter.getItem(position);
                 OrderStatus orderStatus;
+                if (order != null) {
+                    showInformation(ORDER_LEVEL, order.get_id(), parent);
+                }
 
-                showInformation(ORDER_LEVEL, order.get_id(), parent);
                 // проверяем статус наряда
+                // TODO: Разобраться зачем так сделано!
                 if (false && order != null) {
-                    orderStatus = order.getOrderStatus();
+//                    orderStatus = order.getOrderStatus();
                     if (orderStatus != null) {
                         if (orderStatus.getUuid().equals(OrderStatus.Status.COMPLETE)
                                 || order.getOrderStatus().getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
