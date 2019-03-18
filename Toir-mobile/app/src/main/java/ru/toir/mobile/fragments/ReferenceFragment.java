@@ -42,6 +42,7 @@ import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.StageStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
+import ru.toir.mobile.db.realm.AttributeType;
 import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Defect;
@@ -49,6 +50,7 @@ import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.EquipmentType;
@@ -1014,6 +1016,39 @@ public class ReferenceFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+                // AttributeType
+                referenceName = AttributeType.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<AttributeType>> response = ToirAPIFactory.getAttributeTypeService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<AttributeType> list = response.body();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // EquipmentAttribute
+                referenceName = EquipmentAttribute.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<EquipmentAttribute>> response = ToirAPIFactory.getEquipmentAttributeService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<EquipmentAttribute> list = response.body();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 // гасим диалог обновления справочников
                 if (dialog != null) {
