@@ -84,6 +84,19 @@ public class AttributeType extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public String getAttributeTypeString() {
+        switch (type) {
+            case Type.ATTRIBUTE_TYPE_FILE:
+                return "Файл";
+            case Type.ATTRIBUTE_TYPE_VALUE:
+                return "Значение";
+            case Type.ATTRIBUTE_TYPE_STRING:
+                return "Строка";
+            default:
+                return null;
+        }
+    }
+
     public class Type {
         public static final int ATTRIBUTE_TYPE_FILE = 1;
         public static final int ATTRIBUTE_TYPE_VALUE = 2;

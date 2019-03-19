@@ -1040,7 +1040,13 @@ public class ReferenceFragment extends Fragment {
                     Response<List<EquipmentAttribute>> response = ToirAPIFactory.getEquipmentAttributeService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
+                        // TODO: реализовать механизм проверки наличия изменённых данных локально
+                        // при необходимости отбрасывать данные с сервера
                         List<EquipmentAttribute> list = response.body();
+                        // сразу ставим флаг что они "отправлены", чтоб избежать их повторной отправки
+                        for (EquipmentAttribute item : list) {
+                            item.setSent(true);
+                        }
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(list);
                         realm.commitTransaction();
