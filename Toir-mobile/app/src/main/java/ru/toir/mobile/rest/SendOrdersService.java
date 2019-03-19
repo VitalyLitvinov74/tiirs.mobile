@@ -26,6 +26,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationFile;
@@ -156,6 +157,18 @@ public class SendOrdersService extends Service {
                 // отмечаем успешно отправленные измерения
                 setSendMeasuredValues(idUuid, realm);
             }
+
+            // выбираем из базы все неотправленные атрибуты оборудования на сервер
+            RealmResults<EquipmentAttribute> equipmentAttributes = realm.where(EquipmentAttribute.class)
+                    .equalTo("sent", false).findAll();
+
+            if (equipmentAttributes.size() > 0) {
+                // отправляем атрибуты на сервер
+                idUuid = sendAttributes(realm.copyFromRealm(equipmentAttributes));
+                // отмечаем успешно отправленные атрибуты
+                setSendAtributes(idUuid, realm);
+            }
+
 
             realm.close();
 
@@ -432,5 +445,58 @@ public class SendOrdersService extends Service {
         }
 
         return operationUuids;
+    }
+
+    /**
+     * Отправляем новые/изменнённые атрибуты оборудования.
+     *
+     * @param list List<{@link EquipmentAttribute}>
+     * @return LongSparseArray<String>
+     */
+    private LongSparseArray<String> sendAttributes(List<EquipmentAttribute> list) {
+        LongSparseArray<String> idUuid = new LongSparseArray<>();
+        Call<ResponseBody> call = ToirAPIFactory.getEquipmentAttributeService().send(list);
+        try {
+            retrofit2.Response response = call.execute();
+            ResponseBody result = (ResponseBody) response.body();
+            if (response.isSuccessful()) {
+                JSONObject jObj = new JSONObject(result.string());
+                // при сохранении данных на сервере произошли ошибки
+                // данный флаг пока не используем
+//                boolean success = (boolean) jObj.get("success");
+                JSONArray data = (JSONArray) jObj.get("data");
+                for (int idx = 0; idx < data.length(); idx++) {
+                    JSONObject item = (JSONObject) data.get(idx);
+                    Long _id = Long.parseLong(item.get("_id").toString());
+                    String uuid = item.get("uuid").toString();
+                    idUuid.put(_id, uuid);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return idUuid;
+    }
+
+    /**
+     * Отмечаем успешно отправленные атрибуты
+     *
+     * @param idUuid LongSparseArray<String>
+     */
+    private void setSendAtributes(LongSparseArray<String> idUuid, Realm realm) {
+        realm.beginTransaction();
+        for (int idx = 0; idx < idUuid.size(); idx++) {
+            long _id = idUuid.keyAt(idx);
+            String uuid = idUuid.valueAt(idx);
+            EquipmentAttribute value = realm.where(EquipmentAttribute.class).equalTo("_id", _id)
+                    .equalTo("uuid", uuid)
+                    .findFirst();
+            if (value != null) {
+                value.setSent(true);
+            }
+        }
+
+        realm.commitTransaction();
     }
 }

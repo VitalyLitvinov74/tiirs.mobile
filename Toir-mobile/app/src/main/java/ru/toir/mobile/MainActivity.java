@@ -212,9 +212,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             Log.d(TAG, "db.version=" + realmDB.getVersion());
             if (realmDB.getVersion() == 0) {
-                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, 0);
-                toast.show();
+//                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
+//                toast.setGravity(Gravity.BOTTOM, 0, 0);
+//                toast.show();
                 success = true;
             } else {
                 Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);

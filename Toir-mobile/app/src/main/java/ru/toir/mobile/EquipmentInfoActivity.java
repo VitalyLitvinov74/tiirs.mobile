@@ -7,17 +7,21 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -127,7 +131,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-    public static Intent showDocument(File file) {
+    public static Intent showDocument(File file, Context context) {
         MimeTypeMap mt = MimeTypeMap.getSingleton();
         String[] patternList = file.getName().split("\\.");
         String extension = patternList[patternList.length - 1];
@@ -135,8 +139,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (mt.hasExtension(extension)) {
             String mimeType = mt.getMimeTypeFromExtension(extension);
             Intent target = new Intent(Intent.ACTION_VIEW);
-            target.setDataAndType(Uri.fromFile(file), mimeType);
             target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            target.setType(mimeType);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                target.setData(Uri.fromFile(file));
+            } else {
+                Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                target.setData(doc);
+                target.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             return Intent.createChooser(target, "Open File");
         } else {
             return null;
@@ -803,6 +815,33 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         realmDB.close();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        // добавляем элемент меню для обновления справочников
+        MenuItem attributes = menu.add("Атрибуты");
+        MenuItem.OnMenuItemClickListener clickListener = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+//                Activity activity = getActivity();
+//                if (activity == null) {
+//                    return false;
+//                }
+
+                Intent equipmentInfo = new Intent(getApplicationContext(), EquipmentAttributeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("equipment_uuid", equipment_uuid);
+                equipmentInfo.putExtras(bundle);
+                startActivity(equipmentInfo);
+                return true;
+            }
+        };
+        attributes.setOnMenuItemClickListener(clickListener);
+
+        return true;
+    }
+
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -813,7 +852,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
                     documentation.getPath());
             if (file.exists()) {
-                Intent intent = showDocument(file);
+                Intent intent = showDocument(file, getApplicationContext());
                 if (intent != null) {
                     startActivity(intent);
                 }
@@ -843,7 +882,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     public void onDismiss(DialogInterface dialog) {
                         // открываем загруженный документ (если он загрузился)
                         if (file.exists()) {
-                            showDocument(file);
+                            showDocument(file, getApplicationContext());
                         } else {
                             Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
                                     Toast.LENGTH_LONG).show();
