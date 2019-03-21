@@ -23,12 +23,6 @@ public interface IEquipmentAttribute {
     Call<List<EquipmentAttribute>> get(@Query("changedAfter") String changedAfter);
 
     @GET("/equipment-attribute")
-    Call<List<EquipmentAttribute>> getById(@Query("id") String id);
-
-    @GET("/equipment-attribute")
-    Call<List<EquipmentAttribute>> getById(@Query("id[]") String[] id);
-
-    @GET("/equipment-attribute")
     Call<List<EquipmentAttribute>> getByUuid(@Query("uuid") String uuid);
 
     @GET("/equipment-attribute")

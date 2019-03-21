@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey;
  * @author Olejek
  *         Created on 2.05.17.
  */
-public class Defect extends RealmObject {
+public class Defect extends RealmObject implements ISend {
     @PrimaryKey
     private long _id;
     private String uuid;
@@ -23,6 +23,7 @@ public class Defect extends RealmObject {
     private Task task;
     private Date createdAt;
     private Date changedAt;
+    private boolean sent;
 
     public static long getLastId() {
         Realm realm = Realm.getDefaultInstance();
@@ -84,14 +85,6 @@ public class Defect extends RealmObject {
         this.defectType = defectType;
     }
 
-    public boolean getProcess() {
-        return process;
-    }
-
-    public void setProcess(boolean process) {
-        this.process = process;
-    }
-
     public String getComment() {
         return comment;
     }
@@ -122,5 +115,22 @@ public class Defect extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public boolean isProcess() {
+        return process;
+    }
+
+    public void setProcess(boolean process) {
+        this.process = process;
+    }
+
+    public boolean isSent() {
+        return sent;
+    }
+
+    @Override
+    public void setSent(boolean sent) {
+        this.sent = sent;
     }
 }
