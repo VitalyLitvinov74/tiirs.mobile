@@ -296,6 +296,63 @@ public class ReferenceFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+                // AttributeType
+                referenceName = AttributeType.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<AttributeType>> response = ToirAPIFactory.getAttributeTypeService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<AttributeType> list = response.body();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // EquipmentAttribute
+                referenceName = EquipmentAttribute.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<EquipmentAttribute>> response = ToirAPIFactory.getEquipmentAttributeService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        // TODO: реализовать механизм проверки наличия изменённых данных локально
+                        // при необходимости отбрасывать данные с сервера
+                        List<EquipmentAttribute> list = response.body();
+                        // сразу ставим флаг что они "отправлены", чтоб избежать их повторной отправки
+                        for (EquipmentAttribute item : list) {
+                            item.setSent(true);
+                        }
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // DefectType
+                referenceName = DefectType.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<DefectType>> response = ToirAPIFactory.getDefectTypeService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<DefectType> list = response.body();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 realm.close();
             }
         };
@@ -1047,6 +1104,23 @@ public class ReferenceFragment extends Fragment {
                         for (EquipmentAttribute item : list) {
                             item.setSent(true);
                         }
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // DefectType
+                referenceName = DefectType.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<DefectType>> response = ToirAPIFactory.getDefectTypeService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<DefectType> list = response.body();
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(list);
                         realm.commitTransaction();
