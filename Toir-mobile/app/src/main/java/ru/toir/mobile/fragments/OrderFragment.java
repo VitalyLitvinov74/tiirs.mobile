@@ -34,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -54,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
@@ -65,6 +67,7 @@ import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationCancelAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
@@ -72,6 +75,8 @@ import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
+import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
@@ -110,6 +115,7 @@ public class OrderFragment extends Fragment {
     private static final String TAG = OrderFragment.class.getSimpleName();
     FloatingActionButton fab_check;
     FloatingActionButton fab_camera;
+    FloatingActionButton fab_defect;
     private Toolbar toolbar;
     private Task selectedTask;
     private Orders selectedOrder;
@@ -243,6 +249,92 @@ public class OrderFragment extends Fragment {
         fab_check.setVisibility(View.INVISIBLE);
         fab_camera.setVisibility(View.INVISIBLE);
 
+        fab_defect = rootView.findViewById(R.id.fab_defect);
+        fab_defect.setVisibility(View.INVISIBLE);
+        fab_defect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View addDefectLayout;
+                final Spinner defectTypeSpinner;
+                final DefectTypeAdapter defectTypeAdapter;
+                final Equipment equipment;
+                LayoutInflater inflater = getLayoutInflater();
+
+                addDefectLayout = inflater.inflate(R.layout.add_defect_dialog_2, null, false);
+                defectTypeSpinner = addDefectLayout.findViewById(R.id.spinner_defect_type);
+
+                Realm realm = Realm.getDefaultInstance();
+                equipment = realm.where(Equipment.class).equalTo("uuid", currentEquipment.getUuid()).findFirst();
+                RealmResults<DefectType> defectType = realm.where(DefectType.class)
+                        .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid()).findAll();
+                defectTypeAdapter = new DefectTypeAdapter(defectType);
+                defectTypeSpinner.setAdapter(defectTypeAdapter);
+                realm.close();
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+                builder.setTitle("Укажите дефект");
+                builder.setView(addDefectLayout);
+                builder.setIcon(R.drawable.ic_icon_warnings);
+                builder.setCancelable(false);
+                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                final android.support.v7.app.AlertDialog dialog = builder.create();
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
+                        if (defectDescription.getText().toString().equals("")) {
+                            return;
+                        }
+
+                        DefectType currentDefectType = null;
+                        int position = defectTypeSpinner.getSelectedItemPosition();
+                        if (position != AdapterView.INVALID_POSITION) {
+                            currentDefectType = defectTypeAdapter.getItem(position);
+                        }
+
+                        Realm realm = Realm.getDefaultInstance();
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                        UUID uuid = UUID.randomUUID();
+                        Date date = new Date();
+
+                        realm.beginTransaction();
+
+                        long nextId = Defect.getLastId() + 1;
+                        Defect defect = realm.createObject(Defect.class, nextId);
+                        defect.setUuid(uuid.toString().toUpperCase());
+                        defect.setUser(user);
+                        defect.setDate(date);
+                        defect.setEquipment(equipment);
+                        defect.setDefectType(currentDefectType);
+                        defect.setProcess(false);
+                        defect.setComment(defectDescription.getText().toString());
+                        defect.setTask(null);
+                        defect.setCreatedAt(date);
+                        defect.setChangedAt(date);
+
+                        realm.commitTransaction();
+                        realm.close();
+                        dialog.dismiss();
+                    }
+                };
+                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+                dialog.show();
+                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+            }
+        });
+
         fab_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -366,6 +458,7 @@ public class OrderFragment extends Fragment {
         }
 
         fab_check.setVisibility(View.INVISIBLE);
+        fab_defect.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -394,6 +487,7 @@ public class OrderFragment extends Fragment {
 
             fab_camera.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
+            fab_camera.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -423,6 +517,7 @@ public class OrderFragment extends Fragment {
 
             fab_camera.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
+            fab_defect.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -455,6 +550,7 @@ public class OrderFragment extends Fragment {
 
             fab_camera.setVisibility(View.VISIBLE);
             fab_check.setVisibility(View.VISIBLE);
+            fab_defect.setVisibility(View.VISIBLE);
             //mainListView.setOnItemClickListener(mainListViewClickListener);
         }
 
