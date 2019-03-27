@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    tools:ignore="RtlSymmetry"
     tools:context=".EquipmentInfoActivity">
 
     <android.support.v7.widget.Toolbar
@@ -47,7 +48,8 @@
                 android:paddingTop="10dp"
                 android:scaleType="centerCrop"
                 android:textColor="#ffffff"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:paddingStart="15dp" />
 
             <TextView
                 android:id="@+id/equipment_text_inventory"
@@ -60,7 +62,18 @@
                 android:paddingLeft="15dp"
                 android:scaleType="centerCrop"
                 android:textColor="#ffffff"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:paddingStart="15dp" />
+
+            <ImageView
+                android:id="@+id/equipment_tag_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_inventory"
+                android:layout_marginLeft="15dp"
+                android:contentDescription="@string/image_description"
+                android:src="@drawable/location"
+                android:layout_marginStart="15dp" />
 
             <TextView
                 android:id="@+id/equipment_text_uuid"
