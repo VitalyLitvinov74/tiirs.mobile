@@ -63,7 +63,7 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
         ViewHolder viewHolder;
         viewHolder = new DefectAdapter.ViewHolder();
         if (convertView == null) {
-            if (parent.getId() == R.id.spinner_defects) {
+            if (parent.getId() == R.id.spinner_defect_type) {
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
                 viewHolder.title = convertView.findViewById(android.R.id.text1);
                 convertView.setTag(viewHolder);
@@ -83,7 +83,7 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
         if (adapterData != null) {
             defect = adapterData.get(position);
             if (defect != null) {
-                if (parent.getId() == R.id.spinner_defects) {
+                if (parent.getId() == R.id.spinner_defect_type) {
                     viewHolder.title.setText(defect.getComment());
                 } else {
                     if (defect.getDefectType() != null) {

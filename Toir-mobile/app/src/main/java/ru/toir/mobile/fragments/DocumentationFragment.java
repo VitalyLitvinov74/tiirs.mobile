@@ -157,7 +157,7 @@ public class DocumentationFragment extends Fragment {
                 File file = new File(context.getExternalFilesDir(documentation.getImageFilePath()),
                         documentation.getPath());
                 if (file.exists()) {
-                    Intent intent = EquipmentInfoActivity.showDocument(file);
+                    Intent intent = EquipmentInfoActivity.showDocument(file, getContext());
                     if (intent != null) {
                         startActivity(intent);
                     }

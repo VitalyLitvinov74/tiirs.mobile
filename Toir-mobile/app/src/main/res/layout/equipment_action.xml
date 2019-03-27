@@ -4,18 +4,19 @@
     android:layout_height="match_parent">
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/fab_add_defect"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="10dp"
-        android:src="@android:drawable/ic_menu_help"
+        android:src="@android:drawable/ic_dialog_alert"
+        android:tooltipText="Дефект"
         android:visibility="invisible"
-        app:backgroundTint="@color/larisaBlueColor"
+        app:backgroundTint="@color/md_red_400"
         app:fabSize="mini" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_2"
+        android:id="@+id/fab_change_equipment_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -26,7 +27,7 @@
         app:fabSize="mini" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_3"
+        android:id="@+id/fab_augmented_reality"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -37,7 +38,7 @@
         app:fabSize="mini" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_4"
+        android:id="@+id/fab_read_tag_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -48,7 +49,7 @@
         app:fabSize="mini" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_5"
+        android:id="@+id/fab_write_tag_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -59,7 +60,7 @@
         app:fabSize="mini" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/chg_eq_tag_id"
+        android:id="@+id/fab_chg_eq_tag_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

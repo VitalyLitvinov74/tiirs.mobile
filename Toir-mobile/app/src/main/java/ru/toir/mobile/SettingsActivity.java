@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -292,7 +293,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         View listRoot = dialog.findViewById(android.R.id.list);
         ViewGroup mRootView = dialog.findViewById(android.R.id.content);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            FrameLayout root = (FrameLayout) listRoot.getParent();
+            appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
+            root.addView(appBar, 0);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             LinearLayout root = (LinearLayout) listRoot.getParent();
             appBar = (AppBarLayout) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
             root.addView(appBar, 0);

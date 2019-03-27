@@ -213,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             Log.d(TAG, "db.version=" + realmDB.getVersion());
             if (realmDB.getVersion() == 0) {
-                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, 0);
-                toast.show();
+//                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
+//                toast.setGravity(Gravity.BOTTOM, 0, 0);
+//                toast.show();
                 success = true;
             } else {
                 Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
@@ -1151,6 +1151,10 @@ public class MainActivity extends AppCompatActivity {
             }, 3000);
         }
 
+        if (splashShown && !isLogged) {
+            ShowSettings();
+        }
+
         /*
         AuthorizedUser user = AuthorizedUser.getInstance();
         if (user.getTagId() == null) {
@@ -1230,7 +1234,7 @@ public class MainActivity extends AppCompatActivity {
             byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
             StringBuilder hexId = new StringBuilder();
             for (byte b : id) {
-                hexId.append(String.format("%2X", b));
+                hexId.append(String.format("%02X", b));
             }
 
             Intent result = new Intent(RfidDriverNfc.ACTION_NFC);

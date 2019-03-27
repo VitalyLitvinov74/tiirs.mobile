@@ -57,6 +57,17 @@
         app:fabSize="normal" />
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_defect"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="190dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/img_status_3"
+        app:backgroundTint="@color/md_red_A700"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
