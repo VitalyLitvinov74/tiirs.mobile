@@ -30,6 +30,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.Objects;
@@ -226,6 +227,30 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         for (Map.Entry<String, Equipment> entry : equipmentList.entrySet()) {
             needEquipmentUuids.add(entry.getValue().getUuid());
             needEquipmentModelUuids.add(entry.getValue().getEquipmentModel().getUuid());
+        }
+
+        // получаем список необходимых для загрузки атрибутов для оборудования из наряда
+        Call<List<EquipmentAttribute>> eqAttrCall;
+        eqAttrCall = ToirAPIFactory.getEquipmentAttributeService()
+                .getByEquipment(needEquipmentUuids.toArray(new String[]{}));
+        try {
+            retrofit2.Response<List<EquipmentAttribute>> r = eqAttrCall.execute();
+            List<EquipmentAttribute> list = r.body();
+            if (list != null) {
+                for (EquipmentAttribute attribute : list) {
+                    attribute.setSent(true);
+                }
+
+                // сохраняем атрибуты
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                realm.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении атрибутов оборудования.");
+            e.printStackTrace();
         }
 
         // получаем список документации для оборудования в наряде

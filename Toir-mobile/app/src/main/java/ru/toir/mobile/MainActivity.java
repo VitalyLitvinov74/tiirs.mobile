@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -212,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
             Log.d(TAG, "db.version=" + realmDB.getVersion());
             if (realmDB.getVersion() == 0) {
-                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, 0);
-                toast.show();
+//                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
+//                toast.setGravity(Gravity.BOTTOM, 0, 0);
+//                toast.show();
                 success = true;
             } else {
                 Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
@@ -462,8 +463,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setEnabledLoginButton(boolean enable) {
         Button loginButton = findViewById(R.id.loginButton);
-        loginButton.setEnabled(enable);
-        loginButton.setClickable(enable);
+        if (loginButton!=null) {
+            loginButton.setEnabled(enable);
+            loginButton.setClickable(enable);
+        }
     }
 
     /**
@@ -559,6 +562,7 @@ public class MainActivity extends AppCompatActivity {
                             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                             Fragment fr;
                             switch (ident) {
+/*
                                 case PROFILE_ADD:
                                     currentFragment = FRAGMENT_USER;
                                     fr = FragmentAddUser.newInstance();
@@ -569,8 +573,9 @@ public class MainActivity extends AppCompatActivity {
                                     fr = FragmentEditUser.newInstance("EditProfile");
                                     tr.replace(R.id.frame_container, fr);
                                     break;
+*/
                                 default:
-                                    int profileId = profile.getIdentifier() - 2;
+                                    int profileId = profile.getIdentifier(); //-2
                                     int profile_pos;
                                     for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++) {
                                         if (users_id[profile_pos] == profileId) {
@@ -623,18 +628,6 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_USERS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
-//                        new PrimaryDrawerItem()
-//                                .withName(R.string.menu_camera)
-//                                .withDescription("Проверка камеры")
-//                                .withIcon(GoogleMaterial.Icon.gmd_camera)
-//                                .withIdentifier(FRAGMENT_CAMERA)
-//                                .withSelectable(false),
-//                        new PrimaryDrawerItem()
-//                                .withName(R.string.menu_charts)
-//                                .withDescription("Графический пакет")
-//                                .withIcon(GoogleMaterial.Icon.gmd_chart)
-//                                .withIdentifier(FRAGMENT_CHARTS)
-//                                .withSelectable(false),
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_equipment)
                                 .withDescription("Справочник оборудования")
@@ -678,23 +671,6 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_CONTRAGENTS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
-//                        new DividerDrawerItem(),
-//                        new PrimaryDrawerItem()
-//                                .withName("Новые задачи")
-//                                .withDescription("Скачать новые задачи")
-//                                .withIcon(FontAwesome.Icon.faw_plus)
-//                                .withIdentifier(DRAWER_TASKS)
-//                                .withSelectable(false)
-//                                .withSelectable(false)
-//                                .withIconColor(R.color.larisaBlueColor),
-//                        new PrimaryDrawerItem()
-//                                .withName("Обновить с сервера")
-//                                .withDescription("Обновить справочники")
-//                                .withIcon(FontAwesome.Icon.faw_check)
-//                                .withIdentifier(DRAWER_DOWNLOAD)
-//                                .withSelectable(false)
-//                                .withSelectable(false)
-//                                .withIconColor(R.color.larisaBlueColor),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName(R.string.service)
@@ -804,7 +780,7 @@ public class MainActivity extends AppCompatActivity {
             //set the active profile
             if (iprofilelist.size() > 0) {
                 for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
-                    if (activeUserID > 0 && iprofilelist.get(cnt).getIdentifier() == activeUserID + 2)
+                    if (activeUserID > 0 && iprofilelist.get(cnt).getIdentifier() == activeUserID) // +2
                         headerResult.setActiveProfile(iprofilelist.get(cnt));
                 }
             }
@@ -1015,7 +991,7 @@ public class MainActivity extends AppCompatActivity {
                     .withName(item.getName())
                     .withEmail(item.getLogin())
                     // first two elements reserved
-                    .withIdentifier((int) item.get_id() + 2)
+                    .withIdentifier((int) item.get_id()) // +2
                     .withOnDrawerItemClickListener(onDrawerItemClickListener);
             if (myBitmap != null) {
                 new_profile.withIcon(myBitmap);
@@ -1046,7 +1022,7 @@ public class MainActivity extends AppCompatActivity {
             if (users_id[cnt] == id) {
                 iprofilelist.remove(cnt);
                 //headerResult.removeProfile(cnt);
-                id_remove = (int) (users_id[cnt] + 2);
+                id_remove = (int) (users_id[cnt]); // + 2
                 headerResult.removeProfileByIdentifier(id_remove);
             }
         }
@@ -1077,9 +1053,8 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
                         }
-
-                        realmDB.commitTransaction();
                         user.setActive(true);
+                        realmDB.commitTransaction();
                     }
                 }
             }
@@ -1148,6 +1123,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }, 3000);
+        }
+
+        if (splashShown && !isLogged) {
+            ShowSettings();
         }
 
         /*
@@ -1229,7 +1208,7 @@ public class MainActivity extends AppCompatActivity {
             byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
             StringBuilder hexId = new StringBuilder();
             for (byte b : id) {
-                hexId.append(String.format("%2X", b));
+                hexId.append(String.format("%02X", b));
             }
 
             Intent result = new Intent(RfidDriverNfc.ACTION_NFC);

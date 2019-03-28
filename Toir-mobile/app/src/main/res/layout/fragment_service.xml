@@ -23,6 +23,7 @@
     <LinearLayout
         android:id="@+id/service_listview_journal_layout"
         android:layout_width="match_parent"
+        android:paddingLeft="5dip"
         android:orientation="horizontal"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -55,6 +56,7 @@
         android:id="@+id/service_listview_gps_layout"
         android:layout_width="match_parent"
         android:orientation="horizontal"
+        android:paddingLeft="5dip"
         android:layout_height="0dp"
         android:layout_weight="1">
 

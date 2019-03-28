@@ -23,7 +23,7 @@ public class AuthorizedUser {
     }
 
     public void setLogin(String login) {
-        this.mLogin = login;
+        mLogin = login;
     }
 
     /**
@@ -34,10 +34,10 @@ public class AuthorizedUser {
     }
 
     /**
-     * @param Uuid the mUuid to set
+     * @param uuid the mUuid to set
      */
-    public void setUuid(String Uuid) {
-        this.mUuid = Uuid;
+    public void setUuid(String uuid) {
+        mUuid = uuid;
     }
 
     /**
@@ -48,10 +48,10 @@ public class AuthorizedUser {
     }
 
     /**
-     * @param TagId the mTagId to set
+     * @param tagId the mTagId to set
      */
-    public void setTagId(String TagId) {
-        this.mTagId = TagId;
+    public void setTagId(String tagId) {
+        mTagId = tagId;
     }
 
     /**
@@ -62,10 +62,10 @@ public class AuthorizedUser {
     }
 
     /**
-     * @param Token the mToken to set
+     * @param token the mToken to set
      */
-    public void setToken(String Token) {
-        this.mToken = Token;
+    public void setToken(String token) {
+        mToken = token;
     }
 
     /**

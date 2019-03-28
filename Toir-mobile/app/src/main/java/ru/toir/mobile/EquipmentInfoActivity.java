@@ -7,25 +7,25 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -127,7 +127,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-    public static Intent showDocument(File file) {
+    public static Intent showDocument(File file, Context context) {
         MimeTypeMap mt = MimeTypeMap.getSingleton();
         String[] patternList = file.getName().split("\\.");
         String extension = patternList[patternList.length - 1];
@@ -135,8 +135,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (mt.hasExtension(extension)) {
             String mimeType = mt.getMimeTypeFromExtension(extension);
             Intent target = new Intent(Intent.ACTION_VIEW);
-            target.setDataAndType(Uri.fromFile(file), mimeType);
             target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            target.setType(mimeType);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                target.setData(Uri.fromFile(file));
+            } else {
+                Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                target.setData(doc);
+                target.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             return Intent.createChooser(target, "Open File");
         } else {
             return null;
@@ -234,7 +242,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
         String sDate;
-        RealmResults<Stage> stages = realmDB.where(Stage.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
+        RealmResults<Stage> stages = realmDB.where(Stage.class).
+                equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
         if (stages.size() > 2) {
             stages.subList(0, 2);
         }
@@ -253,7 +262,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         tv_equipment_listview.setAdapter(stageAdapter);
 
-        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("date", Sort.DESCENDING);
+        RealmResults<Defect> defects = realmDB.where(Defect.class)
+                .equalTo("equipment.uuid", equipment.getUuid())
+                .findAllSorted("date", Sort.DESCENDING);
         if (defects.size() > 2) {
             defects.subList(0, 2);
         }
@@ -292,13 +303,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         rootLayout = findViewById(R.id.coordinatorLayout);
 
-        findViewById(R.id.chg_eq_tag_id).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_chg_eq_tag_id).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-                alert.setTitle("Изменение метки оборудования");
-                alert.setMessage("Вы действительно хотите изменить метку?");
+                builder.setTitle("Изменение метки оборудования");
+                builder.setMessage("Вы действительно хотите изменить метку?");
                 DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -360,47 +371,47 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         rfidDialog.show(getFragmentManager(), TAG);
                     }
                 };
-                alert.setPositiveButton("OK", clickListener);
-                alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("OK", clickListener);
+                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 });
-                alert.show();
+                builder.create().show();
             }
         });
 
         //Floating Action Buttons
+/*
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (!FAB_Status) {
                     expandFAB();
-                    FAB_Status = true;
                 } else {
                     hideFAB();
-                    FAB_Status = false;
                 }
             }
         });
+*/
 
-        findViewById(R.id.fab_1).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_add_defect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogDefect(equipment, (ViewGroup) v.getParent());
+                showDialogDefect2((ViewGroup) v.getParent());
+                //hideFAB();
             }
         });
 
-        findViewById(R.id.fab_2).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_change_equipment_status).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialogStatus(equipment, (ViewGroup) v.getParent());
             }
         });
 
-        findViewById(R.id.fab_3).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_augmented_reality).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = getPackageManager().getLaunchIntentForPackage("ru.shtrm.toir");
@@ -410,19 +421,23 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.fab_4).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                readRFIDTag(equipment);
-            }
-        });
+        if (BuildConfig.DEBUG) {
+            findViewById(R.id.fab_read_tag_content).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    readRFIDTag(equipment);
+                }
+            });
 
-        findViewById(R.id.fab_5).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                writeRFIDTag(equipment);
-            }
-        });
+/*
+            findViewById(R.id.fab_write_tag_content).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    writeRFIDTag(equipment);
+                }
+            });
+*/
+        }
 
     }
 
@@ -486,13 +501,18 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         about.show();
     }
 
+    /*
     private void expandFAB() {
-        showFloatingActionButton(R.id.fab_1, R.anim.fab1_show, 2.3, 0.05);
-        showFloatingActionButton(R.id.fab_2, R.anim.fab2_show, 2, 2);
-        showFloatingActionButton(R.id.fab_3, R.anim.fab3_show, 0.05, 2.3);
-        showFloatingActionButton(R.id.fab_4, R.anim.fab4_show, 1.7, 0.9);
-        showFloatingActionButton(R.id.fab_5, R.anim.fab5_show, 0.9, 1.7);
-        showFloatingActionButton(R.id.chg_eq_tag_id, R.anim.chg_eq_tag_id_show, 0.05, 1.5);
+        showFloatingActionButton(R.id.fab_add_defect, R.anim.fab_add_defect_show, 2.3, 0.05);
+        showFloatingActionButton(R.id.fab_change_equipment_status, R.anim.fab_change_equipment_status_show, 2, 2);
+        showFloatingActionButton(R.id.fab_augmented_reality, R.anim.fab_augmented_reality_show, 0.05, 2.3);
+        showFloatingActionButton(R.id.fab_chg_eq_tag_id, R.anim.chg_eq_tag_id_show, 0.05, 1.5);
+        if (BuildConfig.DEBUG) {
+            showFloatingActionButton(R.id.fab_read_tag_content, R.anim.fab_read_tag_content, 1.7, 0.9);
+            showFloatingActionButton(R.id.fab_write_tag_content, R.anim.fab_write_tag_content_show, 0.9, 1.7);
+        }
+
+        FAB_Status = true;
     }
 
     private void showFloatingActionButton(int buttonId, int animationId, double kw, double kh) {
@@ -507,12 +527,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     }
 
     private void hideFAB() {
-        hideFloatingActionButton(R.id.fab_1, R.anim.fab1_hide, 2.3, 0.05);
-        hideFloatingActionButton(R.id.fab_2, R.anim.fab2_hide, 2, 2);
-        hideFloatingActionButton(R.id.fab_3, R.anim.fab3_hide, 0.05, 2.3);
-        hideFloatingActionButton(R.id.fab_4, R.anim.fab4_hide, 1.7, 0.9);
-        hideFloatingActionButton(R.id.fab_5, R.anim.fab5_hide, 0.9, 1.7);
-        hideFloatingActionButton(R.id.chg_eq_tag_id, R.anim.chg_eq_tag_id_hide, 0.05, 1.5);
+        hideFloatingActionButton(R.id.fab_add_defect, R.anim.fab_add_defect_hide, 2.3, 0.05);
+        hideFloatingActionButton(R.id.fab_change_equipment_status, R.anim.fab_change_equipment_status_hide, 2, 2);
+        hideFloatingActionButton(R.id.fab_augmented_reality, R.anim.fab_augmented_reality_hide, 0.05, 2.3);
+        hideFloatingActionButton(R.id.fab_chg_eq_tag_id, R.anim.chg_eq_tag_id_hide, 0.05, 1.5);
+        if (BuildConfig.DEBUG) {
+            hideFloatingActionButton(R.id.fab_read_tag_content, R.anim.fab_read_tag_content_hide, 1.7, 0.9);
+            hideFloatingActionButton(R.id.fab_write_tag_content, R.anim.fab_write_tag_content_hide, 0.9, 1.7);
+        }
+
+        FAB_Status = false;
     }
 
     private void hideFloatingActionButton(int buttonId, int animationId, double kw, double kh) {
@@ -525,13 +549,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab.startAnimation(animation);
         fab.setClickable(false);
     }
+*/
 
+    // TODO: в дальнейшем после того как будет реализован механизм выбора существующего
+    // дефекта для того чтобы повторно не вводить описание вновь создаваемого дефекта - удалить
     public void showDialogDefect(final Equipment equipment, ViewGroup parent) {
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
 
         RealmResults<DefectType> defectType = realmDB.where(DefectType.class).findAll();
-        final Spinner defectTypeSpinner = alertLayout.findViewById(R.id.spinner_defects);
+        final Spinner defectTypeSpinner = alertLayout.findViewById(R.id.spinner_defect_type);
         final DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(defectType);
         defectTypeSpinner.setAdapter(typeSpinnerAdapter);
 
@@ -543,8 +570,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 if (typeSelected != null) {
                     DefectType currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
                     if (currentDefectType != null) {
-                        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("DefectType.uuid", currentDefectType.getUuid()).findAll();
-                        Spinner defectSpinner = alertLayout.findViewById(R.id.spinner_defects);
+                        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("defectType.uuid", currentDefectType.getUuid()).findAll();
+                        Spinner defectSpinner = alertLayout.findViewById(R.id.spinner_defect_type);
                         DefectAdapter defectAdapter = new DefectAdapter(defects);
                         defectSpinner.setAdapter(defectAdapter);
                     }
@@ -616,6 +643,114 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
         dialog.setContentView(R.layout.add_defect_dialog);
         dialog.show();
+    }
+
+    public void showDialogDefect2(ViewGroup parent) {
+
+        final View addDefectLayout;
+        final Spinner defectTypeSpinner;
+        final DefectTypeAdapter defectTypeAdapter;
+        final Equipment equipment;
+        LayoutInflater inflater = getLayoutInflater();
+
+        addDefectLayout = inflater.inflate(R.layout.add_defect_dialog_2, parent, false);
+        defectTypeSpinner = addDefectLayout.findViewById(R.id.spinner_defect_type);
+
+        Realm realm = Realm.getDefaultInstance();
+        equipment = realm.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
+        RealmResults<DefectType> defectType = realm.where(DefectType.class)
+                .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid()).findAll();
+        defectTypeAdapter = new DefectTypeAdapter(defectType);
+        defectTypeSpinner.setAdapter(defectTypeAdapter);
+        realm.close();
+
+        // здесь по идее должен быть механизм показа уже существующих дефектов, для того чтобы можно
+        // было выбрать похожий и не забивать его текст по новой
+        /*
+        defectTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                DefectType typeSelected = (DefectType) defectTypeSpinner
+                        .getSelectedItem();
+                if (typeSelected != null) {
+                    DefectType currentDefectType = typeSpinnerAdapter.getItem(defectTypeSpinner.getSelectedItemPosition());
+                    if (currentDefectType != null) {
+                        RealmResults<Defect> defects = realmDB.where(Defect.class).equalTo("defectType.uuid", currentDefectType.getUuid()).findAll();
+                        Spinner defectSpinner = alertLayout.findViewById(R.id.spinner_defects);
+                        DefectAdapter defectAdapter = new DefectAdapter(defects);
+                        defectSpinner.setAdapter(defectAdapter);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        */
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Укажите дефект");
+        builder.setView(addDefectLayout);
+        builder.setIcon(R.drawable.ic_icon_warnings);
+        builder.setCancelable(false);
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
+                if (defectDescription.getText().toString().equals("")) {
+                    return;
+                }
+
+                DefectType currentDefectType = null;
+                int position = defectTypeSpinner.getSelectedItemPosition();
+                if (position != AdapterView.INVALID_POSITION) {
+                    currentDefectType = defectTypeAdapter.getItem(position);
+                }
+
+                Realm realm = Realm.getDefaultInstance();
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                UUID uuid = UUID.randomUUID();
+                Date date = new Date();
+
+                realm.beginTransaction();
+
+                long nextId = Defect.getLastId() + 1;
+                Defect defect = realm.createObject(Defect.class, nextId);
+                defect.setUuid(uuid.toString().toUpperCase());
+                defect.setUser(user);
+                defect.setDate(date);
+                defect.setEquipment(equipment);
+                defect.setDefectType(currentDefectType);
+                defect.setProcess(false);
+                defect.setComment(defectDescription.getText().toString());
+                defect.setTask(null);
+                defect.setCreatedAt(date);
+                defect.setChangedAt(date);
+
+                realm.commitTransaction();
+                realm.close();
+                dialog.dismiss();
+            }
+        };
+        dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
     }
 
     public void showDialogStatus(final Equipment equipment, ViewGroup parent) {
@@ -803,6 +938,28 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         realmDB.close();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        // добавляем элемент меню для перехода к списку атрибутов оборудования
+        MenuItem attributes = menu.add("Атрибуты");
+        MenuItem.OnMenuItemClickListener clickListener = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent equipmentInfo = new Intent(getApplicationContext(), EquipmentAttributeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("equipment_uuid", equipment_uuid);
+                equipmentInfo.putExtras(bundle);
+                startActivity(equipmentInfo);
+                return true;
+            }
+        };
+        attributes.setOnMenuItemClickListener(clickListener);
+
+        return true;
+    }
+
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -813,7 +970,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
                     documentation.getPath());
             if (file.exists()) {
-                Intent intent = showDocument(file);
+                Intent intent = showDocument(file, getApplicationContext());
                 if (intent != null) {
                     startActivity(intent);
                 }
@@ -843,7 +1000,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     public void onDismiss(DialogInterface dialog) {
                         // открываем загруженный документ (если он загрузился)
                         if (file.exists()) {
-                            showDocument(file);
+                            showDocument(file, getApplicationContext());
                         } else {
                             Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
                                     Toast.LENGTH_LONG).show();

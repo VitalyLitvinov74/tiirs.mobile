@@ -26,6 +26,7 @@ import retrofit2.Retrofit;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
+import ru.toir.mobile.rest.interfaces.IAttributeType;
 import ru.toir.mobile.rest.interfaces.IContragent;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
 import ru.toir.mobile.rest.interfaces.IDefect;
@@ -33,6 +34,7 @@ import ru.toir.mobile.rest.interfaces.IDefectType;
 import ru.toir.mobile.rest.interfaces.IDocumentation;
 import ru.toir.mobile.rest.interfaces.IDocumentationType;
 import ru.toir.mobile.rest.interfaces.IEquipment;
+import ru.toir.mobile.rest.interfaces.IEquipmentAttribute;
 import ru.toir.mobile.rest.interfaces.IEquipmentModel;
 import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
 import ru.toir.mobile.rest.interfaces.IEquipmentType;
@@ -344,6 +346,16 @@ ToirAPIFactory {
     @NonNull
     public static IGpsTrack getGpsTrackService() {
         return getRetrofit().create(IGpsTrack.class);
+    }
+
+    @NonNull
+    public static IAttributeType getAttributeTypeService() {
+        return getRetrofit().create(IAttributeType.class);
+    }
+
+    @NonNull
+    public static IEquipmentAttribute getEquipmentAttributeService() {
+        return getRetrofit().create(IEquipmentAttribute.class);
     }
 
     @NonNull

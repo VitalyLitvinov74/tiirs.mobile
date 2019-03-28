@@ -4,31 +4,30 @@ import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author Olejek
- *         Created on 2.05.17.
+ * @author Dmitriy Logachev
+ *         Created by koputo on 17/03/19.
  */
-public class Defect extends RealmObject implements ISend {
-    @PrimaryKey
+public class EquipmentAttribute extends RealmObject implements ISend {
+    @Index
     private long _id;
+    @PrimaryKey
     private String uuid;
-    private User user;
-    private Date date;
+    private AttributeType attributeType;
     private Equipment equipment;
-    private DefectType defectType;
-    private boolean process;
-    private String comment;
-    private Task task;
+    private Date date;
+    private String value;
+    private boolean sent;
     private Date createdAt;
     private Date changedAt;
-    private boolean sent;
 
     public static long getLastId() {
         Realm realm = Realm.getDefaultInstance();
 
-        Number lastId = realm.where(Defect.class).max("_id");
+        Number lastId = realm.where(MeasuredValue.class).max("_id");
         if (lastId == null) {
             lastId = 0;
         }
@@ -53,52 +52,12 @@ public class Defect extends RealmObject implements ISend {
         this.uuid = uuid;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public Equipment getEquipment() {
         return equipment;
     }
 
     public void setEquipment(Equipment equipment) {
         this.equipment = equipment;
-    }
-
-    public DefectType getDefectType() {
-        return defectType;
-    }
-
-    public void setDefectType(DefectType defectType) {
-        this.defectType = defectType;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
     }
 
     public Date getCreatedAt() {
@@ -117,12 +76,28 @@ public class Defect extends RealmObject implements ISend {
         this.changedAt = changedAt;
     }
 
-    public boolean isProcess() {
-        return process;
+    public AttributeType getAttributeType() {
+        return attributeType;
     }
 
-    public void setProcess(boolean process) {
-        this.process = process;
+    public void setAttributeType(AttributeType attributeType) {
+        this.attributeType = attributeType;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public boolean isSent() {

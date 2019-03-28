@@ -130,7 +130,7 @@
     <string name="sec">сек.</string>
     <string name="sec_with_value">%1$d сек.</string>
     <string name="input_value">введите данные</string>
-    <string name="program_version">TOiR Mobile v1.1.0\n ООО "ТЭС"\n (tourus.ru) (&#169;)2019</string>
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
 
     <string name="gps_track">GPS трек</string>
     <string name="journal">Журнал</string>
@@ -154,6 +154,7 @@
     <string name="choose_defect">Выберите дефект</string>
     <string name="add_new_defect">или введите новый</string>
     <string name="choose_defect_category">Категория дефекта</string>
+    <string name="choose_defect_type">Тип дефекта</string>
     <string name="defects_category_all">Все категории</string>
     <string name="defects_category_non_specific">Не специфические дефекты</string>
     <string name="action_save">Записать</string>
@@ -184,4 +185,5 @@
     <string name="receive_viber">Оповещать через Viber</string>
     <string name="telegram_chat_id">Идентификатор чата</string>
     <string name="telegram_chat_id_value">0</string>
+    <string name="defect_description">Описание дефекта</string>
 </resources>

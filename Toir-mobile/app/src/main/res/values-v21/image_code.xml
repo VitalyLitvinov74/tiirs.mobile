@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="icon_tags">&#xf02c;</string>
+    <string name="icon_map_marker">&#xf3c5;</string>
+    <string name="icon_calendar">&#xf073;</string>
+    <string name="icon_calendar_check">&#xf274;</string>
+    <string name="icon_cogs">&#xf085;</string>
+    <string name="icon_tools">&#xf7d9;</string>
+    <string name="icon_book">&#xf02d;</string>
+    <string name="icon_bell">&#xf0f3;</string>
+    <string name="icon_user">&#xf007;</string>
+    <string name="icon_user_tie">&#xf508;</string>
+    <string name="icon_server">&#xf233;</string>
+    <string name="icon_phone">&#xf095;</string>
+    <string name="icon_email">&#xf0e0;</string>
+    <string name="icon_password">&#xf084;</string>
+    <string name="icon_lock">&#xf023;</string>
+    <string name="icon_checkbox_checked">&#xf046;</string>
+    <string name="icon_eye">&#xf06e;</string>
+    <string name="icon_eye_closed">&#xf070;</string>
+</resources>

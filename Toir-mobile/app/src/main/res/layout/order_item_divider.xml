@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:background="#1565c0"
         android:textColor="#ffffff"
-        android:layout_marginLeft="10dip"
+        android:layout_marginLeft="5dip"
         android:paddingLeft="5dip"
         android:gravity="center_vertical"
         android:text="@string/description"
