@@ -671,23 +671,6 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_CONTRAGENTS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
-//                        new DividerDrawerItem(),
-//                        new PrimaryDrawerItem()
-//                                .withName("Новые задачи")
-//                                .withDescription("Скачать новые задачи")
-//                                .withIcon(FontAwesome.Icon.faw_plus)
-//                                .withIdentifier(DRAWER_TASKS)
-//                                .withSelectable(false)
-//                                .withSelectable(false)
-//                                .withIconColor(R.color.larisaBlueColor),
-//                        new PrimaryDrawerItem()
-//                                .withName("Обновить с сервера")
-//                                .withDescription("Обновить справочники")
-//                                .withIcon(FontAwesome.Icon.faw_check)
-//                                .withIdentifier(DRAWER_DOWNLOAD)
-//                                .withSelectable(false)
-//                                .withSelectable(false)
-//                                .withIconColor(R.color.larisaBlueColor),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName(R.string.service)

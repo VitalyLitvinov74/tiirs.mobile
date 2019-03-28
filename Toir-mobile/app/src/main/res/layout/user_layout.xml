@@ -2,10 +2,12 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    tools:ignore="RtlSymmetry">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -177,10 +179,21 @@
                 android:background="#FAFAFA"
                 android:clickable="false"
                 android:gravity="center_vertical"
-                android:paddingLeft="45dp"
+                android:paddingLeft="50dp"
                 android:text="@string/gprs_status"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/user_status_gprs_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignRight="@+id/user_status_gprs"
+                android:layout_below="@+id/user_divider"
+                android:enabled="false"
+                android:gravity="center_vertical"
+                android:text=""
+                android:layout_alignEnd="@+id/user_status_gprs" />
 
             <TextView
                 android:id="@+id/user_status_gps"
@@ -189,32 +202,21 @@
                 android:layout_below="@+id/user_status_gprs"
                 android:background="#FAFAFA"
                 android:clickable="false"
+                android:paddingLeft="50dp"
                 android:gravity="center_vertical"
-                android:paddingLeft="45dp"
                 android:text="@string/gps_status"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="18sp" />
 
             <Switch
-                android:id="@+id/user_status_gprs_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_alignRight="@+id/user_boss_contact"
-                android:layout_below="@+id/user_divider"
-                android:enabled="false"
-                android:gravity="center_vertical"
-                android:text=""
-                android:layout_alignEnd="@+id/user_boss_contact" />
-
-            <Switch
                 android:id="@+id/user_status_gps_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_alignRight="@+id/user_boss_contact"
-                android:layout_below="@+id/user_status_gprs"
+                android:layout_alignRight="@+id/user_status_gps"
+                android:layout_below="@+id/user_status_gprs_switch"
                 android:gravity="center_vertical"
                 android:text=""
-                android:layout_alignEnd="@+id/user_boss_contact" />
+                android:layout_alignEnd="@+id/user_status_gps" />
 
             <View
                 android:id="@+id/user_divider2"
@@ -223,43 +225,45 @@
                 android:layout_below="@+id/user_status_gps"
                 android:background="#EDEDED"
                 android:paddingLeft="30dp"
-                android:paddingRight="10dp" />
+                android:paddingRight="10dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="10dp" />
+
+            <ru.toir.mobile.utils.IconTextView
+                android:id="@+id/user_boss_contact"
+                android:layout_width="36dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_divider2"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_phone"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/user_text_boss"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
+                android:paddingLeft="10dp"
+                android:layout_toRightOf="@+id/user_boss_contact"
                 android:layout_below="@+id/user_divider2"
                 android:background="#FAFAFA"
-                android:paddingLeft="45dp"
                 android:textColor="@color/larisaTextColorABlack"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/user_boss_contact"
+                android:paddingStart="10dp" />
 
             <TextView
                 android:id="@+id/user_text_boss_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_boss"
+                android:layout_toRightOf="@+id/user_boss_contact"
                 android:background="#FAFAFA"
-                android:paddingStart="45dp"
-                android:paddingLeft="45dp"
+                android:paddingLeft="10dp"
                 android:text="@string/boss_contact"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
-
-            <ru.toir.mobile.utils.IconTextView
-                android:id="@+id/user_boss_contact"
-                android:layout_width="36dp"
-                android:layout_height="50dp"
-                android:textSize="24sp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/user_divider2"
-                android:layout_gravity="right"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dp"
-                android:text="@string/icon_phone"
-                android:textColor="@color/larisaBlueColor"
-                android:layout_alignParentEnd="true" />
 
             <View
                 android:id="@+id/user_divider3"
