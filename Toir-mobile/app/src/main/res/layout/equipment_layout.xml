@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".EquipmentInfoActivity">
+    tools:context=".EquipmentInfoActivity"
+    tools:ignore="RtlSymmetry">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -44,6 +45,7 @@
                 android:adjustViewBounds="true"
                 android:background="@color/larisaBlueColor"
                 android:paddingLeft="15dp"
+                android:paddingStart="15dp"
                 android:paddingTop="10dp"
                 android:scaleType="centerCrop"
                 android:textColor="#ffffff"
@@ -58,48 +60,73 @@
                 android:background="@color/larisaBlueColor"
                 android:paddingBottom="10dp"
                 android:paddingLeft="15dp"
+                android:paddingStart="15dp"
                 android:scaleType="centerCrop"
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
 
+            <ru.toir.mobile.utils.IconTextView
+                android:id="@+id/equipment_id_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:textSize="20sp"
+                android:layout_below="@+id/equipment_text_inventory"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tags"
+                android:textColor="@color/larisaBlueColor" />
+
             <TextView
                 android:id="@+id/equipment_text_uuid"
                 android:layout_width="fill_parent"
-                android:layout_height="30dp"
+                android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_inventory"
-                android:layout_marginTop="15dp"
+                android:layout_toEndOf="@+id/equipment_id_icon"
+                android:layout_toRightOf="@+id/equipment_id_icon"
                 android:background="#FAFAFA"
-                android:paddingLeft="45dp"
+                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:textColor="#000000"
                 android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/equipment_text_id"
                 android:layout_width="fill_parent"
-                android:layout_height="30dp"
+                android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_uuid"
+                android:layout_toEndOf="@+id/equipment_id_icon"
+                android:layout_toRightOf="@+id/equipment_id_icon"
                 android:background="#FAFAFA"
-                android:paddingLeft="45dp"
+                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:textColor="#000000"
                 android:textSize="14sp" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_location_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="50dp"
+                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_id"
-                android:layout_marginLeft="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/location" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_map_marker"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/equipment_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_id"
+                android:layout_toEndOf="@+id/equipment_location_icon"
                 android:layout_toRightOf="@+id/equipment_location_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -108,30 +135,38 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_location"
+                android:layout_toEndOf="@+id/equipment_location_icon"
                 android:layout_toRightOf="@+id/equipment_location_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:text="@string/current_location"
                 android:textColor="#757575"
                 android:textSize="14sp" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_date_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="50dp"
+                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_location_label"
-                android:layout_marginLeft="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/calendar" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_calendar"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/equipment_text_date"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_location_label"
+                android:layout_toEndOf="@+id/equipment_date_icon"
                 android:layout_toRightOf="@+id/equipment_date_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -140,30 +175,38 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_date"
+                android:layout_toEndOf="@+id/equipment_date_icon"
                 android:layout_toRightOf="@+id/equipment_date_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:text="@string/regular_date"
                 android:textColor="#757575"
                 android:textSize="14sp" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_date_icon2"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="50dp"
+                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_date_label"
-                android:layout_marginLeft="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/calendar" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_calendar"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/equipment_text_date2"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_date_label"
+                android:layout_toEndOf="@+id/equipment_date_icon2"
                 android:layout_toRightOf="@+id/equipment_date_icon2"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -172,30 +215,38 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_date2"
+                android:layout_toEndOf="@+id/equipment_date_icon2"
                 android:layout_toRightOf="@+id/equipment_date_icon2"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:text="@string/last_date"
                 android:textColor="#757575"
                 android:textSize="14sp" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_status_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="50dp"
+                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_date_label2"
-                android:layout_marginLeft="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/equipment_status_repair" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_cogs"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/equipment_text_status"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_date_label2"
+                android:layout_toEndOf="@+id/equipment_status_icon"
                 android:layout_toRightOf="@+id/equipment_status_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -204,9 +255,11 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_status"
+                android:layout_toEndOf="@+id/equipment_status_icon"
                 android:layout_toRightOf="@+id/equipment_status_icon"
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:text="@string/current_status"
                 android:textColor="#757575"
                 android:textSize="14sp" />
@@ -218,26 +271,33 @@
                 android:layout_below="@+id/equipment_text_status_label"
                 android:background="#777777" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_information_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider1"
-                android:contentDescription="@string/image_description"
-                android:maxHeight="32dp"
-                android:src="@drawable/ic_icon_tools" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tools"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_operation_list"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider1"
-                android:background="#FAFAFA"
-                android:layout_marginRight="25dp"
-                android:paddingLeft="20dp"
-                android:paddingTop="10dp"
-                android:text="@string/operation_list"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_toEndOf="@+id/equipment_information_icon"
                 android:layout_toRightOf="@+id/equipment_information_icon"
+                android:background="#FAFAFA"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:text="@string/operation_list"
                 android:textColor="#757575"
                 android:textSize="16sp" />
 
@@ -246,9 +306,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/equipment_text_operation_list"
+                android:layout_marginBottom="10dp"
                 android:divider="#333333"
                 android:dividerHeight="1px"
-                android:layout_marginBottom="10dp"
                 android:paddingBottom="10dp" />
 
             <View
@@ -258,37 +318,44 @@
                 android:layout_below="@+id/list_view"
                 android:background="#777777" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_documentation_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:textSize="20sp"
                 android:layout_below="@+id/equipment_divider2"
-                android:contentDescription="@string/image_description"
-                android:maxHeight="32dp"
-                android:src="@drawable/ic_icon_tasks2" />
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_book"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/equipment_text_documentation"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider2"
-                android:background="#FAFAFA"
-                android:paddingLeft="20dp"
-                android:paddingTop="10dp"
-                android:layout_marginRight="25dp"
+                android:layout_marginRight="15dp"
                 android:layout_toRightOf="@+id/equipment_documentation_icon"
+                android:background="#FAFAFA"
+                android:paddingLeft="10dp"
+                android:gravity="center_vertical"
                 android:text="@string/documentation"
                 android:textColor="#757575"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_marginEnd="15dp"
+                android:layout_toEndOf="@+id/equipment_documentation_icon"
+                android:paddingStart="10dp" />
 
             <ListView
                 android:id="@+id/equipment_documentation_listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_documentation"
                 android:divider="#333333"
                 android:dividerHeight="1px"
-                android:paddingBottom="10dp"
-                android:layout_below="@+id/equipment_text_documentation" />
+                android:paddingBottom="10dp" />
 
             <View
                 android:id="@+id/equipment_divider3"
@@ -297,53 +364,100 @@
                 android:layout_below="@+id/equipment_documentation_listView"
                 android:background="#777777" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/equipment_defects_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:textSize="20sp"
                 android:layout_below="@+id/equipment_divider3"
-                android:contentDescription="@string/image_description"
-                android:maxHeight="32dp"
-                android:paddingLeft="5dp"
-                android:src="@drawable/ic_icon_warnings" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_bell"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/equipment_text_defects"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider3"
-                android:background="#FAFAFA"
-                android:paddingLeft="20dp"
-                android:paddingTop="5dp"
                 android:layout_toRightOf="@+id/equipment_defects_icon"
+                android:background="#FAFAFA"
+                android:paddingLeft="10dp"
                 android:text="@string/defects"
+                android:gravity="center_vertical"
                 android:textColor="#757575"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/equipment_defects_icon"
+                android:paddingStart="10dp" />
 
             <ListView
                 android:id="@+id/equipment_defects_listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_defects"
                 android:divider="#333333"
                 android:dividerHeight="1px"
-                android:paddingBottom="10dp"
-                android:layout_below="@+id/equipment_text_defects" />
+                android:paddingBottom="10dp" />
 
         </RelativeLayout>
 
     </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:src="@drawable/ic_plus_white_36dp"
-        app:fabSize="normal"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="15dp"
-        app:backgroundTint="@color/larisaBlueColor"
-        app:layout_behavior="ru.toir.mobile.utils.ScrollAwareFABBehavior"
+        android:id="@+id/fab_add_defect"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:src="@android:drawable/ic_dialog_alert"
+        app:backgroundTint="@color/md_red_400"
+        app:fabSize="normal" />
 
-    <include layout="@layout/equipment_action" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_change_equipment_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="70dp"
+        android:src="@android:drawable/ic_menu_edit"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_augmented_reality"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="130dp"
+        android:src="@android:drawable/ic_menu_view"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_read_tag_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="190dp"
+        android:src="@android:drawable/ic_input_get"
+        app:backgroundTint="@color/md_green_400"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_chg_eq_tag_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="250dp"
+        android:src="@android:drawable/ic_menu_save"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
 
 </android.support.design.widget.CoordinatorLayout>

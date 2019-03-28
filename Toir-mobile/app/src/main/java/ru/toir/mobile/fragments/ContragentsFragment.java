@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import java.util.Locale;
 
@@ -23,20 +22,10 @@ import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.ContragentAdapter;
-import ru.toir.mobile.db.adapters.EquipmentAdapter;
-import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Contragent;
-import ru.toir.mobile.db.realm.Equipment;
-import ru.toir.mobile.db.realm.EquipmentType;
 
 public class ContragentsFragment extends Fragment {
     private Realm realmDB;
-	private boolean isInit;
-
-	private EditText filter;
-	private ListView contragentsListView;
-
-    private String object_uuid;
 
     public static ContragentsFragment newInstance() {
 		return new ContragentsFragment();
@@ -51,7 +40,7 @@ public class ContragentsFragment extends Fragment {
         toolbar.setSubtitle("Клиенты");
         realmDB = Realm.getDefaultInstance();
 
-        contragentsListView = rootView.findViewById(R.id.crl_contragents_listView);
+        ListView contragentsListView = rootView.findViewById(R.id.crl_contragents_listView);
         contragentsListView.setOnItemClickListener(new ListviewClickListener());
         contragentsListView.setTextFilterEnabled(true);
 
@@ -76,8 +65,6 @@ public class ContragentsFragment extends Fragment {
 
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
-
-		isInit = true;
 
 		return rootView;
 	}

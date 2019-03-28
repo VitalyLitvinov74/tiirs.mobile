@@ -28,14 +28,16 @@ class AboutDialog extends Dialog {
         TextView tv;
         setContentView(R.layout.about);
 
-        tv = (TextView) findViewById(R.id.legal_text);
+        tv = findViewById(R.id.legal_text);
         tv.setText(readRawTextFile(R.raw.legal));
-        tv = (TextView) findViewById(R.id.info_text);
+        tv = findViewById(R.id.info_text);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Html.fromHtml(readRawTextFile(R.raw.info),Html.FROM_HTML_MODE_LEGACY);
         } else {
             Html.fromHtml(readRawTextFile(R.raw.info));
         }
+
+        tv.setText(getContext().getString(R.string.program_version, "4.0.5"));
         Linkify.addLinks(tv, Linkify.ALL);
     }
 

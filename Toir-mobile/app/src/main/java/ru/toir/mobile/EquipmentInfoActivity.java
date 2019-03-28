@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -25,11 +24,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -246,7 +242,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
         String sDate;
-        RealmResults<Stage> stages = realmDB.where(Stage.class).equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
+        RealmResults<Stage> stages = realmDB.where(Stage.class).
+                equalTo("equipment.uuid", equipment.getUuid()).findAllSorted("endDate", Sort.DESCENDING);
         if (stages.size() > 2) {
             stages.subList(0, 2);
         }
@@ -386,10 +383,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         });
 
         //Floating Action Buttons
+/*
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (!FAB_Status) {
                     expandFAB();
                 } else {
@@ -397,12 +394,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 }
             }
         });
+*/
 
         findViewById(R.id.fab_add_defect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialogDefect2((ViewGroup) v.getParent());
-                hideFAB();
+                //hideFAB();
             }
         });
 
@@ -431,12 +429,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 }
             });
 
+/*
             findViewById(R.id.fab_write_tag_content).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     writeRFIDTag(equipment);
                 }
             });
+*/
         }
 
     }
@@ -501,6 +501,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         about.show();
     }
 
+    /*
     private void expandFAB() {
         showFloatingActionButton(R.id.fab_add_defect, R.anim.fab_add_defect_show, 2.3, 0.05);
         showFloatingActionButton(R.id.fab_change_equipment_status, R.anim.fab_change_equipment_status_show, 2, 2);
@@ -548,6 +549,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         fab.startAnimation(animation);
         fab.setClickable(false);
     }
+*/
 
     // TODO: в дальнейшем после того как будет реализован механизм выбора существующего
     // дефекта для того чтобы повторно не вводить описание вновь создаваемого дефекта - удалить

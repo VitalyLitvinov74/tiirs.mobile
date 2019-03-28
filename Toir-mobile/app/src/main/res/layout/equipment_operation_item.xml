@@ -39,7 +39,8 @@
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/eoi_ImageStatus"
         android:text="@string/operation_title"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginStart="5dp" />
 
     <TextView
         android:id="@+id/eoi_Operation"

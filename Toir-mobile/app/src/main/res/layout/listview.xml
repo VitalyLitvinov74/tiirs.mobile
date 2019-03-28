@@ -26,7 +26,10 @@
         android:paddingLeft="5dp"
         android:text="@string/description"
         android:textColor="#333333"
-        android:textSize="16sp" />
+        android:textSize="14sp"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/lv_icon"
+        android:paddingStart="5dp" />
 
     <TextView
         android:id="@+id/lv_secondLine"
@@ -37,9 +40,11 @@
         android:layout_below="@+id/lv_firstLine"
         android:layout_toRightOf="@id/lv_icon"
         android:ellipsize="marquee"
-        android:paddingLeft="15dp"
+        android:paddingLeft="13dp"
         android:text="@string/description"
         android:textColor="#333333"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/lv_icon" />
 
 </RelativeLayout> 

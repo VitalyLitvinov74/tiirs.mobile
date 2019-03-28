@@ -22,23 +22,27 @@
         android:layout_toRightOf="@id/ti_ImageStatus"
         android:background="#FAFAFA"
         android:textColor="#454545"
+        android:singleLine="true"
         android:gravity="center_vertical"
         android:text="@string/description"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:layout_toEndOf="@id/ti_ImageStatus" />
 
     <TextView
-        android:id="@+id/ti_Equipment"
+        android:id="@+id/ti_Comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dip"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@id/ti_ImageStatus"
         android:background="#FAFAFA"
+        android:singleLine="true"
         android:textColor="#454545"
         android:layout_below="@+id/ti_Name"
         android:ellipsize="marquee"
         android:text="@string/description"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:layout_toEndOf="@id/ti_ImageStatus" />
 
     <TextView
         android:id="@+id/ti_Status"
@@ -50,7 +54,7 @@
         android:layout_toRightOf="@id/ti_ImageStatus"
         android:background="#FAFAFA"
         android:textColor="#454545"
-        android:layout_below="@+id/ti_Equipment"
+        android:layout_below="@+id/ti_Comment"
         android:ellipsize="marquee"
         android:text="@string/description"
         android:textSize="12sp" />
