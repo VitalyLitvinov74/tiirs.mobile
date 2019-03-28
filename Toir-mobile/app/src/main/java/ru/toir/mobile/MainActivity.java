@@ -540,6 +540,7 @@ public class MainActivity extends AppCompatActivity {
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
                 .withTextColor(ContextCompat.getColor(this, R.color.white))
+/*
                 .addProfiles(
                         new ProfileSettingDrawerItem()
                                 .withName("Добавить пользователя")
@@ -551,6 +552,7 @@ public class MainActivity extends AppCompatActivity {
                                 .withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings))
                                 .withIdentifier(PROFILE_SETTINGS)
                 )
+*/
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
@@ -560,6 +562,7 @@ public class MainActivity extends AppCompatActivity {
                             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                             Fragment fr;
                             switch (ident) {
+/*
                                 case PROFILE_ADD:
                                     currentFragment = FRAGMENT_USER;
                                     fr = FragmentAddUser.newInstance();
@@ -570,8 +573,9 @@ public class MainActivity extends AppCompatActivity {
                                     fr = FragmentEditUser.newInstance("EditProfile");
                                     tr.replace(R.id.frame_container, fr);
                                     break;
+*/
                                 default:
-                                    int profileId = profile.getIdentifier() - 2;
+                                    int profileId = profile.getIdentifier(); //-2
                                     int profile_pos;
                                     for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++) {
                                         if (users_id[profile_pos] == profileId) {
@@ -624,18 +628,6 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_USERS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
-//                        new PrimaryDrawerItem()
-//                                .withName(R.string.menu_camera)
-//                                .withDescription("Проверка камеры")
-//                                .withIcon(GoogleMaterial.Icon.gmd_camera)
-//                                .withIdentifier(FRAGMENT_CAMERA)
-//                                .withSelectable(false),
-//                        new PrimaryDrawerItem()
-//                                .withName(R.string.menu_charts)
-//                                .withDescription("Графический пакет")
-//                                .withIcon(GoogleMaterial.Icon.gmd_chart)
-//                                .withIdentifier(FRAGMENT_CHARTS)
-//                                .withSelectable(false),
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_equipment)
                                 .withDescription("Справочник оборудования")
@@ -805,7 +797,7 @@ public class MainActivity extends AppCompatActivity {
             //set the active profile
             if (iprofilelist.size() > 0) {
                 for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
-                    if (activeUserID > 0 && iprofilelist.get(cnt).getIdentifier() == activeUserID + 2)
+                    if (activeUserID > 0 && iprofilelist.get(cnt).getIdentifier() == activeUserID) // +2
                         headerResult.setActiveProfile(iprofilelist.get(cnt));
                 }
             }
@@ -1016,7 +1008,7 @@ public class MainActivity extends AppCompatActivity {
                     .withName(item.getName())
                     .withEmail(item.getLogin())
                     // first two elements reserved
-                    .withIdentifier((int) item.get_id() + 2)
+                    .withIdentifier((int) item.get_id()) // +2
                     .withOnDrawerItemClickListener(onDrawerItemClickListener);
             if (myBitmap != null) {
                 new_profile.withIcon(myBitmap);
@@ -1047,7 +1039,7 @@ public class MainActivity extends AppCompatActivity {
             if (users_id[cnt] == id) {
                 iprofilelist.remove(cnt);
                 //headerResult.removeProfile(cnt);
-                id_remove = (int) (users_id[cnt] + 2);
+                id_remove = (int) (users_id[cnt]); // + 2
                 headerResult.removeProfileByIdentifier(id_remove);
             }
         }
@@ -1078,9 +1070,8 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
                         }
-
-                        realmDB.commitTransaction();
                         user.setActive(true);
+                        realmDB.commitTransaction();
                     }
                 }
             }

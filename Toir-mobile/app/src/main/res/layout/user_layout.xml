@@ -54,14 +54,16 @@
                 android:textColor="#ffffff"
                 android:textSize="15sp" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/user_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="50dp"
+                android:textSize="24sp"
                 android:layout_below="@+id/user_text_uuid"
                 android:layout_marginLeft="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/user_32" />
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_user_tie"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/user_text_type"
@@ -72,7 +74,8 @@
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
                 android:textColor="@color/larisaTextColorABlack"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/user_icon" />
 
             <TextView
                 android:id="@+id/user_text_whois_label"
@@ -84,16 +87,19 @@
                 android:paddingLeft="10dp"
                 android:text="@string/whois"
                 android:textColor="@color/larisaTextColor"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:layout_toEndOf="@+id/user_icon" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/user_location_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="50dp"
+                android:textSize="24sp"
                 android:layout_below="@+id/user_text_whois_label"
                 android:layout_marginLeft="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/location" />
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_map_marker"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/user_text_location"
@@ -116,17 +122,19 @@
                 android:paddingLeft="10dp"
                 android:text="@string/current_location"
                 android:textColor="@color/larisaTextColor"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:layout_toEndOf="@+id/user_location_icon" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/user_date_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="50dp"
+                android:textSize="24sp"
                 android:layout_below="@+id/user_text_location_label"
                 android:layout_marginLeft="15dp"
-                android:clickable="false"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/calendar" />
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_server"
+                android:textColor="@color/larisaBlueColor" />
 
             <TextView
                 android:id="@+id/user_text_date"
@@ -137,7 +145,8 @@
                 android:background="#FAFAFA"
                 android:paddingLeft="10dp"
                 android:textColor="@color/larisaTextColorABlack"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/user_date_icon" />
 
             <TextView
                 android:id="@+id/user_text_date_label"
@@ -149,7 +158,8 @@
                 android:paddingLeft="10dp"
                 android:text="@string/server_date_connect"
                 android:textColor="@color/larisaTextColor"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:layout_toEndOf="@+id/user_date_icon" />
 
             <View
                 android:id="@+id/user_divider"
@@ -193,7 +203,8 @@
                 android:layout_below="@+id/user_divider"
                 android:enabled="false"
                 android:gravity="center_vertical"
-                android:text="" />
+                android:text=""
+                android:layout_alignEnd="@+id/user_boss_contact" />
 
             <Switch
                 android:id="@+id/user_status_gps_switch"
@@ -202,7 +213,8 @@
                 android:layout_alignRight="@+id/user_boss_contact"
                 android:layout_below="@+id/user_status_gprs"
                 android:gravity="center_vertical"
-                android:text="" />
+                android:text=""
+                android:layout_alignEnd="@+id/user_boss_contact" />
 
             <View
                 android:id="@+id/user_divider2"
@@ -235,17 +247,19 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ImageView
+            <ru.toir.mobile.utils.IconTextView
                 android:id="@+id/user_boss_contact"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="50dp"
+                android:textSize="24sp"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/user_divider2"
                 android:layout_gravity="right"
-                android:layout_marginEnd="15dp"
-                android:layout_marginRight="15dp"
-                android:contentDescription="@string/image_description"
-                android:src="@drawable/phone" />
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_phone"
+                android:textColor="@color/larisaBlueColor"
+                android:layout_alignParentEnd="true" />
 
             <View
                 android:id="@+id/user_divider3"
@@ -256,16 +270,4 @@
 
         </RelativeLayout>
     </ScrollView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/user_edit_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:src="@drawable/ic_mode_edit_white_24dp"
-        android:tint="@android:color/white"
-        app:backgroundTint="#2CB6E1"
-        app:layout_anchor="@id/user_text_uuid"
-        app:layout_anchorGravity="bottom|end" />
 </android.support.design.widget.CoordinatorLayout>

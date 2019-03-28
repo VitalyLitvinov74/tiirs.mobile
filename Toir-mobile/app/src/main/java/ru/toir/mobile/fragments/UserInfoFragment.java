@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -35,6 +34,7 @@ import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.User;
+import ru.toir.mobile.utils.IconTextView;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
@@ -79,28 +79,13 @@ public class UserInfoFragment extends Fragment {
         TextView tv_user_type = view.findViewById(R.id.user_text_type);
         TextView tv_user_gps = view.findViewById(R.id.user_text_location);
         ImageView user_image = view.findViewById(R.id.user_image);
-        FloatingActionButton edit_image = view.findViewById(R.id.user_edit_image);
-        ImageView call_image = view.findViewById(R.id.user_boss_contact);
+        IconTextView call_image = view.findViewById(R.id.user_boss_contact);
         Switch user_status_gps = view.findViewById(R.id.user_status_gps_switch);
         Switch user_status_gprs = view.findViewById(R.id.user_status_gprs_switch);
         TextView tv_user_date = view.findViewById(R.id.user_text_date);
         TextView tv_user_boss = view.findViewById(R.id.user_text_boss);
 
-        edit_image.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                FragmentActivity activity = getActivity();
-                if (activity != null) {
-                    activity.getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.frame_container, FragmentEditUser.newInstance("EditProfile"))
-                            .commit();
-                }
-            }
-        });
-
-        // !!!!!
         final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-        //final User user = realmDB.where(User.class).findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
