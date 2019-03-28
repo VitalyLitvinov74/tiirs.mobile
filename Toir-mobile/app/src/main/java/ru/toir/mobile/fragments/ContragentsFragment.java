@@ -26,12 +26,6 @@ import ru.toir.mobile.db.realm.Contragent;
 
 public class ContragentsFragment extends Fragment {
     private Realm realmDB;
-	private boolean isInit;
-
-	private EditText filter;
-	private ListView contragentsListView;
-
-    private String object_uuid;
 
     public static ContragentsFragment newInstance() {
 		return new ContragentsFragment();
@@ -46,7 +40,7 @@ public class ContragentsFragment extends Fragment {
         toolbar.setSubtitle("Клиенты");
         realmDB = Realm.getDefaultInstance();
 
-        contragentsListView = rootView.findViewById(R.id.crl_contragents_listView);
+        ListView contragentsListView = rootView.findViewById(R.id.crl_contragents_listView);
         contragentsListView.setOnItemClickListener(new ListviewClickListener());
         contragentsListView.setTextFilterEnabled(true);
 
@@ -71,8 +65,6 @@ public class ContragentsFragment extends Fragment {
 
 		rootView.setFocusableInTouchMode(true);
 		rootView.requestFocus();
-
-		isInit = true;
 
 		return rootView;
 	}

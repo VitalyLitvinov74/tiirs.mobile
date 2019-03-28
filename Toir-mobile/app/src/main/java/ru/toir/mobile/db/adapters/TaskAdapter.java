@@ -65,6 +65,8 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
             viewHolder.title = convertView.findViewById(R.id.ti_Name);
             viewHolder.date = convertView.findViewById(R.id.ti_Status);
             viewHolder.icon = convertView.findViewById(R.id.ti_ImageStatus);
+            viewHolder.comment = convertView.findViewById(R.id.ti_Comment);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -82,10 +84,11 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
                 sDate = "Дата: " + sDate + " " + task.getTaskStatus().getTitle();
                 viewHolder.date.setText(sDate);
             } else {
-                //viewHolder.date.setText("не выполнялся");
+                viewHolder.date.setText("не выполнялся");
             }
-
+            viewHolder.comment.setText(task.getComment());
             viewHolder.title.setText(task.getTaskTemplate().getTitle());
+            viewHolder.icon.setImageResource(getIconForStatusAndCriticalType(task.getTaskStatus().getUuid()));
         }
 
         return convertView;
@@ -95,46 +98,21 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
      * Вспомогательный метод, возвращает id ресурса в зависимости от сочетания статуса и критичности.
      *
      * @param statusUuid   Uuid статуса задачи.
-     * @param criticalUuid Uuid типа критичности.
      * @return Id drawable ресурса.
      */
-    private int getIconForStatusAndCriticalType(String statusUuid, String criticalUuid) {
+    private int getIconForStatusAndCriticalType(String statusUuid) {
         int id = R.drawable.status_easy_receive;
 
-        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+        if (statusUuid.equals(TaskStatus.Status.NEW)) {
             id = R.drawable.status_easy_receive;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
-            id = R.drawable.status_mod_receive;
-        }
-
-        if (statusUuid.equals(TaskStatus.Status.NEW) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
-            id = R.drawable.status_high_receive;
-        }
-
-        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+        if (statusUuid.equals(TaskStatus.Status.IN_WORK)) {
             id = R.drawable.status_easy_work;
         }
 
-        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
-            id = R.drawable.status_mod_work;
-        }
-
-        if (statusUuid.equals(TaskStatus.Status.IN_WORK) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
-            id = R.drawable.status_high_work;
-        }
-
-        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_3)) {
+        if (statusUuid.equals(TaskStatus.Status.COMPLETE)) {
             id = R.drawable.status_easy_ready;
-        }
-
-        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_2)) {
-            id = R.drawable.status_mod_ready;
-        }
-
-        if (statusUuid.equals(TaskStatus.Status.COMPLETE) && criticalUuid.equals(CriticalType.Status.TYPE_1)) {
-            id = R.drawable.status_high_ready;
         }
 
         return id;
@@ -143,7 +121,7 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
     private static class ViewHolder {
         TextView title;
         TextView date;
-        //TextView status;
+        TextView comment;
         ImageView icon;
     }
 }
