@@ -21,8 +21,6 @@ import ru.toir.mobile.db.realm.Journal;
 
 public class ServiceFragment extends Fragment {
     private Realm realmDB;
-    private ListView journalListView;
-    private ListView gpsListView;
 
     public static ServiceFragment newInstance() {
         return new ServiceFragment();
@@ -34,8 +32,8 @@ public class ServiceFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_service, container, false);
 
-        journalListView = rootView.findViewById(R.id.service_list_view_journal);
-        gpsListView = rootView.findViewById(R.id.service_list_view_gps);
+        ListView journalListView = rootView.findViewById(R.id.service_list_view_journal);
+        ListView gpsListView = rootView.findViewById(R.id.service_list_view_gps);
 
         Toolbar toolbar = (getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Сервис");
