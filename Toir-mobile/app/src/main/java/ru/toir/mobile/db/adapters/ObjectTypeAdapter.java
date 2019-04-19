@@ -24,14 +24,6 @@ public class ObjectTypeAdapter extends RealmBaseAdapter<ObjectType> implements L
         super(data);
     }
 
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-        return 0;
-    }
-
     public RealmResults<ObjectType> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ObjectType> result = realm.where(ObjectType.class).findAll();

@@ -21,6 +21,8 @@ import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 
+import static java.lang.Long.valueOf;
+
 /**
  * @author olejek
  * Created by olejek on 12.09.16.
@@ -65,11 +67,11 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
                 if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
                     currentDate = separateDate;
-                    separates.add(i + j, Long.valueOf(TYPE_SEPARATOR));
+                    separates.add(i + j, valueOf(TYPE_SEPARATOR));
                     j++;
-                    separates.add(i + j, Long.valueOf(i));
+                    separates.add(i + j, valueOf(i));
                 } else {
-                    separates.add(i + j, Long.valueOf(i));
+                    separates.add(i + j, valueOf(i));
                 }
                 i++;
             }

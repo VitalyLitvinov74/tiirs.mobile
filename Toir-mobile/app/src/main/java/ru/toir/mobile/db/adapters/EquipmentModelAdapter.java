@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import java.io.File;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -29,14 +28,6 @@ public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> impl
 
     public EquipmentModelAdapter(RealmResults<EquipmentModel> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<EquipmentModel> rows = realm.where(EquipmentModel.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

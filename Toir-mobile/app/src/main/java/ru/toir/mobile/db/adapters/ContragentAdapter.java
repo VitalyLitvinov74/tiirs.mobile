@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,14 +29,6 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
 
     public ContragentAdapter(RealmList<Contragent> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-        return 0;
     }
 
     public void setFilter(String text, Realm realmDB) {
