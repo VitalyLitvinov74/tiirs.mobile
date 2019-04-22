@@ -27,15 +27,6 @@ public class GPSTrackAdapter extends RealmBaseAdapter<GpsTrack> implements ListA
         super(data);
     }
 
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
     public RealmResults<GpsTrack> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<GpsTrack> result = realm.where(GpsTrack.class).findAll();

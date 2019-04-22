@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -42,14 +41,6 @@ public class EquipmentStatusAdapter extends RealmBaseAdapter<EquipmentStatus> im
             return equipmentStatus.get_id();
         }
         return 0;
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<EquipmentStatus> rows = realm.where(EquipmentStatus.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

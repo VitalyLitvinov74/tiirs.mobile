@@ -14,8 +14,10 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -24,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -178,6 +181,7 @@ public class OrderFragment extends Fragment {
         public void onFinish() {
         }
     };
+    private String photoFilePath;
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
@@ -338,7 +342,25 @@ public class OrderFragment extends Fragment {
         fab_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, ACTIVITY_PHOTO);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    startActivityForResult(intent, ACTIVITY_PHOTO);
+                } else {
+                    Context context = getContext();
+                    File file = null;
+                    try {
+                        file = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+                    if (file != null) {
+                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(intent, ACTIVITY_PHOTO);
+                    }
+//                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+//                    intent.setData(doc);
+//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
             }
         });
         fab_check.setOnClickListener(new SubmitOnClickListener());
@@ -1132,32 +1154,54 @@ public class OrderFragment extends Fragment {
         dialog.show();
     }
 
+    private File createImageFile() throws IOException {
+        String timeStamp =
+                new SimpleDateFormat("yyyyMMdd_HHmmss",
+                        Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp + "_";
+        File storageDir =
+                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        photoFilePath = image.getAbsolutePath();
+        return image;
+    }
+
     public String getLastPhotoFilePath() {
+        String result;
         Activity activity = getActivity();
 
         if (activity == null) {
             return null;
         }
 
-        String[] projection = {
-                MediaStore.Images.Media.DATA,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA,
 //                MediaStore.Images.Media._ID,
 //                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
 //                MediaStore.Images.Media.DATE_TAKEN
-        };
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        ContentResolver resolver = activity.getContentResolver();
-        String orderBy = android.provider.MediaStore.Video.Media.DATE_TAKEN + " DESC";
-        Cursor cursor = resolver.query(uri, projection, null, null, orderBy);
-        // TODO: реализовать удаление записи о фотке котрую мы "забрали"
-        //resolver.delete(uri,);
-        String result;
-        if (cursor != null && cursor.moveToFirst()) {
-            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            result = cursor.getString(column_index_data);
-            cursor.close();
+            };
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            ContentResolver resolver = activity.getContentResolver();
+            String orderBy = android.provider.MediaStore.Video.Media.DATE_TAKEN + " DESC";
+            Cursor cursor = resolver.query(uri, projection, null, null, orderBy);
+            // TODO: реализовать удаление записи о фотке котрую мы "забрали"
+            //resolver.delete(uri,);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                result = cursor.getString(column_index_data);
+                cursor.close();
+            } else {
+                result = null;
+            }
         } else {
-            result = null;
+            result = photoFilePath;
         }
 
         return result;
@@ -1213,6 +1257,7 @@ public class OrderFragment extends Fragment {
                     File toFile = new File(picDir, operationFile.getFileName());
                     try {
                         copyFile(fromFile, toFile);
+                        fromFile.delete();
                     } catch (Exception e) {
                         e.printStackTrace();
                         return;

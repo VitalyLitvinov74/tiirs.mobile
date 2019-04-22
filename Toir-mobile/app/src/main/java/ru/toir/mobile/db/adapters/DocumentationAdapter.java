@@ -24,16 +24,6 @@ public class DocumentationAdapter extends RealmBaseAdapter<Documentation> implem
     }
 
     @Override
-    public int getCount() {
-
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
-    @Override
     public Documentation getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);

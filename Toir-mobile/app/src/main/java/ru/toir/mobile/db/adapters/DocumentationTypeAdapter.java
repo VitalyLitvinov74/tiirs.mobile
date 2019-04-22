@@ -24,15 +24,6 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
         super(data);
     }
 
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
     public RealmResults<DocumentationType> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<DocumentationType> result = realm.where(DocumentationType.class).findAll();

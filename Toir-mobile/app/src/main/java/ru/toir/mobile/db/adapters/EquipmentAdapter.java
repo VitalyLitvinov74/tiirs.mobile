@@ -41,15 +41,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     }
 
     @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
-    @Override
     public Equipment getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);

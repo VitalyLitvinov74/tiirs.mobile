@@ -28,15 +28,6 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
     }
 
     @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
     public Defect getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);

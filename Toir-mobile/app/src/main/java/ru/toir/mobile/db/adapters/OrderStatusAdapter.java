@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -21,14 +20,6 @@ public class OrderStatusAdapter extends RealmBaseAdapter<OrderStatus> implements
 
     public OrderStatusAdapter(RealmResults<OrderStatus> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<OrderStatus> rows = realm.where(OrderStatus.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

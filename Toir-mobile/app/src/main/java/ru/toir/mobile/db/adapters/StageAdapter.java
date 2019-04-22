@@ -30,15 +30,6 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
     }
 
     @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
     public Stage getItem(int position) {
         Stage stages;
         if (adapterData != null) {

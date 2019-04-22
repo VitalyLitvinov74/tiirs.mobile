@@ -6,4 +6,10 @@
     <external-path
         name="my_doc"
         path="Android/data/ru.toir.mobile/files/doc/" />
+    <files-path
+        name="my_photo"
+        path="Pictures/" />
+    <external-path
+        name="my_photo"
+        path="Android/data/ru.toir.mobile/files/Pictures/" />
 </paths>
