@@ -68,6 +68,7 @@ import io.realm.Sort;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
@@ -119,6 +120,7 @@ public class OrderFragment extends Fragment {
     FloatingActionButton fab_check;
     FloatingActionButton fab_camera;
     FloatingActionButton fab_defect;
+    FloatingActionButton fab_equipmentInfo;
     private Toolbar toolbar;
     private Task selectedTask;
     private Orders selectedOrder;
@@ -365,6 +367,28 @@ public class OrderFragment extends Fragment {
         });
         fab_check.setOnClickListener(new SubmitOnClickListener());
 
+        fab_equipmentInfo = rootView.findViewById(R.id.fab_equipmentInfo);
+        fab_equipmentInfo.setVisibility(View.INVISIBLE);
+        fab_equipmentInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentEquipment != null) {
+                    Activity activity = getActivity();
+                    if (activity == null) {
+                        return;
+                    }
+
+
+                    String equipment_uuid = currentEquipment.getUuid();
+                    Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("equipment_uuid", equipment_uuid);
+                    equipmentInfo.putExtras(bundle);
+                    activity.startActivity(equipmentInfo);
+                }
+            }
+        });
+
         mainListView = rootView.findViewById(R.id.list_view);
 
         setHasOptionsMenu(true);
@@ -481,6 +505,7 @@ public class OrderFragment extends Fragment {
 
         fab_check.setVisibility(View.INVISIBLE);
         fab_defect.setVisibility(View.INVISIBLE);
+        fab_equipmentInfo.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -540,6 +565,7 @@ public class OrderFragment extends Fragment {
             fab_camera.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
             fab_defect.setVisibility(View.INVISIBLE);
+            fab_equipmentInfo.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -573,6 +599,7 @@ public class OrderFragment extends Fragment {
             fab_camera.setVisibility(View.VISIBLE);
             fab_check.setVisibility(View.VISIBLE);
             fab_defect.setVisibility(View.VISIBLE);
+            fab_equipmentInfo.setVisibility(View.VISIBLE);
             //mainListView.setOnItemClickListener(mainListViewClickListener);
         }
 
