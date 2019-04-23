@@ -80,7 +80,7 @@ public class GetOrdersService extends Service {
             }
 
             // обновляем справочники
-            ReferenceFragment.updateReferencesForOrders();
+            ReferenceFragment.updateReferencesForOrders(context);
 
             // запрашиваем наряды
             Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(statusUuids);
