@@ -28,6 +28,18 @@ public interface IDefect {
     @GET("/defect")
     Call<List<Defect>> getByUuid(@Query("uuid[]") String[] uuid);
 
+    @GET("/defect")
+    Call<List<Defect>> getByEquipment(@Query("equipment") String uuid);
+
+    @GET("/defect")
+    Call<List<Defect>> getByEquipment(@Query("equipment[]") String[] uuid);
+
+    @GET("/defect")
+    Call<List<Defect>> getByEquipment(@Query("equipment") String uuid, @Query("changedAfter") String changedAfter);
+
+    @GET("/defect")
+    Call<List<Defect>> getByEquipment(@Query("equipment[]") String[] uuid, @Query("changedAfter") String changedAfter);
+
     @POST("/defect/upload")
     Call<ResponseBody> send(@Body List<Defect> values);
 }

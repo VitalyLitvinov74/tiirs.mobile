@@ -46,22 +46,11 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_check"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="60dp"
-        android:layout_marginRight="15dp"
-        android:src="@drawable/check_box"
-        app:backgroundTint="@color/larisaBlueColor"
-        app:fabSize="normal" />
-
-    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_defect"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="190dp"
+        android:layout_marginBottom="255dp"
         android:layout_marginRight="15dp"
         android:src="@drawable/img_status_3"
         app:backgroundTint="@color/md_red_A700"
@@ -72,9 +61,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="125dp"
+        android:layout_marginBottom="190dp"
         android:layout_marginRight="15dp"
         android:src="@drawable/cameraicon"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_equipmentInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="125dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/ic_info"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="60dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/check_box"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
 
