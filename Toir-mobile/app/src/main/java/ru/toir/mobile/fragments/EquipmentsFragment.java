@@ -14,6 +14,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
@@ -65,9 +68,16 @@ public class EquipmentsFragment extends Fragment {
 */
         equipmentListView = rootView.findViewById(R.id.erl_equipment_listView);
 
-        RealmResults<EquipmentType> equipmentType = realmDB.where(EquipmentType.class).findAll();
+        RealmResults<Equipment> equipment = realmDB.where(Equipment.class).findAll();
+        Set<String> equipmentTypeUuids = new HashSet<>();
+        for (Equipment item : equipment) {
+            equipmentTypeUuids.add(item.getEquipmentModel().getEquipmentType().getUuid());
+        }
+        RealmResults<EquipmentType> equipmentTypes = realmDB.where(EquipmentType.class)
+                .in("uuid", equipmentTypeUuids.toArray(new String[]{}))
+                .findAll();
         typeSpinner = rootView.findViewById(R.id.simple_spinner);
-        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentType);
+        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentTypes);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
