@@ -69,6 +69,8 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MeasureActivity;
@@ -1511,6 +1513,8 @@ public class OrderFragment extends Fragment {
         final Operation operationFinished = operationAdapter.getItem(currentOperationPosition);
         // если операция уже завершена - то ни статус, ни дату не меняем
         if (operationFinished != null && !operationFinished.isComplete()) {
+//            final OperationStatus operationStatus = OperationStatus.getObjectComplete(realmDB);
+//            final OperationVerdict operationVerdict = OperationVerdict.getObjectComplete(realmDB);
             realmDB.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -1520,6 +1524,28 @@ public class OrderFragment extends Fragment {
                     operationFinished.setOperationVerdict(OperationVerdict.getObjectComplete(realm));
                 }
             });
+
+            final String operationUuid = operationFinished.getUuid();
+            final String statusUuid = OperationStatus.getObjectComplete(realmDB).getUuid();
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Call<Boolean> call = ToirAPIFactory.getOperationService()
+                            .setStatus(operationUuid, statusUuid);
+                    call.enqueue(new Callback<Boolean>() {
+                        @Override
+                        public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                            Log.d(TAG, "set status result = " + response.body());
+                        }
+
+                        @Override
+                        public void onFailure(Call<Boolean> call, Throwable t) {
+                            Log.d(TAG, "set status result failure!!!");
+                        }
+                    });
+                }
+            });
+            t.start();
 
             textTime = operationView.findViewById(R.id.op_time);
             if (textTime != null) {
@@ -1939,6 +1965,29 @@ public class OrderFragment extends Fragment {
                                 selectedStage.setEndDate(new Date());
                             }
                         });
+
+                        final String stageUuid = selectedStage.getUuid();
+                        final String statusUuid = StageStatus.getObjectComplete(realmDB).getUuid();
+                        Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Call<Boolean> call = ToirAPIFactory.getStageService()
+                                        .setStatus(stageUuid, statusUuid);
+                                call.enqueue(new Callback<Boolean>() {
+                                    @Override
+                                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                                        Log.d(TAG, "set status result = " + response.body());
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Boolean> call, Throwable t) {
+                                        Log.d(TAG, "set status result failure!!!");
+                                    }
+                                });
+                            }
+                        });
+                        t.start();
+
                     }
 
                     Log.d(TAG, "Остановка таймера...");
@@ -1972,6 +2021,28 @@ public class OrderFragment extends Fragment {
                     addToJournal("Закончено выполнение задачи "
                             + selectedTask.getTaskTemplate().getTitle() + "("
                             + selectedTask.getUuid() + ")");
+
+                    final String taskUuid = selectedTask.getUuid();
+                    final String statusUuid = TaskStatus.getObjectComplete(realmDB).getUuid();
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Call<Boolean> call = ToirAPIFactory.getTasksService()
+                                    .setStatus(taskUuid, statusUuid);
+                            call.enqueue(new Callback<Boolean>() {
+                                @Override
+                                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                                    Log.d(TAG, "set status result = " + response.body());
+                                }
+
+                                @Override
+                                public void onFailure(Call<Boolean> call, Throwable t) {
+                                    Log.d(TAG, "set status result failure!!!");
+                                }
+                            });
+                        }
+                    });
+                    t.start();
 
                     // если все этапы в задаче завершены, переключаемся на список задач
                     return closeLevel(TASK_LEVEL);
