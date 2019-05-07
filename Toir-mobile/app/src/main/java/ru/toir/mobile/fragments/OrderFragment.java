@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -354,10 +356,16 @@ public class OrderFragment extends Fragment {
                     } catch (IOException ex) {
                         // Error occurred while creating the File
                     }
+
                     if (file != null) {
                         Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        startActivityForResult(intent, ACTIVITY_PHOTO);
+                        if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            startActivityForResult(intent, ACTIVITY_PHOTO);
+                        } else {
+                            getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
+                        }
+
                     }
 //                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
 //                    intent.setData(doc);
