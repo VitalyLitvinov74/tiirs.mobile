@@ -4,6 +4,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import ru.toir.mobile.db.realm.Operation;
 
@@ -30,4 +31,7 @@ public interface IOperation {
 
     @GET("/operation")
     Call<List<Operation>> getByUuid(@Query("uuid[]") String[] uuid);
+
+    @POST("/operation/set-status")
+    Call<Boolean> setStatus(@Query("uuid") String uuid, @Query("statusUuid") String statusUuid);
 }
