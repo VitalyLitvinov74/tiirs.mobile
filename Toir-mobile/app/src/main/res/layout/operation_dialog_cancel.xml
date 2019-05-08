@@ -11,6 +11,7 @@
         android:layout_marginLeft="5dip"
         android:layout_marginRight="5dip"
         android:layout_marginTop="5dip"
+        android:tag="description"
         android:text="@string/operation_cancel_text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="16sp" />

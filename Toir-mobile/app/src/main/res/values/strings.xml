@@ -138,7 +138,7 @@
 
     <string name="dialog_accept">Принять</string>
     <string name="dialog_cancel">Отменить</string>
-    <string name="select_all">Выбрать все операции</string>
+    <string name="select_all">Выбрать все</string>
     <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
 
     <string name="run_ar_content">Запуск AR-контента</string>
@@ -186,4 +186,5 @@
     <string name="telegram_chat_id">Идентификатор чата</string>
     <string name="telegram_chat_id_value">0</string>
     <string name="defect_description">Описание дефекта</string>
+    <string name="select_verdict">Укажите вердикт</string>
 </resources>
