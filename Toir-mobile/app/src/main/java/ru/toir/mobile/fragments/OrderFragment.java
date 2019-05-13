@@ -102,6 +102,7 @@ import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
+import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetOrderAsyncTask;
 import ru.toir.mobile.rest.SendFiles;
@@ -1004,16 +1005,12 @@ public class OrderFragment extends Fragment {
      * @param operation - операция для отмены
      */
     private void closeOperationManual(final Operation operation, AdapterView<?> parent) {
-        final OperationStatus operationStatusUnComplete;
+
         Activity activity = getActivity();
         if (activity == null) {
             // какое-то сообщение пользователю что не смогли показать диалог?
             return;
         }
-
-        operationStatusUnComplete = realmDB.where(OperationStatus.class)
-                .equalTo("uuid", OperationStatus.Status.UN_COMPLETE)
-                .findFirst();
 
         // диалог для отмены операции
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -1035,11 +1032,11 @@ public class OrderFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 final OperationVerdict verdict = (OperationVerdict) operationVerdictSpinner.getSelectedItem();
-                // выставляем выбранный статус
+                // выставляем выбранный вердикт
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        operation.setOperationStatus(operationStatusUnComplete);
+                        operation.setOperationStatus(OperationStatus.getObjectUnComplete(realm));
                         operation.setOperationVerdict(verdict);
                         if (operation.getStartDate() == null) {
                             operation.setStartDate(new Date());
@@ -1075,18 +1072,12 @@ public class OrderFragment extends Fragment {
      * @param stage - этап для отмены
      */
     private void closeStageManual(final Stage stage, AdapterView<?> parent) {
-        final StageStatus stageStatus;
+
         Activity activity = getActivity();
         if (activity == null) {
             // какое-то сообщение пользователю что не смогли показать диалог?
             return;
         }
-
-//        stageStatusUnComplete = realmDB.where(StageStatus.class)
-//                .equalTo("uuid", StageStatus.Status.CANCELED)
-//                .findFirst();
-
-        stageStatus = StageStatus.getObjectCanceled(realmDB);
 
         // диалог для отмены этапа
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -1102,7 +1093,6 @@ public class OrderFragment extends Fragment {
 
         dialog.setView(myView);
         dialog.setTitle("Отмена этапа");
-
         DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
 
             @Override
@@ -1112,13 +1102,15 @@ public class OrderFragment extends Fragment {
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        stage.setStageStatus(stageStatus);
+                        stage.setStageStatus(StageStatus.getObjectUnComplete(realm));
                         stage.setStageVerdict(verdict);
+                        stage.setStartDate(new Date());
+                        stage.setEndDate(new Date());
                     }
                 });
 
                 List<Operation> operations = getUncompleteOperations(stage);
-                OperationStatus operationStatus = OperationStatus.getObjectCanceled(realmDB);
+                OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realmDB);
                 OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realmDB);
                 realmDB.beginTransaction();
                 for (Operation operation : operations) {
@@ -1469,7 +1461,7 @@ public class OrderFragment extends Fragment {
                                     @Override
                                     public void execute(Realm realm) {
                                         operation.setOperationStatus(
-                                                OperationStatus.getObjectCanceled(realm));
+                                                OperationStatus.getObjectUnComplete(realm));
                                         operation.setOperationVerdict(operationVerdict);
                                         if (operation.getStartDate() == null) {
                                             operation.setStartDate(new Date());
@@ -1481,12 +1473,13 @@ public class OrderFragment extends Fragment {
                             }
                         }
 
-                        // устанавливаем статус для текущего этапа - выполнен
+                        // устанавливаем статус для текущего этапа - не выполнен
                         if (selectedStage != null && !selectedStage.isComplete()) {
                             realmDB.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    selectedStage.setStageStatus(StageStatus.getObjectComplete(realm));
+                                    selectedStage.setStageStatus(StageStatus.getObjectUnComplete(realm));
+                                    selectedStage.setStageVerdict(StageVerdict.getObjectUnComplete(realm));
                                     if (selectedStage.getStartDate() == null) {
                                         selectedStage.setStartDate(new Date());
                                     }
@@ -1597,7 +1590,7 @@ public class OrderFragment extends Fragment {
                                     @Override
                                     public void execute(Realm realm) {
                                         stage.setStageStatus(
-                                                StageStatus.getObjectCanceled(realm));
+                                                StageStatus.getObjectUnComplete(realm));
                                         stage.setStageVerdict(stageVerdict);
                                         if (stage.getStartDate() == null) {
                                             stage.setStartDate(new Date());
@@ -1605,7 +1598,7 @@ public class OrderFragment extends Fragment {
 
                                         stage.setEndDate(new Date());
 
-                                        OperationStatus operationStatus = OperationStatus.getObjectCanceled(realm);
+                                        OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realm);
                                         OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realm);
                                         List<Operation> operations = getUncompleteOperations(stage);
                                         for (Operation operation : operations) {
@@ -1627,6 +1620,7 @@ public class OrderFragment extends Fragment {
                                 @Override
                                 public void execute(Realm realm) {
                                     selectedTask.setTaskStatus(TaskStatus.getObjectComplete(realm));
+                                    selectedTask.setTaskVerdict(TaskVerdict.getObjectComplete(realm));
                                     if (selectedTask.getStartDate() == null) {
                                         selectedTask.setStartDate(new Date());
                                     }
@@ -2225,7 +2219,20 @@ public class OrderFragment extends Fragment {
                         realmDB.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                selectedStage.setStageStatus(StageStatus.getObjectComplete(realm));
+                                StageStatus status;
+                                long totalOperationsOfStage = selectedStage.getOperations().size();
+                                long completeStatusOperationOfStage = realm.where(Operation.class)
+                                        .equalTo("stageUuid", selectedStage.getUuid())
+                                        .equalTo("operationStatus.uuid", OperationStatus.Status.COMPLETE)
+                                        .findAll()
+                                        .size();
+                                if (totalOperationsOfStage == completeStatusOperationOfStage) {
+                                    status = StageStatus.getObjectComplete(realm);
+                                } else {
+                                    status = StageStatus.getObjectUnComplete(realm);
+                                }
+
+                                selectedStage.setStageStatus(status);
                                 selectedStage.setEndDate(new Date());
                             }
                         });
