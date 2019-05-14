@@ -584,6 +584,9 @@ public class OrderFragment extends Fragment {
     // Operations----------------------------------------------------------------------------------------
     private void fillListViewOperations(Stage stage) {
         Activity activity = getActivity();
+
+        firstLaunch = true;
+
         if (activity == null) {
             return;
         }
@@ -1085,7 +1088,12 @@ public class OrderFragment extends Fragment {
         View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
         final Spinner verdictSpinner;
         // список вердиктов в выпадающем списке для выбора
-        RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class).findAll();
+        RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
+                // TODO: завести типы? сделать отдельный метод для выбрки вердиктов по типу этапа + "общие"?
+                .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E").or()
+                .equalTo("stageType.uuid", stage.getStageTemplate().getStageType().getUuid())
+                .findAll();
         verdictSpinner = myView.findViewById(R.id.simple_spinner);
         StageVerdictAdapter stageVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
         stageVerdictAdapter.notifyDataSetChanged();
@@ -1565,7 +1573,10 @@ public class OrderFragment extends Fragment {
         CheckBox checkBoxAll = myView.findViewById(R.id.odc_main_status);
         final Spinner mainSpinner = myView.findViewById(R.id.simple_spinner);
 
-        RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class).findAll();
+        RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
+                .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E")
+                .findAll();
         final StageVerdictAdapter stageVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
         stageVerdictAdapter.notifyDataSetChanged();
         mainSpinner.setAdapter(stageVerdictAdapter);

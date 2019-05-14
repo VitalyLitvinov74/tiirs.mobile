@@ -100,26 +100,43 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
             }
 
             if (stageStatus != null && stage.getEquipment() != null && stage.getEquipment().getCriticalType() != null) {
-                String stageStatusUuid = stageStatus.getUuid();
-                String criticalTypeUuid = stage.getEquipment().getCriticalType().getUuid();
-                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                CriticalType criticalType = stage.getEquipment().getCriticalType();
+
+                if (stageStatus.isNew() && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                }
+
+                if (stageStatus.isNew() && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                }
+
+                if (stageStatus.isNew() && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                }
+
+                if (stageStatus.isInWork() && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                }
+
+                if (stageStatus.isInWork() && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                }
+
+                if (stageStatus.isInWork() && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                }
+
+                if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                }
+
+                if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                }
+
+                if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+                }
             }
         }
         return convertView;

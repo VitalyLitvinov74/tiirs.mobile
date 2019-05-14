@@ -177,9 +177,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 }
             }
 
-            if (operation.isNew() || operation.isInWork()) {
-                viewHolder.status.setEnabled(true);
-            } else {
+            if (!operation.getOperationVerdict().isNotDefined()) {
                 viewHolder.status.setEnabled(false);
             }
 

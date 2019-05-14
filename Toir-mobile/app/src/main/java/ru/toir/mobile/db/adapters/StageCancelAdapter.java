@@ -94,7 +94,12 @@ public class StageCancelAdapter extends RealmBaseAdapter<Stage> implements ListA
             Realm realm = Realm.getDefaultInstance();
             viewHolder.title.setText(stage.getStageTemplate().getTitle());
             RealmResults<StageVerdict> stageVerdicts;
-            stageVerdicts = realm.where(StageVerdict.class).findAll();
+            stageVerdicts = realm.where(StageVerdict.class)
+                    // TODO: избавится от этой лапши. нужен метод который вернёт и общие вердикты и для типа этапа
+                    .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                    .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E").or()
+                    .equalTo("stageType.uuid", stage.getStageTemplate().getStageType().getUuid())
+                    .findAll();
             StageVerdictAdapter operationVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
             viewHolder.spinner.setAdapter(operationVerdictAdapter);
             realm.close();

@@ -139,15 +139,15 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     CriticalType criticalType = equipment.getCriticalType();
                     if (criticalType != null) {
                         viewHolder.criticalTypeUuid.setText(criticalType.getTitle());
-                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_1)) {
+                        if (criticalType.isType1()) {
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));
                         }
 
-                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_2)) {
+                        if (criticalType.isType2()) {
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.md_deep_orange_300));
                         }
 
-                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_3)) {
+                        if (criticalType.isType3()) {
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
                         }
                     }
