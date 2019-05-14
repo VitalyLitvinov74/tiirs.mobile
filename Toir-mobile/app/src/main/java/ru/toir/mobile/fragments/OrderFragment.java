@@ -584,6 +584,9 @@ public class OrderFragment extends Fragment {
     // Operations----------------------------------------------------------------------------------------
     private void fillListViewOperations(Stage stage) {
         Activity activity = getActivity();
+
+        firstLaunch = true;
+
         if (activity == null) {
             return;
         }
