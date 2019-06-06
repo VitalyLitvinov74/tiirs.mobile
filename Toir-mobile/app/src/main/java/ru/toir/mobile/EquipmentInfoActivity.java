@@ -642,7 +642,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         AlertDialog dialog = alert.create();
         dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
         dialog.setContentView(R.layout.add_defect_dialog);
-        dialog.show();
+        if (defectType.size() > 0) {
+            dialog.show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void showDialogDefect2(ViewGroup parent) {
