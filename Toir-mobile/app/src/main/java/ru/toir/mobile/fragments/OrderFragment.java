@@ -340,7 +340,11 @@ public class OrderFragment extends Fragment {
                     }
                 };
                 dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-                dialog.show();
+                if (defectType.size() > 0) {
+                    dialog.show();
+                } else {
+                    Toast.makeText(getContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
+                }
                 dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
             }
         });
