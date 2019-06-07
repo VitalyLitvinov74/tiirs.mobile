@@ -322,7 +322,9 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
 
                         long nextId = Defect.getLastId() + 1;
-                        Defect defect = realm.createObject(Defect.class, nextId);
+//                        Defect defect = realm.createObject(Defect.class, nextId);
+                        Defect defect = new Defect();
+                        defect.set_id(nextId);
                         defect.setUuid(uuid.toString().toUpperCase());
                         defect.setUser(user);
                         defect.setDate(date);
@@ -333,6 +335,7 @@ public class OrderFragment extends Fragment {
                         defect.setTask(null);
                         defect.setCreatedAt(date);
                         defect.setChangedAt(date);
+                        realm.copyToRealmOrUpdate(defect);
 
                         realm.commitTransaction();
                         realm.close();

@@ -607,7 +607,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 if (newDefect != null) {
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    final Defect defect = realm.createObject(Defect.class);
+//                    final Defect defect = realm.createObject(Defect.class);
+                    Defect defect = new Defect();
                     UUID uuid = UUID.randomUUID();
                     long next_id = Defect.getLastId() + 1;
                     defect.set_id(next_id);
@@ -633,6 +634,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     }
 
                     defect.setTask(null);
+                    realm.copyToRealmOrUpdate(defect);
+
                     realm.commitTransaction();
                     realm.close();
                 }
@@ -735,7 +738,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 realm.beginTransaction();
 
                 long nextId = Defect.getLastId() + 1;
-                Defect defect = realm.createObject(Defect.class, nextId);
+//                Defect defect = realm.createObject(Defect.class, nextId);
+                Defect defect = new Defect();
+                defect.set_id(nextId);
                 defect.setUuid(uuid.toString().toUpperCase());
                 defect.setUser(user);
                 defect.setDate(date);
@@ -746,6 +751,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 defect.setTask(null);
                 defect.setCreatedAt(date);
                 defect.setChangedAt(date);
+                realm.copyToRealmOrUpdate(defect);
 
                 realm.commitTransaction();
                 realm.close();
