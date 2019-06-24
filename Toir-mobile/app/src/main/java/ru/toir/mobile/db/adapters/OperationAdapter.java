@@ -24,6 +24,7 @@ import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
+import ru.toir.mobile.fragments.OrderFragment;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
@@ -38,8 +39,14 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     private boolean[] visibility = new boolean[MAX_OPERATIONS];
     private boolean[] completed = new boolean[MAX_OPERATIONS];
 
+    private OrderFragment.OnCheckBoxClickListener gCBlistener;
+
     public OperationAdapter(RealmResults<Operation> data) {
         super(data);
+    }
+
+    public void setGBListener(OrderFragment.OnCheckBoxClickListener l) {
+        gCBlistener = l;
     }
 
     @Override
@@ -132,6 +139,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
+        viewHolder.status.setOnClickListener(gCBlistener);
 
         Operation operation = adapterData.get(position);
         if (operation != null) {
