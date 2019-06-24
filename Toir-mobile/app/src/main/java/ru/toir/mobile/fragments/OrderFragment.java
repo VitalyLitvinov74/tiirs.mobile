@@ -129,6 +129,7 @@ public class OrderFragment extends Fragment {
     FloatingActionButton fab_camera;
     FloatingActionButton fab_defect;
     FloatingActionButton fab_equipmentInfo;
+    OnCheckBoxClickListener gCBlistener = new OnCheckBoxClickListener();
     private Toolbar toolbar;
     private Task selectedTask;
     private Orders selectedOrder;
@@ -170,21 +171,32 @@ public class OrderFragment extends Fragment {
             }
         }
 
+//        public View getViewByPosition(int pos, ListView listView) {
+//            final int firstListItemPosition = listView.getFirstVisiblePosition();
+//            final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+//
+//            if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+//                return listView.getAdapter().getView(pos, null, listView);
+//            } else {
+//                final int childIndex = pos - firstListItemPosition;
+//                return listView.getChildAt(childIndex);
+//            }
+//        }
+
         void firstLaunch() {
             Log.d(TAG, "Инициализация вьюх для отображения секунд...");
-            CheckBox checkBox;
-            OnCheckBoxClickListener listener = new OnCheckBoxClickListener();
-            if (operationAdapter != null && mainListView != null) {
-                int totalOperationCount = operationAdapter.getCount();
-                for (int i = 0; i < totalOperationCount; i++) {
-                    if (mainListView.getChildAt(i) != null) {
-                        checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
-                        checkBox.setOnClickListener(listener);
-                    }
-                }
+//            CheckBox checkBox;
+//            OnCheckBoxClickListener listener = new OnCheckBoxClickListener();
+//            if (operationAdapter != null && mainListView != null) {
+//                int totalOperationCount = operationAdapter.getCount();
+//                    if (mainListView.getChildAt(i) != null) {
+//                        checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
+//                        checkBox.setOnClickListener(listener);
+//                    }
+//                }
 
                 firstLaunch = false;
-            }
+//            }
         }
 
         @Override
@@ -604,6 +616,7 @@ public class OrderFragment extends Fragment {
 
         if (stage.getOperations() != null && stage.getOperations().size() > 0) {
             operationAdapter = new OperationAdapter(stage.getOperations().sort("_id"));
+            operationAdapter.setGBListener(gCBlistener);
             currentOperation = operationAdapter.getItem(0);
             mainListView.setAdapter(operationAdapter);
             //resultButtonLayout.setVisibility(View.VISIBLE);
@@ -1762,7 +1775,8 @@ public class OrderFragment extends Fragment {
             return;
         }
 
-        View operationView = mainListView.getChildAt(currentOperationPosition);
+//        View operationView = mainListView.getChildAt(currentOperationPosition);
+        View operationView = operationAdapter.getView(currentOperationPosition, null, mainListView);
         if (operationView == null) {
             Log.d(TAG, "Операции с индексом {currentOperationPosition} нет в списке");
             return;
@@ -2518,7 +2532,7 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    private class OnCheckBoxClickListener implements View.OnClickListener {
+    public class OnCheckBoxClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View arg) {
