@@ -137,7 +137,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             Intent target = new Intent(Intent.ACTION_VIEW);
             target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             target.setType(mimeType);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 target.setData(Uri.fromFile(file));
             } else {
                 Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
