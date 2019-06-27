@@ -367,7 +367,7 @@ public class OrderFragment extends Fragment {
         fab_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                     startActivityForResult(intent, ACTIVITY_PHOTO);
                 } else {
                     Context context = getContext();
