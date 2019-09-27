@@ -1,17 +1,16 @@
 package ru.toir.mobile.db.adapters;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -124,6 +123,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.operation_item, parent, false);
+            viewHolder.linearLayout = convertView.findViewById(R.id.operation_linear_layout);
             viewHolder.title = convertView.findViewById(R.id.operation_title);
             viewHolder.status = convertView.findViewById(R.id.operation_status);
             viewHolder.verdict = convertView.findViewById(R.id.operation_verdict);
@@ -134,7 +134,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.measure = convertView.findViewById(R.id.op_measure_label);
             viewHolder.measure_value = convertView.findViewById(R.id.op_measure_value);
             viewHolder.time = convertView.findViewById(R.id.op_time);
-            viewHolder.image = convertView.findViewById(R.id.op_image);
+            //viewHolder.image = convertView.findViewById(R.id.op_image);
             viewHolder.description_layout = convertView.findViewById(R.id.operation_description_layout);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -183,6 +183,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 if (operationStatus.isComplete()) {
                     viewHolder.status.setChecked(true);
                     viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
+                    viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
                 }
             }
 
@@ -218,6 +219,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             realmDB.close();
 
             OperationTemplate opTemplate = operation.getOperationTemplate();
+/*
             String imgPath = opTemplate.getImageFilePath();
             String fileName = opTemplate.getImage();
             if (imgPath != null && fileName != null) {
@@ -230,6 +232,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                     }
                 }
             }
+*/
         }
 
         convertView.setTag(viewHolder);
@@ -248,7 +251,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         TextView time;
         TextView measure;
         TextView measure_value;
-        ImageView image;
+        //ImageView image;
+        LinearLayout linearLayout;
         RelativeLayout description_layout;
     }
 }

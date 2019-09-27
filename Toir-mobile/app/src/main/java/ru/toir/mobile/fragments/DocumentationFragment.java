@@ -12,33 +12,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
+import ru.toir.mobile.db.adapters.EquipmentModelAdapter;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
+import ru.toir.mobile.db.realm.EquipmentModel;
 
 public class DocumentationFragment extends Fragment {
     private Realm realmDB;
     private boolean isInit;
 
-    private Spinner sortSpinner;
+    private Spinner modelSpinner;
     private Spinner typeSpinner;
     private ListView documentationListView;
-
-    private ArrayAdapter<SortField> sortSpinnerAdapter;
 
     public static DocumentationFragment newInstance() {
         return new DocumentationFragment();
@@ -64,22 +61,20 @@ public class DocumentationFragment extends Fragment {
         SpinnerListener spinnerListener = new SpinnerListener();
 
         RealmResults<DocumentationType> documentationType = realmDB.where(DocumentationType.class).findAll();
-        typeSpinner = rootView.findViewById(R.id.simple_spinner);
+        typeSpinner = rootView.findViewById(R.id.documentation_type_sort);
         DocumentationTypeAdapter typeSpinnerAdapter = new DocumentationTypeAdapter(documentationType);
         typeSpinnerAdapter.notifyDataSetChanged();
         typeSpinner.setAdapter(typeSpinnerAdapter);
         typeSpinner.setOnItemSelectedListener(spinnerListener);
 
-        // настраиваем сортировку по полям
-        sortSpinner = rootView.findViewById(R.id.documentation_spinner_sort);
-        sortSpinnerAdapter = new ArrayAdapter<>(rootView.getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                new ArrayList<SortField>());
-        sortSpinner.setAdapter(sortSpinnerAdapter);
-        sortSpinner.setOnItemSelectedListener(spinnerListener);
+        RealmResults<EquipmentModel> equipmentModel = realmDB.where(EquipmentModel.class).findAll();
+        modelSpinner = rootView.findViewById(R.id.documentation_model_sort);
+        EquipmentModelAdapter equipmentModelAdapter = new EquipmentModelAdapter(equipmentModel);
+        equipmentModelAdapter.notifyDataSetChanged();
+        modelSpinner.setAdapter(equipmentModelAdapter);
+        modelSpinner.setOnItemSelectedListener(spinnerListener);
 
         documentationListView = rootView.findViewById(R.id.documentation_listView);
-
         documentationListView.setOnItemClickListener(new ListviewClickListener());
 
         initView();
@@ -93,39 +88,20 @@ public class DocumentationFragment extends Fragment {
     }
 
     private void initView() {
-
         FillListViewDocumentation(null, null);
-        fillSortFieldSpinner();
     }
 
-    private void fillSortFieldSpinner() {
-
-        sortSpinnerAdapter.clear();
-        sortSpinnerAdapter.add(new SortField("Без сортировки", null));
-        sortSpinnerAdapter.add(new SortField("По типу", "documentationType.title"));
-        sortSpinnerAdapter.add(new SortField("По оборудованию", "equipment.title"));
-        sortSpinnerAdapter.add(new SortField("По модели", "equipmentModel.title"));
-
-    }
-
-    private void FillListViewDocumentation(String documentationTypeUuid, String sort) {
+    private void FillListViewDocumentation(String documentationTypeUuid, String equipmentModelUuid) {
         RealmResults<Documentation> documentation;
         RealmQuery<Documentation> query = realmDB.where(Documentation.class);
         if (documentationTypeUuid != null) {
             query.equalTo("documentationType.uuid", documentationTypeUuid);
-            if (sort != null) {
-                documentation = query.findAllSorted(sort);
-            } else {
-                documentation = query.findAll();
-            }
-        } else {
-            if (sort != null) {
-                documentation = query.findAllSorted(sort);
-            } else {
-                documentation = query.findAll();
-            }
         }
-
+        if (equipmentModelUuid != null) {
+            documentation = query.equalTo("equipmentModel.uuid", equipmentModelUuid).findAll();
+        } else {
+            documentation = query.findAll();
+        }
         DocumentationAdapter documentationAdapter = new DocumentationAdapter(documentation);
         documentationListView.setAdapter(documentationAdapter);
     }
@@ -179,7 +155,7 @@ public class DocumentationFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parentView,
                                    View selectedItemView, int position, long id) {
             String type = null;
-            String orderBy = null;
+            String model = null;
 
             DocumentationType typeSelected = (DocumentationType) typeSpinner.getSelectedItem();
             // так как список построен по данным из базы, в выборке нет "Все типы"
@@ -190,14 +166,14 @@ public class DocumentationFragment extends Fragment {
                 }
             }
 
-            // сортировка указывается, даже работает, но в самом списке с файлами документации
-            // не отображаются поля по которым идёт сортировка.
-            SortField fieldSelected = (SortField) sortSpinner.getSelectedItem();
-            if (fieldSelected != null) {
-                orderBy = fieldSelected.getField();
+            EquipmentModel modelSelected = (EquipmentModel) modelSpinner.getSelectedItem();
+            if (modelSpinner.getSelectedItemPosition() != 0) {
+                if (modelSelected != null) {
+                    model = modelSelected.getUuid();
+                }
             }
 
-            FillListViewDocumentation(type, orderBy);
+            FillListViewDocumentation(type, model);
         }
     }
 }

@@ -479,7 +479,7 @@ public class MainActivity extends AppCompatActivity {
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 
-        BottomBar bottomBar = findViewById(R.id.bottomBar);
+        final BottomBar bottomBar = findViewById(R.id.bottomBar);
         assert bottomBar != null;
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override

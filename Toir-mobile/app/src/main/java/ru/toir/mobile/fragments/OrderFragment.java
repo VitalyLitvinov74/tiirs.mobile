@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -42,11 +41,13 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Message;
 
 import com.roughike.bottombar.BottomBar;
 
@@ -107,6 +108,7 @@ import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetOrderAsyncTask;
 import ru.toir.mobile.rest.SendFiles;
 import ru.toir.mobile.rest.SendMeasureValues;
+import ru.toir.mobile.rest.SendMessages;
 import ru.toir.mobile.rest.SendOrders;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
@@ -126,6 +128,7 @@ public class OrderFragment extends Fragment {
     private static final int ACTIVITY_MEASURE = 101;
     private static final String TAG = OrderFragment.class.getSimpleName();
     FloatingActionButton fab_check;
+    FloatingActionButton fab_question;
     FloatingActionButton fab_camera;
     FloatingActionButton fab_defect;
     FloatingActionButton fab_equipmentInfo;
@@ -214,6 +217,7 @@ public class OrderFragment extends Fragment {
 
     private RfidDialog rfidDialog;
     private AtomicInteger taskCounter;
+    private AtomicInteger messageCounter;
     private ProgressDialog dialog;
     BroadcastReceiver taskDoneReceiver = new BroadcastReceiver() {
         @Override
@@ -271,8 +275,10 @@ public class OrderFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
         listLayout = rootView.findViewById(R.id.tl_listview_layout);
         fab_check = rootView.findViewById(R.id.fab_check);
+        fab_question = rootView.findViewById(R.id.fab_question);
         fab_camera = rootView.findViewById(R.id.fab_photo);
         fab_check.setVisibility(View.INVISIBLE);
+        fab_question.setVisibility(View.INVISIBLE);
         fab_camera.setVisibility(View.INVISIBLE);
 
         fab_defect = rootView.findViewById(R.id.fab_defect);
@@ -395,6 +401,77 @@ public class OrderFragment extends Fragment {
             }
         });
         fab_check.setOnClickListener(new SubmitOnClickListener());
+        fab_question.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View addCommentLayout;
+                final TextView author;
+                LayoutInflater inflater = getLayoutInflater();
+
+                addCommentLayout = inflater.inflate(R.layout.order_question, null, false);
+                author = addCommentLayout.findViewById(R.id.order_author);
+                author.setText(selectedOrder.getAuthor().getName());
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+                builder.setTitle("Cообщение автору");
+                builder.setView(addCommentLayout);
+                builder.setIcon(R.drawable.ic_icon_user);
+                builder.setCancelable(false);
+                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                final android.support.v7.app.AlertDialog dialog = builder.create();
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText orderComment = addCommentLayout.findViewById(R.id.order_comment);
+
+                        Realm realm = Realm.getDefaultInstance();
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                        UUID uuid = UUID.randomUUID();
+                        Date date = new Date();
+                        realm.beginTransaction();
+
+                        long nextId = ru.toir.mobile.db.realm.Message.getLastId() + 1;
+                        ru.toir.mobile.db.realm.Message message = new ru.toir.mobile.db.realm.Message();
+                        message.set_id(nextId);
+                        message.setUuid(uuid.toString().toUpperCase());
+                        message.setFromUser(user);
+                        message.setToUser(selectedOrder.getAuthor());
+                        message.setDate(date);
+                        message.setCreatedAt(date);
+                        message.setChangedAt(date);
+                        message.setStatus(0);
+                        message.setText(orderComment.getText().toString());
+                        //message.setTitle("Вопрос по наряду #".concat(String.valueOf(selectedOrder.get_id())));
+                        realm.copyToRealmOrUpdate(message);
+                        realm.commitTransaction();
+                        realm.close();
+                        // отправляем сообшения
+                        messageCounter = new AtomicInteger(3);
+                        RealmResults<ru.toir.mobile.db.realm.Message> messages = realmDB
+                                .where(ru.toir.mobile.db.realm.Message.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        sendMessages(realmDB.copyFromRealm(messages));
+                        dialog.dismiss();
+                    }
+                };
+                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+                dialog.show();
+                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+            }
+        });
 
         fab_equipmentInfo = rootView.findViewById(R.id.fab_equipmentInfo);
         fab_equipmentInfo.setVisibility(View.INVISIBLE);
@@ -536,6 +613,7 @@ public class OrderFragment extends Fragment {
         fab_camera.setVisibility(View.INVISIBLE);
         fab_equipmentInfo.setVisibility(View.INVISIBLE);
         fab_check.setVisibility(View.INVISIBLE);
+        fab_question.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -566,6 +644,7 @@ public class OrderFragment extends Fragment {
             fab_camera.setVisibility(View.INVISIBLE);
             fab_equipmentInfo.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
+            fab_question.setVisibility(View.VISIBLE);
         }
     }
 
@@ -597,6 +676,7 @@ public class OrderFragment extends Fragment {
             fab_camera.setVisibility(View.INVISIBLE);
             fab_equipmentInfo.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
+            fab_question.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -635,6 +715,7 @@ public class OrderFragment extends Fragment {
             fab_camera.setVisibility(View.VISIBLE);
             fab_equipmentInfo.setVisibility(View.VISIBLE);
             fab_check.setVisibility(View.VISIBLE);
+            fab_question.setVisibility(View.INVISIBLE);
             //mainListView.setOnItemClickListener(mainListViewClickListener);
         }
 
@@ -923,6 +1004,17 @@ public class OrderFragment extends Fragment {
         }
     }
 
+    private void sendMessages(List<ru.toir.mobile.db.realm.Message> values) {
+        Context context = getContext();
+        if (context != null) {
+            SendMessages task = new SendMessages(context, messageCounter);
+            ru.toir.mobile.db.realm.Message[] valuesArray = values.toArray(new ru.toir.mobile.db.realm.Message[]{});
+            task.execute(valuesArray);
+        } else {
+            Log.e(TAG, "Не удалось запустить задачу отправки сообщений!");
+        }
+    }
+
     /**
      * Отправка всех выполненных нарядов на сервер
      */
@@ -958,6 +1050,7 @@ public class OrderFragment extends Fragment {
         dialog.show();
 
         taskCounter = new AtomicInteger(3);
+        messageCounter = new AtomicInteger(3);
 
         // отправляем результат
         sendOrders(realmDB.copyFromRealm(ordersList));
@@ -1008,6 +1101,13 @@ public class OrderFragment extends Fragment {
                 .findAll();
 
         sendMeasuredValues(realmDB.copyFromRealm(measuredValues));
+
+        // отправляем сообшения
+        RealmResults<ru.toir.mobile.db.realm.Message> messages = realmDB
+                .where(ru.toir.mobile.db.realm.Message.class)
+                .equalTo("sent", false)
+                .findAll();
+        sendMessages(realmDB.copyFromRealm(messages));
     }
 
     public View getViewByPosition(int pos, ListView listView) {
@@ -1120,7 +1220,7 @@ public class OrderFragment extends Fragment {
         verdictSpinner.setAdapter(stageVerdictAdapter);
 
         dialog.setView(myView);
-        dialog.setTitle("Отмена этапа");
+        dialog.setTitle("Отмена задачи");
         DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
 
             @Override
@@ -2539,7 +2639,6 @@ public class OrderFragment extends Fragment {
             if (!operationAdapter.isItemEnabled(currentOperationPosition)) {
                 return;
             }
-
             CompleteCurrentOperation(null);
         }
     }

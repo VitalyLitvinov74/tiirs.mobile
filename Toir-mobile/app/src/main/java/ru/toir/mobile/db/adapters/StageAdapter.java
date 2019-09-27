@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -55,6 +56,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
+            viewHolder.linearLayout = convertView.findViewById(R.id.stage_linear_layout);
             viewHolder.icon = convertView.findViewById(R.id.ts_ImageStatus);
             viewHolder.title = convertView.findViewById(R.id.ts_Name);
             viewHolder.equipment = convertView.findViewById(R.id.ts_Equipment);
@@ -128,14 +130,17 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
 
                 if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
+                    //viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
                 }
 
                 if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
+                    //viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
                 }
 
                 if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+                    //viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
                 }
             }
         }
@@ -145,16 +150,9 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
     private static class ViewHolder {
         TextView equipment;
         TextView title;
-        //TextView taskTitle;
-        //TextView description;
-        //TextView normative;
-        //TextView comment;
-        //TextView stageType;
-        //TextView stageStatus;
-        //TextView stageVerdict;
-        //TextView status;
         ImageView icon;
-        //ImageView image;
+        RelativeLayout linearLayout;
+
         TextView start_date;
         TextView end_date;
     }

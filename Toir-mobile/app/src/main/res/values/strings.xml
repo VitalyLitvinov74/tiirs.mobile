@@ -49,13 +49,13 @@
     <string name="current_location">Текущие координаты</string>
     <string name="no_gps_data">Нет данных GPS</string>
     <string name="current_status">Текущий статус</string>
-    <string name="operation_list">Список последних операций</string>
+    <string name="operation_list">Список последних задач</string>
     <string name="gps_status">Состояние GPS</string>
     <string name="gprs_status">Связь GPRS</string>
     <string name="server_date_connect">Дата связи с сервером</string>
     <string name="tasks_quantity">Статистика нарядов</string>
     <string name="boss_contact">Контакт начальника</string>
-    <string name="type">Тип:</string>
+    <string name="type">Модель:</string>
     <string name="service">Сервис:</string>
     <string name="critical">Критичность:</string>
     <string name="last_date">Дата обслуживания</string>
@@ -65,6 +65,7 @@
     <string name="pleaseScanImg">Наведите камеру на код</string>
     <string name="scan_process">Процесс сканирования</string>
     <string name="empty"></string>
+    <string name="order_send_message">Отправить сообщение</string>
     <string name="created">Создан: </string>
     <string name="off">Отключен: </string>
     <string name="status">Статус: %1$s</string>
@@ -110,7 +111,7 @@
     <string name="menu_charts">Тест графиков</string>
     <string name="menu_equipment">Оборудование</string>
     <string name="menu_gps">Карта</string>
-    <string name="menu_tasks">Задачи</string>
+    <string name="menu_tasks">Наряды</string>
     <string name="menu_references">Справочники</string>
     <string name="menu_users">Пользователи</string>
 
@@ -179,6 +180,9 @@
     <string name="order_verdict">Вердикт: %1$s</string>
     <string name="order_comment">Коментарий: %1$s</string>
     <string name="order_reason">Основание наряда: %1$s</string>
+
+    <string name="send_order_comment">Коментарий</string>
+    <string name="send_order_author">Автор наряда</string>
 
     <string name="debug_nocheck_gps">Не проверять GPS</string>
     <string name="receive_telegram">Оповещать через Telegram</string>

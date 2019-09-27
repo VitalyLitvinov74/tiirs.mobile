@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/operation_linear_layout"
     android:descendantFocusability="blocksDescendants"
     android:orientation="vertical" >
 
@@ -9,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:orientation="horizontal" >
-
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal">
 
         <CheckBox
         android:id="@+id/operation_status"
@@ -27,7 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_weight="1"
-        android:orientation="vertical" >
+        android:layout_marginStart="5dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/operation_title"
@@ -58,6 +60,7 @@
             android:textColor="#454545"
             android:layout_below="@+id/operation_title"
             android:text="@string/tire"
+            android:layout_toEndOf="@id/operation_startDate"
             android:textSize="12sp" />
 
         <TextView
@@ -69,6 +72,8 @@
             android:layout_toRightOf="@id/operation_divider"
             android:text=""
             android:textColor="#333333"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/operation_divider"
             android:textSize="12sp" />
 
     </RelativeLayout>
@@ -80,6 +85,7 @@
         android:layout_gravity="center|right"
         android:layout_marginRight="5dp"
         android:contentDescription="@string/image_description"
+        android:layout_marginEnd="5dp"
         android:src="@drawable/status_easy_receive" />
     </LinearLayout>
 
@@ -87,18 +93,6 @@
         android:id="@+id/operation_description_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-
-        <ImageView
-            android:id="@+id/op_image"
-            android:layout_width="150dp"
-            android:layout_height="130dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:contentDescription="@string/description"
-            android:src="@drawable/no_image" />
 
         <TextView
             android:id="@+id/op_description"
@@ -110,7 +104,8 @@
             android:textColor="#222222"
             android:textSize="12sp"
             android:gravity="center_vertical"
-            android:layout_toRightOf="@+id/op_image"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
@@ -120,8 +115,8 @@
             android:layout_marginLeft="5dp"
             android:textColor="#222222"
             android:textSize="12sp"
-            android:layout_toRightOf="@+id/op_image"
             android:layout_below="@+id/op_description"
+            android:layout_marginStart="5dp"
             android:text="@string/normative" />
 
         <TextView
@@ -132,7 +127,9 @@
             android:textSize="12sp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/op_normative_label"
-            android:layout_below="@+id/op_description" />
+            android:layout_below="@+id/op_description"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_normative_label" />
 
         <TextView
             android:id="@+id/op_time_label"
@@ -141,8 +138,8 @@
             android:layout_marginLeft="5dp"
             android:textColor="#222222"
             android:textSize="12sp"
-            android:layout_toRightOf="@+id/op_image"
             android:layout_below="@+id/op_normative_label"
+            android:layout_marginStart="5dp"
             android:text="@string/operation_time" />
 
         <TextView
@@ -153,7 +150,9 @@
             android:textSize="12sp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/op_time_label"
-            android:layout_below="@+id/op_normative" />
+            android:layout_below="@+id/op_normative"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_time_label" />
 
         <TextView
             android:id="@+id/op_measure_label"
@@ -162,8 +161,8 @@
             android:layout_marginLeft="5dp"
             android:textColor="#222222"
             android:textSize="12sp"
-            android:layout_toRightOf="@+id/op_image"
             android:layout_below="@+id/op_time_label"
+            android:layout_marginStart="5dp"
             android:text="@string/measure_label" />
 
         <TextView
@@ -174,7 +173,8 @@
             android:textSize="12sp"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/op_measure_label"
-            android:layout_below="@+id/op_time_label" />
+            android:layout_below="@+id/op_time_label"
+            android:layout_marginStart="5dp" />
 
         <LinearLayout
                 android:id="@+id/twf_resultButtonLayout"

@@ -81,7 +81,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder.icon = convertView.findViewById(R.id.eril_image);
                 viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
                 viewHolder.criticalTypeUuid = convertView.findViewById(R.id.eril_critical);
-                viewHolder.startDate = convertView.findViewById(R.id.eril_last_operation_date);
+                //viewHolder.startDate = convertView.findViewById(R.id.eril_last_operation_date);
                 viewHolder.location = convertView.findViewById(R.id.eril_location);
                 viewHolder.equipmentModelUuid = convertView.findViewById(R.id.eril_type);
                 viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
@@ -152,6 +152,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         }
                     }
 
+/*
                     Date date = equipment.getStartDate();
                     String sDate;
                     if (date != null && date.after(new Date(100000))) {
@@ -159,8 +160,8 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     } else {
                         sDate = "неизвестна";
                     }
-
                     viewHolder.startDate.setText(sDate);
+*/
                 }
             }
         }
@@ -179,7 +180,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         TextView inventoryNumber;
         TextView criticalTypeUuid;
         TextView criticalLevel;
-        TextView startDate;
+        //TextView startDate;
         TextView checkDate;
     }
 }

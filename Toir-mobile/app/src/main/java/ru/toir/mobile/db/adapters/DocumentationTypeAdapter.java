@@ -64,7 +64,7 @@ public class DocumentationTypeAdapter extends RealmBaseAdapter<DocumentationType
                 convertView.setTag(viewHolder);
             }
 
-            if (parent.getId() == R.id.simple_spinner) {
+            if (parent.getId() == R.id.simple_spinner || parent.getId() == R.id.documentation_type_sort) {
                 //convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
                 viewHolder.title = convertView.findViewById(android.R.id.text1);

@@ -67,7 +67,7 @@ public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> impl
                 convertView.setTag(viewHolder);
             }
 
-            if (parent.getId() == R.id.simple_spinner) {
+            if (parent.getId() == R.id.simple_spinner || parent.getId() == R.id.documentation_model_sort) {
                 convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
                 viewHolder.title = convertView.findViewById(android.R.id.text1);
                 convertView.setTag(viewHolder);
@@ -81,27 +81,27 @@ public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> impl
             equipmentModel = adapterData.get(position);
             if (equipmentModel != null) {
                 viewHolder.title.setText(equipmentModel.getTitle());
-                viewHolder.uuid.setText(equipmentModel.getUuid());
-                if (equipmentModel.getEquipmentType() != null) {
-                    viewHolder.type.setText(equipmentModel.getEquipmentType().getTitle());
-                }
+                if (parent.getId() == R.id.reference_listView) {
+                    viewHolder.uuid.setText(equipmentModel.getUuid());
+                    if (equipmentModel.getEquipmentType() != null) {
+                        viewHolder.type.setText(equipmentModel.getEquipmentType().getTitle());
+                    }
 
-                if (equipmentModel.getImage() != null) {
-                    File path = context.getExternalFilesDir(equipmentModel.getImageFilePath());
-                    if (path != null) {
-                        Bitmap image_bitmap = getResizedBitmap(
-                                path.toString() + File.separator,
-                                equipmentModel.getImage(), 300, 0,
-                                equipmentModel.getChangedAt().getTime());
-                        if (image_bitmap != null) {
-                            viewHolder.image.setImageBitmap(image_bitmap);
-                        } else {
-                            viewHolder.image.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image));
+                    if (equipmentModel.getImage() != null) {
+                        File path = context.getExternalFilesDir(equipmentModel.getImageFilePath());
+                        if (path != null) {
+                            Bitmap image_bitmap = getResizedBitmap(
+                                    path.toString() + File.separator,
+                                    equipmentModel.getImage(), 300, 0,
+                                    equipmentModel.getChangedAt().getTime());
+                            if (image_bitmap != null) {
+                                viewHolder.image.setImageBitmap(image_bitmap);
+                            } else {
+                                viewHolder.image.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image));
+                            }
                         }
                     }
                 }
-
-                viewHolder.title.setText(equipmentModel.getTitle());
             }
         }
 

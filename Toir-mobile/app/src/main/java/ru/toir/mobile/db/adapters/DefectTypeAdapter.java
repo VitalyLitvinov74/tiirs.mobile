@@ -62,7 +62,7 @@ public class DefectTypeAdapter extends RealmBaseAdapter<DefectType> implements L
         }
 
         DefectType defectType;
-        if (adapterData != null && viewHolder.title != null) {
+        if (adapterData != null && viewHolder.title != null && adapterData.size() > 0) {
             defectType = adapterData.get(position);
             if (defectType != null)
                 viewHolder.title.setText(defectType.getTitle());
