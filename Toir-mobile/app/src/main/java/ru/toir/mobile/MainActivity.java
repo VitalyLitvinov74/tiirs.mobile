@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
@@ -24,7 +25,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -45,7 +45,6 @@ import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
@@ -56,6 +55,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -68,8 +68,6 @@ import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ContragentsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
-import ru.toir.mobile.fragments.FragmentAddUser;
-import ru.toir.mobile.fragments.FragmentEditUser;
 import ru.toir.mobile.fragments.GPSFragment;
 import ru.toir.mobile.fragments.ObjectFragment;
 import ru.toir.mobile.fragments.OrderFragment;
@@ -407,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
                             // TODO нужен какой-то механизм уведомления о причине не успеха
-//                            String message = bundle.getString(IServiceProvider.MESSAGE);
+                            // String message = bundle.getString(IServiceProvider.MESSAGE);
                             String message = "Просто не получили токен.";
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             // TODO реализовать проверку на то что пользователя нет на сервере
@@ -540,34 +538,15 @@ public class MainActivity extends AppCompatActivity {
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
                 .withTextColor(ContextCompat.getColor(this, R.color.white))
-/*
-                .addProfiles(
-                        new ProfileSettingDrawerItem()
-                                .withName("Добавить пользователя")
-                                .withDescription("Добавить пользователя")
-                                .withIcon(String.valueOf(GoogleMaterial.Icon.gmd_plus))
-                                .withIdentifier(PROFILE_ADD),
-                        new ProfileSettingDrawerItem()
-                                .withName("Редактировать пользователей")
-                                .withIcon(String.valueOf(GoogleMaterial.Icon.gmd_settings))
-                                .withIdentifier(PROFILE_SETTINGS)
-                )
-*/
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
-
                         if (profile instanceof IDrawerItem) {
                             int ident = profile.getIdentifier();
                             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                             Fragment fr;
                             switch (ident) {
 /*
-                                case PROFILE_ADD:
-                                    currentFragment = FRAGMENT_USER;
-                                    fr = FragmentAddUser.newInstance();
-                                    tr.replace(R.id.frame_container, fr);
-                                    break;
                                 case PROFILE_SETTINGS:
                                     currentFragment = FRAGMENT_USER;
                                     fr = FragmentEditUser.newInstance("EditProfile");
@@ -1238,5 +1217,19 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         return sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
+    }
+
+    public void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+        this.setContentView(R.layout.activity_main);
+
+        //Intent refresh = new Intent(this, AndroidLocalize.class);
+        //finish();
+        //startActivity(refresh);
     }
 }

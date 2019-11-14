@@ -31,6 +31,13 @@
             android:key="@string/rfidDrvSettingKey"
             android:title="Настройки драйвера RFID" />
 
+        <ListPreference
+            android:entries="@array/languages"
+            android:entryValues="@array/language_values"
+            android:icon="@drawable/pref_lang"
+            android:key="@string/langListKey"
+            android:title="@string/pref_lang" />
+
     </PreferenceScreen>
     <PreferenceScreen
         android:icon="@drawable/pref_check"

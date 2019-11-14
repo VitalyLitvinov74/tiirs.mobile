@@ -113,6 +113,7 @@
     <string name="menu_tasks">Задачи</string>
     <string name="menu_references">Справочники</string>
     <string name="menu_users">Пользователи</string>
+    <string name="pref_lang">Язык интерфейса</string>
 
     <string name="profile_type_administrator">Администратор</string>
     <string name="profile_type_engeneer">Пользователь</string>
@@ -150,6 +151,7 @@
     <string name="dont_ask_text_tags">Не спрашивать текстовые теги</string>
     <string name="ask_text_tags_key">without_tags_mode</string>
     <string name="model">Модель: %1$s</string>
+    <string name="langListKey">lang_key</string>
 
     <string name="choose_defect">Выберите дефект</string>
     <string name="add_new_defect">или введите новый</string>
@@ -186,4 +188,12 @@
     <string name="telegram_chat_id">Идентификатор чата</string>
     <string name="telegram_chat_id_value">0</string>
     <string name="defect_description">Описание дефекта</string>
+
+    <string name="lang_ru_text">Русский</string>
+    <string name="lang_de_text">Deutsch</string>
+    <string name="lang_en_text">English</string>
+
+    <string name="lang_ru">ru</string>
+    <string name="lang_de">de</string>
+    <string name="lang_en">en</string>
 </resources>

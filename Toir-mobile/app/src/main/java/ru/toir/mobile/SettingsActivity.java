@@ -54,6 +54,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
@@ -203,6 +204,19 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 telegramIntent.setData(Uri.parse("http://telegram.me/toirus_bot"));
                 //startActivity(telegramIntent);
                 startActivityForResult(telegramIntent, ACTIVITY_TELEGRAM);
+                return true;
+            }
+        });
+
+        // элемент интерфейса со списком драйверов считывателей
+        ListPreference langList = (ListPreference) this.findPreference(getResources().getString(
+                R.string.langListKey));
+        langList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String value = (String) newValue;
+                setLocale(value);
                 return true;
             }
         });
@@ -556,6 +570,19 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         interface Listener {
             void onSuccess(String object);
         }
+    }
+
+    public void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+        this.setContentView(R.layout.activity_main);
+        Intent refresh = new Intent(this, MainActivity.class);
+        finish();
+        startActivity(refresh);
     }
 }
 
