@@ -103,7 +103,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
     @Override
     protected List<Orders> doInBackground(String[]... params) {
         // обновляем справочники
-        ReferenceFragment.updateReferencesForOrders();
+        ReferenceFragment.updateReferencesForOrders(dialog.getContext());
 
         List<String> args = java.util.Arrays.asList(params[0]);
 

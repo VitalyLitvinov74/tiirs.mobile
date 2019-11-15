@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -22,14 +21,6 @@ public class AlertTypeAdapter extends RealmBaseAdapter<AlertType> implements Lis
 
     public AlertTypeAdapter(RealmResults<AlertType> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<AlertType> rows = realm.where(AlertType.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -11,8 +12,9 @@ import io.realm.annotations.PrimaryKey;
  *         Created on 2.05.17.
  */
 public class Defect extends RealmObject implements ISend {
-    @PrimaryKey
+    @Index
     private long _id;
+    @PrimaryKey
     private String uuid;
     private User user;
     private Date date;

@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.db.realm.AttributeType;
@@ -21,14 +20,6 @@ public class AttributeTypeAdapter extends RealmBaseAdapter<AttributeType> implem
 
     public AttributeTypeAdapter(RealmResults<AttributeType> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<AttributeType> rows = realm.where(AttributeType.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

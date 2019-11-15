@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -27,15 +28,6 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
 
     public StageAdapter(RealmResults<Stage> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        } else {
-            return 0;
-        }
     }
 
     @Override
@@ -64,6 +56,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.taskstage_item, parent, false);
             viewHolder = new ViewHolder();
+            viewHolder.linearLayout = convertView.findViewById(R.id.stage_linear_layout);
             viewHolder.icon = convertView.findViewById(R.id.ts_ImageStatus);
             viewHolder.title = convertView.findViewById(R.id.ts_Name);
             viewHolder.equipment = convertView.findViewById(R.id.ts_Equipment);
@@ -109,26 +102,46 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
             }
 
             if (stageStatus != null && stage.getEquipment() != null && stage.getEquipment().getCriticalType() != null) {
-                String stageStatusUuid = stageStatus.getUuid();
-                String criticalTypeUuid = stage.getEquipment().getCriticalType().getUuid();
-                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                CriticalType criticalType = stage.getEquipment().getCriticalType();
+
+                if (stageStatus.isNew() && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                }
+
+                if (stageStatus.isNew() && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                if (stageStatusUuid.equals(StageStatus.Status.NEW) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                }
+
+                if (stageStatus.isNew() && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                }
+
+                if (stageStatus.isInWork() && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                }
+
+                if (stageStatus.isInWork() && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                if (stageStatusUuid.equals(StageStatus.Status.IN_WORK) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                }
+
+                if (stageStatus.isInWork() && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_3)))
+                }
+
+                if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType3()) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_2)))
+                    //viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+                }
+
+                if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType2()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                if (stageStatusUuid.equals(StageStatus.Status.COMPLETE) && (criticalTypeUuid.equals(CriticalType.Status.TYPE_1)))
+                    //viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+                }
+
+                if ((!stageStatus.isNew() && !stageStatus.isInWork()) && criticalType.isType1()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+                    //viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+                }
             }
         }
         return convertView;
@@ -137,16 +150,9 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
     private static class ViewHolder {
         TextView equipment;
         TextView title;
-        //TextView taskTitle;
-        //TextView description;
-        //TextView normative;
-        //TextView comment;
-        //TextView stageType;
-        //TextView stageStatus;
-        //TextView stageVerdict;
-        //TextView status;
         ImageView icon;
-        //ImageView image;
+        RelativeLayout linearLayout;
+
         TextView start_date;
         TextView end_date;
     }

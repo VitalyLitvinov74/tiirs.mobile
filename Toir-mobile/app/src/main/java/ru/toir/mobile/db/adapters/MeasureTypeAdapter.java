@@ -1,14 +1,12 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -19,14 +17,6 @@ public class MeasureTypeAdapter extends RealmBaseAdapter<MeasureType> implements
 
     public MeasureTypeAdapter(RealmResults<MeasureType> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<MeasureType> rows = realm.where(MeasureType.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

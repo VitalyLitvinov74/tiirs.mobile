@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -22,14 +21,6 @@ public class DefectTypeAdapter extends RealmBaseAdapter<DefectType> implements L
 
     public DefectTypeAdapter(RealmResults<DefectType> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<DefectType> rows = realm.where(DefectType.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override
@@ -71,7 +62,7 @@ public class DefectTypeAdapter extends RealmBaseAdapter<DefectType> implements L
         }
 
         DefectType defectType;
-        if (adapterData != null && viewHolder.title != null) {
+        if (adapterData != null && viewHolder.title != null && adapterData.size() > 0) {
             defectType = adapterData.get(position);
             if (defectType != null)
                 viewHolder.title.setText(defectType.getTitle());

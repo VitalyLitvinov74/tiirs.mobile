@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
+    android:id="@+id/stage_linear_layout"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="6dip" >
 
@@ -10,6 +11,7 @@
         android:layout_height="fill_parent"
         android:layout_marginRight="6dip"
         android:src="@drawable/status_easy_receive"
+        android:layout_marginEnd="6dip"
         android:contentDescription="@string/image_description" />
 
     <TextView
@@ -24,6 +26,8 @@
         android:textColor="#454545"
         android:gravity="center_vertical"
         android:text="@string/description"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/ts_ImageStatus"
         android:textSize="14sp" />
 
     <TextView
@@ -37,6 +41,7 @@
         android:ellipsize="marquee"
         android:text="@string/description"
         android:textSize="12sp"
+        android:layout_toEndOf="@+id/ts_ImageStatus"
         android:layout_toRightOf="@+id/ts_ImageStatus" />
 
     <TextView
@@ -52,6 +57,8 @@
         android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
         android:text="@string/not_started"
+        android:layout_marginEnd="10dip"
+        android:layout_toEndOf="@id/ts_ImageStatus"
         android:textSize="12sp" />
 
     <TextView
@@ -66,6 +73,7 @@
         android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
         android:text="@string/tire"
+        android:layout_toEndOf="@id/ts_StartDate"
         android:textSize="12sp" />
 
     <TextView
@@ -82,6 +90,9 @@
         android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
         android:text="@string/not_finished"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dip"
+        android:layout_toEndOf="@id/ts_divider"
         android:textSize="12sp" />
 
 </RelativeLayout>

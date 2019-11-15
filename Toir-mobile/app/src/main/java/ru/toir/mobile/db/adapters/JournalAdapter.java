@@ -27,14 +27,6 @@ public class JournalAdapter extends RealmBaseAdapter<Journal> implements ListAda
         super(data);
     }
 
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-        return 0;
-    }
-
     public RealmResults<Journal> getAllItems() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<Journal> result = realm.where(Journal.class).findAll();

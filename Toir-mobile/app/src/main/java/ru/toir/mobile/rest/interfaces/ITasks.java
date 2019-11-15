@@ -4,6 +4,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import ru.toir.mobile.db.realm.Task;
 
@@ -30,4 +31,7 @@ public interface ITasks {
 
     @GET("/task")
     Call<List<Task>> getByUuid(@Query("uuid[]") String[] uuid);
+
+    @POST("/task/set-status")
+    Call<Boolean> setStatus(@Query("uuid") String uuid, @Query("statusUuid") String statusUuid);
 }

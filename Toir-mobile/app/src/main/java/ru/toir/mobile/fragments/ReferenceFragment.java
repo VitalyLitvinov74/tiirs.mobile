@@ -2,6 +2,7 @@ package ru.toir.mobile.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,14 +21,25 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.realm.Realm;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
+import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
+import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.AlertTypeAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeAdapter;
@@ -54,6 +66,7 @@ import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.EquipmentType;
+import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.ObjectType;
@@ -99,8 +112,7 @@ public class ReferenceFragment extends Fragment {
     /**
      * Метод для обновления справочников необходимых для работы с нарядом.
      */
-    public static void updateReferencesForOrders() {
-
+    public static void updateReferencesForOrders(final Context context) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -348,6 +360,83 @@ public class ReferenceFragment extends Fragment {
                         realm.copyToRealmOrUpdate(list);
                         realm.commitTransaction();
                         ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Documentation
+                referenceName = Documentation.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<Documentation>> response = ToirAPIFactory.getDocumentationService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<Documentation> list = response.body();
+                        List<FilePath> files = new ArrayList<>();
+                        File extDir = context.getExternalFilesDir("");
+                        AuthorizedUser user = AuthorizedUser.getInstance();
+                        String userName = user.getLogin();
+                        if (extDir == null) {
+                            throw new Exception("Unable get extDir!!!");
+                        }
+
+                        for (Documentation item : list) {
+                            String localPath = item.getImageFilePath() + "/";
+                            if (isNeedDownload(extDir, item, localPath, item.isRequired())) {
+                                String url = item.getImageFileUrl(userName) + "/";
+                                files.add(new FilePath(item.getPath(), url, localPath));
+                            }
+                        }
+
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+
+                        Map<String, Set<String>> requestList = new HashMap<>();
+                        // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
+                        for (FilePath item : files) {
+                            String key = item.urlPath + item.fileName;
+                            if (!requestList.containsKey(key)) {
+                                Set<String> listOfDoc = new HashSet<>();
+                                listOfDoc.add(item.localPath);
+                                requestList.put(key, listOfDoc);
+                            } else {
+                                requestList.get(key).add(item.localPath);
+                            }
+                        }
+
+                        // загружаем файлы
+                        for (String key : requestList.keySet()) {
+                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
+                            try {
+                                retrofit2.Response<ResponseBody> r = callFile.execute();
+                                ResponseBody trueImgBody = r.body();
+                                if (trueImgBody == null) {
+                                    continue;
+                                }
+
+                                for (String localPath : requestList.get(key)) {
+                                    String fileName = key.substring(key.lastIndexOf("/") + 1);
+                                    File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
+                                    if (!file.getParentFile().exists()) {
+                                        if (!file.getParentFile().mkdirs()) {
+                                            Log.e(TAG, "Не удалось создать папку " +
+                                                    file.getParentFile().toString() +
+                                                    " для сохранения файла изображения!");
+                                            continue;
+                                        }
+                                    }
+
+                                    FileOutputStream fos = new FileOutputStream(file);
+                                    fos.write(trueImgBody.bytes());
+                                    fos.close();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1141,6 +1230,36 @@ public class ReferenceFragment extends Fragment {
         thread.start();
     }
 
+    public static boolean isNeedDownload(File extDir, RealmObject obj, String localPath, boolean isRequery) {
+        Realm realm = Realm.getDefaultInstance();
+        String uuid = ((IToirDbObject) obj).getUuid();
+        RealmObject dbObj = realm.where(obj.getClass()).equalTo("uuid", uuid).findFirst();
+        long localChangedAt;
+
+        // есть ли локальная запись
+        try {
+            localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
+        } catch (Exception e) {
+            return isRequery;
+        } finally {
+            realm.close();
+        }
+
+        // есть ли локально файл
+        String fileName = ((IToirDbObject) obj).getImageFile();
+        if (fileName != null) {
+            File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
+            if (!file.exists()) {
+                return isRequery;
+            }
+        } else {
+            return false;
+        }
+
+        // есть ли изменения на сервере
+        return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -1329,6 +1448,18 @@ public class ReferenceFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         realmDB.close();
+    }
+
+    static class FilePath {
+        String fileName;
+        String urlPath;
+        String localPath;
+
+        FilePath(String name, String url, String local) {
+            fileName = name;
+            urlPath = url;
+            localPath = local;
+        }
     }
 
     /**

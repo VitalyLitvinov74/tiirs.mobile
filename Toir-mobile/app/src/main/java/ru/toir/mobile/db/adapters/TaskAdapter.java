@@ -14,7 +14,6 @@ import java.util.Locale;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
 
@@ -27,15 +26,6 @@ public class TaskAdapter extends RealmBaseAdapter<Task> implements ListAdapter {
 
     public TaskAdapter(RealmResults<Task> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        } else {
-            return 0;
-        }
     }
 
     @Override

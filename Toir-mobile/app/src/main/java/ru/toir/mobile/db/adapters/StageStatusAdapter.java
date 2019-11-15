@@ -23,15 +23,6 @@ public class StageStatusAdapter extends RealmBaseAdapter<StageStatus> implements
     }
 
     @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
-    @Override
     public StageStatus getItem(int position) {
         return null;
     }

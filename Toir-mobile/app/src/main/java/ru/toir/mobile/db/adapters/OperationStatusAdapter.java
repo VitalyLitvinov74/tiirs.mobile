@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -25,14 +24,6 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
     }
 
     @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<OperationStatus> rows = realm.where(OperationStatus.class).findAll();
-        realm.close();
-        return rows.size();
-    }
-
-    @Override
     public OperationStatus getItem(int position) {
         return null;
     }
@@ -44,6 +35,10 @@ public class OperationStatusAdapter extends RealmBaseAdapter<OperationStatus> im
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        if (adapterData == null) {
+            return null;
+        }
+
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         ViewHolder viewHolder;

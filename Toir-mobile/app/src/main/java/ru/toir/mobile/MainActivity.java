@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
 import android.nfc.NfcAdapter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -479,7 +480,7 @@ public class MainActivity extends AppCompatActivity {
         //FragmentTransaction ft = getFragmentManager().beginTransaction();
         //ft.detach(this).attach(this).commit();
 
-        BottomBar bottomBar = findViewById(R.id.bottomBar);
+        final BottomBar bottomBar = findViewById(R.id.bottomBar);
         assert bottomBar != null;
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
@@ -1054,7 +1055,14 @@ public class MainActivity extends AppCompatActivity {
         String driverName = RfidDriverBase.getDriverName(classPath);
         if (driverName == null) {
             driverName = "драйвер не выбран";
+        } else if (ru.toir.mobile.rfid.driver.RfidDriverQRcode.class.getName().equals(classPath)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, 111);
+                }
+            }
         }
+
         //sp.getString(getString(R.string.updateUrl), "");
         // указываем названия и значения для элементов списка
         if (driver != null) {

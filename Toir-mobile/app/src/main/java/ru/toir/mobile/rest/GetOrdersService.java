@@ -27,6 +27,7 @@ import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentAttribute;
@@ -36,6 +37,7 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.Task;
@@ -80,7 +82,7 @@ public class GetOrdersService extends Service {
             }
 
             // обновляем справочники
-            ReferenceFragment.updateReferencesForOrders();
+            ReferenceFragment.updateReferencesForOrders(context);
 
             // запрашиваем наряды
             Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(statusUuids);
@@ -236,6 +238,31 @@ public class GetOrdersService extends Service {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Ошибка при получении атрибутов оборудования.");
+                e.printStackTrace();
+            }
+
+            // получаем список дефектов для оборудования из наряда
+            Call<List<Defect>> defectCall;
+            String changedDate = ReferenceUpdate.lastChangedAsStr(Defect.class.getSimpleName());
+            defectCall = ToirAPIFactory.getDefectService()
+                    .getByEquipment(needEquipmentUuids.toArray(new String[]{}), changedDate);
+            try {
+                retrofit2.Response<List<Defect>> r = defectCall.execute();
+                List<Defect> list = r.body();
+                if (list != null) {
+                    for (Defect defect : list) {
+                        defect.setSent(true);
+                    }
+
+                    // сохраняем атрибуты
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(list);
+                    realm.commitTransaction();
+                    realm.close();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка при получении дефектов оборудования.");
                 e.printStackTrace();
             }
 

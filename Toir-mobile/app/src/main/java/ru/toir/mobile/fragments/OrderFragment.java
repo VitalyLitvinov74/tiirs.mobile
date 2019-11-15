@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,20 +11,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -37,11 +41,13 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Message;
 
 import com.roughike.bottombar.BottomBar;
 
@@ -64,7 +70,10 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
@@ -74,6 +83,8 @@ import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
 import ru.toir.mobile.db.adapters.OrderAdapter;
 import ru.toir.mobile.db.adapters.OrderVerdictAdapter;
 import ru.toir.mobile.db.adapters.StageAdapter;
+import ru.toir.mobile.db.adapters.StageCancelAdapter;
+import ru.toir.mobile.db.adapters.StageVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.DefectType;
@@ -89,12 +100,15 @@ import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
+import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
+import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetOrderAsyncTask;
 import ru.toir.mobile.rest.SendFiles;
 import ru.toir.mobile.rest.SendMeasureValues;
+import ru.toir.mobile.rest.SendMessages;
 import ru.toir.mobile.rest.SendOrders;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
@@ -114,8 +128,11 @@ public class OrderFragment extends Fragment {
     private static final int ACTIVITY_MEASURE = 101;
     private static final String TAG = OrderFragment.class.getSimpleName();
     FloatingActionButton fab_check;
+    FloatingActionButton fab_question;
     FloatingActionButton fab_camera;
     FloatingActionButton fab_defect;
+    FloatingActionButton fab_equipmentInfo;
+    OnCheckBoxClickListener gCBlistener = new OnCheckBoxClickListener();
     private Toolbar toolbar;
     private Task selectedTask;
     private Orders selectedOrder;
@@ -157,27 +174,39 @@ public class OrderFragment extends Fragment {
             }
         }
 
+//        public View getViewByPosition(int pos, ListView listView) {
+//            final int firstListItemPosition = listView.getFirstVisiblePosition();
+//            final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+//
+//            if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+//                return listView.getAdapter().getView(pos, null, listView);
+//            } else {
+//                final int childIndex = pos - firstListItemPosition;
+//                return listView.getChildAt(childIndex);
+//            }
+//        }
+
         void firstLaunch() {
             Log.d(TAG, "Инициализация вьюх для отображения секунд...");
-            CheckBox checkBox;
-            OnCheckBoxClickListener listener = new OnCheckBoxClickListener();
-            if (operationAdapter != null && mainListView != null) {
-                int totalOperationCount = operationAdapter.getCount();
-                for (int i = 0; i < totalOperationCount; i++) {
-                    if (mainListView.getChildAt(i) != null) {
-                        checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
-                        checkBox.setOnClickListener(listener);
-                    }
-                }
+//            CheckBox checkBox;
+//            OnCheckBoxClickListener listener = new OnCheckBoxClickListener();
+//            if (operationAdapter != null && mainListView != null) {
+//                int totalOperationCount = operationAdapter.getCount();
+//                    if (mainListView.getChildAt(i) != null) {
+//                        checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
+//                        checkBox.setOnClickListener(listener);
+//                    }
+//                }
 
                 firstLaunch = false;
-            }
+//            }
         }
 
         @Override
         public void onFinish() {
         }
     };
+    private String photoFilePath;
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
@@ -188,6 +217,7 @@ public class OrderFragment extends Fragment {
 
     private RfidDialog rfidDialog;
     private AtomicInteger taskCounter;
+    private AtomicInteger messageCounter;
     private ProgressDialog dialog;
     BroadcastReceiver taskDoneReceiver = new BroadcastReceiver() {
         @Override
@@ -245,8 +275,10 @@ public class OrderFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
         listLayout = rootView.findViewById(R.id.tl_listview_layout);
         fab_check = rootView.findViewById(R.id.fab_check);
+        fab_question = rootView.findViewById(R.id.fab_question);
         fab_camera = rootView.findViewById(R.id.fab_photo);
         fab_check.setVisibility(View.INVISIBLE);
+        fab_question.setVisibility(View.INVISIBLE);
         fab_camera.setVisibility(View.INVISIBLE);
 
         fab_defect = rootView.findViewById(R.id.fab_defect);
@@ -293,10 +325,6 @@ public class OrderFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
-                        if (defectDescription.getText().toString().equals("")) {
-                            return;
-                        }
-
                         DefectType currentDefectType = null;
                         int position = defectTypeSpinner.getSelectedItemPosition();
                         if (position != AdapterView.INVALID_POSITION) {
@@ -312,7 +340,9 @@ public class OrderFragment extends Fragment {
                         realm.beginTransaction();
 
                         long nextId = Defect.getLastId() + 1;
-                        Defect defect = realm.createObject(Defect.class, nextId);
+//                        Defect defect = realm.createObject(Defect.class, nextId);
+                        Defect defect = new Defect();
+                        defect.set_id(nextId);
                         defect.setUuid(uuid.toString().toUpperCase());
                         defect.setUser(user);
                         defect.setDate(date);
@@ -323,9 +353,117 @@ public class OrderFragment extends Fragment {
                         defect.setTask(null);
                         defect.setCreatedAt(date);
                         defect.setChangedAt(date);
+                        realm.copyToRealmOrUpdate(defect);
 
                         realm.commitTransaction();
                         realm.close();
+                        dialog.dismiss();
+                    }
+                };
+                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+                if (defectType.size() > 0) {
+                    dialog.show();
+                } else {
+                    Toast.makeText(getContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
+                }
+                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+            }
+        });
+
+        fab_camera.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    startActivityForResult(intent, ACTIVITY_PHOTO);
+                } else {
+                    Context context = getContext();
+                    File file = null;
+                    try {
+                        file = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+
+                    if (file != null) {
+                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            startActivityForResult(intent, ACTIVITY_PHOTO);
+                        } else {
+                            getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
+                        }
+
+                    }
+//                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+//                    intent.setData(doc);
+//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+            }
+        });
+        fab_check.setOnClickListener(new SubmitOnClickListener());
+        fab_question.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View addCommentLayout;
+                final TextView author;
+                LayoutInflater inflater = getLayoutInflater();
+
+                addCommentLayout = inflater.inflate(R.layout.order_question, null, false);
+                author = addCommentLayout.findViewById(R.id.order_author);
+                author.setText(selectedOrder.getAuthor().getName());
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+                builder.setTitle("Cообщение автору");
+                builder.setView(addCommentLayout);
+                builder.setIcon(R.drawable.ic_icon_user);
+                builder.setCancelable(false);
+                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                final android.support.v7.app.AlertDialog dialog = builder.create();
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText orderComment = addCommentLayout.findViewById(R.id.order_comment);
+
+                        Realm realm = Realm.getDefaultInstance();
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                        UUID uuid = UUID.randomUUID();
+                        Date date = new Date();
+                        realm.beginTransaction();
+
+                        long nextId = ru.toir.mobile.db.realm.Message.getLastId() + 1;
+                        ru.toir.mobile.db.realm.Message message = new ru.toir.mobile.db.realm.Message();
+                        message.set_id(nextId);
+                        message.setUuid(uuid.toString().toUpperCase());
+                        message.setFromUser(user);
+                        message.setToUser(selectedOrder.getAuthor());
+                        message.setDate(date);
+                        message.setCreatedAt(date);
+                        message.setChangedAt(date);
+                        message.setStatus(0);
+                        message.setText(orderComment.getText().toString());
+                        //message.setTitle("Вопрос по наряду #".concat(String.valueOf(selectedOrder.get_id())));
+                        realm.copyToRealmOrUpdate(message);
+                        realm.commitTransaction();
+                        realm.close();
+                        // отправляем сообшения
+                        messageCounter = new AtomicInteger(3);
+                        RealmResults<ru.toir.mobile.db.realm.Message> messages = realmDB
+                                .where(ru.toir.mobile.db.realm.Message.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        sendMessages(realmDB.copyFromRealm(messages));
                         dialog.dismiss();
                     }
                 };
@@ -335,13 +473,27 @@ public class OrderFragment extends Fragment {
             }
         });
 
-        fab_camera.setOnClickListener(new View.OnClickListener() {
+        fab_equipmentInfo = rootView.findViewById(R.id.fab_equipmentInfo);
+        fab_equipmentInfo.setVisibility(View.INVISIBLE);
+        fab_equipmentInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, ACTIVITY_PHOTO);
+                if (currentEquipment != null) {
+                    Activity activity = getActivity();
+                    if (activity == null) {
+                        return;
+                    }
+
+
+                    String equipment_uuid = currentEquipment.getUuid();
+                    Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("equipment_uuid", equipment_uuid);
+                    equipmentInfo.putExtras(bundle);
+                    activity.startActivity(equipmentInfo);
+                }
             }
         });
-        fab_check.setOnClickListener(new SubmitOnClickListener());
 
         mainListView = rootView.findViewById(R.id.list_view);
 
@@ -457,8 +609,11 @@ public class OrderFragment extends Fragment {
             bottomBar.getTabAtPosition(1).setBadgeCount(new_orders);
         }
 
-        fab_check.setVisibility(View.INVISIBLE);
         fab_defect.setVisibility(View.INVISIBLE);
+        fab_camera.setVisibility(View.INVISIBLE);
+        fab_equipmentInfo.setVisibility(View.INVISIBLE);
+        fab_check.setVisibility(View.INVISIBLE);
+        fab_question.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -485,9 +640,11 @@ public class OrderFragment extends Fragment {
                 tl_Header.setText(order.getTitle());
             }
 
+            fab_defect.setVisibility(View.INVISIBLE);
             fab_camera.setVisibility(View.INVISIBLE);
+            fab_equipmentInfo.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
-            fab_camera.setVisibility(View.INVISIBLE);
+            fab_question.setVisibility(View.VISIBLE);
         }
     }
 
@@ -515,15 +672,20 @@ public class OrderFragment extends Fragment {
             params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             listLayout.setLayoutParams(params);
 
-            fab_camera.setVisibility(View.INVISIBLE);
-            fab_check.setVisibility(View.VISIBLE);
             fab_defect.setVisibility(View.INVISIBLE);
+            fab_camera.setVisibility(View.INVISIBLE);
+            fab_equipmentInfo.setVisibility(View.INVISIBLE);
+            fab_check.setVisibility(View.VISIBLE);
+            fab_question.setVisibility(View.INVISIBLE);
         }
     }
 
     // Operations----------------------------------------------------------------------------------------
     private void fillListViewOperations(Stage stage) {
         Activity activity = getActivity();
+
+        firstLaunch = true;
+
         if (activity == null) {
             return;
         }
@@ -534,6 +696,7 @@ public class OrderFragment extends Fragment {
 
         if (stage.getOperations() != null && stage.getOperations().size() > 0) {
             operationAdapter = new OperationAdapter(stage.getOperations().sort("_id"));
+            operationAdapter.setGBListener(gCBlistener);
             currentOperation = operationAdapter.getItem(0);
             mainListView.setAdapter(operationAdapter);
             //resultButtonLayout.setVisibility(View.VISIBLE);
@@ -548,9 +711,11 @@ public class OrderFragment extends Fragment {
                 tl_Header.setText(stage.getStageTemplate().getTitle());
             }
 
-            fab_camera.setVisibility(View.VISIBLE);
-            fab_check.setVisibility(View.VISIBLE);
             fab_defect.setVisibility(View.VISIBLE);
+            fab_camera.setVisibility(View.VISIBLE);
+            fab_equipmentInfo.setVisibility(View.VISIBLE);
+            fab_check.setVisibility(View.VISIBLE);
+            fab_question.setVisibility(View.INVISIBLE);
             //mainListView.setOnItemClickListener(mainListViewClickListener);
         }
 
@@ -839,6 +1004,17 @@ public class OrderFragment extends Fragment {
         }
     }
 
+    private void sendMessages(List<ru.toir.mobile.db.realm.Message> values) {
+        Context context = getContext();
+        if (context != null) {
+            SendMessages task = new SendMessages(context, messageCounter);
+            ru.toir.mobile.db.realm.Message[] valuesArray = values.toArray(new ru.toir.mobile.db.realm.Message[]{});
+            task.execute(valuesArray);
+        } else {
+            Log.e(TAG, "Не удалось запустить задачу отправки сообщений!");
+        }
+    }
+
     /**
      * Отправка всех выполненных нарядов на сервер
      */
@@ -874,6 +1050,7 @@ public class OrderFragment extends Fragment {
         dialog.show();
 
         taskCounter = new AtomicInteger(3);
+        messageCounter = new AtomicInteger(3);
 
         // отправляем результат
         sendOrders(realmDB.copyFromRealm(ordersList));
@@ -924,6 +1101,13 @@ public class OrderFragment extends Fragment {
                 .findAll();
 
         sendMeasuredValues(realmDB.copyFromRealm(measuredValues));
+
+        // отправляем сообшения
+        RealmResults<ru.toir.mobile.db.realm.Message> messages = realmDB
+                .where(ru.toir.mobile.db.realm.Message.class)
+                .equalTo("sent", false)
+                .findAll();
+        sendMessages(realmDB.copyFromRealm(messages));
     }
 
     public View getViewByPosition(int pos, ListView listView) {
@@ -944,16 +1128,12 @@ public class OrderFragment extends Fragment {
      * @param operation - операция для отмены
      */
     private void closeOperationManual(final Operation operation, AdapterView<?> parent) {
-        final OperationStatus operationStatusUnComplete;
+
         Activity activity = getActivity();
         if (activity == null) {
             // какое-то сообщение пользователю что не смогли показать диалог?
             return;
         }
-
-        operationStatusUnComplete = realmDB.where(OperationStatus.class)
-                .equalTo("uuid", OperationStatus.Status.UN_COMPLETE)
-                .findFirst();
 
         // диалог для отмены операции
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -975,14 +1155,103 @@ public class OrderFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 final OperationVerdict verdict = (OperationVerdict) operationVerdictSpinner.getSelectedItem();
+                // выставляем выбранный вердикт
+                realmDB.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        operation.setOperationStatus(OperationStatus.getObjectUnComplete(realm));
+                        operation.setOperationVerdict(verdict);
+                        if (operation.getStartDate() == null) {
+                            operation.setStartDate(new Date());
+                        }
+
+                        operation.setEndDate(new Date());
+                    }
+                });
+
+                // переходим на следующую операцию
+                goToNextOperation();
+
+                // закрываем диалог
+                dialog.dismiss();
+            }
+        };
+
+        dialog.setPositiveButton(android.R.string.ok, okListener);
+        dialog.setNegativeButton(android.R.string.cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        //operationTypeSpinner.setOnItemSelectedListener(new ReferenceSpinnerListener());
+        dialog.show();
+    }
+
+    /**
+     * Диалог изменения статуса этапа
+     *
+     * @param stage - этап для отмены
+     */
+    private void closeStageManual(final Stage stage, AdapterView<?> parent) {
+
+        Activity activity = getActivity();
+        if (activity == null) {
+            // какое-то сообщение пользователю что не смогли показать диалог?
+            return;
+        }
+
+        // диалог для отмены этапа
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = activity.getLayoutInflater();
+        View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
+        final Spinner verdictSpinner;
+        // список вердиктов в выпадающем списке для выбора
+        RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
+                // TODO: завести типы? сделать отдельный метод для выбрки вердиктов по типу этапа + "общие"?
+                .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E").or()
+                .equalTo("stageType.uuid", stage.getStageTemplate().getStageType().getUuid())
+                .findAll();
+        verdictSpinner = myView.findViewById(R.id.simple_spinner);
+        StageVerdictAdapter stageVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
+        stageVerdictAdapter.notifyDataSetChanged();
+        verdictSpinner.setAdapter(stageVerdictAdapter);
+
+        dialog.setView(myView);
+        dialog.setTitle("Отмена задачи");
+        DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final StageVerdict verdict = (StageVerdict) verdictSpinner.getSelectedItem();
                 // выставляем выбранный статус
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        operation.setOperationStatus(operationStatusUnComplete);
-                        operation.setOperationVerdict(verdict);
+                        stage.setStageStatus(StageStatus.getObjectUnComplete(realm));
+                        stage.setStageVerdict(verdict);
+                        stage.setStartDate(new Date());
+                        stage.setEndDate(new Date());
                     }
                 });
+
+                List<Operation> operations = getUncompleteOperations(stage);
+                OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realmDB);
+                OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realmDB);
+                realmDB.beginTransaction();
+                for (Operation operation : operations) {
+                    operation.setOperationStatus(operationStatus);
+                    operation.setOperationVerdict(operationVerdict);
+                    if (operation.getStartDate() == null) {
+                        operation.setStartDate(new Date());
+                    }
+
+                    operation.setEndDate(new Date());
+                }
+
+                realmDB.commitTransaction();
 
                 // закрываем диалог
                 dialog.dismiss();
@@ -1030,18 +1299,10 @@ public class OrderFragment extends Fragment {
         orderVerdictAdapter.notifyDataSetChanged();
         orderVerdictSpinner.setAdapter(orderVerdictAdapter);
 
-        orderStatusUnComplete = realmDB.where(OrderStatus.class)
-                .equalTo("uuid", OrderStatus.Status.UN_COMPLETE)
-                .findFirst();
-        stageStatusUnComplete = realmDB.where(StageStatus.class)
-                .equalTo("uuid", StageStatus.Status.UN_COMPLETE)
-                .findFirst();
-        operationStatusUnComplete = realmDB.where(OperationStatus.class)
-                .equalTo("uuid", OperationStatus.Status.UN_COMPLETE)
-                .findFirst();
-        taskStatusUnComplete = realmDB.where(TaskStatus.class)
-                .equalTo("uuid", TaskStatus.Status.UN_COMPLETE)
-                .findFirst();
+        orderStatusUnComplete = OrderStatus.getObjectUnComplete(realmDB);
+        stageStatusUnComplete = StageStatus.getObjectUnComplete(realmDB);
+        operationStatusUnComplete = OperationStatus.getObjectUnComplete(realmDB);
+        taskStatusUnComplete = TaskStatus.getObjectUnComplete(realmDB);
 
         dialog.setView(myView);
         dialog.setTitle("Закрытие наряда");
@@ -1075,6 +1336,11 @@ public class OrderFragment extends Fragment {
                                 @Override
                                 public void execute(Realm realm) {
                                     operation.setOperationStatus(operationStatusUnComplete);
+                                    if (operation.getStartDate() == null) {
+                                        operation.setStartDate(new Date());
+                                    }
+
+                                    operation.setEndDate(new Date());
                                 }
                             });
                         }
@@ -1132,32 +1398,54 @@ public class OrderFragment extends Fragment {
         dialog.show();
     }
 
+    private File createImageFile() throws IOException {
+        String timeStamp =
+                new SimpleDateFormat("yyyyMMdd_HHmmss",
+                        Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp + "_";
+        File storageDir =
+                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        photoFilePath = image.getAbsolutePath();
+        return image;
+    }
+
     public String getLastPhotoFilePath() {
+        String result;
         Activity activity = getActivity();
 
         if (activity == null) {
             return null;
         }
 
-        String[] projection = {
-                MediaStore.Images.Media.DATA,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA,
 //                MediaStore.Images.Media._ID,
 //                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
 //                MediaStore.Images.Media.DATE_TAKEN
-        };
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        ContentResolver resolver = activity.getContentResolver();
-        String orderBy = android.provider.MediaStore.Video.Media.DATE_TAKEN + " DESC";
-        Cursor cursor = resolver.query(uri, projection, null, null, orderBy);
-        // TODO: реализовать удаление записи о фотке котрую мы "забрали"
-        //resolver.delete(uri,);
-        String result;
-        if (cursor != null && cursor.moveToFirst()) {
-            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            result = cursor.getString(column_index_data);
-            cursor.close();
+            };
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            ContentResolver resolver = activity.getContentResolver();
+            String orderBy = android.provider.MediaStore.Video.Media.DATE_TAKEN + " DESC";
+            Cursor cursor = resolver.query(uri, projection, null, null, orderBy);
+            // TODO: реализовать удаление записи о фотке котрую мы "забрали"
+            //resolver.delete(uri,);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                result = cursor.getString(column_index_data);
+                cursor.close();
+            } else {
+                result = null;
+            }
         } else {
-            result = null;
+            result = photoFilePath;
         }
 
         return result;
@@ -1213,6 +1501,7 @@ public class OrderFragment extends Fragment {
                     File toFile = new File(picDir, operationFile.getFileName());
                     try {
                         copyFile(fromFile, toFile);
+                        fromFile.delete();
                     } catch (Exception e) {
                         e.printStackTrace();
                         return;
@@ -1281,7 +1570,7 @@ public class OrderFragment extends Fragment {
         mainSpinner.setAdapter(operationVerdictAdapter);
 
         fillListViewUncompleteOperations(listView, uncompleteOperationList);
-
+        dialog.setTitle(R.string.select_verdict);
         dialog.setView(myView);
         dialog.setPositiveButton(R.string.dialog_accept,
                 new DialogInterface.OnClickListener() {
@@ -1302,17 +1591,27 @@ public class OrderFragment extends Fragment {
                                         operation.setOperationStatus(
                                                 OperationStatus.getObjectUnComplete(realm));
                                         operation.setOperationVerdict(operationVerdict);
+                                        if (operation.getStartDate() == null) {
+                                            operation.setStartDate(new Date());
+                                        }
+
+                                        operation.setEndDate(new Date());
                                     }
                                 });
                             }
                         }
 
-                        // устанавливаем статус для текущего этапа - выполнен
+                        // устанавливаем статус для текущего этапа - не выполнен
                         if (selectedStage != null && !selectedStage.isComplete()) {
                             realmDB.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    selectedStage.setStageStatus(StageStatus.getObjectComplete(realm));
+                                    selectedStage.setStageStatus(StageStatus.getObjectUnComplete(realm));
+                                    selectedStage.setStageVerdict(StageVerdict.getObjectUnComplete(realm));
+                                    if (selectedStage.getStartDate() == null) {
+                                        selectedStage.setStartDate(new Date());
+                                    }
+
                                     selectedStage.setEndDate(new Date());
                                 }
                             });
@@ -1322,7 +1621,7 @@ public class OrderFragment extends Fragment {
                         taskTimer.cancel();
                         firstLaunch = true;
                         currentOperationPosition = 0;
-                        Level = closeLevel(OPERATION_LEVEL);
+                        Level = closeLevel(OPERATION_LEVEL, false);
                         fillListView(Level);
                     }
                 });
@@ -1373,6 +1672,151 @@ public class OrderFragment extends Fragment {
     }
 
     /**
+     * Построение диалога если не выполнены некоторые этапы
+     *
+     * @param uncompleteStageList Список не выполненных этапов
+     */
+    private void setStagesVerdict(final List<Stage> uncompleteStageList) {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+        Activity activity = getActivity();
+        if (activity == null) {
+            // какое-то сообщение пользователю что не смогли показать диалог?
+            return;
+        }
+
+        LayoutInflater inflater = activity.getLayoutInflater();
+        final View myView = inflater.inflate(R.layout.operation_dialog_cancel, null, false);
+        TextView description = myView.findViewWithTag("description");
+        description.setText("Вы пропустили несколько этапов.  Укажите для них вердикт.");
+        final ListView listView = myView.findViewById(R.id.odc_list_view);
+        CheckBox checkBoxAll = myView.findViewById(R.id.odc_main_status);
+        final Spinner mainSpinner = myView.findViewById(R.id.simple_spinner);
+
+        RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
+                .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E")
+                .findAll();
+        final StageVerdictAdapter stageVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
+        stageVerdictAdapter.notifyDataSetChanged();
+        mainSpinner.setAdapter(stageVerdictAdapter);
+
+        fillListViewUncompleteStages(listView, uncompleteStageList);
+
+        dialog.setTitle(R.string.select_verdict);
+        dialog.setView(myView);
+        dialog.setPositiveButton(R.string.dialog_accept,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        CheckBox checkBox;
+                        Spinner spinner;
+                        for (int i = 0; i < uncompleteStageList.size(); i++) {
+//                            checkBox = getViewByPosition(i, listView).findViewById(R.id.operation_status);
+                            spinner = getViewByPosition(i, listView).findViewById(R.id.operation_verdict_spinner);
+                            final StageVerdict stageVerdict = stageVerdictAdapter.getItem(spinner.getSelectedItemPosition());
+                            final Stage stage = uncompleteStageList.get(i);
+                            if (stage != null) {
+                                realmDB.executeTransaction(new Realm.Transaction() {
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        stage.setStageStatus(
+                                                StageStatus.getObjectUnComplete(realm));
+                                        stage.setStageVerdict(stageVerdict);
+                                        if (stage.getStartDate() == null) {
+                                            stage.setStartDate(new Date());
+                                        }
+
+                                        stage.setEndDate(new Date());
+
+                                        OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realm);
+                                        OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realm);
+                                        List<Operation> operations = getUncompleteOperations(stage);
+                                        for (Operation operation : operations) {
+                                            operation.setOperationStatus(operationStatus);
+                                            operation.setOperationVerdict(operationVerdict);
+                                            if (operation.getStartDate() == null) {
+                                                operation.setStartDate(new Date());
+                                            }
+                                            operation.setEndDate(new Date());
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        // устанавливаем статус для текущей задачи - выполнена
+                        if (selectedTask != null && !selectedTask.isComplete()) {
+                            realmDB.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    selectedTask.setTaskStatus(TaskStatus.getObjectComplete(realm));
+                                    selectedTask.setTaskVerdict(TaskVerdict.getObjectComplete(realm));
+                                    if (selectedTask.getStartDate() == null) {
+                                        selectedTask.setStartDate(new Date());
+                                    }
+
+                                    selectedTask.setEndDate(new Date());
+                                }
+                            });
+                        }
+
+
+//                        Log.d(TAG, "Остановка таймера...");
+//                        taskTimer.cancel();
+//                        firstLaunch = true;
+//                        currentOperationPosition = 0;
+                        Level = closeLevel(STAGE_LEVEL, false);
+                        fillListView(Level);
+                    }
+                });
+
+        dialog.setNegativeButton(R.string.dialog_cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        checkBoxAll.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                CheckBox checkBox;
+                CheckBox checkBoxAll = v.findViewById(R.id.odc_main_status);
+                int j = mainSpinner.getSelectedItemPosition();
+                for (int i = 0; i < uncompleteStageList.size(); i++) {
+                    checkBox = getViewByPosition(i, listView).findViewById(R.id.operation_status);
+                    checkBox.setChecked(checkBoxAll.isChecked());
+                    checkBoxAll = myView.findViewById(R.id.odc_main_status);
+                    if (checkBoxAll.isChecked()) {
+                        Spinner spinner = getViewByPosition(i, listView).findViewById(R.id.operation_verdict_spinner);
+                        spinner.setSelection(j);
+                    }
+                }
+            }
+        });
+        mainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Spinner spinner;
+                CheckBox checkBoxAll;
+                checkBoxAll = myView.findViewById(R.id.odc_main_status);
+                if (checkBoxAll.isChecked()) {
+                    for (int j = 0; j < uncompleteStageList.size(); j++) {
+                        spinner = getViewByPosition(j, listView).findViewById(R.id.operation_verdict_spinner);
+                        spinner.setSelection(i);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        dialog.show();
+    }
+
+    /**
      * Метод заполнения списка для диалога установки вердикта незаконченных операций
      *
      * @param listView                Список для отображения незаконченных операций
@@ -1393,6 +1837,26 @@ public class OrderFragment extends Fragment {
     }
 
     /**
+     * Метод заполнения списка для диалога установки вердикта незаконченных этапов
+     *
+     * @param listView            Список для отображения незаконченных этапов
+     * @param uncompleteStageList Список не законченных этапов
+     */
+    private void fillListViewUncompleteStages(ListView listView, List<Stage> uncompleteStageList) {
+        RealmResults<Stage> stages;
+        RealmQuery<Stage> q = realmDB.where(Stage.class);
+        Long ids[] = new Long[uncompleteStageList.size()];
+        int index = 0;
+        for (Stage stage : uncompleteStageList) {
+            ids[index++] = stage.get_id();
+        }
+
+        stages = q.in("_id", ids).findAll();
+        StageCancelAdapter uncompleteStageAdapter = new StageCancelAdapter(stages);
+        listView.setAdapter(uncompleteStageAdapter);
+    }
+
+    /**
      * Метод завершения операции по событию "Операция выполнена"
      *
      * @param measureValue Измеренное значение.
@@ -1401,7 +1865,6 @@ public class OrderFragment extends Fragment {
         TextView textTime;
         TextView textValue;
         final long currentTime = System.currentTimeMillis();
-        boolean isMeasure = false;
 
         if (operationAdapter == null) {
             return;
@@ -1412,7 +1875,8 @@ public class OrderFragment extends Fragment {
             return;
         }
 
-        View operationView = mainListView.getChildAt(currentOperationPosition);
+//        View operationView = mainListView.getChildAt(currentOperationPosition);
+        View operationView = operationAdapter.getView(currentOperationPosition, null, mainListView);
         if (operationView == null) {
             Log.d(TAG, "Операции с индексом {currentOperationPosition} нет в списке");
             return;
@@ -1431,6 +1895,8 @@ public class OrderFragment extends Fragment {
         final Operation operationFinished = operationAdapter.getItem(currentOperationPosition);
         // если операция уже завершена - то ни статус, ни дату не меняем
         if (operationFinished != null && !operationFinished.isComplete()) {
+//            final OperationStatus operationStatus = OperationStatus.getObjectComplete(realmDB);
+//            final OperationVerdict operationVerdict = OperationVerdict.getObjectComplete(realmDB);
             realmDB.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -1440,6 +1906,29 @@ public class OrderFragment extends Fragment {
                     operationFinished.setOperationVerdict(OperationVerdict.getObjectComplete(realm));
                 }
             });
+
+            final String operationUuid = operationFinished.getUuid();
+            final String statusUuid = OperationStatus.getObjectComplete(realmDB).getUuid();
+            // уведомляем сервер о изменении статуса операции
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Call<Boolean> call = ToirAPIFactory.getOperationService()
+                            .setStatus(operationUuid, statusUuid);
+                    call.enqueue(new Callback<Boolean>() {
+                        @Override
+                        public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                            Log.d(TAG, "set status result = " + response.body());
+                        }
+
+                        @Override
+                        public void onFailure(Call<Boolean> call, Throwable t) {
+                            Log.d(TAG, "set status result failure!!!");
+                        }
+                    });
+                }
+            });
+            t.start();
 
             textTime = operationView.findViewById(R.id.op_time);
             if (textTime != null) {
@@ -1458,6 +1947,12 @@ public class OrderFragment extends Fragment {
             startTime = currentTime;
         }
 
+        goToNextOperation();
+    }
+
+    public void goToNextOperation() {
+        boolean isMeasure = false;
+
         final Operation operationStarted;
         int nextOperationPosition = currentOperationPosition + 1;
         if (nextOperationPosition < operationAdapter.getCount()) {
@@ -1471,7 +1966,7 @@ public class OrderFragment extends Fragment {
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        operationStarted.setStartDate(new Date(currentTime));
+                        operationStarted.setStartDate(new Date());
                         operationStarted.setOperationStatus(OperationStatus.getObjectInWork(realm));
                     }
                 });
@@ -1745,10 +2240,10 @@ public class OrderFragment extends Fragment {
      *
      * @return List<Operation>
      */
-    List<Operation> getUncompleteOperations() {
+    List<Operation> getUncompleteOperations(Stage stage) {
 //        int totalOperationCount = operationAdapter.getCount();
         List<Operation> uncompleteOperationList = new ArrayList<>();
-        List<Operation> operations = selectedStage.getOperations();
+        List<Operation> operations = stage.getOperations();
 
         // проверяем/строим список невыполненных операций
         for (Operation operation : operations) {
@@ -1777,8 +2272,8 @@ public class OrderFragment extends Fragment {
     /**
      * Проверяет все ли операции в текущем этапе выполнены
      */
-    boolean isAllOperationComplete() {
-        return getUncompleteOperations().size() == 0;
+    boolean isAllOperationComplete(Stage stage) {
+        return getUncompleteOperations(stage).size() == 0;
     }
 
     /**
@@ -1786,9 +2281,9 @@ public class OrderFragment extends Fragment {
      *
      * @return List<Stage>
      */
-    List<Stage> getUncompleteStages() {
+    List<Stage> getUncompleteStages(Task task) {
         List<Stage> uncompleteList = new ArrayList<>();
-        List<Stage> stages = selectedTask.getStages();
+        List<Stage> stages = task.getStages();
 
         // проверяем/строим список невыполненных этапов
         for (Stage stage : stages) {
@@ -1803,8 +2298,8 @@ public class OrderFragment extends Fragment {
     /**
      * Проверяет все ли этапы в текущей задаче выполнены
      */
-    boolean isAllStageComplete() {
-        return getUncompleteStages().size() == 0;
+    boolean isAllStageComplete(Task task) {
+        return getUncompleteStages(task).size() == 0;
     }
 
     /**
@@ -1837,28 +2332,66 @@ public class OrderFragment extends Fragment {
      * Метод для проведения необходимых действий при завершении текущего этапа, задачи, наряда.
      *
      * @param currentLevel Текущий уровень
+     * @param setVerdict   Показывать или нет диалог с установкой вердиктов при закрытии элемента наряда и при наличии невыполненных дочерних элементов
      * @return Новый уровень на который необходимо переключится
      */
-    private int closeLevel(int currentLevel) {
+    private int closeLevel(int currentLevel, boolean setVerdict) {
         switch (currentLevel) {
             case OPERATION_LEVEL:
                 // если недоступен адаптер с операцииями, сразу переходим на уровень этапов
                 if (operationAdapter == null) {
-                    return closeLevel(STAGE_LEVEL);
+                    return closeLevel(STAGE_LEVEL, false);
                 }
 
                 // проверяем все ли операции завершены,
                 // если нет показываем диалог для установки причины их невыполнения
-                if (isAllOperationComplete()) {
+                if (isAllOperationComplete(selectedStage)) {
                     // устанавливаем статус для текущего этапа - выполнен
                     if (selectedStage != null && !selectedStage.isComplete()) {
                         realmDB.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                selectedStage.setStageStatus(StageStatus.getObjectComplete(realm));
+                                StageStatus status;
+                                long totalOperationsOfStage = selectedStage.getOperations().size();
+                                long completeStatusOperationOfStage = realm.where(Operation.class)
+                                        .equalTo("stageUuid", selectedStage.getUuid())
+                                        .equalTo("operationStatus.uuid", OperationStatus.Status.COMPLETE)
+                                        .findAll()
+                                        .size();
+                                if (totalOperationsOfStage == completeStatusOperationOfStage) {
+                                    status = StageStatus.getObjectComplete(realm);
+                                } else {
+                                    status = StageStatus.getObjectUnComplete(realm);
+                                }
+
+                                selectedStage.setStageStatus(status);
                                 selectedStage.setEndDate(new Date());
                             }
                         });
+
+                        // пытаемся просигнализировать серверу что этап выполнен
+                        final String stageUuid = selectedStage.getUuid();
+                        final String statusUuid = StageStatus.getObjectComplete(realmDB).getUuid();
+                        Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Call<Boolean> call = ToirAPIFactory.getStageService()
+                                        .setStatus(stageUuid, statusUuid);
+                                call.enqueue(new Callback<Boolean>() {
+                                    @Override
+                                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                                        Log.d(TAG, "set status result = " + response.body());
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Boolean> call, Throwable t) {
+                                        Log.d(TAG, "set status result failure!!!");
+                                    }
+                                });
+                            }
+                        });
+                        t.start();
+
                     }
 
                     Log.d(TAG, "Остановка таймера...");
@@ -1866,21 +2399,24 @@ public class OrderFragment extends Fragment {
                     firstLaunch = true;
                     currentOperationPosition = 0;
 
-                    return closeLevel(STAGE_LEVEL);
+                    return closeLevel(STAGE_LEVEL, false);
                 } else {
                     // показываем диалог для установки вердиктов для невыполненных операций
-                    setOperationsVerdict(getUncompleteOperations());
+                    if (setVerdict) {
+                        setOperationsVerdict(getUncompleteOperations(selectedStage));
+                    }
+
                     return OPERATION_LEVEL;
                 }
 
             case STAGE_LEVEL:
                 // если недоступен адаптер с этапами, сразу переходим на уровень задач
                 if (stageAdapter == null) {
-                    return closeLevel(TASK_LEVEL);
+                    return closeLevel(TASK_LEVEL, false);
                 }
 
                 // проверяем все ли этапы выполнены
-                if (isAllStageComplete()) {
+                if (isAllStageComplete(selectedTask)) {
                     // устанавливаем статус для текущей задачи - выполнена
                     realmDB.executeTransaction(new Realm.Transaction() {
                         @Override
@@ -1893,10 +2429,39 @@ public class OrderFragment extends Fragment {
                             + selectedTask.getTaskTemplate().getTitle() + "("
                             + selectedTask.getUuid() + ")");
 
+                    // пытаемся просигнализировать серверу что этап выполнен
+                    final String taskUuid = selectedTask.getUuid();
+                    final String statusUuid = TaskStatus.getObjectComplete(realmDB).getUuid();
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Call<Boolean> call = ToirAPIFactory.getTasksService()
+                                    .setStatus(taskUuid, statusUuid);
+                            call.enqueue(new Callback<Boolean>() {
+                                @Override
+                                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                                    Log.d(TAG, "set status result = " + response.body());
+                                }
+
+                                @Override
+                                public void onFailure(Call<Boolean> call, Throwable t) {
+                                    Log.d(TAG, "set status result failure!!!");
+                                }
+                            });
+                        }
+                    });
+                    t.start();
+
                     // если все этапы в задаче завершены, переключаемся на список задач
-                    return closeLevel(TASK_LEVEL);
+                    return closeLevel(TASK_LEVEL, false);
                 } else {
                     Log.d(TAG, "Leave current level");
+
+                    if (setVerdict) {
+                        // показываем диалог для установки вердиктов для невыполненных этапов
+                        setStagesVerdict(getUncompleteStages(selectedTask));
+                    }
+
                     // указываем на то что переключаемся на список этапов
                     return STAGE_LEVEL;
                 }
@@ -1904,7 +2469,7 @@ public class OrderFragment extends Fragment {
             case TASK_LEVEL:
                 // если недоступен адаптер с задачами, сразу переходим на уровень нарядов
                 if (taskAdapter == null) {
-                    return closeLevel(ORDER_LEVEL);
+                    return closeLevel(ORDER_LEVEL, false);
                 }
 
                 // проверяем все ли задачи выполнены
@@ -1946,7 +2511,7 @@ public class OrderFragment extends Fragment {
                     thread.start();
 
                     // если все задачи в наряде завершены, переключаемся на список нарядов
-                    return closeLevel(ORDER_LEVEL);
+                    return closeLevel(ORDER_LEVEL, false);
                 } else {
                     // указываем на то что переключаемся на список задач
                     Log.d(TAG, "Leave current level");
@@ -1988,7 +2553,7 @@ public class OrderFragment extends Fragment {
     private class SubmitOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Level = closeLevel(Level);
+            Level = closeLevel(Level, true);
             fillListView(Level);
         }
     }
@@ -2067,14 +2632,13 @@ public class OrderFragment extends Fragment {
         }
     }
 
-    private class OnCheckBoxClickListener implements View.OnClickListener {
+    public class OnCheckBoxClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View arg) {
             if (!operationAdapter.isItemEnabled(currentOperationPosition)) {
                 return;
             }
-
             CompleteCurrentOperation(null);
         }
     }
@@ -2090,8 +2654,7 @@ public class OrderFragment extends Fragment {
                 // менять произвольно статус операции позволяем только если
                 // статус операции "Новая" или "В работе"
                 Operation operation = (Operation) parent.getItemAtPosition(position);
-                if (!operation.getOperationStatus().getUuid().equals(OperationStatus.Status.NEW) ||
-                        !operation.getOperationStatus().getUuid().equals(OperationStatus.Status.IN_WORK)) {
+                if (operation.isNew() || operation.isInWork()) {
                     // показываем диалог изменения статуса
                     closeOperationManual(operation, parent);
                 } else {
@@ -2100,6 +2663,32 @@ public class OrderFragment extends Fragment {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
                     dialog.setTitle("Внимание!");
                     dialog.setMessage("Изменить статус операции нельзя!");
+                    dialog.setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialog.show();
+                }
+            } else if (Level == STAGE_LEVEL) {
+                // находимся на "экране" с этапами
+                //String operationStatus = operation.getOperation_status_uuid();
+                // менять произвольно статус этапа позволяем только если
+                // статус этапа "Новый" или "В работе"
+                Stage stage = (Stage) parent.getItemAtPosition(position);
+
+                if (stage.isNew() || stage.isInWork()) {
+                    // показываем диалог изменения статуса
+                    closeStageManual(stage, parent);
+                } else {
+                    // операция уже выполнена, изменить статус нельзя
+                    // сообщаем об этом
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                    dialog.setTitle("Внимание!");
+                    dialog.setMessage("Изменить статус этапа нельзя!");
                     dialog.setPositiveButton(android.R.string.ok,
                             new DialogInterface.OnClickListener() {
 

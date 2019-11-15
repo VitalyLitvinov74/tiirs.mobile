@@ -41,15 +41,6 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
     }
 
     @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
-    @Override
     public Equipment getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);
@@ -90,7 +81,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder.icon = convertView.findViewById(R.id.eril_image);
                 viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
                 viewHolder.criticalTypeUuid = convertView.findViewById(R.id.eril_critical);
-                viewHolder.startDate = convertView.findViewById(R.id.eril_last_operation_date);
+                //viewHolder.startDate = convertView.findViewById(R.id.eril_last_operation_date);
                 viewHolder.location = convertView.findViewById(R.id.eril_location);
                 viewHolder.equipmentModelUuid = convertView.findViewById(R.id.eril_type);
                 viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
@@ -148,19 +139,20 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     CriticalType criticalType = equipment.getCriticalType();
                     if (criticalType != null) {
                         viewHolder.criticalTypeUuid.setText(criticalType.getTitle());
-                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_1)) {
+                        if (criticalType.isType1()) {
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));
                         }
 
-                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_2)) {
+                        if (criticalType.isType2()) {
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.md_deep_orange_300));
                         }
 
-                        if (criticalType.getUuid().equals(CriticalType.Status.TYPE_3)) {
+                        if (criticalType.isType3()) {
                             viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
                         }
                     }
 
+/*
                     Date date = equipment.getStartDate();
                     String sDate;
                     if (date != null && date.after(new Date(100000))) {
@@ -168,8 +160,8 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                     } else {
                         sDate = "неизвестна";
                     }
-
                     viewHolder.startDate.setText(sDate);
+*/
                 }
             }
         }
@@ -188,7 +180,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         TextView inventoryNumber;
         TextView criticalTypeUuid;
         TextView criticalLevel;
-        TextView startDate;
+        //TextView startDate;
         TextView checkDate;
     }
 }

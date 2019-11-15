@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -24,14 +23,6 @@ public class OperationTypeAdapter extends RealmBaseAdapter<OperationType> implem
     }
 
     @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<OperationType> rows = realm.where(OperationType.class).findAll();
-        realm.close();
-        return rows.size();
-    }
-
-    @Override
     public OperationType getItem(int position) {
         return null;
     }
@@ -44,6 +35,10 @@ public class OperationTypeAdapter extends RealmBaseAdapter<OperationType> implem
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+        if (adapterData == null) {
+            return null;
+        }
+
         if (parent.getId() == R.id.simple_spinner) {
             TextView textView = (TextView) View.inflate(parent.getContext(), android.R.layout.simple_spinner_item, null);
             OperationType operationType = adapterData.get(position);

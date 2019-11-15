@@ -31,6 +31,10 @@ public interface IEquipment {
     @GET("/equipment")
     Call<List<Equipment>> getByUuid(@Query("uuid[]") String[] uuid);
 
+    // TODO: заменить на POST !!!!
     @GET("/equipment/set-tag")
     Call<Boolean> setTagId(@Query("uuid") String uuid, @Query("tagId") String tagId);
+
+    @GET("/equipment")
+    Call<Equipment> getByTagId(@Query("tagId") String tagId);
 }

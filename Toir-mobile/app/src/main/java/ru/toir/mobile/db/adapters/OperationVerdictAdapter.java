@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
@@ -22,14 +21,6 @@ public class OperationVerdictAdapter extends RealmBaseAdapter<OperationVerdict> 
 
     public OperationVerdictAdapter(RealmResults<OperationVerdict> data) {
         super(data);
-    }
-
-    @Override
-    public int getCount() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<OperationVerdict> rows = realm.where(OperationVerdict.class).findAll();
-        realm.close();
-        return rows.size();
     }
 
     @Override

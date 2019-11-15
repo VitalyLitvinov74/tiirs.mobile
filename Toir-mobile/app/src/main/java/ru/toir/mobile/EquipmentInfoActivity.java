@@ -137,7 +137,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             Intent target = new Intent(Intent.ACTION_VIEW);
             target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             target.setType(mimeType);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 target.setData(Uri.fromFile(file));
             } else {
                 Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
@@ -607,7 +607,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 if (newDefect != null) {
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    final Defect defect = realm.createObject(Defect.class);
+//                    final Defect defect = realm.createObject(Defect.class);
+                    Defect defect = new Defect();
                     UUID uuid = UUID.randomUUID();
                     long next_id = Defect.getLastId() + 1;
                     defect.set_id(next_id);
@@ -633,6 +634,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     }
 
                     defect.setTask(null);
+                    realm.copyToRealmOrUpdate(defect);
+
                     realm.commitTransaction();
                     realm.close();
                 }
@@ -642,7 +645,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         AlertDialog dialog = alert.create();
         dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
         dialog.setContentView(R.layout.add_defect_dialog);
-        dialog.show();
+        if (defectType.size() > 0) {
+            dialog.show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void showDialogDefect2(ViewGroup parent) {
@@ -731,7 +738,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 realm.beginTransaction();
 
                 long nextId = Defect.getLastId() + 1;
-                Defect defect = realm.createObject(Defect.class, nextId);
+//                Defect defect = realm.createObject(Defect.class, nextId);
+                Defect defect = new Defect();
+                defect.set_id(nextId);
                 defect.setUuid(uuid.toString().toUpperCase());
                 defect.setUser(user);
                 defect.setDate(date);
@@ -742,6 +751,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 defect.setTask(null);
                 defect.setCreatedAt(date);
                 defect.setChangedAt(date);
+                realm.copyToRealmOrUpdate(defect);
 
                 realm.commitTransaction();
                 realm.close();

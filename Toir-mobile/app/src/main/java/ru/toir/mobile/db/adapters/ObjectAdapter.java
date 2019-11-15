@@ -36,15 +36,6 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
     }
 
     @Override
-    public int getCount() {
-        if (adapterData != null) {
-            return adapterData.size();
-        }
-
-        return 0;
-    }
-
-    @Override
     public Objects getItem(int position) {
         if (adapterData != null) {
             return adapterData.get(position);
