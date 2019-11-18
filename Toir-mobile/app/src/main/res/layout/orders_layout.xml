@@ -51,10 +51,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="255dp"
-        android:layout_marginRight="15dp"
         android:layout_marginEnd="15dp"
-        app:backgroundTint="@color/md_red_A700"
+        android:layout_marginRight="15dp"
         android:src="@android:drawable/ic_dialog_alert"
+        app:backgroundTint="@color/md_red_A700"
         app:fabSize="normal" />
 
     <android.support.design.widget.FloatingActionButton
@@ -63,10 +63,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="190dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:src="@drawable/cameraicon"
         app:backgroundTint="@color/larisaBlueColor"
-        android:layout_marginEnd="15dp"
         app:fabSize="normal" />
 
     <android.support.design.widget.FloatingActionButton
@@ -75,10 +75,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="125dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:src="@drawable/ic_info"
         app:backgroundTint="@color/larisaBlueColor"
-        android:layout_marginEnd="15dp"
         app:fabSize="normal" />
 
     <android.support.design.widget.FloatingActionButton

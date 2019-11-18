@@ -14,7 +14,7 @@ import ru.toir.mobile.db.realm.StageVerdict;
 
 /**
  * @author koputo
- *         Created by koputo on 08.09.16.
+ * Created by koputo on 08.09.16.
  */
 public class StageVerdictAdapter extends RealmBaseAdapter<StageVerdict> implements ListAdapter {
     public static final String TABLE_NAME = "OperationVerdict";

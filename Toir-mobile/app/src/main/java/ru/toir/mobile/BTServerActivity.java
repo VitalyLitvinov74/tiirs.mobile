@@ -151,7 +151,7 @@ public class BTServerActivity extends Activity {
             return;
         }
 
-        serverStatusTextView = (TextView) findViewById(R.id.bluetoothServerStatus);
+        serverStatusTextView = findViewById(R.id.bluetoothServerStatus);
 
         // создаём объект сервера блютус
         mBtRfidServer = new BTRfidServer(mHandler);

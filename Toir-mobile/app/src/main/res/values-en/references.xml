@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="references_array">
+        <item>Documentation Types:DocumentationType</item>
+        <item>Equipment Types:EquipmentType</item>
+        <item>Critical Types:CriticalType</item>
+        <item>Alert Types:AlertType</item>
+        <item>Operation Verdicts:OperationVerdict</item>
+        <item>Operation Types:OperationType</item>
+        <item>Object Types:ObjectType</item>
+        <item>Operation Statuses:OperationStatus</item>
+        <item>Task Statuses:TaskStatus</item>
+        <item>Task Stage Statuses:TaskStageStatus</item>
+        <item>Equipment Statuses:EquipmentStatus</item>
+    </string-array>
+
+</resources>

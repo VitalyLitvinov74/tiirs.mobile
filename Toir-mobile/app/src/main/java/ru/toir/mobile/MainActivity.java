@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
@@ -74,6 +75,7 @@ import ru.toir.mobile.fragments.ObjectFragment;
 import ru.toir.mobile.fragments.OrderFragment;
 import ru.toir.mobile.fragments.ReferenceFragment;
 import ru.toir.mobile.fragments.ServiceFragment;
+import ru.toir.mobile.fragments.SettingsFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
 import ru.toir.mobile.rest.ForegroundService;
@@ -88,12 +90,16 @@ import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int PROFILE_ADD = 1;
-    private static final int PROFILE_SETTINGS = 2;
+    //private static final int PROFILE_ADD = 1;
+    //private static final int PROFILE_SETTINGS = 2;
+    //private static final int FRAGMENT_CAMERA = 1;
+    //private static final int FRAGMENT_OTHER = 10;
+    //private static final int DRAWER_TASKS = 11;
+    //private static final int DRAWER_ONLINE = 15;
+
     private static final int MAX_USER_PROFILE = 10;
 
     private static final int NO_FRAGMENT = 0;
-    //private static final int FRAGMENT_CAMERA = 1;
     private static final int FRAGMENT_CHARTS = 2;
     private static final int FRAGMENT_EQUIPMENT = 3;
     private static final int FRAGMENT_GPS = 4;
@@ -102,14 +108,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_USERS = 7;
     private static final int FRAGMENT_USER = 8;
     private static final int FRAGMENT_DOCS = 9;
-    //private static final int FRAGMENT_OTHER = 10;
+    private static final int FRAGMENT_SETTINGS = 11;
 
-    //private static final int DRAWER_TASKS = 11;
     private static final int DRAWER_DOWNLOAD = 12;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
     private static final int FRAGMENT_SERVICE = 15;
-    //private static final int DRAWER_ONLINE = 15;
     private static final int FRAGMENT_OBJECTS = 16;
     private static final int FRAGMENT_CONTRAGENTS = 17;
 
@@ -143,37 +147,10 @@ public class MainActivity extends AppCompatActivity {
     private String locationBestProvider = LocationManager.GPS_PROVIDER;
     private boolean GPSPresent = false;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        savedInstance = savedInstanceState;
-
-        // инициализация приложения
-        init();
-        // this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
-        if (savedInstanceState != null) {
-            isLogged = savedInstanceState.getBoolean("isLogged");
-            Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
-            splashShown = savedInstanceState.getBoolean("splashShown");
-            AuthorizedUser aUser = AuthorizedUser.getInstance();
-            aUser.setTagId(savedInstanceState.getString("tagId"));
-            aUser.setToken(savedInstanceState.getString("token"));
-            aUser.setUuid(savedInstanceState.getString("userUuid"));
-            aUser.setLogin(savedInstanceState.getString("userLogin"));
-        }
-
-        Log.d(TAG, "onCreate");
-
-        if (splashShown) {
-            if (isLogged) {
-                setMainLayout(savedInstanceState);
-            } else {
-                setContentView(R.layout.login_layout);
-                ShowSettings();
-            }
-        }
+    public static Locale getLocale(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String lang = sharedPreferences.getString("lang_key", "ru");
+        return new Locale(lang);
     }
 
     /**
@@ -202,6 +179,38 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setLocale();
+        savedInstance = savedInstanceState;
+
+        // инициализация приложения
+        init();
+        // this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
+        if (savedInstanceState != null) {
+            isLogged = savedInstanceState.getBoolean("isLogged");
+            Log.d(TAG, "onCreate:after read: isLogged=" + isLogged);
+            splashShown = savedInstanceState.getBoolean("splashShown");
+            AuthorizedUser aUser = AuthorizedUser.getInstance();
+            aUser.setTagId(savedInstanceState.getString("tagId"));
+            aUser.setToken(savedInstanceState.getString("token"));
+            aUser.setUuid(savedInstanceState.getString("userUuid"));
+            aUser.setLogin(savedInstanceState.getString("userLogin"));
+        }
+
+        Log.d(TAG, "onCreate");
+        if (splashShown) {
+            if (isLogged) {
+                setMainLayout(savedInstanceState);
+            } else {
+                setContentView(R.layout.login_layout);
+                ShowSettings();
+            }
+        }
+    }
+
     public boolean initDB() {
         boolean success = false;
         try {
@@ -217,14 +226,13 @@ public class MainActivity extends AppCompatActivity {
 //                toast.show();
                 success = true;
             } else {
-                Toast toast = Toast.makeText(this, "База данных актуальна!", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(this, getString(R.string.toast_db_actual), Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.BOTTOM, 0, 0);
                 toast.show();
                 success = true;
             }
         } catch (Exception e) {
-            Toast toast = Toast.makeText(this,
-                    "Не удалось открыть/обновить базу данных!",
+            Toast toast = Toast.makeText(this, getString(R.string.toast_db_error),
                     Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 0);
             toast.show();
@@ -257,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // показываем диалог входа
                     authorizationDialog = new ProgressDialog(MainActivity.this);
-                    authorizationDialog.setMessage("Вход в систему");
+                    authorizationDialog.setMessage(getString(R.string.toast_enter));
                     authorizationDialog.setIndeterminate(true);
                     authorizationDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     authorizationDialog.setCancelable(false);
@@ -274,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 authUser.setToken(token.getAccessToken());
                                 Toast.makeText(getApplicationContext(),
-                                        "Токен получен.", Toast.LENGTH_SHORT).show();
+                                        getString(R.string.toast_token_received), Toast.LENGTH_SHORT).show();
                                 // Сохраняем login в AuthorizedUser для дальнейших запросв статики
                                 authUser.setLogin(token.getUserName());
                             } else {
@@ -363,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
                                                         if (user_bitmap == null) {
                                                             // По какой-то причине не смогли получить
                                                             // уменьшенное изображение
-                                                            Log.e(TAG, "Не удалось получить масштабированное изображение.");
+                                                            Log.e(TAG, getString(R.string.toast_error_picture));
                                                         }
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
@@ -383,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         realm.close();
                                     } else {
-                                        String message = "Информация о пользователе не получена с сервера.";
+                                        String message = getString(R.string.toast_error_no_user);
                                         addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
                                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     }
@@ -396,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
                                     // сообщаем описание неудачи
                                     // TODO нужен какой-то механизм уведомления о причине не успеха
 //                                    String message = bundle.getString(IServiceProvider.MESSAGE);
-                                    String message = "Просто не получили пользователя.";
+                                    String message = getString(R.string.toast_error_no_user_received);
                                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     authorizationDialog.dismiss();
                                 }
@@ -407,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
                             // TODO нужен какой-то механизм уведомления о причине не успеха
                             // String message = bundle.getString(IServiceProvider.MESSAGE);
-                            String message = "Просто не получили токен.";
+                            String message = getString(R.string.toast_error_no_token_received);
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             // TODO реализовать проверку на то что пользователя нет на сервере
                             // токен не получен, сервер не ответил...
@@ -429,7 +437,8 @@ public class MainActivity extends AppCompatActivity {
                                 setMainLayout(savedInstance);
                             } else {
                                 Toast.makeText(getApplicationContext(),
-                                        "Нет доступа.", Toast.LENGTH_LONG).show();
+                                        getString(R.string.toast_error_no_access),
+                                        Toast.LENGTH_LONG).show();
                             }
 
                             authorizationDialog.dismiss();
@@ -438,7 +447,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // по кодам из RFID можно показать более подробные сообщения
                     Toast.makeText(getApplicationContext(),
-                            "Операция прервана", Toast.LENGTH_SHORT).show();
+                            getString(R.string.toast_error_operation_canceled),
+                            Toast.LENGTH_SHORT).show();
                 }
 
                 // закрываем диалог
@@ -462,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setEnabledLoginButton(boolean enable) {
         Button loginButton = findViewById(R.id.loginButton);
-        if (loginButton!=null) {
+        if (loginButton != null) {
             loginButton.setEnabled(enable);
             loginButton.setClickable(enable);
         }
@@ -520,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(toolbar);
-        toolbar.setSubtitle("Обслуживание и ремонт");
+        toolbar.setSubtitle(getString(R.string.subtitle_repair));
         toolbar.setTitleTextColor(Color.WHITE);
 
         //set the back arrow in the toolbar
@@ -547,13 +557,6 @@ public class MainActivity extends AppCompatActivity {
                             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                             Fragment fr;
                             switch (ident) {
-/*
-                                case PROFILE_SETTINGS:
-                                    currentFragment = FRAGMENT_USER;
-                                    fr = FragmentEditUser.newInstance("EditProfile");
-                                    tr.replace(R.id.frame_container, fr);
-                                    break;
-*/
                                 default:
                                     int profileId = profile.getIdentifier(); //-2
                                     int profile_pos;
@@ -584,7 +587,7 @@ public class MainActivity extends AppCompatActivity {
 
         PrimaryDrawerItem taskPrimaryDrawerItem = new PrimaryDrawerItem()
                 .withName(R.string.menu_tasks)
-                .withDescription("Текущие задания")
+                .withDescription(getString(R.string.current_tasks))
                 .withIcon(GoogleMaterial.Icon.gmd_calendar)
                 .withIdentifier(FRAGMENT_TASKS)
                 .withSelectable(false)
@@ -594,7 +597,6 @@ public class MainActivity extends AppCompatActivity {
                     .withBadge("" + new_orders)
                     .withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.red));
         }
-
         Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -603,21 +605,21 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_users)
-                                .withDescription("Информация о пользователе")
+                                .withDescription(R.string.menu_user_description)
                                 .withIcon(GoogleMaterial.Icon.gmd_account_box)
                                 .withIdentifier(FRAGMENT_USERS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_equipment)
-                                .withDescription("Справочник оборудования")
+                                .withDescription(R.string.menu_equipment_description)
                                 .withIcon(GoogleMaterial.Icon.gmd_devices)
                                 .withIdentifier(FRAGMENT_EQUIPMENT)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_gps)
-                                .withDescription("Расположение оборудования")
+                                .withDescription(R.string.menu_equipment_map)
                                 .withIcon(GoogleMaterial.Icon.gmd_my_location)
                                 .withIdentifier(FRAGMENT_GPS)
                                 .withSelectable(false)
@@ -625,28 +627,28 @@ public class MainActivity extends AppCompatActivity {
                         taskPrimaryDrawerItem,
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_references)
-                                .withDescription("Дополнительно")
+                                .withDescription(R.string.menu_additional)
                                 .withIcon(GoogleMaterial.Icon.gmd_book)
                                 .withIdentifier(FRAGMENT_REFERENCES)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new PrimaryDrawerItem()
-                                .withName("Документация")
-                                .withDescription("на оборудование")
+                                .withName(R.string.menu_documentation)
+                                .withDescription(R.string.menu_on_equipment)
                                 .withIcon(GoogleMaterial.Icon.gmd_collection_bookmark)
                                 .withIdentifier(FRAGMENT_DOCS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new PrimaryDrawerItem()
-                                .withName("Объекты")
-                                .withDescription("Здания и сооружения")
+                                .withName(R.string.menu_objects)
+                                .withDescription(R.string.menu_objects_description)
                                 .withIcon(GoogleMaterial.Icon.gmd_home)
                                 .withIdentifier(FRAGMENT_OBJECTS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new PrimaryDrawerItem()
                                 .withName(R.string.contragents)
-                                .withDescription("Справочник контрагентов")
+                                .withDescription(R.string.menu_client_reference)
                                 .withIcon(GoogleMaterial.Icon.gmd_accounts_alt)
                                 .withIdentifier(FRAGMENT_CONTRAGENTS)
                                 .withSelectable(false)
@@ -654,19 +656,19 @@ public class MainActivity extends AppCompatActivity {
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName(R.string.service)
-                                .withDescription("Журнал и gps трек")
+                                .withDescription(R.string.menu_journal_track)
                                 .withIcon(GoogleMaterial.Icon.gmd_gps)
                                 .withIdentifier(FRAGMENT_SERVICE)
                                 .withSelectable(false),
                         new PrimaryDrawerItem()
-                                .withName("О программе")
-                                .withDescription("Информация о версии")
+                                .withName(R.string.menu_about_app)
+                                .withDescription(R.string.menu_information)
                                 .withIcon(FontAwesome.Icon.faw_info)
                                 .withIdentifier(DRAWER_INFO)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new PrimaryDrawerItem()
-                                .withName("Выход")
+                                .withName(R.string.menu_exit)
                                 .withIcon(FontAwesome.Icon.faw_undo)
                                 .withIdentifier(DRAWER_EXIT)
                                 .withSelectable(false)
@@ -684,7 +686,7 @@ public class MainActivity extends AppCompatActivity {
                             } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
                                 mProgressDialog = new ProgressDialog(MainActivity.this);
-                                mProgressDialog.setMessage("Синхронизируем данные");
+                                mProgressDialog.setMessage(getString(R.string.sync_data));
                                 mProgressDialog.setIndeterminate(true);
                                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 mProgressDialog.setCancelable(true);
@@ -771,7 +773,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (activeUserID <= 0) {
             Toast.makeText(getApplicationContext(),
-                    "Пожалуйста зарегистрируйтесь", Toast.LENGTH_LONG).show();
+                    getString(R.string.please_login), Toast.LENGTH_LONG).show();
         }
 
         //((ViewGroup) findViewById(R.id.frame_container)).addView(result.getSlider());
@@ -783,23 +785,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Обработчик клика кнопки "Войти"
-     *
-     * @param view Event's view
-     */
-    public void onClickLogin(View view) {
-        if (!isSkipGPS() && !isGpsOn()) {
-            Toast.makeText(getApplicationContext(), "GPS must be enabled.", Toast.LENGTH_SHORT)
-                    .show();
-            return;
-        }
-
-        setEnabledLoginButton(false);
-        startAuthorise();
-        setEnabledLoginButton(true);
-    }
-
-    /**
      * Обработчик клика меню запуска блютус сервера
      *
      * @param menuItem - пункт меню
@@ -808,6 +793,23 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onActionBTServer");
         Intent i = new Intent(MainActivity.this, BTServerActivity.class);
         startActivity(i);
+    }
+
+    /**
+     * Обработчик клика кнопки "Войти"
+     *
+     * @param view Event's view
+     */
+    public void onClickLogin(View view) {
+        if (!isSkipGPS() && !isGpsOn()) {
+            Toast.makeText(getApplicationContext(), getString(R.string.gps_must_enabled), Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
+        setEnabledLoginButton(false);
+        startAuthorise();
+        setEnabledLoginButton(true);
     }
 
     /**
@@ -824,7 +826,7 @@ public class MainActivity extends AppCompatActivity {
         String updateUrl = sp.getString(getString(R.string.updateUrl), "");
 
         if (updateUrl.equals("")) {
-            Toast toast = Toast.makeText(this, "Не указан URL для обновления!",
+            Toast toast = Toast.makeText(this, getString(R.string.no_url_for_update),
                     Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -841,21 +843,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onActionSettings(MenuItem menuItem) {
-        Log.d(TAG, "onActionSettings");
-        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
-        startActivity(i);
-    }
-
     public void onActionAbout(MenuItem menuItem) {
         Log.d(TAG, "onActionAbout");
         startAboutDialog();
     }
 
-    public void startAboutDialog() {
-        AboutDialog about = new AboutDialog(this);
-        about.setTitle("О программе");
-        about.show();
+    public void onActionSettings(MenuItem menuItem) {
+        Log.d(TAG, "onActionSettings");
+        //Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+        //startActivity(i);
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        currentFragment = FRAGMENT_SETTINGS;
+        SettingsFragment fragment = new SettingsFragment();
+        tr.replace(R.id.frame_container, fragment).commit();
     }
 
     @Override
@@ -1009,8 +1009,14 @@ public class MainActivity extends AppCompatActivity {
         refreshProfileList();
     }
 
+    public void startAboutDialog() {
+        AboutDialog about = new AboutDialog(this);
+        about.setTitle(getString(R.string.about));
+        about.show();
+    }
+
     public void mOnClickMethod(View view) {
-        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+        Intent i = new Intent(MainActivity.this, PrefsActivity.class);
         startActivity(i);
     }
 
@@ -1031,13 +1037,22 @@ public class MainActivity extends AppCompatActivity {
                             profilesList.get(cnt).setActive(true);
                         } else {
                             Toast.makeText(getApplicationContext(),
-                                    "Непредвиденная ошибка: нет такого пользователя", Toast.LENGTH_LONG).show();
+                                    getString(R.string.no_user_present), Toast.LENGTH_LONG).show();
                         }
                         user.setActive(true);
                         realmDB.commitTransaction();
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        if (checkGPSThread != null) {
+            checkGPSThread.interrupt();
         }
     }
 
@@ -1054,7 +1069,7 @@ public class MainActivity extends AppCompatActivity {
         String classPath = sp.getString(getString(R.string.rfidDriverListPrefKey), "");
         String driverName = RfidDriverBase.getDriverName(classPath);
         if (driverName == null) {
-            driverName = "драйвер не выбран";
+            driverName = getString(R.string.no_driver_select);
         } else if (ru.toir.mobile.rfid.driver.RfidDriverQRcode.class.getName().equals(classPath)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -1079,12 +1094,62 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        Log.d(TAG, "onPause()");
-        super.onPause();
-        if (checkGPSThread != null) {
-            checkGPSThread.interrupt();
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy()");
+        super.onDestroy();
+        if (realmDB != null) {
+            realmDB.close();
         }
+
+        if (_locationManager != null) {
+            if (_gpsListener != null) {
+                _locationManager.removeUpdates(_gpsListener);
+            }
+
+            _locationManager = null;
+            _gpsListener = null;
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        String action = intent.getAction();
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+            StringBuilder hexId = new StringBuilder();
+            for (byte b : id) {
+                hexId.append(String.format("%02X", b));
+            }
+
+            Intent result = new Intent(RfidDriverNfc.ACTION_NFC);
+            result.putExtra("tagId", hexId.toString());
+            sendBroadcast(result);
+        }
+    }
+
+    /**
+     * Проверка включен ли GPS.
+     *
+     * @return boolean
+     */
+    private boolean isGpsOn() {
+        if (GPSPresent) {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            return lm != null && lm.isProviderEnabled(locationBestProvider);
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Проверка на необходимость GPS
+     */
+    private boolean isSkipGPS() {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        return sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
     }
 
     @Override
@@ -1162,69 +1227,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (!GPSPresent) {
-                Toast.makeText(this, "Устройство не оборудовано приёмником GPS!",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.device_has_no_gps), Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "onDestroy()");
-        super.onDestroy();
-        if (realmDB != null) {
-            realmDB.close();
-        }
-
-        if (_locationManager != null) {
-            if (_gpsListener != null) {
-                _locationManager.removeUpdates(_gpsListener);
-            }
-
-            _locationManager = null;
-            _gpsListener = null;
-        }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        String action = intent.getAction();
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-            byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
-            StringBuilder hexId = new StringBuilder();
-            for (byte b : id) {
-                hexId.append(String.format("%02X", b));
-            }
-
-            Intent result = new Intent(RfidDriverNfc.ACTION_NFC);
-            result.putExtra("tagId", hexId.toString());
-            sendBroadcast(result);
-        }
-    }
-
-    /**
-     * Проверка включен ли GPS.
-     *
-     * @return boolean
-     */
-    private boolean isGpsOn() {
-        if (GPSPresent) {
-            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            return lm != null && lm.isProviderEnabled(locationBestProvider);
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Проверка на необходимость GPS
-     */
-    private boolean isSkipGPS() {
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-        return sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
     }
 
     public void setLocale(String lang) {
@@ -1235,9 +1240,15 @@ public class MainActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(config,
                 getBaseContext().getResources().getDisplayMetrics());
         this.setContentView(R.layout.activity_main);
+    }
 
-        //Intent refresh = new Intent(this, AndroidLocalize.class);
-        //finish();
-        //startActivity(refresh);
+    private void setLocale() {
+        final Resources resources = getResources();
+        final Configuration configuration = resources.getConfiguration();
+        final Locale locale = getLocale(this);
+        if (!configuration.locale.equals(locale)) {
+            configuration.setLocale(locale);
+            resources.updateConfiguration(configuration, null);
+        }
     }
 }

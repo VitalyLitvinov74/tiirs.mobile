@@ -51,7 +51,7 @@ public class DocumentationFragment extends Fragment {
         if (activity != null) {
             Toolbar toolbar = activity.findViewById(R.id.toolbar);
             if (toolbar != null) {
-                toolbar.setSubtitle("Документация");
+                toolbar.setSubtitle(getString(R.string.documentation));
             }
         }
 

@@ -1,5 +1,6 @@
 package ru.toir.mobile.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,7 @@ import ru.toir.mobile.db.realm.Contragent;
 
 public class ContragentsFragment extends Fragment {
     private Realm realmDB;
+    private Activity mainActivityConnector = null;
 
     public static ContragentsFragment newInstance() {
 		return new ContragentsFragment();
@@ -34,10 +36,12 @@ public class ContragentsFragment extends Fragment {
 	@Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        mainActivityConnector = getActivity();
+        if (mainActivityConnector == null)
+            return null;
         View rootView = inflater.inflate(R.layout.contragent_reference_layout, container, false);
-        Toolbar toolbar = (getActivity()).findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Клиенты");
+        Toolbar toolbar = mainActivityConnector.findViewById(R.id.toolbar);
+        toolbar.setSubtitle(getString(R.string.contragents));
         realmDB = Realm.getDefaultInstance();
 
         ListView contragentsListView = rootView.findViewById(R.id.crl_contragents_listView);
@@ -89,7 +93,7 @@ public class ContragentsFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("contragent_uuid", contragent_uuid);
                 contragentInfo.putExtras(bundle);
-                getActivity().startActivity(contragentInfo);
+                mainActivityConnector.startActivity(contragentInfo);
             }
         }
     }

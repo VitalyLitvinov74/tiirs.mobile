@@ -1401,7 +1401,7 @@ public class ReferenceFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         // добавляем элемент меню для обновления справочников
-        MenuItem getTask = menu.add("Обновить справочники");
+        MenuItem getTask = menu.add(getString(R.string.menu_references_update));
         getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
             @Override
@@ -1416,24 +1416,24 @@ public class ReferenceFragment extends Fragment {
                 updateReferences(dialog);
 
                 // показываем диалог обновления справочников
-                dialog.setMessage("Получаем справочники");
+                dialog.setMessage(getString(R.string.references_update));
                 dialog.setIndeterminate(true);
                 dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 dialog.setCancelable(false);
                 dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-                        "Отмена", new DialogInterface.OnClickListener() {
+                        getString(R.string.cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int which) {
 //								getActivity().unregisterReceiver(mReceiverGetReference);
-                                Toast.makeText(getActivity(), "Обновление справочников отменено",
+                                Toast.makeText(getActivity(), getString(R.string.references_update_canceled),
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
-                        Toast.makeText(getContext(), "Справочники обновлены", Toast.LENGTH_SHORT)
+                        Toast.makeText(getContext(), getString(R.string.references_update_success), Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });

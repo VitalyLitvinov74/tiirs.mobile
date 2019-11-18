@@ -59,7 +59,7 @@ public class UserInfoFragment extends Fragment {
         FragmentActivity activity = getActivity();
         if (activity != null) {
             Toolbar toolbar = activity.findViewById(R.id.toolbar);
-            toolbar.setSubtitle("Пользователь");
+            toolbar.setSubtitle(getString(R.string.menu_user));
 
             realmDB = Realm.getDefaultInstance();
             initView(rootView);

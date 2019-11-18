@@ -604,7 +604,7 @@ public class LoadTestData {
                 //equipment3.setCriticalTypeUuid(criticalTypeUuid2);
                 //equipment3.setEquipmentModelUuid(equipmentModelUuid3);
                 //equipment3.setEquipmentStatusUuid(equipmentStatusUuid3);
-                equipment3.setImage("gas_counter.jpg");
+                //equipment3.setImage("gas_counter.jpg");
                 equipment3.setInventoryNumber("IN:62211252");
                 equipment3.setUuid(equipmentUuid3);
                 equipment3.setTitle("Счетчик газа ВК-G10T");
@@ -628,7 +628,7 @@ public class LoadTestData {
                 //equipment4.setCriticalTypeUuid(criticalTypeUuid);
                 //equipment4.setEquipmentModelUuid(equipmentModelUuid4);
                 //equipment4.setEquipmentStatusUuid(equipmentStatusUuid3);
-                equipment4.setImage("pressure.jpg");
+                //equipment4.setImage("pressure.jpg");
                 equipment4.setInventoryNumber("IN:78921213");
                 equipment4.setUuid(equipmentUuid4);
                 equipment4.setTitle("Датчик давления YSO-04");

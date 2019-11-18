@@ -90,7 +90,7 @@ public class GPSFragment extends Fragment {
         EquipmentAdapter equipmentAdapter;
         ListView equipmentListView;
 
-        toolbar.setSubtitle("Карта");
+        toolbar.setSubtitle(getString(R.string.menu_map));
         realmDB = Realm.getDefaultInstance();
         RealmResults<Equipment> equipments; // = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
 

@@ -186,12 +186,73 @@
     <string name="send_order_comment">Коментарий</string>
     <string name="send_order_author">Автор наряда</string>
 
+    <string name="rfid_settings">Настройки драйвера RFID</string>
     <string name="debug_nocheck_gps">Не проверять GPS</string>
     <string name="receive_telegram">Оповещать через Telegram</string>
     <string name="receive_viber">Оповещать через Viber</string>
     <string name="telegram_chat_id">Идентификатор чата</string>
-    <string name="telegram_chat_id_value">0</string>
+    <string name="telegram_chat_id_value">Идентификатор чата 0</string>
     <string name="defect_description">Описание дефекта</string>
+
+    <string name="driver_text">Текстовый драйвер</string>
+    <string name="advanced_settings">Отображение и данные</string>
+
+    <string name="menu_user">Исполнитель</string>
+    <string name="menu_orders">Наряды</string>
+    <string name="menu_map">Карта</string>
+
+    <string name="menu_user_description">Информация о пользователе</string>
+    <string name="menu_equipment_description">Справочник оборудования</string>
+    <string name="menu_equipment_map">Расположение оборудования</string>
+    <string name="menu_additional">Дополнительно</string>
+    <string name="menu_documentation">Документация</string>
+    <string name="menu_on_equipment">на оборудование</string>
+    <string name="menu_objects">Объекты</string>
+    <string name="menu_objects_description">Здания и сооружения</string>
+    <string name="menu_client_reference">Справочник контрагентов</string>
+    <string name="menu_journal_track">Журнал и gps трек</string>
+    <string name="menu_about_app">О программе</string>
+    <string name="menu_information">Информация о версии</string>
+    <string name="menu_exit">Выход</string>
+
+    <string name="toast_db_actual">База данных актуальна!</string>
+    <string name="toast_db_error">Не удалось открыть/обновить базу данных!</string>
+    <string name="toast_enter">Вход в систему</string>
+    <string name="toast_token_received">Токен получен</string>
+    <string name="toast_error_picture">Не удалось получить масштабированное изображение</string>
+    <string name="toast_error_no_user">Информация о пользователе не получена с сервера</string>
+    <string name="toast_error_no_user_received">Просто не получили пользователя</string>
+    <string name="toast_error_no_token_received">Просто не получили токен</string>
+    <string name="toast_error_no_access">Нет доступа</string>
+    <string name="toast_error_operation_canceled">Операция прервана</string>
+
+    <string name="subtitle_repair">Обслуживание и ремонт</string>
+    <string name="current_tasks">Текущие задания</string>
+    <string name="sync_data">Синхронизируем данные</string>
+    <string name="please_login">Пожалуйста зарегистрируйтесь</string>
+    <string name="no_driver_select">Драйвер не выбран</string>
+    <string name="no_user_present">Непредвиденная ошибка: нет такого пользователя</string>
+    <string name="gps_must_enabled">GPS должен быть включен</string>
+    <string name="no_url_for_update">Не указан URL для обновления!</string>
+
+    <string name="change_attribute">Изменение атрибута</string>
+    <string name="download_update">Загрузка обновления</string>
+    <string name="update_error">Ошибка при обновлении!</string>
+    <string name="unknown">неизвестен</string>
+    <string name="device_has_no_gps">Устройство не оборудовано приёмником GPS!</string>
+    <string name="cannot_upload_file">Файл не удалось загрузить</string>
+    <string name="measure_values">Измерение параметров</string>
+
+    <string name="menu_stages">Этапы задач</string>
+    <string name="menu_operations">Операции</string>
+    <string name="error_equipment_not_found">Оборудование не найдено</string>
+    <string name="error_equipment_read_tag_error">Ошибка при запросе оборудования</string>
+    <string name="error_read_tag">Не удалось считать метку</string>
+    <string name="menu_service">Сервис</string>
+    <string name="menu_references_update">Обновить справочники</string>
+    <string name="references_update">"Получаем справочники"</string>
+    <string name="references_update_canceled">"Обновление справочников отменено"</string>
+    <string name="references_update_success">"Справочники обновлены"</string>
 
     <string name="lang_ru_text">Русский</string>
     <string name="lang_de_text">Deutsch</string>

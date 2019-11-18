@@ -81,12 +81,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private final static String TAG = "EquipmentInfoActivity";
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
-
     //private static final int DIALOG_SET_DEFECT = 1;
     //private static final int DIALOG_SET_STATUS = 2;
     CoordinatorLayout rootLayout;
-
-    //Spinner defectTypeSpinner;
 
     private Realm realmDB;
     private String equipment_uuid;
@@ -238,7 +235,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (equipment.getEquipmentStatus() != null) {
             tv_equipment_status.setText(equipment.getEquipmentStatus().getTitle());
         } else {
-            tv_equipment_status.setText("неизвестен");
+            tv_equipment_status.setText(getString(R.string.unknown));
         }
 
         String sDate;
@@ -1012,7 +1009,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                         if (file.exists()) {
                             showDocument(file, getApplicationContext());
                         } else {
-                            Toast.makeText(getBaseContext(), "Файл не удалось загрузить.",
+                            Toast.makeText(getBaseContext(), getString(R.string.cannot_upload_file),
                                     Toast.LENGTH_LONG).show();
                         }
                     }

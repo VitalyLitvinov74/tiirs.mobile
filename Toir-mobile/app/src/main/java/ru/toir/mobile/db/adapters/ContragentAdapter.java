@@ -108,8 +108,6 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
         TextView description;
         TextView phone;
         TextView type;
-        TextView latitude;
-        TextView longitude;
         TextView parent;
     }
 

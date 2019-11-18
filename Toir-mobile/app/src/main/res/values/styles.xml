@@ -27,11 +27,13 @@
 	    <item name="android:windowActionBarOverlay">true</item>
         <item name="colorControlNormal">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="PreferenceScreen" parent="CustomTheme">
         <item name="android:textColor">@color/larisaTextColorABlack</item>
         <item name="colorControlNormal">@color/larisaBlueColor</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="PreferenceCategory" parent="CustomTheme">
@@ -42,7 +44,7 @@
         <item name="android:textColor">@color/larisaTextColorABlack</item>
     </style>
 
-    <style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+    <style name="CMOptionsMenu">
 	     <item name="android:popupBackground">#ffffff</item>
 	</style>
 
@@ -53,7 +55,7 @@
     <style name="FullscreenTheme" parent="MaterialDrawerTheme.Light.TranslucentStatus">
     </style>
 
-    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
+    <style name="checkBoxStyle">
         <item name="colorAccent">@color/larisaBlueColor</item>
         <item name="android:textColorSecondary">@color/larisaBlueColor</item>
     </style>

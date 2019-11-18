@@ -17,21 +17,22 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Downloader extends AsyncTask<String, Integer, String> {
-	
-	ProgressDialog dialog;
-	Context context;
-	File outputFile;
 
-    public Downloader(Context d) {
+    private ProgressDialog dialog;
+	Context context;
+    private File outputFile;
+
+    Downloader(Context d) {
 		context = d;
 		dialog = new ProgressDialog(context);
-		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена", new DialogInterface.OnClickListener() {
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				cancel(true);
 			}
 		});
-		dialog.setMessage("Загрузка обновления");
+        dialog.setMessage(context.getString(R.string.download_update));
 		dialog.setIndeterminate(true);
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		dialog.setCancelable(false);
@@ -122,7 +123,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 			intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
 			context.startActivity(intent);
 		} else {
-			Toast.makeText(context, "Ошибка при обновлении!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.update_error), Toast.LENGTH_LONG).show();
 		}
 
 	}

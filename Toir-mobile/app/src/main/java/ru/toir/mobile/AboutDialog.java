@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 
 class AboutDialog extends Dialog {
 
-    private static final String TAG = "AboutDialog";
     private Context mContext = null;
 
     AboutDialog(Context context) {

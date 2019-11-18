@@ -255,7 +255,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
         setSupportActionBar(toolbar);
         //toolbar.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.larisaBlueColor));
         toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setSubtitle("Измерение параметров");
+        toolbar.setSubtitle(getString(R.string.measure_values));
 
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -275,8 +275,15 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false),
-                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false)
+                        new PrimaryDrawerItem().withName(getString(R.string.menu_about_app))
+                                .withDescription(getString(R.string.menu_information))
+                                .withIcon(FontAwesome.Icon.faw_info)
+                                .withIdentifier(DRAWER_INFO)
+                                .withSelectable(false),
+                        new PrimaryDrawerItem().withName(getString(R.string.menu_exit))
+                                .withIcon(FontAwesome.Icon.faw_undo)
+                                .withIdentifier(DRAWER_EXIT)
+                                .withSelectable(false)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -284,7 +291,7 @@ public class MeasureActivity extends AppCompatActivity implements OnChartValueSe
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == DRAWER_INFO) {
                                 new AlertDialog.Builder(view.getContext())
-                                        .setTitle("Информация о программе")
+                                        .setTitle(getString(R.string.about_message))
                                         .setMessage(R.string.program_version)
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {

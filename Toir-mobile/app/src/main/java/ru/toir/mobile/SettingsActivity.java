@@ -212,7 +212,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         ListPreference langList = (ListPreference) this.findPreference(getResources().getString(
                 R.string.langListKey));
         langList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 String value = (String) newValue;
@@ -579,10 +578,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         config.locale = locale;
         getBaseContext().getResources().updateConfiguration(config,
                 getBaseContext().getResources().getDisplayMetrics());
-        this.setContentView(R.layout.activity_main);
-        Intent refresh = new Intent(this, MainActivity.class);
-        finish();
-        startActivity(refresh);
+        getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
     }
 }
 

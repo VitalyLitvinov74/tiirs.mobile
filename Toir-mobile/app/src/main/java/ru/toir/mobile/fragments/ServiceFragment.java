@@ -36,7 +36,7 @@ public class ServiceFragment extends Fragment {
         ListView gpsListView = rootView.findViewById(R.id.service_list_view_gps);
 
         Toolbar toolbar = (getActivity()).findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Сервис");
+        toolbar.setSubtitle(getString(R.string.menu_service));
         realmDB = Realm.getDefaultInstance();
 
         RealmResults<Journal> journal;

@@ -2,17 +2,17 @@
     <tab
         id="@+id/menu_user"
         icon="@drawable/ic_icon_user"
-        title="Пользователь" />
+        title="@string/menu_user" />
     <tab
         id="@+id/menu_orders"
         icon="@drawable/ic_icon_tasks2"
-        title="Наряды" />
+        title="@string/menu_orders" />
     <tab
         id="@+id/menu_equipments"
         icon="@drawable/ic_icon_tools"
-        title="Оборудование" />
+        title="@string/menu_equipment" />
     <tab
         id="@+id/menu_maps"
         icon="@drawable/ic_icon_maps"
-        title="Карта" />
+        title="@string/menu_map" />
 </tabs>

@@ -75,7 +75,7 @@ public class EquipmentsFragment extends Fragment {
         }
 
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Оборудование");
+        toolbar.setSubtitle(getString(R.string.menu_equipment));
         realmDB = Realm.getDefaultInstance();
 
         // обработчик для выпадающих списков у нас один
@@ -175,14 +175,14 @@ public class EquipmentsFragment extends Fragment {
                                             realm.close();
                                             showEquipmentInfoActivity(getActivity(), equipment.getUuid());
                                         } else {
-                                            Toast.makeText(getActivity(), "Оборудование не найдено.",
+                                            Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
                                                     Toast.LENGTH_LONG).show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(Call<Equipment> responseBodyCall, Throwable t) {
-                                        Toast.makeText(getActivity(), "Ошибка при запросе оборудования.",
+                                        Toast.makeText(getActivity(), getString(R.string.error_equipment_read_tag_error),
                                                 Toast.LENGTH_LONG).show();
                                         t.printStackTrace();
                                     }
@@ -192,7 +192,7 @@ public class EquipmentsFragment extends Fragment {
 
                             realm.close();
                         } else {
-                            Toast.makeText(getActivity(), "Не удалось считать метку.",
+                            Toast.makeText(getActivity(), getString(R.string.error_read_tag),
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -247,14 +247,19 @@ public class EquipmentsFragment extends Fragment {
             object_uuid = bundle.getString("object_uuid");
         }
         if (equipmentTypeUuid != null) {
-            equipments = realmDB.where(Equipment.class).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
+            equipments = realmDB.where(Equipment.class)
+                    .equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid)
+                    .findAll();
             if (object_uuid != null) {
-                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid).findAll();
+                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid)
+                        .equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid)
+                        .findAll();
             }
         } else {
             equipments = realmDB.where(Equipment.class).findAll();
             if (object_uuid != null) {
-                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid).findAll();
+                equipments = realmDB.where(Equipment.class).equalTo("location.uuid", object_uuid)
+                        .findAll();
             }
         }
 

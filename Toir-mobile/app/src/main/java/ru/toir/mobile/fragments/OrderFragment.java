@@ -267,7 +267,7 @@ public class OrderFragment extends Fragment {
         Activity activity = getActivity();
         if (activity != null) {
             toolbar = activity.findViewById(R.id.toolbar);
-            toolbar.setSubtitle("Наряды");
+            toolbar.setSubtitle(getString(R.string.menu_orders));
             sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
             bottomBar = activity.findViewById(R.id.bottomBar);
         }
@@ -548,7 +548,7 @@ public class OrderFragment extends Fragment {
 
         Level = ORDER_LEVEL;
         if (toolbar != null) {
-            toolbar.setSubtitle("Наряды");
+            toolbar.setSubtitle(getString(R.string.menu_orders));
         }
 
         fillListViewOrders();
@@ -628,7 +628,7 @@ public class OrderFragment extends Fragment {
         }
 
         if (toolbar != null) {
-            toolbar.setSubtitle("Задачи");
+            toolbar.setSubtitle(getString(R.string.menu_tasks));
         }
 
         if (order.getTasks() != null && order.getTasks().size() > 0) {
@@ -656,7 +656,7 @@ public class OrderFragment extends Fragment {
         }
 
         if (toolbar != null) {
-            toolbar.setSubtitle("Этапы задач");
+            toolbar.setSubtitle(getString(R.string.menu_stages));
         }
 
         if (task.getStages() != null && task.getStages().size() > 0) {
@@ -691,7 +691,7 @@ public class OrderFragment extends Fragment {
         }
 
         if (toolbar != null) {
-            toolbar.setSubtitle("Операции");
+            toolbar.setSubtitle(getString(R.string.menu_operations));
         }
 
         if (stage.getOperations() != null && stage.getOperations().size() > 0) {

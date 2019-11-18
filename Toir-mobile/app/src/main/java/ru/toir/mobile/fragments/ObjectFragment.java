@@ -85,7 +85,7 @@ public class ObjectFragment extends Fragment {
         final ObjectAdapter objectAdapter;
         final ListView objectsListView;
 
-        toolbar.setSubtitle("Карта объектов");
+        toolbar.setSubtitle(getString(R.string.menu_objects));
         realmDB = Realm.getDefaultInstance();
 
         //User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();

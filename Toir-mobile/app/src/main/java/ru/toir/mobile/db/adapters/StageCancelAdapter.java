@@ -18,7 +18,7 @@ import ru.toir.mobile.db.realm.StageVerdict;
 
 /**
  * @author Dmitriy Logachev
- *         Created by koputo on 16.05.18.
+ * Created by koputo on 16.05.18.
  */
 public class StageCancelAdapter extends RealmBaseAdapter<Stage> implements ListAdapter {
     private static final int MAX_OPERATIONS = 100;

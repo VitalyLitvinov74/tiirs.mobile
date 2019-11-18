@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceScreen
+    <PreferenceCategory
         android:icon="@drawable/pref_basic"
         android:key="preferenceBasicScreen"
         android:theme="@style/PreferenceScreen"
@@ -29,7 +30,7 @@
         <PreferenceScreen
             android:icon="@drawable/pref_rfid"
             android:key="@string/rfidDrvSettingKey"
-            android:title="Настройки драйвера RFID" />
+            android:title="@string/rfid_settings" />
 
         <ListPreference
             android:entries="@array/languages"
@@ -37,47 +38,45 @@
             android:icon="@drawable/pref_lang"
             android:key="@string/langListKey"
             android:title="@string/pref_lang" />
+    </PreferenceCategory>
 
-    </PreferenceScreen>
-    <PreferenceScreen
+    <PreferenceCategory
         android:icon="@drawable/pref_check"
         android:theme="@style/CustomTheme"
-        android:title="Отображение и данные">
-        <PreferenceCategory android:title="@string/pref_cat_show">
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="@string/pref_debug_mode_key"
-                android:title="@string/pref_debug_mode" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="@string/pref_autonome_mode_key"
-                android:title="@string/pref_autonome_mode" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="@string/run_ar_content_key"
-                android:title="@string/run_ar_content" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="without_tags_mode"
-                android:title="@string/dont_ask_text_tags" />
-            <Preference
-                android:key="@string/load_test_data"
-                android:title="@string/load_test_data" />
-            <Preference
-                android:key="@string/delete_test_data"
-                android:title="@string/delete_test_data" />
-            <CheckBoxPreference
-                android:key="@string/debug_nocheck_gps"
-                android:title="@string/debug_nocheck_gps" />
-            <CheckBoxPreference
-                android:key="@string/receive_telegram"
-                android:title="@string/receive_telegram" />
-            <CheckBoxPreference
-                android:key="@string/receive_viber"
-                android:title="@string/receive_viber" />
-            <Preference
-                android:key="@string/telegram_chat_id"
-                android:title="@string/telegram_chat_id_value" />
-        </PreferenceCategory>
-    </PreferenceScreen>
+        android:title="@string/advanced_settings">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_debug_mode_key"
+            android:title="@string/pref_debug_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_autonome_mode_key"
+            android:title="@string/pref_autonome_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/run_ar_content_key"
+            android:title="@string/run_ar_content" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="without_tags_mode"
+            android:title="@string/dont_ask_text_tags" />
+        <Preference
+            android:key="@string/load_test_data"
+            android:title="@string/load_test_data" />
+        <Preference
+            android:key="@string/delete_test_data"
+            android:title="@string/delete_test_data" />
+        <CheckBoxPreference
+            android:key="@string/debug_nocheck_gps"
+            android:title="@string/debug_nocheck_gps" />
+        <CheckBoxPreference
+            android:key="@string/receive_telegram"
+            android:title="@string/receive_telegram" />
+        <CheckBoxPreference
+            android:key="@string/receive_viber"
+            android:title="@string/receive_viber" />
+        <Preference
+            android:key="@string/telegram_chat_id"
+            android:title="@string/telegram_chat_id_value" />
+    </PreferenceCategory>
 </PreferenceScreen>
