@@ -114,13 +114,13 @@ public class DocumentationFragment extends Fragment {
         if (documentationTypeUuid != null) {
             query.equalTo("documentationType.uuid", documentationTypeUuid);
             if (sort != null) {
-                documentation = query.findAllSorted(sort);
+                documentation = query.sort(sort).findAll();
             } else {
                 documentation = query.findAll();
             }
         } else {
             if (sort != null) {
-                documentation = query.findAllSorted(sort);
+                documentation = query.sort(sort).findAll();
             } else {
                 documentation = query.findAll();
             }

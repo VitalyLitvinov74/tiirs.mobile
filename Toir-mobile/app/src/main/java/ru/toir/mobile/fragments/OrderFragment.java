@@ -509,9 +509,9 @@ public class OrderFragment extends Fragment {
 
             RealmResults<Orders> orders;
             if (orderByField != null) {
-                orders = query.findAllSorted(orderByField);
+                orders = query.sort(orderByField).findAll();
             } else {
-                orders = query.findAllSorted("startDate", Sort.DESCENDING);
+                orders = query.sort("startDate", Sort.DESCENDING).findAll();
             }
 
             orderAdapter = new OrderAdapter(orders);
