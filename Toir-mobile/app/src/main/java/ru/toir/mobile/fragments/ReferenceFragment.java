@@ -55,6 +55,7 @@ import ru.toir.mobile.db.adapters.StageStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
 import ru.toir.mobile.db.realm.AttributeType;
+import ru.toir.mobile.db.realm.CommonFile;
 import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Defect;
@@ -69,10 +70,10 @@ import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.ObjectType;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationFile;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationTool;
@@ -442,6 +443,83 @@ public class ReferenceFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+                // CommonFile
+                referenceName = CommonFile.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<CommonFile>> response = ToirAPIFactory.getCommonFileService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<CommonFile> list = response.body();
+                        List<FilePath> files = new ArrayList<>();
+                        File extDir = context.getExternalFilesDir("");
+                        AuthorizedUser user = AuthorizedUser.getInstance();
+                        String userName = user.getLogin();
+                        if (extDir == null) {
+                            throw new Exception("Unable get extDir!!!");
+                        }
+
+                        for (CommonFile item : list) {
+                            // TODO: решить вопрос с алгоритмом сохранения файлов. в какие папки.
+                            String localPath = item.getImageFilePath() + "/";
+                            if (isNeedDownload(extDir, item, localPath, item.isRequired())) {
+                                String url = item.getImageFileUrl(userName) + "/";
+                                files.add(new FilePath(item.getPath(), url, localPath));
+                            }
+                        }
+
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+
+                        Map<String, Set<String>> requestList = new HashMap<>();
+                        // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
+                        for (FilePath item : files) {
+                            String key = item.urlPath + item.fileName;
+                            if (!requestList.containsKey(key)) {
+                                Set<String> listOfDoc = new HashSet<>();
+                                listOfDoc.add(item.localPath);
+                                requestList.put(key, listOfDoc);
+                            } else {
+                                requestList.get(key).add(item.localPath);
+                            }
+                        }
+
+                        // загружаем файлы
+                        for (String key : requestList.keySet()) {
+                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
+                            try {
+                                retrofit2.Response<ResponseBody> r = callFile.execute();
+                                ResponseBody trueImgBody = r.body();
+                                if (trueImgBody == null) {
+                                    continue;
+                                }
+
+                                for (String localPath : requestList.get(key)) {
+                                    String fileName = key.substring(key.lastIndexOf("/") + 1);
+                                    File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
+                                    if (!file.getParentFile().exists()) {
+                                        if (!file.getParentFile().mkdirs()) {
+                                            Log.e(TAG, "Не удалось создать папку " +
+                                                    file.getParentFile().toString() +
+                                                    " для сохранения файла изображения!");
+                                            continue;
+                                        }
+                                    }
+
+                                    FileOutputStream fos = new FileOutputStream(file);
+                                    fos.write(trueImgBody.bytes());
+                                    fos.close();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 realm.close();
             }
         };
@@ -1140,16 +1218,17 @@ public class ReferenceFragment extends Fragment {
 
                 // User ???
 
-                // OperationFile
-                referenceName = OperationFile.class.getSimpleName();
+                // MediaFile (Пока тянем с прицелом на то что понадобится например смотреть фотки
+                // предыдущих дефектов, например.)
+                referenceName = MediaFile.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<OperationFile>> response = ToirAPIFactory.getOperationFileService()
+                    Response<List<MediaFile>> response = ToirAPIFactory.getMediaFileService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<OperationFile> list = response.body();
+                        List<MediaFile> list = response.body();
                         // устанавливаем флаг того данные были уже отправлены на сервер
-                        for (OperationFile file : list) {
+                        for (MediaFile file : list) {
                             file.setSent(true);
                         }
 
@@ -1237,12 +1316,12 @@ public class ReferenceFragment extends Fragment {
         long localChangedAt;
 
         // есть ли локальная запись
-        try {
+        if (dbObj != null) {
             localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
-        } catch (Exception e) {
-            return isRequery;
-        } finally {
             realm.close();
+        } else {
+            realm.close();
+            return isRequery;
         }
 
         // есть ли локально файл
@@ -1401,47 +1480,47 @@ public class ReferenceFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         // добавляем элемент меню для обновления справочников
-        MenuItem getTask = menu.add("Обновить справочники");
-        getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(TAG, "Обновляем справочники.");
-                ProgressDialog dialog = new ProgressDialog(getActivity());
-
-
-//				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity().getApplicationContext(), ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
-//				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
-//				rsh.getAll();
-                updateReferences(dialog);
-
-                // показываем диалог обновления справочников
-                dialog.setMessage("Получаем справочники");
-                dialog.setIndeterminate(true);
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setCancelable(false);
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-                        "Отмена", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-//								getActivity().unregisterReceiver(mReceiverGetReference);
-                                Toast.makeText(getActivity(), "Обновление справочников отменено",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        Toast.makeText(getContext(), "Справочники обновлены", Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                });
-                dialog.show();
-
-                return true;
-            }
-        });
+//        MenuItem getTask = menu.add("Обновить справочники");
+//        getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                Log.d(TAG, "Обновляем справочники.");
+//                ProgressDialog dialog = new ProgressDialog(getActivity());
+//
+//
+////				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity().getApplicationContext(), ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
+////				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
+////				rsh.getAll();
+//                updateReferences(dialog);
+//
+//                // показываем диалог обновления справочников
+//                dialog.setMessage("Получаем справочники");
+//                dialog.setIndeterminate(true);
+//                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//                dialog.setCancelable(false);
+//                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+//                        "Отмена", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog,
+//                                                int which) {
+////								getActivity().unregisterReceiver(mReceiverGetReference);
+//                                Toast.makeText(getActivity(), "Обновление справочников отменено",
+//                                        Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                    @Override
+//                    public void onDismiss(DialogInterface dialogInterface) {
+//                        Toast.makeText(getContext(), "Справочники обновлены", Toast.LENGTH_SHORT)
+//                                .show();
+//                    }
+//                });
+//                dialog.show();
+//
+//                return true;
+//            }
+//        });
     }
 
     @Override

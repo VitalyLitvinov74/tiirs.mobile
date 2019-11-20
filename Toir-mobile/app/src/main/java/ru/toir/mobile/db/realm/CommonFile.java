@@ -13,6 +13,7 @@ public class CommonFile extends RealmObject implements IToirDbObject {
     private String path;
     private String name;
     private String description;
+    private boolean required;
     private Date createdAt;
     private Date changedAt;
 
@@ -97,5 +98,13 @@ public class CommonFile extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }

@@ -27,6 +27,7 @@ import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
 import ru.toir.mobile.rest.interfaces.IAttributeType;
+import ru.toir.mobile.rest.interfaces.ICommonFile;
 import ru.toir.mobile.rest.interfaces.IContragent;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
 import ru.toir.mobile.rest.interfaces.IDefect;
@@ -42,10 +43,10 @@ import ru.toir.mobile.rest.interfaces.IFileDownload;
 import ru.toir.mobile.rest.interfaces.IGpsTrack;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
 import ru.toir.mobile.rest.interfaces.IMeasuredValue;
+import ru.toir.mobile.rest.interfaces.IMediaFile;
 import ru.toir.mobile.rest.interfaces.IObjectType;
 import ru.toir.mobile.rest.interfaces.IObjects;
 import ru.toir.mobile.rest.interfaces.IOperation;
-import ru.toir.mobile.rest.interfaces.IOperationFile;
 import ru.toir.mobile.rest.interfaces.IOperationStatus;
 import ru.toir.mobile.rest.interfaces.IOperationTemplate;
 import ru.toir.mobile.rest.interfaces.IOperationTool;
@@ -169,6 +170,11 @@ ToirAPIFactory {
     }
 
     @NonNull
+    public static ICommonFile getCommonFileService() {
+        return getRetrofit().create(ICommonFile.class);
+    }
+
+    @NonNull
     public static IDocumentationType getDocumentationTypeService() {
         return getRetrofit().create(IDocumentationType.class);
     }
@@ -219,8 +225,8 @@ ToirAPIFactory {
     }
 
     @NonNull
-    public static IOperationFile getOperationFileService() {
-        return getRetrofit().create(IOperationFile.class);
+    public static IMediaFile getMediaFileService() {
+        return getRetrofit().create(IMediaFile.class);
     }
 
     @NonNull

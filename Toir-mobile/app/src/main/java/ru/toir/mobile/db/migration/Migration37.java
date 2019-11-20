@@ -23,6 +23,7 @@ public class Migration37 implements IToirMigration {
                 .addField("path", String.class)
                 .addField("name", String.class)
                 .addField("description", String.class)
+                .addField("required", boolean.class)
                 .addField("createdAt", Date.class)
                 .addField("changedAt", Date.class)
                 .addPrimaryKey("_id");
