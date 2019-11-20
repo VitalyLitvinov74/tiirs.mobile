@@ -82,7 +82,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:background="@color/larisaBackColor"
-            android:textColor="#FAFAFA"
+            android:textColor="@color/larisaTextColorAWhite"
             android:onClick="mOnClickMethod"
             android:text="@string/profile_submit_button" />
 

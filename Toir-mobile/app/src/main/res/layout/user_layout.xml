@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
@@ -12,7 +11,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FAFAFA"
+        android:background="@color/larisaTextColorAWhite"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -35,12 +34,12 @@
                 android:layout_height="40dp"
                 android:layout_below="@+id/user_image"
                 android:adjustViewBounds="true"
-                android:background="#1565C0"
+                android:background="@color/larisaBlueColor"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
                 android:paddingTop="10dp"
                 android:scaleType="centerCrop"
-                android:textColor="#ffffff"
+                android:textColor="@color/larisaWhiteColor"
                 android:textSize="20sp" />
 
             <TextView
@@ -49,11 +48,11 @@
                 android:layout_height="30dp"
                 android:layout_below="@+id/user_text_name"
                 android:adjustViewBounds="true"
-                android:background="#1565C0"
+                android:background="@color/larisaBlueColor"
                 android:paddingBottom="10dp"
-                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:scaleType="centerCrop"
-                android:textColor="#ffffff"
+                android:textColor="@color/larisaWhiteColor"
                 android:textSize="15sp" />
 
             <ru.toir.mobile.utils.IconTextView
@@ -62,7 +61,6 @@
                 android:layout_height="50dp"
                 android:textSize="24sp"
                 android:layout_below="@+id/user_text_uuid"
-                android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
                 android:text="@string/icon_user_tie"
                 android:textColor="@color/larisaBlueColor" />
@@ -72,9 +70,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_uuid"
-                android:layout_toRightOf="@+id/user_icon"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp"
                 android:layout_toEndOf="@+id/user_icon" />
@@ -84,9 +81,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_type"
-                android:layout_toRightOf="@+id/user_icon"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:text="@string/whois"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp"
@@ -98,7 +94,6 @@
                 android:layout_height="50dp"
                 android:textSize="24sp"
                 android:layout_below="@+id/user_text_whois_label"
-                android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
                 android:text="@string/icon_map_marker"
                 android:textColor="@color/larisaBlueColor" />
@@ -108,9 +103,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_whois_label"
-                android:layout_toRightOf="@+id/user_location_icon"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:layout_toEndOf="@+id/user_location_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
@@ -119,9 +114,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_location"
-                android:layout_toRightOf="@+id/user_location_icon"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:text="@string/current_location"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp"
@@ -133,7 +127,6 @@
                 android:layout_height="50dp"
                 android:textSize="24sp"
                 android:layout_below="@+id/user_text_location_label"
-                android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
                 android:text="@string/icon_server"
                 android:textColor="@color/larisaBlueColor" />
@@ -143,9 +136,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_location_label"
-                android:layout_toRightOf="@+id/user_date_icon"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp"
                 android:layout_toEndOf="@+id/user_date_icon" />
@@ -155,9 +147,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_date"
-                android:layout_toRightOf="@+id/user_date_icon"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:text="@string/server_date_connect"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp"
@@ -176,10 +167,10 @@
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:layout_below="@+id/user_divider"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:clickable="false"
                 android:gravity="center_vertical"
-                android:paddingLeft="50dp"
+                android:paddingStart="50dp"
                 android:text="@string/gprs_status"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="18sp" />
@@ -188,7 +179,6 @@
                 android:id="@+id/user_status_gprs_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_alignRight="@+id/user_status_gprs"
                 android:layout_below="@+id/user_divider"
                 android:enabled="false"
                 android:gravity="center_vertical"
@@ -200,9 +190,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:layout_below="@+id/user_status_gprs"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:clickable="false"
-                android:paddingLeft="50dp"
+                android:paddingStart="50dp"
                 android:gravity="center_vertical"
                 android:text="@string/gps_status"
                 android:textColor="@color/larisaTextColor"
@@ -212,7 +202,6 @@
                 android:id="@+id/user_status_gps_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_alignRight="@+id/user_status_gps"
                 android:layout_below="@+id/user_status_gprs_switch"
                 android:gravity="center_vertical"
                 android:text=""
@@ -224,8 +213,6 @@
                 android:layout_height="1dp"
                 android:layout_below="@+id/user_status_gps"
                 android:background="#EDEDED"
-                android:paddingLeft="30dp"
-                android:paddingRight="10dp"
                 android:paddingStart="30dp"
                 android:paddingEnd="10dp" />
 
@@ -234,7 +221,6 @@
                 android:layout_width="36dp"
                 android:layout_height="50dp"
                 android:layout_below="@+id/user_divider2"
-                android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
                 android:text="@string/icon_phone"
                 android:textColor="@color/larisaBlueColor"
@@ -244,10 +230,8 @@
                 android:id="@+id/user_text_boss"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp"
-                android:layout_toRightOf="@+id/user_boss_contact"
                 android:layout_below="@+id/user_divider2"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp"
                 android:layout_toEndOf="@+id/user_boss_contact"
@@ -258,9 +242,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/user_text_boss"
-                android:layout_toRightOf="@+id/user_boss_contact"
-                android:background="#FAFAFA"
-                android:paddingLeft="10dp"
+                android:layout_toEndOf="@+id/user_boss_contact"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
                 android:text="@string/boss_contact"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
@@ -270,7 +254,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:layout_below="@+id/user_boss_contact"
-                android:background="#ffffff" />
+                android:background="@color/larisaWhiteColor" />
 
         </RelativeLayout>
     </ScrollView>

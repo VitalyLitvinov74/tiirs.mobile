@@ -20,9 +20,9 @@
             android:layout_marginTop="5dip"
             android:background="#1565c0"
             android:gravity="center_vertical"
-            android:paddingLeft="5dip"
+            android:paddingStart="5dip"
             android:text="@string/description"
-            android:textColor="#ffffff"
+            android:textColor="@color/larisaWhiteColor"
             android:textSize="16sp"
             android:visibility="gone" />
 
@@ -52,7 +52,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="255dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:src="@android:drawable/ic_dialog_alert"
         app:backgroundTint="@color/md_red_A700"
         app:fabSize="normal" />
@@ -64,7 +63,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="190dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:src="@drawable/cameraicon"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
@@ -76,7 +74,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="125dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:src="@drawable/ic_info"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
@@ -87,7 +84,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="60dp"
-        android:layout_marginRight="15dp"
         android:src="@drawable/check_box"
         app:backgroundTint="@color/larisaBlueColor"
         android:layout_marginEnd="15dp"
@@ -100,7 +96,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="125dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:src="@android:drawable/ic_menu_help"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />

@@ -21,7 +21,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FAFAFA"
+        android:background="@color/larisaTextColorAWhite"
         android:scrollbars="vertical">
 
         <RelativeLayout
@@ -47,7 +47,7 @@
                 android:paddingStart="15dp"
                 android:paddingTop="10dp"
                 android:scaleType="centerCrop"
-                android:textColor="#ffffff"
+                android:textColor="@color/larisaWhiteColor"
                 android:textSize="20sp" />
 
             <TextView
@@ -60,7 +60,7 @@
                 android:paddingBottom="10dp"
                 android:paddingStart="15dp"
                 android:scaleType="centerCrop"
-                android:textColor="#ffffff"
+                android:textColor="@color/larisaWhiteColor"
                 android:textSize="16sp" />
 
             <ru.toir.mobile.utils.IconTextView
@@ -81,9 +81,9 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_text_type"
                 android:layout_toEndOf="@+id/equipment_id_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
-                android:textColor="#000000"
+                android:textColor="@color/larisaTextColorABlack"
                 android:textSize="14sp" />
 
             <TextView
@@ -92,10 +92,10 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_uuid"
                 android:layout_toEndOf="@+id/equipment_id_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
                 android:text="@string/equipment_title"
-                android:textColor="#757575"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <ru.toir.mobile.utils.IconTextView
@@ -116,9 +116,9 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_id"
                 android:layout_toEndOf="@+id/defect_user_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
-                android:textColor="#000000"
+                android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
             <TextView
@@ -127,10 +127,10 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_user_name"
                 android:layout_toEndOf="@+id/defect_user_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
                 android:text="@string/defect_user"
-                android:textColor="#757575"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <ru.toir.mobile.utils.IconTextView
@@ -151,9 +151,9 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_text_user_label"
                 android:layout_toEndOf="@+id/defect_date_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
-                android:textColor="#000000"
+                android:textColor="@color/larisaTextColorBlack"
                 android:textSize="16sp" />
 
             <TextView
@@ -162,10 +162,10 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_text_date"
                 android:layout_toEndOf="@+id/defect_date_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
                 android:text="@string/defect_date"
-                android:textColor="#757575"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <ru.toir.mobile.utils.IconTextView
@@ -186,9 +186,9 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_text_date_label"
                 android:layout_toEndOf="@+id/defect_status_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
-                android:textColor="#000000"
+                android:textColor="@color/larisaTextColorABlack"
                 android:textSize="16sp" />
 
             <TextView
@@ -197,10 +197,10 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_text_status"
                 android:layout_toEndOf="@+id/defect_status_icon"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
                 android:text="@string/current_status"
-                android:textColor="#757575"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
             <TextView
@@ -208,10 +208,10 @@
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/defect_text_status_label"
-                android:background="#FAFAFA"
+                android:background="@color/larisaTextColorAWhite"
                 android:minLines="3"
                 android:paddingStart="10dp"
-                android:textColor="#757575"
+                android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
         </RelativeLayout>
 

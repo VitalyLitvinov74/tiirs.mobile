@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0dip"
             android:layout_toRightOf="@id/operation_startDate"
-            android:background="#FAFAFA"
+            android:background="@color/larisaTextColorAWhite"
             android:textColor="#454545"
             android:layout_below="@+id/operation_title"
             android:text="@string/tire"

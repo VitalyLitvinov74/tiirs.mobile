@@ -22,7 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="5dp"
-        android:textColor="#222222"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="16sp"
         android:gravity="center_vertical"
         android:layout_toEndOf="@+id/defect_image"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/defect_title"
         android:layout_marginStart="5dp"
-        android:textColor="#222222"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="14sp"
         android:layout_toEndOf="@+id/defect_image" />
 

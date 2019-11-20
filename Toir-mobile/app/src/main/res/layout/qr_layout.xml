@@ -14,7 +14,7 @@
             android:layout_width="200dip"
             android:layout_height="200dip"
             android:layout_marginTop="1dp"
-            android:background="@android:color/white" >
+            android:background="@color/larisaWhiteColor">
         </FrameLayout>
 
     </LinearLayout>
@@ -31,7 +31,7 @@
             android:layout_width="150dip"
             android:layout_height="150dip"
             android:contentDescription="@string/image_description"
-            android:background="@android:color/white" />
+            android:background="@color/larisaWhiteColor" />
 
     </LinearLayout>
 
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dip"
             android:text="@string/scan_process"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/larisaTextColorBlack" />
 
     </LinearLayout>
 

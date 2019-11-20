@@ -8,12 +8,12 @@
             android:id="@+id/tl_Header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
+            android:layout_marginStart="10dip"
             android:background="#1565c0"
             android:gravity="center_vertical"
-            android:paddingLeft="5dip"
+            android:paddingStart="5dip"
             android:text="@string/description"
-            android:textColor="#ffffff"
+            android:textColor="@color/larisaWhiteColor"
             android:textSize="16sp" />
 
         <ListView

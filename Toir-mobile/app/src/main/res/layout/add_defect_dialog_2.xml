@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true"
         android:text="@string/choose_defect_type"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/almostblack" />
+        android:textColor="@color/larisaTextColorABlack" />
 
     <Spinner
         android:id="@+id/spinner_defect_type"
@@ -33,7 +33,7 @@
         android:layout_below="@+id/spinner_defect_type"
         android:text="@string/equipment_title"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/almostblack" />
+        android:textColor="@color/larisaTextColorABlack" />
 
     <Spinner
         android:id="@+id/spinner_equipment"
@@ -53,7 +53,7 @@
         android:layout_below="@+id/spinner_equipment"
         android:text="@string/defect_description"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/almostblack" />
+        android:textColor="@color/larisaTextColorABlack" />
 
     <EditText
         android:id="@+id/add_new_comment"

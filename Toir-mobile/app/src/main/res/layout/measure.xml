@@ -17,14 +17,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:background="#FAFAFA"
+        android:background="@color/larisaTextColorAWhite"
         android:text="@string/measure_description"
         android:textSize="16sp" />
 
     <LinearLayout
         android:id="@+id/meas_linearLayout"
         android:layout_width="fill_parent"
-        android:background="#FAFAFA"
+        android:background="@color/larisaTextColorAWhite"
         android:layout_height="wrap_content" >
 
         <Spinner
@@ -40,7 +40,7 @@
         android:id="@+id/meas_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FAFAFA"
+        android:background="@color/larisaTextColorAWhite"
         android:orientation="horizontal">
 
         <EditText
@@ -57,7 +57,7 @@
             android:text="@string/measure"
             android:background="#4DD0E1"
             android:drawableLeft="@drawable/measureicon"
-            android:textColor="#FAFAFA"
+            android:textColor="@color/larisaTextColorAWhite"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:layout_marginLeft="5dp"
@@ -72,7 +72,7 @@
         android:id="@+id/meas_content2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FAFAFA"
+        android:background="@color/larisaTextColorAWhite"
         android:orientation="horizontal">
 
             <com.github.mikephil.charting.charts.BarChart

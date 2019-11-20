@@ -8,9 +8,9 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="5dp"
+        android:layout_alignParentStart="true"
         android:layout_marginBottom="5dp"
-        android:layout_alignParentLeft="true"
+        android:layout_marginStart="5dp"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/description"
         android:src="@drawable/no_image" />
@@ -19,13 +19,13 @@
         android:id="@+id/cril_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:textColor="#222222"
         android:textSize="16sp"
         android:gravity="center_vertical"
-        android:layout_toRightOf="@+id/cril_image"
+        android:layout_toEndOf="@+id/cril_image"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -33,10 +33,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cril_title"
-        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:textColor="#222222"
         android:textSize="14sp"
-        android:layout_toRightOf="@+id/cril_image"
+        android:layout_toEndOf="@+id/cril_image"
         android:text="@string/client_type" />
 
     <TextView
@@ -46,8 +46,8 @@
         android:layout_below="@+id/cril_type"
         android:textColor="#222222"
         android:textSize="14sp"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/cril_image"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/cril_image"
         android:text="@string/client_phone" />
 
 </RelativeLayout>
