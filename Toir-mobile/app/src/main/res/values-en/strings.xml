@@ -169,7 +169,7 @@
     <string name="client_phone">phone: %1$s</string>
 
     <string name="defects">Fixed defects</string>
-    <string name="defect_user">User: </string>
+    <string name="defect_user">User</string>
 
     <string name="order_title">[#%1$d] %2$s</string>
     <string name="order_author">Order author: %1$s</string>
@@ -201,6 +201,7 @@
     <string name="menu_user">User</string>
     <string name="menu_orders">Orders</string>
     <string name="menu_map">Map</string>
+    <string name="menu_defects">Defects</string>
 
     <string name="menu_user_description">User information</string>
     <string name="menu_equipment_description">Equipment reference</string>

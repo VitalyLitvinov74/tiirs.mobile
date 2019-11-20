@@ -6,7 +6,7 @@
     <string name="pleasePutTag">Label</string>
     <string name="readTag">Lesen</string>
     <string name="cancel">Abbrechen</string>
-    <string name="action_update">Die App aktualisieren</string>
+    <string name="action_update">App aktualisieren</string>
     <string name="pref_cat_main">Grundlegend</string>
     <string name="pref_cat_rfid">Geräteeinstellungen</string>
     <string name="pref_cat_show">Anzeigeeinstellungen</string>
@@ -36,8 +36,8 @@
     <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Referenzen</string>
-    <string name="get_task">Die Orders bekommen</string>
-    <string name="choose_tag">Wählen Sie ein Tag aus dem Menü aus</string>
+    <string name="get_task">Orders bekommen</string>
+    <string name="choose_tag">Wählen Sie einen Tag aus dem Menü aus</string>
     <string name="back">Zurück</string>
     <string name="ok">OK</string>
     <string name="make_photo">Fotografieren</string>
@@ -48,7 +48,7 @@
     <string name="current_location">Aktuelle Koordinaten</string>
     <string name="no_gps_data">Keine GPS-Daten</string>
     <string name="current_status">Aktueller Status</string>
-    <string name="operation_list">Liste der zuletzt ausgeführten Tasken</string>
+    <string name="operation_list">Liste der zuletzt ausgeführten Tasks</string>
     <string name="gps_status">GPS-Status</string>
     <string name="gprs_status">GPRS-Status</string>
     <string name="server_date_connect">Serverkommunikationsdatum</string>
@@ -74,19 +74,19 @@
     <string name="operation_title">Operation:</string>
     <string name="status_title">Status:</string>
     <string name="result_title">Ergebnis:</string>
-    <string name="step_image_descr">Arbeitesgang foto</string>
+    <string name="step_image_descr">Arbeitsgangsfoto</string>
     <string name="task_title">Order:</string>
     <string name="stat_status">Status:</string>
     <string name="operation">Operation:</string>
     <string name="operation_step_title">Schritt:</string>
     <string name="additional_information">Zusätzliche Informationen</string>
-    <string name="operation_step_descr_title">Beschreibung des Operationsschritte</string>
+    <string name="operation_step_descr_title">Beschreibung des Operationsschrittes</string>
     <string name="operation_status_change_title">Operationsstatus ändern</string>
     <string name="operation_choose_status">Wählen Sie den Abschlussstatus für die Operation aus</string>
     <string name="divider">|</string>
     <string name="num500">500</string>
     <string name="application_full_name">Mobile Toir/MRO</string>
-    <string name="bluetooth_server">Bluetooth server</string>
+    <string name="bluetooth_server">Bluetooth Server</string>
     <string name="open_documentation">Dokumentation öffnen</string>
 
     <string name="title_activity_btserver">BTServerActivity</string>
@@ -113,7 +113,7 @@
     <string name="menu_tasks">Orders</string>
     <string name="menu_references">Referenzen</string>
     <string name="menu_users">Benutzer</string>
-    <string name="pref_lang">Oberflächensprache</string>
+    <string name="pref_lang">Interfacesprache</string>
 
     <string name="profile_type_administrator">Admin</string>
     <string name="profile_type_engeneer">Benutzer</string>
@@ -138,7 +138,7 @@
     <string name="dialog_accept">Akzeptieren</string>
     <string name="dialog_cancel">Abbrechen</string>
     <string name="select_all">Alles auswählen</string>
-    <string name="operation_cancel_text">Sie haben eine oder mehrere Operationen verpasst. Geben Sie den Grund / das Urteil für sie an. </string>
+    <string name="operation_cancel_text">Sie haben eine oder mehrere Operationen verpasst. Geben Sie den Grund / das Urteil dafür an. </string>
 
     <string name="run_ar_content">AR-Inhalt starten</string>
     <string name="run_ar_content_key">run_ar_content_key</string>
@@ -157,17 +157,17 @@
     <string name="choose_defect_category">Defektkategorie</string>
     <string name="choose_defect_type">Fehlertyp</string>
     <string name="mistakes_category_all">Alle Kategorien</string>
-    <string name="mistakes_category_non_specific">Unspezifische Defekt</string>
-    <string name="action_save">Schreiben</string>
-    <string name="new_status">Ändern Sie den Status in</string>
+    <string name="mistakes_category_non_specific">Unspezifischer Defekt</string>
+    <string name="action_save">Aufschreiben</string>
+    <string name="new_status">Ändern Sie den Status</string>
     <string name="contragents">Clients</string>
     <string name="input_contragents_name">Geben Sie den Kundennamen ein</string>
 
     <string name="client_type">Client Typ: $1$s</string>
     <string name="client_phone">Telefon: %1$s</string>
 
-    <string name="mistakes">Entdeckt Defekt</string>
-    <string name="defect_user">Gefunden:</string>
+    <string name="mistakes">Entdeckte Defekten</string>
+    <string name="defect_user">Gefunden</string>
 
     <string name="order_title">[#%1$d] %2$s</string>
     <string name="order_author">Orderautor: %1$s</string>
@@ -190,7 +190,7 @@
     <string name="receive_viber">Über Viber benachrichtigen</string>
     <string name="telegram_chat_id">Chat-ID</string>
     <string name="telegram_chat_id_value">Chat-ID 0</string>
-    <string name="defect_description">Beschreibung den Defekt</string>
+    <string name="defect_description">Defektbeschreibung</string>
 
     <string name="driver_text">Texttreiber</string>
     <string name="advanced_settings">Anzeige und Daten</string>
@@ -198,6 +198,7 @@
     <string name="menu_user">Mitarbeiter</string>
     <string name="menu_orders">Orders</string>
     <string name="menu_map">Karte</string>
+    <string name="menu_defects">Defekten</string>
 
     <string name="menu_user_description">Benutzerinformationen</string>
     <string name="menu_equipment_description">Hardware-Referenz</string>
@@ -214,7 +215,7 @@
     <string name="menu_exit">Beenden</string>
 
     <string name="toast_db_actual">Die Datenbank ist aktuell!</string>
-    <string name="toast_db_error">Fehler beim Öffnen / Aktualisieren der Datenbank!</string>
+    <string name="toast_db_error">Fehler beim Öffnen / Datenbank aktualisieren!</string>
     <string name="toast_enter">Anmelden</string>
     <string name="toast_token_received">Token empfangen</string>
     <string name="toast_error_picture">Skaliertes Foto konnte nicht abgerufen werden</string>
@@ -227,9 +228,9 @@
     <string name="subtitle_repair">Service und Reparatur</string>
     <string name="current_tasks">Aktuelle Jobs</string>
     <string name="sync_data">Daten synchronisieren</string>
-    <string name="please_login">Bitte registrieren Sie sich</string>
+    <string name="please_login">Bitte melden Sie sich an</string>
     <string name="no_driver_select">Kein Treiber ausgewählt</string>
-    <string name="no_user_present">Unerwarteter Fehler: Kein solcher Benutzer</string>
+    <string name="no_user_present">Unerwarteter Fehler: Benutzer nicht gefunden</string>
     <string name="gps_must_enabled">GPS muss aktiviert sein</string>
     <string name="no_url_for_update">Keine zu aktualisierende URL!</string>
 

@@ -68,6 +68,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ContragentsFragment;
+import ru.toir.mobile.fragments.DefectsFragment;
 import ru.toir.mobile.fragments.DocumentationFragment;
 import ru.toir.mobile.fragments.EquipmentsFragment;
 import ru.toir.mobile.fragments.GPSFragment;
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_SERVICE = 15;
     private static final int FRAGMENT_OBJECTS = 16;
     private static final int FRAGMENT_CONTRAGENTS = 17;
+    private static final int FRAGMENT_DEFECTS = 18;
 
     private static final String TAG = "MainActivity";
 
@@ -509,9 +511,9 @@ public class MainActivity extends AppCompatActivity {
                         currentFragment = FRAGMENT_EQUIPMENT;
                         tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
                         break;
-                    case R.id.menu_maps:
-                        currentFragment = FRAGMENT_GPS;
-                        tr.replace(R.id.frame_container, GPSFragment.newInstance());
+                    case R.id.menu_defects:
+                        currentFragment = FRAGMENT_DEFECTS;
+                        tr.replace(R.id.frame_container, DefectsFragment.newInstance());
                         break;
                 }
 
@@ -994,19 +996,6 @@ public class MainActivity extends AppCompatActivity {
             cnt = cnt + 1;
             if (cnt > MAX_USER_PROFILE) break;
         }
-    }
-
-    public void deleteProfile(int id) {
-        int id_remove;
-        for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
-            if (users_id[cnt] == id) {
-                iprofilelist.remove(cnt);
-                //headerResult.removeProfile(cnt);
-                id_remove = (int) (users_id[cnt]); // + 2
-                headerResult.removeProfileByIdentifier(id_remove);
-            }
-        }
-        refreshProfileList();
     }
 
     public void startAboutDialog() {

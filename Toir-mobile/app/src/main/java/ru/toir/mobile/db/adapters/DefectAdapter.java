@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -62,8 +63,11 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                 convertView = inflater.inflate(R.layout.defect_item_layout, parent, false);
                 viewHolder = new DefectAdapter.ViewHolder();
                 viewHolder.title = convertView.findViewById(R.id.defect_title);
-                viewHolder.user_name = convertView.findViewById(R.id.defect_user);
+                viewHolder.equipment = convertView.findViewById(R.id.defect_equipment);
                 viewHolder.date = convertView.findViewById(R.id.defect_date);
+                viewHolder.status = convertView.findViewById(R.id.defect_status);
+                viewHolder.image_status = convertView.findViewById(R.id.defect_status_image);
+                viewHolder.image_defect = convertView.findViewById(R.id.defect_image);
                 convertView.setTag(viewHolder);
             }
         } else {
@@ -84,16 +88,21 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                         viewHolder.title.setText(textData);
                         //viewHolder.title.setText("новый");
                     }
-
+                    if (defect.isProcess()) {
+                        viewHolder.image_status.setImageResource(R.drawable.status_easy_ready);
+                        viewHolder.status.setText(R.string.defect_status_processed);
+                    } else {
+                        viewHolder.status.setText(R.string.defect_status_non_processed);
+                    }
                     java.util.Date date = defect.getDate();
                     if (date != null) {
                         String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US)
                                 .format(date);
-                        viewHolder.date.setText(sDate);
+                        viewHolder.date.setText(defect.getUser().getName().concat(" [").concat(sDate).concat("]"));
                     }
 
                     if (defect.getUser() != null) {
-                        viewHolder.user_name.setText(defect.getUser().getName());
+                        viewHolder.equipment.setText(defect.getEquipment().getTitle());
                     }
                 }
             }
@@ -106,8 +115,10 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
     private static class ViewHolder {
         TextView uuid;
         TextView title;
-        TextView user_name;
         TextView date;
-        //TextView equipment;
+        TextView equipment;
+        TextView status;
+        ImageView image_status;
+        ImageView image_defect;
     }
 }
