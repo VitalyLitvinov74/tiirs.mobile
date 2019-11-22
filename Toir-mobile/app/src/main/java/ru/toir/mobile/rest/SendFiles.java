@@ -66,9 +66,7 @@ public class SendFiles extends AsyncTask<MediaFile[], Void, LongSparseArray<Stri
             List<MultipartBody.Part> list = new ArrayList<>();
 
             try {
-                // TODO: решить вопрос со схемой хранения файлов!!!!
-                File path = new File(extDir.getAbsolutePath() + '/' + file.getImageFilePath(),
-                        file.getPath() + '/' + file.getName());
+                File path = new File(extDir.getAbsolutePath() + '/' + file.getPath(), file.getName());
                 Uri uri = Uri.fromFile(path);
                 String fileUuid = file.getUuid();
                 String formId = "file[" + fileUuid + "]";

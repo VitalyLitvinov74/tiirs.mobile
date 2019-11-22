@@ -368,33 +368,39 @@ public class OrderFragment extends Fragment {
 
         fab_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Context context = getContext();
+                if (context == null) {
+                    return;
+                }
+
+                File file = null;
+                try {
+                    file = createImageFile();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+
+                photoFilePath = file.getAbsolutePath();
+                // TODO: реализовать все возможные варианты когда мы можем привязать фотку к сущности
+                switch (Level) {
+                    case OPERATION_LEVEL :
+                        currentEntityUuid = currentOperation.getUuid();
+                        break;
+                    default:
+                        currentEntityUuid = null;
+                        break;
+                }
+
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                     startActivityForResult(intent, ACTIVITY_PHOTO);
                 } else {
-                    Context context = getContext();
-                    if (context == null) {
-                        return;
-                    }
-
-                    File file = null;
-                    try {
-                        file = createImageFile();
-                    } catch (IOException ex) {
-                        // Error occurred while creating the File
-                    }
-
-                    if (file != null) {
-                        photoFilePath = file.getAbsolutePath();
-                        // фактически костыль, потому что у нас сейчас фотку можно сделать только на экране с операциями
-                        currentEntityUuid = currentOperation.getUuid();
-                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            startActivityForResult(intent, ACTIVITY_PHOTO);
-                        } else {
-                            getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
-                        }
+                    Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        startActivityForResult(intent, ACTIVITY_PHOTO);
+                    } else {
+                        getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
                     }
 //                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
 //                    intent.setData(doc);
@@ -989,7 +995,6 @@ public class OrderFragment extends Fragment {
         // строим список (всех) неотправленых медиа файлов
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
         List<MediaFile> filesToSend = new ArrayList<>();
-        String[] opUuidsArray = operationUuids.toArray(new String[]{});
         RealmResults<MediaFile> mediaFiles = realmDB.where(MediaFile.class)
                 .equalTo("sent", false)
                 .findAll();
@@ -1008,6 +1013,7 @@ public class OrderFragment extends Fragment {
         sendFiles(filesToSend);
 
         // получаем все измерения связанные с выполненными операциями
+        String[] opUuidsArray = operationUuids.toArray(new String[]{});
         RealmResults<MeasuredValue> measuredValues = realmDB
                 .where(MeasuredValue.class)
                 .equalTo("sent", false)
@@ -1391,8 +1397,8 @@ public class OrderFragment extends Fragment {
                     MediaFile mediaFile = new MediaFile();
                     mediaFile.set_id(MediaFile.getLastId() + 1);
                     mediaFile.setEntityUuid(currentEntityUuid);
-                    // TODO: решить вопрос с алгоритмом сохранения файлов - в какую папку сохранять?
-                    mediaFile.setPath("");
+                    format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
                     mediaFile.setName(fileName.toString());
                     File picDir = activity.getApplicationContext()
                             .getExternalFilesDir(mediaFile.getPath());
