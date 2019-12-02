@@ -96,6 +96,7 @@ import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.Tool;
 import ru.toir.mobile.db.realm.ToolType;
 import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.ToirAPIResponse;
 
 public class ReferenceFragment extends Fragment {
     private static final String TAG = "ReferenceFragment";
@@ -479,7 +480,6 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<CommonFile> list = response.body();
-                        List<FilePath> files = new ArrayList<>();
                         File extDir = context.getExternalFilesDir("");
                         AuthorizedUser user = AuthorizedUser.getInstance();
                         String userName = user.getLogin();
@@ -488,12 +488,8 @@ public class ReferenceFragment extends Fragment {
                         }
 
                         for (CommonFile item : list) {
-                            // TODO: решить вопрос с алгоритмом сохранения файлов. в какие папки.
-                            String localPath = item.getImageFilePath() + "/";
-                            if (isNeedDownload(extDir, item, localPath, item.isRequired())) {
-                                String url = item.getImageFileUrl(userName) + "/";
-                                files.add(new FilePath(item.getPath(), url, localPath));
-                            }
+                            String localPath = CommonFile.getImageRoot();
+                            item.setPath(localPath);
                         }
 
                         if (list.size() > 0) {
@@ -503,22 +499,26 @@ public class ReferenceFragment extends Fragment {
                             ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                         }
 
-                        Map<String, Set<String>> requestList = new HashMap<>();
-                        // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
-                        for (FilePath item : files) {
-                            String key = item.urlPath + item.fileName;
-                            if (!requestList.containsKey(key)) {
-                                Set<String> listOfDoc = new HashSet<>();
-                                listOfDoc.add(item.localPath);
-                                requestList.put(key, listOfDoc);
-                            } else {
-                                requestList.get(key).add(item.localPath);
-                            }
-                        }
-
                         // загружаем файлы
-                        for (String key : requestList.keySet()) {
-                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
+                        for (CommonFile item : list) {
+                            if (!isNeedDownload(extDir, item, item.getPath(), item.isRequire())) {
+                                continue;
+                            }
+
+                            String url = null;
+                            Response<ToirAPIResponse> urlResponse = ToirAPIFactory.getCommonFileService()
+                                    .getUrl(item.getUuid()).execute();
+                            if (response.isSuccessful()) {
+                                ToirAPIResponse data = urlResponse.body();
+                                url = (String) data.getData();
+                                if (url == null || url.equals("")) {
+                                    continue;
+                                }
+
+                                url = ToirApplication.serverUrl + data.getData();
+                            }
+
+                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
                             try {
                                 retrofit2.Response<ResponseBody> r = callFile.execute();
                                 ResponseBody trueImgBody = r.body();
@@ -526,22 +526,19 @@ public class ReferenceFragment extends Fragment {
                                     continue;
                                 }
 
-                                for (String localPath : requestList.get(key)) {
-                                    String fileName = key.substring(key.lastIndexOf("/") + 1);
-                                    File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
-                                    if (!file.getParentFile().exists()) {
-                                        if (!file.getParentFile().mkdirs()) {
-                                            Log.e(TAG, "Не удалось создать папку " +
-                                                    file.getParentFile().toString() +
-                                                    " для сохранения файла изображения!");
-                                            continue;
-                                        }
+                                File file = new File(extDir.getAbsolutePath() + '/' + item.getPath(), item.getName());
+                                if (!file.getParentFile().exists()) {
+                                    if (!file.getParentFile().mkdirs()) {
+                                        Log.e(TAG, "Не удалось создать папку " +
+                                                file.getParentFile().toString() +
+                                                " для сохранения файла!");
+                                        continue;
                                     }
-
-                                    FileOutputStream fos = new FileOutputStream(file);
-                                    fos.write(trueImgBody.bytes());
-                                    fos.close();
                                 }
+
+                                FileOutputStream fos = new FileOutputStream(file);
+                                fos.write(trueImgBody.bytes());
+                                fos.close();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

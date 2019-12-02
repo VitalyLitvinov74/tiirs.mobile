@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 import ru.toir.mobile.db.realm.CommonFile;
 import ru.toir.mobile.db.realm.Documentation;
+import ru.toir.mobile.rest.ToirAPIResponse;
 
 public interface ICommonFile {
     @GET("/common-file")
@@ -26,4 +27,7 @@ public interface ICommonFile {
 
     @GET("/common-file")
     Call<List<CommonFile>> getByUuid(@Query("uuid") String[] uuid);
+
+    @GET("/common-file/url")
+    Call<ToirAPIResponse> getUrl(@Query("uuid") String uuid);
 }
