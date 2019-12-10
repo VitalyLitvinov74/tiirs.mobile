@@ -24,14 +24,14 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.*;
-import ru.toir.mobile.db.realm.OperationFile;
+import ru.toir.mobile.db.realm.MediaFile;
 
 /**
  * @author Dmitriy Logachev
  *         Created by koputo on 2/21/18.
  */
 
-public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<String>> {
+public class SendFiles extends AsyncTask<MediaFile[], Void, LongSparseArray<String>> {
 
     private File extDir;
     private WeakReference<Context> context;
@@ -58,16 +58,15 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
     }
 
     @Override
-    protected LongSparseArray<String> doInBackground(OperationFile[]... lists) {
+    protected LongSparseArray<String> doInBackground(MediaFile[]... lists) {
         LongSparseArray<String> idUuid = new LongSparseArray<>();
         RequestBody descr = RequestBody.create(MultipartBody.FORM, "Photos due execution operation.");
 
-        for (OperationFile file : lists[0]) {
+        for (MediaFile file : lists[0]) {
             List<MultipartBody.Part> list = new ArrayList<>();
 
             try {
-                File path = new File(extDir.getAbsolutePath() + '/' + file.getImageFilePath(),
-                        file.getFileName());
+                File path = new File(extDir.getAbsolutePath() + '/' + file.getPath(), file.getName());
                 Uri uri = Uri.fromFile(path);
                 String fileUuid = file.getUuid();
                 String formId = "file[" + fileUuid + "]";
@@ -78,9 +77,11 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
                 list.add(MultipartBody.Part
                         .createFormData(formId + "[uuid]", fileUuid));
                 list.add(MultipartBody.Part
-                        .createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
+                        .createFormData(formId + "[entityUuid]", file.getEntityUuid()));
                 list.add(MultipartBody.Part
-                        .createFormData(formId + "[fileName]", file.getFileName()));
+                        .createFormData(formId + "[path]", file.getPath()));
+                list.add(MultipartBody.Part
+                        .createFormData(formId + "[name]", file.getName()));
                 list.add(MultipartBody.Part
                         .createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
                 list.add(MultipartBody.Part
@@ -92,7 +93,7 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
 
             // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
             // объём данных превышающий ограничения на отправку POST запросом на сервере
-            Call<ResponseBody> call = ToirAPIFactory.getOperationFileService().upload(descr, list);
+            Call<ResponseBody> call = ToirAPIFactory.getMediaFileService().upload(descr, list);
             try {
                 retrofit2.Response response = call.execute();
                 ResponseBody result = (ResponseBody) response.body();
@@ -131,7 +132,7 @@ public class SendFiles extends AsyncTask<OperationFile[], Void, LongSparseArray<
         for (int idx = 0; idx < idUuid.size(); idx++) {
             long id = idUuid.keyAt(idx);
             String uuid = idUuid.valueAt(idx);
-            OperationFile file = realm.where(OperationFile.class).equalTo("_id", id)
+            MediaFile file = realm.where(MediaFile.class).equalTo("_id", id)
                     .equalTo("uuid", uuid).findFirst();
             if (file != null) {
                 file.setSent(true);

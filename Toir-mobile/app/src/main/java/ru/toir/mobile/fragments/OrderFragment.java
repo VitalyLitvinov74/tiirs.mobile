@@ -91,7 +91,7 @@ import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationFile;
+import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationType;
 import ru.toir.mobile.db.realm.OperationVerdict;
@@ -206,6 +206,8 @@ public class OrderFragment extends Fragment {
         public void onFinish() {
         }
     };
+    // свойство для хранения uuid сущности к которой мы привяжем медиа файл
+    private String currentEntityUuid;
     private String photoFilePath;
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
@@ -372,27 +374,39 @@ public class OrderFragment extends Fragment {
 
         fab_camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Context context = getContext();
+                if (context == null) {
+                    return;
+                }
+
+                File file = null;
+                try {
+                    file = createImageFile();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+
+                photoFilePath = file.getAbsolutePath();
+                // TODO: реализовать все возможные варианты когда мы можем привязать фотку к сущности
+                switch (Level) {
+                    case OPERATION_LEVEL :
+                        currentEntityUuid = currentOperation.getUuid();
+                        break;
+                    default:
+                        currentEntityUuid = null;
+                        break;
+                }
+
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                     startActivityForResult(intent, ACTIVITY_PHOTO);
                 } else {
-                    Context context = getContext();
-                    File file = null;
-                    try {
-                        file = createImageFile();
-                    } catch (IOException ex) {
-                        // Error occurred while creating the File
-                    }
-
-                    if (file != null) {
-                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            startActivityForResult(intent, ACTIVITY_PHOTO);
-                        } else {
-                            getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
-                        }
-
+                    Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        startActivityForResult(intent, ACTIVITY_PHOTO);
+                    } else {
+                        getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
                     }
 //                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
 //                    intent.setData(doc);
@@ -586,9 +600,9 @@ public class OrderFragment extends Fragment {
 
             RealmResults<Orders> orders;
             if (orderByField != null) {
-                orders = query.findAllSorted(orderByField);
+                orders = query.sort(orderByField).findAll();
             } else {
-                orders = query.findAllSorted("startDate", Sort.DESCENDING);
+                orders = query.sort("startDate", Sort.DESCENDING).findAll();
             }
 
             orderAdapter = new OrderAdapter(orders);
@@ -847,17 +861,17 @@ public class OrderFragment extends Fragment {
     }
 
     /**
-     * Метод для отправки файлов созданных во время выполнения операций или привязанных к операции.
+     * Метод для отправки медиа файлов
      */
-    private void sendFiles(List<OperationFile> files) {
+    private void sendFiles(List<MediaFile> files) {
         Context context = getContext();
         if (context != null) {
             File extDir = context.getExternalFilesDir("");
             SendFiles task = new SendFiles(extDir, context, taskCounter);
-            OperationFile[] sendFiles = files.toArray(new OperationFile[]{});
+            MediaFile[] sendFiles = files.toArray(new MediaFile[]{});
             task.execute(sendFiles);
         } else {
-            Log.e(TAG, "Не удалось запустить задачу отправки фотографий!");
+            Log.e(TAG, "Не удалось запустить задачу отправки медиа!");
         }
     }
 
@@ -1071,21 +1085,19 @@ public class OrderFragment extends Fragment {
             }
         }
 
-        // строим список файлов связанных с выполненными операциями
+        // строим список (всех) неотправленых медиа файлов
         // раньше список передавался как параметр в сервис отправки данных, сейчас пока не решено
-        List<OperationFile> filesToSend = new ArrayList<>();
-        String[] opUuidsArray = operationUuids.toArray(new String[]{});
-        RealmResults<OperationFile> operationFiles = realmDB.where(OperationFile.class)
-                .in("operation.uuid", opUuidsArray)
+        List<MediaFile> filesToSend = new ArrayList<>();
+        RealmResults<MediaFile> mediaFiles = realmDB.where(MediaFile.class)
                 .equalTo("sent", false)
                 .findAll();
 
         Context context = getContext();
         if (context != null) {
-            for (OperationFile item : operationFiles) {
-                File extDir = context.getExternalFilesDir(item.getImageFilePath());
-                File operationFile = new File(extDir, item.getFileName());
-                if (operationFile.exists()) {
+            for (MediaFile item : mediaFiles) {
+                File extDir = context.getExternalFilesDir(item.getPath());
+                File mediaFile = new File(extDir, item.getName());
+                if (mediaFile.exists()) {
                     filesToSend.add(realmDB.copyFromRealm(item));
                 }
             }
@@ -1094,6 +1106,7 @@ public class OrderFragment extends Fragment {
         sendFiles(filesToSend);
 
         // получаем все измерения связанные с выполненными операциями
+        String[] opUuidsArray = operationUuids.toArray(new String[]{});
         RealmResults<MeasuredValue> measuredValues = realmDB
                 .where(MeasuredValue.class)
                 .equalTo("sent", false)
@@ -1399,19 +1412,22 @@ public class OrderFragment extends Fragment {
     }
 
     private File createImageFile() throws IOException {
+        Context context = getContext();
+        if (context == null) {
+            return null;
+        }
+
         String timeStamp =
                 new SimpleDateFormat("yyyyMMdd_HHmmss",
                         Locale.getDefault()).format(new Date());
         String imageFileName = "IMG_" + timeStamp + "_";
-        File storageDir =
-                getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
 
-        photoFilePath = image.getAbsolutePath();
         return image;
     }
 
@@ -1471,20 +1487,21 @@ public class OrderFragment extends Fragment {
                     // имя файла для сохранения
                     SimpleDateFormat format = new SimpleDateFormat("HHmmss", Locale.US);
                     StringBuilder fileName = new StringBuilder();
-                    fileName.append(currentOperation.getUuid());
+                    fileName.append(currentEntityUuid);
                     fileName.append('-');
                     fileName.append(format.format(new Date()));
                     String extension = fromFilePath.substring(fromFilePath.lastIndexOf('.'));
                     fileName.append(extension);
 
                     // создаём объект файла фотографии для операции
-                    OperationFile operationFile = new OperationFile();
-                    operationFile.set_id(OperationFile.getLastId() + 1);
-                    operationFile.setOperation(currentOperation);
-                    operationFile.setFileName(fileName.toString());
-
+                    MediaFile mediaFile = new MediaFile();
+                    mediaFile.set_id(MediaFile.getLastId() + 1);
+                    mediaFile.setEntityUuid(currentEntityUuid);
+                    format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
+                    mediaFile.setName(fileName.toString());
                     File picDir = activity.getApplicationContext()
-                            .getExternalFilesDir(operationFile.getImageFilePath());
+                            .getExternalFilesDir(mediaFile.getPath());
                     if (picDir == null) {
                         // какое-то сообщение пользователю что не смогли "сохранить" результат
                         // фотофиксации?
@@ -1498,10 +1515,12 @@ public class OrderFragment extends Fragment {
                         }
                     }
 
-                    File toFile = new File(picDir, operationFile.getFileName());
+                    File toFile = new File(picDir, mediaFile.getName());
                     try {
                         copyFile(fromFile, toFile);
-                        fromFile.delete();
+                        if (!fromFile.delete()) {
+                            Log.d(TAG, "Не удалось удалить исходный файл");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         return;
@@ -1517,7 +1536,7 @@ public class OrderFragment extends Fragment {
                     // добавляем запись о полученном файле
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
-                    realm.copyToRealm(operationFile);
+                    realm.copyToRealm(mediaFile);
                     realm.commitTransaction();
                     realm.close();
                 }

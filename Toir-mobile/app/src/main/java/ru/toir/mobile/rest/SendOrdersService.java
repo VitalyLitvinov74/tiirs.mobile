@@ -30,7 +30,7 @@ import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationFile;
+import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.Task;
@@ -82,19 +82,17 @@ public class SendOrdersService extends Service {
                 // отмечаем успешно отправленные наряды
                 setSendOrders(idUuid, realm);
 
-                // список всех uuid операций во всех нарядах
-                String[] operationUuids = getAllOperations(orders).toArray(new String[]{});
-
-                // получаем список всех файлов связанных с операциями
-                RealmResults<OperationFile> operationFiles = realm.where(OperationFile.class)
-                        .in("operation.uuid", operationUuids)
+                // получаем список всех неотправленных файлов
+                RealmResults<MediaFile> mediaFiles = realm.where(MediaFile.class)
                         .equalTo("sent", false)
                         .findAll();
                 // отправляем файлы на сервер
-                idUuid = sendOperationFiles(realm.copyFromRealm(operationFiles));
+                idUuid = sendMediaFiles(realm.copyFromRealm(mediaFiles));
                 // отмечаем успешно отправленные файлы
-                setSendOperationFiles(idUuid, realm);
+                setSendMediaFiles(idUuid, realm);
 
+                // список всех uuid операций во всех нарядах
+                String[] operationUuids = getAllOperations(orders).toArray(new String[]{});
                 // получаем все измерения связанные с выполненными операциями
                 RealmResults<MeasuredValue> measuredValues = realm.where(MeasuredValue.class)
                         .equalTo("sent", false)
@@ -106,32 +104,6 @@ public class SendOrdersService extends Service {
                 setSendMeasuredValues(idUuid, realm);
             }
 
-            // выбираем все неотправленные по каким-то причинам ранее файлы
-            // (не обязательно входящие в наряды которые сейчас отправляем)
-            List<OperationFile> sendOldFiles = new ArrayList<>();
-            RealmResults<OperationFile> oldFiles = realm.where(OperationFile.class)
-                    .equalTo("sent", false).findAll();
-            for (OperationFile file : oldFiles) {
-                Stage stage = realm.where(Stage.class)
-                        .equalTo("uuid", file.getOperation().getStageUuid()).findFirst();
-                Task task = realm.where(Task.class).equalTo("uuid", stage.getTaskUuid())
-                        .findFirst();
-                Orders order = realm.where(Orders.class).equalTo("uuid", task.getOrderUuid())
-                        .findFirst();
-                // для того чтобы не отправлялись данные по выполняемым прямо сейчас нарядам
-                // дополнительно проверяем что наряд уже был отправлен
-                if (user.getUuid().equals(order.getUser().getUuid()) && order.isSent()) {
-                    sendOldFiles.add(realm.copyFromRealm(file));
-                }
-            }
-
-            if (sendOldFiles.size() > 0) {
-                // отправляем файлы на сервер
-                idUuid = sendOperationFiles(sendOldFiles);
-                // отмечаем успешно отправленные файлы
-                setSendOperationFiles(idUuid, realm);
-            }
-
             // выбираем все неотправленные по каким-то причинам ранее измерения
             // (не обязательно входящие в наряды которые сейчас отправляем)
             List<MeasuredValue> sendOldMeasuredValues = new ArrayList<>();
@@ -141,10 +113,22 @@ public class SendOrdersService extends Service {
                 String stageUuid = measuredValue.getOperation().getStageUuid();
                 Stage stage = realm.where(Stage.class).equalTo("uuid", stageUuid)
                         .findFirst();
+                if (stage == null) {
+                    continue;
+                }
+
                 Task task = realm.where(Task.class).equalTo("uuid", stage.getTaskUuid())
                         .findFirst();
+                if (task == null) {
+                    continue;
+                }
+
                 Orders order = realm.where(Orders.class).equalTo("uuid", task.getOrderUuid())
                         .findFirst();
+                if (order == null) {
+                    continue;
+                }
+
                 // для того чтобы не отправлялись данные по выполняемым прямо сейчас нарядам
                 // дополнительно проверяем что наряд уже был отправлен
                 if (user.getUuid().equals(order.getUser().getUuid()) && order.isSent()) {
@@ -235,7 +219,7 @@ public class SendOrdersService extends Service {
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
 
-    private List<MultipartBody.Part> getMultipartBody(OperationFile file, File path) {
+    private List<MultipartBody.Part> getMultipartBody(MediaFile file, File path) {
         List<MultipartBody.Part> list = new ArrayList<>();
         try {
             Uri uri = Uri.fromFile(path);
@@ -248,9 +232,11 @@ public class SendOrdersService extends Service {
             list.add(MultipartBody.Part
                     .createFormData(formId + "[uuid]", fileUuid));
             list.add(MultipartBody.Part
-                    .createFormData(formId + "[operationUuid]", file.getOperation().getUuid()));
+                    .createFormData(formId + "[entityUuid]", file.getEntityUuid()));
             list.add(MultipartBody.Part
-                    .createFormData(formId + "[fileName]", file.getFileName()));
+                    .createFormData(formId + "[path]", file.getPath()));
+            list.add(MultipartBody.Part
+                    .createFormData(formId + "[name]", file.getName()));
             list.add(MultipartBody.Part
                     .createFormData(formId + "[createdAt]", String.valueOf(file.getCreatedAt())));
             list.add(MultipartBody.Part
@@ -266,22 +252,22 @@ public class SendOrdersService extends Service {
     /**
      * Отправляем файлы
      *
-     * @param files List<OperationFile>
+     * @param files List<MediaFile>
      * @return LongSparseArray<String>
      */
-    private LongSparseArray<String> sendOperationFiles(List<OperationFile> files) {
+    private LongSparseArray<String> sendMediaFiles(List<MediaFile> files) {
         LongSparseArray<String> idUuid = new LongSparseArray<>();
         RequestBody descr = RequestBody.create(MultipartBody.FORM,
                 "Photos due execution operation.");
 
         // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
         // объём данных превышающий ограничения на отправку POST запросом на сервере
-        for (OperationFile file : files) {
-            File extDir = context.getExternalFilesDir(file.getImageFilePath());
-            File operationFile = new File(extDir, file.getFileName());
-            if (operationFile.exists()) {
-                Call<ResponseBody> call = ToirAPIFactory.getOperationFileService()
-                        .upload(descr, getMultipartBody(file, operationFile));
+        for (MediaFile file : files) {
+            File extDir = context.getExternalFilesDir(file.getPath());
+            File mediaFile = new File(extDir, file.getName());
+            if (mediaFile.exists()) {
+                Call<ResponseBody> call = ToirAPIFactory.getMediaFileService()
+                        .upload(descr, getMultipartBody(file, mediaFile));
                 try {
                     retrofit2.Response response = call.execute();
                     ResponseBody result = (ResponseBody) response.body();
@@ -312,12 +298,12 @@ public class SendOrdersService extends Service {
      *
      * @param idUuid LondSparseArray<String>
      */
-    private void setSendOperationFiles(LongSparseArray<String> idUuid, Realm realm) {
+    private void setSendMediaFiles(LongSparseArray<String> idUuid, Realm realm) {
         realm.beginTransaction();
         for (int idx = 0; idx < idUuid.size(); idx++) {
             long id = idUuid.keyAt(idx);
             String uuid = idUuid.valueAt(idx);
-            OperationFile file = realm.where(OperationFile.class).equalTo("_id", id)
+            MediaFile file = realm.where(MediaFile.class).equalTo("_id", id)
                     .equalTo("uuid", uuid).findFirst();
             if (file != null) {
                 file.setSent(true);

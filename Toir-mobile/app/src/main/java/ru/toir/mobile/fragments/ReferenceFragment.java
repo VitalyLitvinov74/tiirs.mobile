@@ -3,7 +3,6 @@ package ru.toir.mobile.fragments;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,14 +11,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,6 +52,7 @@ import ru.toir.mobile.db.adapters.StageStatusAdapter;
 import ru.toir.mobile.db.adapters.TaskStatusAdapter;
 import ru.toir.mobile.db.realm.AlertType;
 import ru.toir.mobile.db.realm.AttributeType;
+import ru.toir.mobile.db.realm.CommonFile;
 import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Defect;
@@ -69,10 +67,10 @@ import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.db.realm.IToirDbObject;
 import ru.toir.mobile.db.realm.MeasureType;
 import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.ObjectType;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
-import ru.toir.mobile.db.realm.OperationFile;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OperationTool;
@@ -98,6 +96,7 @@ import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.Tool;
 import ru.toir.mobile.db.realm.ToolType;
 import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.ToirAPIResponse;
 
 public class ReferenceFragment extends Fragment {
     private static final String TAG = "ReferenceFragment";
@@ -129,10 +128,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderLevel> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -146,10 +147,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderStatus> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -163,10 +166,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OrderVerdict> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -180,10 +185,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskVerdict> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -197,10 +204,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<TaskStatus> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -214,10 +223,12 @@ public class ReferenceFragment extends Fragment {
                             .getEquipmentStatusService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<EquipmentStatus> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -231,10 +242,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageVerdict> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -248,10 +261,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<StageStatus> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -265,10 +280,12 @@ public class ReferenceFragment extends Fragment {
                             .getOperationVerdictService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationVerdict> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -282,10 +299,12 @@ public class ReferenceFragment extends Fragment {
                             .getOperationStatusService().get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<OperationStatus> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -299,10 +318,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<MeasureType> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -316,10 +337,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<AttributeType> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -335,14 +358,17 @@ public class ReferenceFragment extends Fragment {
                         // TODO: реализовать механизм проверки наличия изменённых данных локально
                         // при необходимости отбрасывать данные с сервера
                         List<EquipmentAttribute> list = response.body();
-                        // сразу ставим флаг что они "отправлены", чтоб избежать их повторной отправки
-                        for (EquipmentAttribute item : list) {
-                            item.setSent(true);
+                        if (list.size() > 0) {
+                            // сразу ставим флаг что они "отправлены", чтоб избежать их повторной отправки
+                            for (EquipmentAttribute item : list) {
+                                item.setSent(true);
+                            }
+
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                         }
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -356,10 +382,12 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<DefectType> list = response.body();
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -389,10 +417,12 @@ public class ReferenceFragment extends Fragment {
                             }
                         }
 
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(list);
-                        realm.commitTransaction();
-                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
 
                         Map<String, Set<String>> requestList = new HashMap<>();
                         // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
@@ -442,6 +472,81 @@ public class ReferenceFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+                // CommonFile
+                referenceName = CommonFile.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<CommonFile>> response = ToirAPIFactory.getCommonFileService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<CommonFile> list = response.body();
+                        File extDir = context.getExternalFilesDir("");
+                        AuthorizedUser user = AuthorizedUser.getInstance();
+                        String userName = user.getLogin();
+                        if (extDir == null) {
+                            throw new Exception("Unable get extDir!!!");
+                        }
+
+                        for (CommonFile item : list) {
+                            String localPath = CommonFile.getImageRoot();
+                            item.setPath(localPath);
+                        }
+
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
+
+                        // загружаем файлы
+                        for (CommonFile item : list) {
+                            if (!isNeedDownload(extDir, item, item.getPath(), item.isRequire())) {
+                                continue;
+                            }
+
+                            String url = null;
+                            Response<ToirAPIResponse> urlResponse = ToirAPIFactory.getCommonFileService()
+                                    .getUrl(item.getUuid()).execute();
+                            if (response.isSuccessful()) {
+                                ToirAPIResponse data = urlResponse.body();
+                                url = (String) data.getData();
+                                if (url == null || url.equals("")) {
+                                    continue;
+                                }
+
+                                url = ToirApplication.serverUrl + data.getData();
+                            }
+
+                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
+                            try {
+                                retrofit2.Response<ResponseBody> r = callFile.execute();
+                                ResponseBody trueImgBody = r.body();
+                                if (trueImgBody == null) {
+                                    continue;
+                                }
+
+                                File file = new File(extDir.getAbsolutePath() + '/' + item.getPath(), item.getName());
+                                if (!file.getParentFile().exists()) {
+                                    if (!file.getParentFile().mkdirs()) {
+                                        Log.e(TAG, "Не удалось создать папку " +
+                                                file.getParentFile().toString() +
+                                                " для сохранения файла!");
+                                        continue;
+                                    }
+                                }
+
+                                FileOutputStream fos = new FileOutputStream(file);
+                                fos.write(trueImgBody.bytes());
+                                fos.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 realm.close();
             }
         };
@@ -1140,16 +1245,17 @@ public class ReferenceFragment extends Fragment {
 
                 // User ???
 
-                // OperationFile
-                referenceName = OperationFile.class.getSimpleName();
+                // MediaFile (Пока тянем с прицелом на то что понадобится например смотреть фотки
+                // предыдущих дефектов, например.)
+                referenceName = MediaFile.class.getSimpleName();
                 changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
                 try {
-                    Response<List<OperationFile>> response = ToirAPIFactory.getOperationFileService()
+                    Response<List<MediaFile>> response = ToirAPIFactory.getMediaFileService()
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
-                        List<OperationFile> list = response.body();
+                        List<MediaFile> list = response.body();
                         // устанавливаем флаг того данные были уже отправлены на сервер
-                        for (OperationFile file : list) {
+                        for (MediaFile file : list) {
                             file.setSent(true);
                         }
 
@@ -1237,12 +1343,12 @@ public class ReferenceFragment extends Fragment {
         long localChangedAt;
 
         // есть ли локальная запись
-        try {
+        if (dbObj != null) {
             localChangedAt = ((IToirDbObject) dbObj).getChangedAt().getTime();
-        } catch (Exception e) {
-            return isRequery;
-        } finally {
             realm.close();
+        } else {
+            realm.close();
+            return isRequery;
         }
 
         // есть ли локально файл
@@ -1401,47 +1507,47 @@ public class ReferenceFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         // добавляем элемент меню для обновления справочников
-        MenuItem getTask = menu.add(getString(R.string.menu_references_update));
-        getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(TAG, "Обновляем справочники.");
-                ProgressDialog dialog = new ProgressDialog(getActivity());
-
-
-//				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity().getApplicationContext(), ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
-//				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
-//				rsh.getAll();
-                updateReferences(dialog);
-
-                // показываем диалог обновления справочников
-                dialog.setMessage(getString(R.string.references_update));
-                dialog.setIndeterminate(true);
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setCancelable(false);
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-                        getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-//								getActivity().unregisterReceiver(mReceiverGetReference);
-                                Toast.makeText(getActivity(), getString(R.string.references_update_canceled),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        Toast.makeText(getContext(), getString(R.string.references_update_success), Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                });
-                dialog.show();
-
-                return true;
-            }
-        });
+//        MenuItem getTask = menu.add("Обновить справочники");
+//        getTask.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                Log.d(TAG, "Обновляем справочники.");
+//                ProgressDialog dialog = new ProgressDialog(getActivity());
+//
+//
+////				ReferenceServiceHelper rsh = new ReferenceServiceHelper(getActivity().getApplicationContext(), ToirAPIFactory.Actions.ACTION_GET_ALL_REFERENCE);
+////				getActivity().registerReceiver(mReceiverGetReference, mFilterGetReference);
+////				rsh.getAll();
+//                updateReferences(dialog);
+//
+//                // показываем диалог обновления справочников
+//                dialog.setMessage("Получаем справочники");
+//                dialog.setIndeterminate(true);
+//                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//                dialog.setCancelable(false);
+//                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+//                        "Отмена", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog,
+//                                                int which) {
+////								getActivity().unregisterReceiver(mReceiverGetReference);
+//                                Toast.makeText(getActivity(), "Обновление справочников отменено",
+//                                        Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                    @Override
+//                    public void onDismiss(DialogInterface dialogInterface) {
+//                        Toast.makeText(getContext(), "Справочники обновлены", Toast.LENGTH_SHORT)
+//                                .show();
+//                    }
+//                });
+//                dialog.show();
+//
+//                return true;
+//            }
+//        });
     }
 
     @Override
