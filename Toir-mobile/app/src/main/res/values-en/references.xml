@@ -5,6 +5,7 @@
         <item>Documentation Types:DocumentationType</item>
         <item>Equipment Types:EquipmentType</item>
         <item>Critical Types:CriticalType</item>
+        <item>Defect Level:DefectLevel</item>
         <item>Alert Types:AlertType</item>
         <item>Operation Verdicts:OperationVerdict</item>
         <item>Operation Types:OperationType</item>

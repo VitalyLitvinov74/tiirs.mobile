@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="references_array">
+        <item>DokumentationTyp:DocumentationType</item>
+        <item>Gerätetyp:EquipmentType</item>
+        <item>Уровни критичности:CriticalType</item>
+        <item>Fehlerstufe:DefectLevel</item>
+        <item>AlertTyp:AlertType</item>
+        <item>OperationVerdict:OperationVerdict</item>
+        <item>OperationTyp:OperationType</item>
+        <item>Типы объектов:ObjectType</item>
+        <item>OperationStatus:OperationStatus</item>
+        <item>TaskStatus:TaskStatus</item>
+        <item>TaskStageStatus:TaskStageStatus</item>
+        <item>Gerätestatus:EquipmentStatus</item>
+    </string-array>
+
+</resources>

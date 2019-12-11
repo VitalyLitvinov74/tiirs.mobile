@@ -156,6 +156,7 @@
 
     <string name="choose_defect_category">Defektkategorie</string>
     <string name="choose_defect_type">Fehlertyp</string>
+    <string name="choose_defect_level">Fehlerstufe</string>
     <string name="mistakes_category_all">Alle Kategorien</string>
     <string name="mistakes_category_non_specific">Unspezifischer Defekt</string>
     <string name="action_save">Aufschreiben</string>

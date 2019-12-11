@@ -105,7 +105,7 @@ public class DefectsFragment extends Fragment {
         addDefectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), inflater, v.getContext());
+                EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), inflater, v.getContext(), equipment_uuid);
             }
         });
 

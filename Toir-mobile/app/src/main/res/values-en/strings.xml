@@ -158,6 +158,7 @@
     <string name="add_new_defect">or input new</string>
     <string name="choose_defect_category">Defect category</string>
     <string name="choose_defect_type">Defect type</string>
+    <string name="choose_defect_level">Defect level</string>
     <string name="defects_category_all">All categories</string>
     <string name="defects_category_non_specific">Non-specific defect</string>
     <string name="action_save">Save</string>

@@ -56,12 +56,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DefectAdapter;
+import ru.toir.mobile.db.adapters.DefectLevelAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationAdapter;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusAdapter;
 import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.realm.DefectLevel;
 import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
@@ -149,27 +151,32 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
     }
 
-    public static void showDialogDefect2(ViewGroup parent, LayoutInflater inflater, Context context) {
+    public static void showDialogDefect2(ViewGroup parent, LayoutInflater inflater, Context context, String equipmentUuid) {
 
         final View addDefectLayout;
         final Spinner defectTypeSpinner;
+        final Spinner defectLevelSpinner;
         final Spinner equipmentSpinner;
         final TextView equipmentLabel;
         final DefectTypeAdapter defectTypeAdapter;
+        final DefectLevelAdapter defectLevelAdapter;
         final EquipmentAdapter equipmentAdapter;
         final Equipment equipment;
 
         addDefectLayout = inflater.inflate(R.layout.add_defect_dialog_2, parent, false);
         defectTypeSpinner = addDefectLayout.findViewById(R.id.spinner_defect_type);
+        defectLevelSpinner = addDefectLayout.findViewById(R.id.spinner_defect_level);
 
         equipmentSpinner = addDefectLayout.findViewById(R.id.spinner_equipment);
         equipmentLabel = addDefectLayout.findViewById(R.id.equipment_label);
 
         Realm realm = Realm.getDefaultInstance();
         RealmResults<DefectType> defectType = realm.where(DefectType.class).findAll();
+        RealmResults<DefectLevel> defectLevel = realm.where(DefectLevel.class).findAll();
         RealmResults<Equipment> equipmentList = realm.where(Equipment.class).findAll();
         equipmentAdapter = new EquipmentAdapter(equipmentList);
-        equipment = realm.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
+        equipment = realm.where(Equipment.class).equalTo("uuid", equipmentUuid).findFirst();
+        defectLevel = realm.where(DefectLevel.class).findAll();
         if (equipment != null) {
             defectType = realm.where(DefectType.class)
                     .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid())
@@ -183,6 +190,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
         defectTypeAdapter = new DefectTypeAdapter(defectType);
         defectTypeSpinner.setAdapter(defectTypeAdapter);
+        defectLevelAdapter = new DefectLevelAdapter(defectLevel);
+        defectLevelSpinner.setAdapter(defectLevelAdapter);
         realm.close();
 
         // здесь по идее должен быть механизм показа уже существующих дефектов, для того чтобы можно
@@ -239,10 +248,17 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 }
 
                 DefectType currentDefectType = null;
+                DefectLevel currentDefectLevel = null;
+
                 int position = defectTypeSpinner.getSelectedItemPosition();
                 if (position != AdapterView.INVALID_POSITION) {
                     currentDefectType = defectTypeAdapter.getItem(position);
                 }
+                position = defectLevelSpinner.getSelectedItemPosition();
+                if (position != AdapterView.INVALID_POSITION) {
+                    currentDefectLevel = defectLevelAdapter.getItem(position);
+                }
+
                 if (currentEquipment == null) {
                     position = equipmentSpinner.getSelectedItemPosition();
                     if (position != AdapterView.INVALID_POSITION) {
@@ -266,6 +282,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 defect.setDate(date);
                 defect.setEquipment(currentEquipment);
                 defect.setDefectType(currentDefectType);
+                defect.setDefectLevel(currentDefectLevel);
                 defect.setProcess(false);
                 defect.setComment(defectDescription.getText().toString());
                 defect.setTask(null);
@@ -437,6 +454,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
     // TODO: в дальнейшем после того как будет реализован механизм выбора существующего
     // дефекта для того чтобы повторно не вводить описание вновь создаваемого дефекта - удалить
+/*
     public void showDialogDefect(final Equipment equipment, ViewGroup parent) {
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.add_defect_dialog, parent, false);
@@ -535,6 +553,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
         }
     }
+*/
 
     private void initView() {
         final Equipment equipment = realmDB.where(Equipment.class).equalTo("uuid", equipment_uuid).findFirst();
@@ -742,7 +761,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         findViewById(R.id.fab_add_defect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext());
+                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment_uuid);
                 //hideFAB();
             }
         });

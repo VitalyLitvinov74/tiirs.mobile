@@ -1,12 +1,23 @@
 package ru.toir.mobile;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,16 +32,31 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.realm.MediaFile;
+
+import static ru.toir.mobile.fragments.OrderFragment.copyFile;
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 public class DefectInfoActivity extends AppCompatActivity {
     private final static String TAG = "DefectInfoActivity";
+    private static final int ACTIVITY_PHOTO = 100;
+    private static final int ACTIVITY_VIDEO = 101;
+
     private static final int DRAWER_EXIT = 14;
     private static String defect_uuid;
     private static String equipment_uuid;
+    private String photoFilePath;
+    private String currentEntityUuid;
+
     private Realm realmDB;
     private ImageView tv_defect_image;
     private TextView tv_defect_text_name;
@@ -101,6 +127,68 @@ public class DefectInfoActivity extends AppCompatActivity {
         }
         tv_defect_comment.setText(defect.getComment());
 
+        findViewById(R.id.fab_add_photo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (context == null) {
+                    return;
+                }
+                File file = null;
+                try {
+                    file = createMediaFile("img", ".jpg");
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+                if (file != null) {
+                    photoFilePath = file.getAbsolutePath();
+                    currentEntityUuid = defect_uuid;
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        startActivityForResult(intent, ACTIVITY_PHOTO);
+                    } else {
+                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            startActivityForResult(intent, ACTIVITY_PHOTO);
+                        } else {
+                            requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
+                        }
+                    }
+                }
+            }
+        });
+
+        findViewById(R.id.fab_add_video).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (context == null) {
+                    return;
+                }
+                File file = null;
+                try {
+                    file = createMediaFile("vid", ".mp4");
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+                if (file != null) {
+                    photoFilePath = file.getAbsolutePath();
+                    currentEntityUuid = defect_uuid;
+                    Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        startActivityForResult(intent, ACTIVITY_VIDEO);
+                    } else {
+                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            startActivityForResult(intent, ACTIVITY_VIDEO);
+                        } else {
+                            requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_VIDEO);
+                        }
+                    }
+                }
+            }
+        });
+
         findViewById(R.id.fab_goto_equipment).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,5 +253,121 @@ public class DefectInfoActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         realmDB.close();
+    }
+
+    private File createMediaFile(String type, String extension) throws IOException {
+        if (context == null) {
+            return null;
+        }
+        String timeStamp =
+                new SimpleDateFormat("yyyyMMdd_HHmmss",
+                        Locale.getDefault()).format(new Date());
+        String imageFileName = type + "_" + timeStamp + "_";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(
+                imageFileName,  /* prefix */
+                extension,         /* suffix */
+                storageDir      /* directory */
+        );
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case ACTIVITY_PHOTO:
+                if (resultCode == Activity.RESULT_OK) {
+                    // получаем штатными средствами последний снятый кадр в системе
+                    String fromFilePath = getLastPhotoFilePath();
+                    File fromFile = new File(fromFilePath);
+
+                    // имя файла для сохранения
+                    SimpleDateFormat format = new SimpleDateFormat("HHmmss", Locale.US);
+                    StringBuilder fileName = new StringBuilder();
+                    fileName.append(currentEntityUuid);
+                    fileName.append('-');
+                    fileName.append(format.format(new Date()));
+                    String extension = fromFilePath.substring(fromFilePath.lastIndexOf('.'));
+                    fileName.append(extension);
+
+                    // создаём объект файла фотографии для операции
+                    MediaFile mediaFile = new MediaFile();
+                    mediaFile.set_id(MediaFile.getLastId() + 1);
+                    mediaFile.setEntityUuid(currentEntityUuid);
+                    format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
+                    mediaFile.setName(fileName.toString());
+                    File picDir = getApplicationContext()
+                            .getExternalFilesDir(mediaFile.getPath());
+                    if (picDir == null) {
+                        // какое-то сообщение пользователю что не смогли "сохранить" результат
+                        // фотофиксации?
+                        return;
+                    }
+
+                    if (!picDir.exists()) {
+                        if (!picDir.mkdirs()) {
+                            Log.d(TAG, "Required media storage does not exist");
+                            return;
+                        }
+                    }
+
+                    File toFile = new File(picDir, mediaFile.getName());
+                    try {
+                        copyFile(fromFile, toFile);
+                        if (!fromFile.delete()) {
+                            Log.d(TAG, "Не удалось удалить исходный файл");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    try {
+                        getResizedBitmap(toFile.getParent(), toFile.getName(), 1024, 0, new Date().getTime());
+                    } catch (Exception e) {
+                        Toast.makeText(context, "Failed to load", Toast.LENGTH_SHORT).show();
+                        Log.e("Camera", e.toString());
+                    }
+
+                    // добавляем запись о полученном файле
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealm(mediaFile);
+                    realm.commitTransaction();
+                    realm.close();
+                }
+
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public String getLastPhotoFilePath() {
+        String result;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            ContentResolver resolver = getContentResolver();
+            String orderBy = android.provider.MediaStore.Video.Media.DATE_TAKEN + " DESC";
+            Cursor cursor = resolver.query(uri, projection, null, null, orderBy);
+            // TODO: реализовать удаление записи о фотке котрую мы "забрали"
+            //resolver.delete(uri,);
+            if (cursor != null && cursor.moveToFirst()) {
+                int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                result = cursor.getString(column_index_data);
+                cursor.close();
+            } else {
+                result = null;
+            }
+        } else {
+            result = photoFilePath;
+        }
+
+        return result;
     }
 }

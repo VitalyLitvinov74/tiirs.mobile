@@ -20,6 +20,7 @@ public class Defect extends RealmObject implements ISend {
     private Date date;
     private Equipment equipment;
     private DefectType defectType;
+    private DefectLevel defectLevel;
     private boolean process;
     private String comment;
     private Task task;
@@ -85,6 +86,14 @@ public class Defect extends RealmObject implements ISend {
 
     public void setDefectType(DefectType defectType) {
         this.defectType = defectType;
+    }
+
+    public DefectLevel getDefectLevel() {
+        return defectLevel;
+    }
+
+    public void setDefectLevel(DefectLevel defectLevel) {
+        this.defectLevel = defectLevel;
     }
 
     public String getComment() {

@@ -5,6 +5,7 @@
         <item>Типы документации:DocumentationType</item>
         <item>Типы устройств:EquipmentType</item>
         <item>Уровни критичности:CriticalType</item>
+        <item>Уровни дефектов:DefectLevel</item>
         <item>Типы предупреждений:AlertType</item>
         <item>Вердикты операций:OperationVerdict</item>
         <item>Типы операций:OperationType</item>

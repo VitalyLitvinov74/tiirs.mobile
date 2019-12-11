@@ -31,6 +31,7 @@ import ru.toir.mobile.rest.interfaces.ICommonFile;
 import ru.toir.mobile.rest.interfaces.IContragent;
 import ru.toir.mobile.rest.interfaces.ICriticalType;
 import ru.toir.mobile.rest.interfaces.IDefect;
+import ru.toir.mobile.rest.interfaces.IDefectLevel;
 import ru.toir.mobile.rest.interfaces.IDefectType;
 import ru.toir.mobile.rest.interfaces.IDocumentation;
 import ru.toir.mobile.rest.interfaces.IDocumentationType;
@@ -163,6 +164,11 @@ ToirAPIFactory {
     @NonNull
     public static IDefectType getDefectTypeService() {
         return getRetrofit().create(IDefectType.class);
+    }
+
+    @NonNull
+    public static IDefectLevel getDefectLevelService() {
+        return getRetrofit().create(IDefectLevel.class);
     }
 
     @NonNull

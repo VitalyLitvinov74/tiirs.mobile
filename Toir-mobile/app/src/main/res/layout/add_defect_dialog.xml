@@ -9,7 +9,6 @@
         android:id="@+id/defect_category_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:text="@string/choose_defect_category"
@@ -21,7 +20,6 @@
         style="@android:style/Widget.Holo.Light.Spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/defect_category_label"
         android:layout_marginTop="5dp"
@@ -32,7 +30,6 @@
         android:id="@+id/add_defect_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/spinner_defects_category"
         android:text="@string/choose_defect"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -43,18 +40,36 @@
         style="@android:style/Widget.Holo.Light.Spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/add_defect_label"
         android:layout_marginTop="5dp" />
 
     <TextView
+        android:id="@+id/defect_level_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_defect_type"
+        android:text="@string/choose_defect_level"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/larisaTextColorABlack" />
+
+    <Spinner
+        android:id="@+id/spinner_defect_level"
+        style="@android:style/Widget.Holo.Light.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/defect_level_label"
+        android:layout_marginTop="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
         android:id="@+id/add_new_comment_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/spinner_defect_type"
+        android:layout_below="@+id/spinner_defect_level"
         android:text="@string/add_new_defect"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/almostblack" />
@@ -64,11 +79,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/add_new_comment_label"
-        android:gravity="top|left"
+        android:gravity="top|start"
         android:inputType="textMultiLine"
-        android:lines="8"
-        android:maxLines="10"
-        android:minLines="6"
+        android:lines="6"
+        android:maxLines="6"
+        android:minLines="4"
         android:paddingTop="30dp"
         android:scrollbars="vertical" />
 

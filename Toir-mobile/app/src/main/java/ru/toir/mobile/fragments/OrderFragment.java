@@ -76,6 +76,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.db.adapters.DefectLevelAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationCancelAdapter;
@@ -115,6 +116,7 @@ import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.MainFunctions;
 
+import static ru.toir.mobile.EquipmentInfoActivity.showDialogDefect2;
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
@@ -254,308 +256,48 @@ public class OrderFragment extends Fragment {
         super.onDestroy();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
-     * android.view.ViewGroup, android.os.Bundle)
-     */
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
 
-        View rootView = inflater.inflate(R.layout.orders_layout, container, false);
-        Activity activity = getActivity();
-        if (activity != null) {
-            toolbar = activity.findViewById(R.id.toolbar);
-            toolbar.setSubtitle(getString(R.string.menu_orders));
-            sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
-            bottomBar = activity.findViewById(R.id.bottomBar);
+        if (!destFile.exists()) {
+            if (!destFile.createNewFile()) {
+                throw new IOException();
+            }
         }
 
-        realmDB = Realm.getDefaultInstance();
-        listLayout = rootView.findViewById(R.id.tl_listview_layout);
-        fab_check = rootView.findViewById(R.id.fab_check);
-        fab_question = rootView.findViewById(R.id.fab_question);
-        fab_camera = rootView.findViewById(R.id.fab_photo);
-        fab_check.setVisibility(View.INVISIBLE);
-        fab_question.setVisibility(View.INVISIBLE);
-        fab_camera.setVisibility(View.INVISIBLE);
+        FileChannel source = null;
+        FileChannel destination = null;
+        FileInputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = new FileInputStream(sourceFile);
+            os = new FileOutputStream(destFile);
+            source = is.getChannel();
+            destination = os.getChannel();
 
-        fab_defect = rootView.findViewById(R.id.fab_defect);
-        fab_defect.setVisibility(View.INVISIBLE);
-        fab_defect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final View addDefectLayout;
-                final Spinner defectTypeSpinner;
-                final DefectTypeAdapter defectTypeAdapter;
-                final Equipment equipment;
-                LayoutInflater inflater = getLayoutInflater();
-
-                addDefectLayout = inflater.inflate(R.layout.add_defect_dialog_2, null, false);
-                defectTypeSpinner = addDefectLayout.findViewById(R.id.spinner_defect_type);
-
-                Realm realm = Realm.getDefaultInstance();
-                equipment = realm.where(Equipment.class).equalTo("uuid", currentEquipment.getUuid()).findFirst();
-                RealmResults<DefectType> defectType = realm.where(DefectType.class)
-                        .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid()).findAll();
-                defectTypeAdapter = new DefectTypeAdapter(defectType);
-                defectTypeSpinner.setAdapter(defectTypeAdapter);
-                realm.close();
-
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
-                builder.setTitle("Укажите дефект");
-                builder.setView(addDefectLayout);
-                builder.setIcon(R.drawable.ic_icon_warnings);
-                builder.setCancelable(false);
-                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                final android.support.v7.app.AlertDialog dialog = builder.create();
-                View.OnClickListener listener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
-                        DefectType currentDefectType = null;
-                        int position = defectTypeSpinner.getSelectedItemPosition();
-                        if (position != AdapterView.INVALID_POSITION) {
-                            currentDefectType = defectTypeAdapter.getItem(position);
-                        }
-
-                        Realm realm = Realm.getDefaultInstance();
-                        AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
-                        UUID uuid = UUID.randomUUID();
-                        Date date = new Date();
-
-                        realm.beginTransaction();
-
-                        long nextId = Defect.getLastId() + 1;
-//                        Defect defect = realm.createObject(Defect.class, nextId);
-                        Defect defect = new Defect();
-                        defect.set_id(nextId);
-                        defect.setUuid(uuid.toString().toUpperCase());
-                        defect.setUser(user);
-                        defect.setDate(date);
-                        defect.setEquipment(equipment);
-                        defect.setDefectType(currentDefectType);
-                        defect.setProcess(false);
-                        defect.setComment(defectDescription.getText().toString());
-                        defect.setTask(null);
-                        defect.setCreatedAt(date);
-                        defect.setChangedAt(date);
-                        realm.copyToRealmOrUpdate(defect);
-
-                        realm.commitTransaction();
-                        realm.close();
-                        dialog.dismiss();
-                    }
-                };
-                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-                if (defectType.size() > 0) {
-                    dialog.show();
-                } else {
-                    Toast.makeText(getContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
-                }
-                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+            long count = 0;
+            long size = source.size();
+            while (count < size) {
+                count += destination.transferFrom(source, count, size - count);
             }
-        });
-
-        fab_camera.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Context context = getContext();
-                if (context == null) {
-                    return;
-                }
-
-                File file = null;
-                try {
-                    file = createImageFile();
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                }
-
-                photoFilePath = file.getAbsolutePath();
-                // TODO: реализовать все возможные варианты когда мы можем привязать фотку к сущности
-                switch (Level) {
-                    case OPERATION_LEVEL :
-                        currentEntityUuid = currentOperation.getUuid();
-                        break;
-                    default:
-                        currentEntityUuid = null;
-                        break;
-                }
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                    startActivityForResult(intent, ACTIVITY_PHOTO);
-                } else {
-                    Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        startActivityForResult(intent, ACTIVITY_PHOTO);
-                    } else {
-                        getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
-                    }
-//                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-//                    intent.setData(doc);
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (source != null) {
+                source.close();
             }
-        });
-        fab_check.setOnClickListener(new SubmitOnClickListener());
-        fab_question.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final View addCommentLayout;
-                final TextView author;
-                LayoutInflater inflater = getLayoutInflater();
 
-                addCommentLayout = inflater.inflate(R.layout.order_question, null, false);
-                author = addCommentLayout.findViewById(R.id.order_author);
-                author.setText(selectedOrder.getAuthor().getName());
-
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
-                builder.setTitle("Cообщение автору");
-                builder.setView(addCommentLayout);
-                builder.setIcon(R.drawable.ic_icon_user);
-                builder.setCancelable(false);
-                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                builder.setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                final android.support.v7.app.AlertDialog dialog = builder.create();
-                View.OnClickListener listener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EditText orderComment = addCommentLayout.findViewById(R.id.order_comment);
-
-                        Realm realm = Realm.getDefaultInstance();
-                        AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
-                        UUID uuid = UUID.randomUUID();
-                        Date date = new Date();
-                        realm.beginTransaction();
-
-                        long nextId = ru.toir.mobile.db.realm.Message.getLastId() + 1;
-                        ru.toir.mobile.db.realm.Message message = new ru.toir.mobile.db.realm.Message();
-                        message.set_id(nextId);
-                        message.setUuid(uuid.toString().toUpperCase());
-                        message.setFromUser(user);
-                        message.setToUser(selectedOrder.getAuthor());
-                        message.setDate(date);
-                        message.setCreatedAt(date);
-                        message.setChangedAt(date);
-                        message.setStatus(0);
-                        message.setText(orderComment.getText().toString());
-                        //message.setTitle("Вопрос по наряду #".concat(String.valueOf(selectedOrder.get_id())));
-                        realm.copyToRealmOrUpdate(message);
-                        realm.commitTransaction();
-                        realm.close();
-                        // отправляем сообшения
-                        messageCounter = new AtomicInteger(3);
-                        RealmResults<ru.toir.mobile.db.realm.Message> messages = realmDB
-                                .where(ru.toir.mobile.db.realm.Message.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        sendMessages(realmDB.copyFromRealm(messages));
-                        dialog.dismiss();
-                    }
-                };
-                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-                dialog.show();
-                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+            if (is != null) {
+                is.close();
             }
-        });
 
-        fab_equipmentInfo = rootView.findViewById(R.id.fab_equipmentInfo);
-        fab_equipmentInfo.setVisibility(View.INVISIBLE);
-        fab_equipmentInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentEquipment != null) {
-                    Activity activity = getActivity();
-                    if (activity == null) {
-                        return;
-                    }
-
-
-                    String equipment_uuid = currentEquipment.getUuid();
-                    Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("equipment_uuid", equipment_uuid);
-                    equipmentInfo.putExtras(bundle);
-                    activity.startActivity(equipmentInfo);
-                }
+            if (destination != null) {
+                destination.close();
             }
-        });
 
-        mainListView = rootView.findViewById(R.id.list_view);
-
-        setHasOptionsMenu(true);
-        rootView.setFocusableInTouchMode(true);
-        rootView.requestFocus();
-        rootView.setOnKeyListener(new View.OnKeyListener() {
-
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                    Log.d(TAG, "OrderFragment !!! back pressed!!!");
-                    if (Level == TASK_LEVEL || Level == 0) {
-                        initView();
-                    }
-
-                    if (Level == STAGE_LEVEL) {
-                        Level = TASK_LEVEL;
-                        fillListViewTasks(selectedOrder);
-                    }
-
-                    if (Level == OPERATION_LEVEL) {
-                        taskTimer.cancel();
-                        firstLaunch = true;
-                        currentOperationPosition = 0;
-                        if (selectedTask != null) {
-                            fillListViewStage(selectedTask);
-                            Level = STAGE_LEVEL;
-                            fab_camera.setVisibility(View.INVISIBLE);
-                            //fab_check.setVisibility(View.INVISIBLE);
-                        }
-                    }
-
-                    return true;
-                }
-
-                return false;
+            if (os != null) {
+                os.close();
             }
-        });
-
-        // так как обработчики пока одни на всё, ставим их один раз
-        mainListView.setOnItemClickListener(mainListViewClickListener);
-        mainListView.setOnItemLongClickListener(infoListViewLongClickListener);
-
-        mainListView.setLongClickable(true);
-
-        initView();
-        return rootView;
+        }
     }
 
     private void initView() {
@@ -1427,7 +1169,6 @@ public class OrderFragment extends Fragment {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         return image;
     }
 
@@ -2087,48 +1828,316 @@ public class OrderFragment extends Fragment {
         realmDB.close();
     }
 
-    public void copyFile(File sourceFile, File destFile) throws IOException {
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater,
+     * android.view.ViewGroup, android.os.Bundle)
+     */
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
-        if (!destFile.exists()) {
-            if (!destFile.createNewFile()) {
-                throw new IOException();
-            }
+        View rootView = inflater.inflate(R.layout.orders_layout, container, false);
+        Activity activity = getActivity();
+        if (activity != null) {
+            toolbar = activity.findViewById(R.id.toolbar);
+            toolbar.setSubtitle(getString(R.string.menu_orders));
+            sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+            bottomBar = activity.findViewById(R.id.bottomBar);
         }
 
-        FileChannel source = null;
-        FileChannel destination = null;
-        FileInputStream is = null;
-        FileOutputStream os = null;
-        try {
-            is = new FileInputStream(sourceFile);
-            os = new FileOutputStream(destFile);
-            source = is.getChannel();
-            destination = os.getChannel();
+        realmDB = Realm.getDefaultInstance();
+        listLayout = rootView.findViewById(R.id.tl_listview_layout);
+        fab_check = rootView.findViewById(R.id.fab_check);
+        fab_question = rootView.findViewById(R.id.fab_question);
+        fab_camera = rootView.findViewById(R.id.fab_photo);
+        fab_check.setVisibility(View.INVISIBLE);
+        fab_question.setVisibility(View.INVISIBLE);
+        fab_camera.setVisibility(View.INVISIBLE);
 
-            long count = 0;
-            long size = source.size();
-            while (count < size) {
-                count += destination.transferFrom(source, count, size - count);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (source != null) {
-                source.close();
-            }
+        fab_defect = rootView.findViewById(R.id.fab_defect);
+        fab_defect.setVisibility(View.INVISIBLE);
+        fab_defect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), currentEquipment.getUuid());
+/*
+                final View addDefectLayout;
+                final Spinner defectTypeSpinner;
+                final DefectTypeAdapter defectTypeAdapter;
+                final Spinner defectLevelSpinner;
+                final DefectLevelAdapter defectLevelAdapter;
 
-            if (is != null) {
-                is.close();
-            }
+                final Equipment equipment;
+                LayoutInflater inflater = getLayoutInflater();
 
-            if (destination != null) {
-                destination.close();
-            }
+                addDefectLayout = inflater.inflate(R.layout.add_defect_dialog_2, null, false);
+                defectTypeSpinner = addDefectLayout.findViewById(R.id.spinner_defect_type);
+                defectLevelSpinner = addDefectLayout.findViewById(R.id.spinner_defect_level);
 
-            if (os != null) {
-                os.close();
+                Realm realm = Realm.getDefaultInstance();
+                equipment = realm.where(Equipment.class).equalTo("uuid", currentEquipment.getUuid()).findFirst();
+                RealmResults<DefectType> defectType = realm.where(DefectType.class)
+                        .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid()).findAll();
+                defectTypeAdapter = new DefectTypeAdapter(defectType);
+                defectTypeSpinner.setAdapter(defectTypeAdapter);
+                realm.close();
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+                builder.setTitle("Укажите дефект");
+                builder.setView(addDefectLayout);
+                builder.setIcon(R.drawable.ic_icon_warnings);
+                builder.setCancelable(false);
+                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                final android.support.v7.app.AlertDialog dialog = builder.create();
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
+                        DefectType currentDefectType = null;
+                        int position = defectTypeSpinner.getSelectedItemPosition();
+                        if (position != AdapterView.INVALID_POSITION) {
+                            currentDefectType = defectTypeAdapter.getItem(position);
+                        }
+
+                        Realm realm = Realm.getDefaultInstance();
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                        UUID uuid = UUID.randomUUID();
+                        Date date = new Date();
+
+                        realm.beginTransaction();
+
+                        long nextId = Defect.getLastId() + 1;
+//                        Defect defect = realm.createObject(Defect.class, nextId);
+                        Defect defect = new Defect();
+                        defect.set_id(nextId);
+                        defect.setUuid(uuid.toString().toUpperCase());
+                        defect.setUser(user);
+                        defect.setDate(date);
+                        defect.setEquipment(equipment);
+                        defect.setDefectLevel(currentDefectLevel);
+                        defect.setDefectType(currentDefectType);
+                        defect.setProcess(false);
+                        defect.setComment(defectDescription.getText().toString());
+                        defect.setTask(null);
+                        defect.setCreatedAt(date);
+                        defect.setChangedAt(date);
+                        realm.copyToRealmOrUpdate(defect);
+
+                        realm.commitTransaction();
+                        realm.close();
+                        dialog.dismiss();
+                    }
+                };
+                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+                if (defectType.size() > 0) {
+                    dialog.show();
+                } else {
+                    Toast.makeText(getContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
+                }
+                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+*/
             }
-        }
+        });
+
+        fab_camera.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Context context = getContext();
+                if (context == null) {
+                    return;
+                }
+
+                File file = null;
+                try {
+                    file = createImageFile();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                }
+
+                photoFilePath = file.getAbsolutePath();
+                // TODO: реализовать все возможные варианты когда мы можем привязать фотку к сущности
+                switch (Level) {
+                    case OPERATION_LEVEL:
+                        currentEntityUuid = currentOperation.getUuid();
+                        break;
+                    default:
+                        currentEntityUuid = null;
+                        break;
+                }
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    startActivityForResult(intent, ACTIVITY_PHOTO);
+                } else {
+                    Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        startActivityForResult(intent, ACTIVITY_PHOTO);
+                    } else {
+                        getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
+                    }
+//                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+//                    intent.setData(doc);
+//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+            }
+        });
+        fab_check.setOnClickListener(new SubmitOnClickListener());
+        fab_question.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final View addCommentLayout;
+                final TextView author;
+                LayoutInflater inflater = getLayoutInflater();
+
+                addCommentLayout = inflater.inflate(R.layout.order_question, null, false);
+                author = addCommentLayout.findViewById(R.id.order_author);
+                author.setText(selectedOrder.getAuthor().getName());
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+                builder.setTitle("Cообщение автору");
+                builder.setView(addCommentLayout);
+                builder.setIcon(R.drawable.ic_icon_user);
+                builder.setCancelable(false);
+                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                final android.support.v7.app.AlertDialog dialog = builder.create();
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText orderComment = addCommentLayout.findViewById(R.id.order_comment);
+
+                        Realm realm = Realm.getDefaultInstance();
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                        UUID uuid = UUID.randomUUID();
+                        Date date = new Date();
+                        realm.beginTransaction();
+
+                        long nextId = ru.toir.mobile.db.realm.Message.getLastId() + 1;
+                        ru.toir.mobile.db.realm.Message message = new ru.toir.mobile.db.realm.Message();
+                        message.set_id(nextId);
+                        message.setUuid(uuid.toString().toUpperCase());
+                        message.setFromUser(user);
+                        message.setToUser(selectedOrder.getAuthor());
+                        message.setDate(date);
+                        message.setCreatedAt(date);
+                        message.setChangedAt(date);
+                        message.setStatus(0);
+                        message.setText(orderComment.getText().toString());
+                        //message.setTitle("Вопрос по наряду #".concat(String.valueOf(selectedOrder.get_id())));
+                        realm.copyToRealmOrUpdate(message);
+                        realm.commitTransaction();
+                        realm.close();
+                        // отправляем сообшения
+                        messageCounter = new AtomicInteger(3);
+                        RealmResults<ru.toir.mobile.db.realm.Message> messages = realmDB
+                                .where(ru.toir.mobile.db.realm.Message.class)
+                                .equalTo("sent", false)
+                                .findAll();
+                        sendMessages(realmDB.copyFromRealm(messages));
+                        dialog.dismiss();
+                    }
+                };
+                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+                dialog.show();
+                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
+            }
+        });
+
+        fab_equipmentInfo = rootView.findViewById(R.id.fab_equipmentInfo);
+        fab_equipmentInfo.setVisibility(View.INVISIBLE);
+        fab_equipmentInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentEquipment != null) {
+                    Activity activity = getActivity();
+                    if (activity == null) {
+                        return;
+                    }
+
+
+                    String equipment_uuid = currentEquipment.getUuid();
+                    Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("equipment_uuid", equipment_uuid);
+                    equipmentInfo.putExtras(bundle);
+                    activity.startActivity(equipmentInfo);
+                }
+            }
+        });
+
+        mainListView = rootView.findViewById(R.id.list_view);
+
+        setHasOptionsMenu(true);
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
+        rootView.setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                    Log.d(TAG, "OrderFragment !!! back pressed!!!");
+                    if (Level == TASK_LEVEL || Level == 0) {
+                        initView();
+                    }
+
+                    if (Level == STAGE_LEVEL) {
+                        Level = TASK_LEVEL;
+                        fillListViewTasks(selectedOrder);
+                    }
+
+                    if (Level == OPERATION_LEVEL) {
+                        taskTimer.cancel();
+                        firstLaunch = true;
+                        currentOperationPosition = 0;
+                        if (selectedTask != null) {
+                            fillListViewStage(selectedTask);
+                            Level = STAGE_LEVEL;
+                            fab_camera.setVisibility(View.INVISIBLE);
+                            //fab_check.setVisibility(View.INVISIBLE);
+                        }
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        // так как обработчики пока одни на всё, ставим их один раз
+        mainListView.setOnItemClickListener(mainListViewClickListener);
+        mainListView.setOnItemLongClickListener(infoListViewLongClickListener);
+
+        mainListView.setLongClickable(true);
+
+        initView();
+        return rootView;
     }
 
     @Override

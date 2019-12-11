@@ -37,6 +37,7 @@ import ru.toir.mobile.db.migration.Migration37;
 import ru.toir.mobile.db.migration.Migration38;
 import ru.toir.mobile.db.migration.Migration39;
 import ru.toir.mobile.db.migration.Migration40;
+
 /**
  * @author Dmitriy Logachev
  */
@@ -662,6 +663,7 @@ class ToirRealmMigration implements RealmMigration {
                 .addField("date", Date.class)
                 .addRealmObjectField("equipment", schema.get("Equipment"))
                 .addRealmObjectField("defectType", schema.get("DefectType"))
+                .addRealmObjectField("defectLevel", schema.get("DefectLevel"))
                 .addField("process", boolean.class)
                 .addField("comment", String.class)
                 .addRealmObjectField("task", schema.get("Tasks"))

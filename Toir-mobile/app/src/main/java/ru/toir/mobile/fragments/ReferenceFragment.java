@@ -40,6 +40,7 @@ import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.SortField;
 import ru.toir.mobile.db.adapters.AlertTypeAdapter;
 import ru.toir.mobile.db.adapters.CriticalTypeAdapter;
+import ru.toir.mobile.db.adapters.DefectLevelAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.DocumentationTypeAdapter;
 import ru.toir.mobile.db.adapters.EquipmentStatusAdapter;
@@ -56,6 +57,7 @@ import ru.toir.mobile.db.realm.CommonFile;
 import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.realm.DefectLevel;
 import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.DocumentationType;
@@ -382,6 +384,25 @@ public class ReferenceFragment extends Fragment {
                             .get(changedDate).execute();
                     if (response.isSuccessful()) {
                         List<DefectType> list = response.body();
+                        if (list.size() > 0) {
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(list);
+                            realm.commitTransaction();
+                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // DefectLevel
+                referenceName = DefectLevel.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<DefectLevel>> response = ToirAPIFactory.getDefectLevelService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<DefectLevel> list = response.body();
                         if (list.size() > 0) {
                             realm.beginTransaction();
                             realm.copyToRealmOrUpdate(list);
@@ -1325,6 +1346,23 @@ public class ReferenceFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+                // DefectLevel
+                referenceName = DefectLevel.class.getSimpleName();
+                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+                try {
+                    Response<List<DefectLevel>> response = ToirAPIFactory.getDefectLevelService()
+                            .get(changedDate).execute();
+                    if (response.isSuccessful()) {
+                        List<DefectLevel> list = response.body();
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 // гасим диалог обновления справочников
                 if (dialog != null) {
                     dialog.dismiss();
@@ -1463,6 +1501,13 @@ public class ReferenceFragment extends Fragment {
         RealmResults<DefectType> defectType;
         defectType = realmDB.where(DefectType.class).findAll();
         DefectTypeAdapter defectAdapter = new DefectTypeAdapter(defectType);
+        contentListView.setAdapter(defectAdapter);
+    }
+
+    private void fillListViewDefectLevel() {
+        RealmResults<DefectLevel> defectLevel;
+        defectLevel = realmDB.where(DefectLevel.class).findAll();
+        DefectLevelAdapter defectAdapter = new DefectLevelAdapter(defectLevel);
         contentListView.setAdapter(defectAdapter);
     }
 
@@ -1620,6 +1665,9 @@ public class ReferenceFragment extends Fragment {
                     break;
                 case DefectTypeAdapter.TABLE_NAME:
                     fillListViewDefectType();
+                    break;
+                case DefectLevelAdapter.TABLE_NAME:
+                    fillListViewDefectLevel();
                     break;
                 default:
                     break;
