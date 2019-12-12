@@ -701,30 +701,31 @@ public class MainActivity extends AppCompatActivity {
                                 tr.replace(R.id.frame_container, ServiceFragment.newInstance());
                             } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
-                                mProgressDialog = new ProgressDialog(MainActivity.this);
-                                mProgressDialog.setMessage("Синхронизируем данные");
-                                mProgressDialog.setIndeterminate(true);
-                                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                                mProgressDialog.setCancelable(true);
-                                final Downloader downloaderTask = new Downloader(MainActivity.this);
-                                SharedPreferences sp = PreferenceManager
-                                        .getDefaultSharedPreferences(getApplicationContext());
-                                String updateUrl = sp.getString(getString(R.string.updateUrl), "");
-
-                                if (!updateUrl.equals("")) {
-                                    String path = Environment.getExternalStorageDirectory() + "/Download/";
-                                    File file = new File(path);
-                                    if (file.mkdirs()) {
-                                        File outputFile = new File(path, "Toir-mobile.apk");
-                                        downloaderTask.execute(updateUrl, outputFile.toString());
-                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                            @Override
-                                            public void onCancel(DialogInterface dialog) {
-                                                downloaderTask.cancel(true);
-                                            }
-                                        });
-                                    }
-                                }
+                                updateApk();
+//                                mProgressDialog = new ProgressDialog(MainActivity.this);
+//                                mProgressDialog.setMessage("Синхронизируем данные");
+//                                mProgressDialog.setIndeterminate(true);
+//                                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//                                mProgressDialog.setCancelable(true);
+//                                final Downloader downloaderTask = new Downloader(MainActivity.this);
+//                                SharedPreferences sp = PreferenceManager
+//                                        .getDefaultSharedPreferences(getApplicationContext());
+//                                String updateUrl = sp.getString(getString(R.string.updateUrl), "");
+//
+//                                if (!updateUrl.equals("")) {
+//                                    String path = Environment.getExternalStorageDirectory() + "/Download/";
+//                                    File file = new File(path);
+//                                    if (file.mkdirs()) {
+//                                        File outputFile = new File(path, "Toir-mobile.apk");
+//                                        downloaderTask.execute(updateUrl, outputFile.toString());
+//                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                                            @Override
+//                                            public void onCancel(DialogInterface dialog) {
+//                                                downloaderTask.cancel(true);
+//                                            }
+//                                        });
+//                                    }
+//                                }
                             } else if (ident == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
                                 tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
@@ -834,29 +835,29 @@ public class MainActivity extends AppCompatActivity {
      * @param menuItem Элемент меню
      */
     public void onActionUpdate(MenuItem menuItem) {
-
-        SharedPreferences sp = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-
-        // урл по которому забираем файл обновления
-        String updateUrl = sp.getString(getString(R.string.updateUrl), "");
-
-        if (updateUrl.equals("")) {
-            Toast toast = Toast.makeText(this, "Не указан URL для обновления!",
-                    Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-            return;
-        }
-
-        addToJournal("Запущено обновление с сервера " + updateUrl);
-        String path = Environment.getExternalStorageDirectory() + "/Download/";
-        File file = new File(path);
-        if (file.mkdirs()) {
-            File outputFile = new File(path, "Toir-mobile.apk");
-            Downloader d = new Downloader(MainActivity.this);
-            d.execute(updateUrl, outputFile.toString());
-        }
+        updateApk();
+//        SharedPreferences sp = PreferenceManager
+//                .getDefaultSharedPreferences(getApplicationContext());
+//
+//        // урл по которому забираем файл обновления
+//        String updateUrl = sp.getString(getString(R.string.updateUrl), "");
+//
+//        if (updateUrl.equals("")) {
+//            Toast toast = Toast.makeText(this, "Не указан URL для обновления!",
+//                    Toast.LENGTH_SHORT);
+//            toast.setGravity(Gravity.CENTER, 0, 0);
+//            toast.show();
+//            return;
+//        }
+//
+//        addToJournal("Запущено обновление с сервера " + updateUrl);
+//        String path = Environment.getExternalStorageDirectory() + "/Download/";
+//        File file = new File(path);
+//        if (file.mkdirs()) {
+//            File outputFile = new File(path, "Toir-mobile.apk");
+//            Downloader d = new Downloader(MainActivity.this);
+//            d.execute(updateUrl, outputFile.toString());
+//        }
     }
 
     public void onActionSettings(MenuItem menuItem) {
@@ -1243,5 +1244,33 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         return sp.getBoolean(getString(R.string.debug_nocheck_gps), false);
+    }
+
+    public void updateApk() {
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        dialog.setMessage("Синхронизируем данные");
+        dialog.setIndeterminate(false);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(true);
+        dialog.setMax(100);
+        final Downloader downloaderTask = new Downloader(dialog);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                downloaderTask.cancel(true);
+            }
+        });
+        String fileName = "toir.apk";
+        String updateUrl = ToirApplication.serverUrl + "/app/" + fileName;
+        if (!ToirApplication.serverUrl.equals("")) {
+            File file = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            File outputFile = new File(file, fileName);
+            downloaderTask.execute(updateUrl, outputFile.toString());
+            dialog.show();
+        } else {
+            Toast.makeText(getApplicationContext(),
+                    "Не указан адрес сервера в настройках приложения!", Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 }
