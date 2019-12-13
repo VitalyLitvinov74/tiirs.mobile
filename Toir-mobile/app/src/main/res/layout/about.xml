@@ -27,6 +27,7 @@
             android:minLines="10"
             android:padding="5dip"
             android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
             android:text="@string/program_version"
             android:textColor="@color/larisaTextColor" />
 

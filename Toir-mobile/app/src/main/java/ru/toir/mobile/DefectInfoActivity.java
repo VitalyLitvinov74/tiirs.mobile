@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,8 +21,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -40,6 +44,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
+import io.realm.Sort;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.MediaFile;
 
@@ -59,6 +64,7 @@ public class DefectInfoActivity extends AppCompatActivity {
 
     private Realm realmDB;
     private ImageView tv_defect_image;
+    private VideoView tv_defect_video;
     private TextView tv_defect_text_name;
     private TextView tv_defect_text_type;
     private TextView tv_equipment_text_uuid;
@@ -95,6 +101,7 @@ public class DefectInfoActivity extends AppCompatActivity {
         tv_defect_text_date = findViewById(R.id.defect_text_date);
         tv_defect_text_status = findViewById(R.id.defect_text_status);
         tv_defect_comment = findViewById(R.id.defect_comment);
+        tv_defect_video = findViewById(R.id.defect_video);
         //fab_goto_equipment = findViewById(R.id.fab_goto_equipment);
 
         initView();
@@ -109,8 +116,35 @@ public class DefectInfoActivity extends AppCompatActivity {
         equipment_uuid = defect.getEquipment().getUuid();
 
         // TODO когда будет сущность с изображениями - вставить сюда
-        //tv_defect_image.setImageResource();
+        MediaFile mediaFile = realmDB.where(MediaFile.class)
+                .equalTo("entityUuid", defect_uuid)
+                .sort("createdAt", Sort.DESCENDING)
+                .findFirst();
+        if (mediaFile != null) {
+            File path = getExternalFilesDir(mediaFile.getPath());
+            String fileName = mediaFile.getName();
+            if (path != null) {
+                if (fileName.contains("jpg")) {
+                    tv_defect_video.setVisibility(View.GONE);
+                    tv_defect_image.setVisibility(View.VISIBLE);
+                    Bitmap tmpBitmap =
+                            getResizedBitmap(path + File.separator,
+                                    fileName, 600, 0, mediaFile.getChangedAt().getTime());
+                    if (tmpBitmap != null) {
+                        tv_defect_image.setImageBitmap(tmpBitmap);
+                    }
+                } else {
+                    tv_defect_video.setVisibility(View.VISIBLE);
+                    tv_defect_image.setVisibility(View.GONE);
 
+                    MediaController mediaController = new MediaController(this);
+                    mediaController.setAnchorView(tv_defect_video);
+                    tv_defect_video.setMediaController(mediaController);
+                    tv_defect_video.setVideoPath(path + File.separator + fileName);
+                    tv_defect_video.start();
+                }
+            }
+        }
         tv_defect_text_name.setText("Дефект #".concat(String.valueOf(defect.get_id())));
         tv_defect_text_type.setText(defect.getDefectType().getTitle());
         tv_equipment_text_uuid.setText(defect.getEquipment().getTitle());
@@ -144,6 +178,10 @@ public class DefectInfoActivity extends AppCompatActivity {
                     currentEntityUuid = defect_uuid;
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        file = new File(Environment.getExternalStorageDirectory(), "image.tmp");
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(file));
+                        photoFilePath = file.getAbsolutePath();
                         startActivityForResult(intent, ACTIVITY_PHOTO);
                     } else {
                         Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
@@ -274,80 +312,79 @@ public class DefectInfoActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case ACTIVITY_PHOTO:
-                if (resultCode == Activity.RESULT_OK) {
-                    // получаем штатными средствами последний снятый кадр в системе
-                    String fromFilePath = getLastPhotoFilePath();
-                    File fromFile = new File(fromFilePath);
+        if (resultCode == Activity.RESULT_OK) {
+            // получаем штатными средствами последний снятый кадр в системе
+            //String fromFilePath = getLastPhotoFilePath();
+            String fromFilePath = photoFilePath;
+            File fromFile = new File(fromFilePath);
 
-                    // имя файла для сохранения
-                    SimpleDateFormat format = new SimpleDateFormat("HHmmss", Locale.US);
-                    StringBuilder fileName = new StringBuilder();
-                    fileName.append(currentEntityUuid);
-                    fileName.append('-');
-                    fileName.append(format.format(new Date()));
-                    String extension = fromFilePath.substring(fromFilePath.lastIndexOf('.'));
-                    fileName.append(extension);
+            // имя файла для сохранения
+            SimpleDateFormat format = new SimpleDateFormat("HHmmss", Locale.US);
+            StringBuilder fileName = new StringBuilder();
+            fileName.append(currentEntityUuid);
+            fileName.append('-');
+            fileName.append(format.format(new Date()));
+            String extension = fromFilePath.substring(fromFilePath.lastIndexOf('.'));
+            fileName.append(extension);
 
-                    // создаём объект файла фотографии для операции
-                    MediaFile mediaFile = new MediaFile();
-                    mediaFile.set_id(MediaFile.getLastId() + 1);
-                    mediaFile.setEntityUuid(currentEntityUuid);
-                    format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                    mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
-                    mediaFile.setName(fileName.toString());
-                    File picDir = getApplicationContext()
-                            .getExternalFilesDir(mediaFile.getPath());
-                    if (picDir == null) {
-                        // какое-то сообщение пользователю что не смогли "сохранить" результат
-                        // фотофиксации?
-                        return;
-                    }
+            // создаём объект файла фотографии для дефекта
+            MediaFile mediaFile = new MediaFile();
+            mediaFile.set_id(MediaFile.getLastId() + 1);
+            mediaFile.setEntityUuid(currentEntityUuid);
+            format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
+            mediaFile.setName(fileName.toString());
+            File picDir = getApplicationContext()
+                    .getExternalFilesDir(mediaFile.getPath());
+            if (picDir == null) {
+                // какое-то сообщение пользователю что не смогли "сохранить" результат
+                // фотофиксации?
+                return;
+            }
 
-                    if (!picDir.exists()) {
-                        if (!picDir.mkdirs()) {
-                            Log.d(TAG, "Required media storage does not exist");
-                            return;
-                        }
-                    }
-
-                    File toFile = new File(picDir, mediaFile.getName());
-                    try {
-                        copyFile(fromFile, toFile);
-                        if (!fromFile.delete()) {
-                            Log.d(TAG, "Не удалось удалить исходный файл");
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return;
-                    }
-
-                    try {
-                        getResizedBitmap(toFile.getParent(), toFile.getName(), 1024, 0, new Date().getTime());
-                    } catch (Exception e) {
-                        Toast.makeText(context, "Failed to load", Toast.LENGTH_SHORT).show();
-                        Log.e("Camera", e.toString());
-                    }
-
-                    // добавляем запись о полученном файле
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
-                    realm.copyToRealm(mediaFile);
-                    realm.commitTransaction();
-                    realm.close();
+            if (!picDir.exists()) {
+                if (!picDir.mkdirs()) {
+                    Log.d(TAG, "Required media storage does not exist");
+                    return;
                 }
+            }
 
-                break;
+            File toFile = new File(picDir, mediaFile.getName());
+            try {
+                copyFile(fromFile, toFile);
+/*
+                if (!fromFile.delete()) {
+                    Log.d(TAG, "Не удалось удалить исходный файл");
+                }
+*/
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
 
-            default:
-                break;
+            try {
+                Bitmap tmpBitmap = getResizedBitmap(toFile.getParent(), toFile.getName(),
+                        1024, 0, new Date().getTime());
+                if (tmpBitmap != null) {
+                    tv_defect_image.setImageBitmap(tmpBitmap);
+                }
+            } catch (Exception e) {
+                Toast.makeText(context, "Failed to load", Toast.LENGTH_SHORT).show();
+                Log.e("Camera", e.toString());
+            }
+
+            // добавляем запись о полученном файле
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            realm.copyToRealm(mediaFile);
+            realm.commitTransaction();
+            realm.close();
         }
     }
 
     public String getLastPhotoFilePath() {
         String result;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (false) {
             String[] projection = {
                     MediaStore.Images.Media.DATA
             };
