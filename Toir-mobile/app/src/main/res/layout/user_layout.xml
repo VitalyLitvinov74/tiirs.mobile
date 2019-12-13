@@ -26,7 +26,7 @@
                 android:layout_gravity="top"
                 android:contentDescription="@string/image_description"
                 android:scaleType="center"
-                android:src="@drawable/profile_ivanov" />
+                android:src="@drawable/profile2" />
 
             <TextView
                 android:id="@+id/user_text_name"

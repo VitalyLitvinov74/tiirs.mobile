@@ -2,6 +2,8 @@ package ru.toir.mobile;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.util.Linkify;
@@ -35,8 +37,8 @@ class AboutDialog extends Dialog {
         } else {
             Html.fromHtml(readRawTextFile(R.raw.info));
         }
-
-        tv.setText(getContext().getString(R.string.program_version, "4.0.5"));
+        PackageInfo pInfo = null;
+        tv.setText(getContext().getString(R.string.program_version, BuildConfig.VERSION_NAME));
         Linkify.addLinks(tv, Linkify.ALL);
     }
 
