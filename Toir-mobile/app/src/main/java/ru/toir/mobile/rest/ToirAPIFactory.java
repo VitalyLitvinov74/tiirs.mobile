@@ -409,6 +409,7 @@ ToirAPIFactory {
 
         builder.registerTypeAdapter(Date.class, new DateTypeDeserializer());
         builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        builder.serializeNulls();
         Gson gson = builder.create();
         return new Retrofit.Builder()
                 .baseUrl(ToirApplication.serverUrl)
