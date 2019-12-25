@@ -22,7 +22,7 @@ public class Stage extends RealmObject {
     private StageTemplate stageTemplate;
     private Date startDate;
     private Date endDate;
-    private int flowOrder;
+    private int type;
     private Date createdAt;
     private Date changedAt;
     private RealmList<Operation> operations;
@@ -91,12 +91,12 @@ public class Stage extends RealmObject {
         this.stageTemplate = stageTemplate;
     }
 
-    public int getFlowOrder() {
-        return flowOrder;
+    public int getType() {
+        return type;
     }
 
-    public void setFlowOrder(int flowOrder) {
-        this.flowOrder = flowOrder;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public Date getStartDate() {
