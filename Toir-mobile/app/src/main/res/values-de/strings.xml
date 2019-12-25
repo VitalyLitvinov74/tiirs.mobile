@@ -15,8 +15,6 @@
     <string name="load_test_data">Testdaten herunterladen</string>
     <string name="delete_test_data">Elementreferenz löschen</string>
 
-    <string name="pref_update_url">Systemserver</string>
-    <string name="pref_update_url_dialog_title">Geben Sie die URL des Update-Servers ein</string>
     <string name="pref_server_url">Systemserver</string>
     <string name="pref_server_url_dialog_title">Geben Sie die Systemserver-URL ein</string>
     <string name="pref_rfid_driver">RFID-Lesertreiber</string>
@@ -32,7 +30,6 @@
     <string name="read_15693">Tag lesen</string>
     <string name="write_15693">Tag schreiben</string>
     <string name="serverUrl">serverUrl</string>
-    <string name="updateUrl">updateUrl</string>
     <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Referenzen</string>

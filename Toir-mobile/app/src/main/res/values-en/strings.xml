@@ -15,8 +15,6 @@
     <string name="load_test_data">Load test data</string>
     <string name="delete_test_data">Delete references</string>
 
-    <string name="pref_update_url">Server update url</string>
-    <string name="pref_update_url_dialog_title">Input server URL</string>
     <string name="pref_server_url">System server</string>
     <string name="pref_server_url_dialog_title">Input server URL</string>
     <string name="pref_rfid_driver">RFID driver</string>
@@ -31,7 +29,6 @@
     <string name="find">Find</string>
 
     <string name="serverUrl">serverUrl</string>
-    <string name="updateUrl">updateUrl</string>
     <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="title_activity_btserver">BTServerActivity</string>
