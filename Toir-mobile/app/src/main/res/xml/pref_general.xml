@@ -10,13 +10,6 @@
 
         <EditTextPreference
             android:defaultValue="https://api.toir.tehnosber.ru"
-            android:dialogTitle="@string/pref_update_url_dialog_title"
-            android:icon="@drawable/pref_server"
-            android:key="@string/updateUrl"
-            android:title="@string/pref_update_url" />
-
-        <EditTextPreference
-            android:defaultValue="https://api.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_server_url_dialog_title"
             android:icon="@drawable/pref_server"
             android:key="@string/serverUrl"

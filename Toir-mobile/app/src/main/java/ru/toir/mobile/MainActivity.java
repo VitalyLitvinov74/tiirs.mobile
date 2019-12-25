@@ -688,30 +688,6 @@ public class MainActivity extends AppCompatActivity {
                             } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
                                 updateApk();
-//                                mProgressDialog = new ProgressDialog(MainActivity.this);
-//                                mProgressDialog.setMessage(getString(R.string.sync_data));
-//                                mProgressDialog.setIndeterminate(true);
-//                                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//                                mProgressDialog.setCancelable(true);
-//                                final Downloader downloaderTask = new Downloader(MainActivity.this);
-//                                SharedPreferences sp = PreferenceManager
-//                                        .getDefaultSharedPreferences(getApplicationContext());
-//                                String updateUrl = sp.getString(getString(R.string.updateUrl), "");
-//
-//                                if (!updateUrl.equals("")) {
-//                                    String path = Environment.getExternalStorageDirectory() + "/Download/";
-//                                    File file = new File(path);
-//                                    if (file.mkdirs()) {
-//                                        File outputFile = new File(path, "Toir-mobile.apk");
-//                                        downloaderTask.execute(updateUrl, outputFile.toString());
-//                                        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                                            @Override
-//                                            public void onCancel(DialogInterface dialog) {
-//                                                downloaderTask.cancel(true);
-//                                            }
-//                                        });
-//                                    }
-//                                }
                             } else if (ident == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
                                 tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
@@ -822,28 +798,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void onActionUpdate(MenuItem menuItem) {
         updateApk();
-//        SharedPreferences sp = PreferenceManager
-//                .getDefaultSharedPreferences(getApplicationContext());
-//
-//        // урл по которому забираем файл обновления
-//        String updateUrl = sp.getString(getString(R.string.updateUrl), "");
-//
-//        if (updateUrl.equals("")) {
-//            Toast toast = Toast.makeText(this, getString(R.string.no_url_for_update),
-//                    Toast.LENGTH_SHORT);
-//            toast.setGravity(Gravity.CENTER, 0, 0);
-//            toast.show();
-//            return;
-//        }
-//
-//        addToJournal("Запущено обновление с сервера " + updateUrl);
-//        String path = Environment.getExternalStorageDirectory() + "/Download/";
-//        File file = new File(path);
-//        if (file.mkdirs()) {
-//            File outputFile = new File(path, "Toir-mobile.apk");
-//            Downloader d = new Downloader(MainActivity.this);
-//            d.execute(updateUrl, outputFile.toString());
-//        }
     }
 
     public void onActionAbout(MenuItem menuItem) {
@@ -1054,7 +1008,6 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-        String updateUrl = sp.getString(getString(R.string.updateUrl), "");
         String serverUrl = sp.getString(getString(R.string.serverUrl), "");
         String classPath = sp.getString(getString(R.string.rfidDriverListPrefKey), "");
         String driverName = RfidDriverBase.getDriverName(classPath);
@@ -1072,10 +1025,6 @@ public class MainActivity extends AppCompatActivity {
         // указываем названия и значения для элементов списка
         if (driver != null) {
             driver.setText(driverName);
-        }
-
-        if (update_server != null) {
-            update_server.setText(updateUrl);
         }
 
         if (system_server != null) {
