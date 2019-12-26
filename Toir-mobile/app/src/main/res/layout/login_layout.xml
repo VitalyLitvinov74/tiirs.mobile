@@ -13,7 +13,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/description"
         android:scaleType="centerCrop"
-        android:src="@drawable/quarzwerke_logo_kt" />
+        android:src="@drawable/login_header" />
 
     <TextView
         android:id="@+id/login_current_driver"

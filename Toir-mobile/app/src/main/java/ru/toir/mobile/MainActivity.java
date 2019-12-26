@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -1160,6 +1161,14 @@ public class MainActivity extends AppCompatActivity {
                         setMainLayout(savedInstance);
                     } else {
                         setContentView(R.layout.login_layout);
+                        ImageView iW = findViewById(R.id.login_header);
+                        if (iW != null) {
+                            SharedPreferences sp = PreferenceManager
+                                    .getDefaultSharedPreferences(getApplicationContext());
+                            String serverUrl = sp.getString(getString(R.string.serverUrl), "");
+                            if (serverUrl.contains("qwvostok"))
+                                iW.setImageResource(R.drawable.quarzwerke_logo_kt);
+                        }
                         ShowSettings();
                     }
                 }

@@ -1,20 +1,27 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.MediaController;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.realm.MediaFile;
+
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author olejek
@@ -103,6 +110,18 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
 
                     if (defect.getUser() != null) {
                         viewHolder.equipment.setText(defect.getEquipment().getTitle());
+                    }
+                    MediaFile mediaFile = defect.getMediaFile();
+                    if (mediaFile != null) {
+                        File path = context.getExternalFilesDir(mediaFile.getPath());
+                        String fileName = mediaFile.getName();
+                        if (path != null && fileName.contains("jpg")) {
+                            Bitmap bm = getResizedBitmap(path + File.separator,
+                                    fileName, 200, 0, mediaFile.getChangedAt().getTime());
+                            if (bm != null) {
+                                viewHolder.image_defect.setImageBitmap(bm);
+                            }
+                        }
                     }
                 }
             }

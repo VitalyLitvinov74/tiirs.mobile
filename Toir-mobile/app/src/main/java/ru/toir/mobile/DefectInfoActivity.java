@@ -115,36 +115,6 @@ public class DefectInfoActivity extends AppCompatActivity {
         }
         equipment_uuid = defect.getEquipment().getUuid();
 
-        // TODO когда будет сущность с изображениями - вставить сюда
-        MediaFile mediaFile = realmDB.where(MediaFile.class)
-                .equalTo("entityUuid", defect_uuid)
-                .sort("createdAt", Sort.DESCENDING)
-                .findFirst();
-        if (mediaFile != null) {
-            File path = getExternalFilesDir(mediaFile.getPath());
-            String fileName = mediaFile.getName();
-            if (path != null) {
-                if (fileName.contains("jpg")) {
-                    tv_defect_video.setVisibility(View.GONE);
-                    tv_defect_image.setVisibility(View.VISIBLE);
-                    Bitmap tmpBitmap =
-                            getResizedBitmap(path + File.separator,
-                                    fileName, 600, 0, mediaFile.getChangedAt().getTime());
-                    if (tmpBitmap != null) {
-                        tv_defect_image.setImageBitmap(tmpBitmap);
-                    }
-                } else {
-                    tv_defect_video.setVisibility(View.VISIBLE);
-                    tv_defect_image.setVisibility(View.GONE);
-
-                    MediaController mediaController = new MediaController(this);
-                    mediaController.setAnchorView(tv_defect_video);
-                    tv_defect_video.setMediaController(mediaController);
-                    tv_defect_video.setVideoPath(path + File.separator + fileName);
-                    tv_defect_video.start();
-                }
-            }
-        }
         tv_defect_text_name.setText("Дефект #".concat(String.valueOf(defect.get_id())));
         tv_defect_text_type.setText(defect.getDefectType().getTitle());
         tv_equipment_text_uuid.setText(defect.getEquipment().getTitle());
@@ -363,8 +333,8 @@ public class DefectInfoActivity extends AppCompatActivity {
             }
 
             try {
-                Bitmap tmpBitmap = getResizedBitmap(toFile.getParent(), toFile.getName(),
-                        1024, 0, new Date().getTime());
+                Bitmap tmpBitmap = getResizedBitmap(getExternalFilesDir(mediaFile.getPath()) + File.separator,
+                        mediaFile.getName(), 600, 0, mediaFile.getChangedAt().getTime());
                 if (tmpBitmap != null) {
                     tv_defect_image.setImageBitmap(tmpBitmap);
                 }
@@ -406,5 +376,41 @@ public class DefectInfoActivity extends AppCompatActivity {
         }
 
         return result;
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+
+        MediaFile mediaFile = realmDB.where(MediaFile.class)
+                .equalTo("entityUuid", defect_uuid)
+                .sort("createdAt", Sort.DESCENDING)
+                .findFirst();
+        if (mediaFile != null) {
+            File path = getExternalFilesDir(mediaFile.getPath());
+            String fileName = mediaFile.getName();
+            if (path != null) {
+                if (fileName.contains("jpg")) {
+                    tv_defect_video.setVisibility(View.GONE);
+                    tv_defect_image.setVisibility(View.VISIBLE);
+                    Bitmap tmpBitmap =
+                            getResizedBitmap(path + File.separator,
+                                    fileName, 600, 0, mediaFile.getChangedAt().getTime());
+                    if (tmpBitmap != null) {
+                        tv_defect_image.setImageBitmap(tmpBitmap);
+                    }
+                } else {
+                    tv_defect_video.setVisibility(View.VISIBLE);
+                    tv_defect_image.setVisibility(View.GONE);
+
+                    MediaController mediaController = new MediaController(this);
+                    mediaController.setAnchorView(tv_defect_video);
+                    tv_defect_video.setMediaController(mediaController);
+                    tv_defect_video.setVideoPath(path + File.separator + fileName);
+                    tv_defect_video.start();
+                }
+            }
+        }
     }
 }
