@@ -166,6 +166,10 @@ public class EquipmentsFragment extends Fragment {
                                 Callback<Equipment> callback = new Callback<Equipment>() {
                                     @Override
                                     public void onResponse(Call<Equipment> responseBodyCall, Response<Equipment> response) {
+                                        if (response.code() != 200) {
+                                            Toast.makeText(getContext(), response.message(), Toast.LENGTH_LONG).show();
+                                        }
+
                                         Equipment equipment = response.body();
                                         if (equipment != null) {
                                             Realm realm = Realm.getDefaultInstance();
