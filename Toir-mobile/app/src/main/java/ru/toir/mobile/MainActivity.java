@@ -266,6 +266,35 @@ public class MainActivity extends AppCompatActivity {
 
                     AuthorizedUser.getInstance().setTagId(tagId);
 
+                    // проверяем, есть соединение с инетом или нет
+                    // если нет, искать по метке в локальной базе, к сети вообще не обращаться.
+                    if (!ToirApplication.isInternetOn(getApplicationContext())) {
+                        // проверяем наличие пользователя в локальной базе
+                        User user = realmDB.where(User.class)
+                                // !!!!!
+                                .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                                .findFirst();
+
+                        // в зависимости от результата либо дать работать, либо не дать
+                        if (user != null && user.isActive()) {
+                            isLogged = true;
+                            //user_changed = true;
+                            changeActiveProfile(user);
+
+                            AuthorizedUser.getInstance().setUuid(user.getUuid());
+                            addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
+                            setMainLayout(savedInstance);
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    getString(R.string.toast_error_no_access),
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        // закрываем диалог
+                        rfidDialog.dismiss();
+                        return true;
+                    }
+
                     // показываем диалог входа
                     authorizationDialog = new ProgressDialog(MainActivity.this);
                     authorizationDialog.setMessage(getString(R.string.toast_enter));
@@ -279,6 +308,10 @@ public class MainActivity extends AppCompatActivity {
                     call.enqueue(new Callback<TokenSrv>() {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
+                            if (response.code() != 200) {
+                                Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                            }
+
                             AuthorizedUser authUser = AuthorizedUser.getInstance();
                             TokenSrv token = response.body();
                             if (token != null) {
@@ -307,6 +340,10 @@ public class MainActivity extends AppCompatActivity {
                             call.enqueue(new Callback<User>() {
                                 @Override
                                 public void onResponse(Call<User> userCall, Response<User> response) {
+                                    if (response.code() != 200) {
+                                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                                    }
+
                                     User user = response.body();
                                     if (user != null) {
                                         final String fileName = user.getImage();
@@ -752,8 +789,9 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
 
         if (activeUserID <= 0) {
-            Toast.makeText(getApplicationContext(),
-                    getString(R.string.please_login), Toast.LENGTH_LONG).show();
+            // TODO: разобраться почему переменной не присваивается ни какое значение
+//            Toast.makeText(getApplicationContext(),
+//                    getString(R.string.please_login), Toast.LENGTH_LONG).show();
         }
 
         //((ViewGroup) findViewById(R.id.frame_container)).addView(result.getSlider());
@@ -798,6 +836,11 @@ public class MainActivity extends AppCompatActivity {
      * @param menuItem Элемент меню
      */
     public void onActionUpdate(MenuItem menuItem) {
+        if (!ToirApplication.isInternetOn(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         updateApk();
     }
 
