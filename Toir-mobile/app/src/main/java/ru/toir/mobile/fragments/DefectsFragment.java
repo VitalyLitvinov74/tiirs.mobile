@@ -25,6 +25,7 @@ import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -130,16 +131,20 @@ public class DefectsFragment extends Fragment {
         if (defectTypeUuid != null) {
             defects = realmDB.where(Defect.class)
                     .equalTo("defectType.uuid", defectTypeUuid)
+                    .sort("createdAt", Sort.DESCENDING)
                     .findAll();
             if (equipment_uuid != null) {
                 defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment_uuid)
                         .equalTo("defectType.uuid", defectTypeUuid)
+                        .sort("createdAt", Sort.DESCENDING)
                         .findAll();
             }
         } else {
-            defects = realmDB.where(Defect.class).findAll();
+            defects = realmDB.where(Defect.class).sort("createdAt", Sort.DESCENDING).findAll();
             if (equipment_uuid != null) {
-                defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment_uuid)
+                defects = realmDB.where(Defect.class)
+                        .equalTo("equipment.uuid", equipment_uuid)
+                        .sort("createdAt", Sort.DESCENDING)
                         .findAll();
             }
         }

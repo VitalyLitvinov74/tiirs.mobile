@@ -1710,7 +1710,8 @@ public class OrderFragment extends Fragment {
             if (textTime != null) {
                 int workTime = (int) (currentTime - startTime) / 1000;
                 textTime.setText(getString(R.string.sec_with_value, workTime));
-                if (workTime <= operationFinished.getOperationTemplate().getNormative()) {
+                if (workTime <= operationFinished.getOperationTemplate().getNormative() ||
+                        operationFinished.getOperationTemplate().getNormative() == 0) {
                     textTime.setBackgroundColor(Color.GREEN);
                 } else {
                     textTime.setBackgroundColor(Color.RED);
