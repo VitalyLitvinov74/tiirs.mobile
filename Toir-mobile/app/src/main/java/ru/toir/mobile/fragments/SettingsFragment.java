@@ -35,6 +35,7 @@ import java.util.Locale;
 
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.utils.LoadTestData;
 import ru.toir.mobile.utils.MainFunctions;
@@ -115,6 +116,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(mainActivityConnector.getApplicationContext());
+
+        this.findPreference(getString(R.string.serverUrl)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                ToirApplication.serverUrl = String.valueOf(newValue);
+                return true;
+            }
+        });
 
         // получаем список драйверов
         String[] driverClassList = RfidDriverBase.getDriverClassList();
