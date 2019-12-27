@@ -148,10 +148,12 @@ public class Defect extends RealmObject implements ISend {
 
     public MediaFile getMediaFile() {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(MediaFile.class)
+        MediaFile mediaFile = realm.where(MediaFile.class)
                 .equalTo("entityUuid", this.uuid)
                 .sort("createdAt", Sort.DESCENDING)
                 .findFirst();
+        realm.close();
+        return mediaFile;
     }
 
     @Override
