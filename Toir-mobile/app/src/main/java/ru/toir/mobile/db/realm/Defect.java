@@ -1,11 +1,17 @@
 package ru.toir.mobile.db.realm;
 
+import android.graphics.Bitmap;
+
+import java.io.File;
 import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.Sort;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
+
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author Olejek
@@ -138,6 +144,14 @@ public class Defect extends RealmObject implements ISend {
 
     public boolean isSent() {
         return sent;
+    }
+
+    public MediaFile getMediaFile() {
+        Realm realm = Realm.getDefaultInstance();
+        return realm.where(MediaFile.class)
+                .equalTo("entityUuid", this.uuid)
+                .sort("createdAt", Sort.DESCENDING)
+                .findFirst();
     }
 
     @Override

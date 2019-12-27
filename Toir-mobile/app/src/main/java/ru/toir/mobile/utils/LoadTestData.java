@@ -1084,7 +1084,7 @@ public class LoadTestData {
                 stage.setUuid(stageUuid);
                 stage.setStageStatus(stageStatusUncomplete);
                 stage.setEndDate(new Date());
-                stage.setFlowOrder(1);
+                stage.setType(1);
                 stage.setStartDate(new Date());
                 stage.setEquipment(equipment);
 //            stage.setEquipmentUuid(equipmentUuid);
@@ -1105,7 +1105,7 @@ public class LoadTestData {
                 stage2.setUuid(stageUuid2);
                 stage2.setStageStatus(stageStatusUncomplete);
                 stage2.setEndDate(new Date());
-                stage2.setFlowOrder(2);
+                stage2.setType(2);
                 stage2.setStartDate(new Date());
                 stage2.setEquipment(equipment2);
 //            stage2.setEquipmentUuid(equipmentUuid2);

@@ -13,7 +13,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/description"
         android:scaleType="centerCrop"
-        android:src="@drawable/quarzwerke_logo_kt" />
+        android:src="@drawable/login_header" />
 
     <TextView
         android:id="@+id/login_current_driver"
@@ -39,33 +39,11 @@
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/login_current_update_server"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/login_label_driver"
-        android:layout_marginTop="20dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/larisaTextColorBlack"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/login_label_update_server"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/login_current_update_server"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/larisaTextColor"
-        android:text="@string/update_server"
-        android:textSize="14sp" />
-
-    <TextView
         android:id="@+id/login_current_system_server"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/login_label_update_server"
+        android:layout_below="@+id/login_label_driver"
         android:layout_marginTop="20dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/larisaTextColorBlack"
