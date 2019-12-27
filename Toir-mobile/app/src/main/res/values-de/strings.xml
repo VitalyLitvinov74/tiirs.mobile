@@ -259,4 +259,15 @@
     <string name="lang_de">de</string>
     <string name="lang_en">en</string>
     <string name="select_verdict">Geben Sie ein Urteil ein</string>
+
+    <string name="defect_date">Defekt Daten</string>
+    <string name="defect_status_processed">Fixed</string>
+    <string name="defect_status_non_processed">Non fixed</string>
+    <string name="defect_level">Defekt</string>
+
+    <string name="defects">Defekten</string>
+    <string name="defects_category_all">Alle categorien</string>
+    <string name="defects_category_non_specific">Unbestimmten defekten</string>
+
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
 </resources>
