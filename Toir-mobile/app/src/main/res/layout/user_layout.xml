@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:ignore="RtlSymmetry">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/larisaTextColorAWhite"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/user_info_common"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/user_image"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="top"
+                android:contentDescription="@string/image_description"
+                android:scaleType="center"
+                android:src="@drawable/profile2" />
+
+            <TextView
+                android:id="@+id/user_text_name"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:layout_below="@+id/user_image"
+                android:adjustViewBounds="true"
+                android:background="@color/larisaBlueColor"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:paddingTop="10dp"
+                android:scaleType="centerCrop"
+                android:textColor="@color/larisaWhiteColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/user_text_uuid"
+                android:layout_width="fill_parent"
+                android:layout_height="30dp"
+                android:layout_below="@+id/user_text_name"
+                android:adjustViewBounds="true"
+                android:background="@color/larisaBlueColor"
+                android:paddingBottom="10dp"
+                android:paddingStart="10dp"
+                android:scaleType="centerCrop"
+                android:textColor="@color/larisaWhiteColor"
+                android:textSize="15sp" />
+
+            <ru.toir.mobile.utils.IconTextView
+                android:id="@+id/user_icon"
+                android:layout_width="36dp"
+                android:layout_height="50dp"
+                android:textSize="24sp"
+                android:layout_below="@+id/user_text_uuid"
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_user_tie"
+                android:textColor="@color/larisaBlueColor" />
+
+            <TextView
+                android:id="@+id/user_text_type"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_uuid"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/user_icon" />
+
+            <TextView
+                android:id="@+id/user_text_whois_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_type"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/whois"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp"
+                android:layout_toEndOf="@+id/user_icon" />
+
+            <ru.toir.mobile.utils.IconTextView
+                android:id="@+id/user_location_icon"
+                android:layout_width="36dp"
+                android:layout_height="50dp"
+                android:textSize="24sp"
+                android:layout_below="@+id/user_text_whois_label"
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_map_marker"
+                android:textColor="@color/larisaBlueColor" />
+
+            <TextView
+                android:id="@+id/user_text_location"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_whois_label"
+                android:layout_toEndOf="@+id/user_location_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/user_text_location_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_location"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/current_location"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp"
+                android:layout_toEndOf="@+id/user_location_icon" />
+
+            <ru.toir.mobile.utils.IconTextView
+                android:id="@+id/user_date_icon"
+                android:layout_width="36dp"
+                android:layout_height="50dp"
+                android:textSize="24sp"
+                android:layout_below="@+id/user_text_location_label"
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_server"
+                android:textColor="@color/larisaBlueColor" />
+
+            <TextView
+                android:id="@+id/user_text_date"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_location_label"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/user_date_icon" />
+
+            <TextView
+                android:id="@+id/user_text_date_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_date"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/server_date_connect"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp"
+                android:layout_toEndOf="@+id/user_date_icon" />
+
+            <View
+                android:id="@+id/user_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/user_text_date_label"
+                android:background="#EDEDED"
+                android:paddingTop="20dp" />
+
+            <TextView
+                android:id="@+id/user_status_gprs"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_divider"
+                android:background="@color/larisaTextColorAWhite"
+                android:clickable="false"
+                android:gravity="center_vertical"
+                android:paddingStart="50dp"
+                android:text="@string/gprs_status"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/user_status_gprs_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_divider"
+                android:enabled="false"
+                android:gravity="center_vertical"
+                android:text=""
+                android:layout_alignEnd="@+id/user_status_gprs" />
+
+            <TextView
+                android:id="@+id/user_status_gps"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_status_gprs"
+                android:background="@color/larisaTextColorAWhite"
+                android:clickable="false"
+                android:paddingStart="50dp"
+                android:gravity="center_vertical"
+                android:text="@string/gps_status"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/user_status_gps_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_status_gprs_switch"
+                android:gravity="center_vertical"
+                android:text=""
+                android:layout_alignEnd="@+id/user_status_gps" />
+
+            <View
+                android:id="@+id/user_divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/user_status_gps"
+                android:background="#EDEDED"
+                android:paddingStart="30dp"
+                android:paddingEnd="10dp" />
+
+            <ru.toir.mobile.utils.IconTextView
+                android:id="@+id/user_boss_contact"
+                android:layout_width="36dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/user_divider2"
+                android:layout_marginStart="15dp"
+                android:text="@string/icon_phone"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/user_text_boss"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_divider2"
+                android:background="@color/larisaTextColorAWhite"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/user_boss_contact"
+                android:paddingStart="10dp" />
+
+            <TextView
+                android:id="@+id/user_text_boss_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/user_text_boss"
+                android:layout_toEndOf="@+id/user_boss_contact"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/boss_contact"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <View
+                android:id="@+id/user_divider3"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_below="@+id/user_boss_contact"
+                android:background="@color/larisaWhiteColor" />
+
+        </RelativeLayout>
+    </ScrollView>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,148 @@
+apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
+
+    def versionPropsFile = file('version.properties')
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+        def code = versionProps['VERSION_CODE'].toInteger() + 1
+        def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
+        def versionMinor = versionProps['VERSION_MINOR'].toInteger()
+        versionProps['VERSION_CODE']=code.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+        defaultConfig {
+            applicationId "ru.toir.mobile"
+            minSdkVersion 17
+            targetSdkVersion 27
+            versionCode code
+            versionName "${versionMajor}.${versionMinor}." + String.format("%03d", code)
+            signingConfig signingConfigs.debug
+        }
+    }
+    else {
+        throw new GradleException("Could not read version.properties!")
+    }
+    signingConfigs {
+        def rootDir = property('rootDir')
+        Properties properties = new Properties()
+        properties.load(new FileInputStream("${rootDir}/local.properties"))
+        debug {
+            // это сделано для того, чтоб не прибивать приложение вместе с базой
+            // при установке release версии приложения
+            storeFile file(properties.getProperty('STORE_FILE'))
+            storePassword properties.getProperty('STORE_PASSWORD')
+            keyAlias properties.getProperty('KEY_ALIAS')
+            keyPassword properties.getProperty('KEY_PASSWORD')
+        }
+        release {
+            storeFile file(properties.getProperty('STORE_FILE'))
+            storePassword properties.getProperty('STORE_PASSWORD')
+            keyAlias properties.getProperty('KEY_ALIAS')
+            keyPassword properties.getProperty('KEY_PASSWORD')
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled false
+            proguardFiles.add(file('proguard-rules.pro'))
+            signingConfig signingConfigs.release
+        }
+    }
+
+    flavorDimensions "common"
+    productFlavors {
+        arm {
+            dimension "common"
+            ndk.abiFilters "armeabi-v7a"
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds true
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
+    dexOptions {
+        jumboMode true
+    }
+
+    packagingOptions{
+        doNotStrip '*/mips/*.so'
+        doNotStrip '*/mips64/*.so'
+    }
+}
+
+
+def rd = property('rootDir')
+Properties prop = new Properties()
+prop.load(new FileInputStream("${rd}/local.properties"))
+def localRepo = prop.getProperty('localRepo')
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
+    maven {
+        url "file://${localRepo}"
+    }
+}
+
+dependencies {
+    implementation 'com.google.zxing:core:3.2.0'
+    implementation 'com.google.zxing:android-integration:3.2.0'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    implementation 'org.osmdroid:osmdroid-android:5.5:release@aar'
+    implementation 'me.dm7.barcodescanner:zbar:1.8.3'
+    implementation 'android.hardware:uhf-tools:1.0@aar'
+    implementation 'android.hardware.p6300:p6300uart:1.0@aar'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.mikepenz:iconics-core:2.5.5@aar'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.android.support:design:27.1.0'
+    implementation 'com.android.support:cardview-v7:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:preference-v7:27.1.0'
+    implementation 'com.android.support:cardview-v7:27.1.0'
+    implementation('com.mikepenz:materialdrawer:4.6.4@aar') {
+        transitive = true
+        //exclude group: 'com.mikepenz'
+    }
+    implementation('com.mikepenz:aboutlibraries:5.5.1@aar') {
+        transitive = true
+    }
+    implementation 'com.mikepenz:fontawesome-typeface:4.5.0.1@aar'
+    implementation 'com.mikepenz:octicons-typeface:3.2.0.1@aar'
+    implementation 'com.mikepenz:google-material-typeface:2.2.0.1@aar'
+    implementation 'com.facebook.stetho:stetho:1.5.1'
+    implementation 'com.uphyca:stetho_realm:2.2.2'
+    implementation 'io.realm:android-adapters:2.0.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.7.0'
+    implementation 'com.roughike:bottom-bar:2.0.2'
+    implementation 'com.sothree.slidinguppanel:library:3.3.1'
+    implementation 'com.github.MKergall:osmbonuspack:6.0'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.2'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.2'
+    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.2'
+    implementation 'junit:junit:4.12'
+    implementation 'com.jayway.android.robotium:robotium-solo:5.6.3'
+    implementation 'me.leolin:ShortcutBadger:1.1.19@aar'
+    implementation 'com.rabbitmq:amqp-client:4.4.1'
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip" >
+
+    <ImageView
+        android:id="@+id/ti_ImageStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_marginEnd="6dip"
+        android:src="@drawable/status_easy_receive"
+        android:contentDescription="@string/image_description" />
+
+    <TextView
+        android:id="@+id/ti_Name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:background="@color/larisaTextColorAWhite"
+        android:textColor="@color/larisaBackColor"
+        android:singleLine="true"
+        android:gravity="center_vertical"
+        android:text="@string/description"
+        android:textSize="16sp"
+        android:layout_toEndOf="@id/ti_ImageStatus" />
+
+    <TextView
+        android:id="@+id/ti_Comment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dip"
+        android:layout_alignParentEnd="true"
+        android:background="@color/larisaTextColorAWhite"
+        android:singleLine="true"
+        android:textColor="@color/larisaBackColor"
+        android:layout_below="@+id/ti_Name"
+        android:ellipsize="marquee"
+        android:text="@string/description"
+        android:textSize="12sp"
+        android:layout_toEndOf="@id/ti_ImageStatus" />
+
+    <TextView
+        android:id="@+id/ti_Status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/ti_ImageStatus"
+        android:background="@color/larisaTextColorAWhite"
+        android:textColor="@color/larisaBackColor"
+        android:layout_below="@+id/ti_Comment"
+        android:ellipsize="marquee"
+        android:text="@string/description"
+        android:textSize="12sp" />
+
+</RelativeLayout>

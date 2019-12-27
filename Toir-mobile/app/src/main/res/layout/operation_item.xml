@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/operation_linear_layout"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+        android:id="@+id/operation_status"
+        android:layout_width="wrap_content"
+        android:theme="@style/checkBoxStyle"
+        android:layout_height="wrap_content"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:layout_gravity="center_vertical" />
+
+    <RelativeLayout
+        android:id="@+id/operation_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1"
+        android:layout_marginStart="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/operation_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text=""
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/operation_startDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/operation_title"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:text=""
+            android:textColor="#333333"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/operation_divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dip"
+            android:layout_toRightOf="@id/operation_startDate"
+            android:background="@color/larisaTextColorAWhite"
+            android:textColor="#454545"
+            android:layout_below="@+id/operation_title"
+            android:text="@string/tire"
+            android:layout_toEndOf="@id/operation_startDate"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/operation_endDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/operation_title"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/operation_divider"
+            android:text=""
+            android:textColor="#333333"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/operation_divider"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/operation_verdict"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|right"
+        android:layout_marginRight="5dp"
+        android:contentDescription="@string/image_description"
+        android:layout_marginEnd="5dp"
+        android:src="@drawable/status_easy_receive" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/operation_description_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/op_description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:textColor="#222222"
+            android:textSize="12sp"
+            android:gravity="center_vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/op_normative_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textColor="#222222"
+            android:textSize="12sp"
+            android:layout_below="@+id/op_description"
+            android:layout_marginStart="5dp"
+            android:text="@string/normative" />
+
+        <TextView
+            android:id="@+id/op_normative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#454545"
+            android:textSize="12sp"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/op_normative_label"
+            android:layout_below="@+id/op_description"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_normative_label" />
+
+        <TextView
+            android:id="@+id/op_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textColor="#222222"
+            android:textSize="12sp"
+            android:layout_below="@+id/op_normative_label"
+            android:layout_marginStart="5dp"
+            android:text="@string/operation_time" />
+
+        <TextView
+            android:id="@+id/op_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#454545"
+            android:textSize="12sp"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/op_time_label"
+            android:layout_below="@+id/op_normative"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_time_label" />
+
+        <TextView
+            android:id="@+id/op_measure_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textColor="#222222"
+            android:textSize="12sp"
+            android:layout_below="@+id/op_time_label"
+            android:layout_marginStart="5dp"
+            android:text="@string/measure_label" />
+
+        <TextView
+            android:id="@+id/op_measure_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#454545"
+            android:textSize="12sp"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/op_measure_label"
+            android:layout_below="@+id/op_time_label"
+            android:layout_marginStart="5dp" />
+
+        <LinearLayout
+                android:id="@+id/twf_resultButtonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical" >
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ToiRus</string>
+    <string name="action_settings">App settings</string>
+    <string name="action_about">About</string>
+    <string name="pleasePutTag">Bring tag</string>
+    <string name="readTag">Read tag</string>
+    <string name="cancel">Cancel</string>
+    <string name="action_update">Update app</string>
+    <string name="pref_cat_main">Basic settings</string>
+    <string name="pref_cat_rfid">Device settings</string>
+    <string name="pref_cat_show">Interface settings</string>
+    <string name="pref_debug_mode">Debug mode</string>
+    <string name="pref_autonome_mode">Offline mode</string>
+    <string name="load_test_data">Load test data</string>
+    <string name="delete_test_data">Delete references</string>
+
+    <string name="pref_server_url">System server</string>
+    <string name="pref_server_url_dialog_title">Input server URL</string>
+    <string name="pref_rfid_driver">RFID driver</string>
+    <string name="login">Login</string>
+    <string name="init_success">Initialization success</string>
+    <string name="init_fail">Initialization failed</string>
+    <string name="find_fail">Tag not found</string>
+    <string name="read_fail">Read failed</string>
+    <string name="write_15693_fail">Write failed</string>
+    <string name="write_15693_success">Write success</string>
+    <string name="init">Initialize</string>
+    <string name="find">Find</string>
+
+    <string name="serverUrl">serverUrl</string>
+    <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
+    <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
+    <string name="title_activity_btserver">BTServerActivity</string>
+    <string name="run_ar_content_key">run_ar_content_key</string>
+    <string name="pref_debug_mode_key">debug_mode</string>
+    <string name="pref_autonome_mode_key">auto_mode</string>
+    <string name="ask_text_tags_key">without_tags_mode</string>
+    <string name="langListKey">lang_key</string>
+
+    <string name="read_15693">Read tag</string>
+    <string name="write_15693">Write tag</string>
+    <string name="references">References</string>
+    <string name="get_task">Get orders</string>
+    <string name="choose_tag">Choose tag from menu</string>
+    <string name="back">Back</string>
+    <string name="ok">OK</string>
+    <string name="make_photo">Make photo</string>
+    <string name="image_description">Photo</string>
+    <string name="description"> </string>
+    <string name="id">ID code: %1$s</string>
+    <string name="whois">Position</string>
+    <string name="current_location">Current coordinates</string>
+    <string name="no_gps_data">No GPS data</string>
+    <string name="current_status">Current status</string>
+    <string name="operation_list">Last tasks list</string>
+    <string name="gps_status">GPS status</string>
+    <string name="gprs_status">GPRS status</string>
+    <string name="server_date_connect">Last connection date</string>
+    <string name="tasks_quantity">Orders stats</string>
+    <string name="boss_contact">Chief contact</string>
+    <string name="type">Model:</string>
+    <string name="service">Service:</string>
+    <string name="critical">Critical:</string>
+    <string name="last_date">Date of service</string>
+    <string name="regular_date">Next check</string>
+    <string name="last_result">Check result:</string>
+    <string name="documentation">Documentation</string>
+    <string name="pleaseScanImg">Focus camera on tag</string>
+    <string name="scan_process">Scan in progress</string>
+    <string name="empty"></string>
+    <string name="order_send_message">Send message</string>
+    <string name="created">Created: </string>
+    <string name="off">Disconnected: </string>
+    <string name="status">Status: %1$s</string>
+    <string name="closed">Closed: </string>
+    <string name="operation_status_title">Operation status</string>
+    <string name="equipment_title">Equipment:</string>
+    <string name="operation_title">Operation:</string>
+    <string name="status_title">Status: </string>
+    <string name="result_title">Result: </string>
+    <string name="step_image_descr">Image description</string>
+    <string name="task_title">Order: </string>
+    <string name="stat_status">Status:</string>
+    <string name="operation">Operation:</string>
+    <string name="operation_step_title">Step:</string>
+    <string name="additional_information">Additional information</string>
+    <string name="operation_step_descr_title">Operation step description</string>
+    <string name="operation_status_change_title">Change operation status</string>
+    <string name="operation_choose_status">Choose operation status</string>
+    <string name="divider"> | </string>
+    <string name="num500">500</string>
+    <string name="application_full_name">Mobile client</string>
+    <string name="open_documentation">Open documentation</string>
+    <string name="bluetooth_server">Bluetooth server</string>
+
+    <string name="profile_tagid">Card tagID</string>
+    <string name="profile_add_name">User name</string>
+    <string name="profile_image">Avatar image</string>
+
+    <string name="profile_type">User type</string>
+    <string name="profile_whois">Work position</string>
+    <string name="profile_login">Login</string>
+    <string name="profile_password">Password</string>
+    <string name="profile_submit_button">Add</string>
+    <string name="profile_edit_button">Change</string>
+    <string name="profile_submit_delete">Delete user</string>
+    <string name="driver">Driver</string>
+    <string name="update_server">Update server</string>
+    <string name="system_server">System server</string>
+
+    <string name="menu">Change settings</string>
+    <string name="menu_camera">Camera test</string>
+    <string name="menu_charts">Charts test</string>
+    <string name="menu_equipment">Equipment</string>
+    <string name="menu_gps">Map</string>
+    <string name="menu_tasks">Orders</string>
+    <string name="menu_references">References</string>
+    <string name="menu_users">Users</string>
+    <string name="pref_lang">Interface language</string>
+
+    <string name="profile_type_administrator">Administrator</string>
+    <string name="profile_type_engeneer">User</string>
+    <string name="profile_whois_shef">Chief</string>
+    <string name="profile_whois_engeneer">Engineer</string>
+
+    <string name="image_status_equipment">Equipment status image</string>
+    <string name="normative">Normative: </string>
+    <string name="finish_stage">Finish</string>
+    <string name="measure">Measure</string>
+    <string name="measure_label">Last measure:</string>
+    <string name="measure_description">Make measure and input data in form below. Also you can see last value changes.</string>
+    <string name="operation_time">Operation time:</string>
+    <string name="tire"> - </string>
+    <string name="sec">sec.</string>
+    <string name="sec_with_value">%1$d sec.</string>
+    <string name="input_value">input data</string>
+
+    <string name="gps_track">GPS track</string>
+    <string name="journal">Journal</string>
+    <string name="toirSettings">App settings</string>
+
+    <string name="dialog_accept">Accept</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="select_all">Choose all</string>
+    <string name="operation_cancel_text">You missed one or several operation. Specify for this reason/verdict.</string>
+
+    <string name="run_ar_content">Run AR-content</string>
+    <string name="not_started">not started</string>
+    <string name="not_finished">not finished</string>
+    <string name="dont_ask_text_tags">Don`task text tags</string>
+    <string name="model">Model: %1$s</string>
+
+    <string name="choose_defect">Choose defect</string>
+    <string name="add_new_defect">or input new</string>
+    <string name="choose_defect_category">Defect category</string>
+    <string name="choose_defect_type">Defect type</string>
+    <string name="choose_defect_level">Defect level</string>
+    <string name="defects_category_all">All categories</string>
+    <string name="defects_category_non_specific">Non-specific defect</string>
+    <string name="action_save">Save</string>
+    <string name="new_status">Change status on</string>
+    <string name="contragents">Clients</string>
+    <string name="input_contragents_name">Input client name</string>
+
+    <string name="client_type">Contragent type: $1$s</string>
+    <string name="client_phone">phone: %1$s</string>
+
+    <string name="defects">Fixed defects</string>
+    <string name="defect_user">User</string>
+
+    <string name="order_title">[#%1$d] %2$s</string>
+    <string name="order_author">Order author: %1$s</string>
+    <string name="order_worker">Worker: %1$s</string>
+    <string name="order_recieved">Received: %1$s</string>
+    <string name="order_start">Order date: %1$s</string>
+    <string name="order_open">Opened: %1$s</string>
+    <string name="order_close">Closed: %1$s</string>
+    <string name="order_status">Status: %1$s</string>
+    <string name="order_verdict">Verdict: %1$s</string>
+    <string name="order_comment">Comment: %1$s</string>
+    <string name="order_reason">Order reason: %1$s</string>
+
+    <string name="send_order_comment">Comment</string>
+    <string name="send_order_author">Order author</string>
+
+    <string name="rfid_settings">RFID settings</string>
+    <string name="debug_nocheck_gps">Don`t check GPS</string>
+    <string name="receive_telegram">Send on Telegram</string>
+    <string name="receive_viber">Send on Viber</string>
+    <string name="telegram_chat_id">Chat identificator</string>
+    <string name="telegram_chat_id_value">Chat identificator 0</string>
+    <string name="defect_description">Defect description</string>
+    <string name="select_verdict">Select verdict</string>
+
+    <string name="driver_text">Text driver</string>
+    <string name="advanced_settings">Advanced settings</string>
+
+    <string name="menu_user">User</string>
+    <string name="menu_orders">Orders</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_defects">Defects</string>
+
+    <string name="menu_user_description">User information</string>
+    <string name="menu_equipment_description">Equipment reference</string>
+    <string name="menu_equipment_map">Equipment map</string>
+    <string name="menu_additional">Additional</string>
+    <string name="menu_documentation">Documentation</string>
+    <string name="menu_on_equipment">for equipment</string>
+    <string name="menu_objects">Objects</string>
+    <string name="menu_objects_description">Buildings and objects</string>
+    <string name="menu_client_reference">Client references</string>
+    <string name="menu_journal_track">Journal and GPS track</string>
+    <string name="menu_about_app">About</string>
+    <string name="menu_information">Version information</string>
+    <string name="menu_exit">Exit</string>
+
+    <string name="toast_db_actual">DB not actual!</string>
+    <string name="toast_db_error">Cannot open/update database!</string>
+    <string name="toast_enter">Login in progress</string>
+    <string name="toast_token_received">Token received</string>
+    <string name="toast_error_picture">Resized image not received</string>
+    <string name="toast_error_no_user">User information not received from server</string>
+    <string name="toast_error_no_user_received">User not received</string>
+    <string name="toast_error_no_token_received">Token not received</string>
+    <string name="toast_error_no_access">Access is prohibited</string>
+    <string name="toast_error_operation_canceled">Operation interrupted</string>
+
+    <string name="subtitle_repair">Maintenance and repair</string>
+    <string name="current_tasks">Current tasks</string>
+    <string name="sync_data">Synchronize data</string>
+    <string name="please_login">Please authorize first</string>
+    <string name="no_driver_select">Driver not selected</string>
+    <string name="no_user_present">Error: no such user</string>
+    <string name="gps_must_enabled">GPS must be enabled</string>
+    <string name="no_url_for_update">URL for update is empty!</string>
+
+    <string name="change_attribute">Attribute change</string>
+    <string name="download_update">Download upgrade</string>
+    <string name="update_error">Upgrade error!</string>
+    <string name="unknown">unknown</string>
+    <string name="device_has_no_gps">Device has no GPS!</string>
+    <string name="cannot_upload_file">Error file loading</string>
+    <string name="measure_values">Measure value</string>
+
+    <string name="menu_stages">Task stages</string>
+    <string name="menu_operations">Operations</string>
+    <string name="error_equipment_not_found">Equipment not found</string>
+    <string name="error_equipment_read_tag_error">Request equipment error</string>
+    <string name="error_read_tag">Read tag error</string>
+    <string name="menu_service">Service</string>
+    <string name="menu_references_update">Update references</string>
+    <string name="references_update">References update</string>
+    <string name="references_update_canceled">References update canceled</string>
+    <string name="references_update_success">Reference update</string>
+
+    <string name="lang_ru_text">Русский</string>
+    <string name="lang_de_text">Deutsch</string>
+    <string name="lang_en_text">English</string>
+
+    <string name="lang_ru">ru</string>
+    <string name="lang_de">de</string>
+    <string name="lang_en">en</string>
+
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
+</resources>

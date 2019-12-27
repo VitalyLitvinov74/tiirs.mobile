@@ -3,11 +3,11 @@
  */
 package ru.toir.mobile.test;
 
-import ru.toir.mobile.TOiRDBAdapter;
-import ru.toir.mobile.TOiRDatabaseContext;
+import ru.toir.mobile.DatabaseHelper;
+import ru.toir.mobile.ToirDatabaseContext;
 import ru.toir.mobile.db.adapters.UsersDBAdapter;
+import ru.toir.mobile.db.tables.Users;
 import android.content.Context;
-import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import android.util.Log;
@@ -42,21 +42,19 @@ public class UsersTest extends AndroidTestCase {
 	 */
 	public void testSelectUserById() {
 		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
-		Cursor user = adapter.getItem(uuid);
-		assertEquals(true, user.moveToFirst());
-		assertEquals(uuid, user.getString(user.getColumnIndex(UsersDBAdapter.FIELD_UUID_NAME)));
+		Users user = adapter.getItem(uuid);
+		assertEquals(uuid, user.getUuid());
 	}
 	
 	/**
 	 * проверка чтения пользователя из из курсора
 	 */
 	public void testSelectUserFromCursor() {
-		String name = "admin";
+		String name = "Иванов О.А.";
 		String uuid = "4462ed77-9bf0-4542-b127-f4ecefce49da";
-		Cursor user = adapter.getItem(uuid);
-		assertEquals(true, user.moveToFirst());
-		assertEquals(uuid, user.getString(user.getColumnIndex(UsersDBAdapter.FIELD_UUID_NAME)));
-		assertEquals(name, user.getString(user.getColumnIndex(UsersDBAdapter.FIELD_NAME_NAME)));
+		Users user = adapter.getItem(uuid);
+		assertEquals(uuid, user.getUuid());
+		assertEquals(name, user.getName());
 	}
 
 	/**
@@ -67,16 +65,14 @@ public class UsersTest extends AndroidTestCase {
 	 */
 	public void testDeleteDatabase() {
 		// закрываем базу
-		adapter.close();
 		adapter = null;
-		assertEquals(true, context.deleteDatabase(TOiRDBAdapter.getDbName()));
+		assertEquals(true, context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName()));
 		
 		// чтобы выполнились последующие тесты, создаём заново базу
-		new TOiRDBAdapter(context).open().close();
+		DatabaseHelper.getInstance(context);
 
 		// для того чтобы выполнился tearDown, создаём заново адаптер
 		adapter = new UsersDBAdapter(context);
-		adapter.open();
 	}
 
 	/* (non-Javadoc)
@@ -92,17 +88,16 @@ public class UsersTest extends AndroidTestCase {
 		Log.d(TAG, "setUp");
 		
 		// контекст с переименованием файлов для тестов
-		context = new TOiRDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
+		context = new ToirDatabaseContext(new RenamingDelegatingContext(getContext(), TEST_FILE_PREFIX));
 		
 		// удаляем предыдущую тестовую базу
-		context.deleteDatabase(TOiRDBAdapter.getDbName());
+		context.deleteDatabase(DatabaseHelper.getInstance(context).getDbName());
 		
 		// создаём тестовую базу
-		new TOiRDBAdapter(context).open().close();
+		DatabaseHelper.getInstance(context);
 		
 		// создаём адаптер для тестов, на базе переименованого и с "правильными" путями к базе данных (TOiRDatabaseContext)
         adapter = new UsersDBAdapter(context);
-		adapter.open();
 	}
 
 	/* (non-Javadoc)
@@ -112,7 +107,6 @@ public class UsersTest extends AndroidTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		Log.d(TAG, "tearDown");
-		adapter.close();
 		adapter = null;
 	}
 }
