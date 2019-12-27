@@ -76,6 +76,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.adapters.DefectLevelAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
@@ -247,15 +248,6 @@ public class OrderFragment extends Fragment {
         return (new OrderFragment());
     }
 
-    @Override
-    public void onDestroy() {
-        if (taskTimer != null) {
-            taskTimer.cancel();
-            taskTimer = null;
-        }
-        super.onDestroy();
-    }
-
     public static void copyFile(File sourceFile, File destFile) throws IOException {
 
         if (!destFile.exists()) {
@@ -298,6 +290,15 @@ public class OrderFragment extends Fragment {
                 os.close();
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (taskTimer != null) {
+            taskTimer.cancel();
+            taskTimer = null;
+        }
+        super.onDestroy();
     }
 
     private void initView() {
@@ -628,6 +629,11 @@ public class OrderFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(TAG, "Получаем новые наряды.");
 
+                if (!ToirApplication.isInternetOn(getContext())) {
+                    Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
+                    return true;
+                }
+
                 // создаём диалог
                 ProgressDialog dialog;
                 dialog = new ProgressDialog(getActivity());
@@ -660,6 +666,11 @@ public class OrderFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(TAG, "Получаем сделанные наряды.");
+
+                if (!ToirApplication.isInternetOn(getContext())) {
+                    Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
+                    return true;
+                }
 
                 // запускаем поток получения выполненных, невыполненных, отменнённых нарядов с сервера
                 List<String> stUuids = new ArrayList<>();
@@ -698,6 +709,11 @@ public class OrderFragment extends Fragment {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                if (!ToirApplication.isInternetOn(getContext())) {
+                    Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
+                    return true;
+                }
+
                 // проверяем наличие не законченных нарядов
                 RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
                         .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
