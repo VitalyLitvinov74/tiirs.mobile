@@ -1002,9 +1002,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ShowSettings() {
-        TextView driver, update_server, system_server;
+        TextView driver, system_server;
         driver = findViewById(R.id.login_current_driver);
-        update_server = findViewById(R.id.login_current_update_server);
         system_server = findViewById(R.id.login_current_system_server);
 
         SharedPreferences sp = PreferenceManager
