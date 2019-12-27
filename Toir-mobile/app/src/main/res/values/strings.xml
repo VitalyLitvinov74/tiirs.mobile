@@ -151,6 +151,10 @@
     <string name="model">Модель: %1$s</string>
     <string name="langListKey">lang_key</string>
 
+    <string name="mistakes_category_all">Все категории</string>
+    <string name="mistakes_category_non_specific">Без категории</string>
+    <string name="mistakes">Зафиксированные дефекты</string>
+
     <string name="choose_defect">Выберите дефект</string>
     <string name="add_new_defect">или введите новый</string>
     <string name="choose_defect_category">Категория дефекта</string>

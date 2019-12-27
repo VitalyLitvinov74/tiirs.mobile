@@ -175,7 +175,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                LoadTestData.LoadAllTestData2();
+                //LoadTestData.LoadAllTestData2();
                 return true;
             }
         });
@@ -184,7 +184,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         button2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                LoadTestData.DeleteSomeData();
+                //LoadTestData.DeleteSomeData();
                 return true;
             }
         });
@@ -506,6 +506,17 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
     }
 
+    public void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+        getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+    }
+
     static class AsyncRequest extends AsyncTask<String, Integer, String> {
 
         private Listener listener;
@@ -569,17 +580,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         interface Listener {
             void onSuccess(String object);
         }
-    }
-
-    public void setLocale(String lang) {
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getBaseContext().getResources().updateConfiguration(config,
-                getBaseContext().getResources().getDisplayMetrics());
-        getResources().updateConfiguration(config,
-                getBaseContext().getResources().getDisplayMetrics());
     }
 }
 
