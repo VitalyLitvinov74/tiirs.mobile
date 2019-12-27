@@ -161,7 +161,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                LoadTestData.LoadAllTestData2();
+                //LoadTestData.LoadAllTestData2();
                 return true;
             }
         });
@@ -170,7 +170,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         button2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                LoadTestData.DeleteSomeData();
+                //LoadTestData.DeleteSomeData();
                 return true;
             }
         });

@@ -154,6 +154,10 @@
     <string name="choose_defect">Choose defect</string>
     <string name="add_new_defect">or input new</string>
     <string name="choose_defect_category">Defect category</string>
+    <string name="mistakes_category_all">All categories</string>
+    <string name="mistakes_category_non_specific">Unspecific defect</string>
+    <string name="mistakes">Defects</string>
+
     <string name="choose_defect_type">Defect type</string>
     <string name="choose_defect_level">Defect level</string>
     <string name="defects_category_all">All categories</string>
@@ -261,6 +265,12 @@
     <string name="lang_ru">ru</string>
     <string name="lang_de">de</string>
     <string name="lang_en">en</string>
+
+    <string name="defect_date">Defect date</string>
+    <string name="defect_status_processed">Fixed</string>
+    <string name="defect_status_non_processed">Non fixed</string>
+
+    <string name="defect_level">Defect level</string>
 
     <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
 </resources>
