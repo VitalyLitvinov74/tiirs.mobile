@@ -82,15 +82,6 @@ public class SendOrdersService extends Service {
                 // отмечаем успешно отправленные наряды
                 setSendOrders(idUuid, realm);
 
-                // получаем список всех неотправленных файлов
-                RealmResults<MediaFile> mediaFiles = realm.where(MediaFile.class)
-                        .equalTo("sent", false)
-                        .findAll();
-                // отправляем файлы на сервер
-                idUuid = sendMediaFiles(realm.copyFromRealm(mediaFiles));
-                // отмечаем успешно отправленные файлы
-                setSendMediaFiles(idUuid, realm);
-
                 // список всех uuid операций во всех нарядах
                 String[] operationUuids = getAllOperations(orders).toArray(new String[]{});
                 // получаем все измерения связанные с выполненными операциями
@@ -153,6 +144,15 @@ public class SendOrdersService extends Service {
                 // отмечаем успешно отправленные атрибуты
                 setSendAtributes(idUuid, realm);
             }
+
+            // получаем список всех неотправленных файлов
+            RealmResults<MediaFile> mediaFiles = realm.where(MediaFile.class)
+                    .equalTo("sent", false)
+                    .findAll();
+            // отправляем файлы на сервер
+            idUuid = sendMediaFiles(realm.copyFromRealm(mediaFiles));
+            // отмечаем успешно отправленные файлы
+            setSendMediaFiles(idUuid, realm);
 
             // выбираем из базы все неотправленные дефекты
             RealmResults<Defect> defects = realm.where(Defect.class)
