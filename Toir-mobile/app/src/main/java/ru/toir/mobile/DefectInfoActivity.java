@@ -375,6 +375,7 @@ public class DefectInfoActivity extends AppCompatActivity {
         }
     }
 
+/*
     public String getLastPhotoFilePath() {
         String result;
         if (false) {
@@ -400,6 +401,7 @@ public class DefectInfoActivity extends AppCompatActivity {
 
         return result;
     }
+*/
 
     @Override
     protected void onResume() {
