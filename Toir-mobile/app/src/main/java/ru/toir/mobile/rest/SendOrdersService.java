@@ -149,10 +149,13 @@ public class SendOrdersService extends Service {
             RealmResults<MediaFile> mediaFiles = realm.where(MediaFile.class)
                     .equalTo("sent", false)
                     .findAll();
-            // отправляем файлы на сервер
-            idUuid = sendMediaFiles(realm.copyFromRealm(mediaFiles));
-            // отмечаем успешно отправленные файлы
-            setSendMediaFiles(idUuid, realm);
+
+            if (mediaFiles.size() > 0) {
+                // отправляем файлы на сервер
+                idUuid = sendMediaFiles(realm.copyFromRealm(mediaFiles));
+                // отмечаем успешно отправленные файлы
+                setSendMediaFiles(idUuid, realm);
+            }
 
             // выбираем из базы все неотправленные дефекты
             RealmResults<Defect> defects = realm.where(Defect.class)

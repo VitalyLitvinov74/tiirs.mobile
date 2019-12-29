@@ -55,6 +55,7 @@ public class DefectInfoActivity extends AppCompatActivity {
     private final static String TAG = "DefectInfoActivity";
     private static final int ACTIVITY_PHOTO = 100;
     private static final int ACTIVITY_VIDEO = 101;
+    private static final int EXTERNAL_STORAGE_ACCESS = 102;
 
     private static final int DRAWER_EXIT = 14;
     private static String defect_uuid;
@@ -137,6 +138,14 @@ public class DefectInfoActivity extends AppCompatActivity {
                 if (context == null) {
                     return;
                 }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_ACCESS);
+                        return;
+                    }
+                }
+
                 File file = null;
                 try {
                     file = createMediaFile("img", ".jpg");
@@ -148,7 +157,7 @@ public class DefectInfoActivity extends AppCompatActivity {
                     currentEntityUuid = defect_uuid;
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                        file = new File(Environment.getExternalStorageDirectory(), "image.tmp");
+                        file = new File(Environment.getExternalStorageDirectory(), "image.jpg");
                         intent.putExtra(MediaStore.EXTRA_OUTPUT,
                                 Uri.fromFile(file));
                         photoFilePath = file.getAbsolutePath();
@@ -172,6 +181,14 @@ public class DefectInfoActivity extends AppCompatActivity {
                 if (context == null) {
                     return;
                 }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_ACCESS);
+                        return;
+                    }
+                }
+
                 File file = null;
                 try {
                     file = createMediaFile("vid", ".mp4");
@@ -349,6 +366,12 @@ public class DefectInfoActivity extends AppCompatActivity {
             realm.copyToRealm(mediaFile);
             realm.commitTransaction();
             realm.close();
+        }
+
+        if (requestCode == EXTERNAL_STORAGE_ACCESS) {
+            if (resultCode != Activity.RESULT_OK) {
+                Toast.makeText(getApplicationContext(), "Без доступа к носителю, невозможно сохранить файлы.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
