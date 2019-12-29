@@ -202,7 +202,7 @@ public class OrderFragment extends Fragment {
 //                    }
 //                }
 
-                firstLaunch = false;
+            firstLaunch = false;
 //            }
         }
 
@@ -1181,12 +1181,11 @@ public class OrderFragment extends Fragment {
                         Locale.getDefault()).format(new Date());
         String imageFileName = "IMG_" + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
+        return File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-        return image;
     }
 
     public String getLastPhotoFilePath() {
@@ -1239,7 +1238,7 @@ public class OrderFragment extends Fragment {
                     }
 
                     // получаем штатными средствами последний снятый кадр в системе
-                    String fromFilePath = getLastPhotoFilePath();
+                    String fromFilePath = photoFilePath;
                     File fromFile = new File(fromFilePath);
 
                     // имя файла для сохранения
@@ -1998,32 +1997,32 @@ public class OrderFragment extends Fragment {
                 } catch (IOException ex) {
                     // Error occurred while creating the File
                 }
-
-                photoFilePath = file.getAbsolutePath();
-                // TODO: реализовать все возможные варианты когда мы можем привязать фотку к сущности
-                switch (Level) {
-                    case OPERATION_LEVEL:
-                        currentEntityUuid = currentOperation.getUuid();
-                        break;
-                    default:
-                        currentEntityUuid = null;
-                        break;
-                }
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                    startActivityForResult(intent, ACTIVITY_PHOTO);
-                } else {
-                    Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    if (getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                if (file != null) {
+                    photoFilePath = file.getAbsolutePath();
+                    switch (Level) {
+                        case OPERATION_LEVEL:
+                            currentEntityUuid = currentOperation.getUuid();
+                            break;
+                        default:
+                            currentEntityUuid = null;
+                            break;
+                    }
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        file = new File(Environment.getExternalStorageDirectory(), "image.tmp");
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(file));
+                        photoFilePath = file.getAbsolutePath();
                         startActivityForResult(intent, ACTIVITY_PHOTO);
                     } else {
-                        getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
+                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            startActivityForResult(intent, ACTIVITY_PHOTO);
+                        } else {
+                            requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
+                        }
                     }
-//                    Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-//                    intent.setData(doc);
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
             }
         });
