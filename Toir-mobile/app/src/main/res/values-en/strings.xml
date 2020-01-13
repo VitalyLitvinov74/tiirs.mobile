@@ -272,5 +272,10 @@
 
     <string name="defect_level">Defect level</string>
 
+    <string name="dialog_start_title">Start work</string>
+    <string name="dialog_start">Start</string>
+    <string name="dialog_later">Later</string>
+
     <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
+
 </resources>

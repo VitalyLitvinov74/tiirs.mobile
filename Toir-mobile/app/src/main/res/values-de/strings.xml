@@ -270,4 +270,8 @@
     <string name="defects_category_non_specific">Unbestimmten defekten</string>
 
     <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
+
+    <string name="dialog_start_title">Arbeit start</string>
+    <string name="dialog_start">Start</string>
+    <string name="dialog_later">Nein</string>
 </resources>

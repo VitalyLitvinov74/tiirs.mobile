@@ -271,4 +271,8 @@
     <string name="defect_status_non_processed">Не обработан</string>
 
     <string name="defect_level">Уровень дефекта</string>
+
+    <string name="dialog_start_title">Начать выполнение</string>
+    <string name="dialog_start">Начать</string>
+    <string name="dialog_later">Отложить</string>
 </resources>

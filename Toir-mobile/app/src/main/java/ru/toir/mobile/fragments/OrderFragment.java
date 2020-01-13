@@ -154,6 +154,8 @@ public class OrderFragment extends Fragment {
     private int currentOperationPosition = 0;
     private long startTime = 0;
     private boolean firstLaunch = true;
+    private boolean start = false;
+
     CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
@@ -215,10 +217,6 @@ public class OrderFragment extends Fragment {
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
-
-    //private NumberPicker numberPicker;
-    //private Spinner spinnerSuffix;
-    //private ArrayList<OrderFragment.Suffixes> suffixList;
 
     private RfidDialog rfidDialog;
     private AtomicInteger taskCounter;
@@ -497,13 +495,16 @@ public class OrderFragment extends Fragment {
                     // меняем ее статус на в процессе
 //                    if (operation.isNew() || operation.isCanceled() || operation.isUnComplete()) {
                     if (operation.isNew()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                operation.setStartDate(new Date());
-                                operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
-                            }
-                        });
+                        askStartOperations();
+                        if (start) {
+                            realmDB.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    operation.setStartDate(new Date());
+                                    operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
+                                }
+                            });
+                        }
                     }
 
                     // если эта операция имеет статус "в работе", то начинаем с нее
@@ -533,7 +534,7 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над этапом задачи, меняем его статус на "в работе"
-        if (selectedStage != null) {
+        if (selectedStage != null && start) {
             StageStatus stageStatus = selectedStage.getStageStatus();
             if (stageStatus != null && stageStatus.isNew()) {
                 realmDB.executeTransaction(new Realm.Transaction() {
@@ -547,7 +548,7 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над задачей, меняем ее статус на "в работе"
-        if (selectedTask != null) {
+        if (selectedTask != null && start) {
             TaskStatus taskStatus = selectedTask.getTaskStatus();
             if (taskStatus != null && taskStatus.isNew()) {
                 realmDB.executeTransaction(new Realm.Transaction() {
@@ -561,7 +562,7 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над нарядом (если у него статус получен), меняем его статус на в процессе
-        if (selectedOrder != null) {
+        if (selectedOrder != null && start) {
             if (selectedOrder.isInWork() || selectedOrder.isUnComplete()) {
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
@@ -957,6 +958,37 @@ public class OrderFragment extends Fragment {
                     }
                 });
         //operationTypeSpinner.setOnItemSelectedListener(new ReferenceSpinnerListener());
+        dialog.show();
+    }
+
+    /**
+     * Диалог вопроса начала работы
+     */
+    private void askStartOperations() {
+        Activity activity = getActivity();
+        if (activity == null) {
+            // какое-то сообщение пользователю что не смогли показать диалог?
+            return;
+        }
+
+        // диалог для отмены операции
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        dialog.setTitle(R.string.dialog_start_title);
+        dialog.setPositiveButton(R.string.dialog_start,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        start = true;
+                        dialog.dismiss();
+                    }
+                });
+        dialog.setNegativeButton(android.R.string.cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
         dialog.show();
     }
 
