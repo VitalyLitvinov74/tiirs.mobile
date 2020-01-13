@@ -129,6 +129,7 @@ public class OrderFragment extends Fragment {
 
     private static final int ACTIVITY_PHOTO = 100;
     private static final int ACTIVITY_MEASURE = 101;
+    private static final int EXTERNAL_STORAGE_ACCESS = 102;
     private static final String TAG = OrderFragment.class.getSimpleName();
     FloatingActionButton fab_check;
     FloatingActionButton fab_question;
@@ -1344,6 +1345,12 @@ public class OrderFragment extends Fragment {
                 }
 
                 break;
+            case EXTERNAL_STORAGE_ACCESS:
+                if (resultCode != Activity.RESULT_OK) {
+                    Toast.makeText(getContext(), "Без доступа к носителю, невозможно сохранить файлы.", Toast.LENGTH_LONG).show();
+                }
+
+                break;
 
             default:
                 break;
@@ -2008,6 +2015,14 @@ public class OrderFragment extends Fragment {
                 if (context == null) {
                     return;
                 }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_ACCESS);
+                        return;
+                    }
+                }
+
                 File file = null;
                 try {
                     file = createImageFile();
@@ -2026,7 +2041,7 @@ public class OrderFragment extends Fragment {
                     }
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                        file = new File(Environment.getExternalStorageDirectory(), "image.tmp");
+                        file = new File(Environment.getExternalStorageDirectory(), "image.jpg");
                         intent.putExtra(MediaStore.EXTRA_OUTPUT,
                                 Uri.fromFile(file));
                         photoFilePath = file.getAbsolutePath();
