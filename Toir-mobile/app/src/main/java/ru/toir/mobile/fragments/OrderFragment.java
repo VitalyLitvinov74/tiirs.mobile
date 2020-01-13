@@ -77,8 +77,6 @@ import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
-import ru.toir.mobile.db.adapters.DefectLevelAdapter;
-import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationCancelAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
@@ -88,8 +86,6 @@ import ru.toir.mobile.db.adapters.StageAdapter;
 import ru.toir.mobile.db.adapters.StageCancelAdapter;
 import ru.toir.mobile.db.adapters.StageVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
-import ru.toir.mobile.db.realm.Defect;
-import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
@@ -155,7 +151,6 @@ public class OrderFragment extends Fragment {
     private int currentOperationPosition = 0;
     private long startTime = 0;
     private boolean firstLaunch = true;
-    private boolean start = false;
 
     CountDownTimer taskTimer = new CountDownTimer(1000000000, 1000) {
         @Override
@@ -496,16 +491,13 @@ public class OrderFragment extends Fragment {
                     // меняем ее статус на в процессе
 //                    if (operation.isNew() || operation.isCanceled() || operation.isUnComplete()) {
                     if (operation.isNew()) {
-                        askStartOperations();
-                        if (start) {
-                            realmDB.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    operation.setStartDate(new Date());
-                                    operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
-                                }
-                            });
-                        }
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                operation.setStartDate(new Date());
+                                operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
+                            }
+                        });
                     }
 
                     // если эта операция имеет статус "в работе", то начинаем с нее
@@ -535,7 +527,7 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над этапом задачи, меняем его статус на "в работе"
-        if (selectedStage != null && start) {
+        if (selectedStage != null) {
             StageStatus stageStatus = selectedStage.getStageStatus();
             if (stageStatus != null && stageStatus.isNew()) {
                 realmDB.executeTransaction(new Realm.Transaction() {
@@ -549,7 +541,7 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над задачей, меняем ее статус на "в работе"
-        if (selectedTask != null && start) {
+        if (selectedTask != null) {
             TaskStatus taskStatus = selectedTask.getTaskStatus();
             if (taskStatus != null && taskStatus.isNew()) {
                 realmDB.executeTransaction(new Realm.Transaction() {
@@ -563,7 +555,7 @@ public class OrderFragment extends Fragment {
         }
 
         // фиксируем начало работы над нарядом (если у него статус получен), меняем его статус на в процессе
-        if (selectedOrder != null && start) {
+        if (selectedOrder != null) {
             if (selectedOrder.isInWork() || selectedOrder.isUnComplete()) {
                 realmDB.executeTransaction(new Realm.Transaction() {
                     @Override
@@ -574,6 +566,31 @@ public class OrderFragment extends Fragment {
 //                        selectedOrder.setOrderStatus(OrderStatus.getObjectInWork(realm));
                     }
                 });
+            }
+        }
+    }
+
+    // Stop Operations----------------------------------------------------------------------------------------
+    // временная тестовая функция, которая возвращает операциям первоначальный вид для отладки
+    void stopOperations() {
+        int totalOperationCount = operationAdapter.getCount();
+        for (int i = 0; i < totalOperationCount; i++) {
+            final Operation operation = operationAdapter.getItem(i);
+            if (operation != null) {
+                if (operation.getOperationStatus() != null) {
+                    if (!operation.isNew()) {
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                operation.setStartDate(null);
+                                operation.setEndDate(null);
+                                operation.setOperationStatus(OperationStatus.getObjectNew(realm));
+                            }
+                        });
+                    }
+                } else {
+                    Log.d(TAG, "Найдена операция с неинициализированным статусом");
+                }
             }
         }
     }
@@ -979,8 +996,8 @@ public class OrderFragment extends Fragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        start = true;
                         dialog.dismiss();
+                        startOperations();
                     }
                 });
         dialog.setNegativeButton(android.R.string.cancel,
@@ -988,6 +1005,7 @@ public class OrderFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        //stopOperations();
                     }
                 });
         dialog.show();
@@ -1855,7 +1873,7 @@ public class OrderFragment extends Fragment {
                         if (level == STAGE_LEVEL) {
                             fillListViewOperations(selectedStage);
                             Level = OPERATION_LEVEL;
-                            startOperations();
+                            askStartOperations();
                         }
                     } else {
                         Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
@@ -2623,7 +2641,8 @@ public class OrderFragment extends Fragment {
         switch (level) {
             case OPERATION_LEVEL:
                 fillListViewOperations(selectedStage);
-                startOperations();
+                askStartOperations();
+                //startOperations();
                 break;
             case STAGE_LEVEL:
                 fillListViewStage(selectedTask);
@@ -2701,7 +2720,8 @@ public class OrderFragment extends Fragment {
                             } else {
                                 fillListViewOperations(selectedStage);
                                 Level = OPERATION_LEVEL;
-                                startOperations();
+                                //startOperations();
+                                askStartOperations();
                             }
                         }
                     }
