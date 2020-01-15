@@ -25,6 +25,7 @@ import io.realm.Realm;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.db.realm.Defect;
@@ -35,6 +36,7 @@ import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationTemplate;
+import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
@@ -84,6 +86,52 @@ public class GetOrdersService extends Service {
             // обновляем справочники
             ReferenceFragment.updateReferencesForOrders(context);
 
+            // список оборудования в полученных нарядах (для постройки списка документации)
+            Map<String, Equipment> equipmentList = new HashMap<>();
+
+            // получаем список последних дефектов
+            String changedDate = ReferenceUpdate.lastChangedAsStr(Defect.class.getSimpleName());
+            Call<List<Defect>> defectCall = ToirAPIFactory.getDefectService().get(changedDate);
+            try {
+                retrofit2.Response<List<Defect>> r = defectCall.execute();
+                List<Defect> list = r.body();
+                if (list != null && list.size() > 0) {
+                    for (Defect defect : list) {
+                        equipmentList.put(defect.getEquipment().getUuid(), defect.getEquipment());
+                        defect.setSent(true);
+                    }
+                    // сохраняем атрибуты
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(list);
+                    realm.commitTransaction();
+                    realm.close();
+
+                    ReferenceUpdate.saveReferenceData("Defect", new Date());
+
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.putExtra("action", "defectFragment");
+                    intent.putExtra("count", list.size());
+                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
+                            .setSmallIcon(R.drawable.toir_notify)
+                            .setAutoCancel(true)
+                            .setTicker("Получены новые неисправности")
+                            .setContentText("Получено " + list.size() + " дефектов")
+                            .setContentIntent(PendingIntent.getActivity(context,
+                                    0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("Тоирус")
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+                    if (notificationManager != null)
+                        notificationManager.notify(1, nb.build());
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка при получении дефектов оборудования.");
+                e.printStackTrace();
+            }
+
             // запрашиваем наряды
             Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(statusUuids);
             List<Orders> orders;
@@ -113,8 +161,6 @@ public class GetOrdersService extends Service {
             }
 
             String userName = user.getLogin();
-            // список оборудования в полученных нарядах (для постройки списка документации)
-            Map<String, Equipment> equipmentList = new HashMap<>();
             // список файлов для загрузки
             List<GetOrderAsyncTask.FilePath> files = new ArrayList<>();
             // строим список изображений для загрузки
@@ -242,8 +288,7 @@ public class GetOrdersService extends Service {
             }
 
             // получаем список дефектов для оборудования из наряда
-            Call<List<Defect>> defectCall;
-            String changedDate = ReferenceUpdate.lastChangedAsStr(Defect.class.getSimpleName());
+            changedDate = ReferenceUpdate.lastChangedAsStr(Defect.class.getSimpleName());
             defectCall = ToirAPIFactory.getDefectService()
                     .getByEquipment(needEquipmentUuids.toArray(new String[]{}), changedDate);
             try {
@@ -399,6 +444,8 @@ public class GetOrdersService extends Service {
                 Intent intent = pm.getLaunchIntentForPackage("ru.toir.mobile");
                 if (intent != null) {
                     intent.putExtra("action", "orderFragment");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("count", count);
 
                     PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, 0);
                     NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")

@@ -28,6 +28,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentAttribute;
@@ -38,6 +39,7 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.ReferenceUpdate;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.Task;
@@ -107,6 +109,54 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
 
         List<String> args = java.util.Arrays.asList(params[0]);
 
+        // список оборудования в полученных нарядах (для постройки списка документации)
+        Map<String, Equipment> equipmentList = new HashMap<>();
+
+        // получаем список последних дефектов
+        Call<List<Defect>> defectCall;
+        String changedDate = ReferenceUpdate.lastChangedAsStr(Defect.class.getSimpleName());
+        defectCall = ToirAPIFactory.getDefectService().get(changedDate);
+        try {
+            retrofit2.Response<List<Defect>> r = defectCall.execute();
+            List<Defect> list = r.body();
+            if (list != null && list.size() > 0) {
+                for (Defect defect : list) {
+                    equipmentList.put(defect.getEquipment().getUuid(), defect.getEquipment());
+                    defect.setSent(true);
+                }
+                // сохраняем атрибуты
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                realm.close();
+
+                ReferenceUpdate.saveReferenceData("Defect", new Date());
+
+                Intent intent = new Intent(dialog.getContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("action", "defectFragment");
+                intent.putExtra("count", list.size());
+                NotificationManager notificationManager = (NotificationManager) dialog.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+                NotificationCompat.Builder nb = new NotificationCompat.Builder(dialog.getContext(), "toir")
+                        .setSmallIcon(R.drawable.toir_notify)
+                        .setAutoCancel(true)
+                        .setTicker("Получены новые неисправности")
+                        .setContentText("Получено " + list.size() + " дефектов")
+                        .setContentIntent(PendingIntent.getActivity(dialog.getContext(),
+                                0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+                        .setWhen(System.currentTimeMillis())
+                        .setContentTitle("Тоирус")
+                        .setDefaults(NotificationCompat.DEFAULT_ALL);
+                if (notificationManager != null)
+                    notificationManager.notify(1, nb.build());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении дефектов оборудования.");
+            e.printStackTrace();
+        }
+
         // запрашиваем наряды
         Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(args);
         List<Orders> result;
@@ -132,8 +182,6 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         }
 
         String userName = AuthorizedUser.getInstance().getLogin();
-        // список оборудования в полученных нарядах (для постройки списка документации)
-        Map<String, Equipment> equipmentList = new HashMap<>();
         // список файлов для загрузки
         List<FilePath> files = new ArrayList<>();
         // строим список изображений для загрузки
@@ -357,6 +405,51 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             }
         }
 
+        // список оборудования в полученных нарядах (для постройки списка документации)
+        // Map<String, Equipment> equipmentList = new HashMap<>();
+        // получаем дефекты
+        // путь до файлов локальный
+/*
+        String basePathLocal;
+        boolean isNeedDownload;
+
+        Call<List<Defect>> defectCall;
+        defectCall = ToirAPIFactory.getDefectService().get();
+        try {
+            retrofit2.Response<List<Defect>> r = defectCall.execute();
+            List<Defect> list = r.body();
+            if (list != null) {
+                for (Defect defect : list) {
+                    // урл изображения оборудования
+                    Equipment equipment = defect.getEquipment();
+                    basePathLocal = equipment.getImageFilePath() + "/";
+                    if (!equipment.getImage().equals("")) {
+                        isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, equipment, basePathLocal);
+                        if (isNeedDownload) {
+                            String url = equipment.getImageFileUrl(userName) + "/";
+                            files.add(new GetOrderAsyncTask.FilePath(equipment.getImage(), url, basePathLocal));
+                        }
+                    }
+
+                    // урл изображения модели оборудования
+                    EquipmentModel equipmentModel = defect.getEquipment().getEquipmentModel();
+                    basePathLocal = equipmentModel.getImageFilePath() + "/";
+                    if (!equipmentModel.getImage().equals("")) {
+                        isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, equipmentModel, basePathLocal);
+                        if (isNeedDownload) {
+                            String url = equipmentModel.getImageFileUrl(userName) + "/";
+                            files.add(new GetOrderAsyncTask.FilePath(equipmentModel.getImage(), url, basePathLocal));
+                        }
+                    }
+                    // строим список оборудования
+                    equipmentList.put(defect.getEquipment().getUuid(), defect.getEquipment());
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении дефектов");
+            e.printStackTrace();
+        }
+*/
         return result;
     }
 
@@ -411,11 +504,14 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 if (notificationManager != null) {
                     Intent intent = new Intent(context, MainActivity.class);
                     intent.putExtra("action", "orderFragment");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("count", count);
+
                     NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
                             .setSmallIcon(R.drawable.toir_notify)
                             .setAutoCancel(true)
                             .setTicker("Получены новые наряды")
-                            .setContentText("Полученно " + count + " нарядов.")
+                            .setContentText("Получено " + count + " нарядов.")
                             .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
                             .setWhen(System.currentTimeMillis())
                             .setContentTitle("Тоирус")

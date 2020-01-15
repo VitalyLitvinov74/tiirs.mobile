@@ -1096,6 +1096,32 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         String action = intent.getAction();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            final BottomBar bottomBar = findViewById(R.id.bottomBar);
+            assert bottomBar != null;
+            int count = intent.getIntExtra("count", 0);
+            if (extras.containsKey("action")) {
+                String fragment = intent.getStringExtra("action");
+                if (fragment.equals("defectFragment")) {
+                    if (count > 0) {
+                        bottomBar.getTabAtPosition(3).setBadgeCount(count);
+                    }
+                    FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                    tr.replace(R.id.frame_container, DefectsFragment.newInstance());
+                    tr.commit();
+                }
+                if (fragment.equals("orderFragment")) {
+                    if (count > 0) {
+                        bottomBar.getTabAtPosition(1).setBadgeCount(count);
+                    }
+                    FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                    tr.replace(R.id.frame_container, OrderFragment.newInstance());
+                    tr.commit();
+                }
+            }
+        }
+
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
