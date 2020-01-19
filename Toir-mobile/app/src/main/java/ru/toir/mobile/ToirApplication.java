@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 
+import java.io.InputStream;
+
 import ru.toir.mobile.db.ToirRealm;
 
 /**
@@ -17,6 +19,9 @@ import ru.toir.mobile.db.ToirRealm;
 public class ToirApplication extends Application {
 
 	public static String serverUrl = "";
+    public static InputStream qwvostokCA;
+    public static InputStream sstalRootCA;
+    public static InputStream sstalInternalCA;
 
     public static boolean isInternetOn(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -42,7 +47,9 @@ public class ToirApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
+        qwvostokCA = getResources().openRawResource(R.raw.forqwvostok);
+        sstalRootCA = getResources().openRawResource(R.raw.severstalroot);
+        sstalInternalCA = getResources().openRawResource(R.raw.severstalinternal);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         serverUrl = preferences.getString(getString(R.string.serverUrl), null);
         if (serverUrl == null) {
