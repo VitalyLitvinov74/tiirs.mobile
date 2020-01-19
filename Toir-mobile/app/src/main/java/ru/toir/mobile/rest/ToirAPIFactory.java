@@ -153,59 +153,9 @@ ToirAPIFactory {
             .sslSocketFactory(sslsf, tm)
             .build();
 
-    static {
-//        tm = getTm();
-//        InputStream inputStream = ToirApplication.qwvostokCA;
-//        try {
-//            // Load CAs from an InputStream
-//            // (could be from a resource or ByteArrayInputStream or ...)
-//            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-//            InputStream caInput = new BufferedInputStream(inputStream);
-//            Certificate ca;
-//            try {
-//                ca = cf.generateCertificate(caInput);
-//                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-//            } finally {
-//                caInput.close();
-//            }
-//
-//            // Create a KeyStore containing our trusted CAs
-//            String keyStoreType = KeyStore.getDefaultType();
-//            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-//            keyStore.load(null, null);
-//            keyStore.setCertificateEntry("ca", ca);
-//
-//            // Create a TrustManager that trusts the CAs in our KeyStore and system CA
-//            ToirAPIFactory.UnifiedTrustManager trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
-//
-//            // Create an SSLContext that uses our TrustManager
-//            SSLContext context = SSLContext.getInstance("TLS");
-////            tm = trustManager;
-//            context.init(null, new TrustManager[]{trustManager}, null);
-////            sslsf = context.getSocketFactory();
-//
-//            // Tell the URLConnection to use a SocketFactory from our SSLContext
-//            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-//
-//        } catch (CertificateException e) {
-//            e.printStackTrace();
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        } catch (KeyStoreException e) {
-//            e.printStackTrace();
-//        } catch (KeyManagementException e) {
-//            e.printStackTrace();
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-    }
-
     static SSLSocketFactory getSslsf() {
         SSLSocketFactory value = null;
-        SSLContext context = null;
+        SSLContext context;
 
         try {
             context = SSLContext.getInstance("TLS");
@@ -238,7 +188,6 @@ ToirAPIFactory {
                 ca1 = cf.generateCertificate(caInput1);
                 ca2 = cf.generateCertificate(caInput2);
                 ca3 = cf.generateCertificate(caInput3);
-//                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
             } finally {
                 caInput1.close();
             }
@@ -252,32 +201,17 @@ ToirAPIFactory {
             keyStore.setCertificateEntry("ca3", ca3);
 
             trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
-
-            // Create an SSLContext that uses our TrustManager
-//            SSLContext context = SSLContext.getInstance("TLS");
-//            tm = trustManager;
-//            context.init(null, new TrustManager[]{trustManager}, null);
-//            sslsf = context.getSocketFactory();
-
-            // Tell the URLConnection to use a SocketFactory from our SSLContext
-//            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (KeyStoreException e) {
             e.printStackTrace();
-//        } catch (KeyManagementException e) {
-//            e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Create a TrustManager that trusts the CAs in our KeyStore and system CA
-//        trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
 
         return trustManager;
     }
@@ -574,52 +508,6 @@ ToirAPIFactory {
 //        public static final String ACTION_GET_USER = "action_get_user";
 //        public static final String ACTION_GET_ALL_REFERENCE = "action_get_all_reference";
 //    }
-
-    public static void setCustomCertificateAuthority(InputStream inputStream) {
-
-        try {
-            // Load CAs from an InputStream
-            // (could be from a resource or ByteArrayInputStream or ...)
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream caInput = new BufferedInputStream(inputStream);
-            Certificate ca;
-            try {
-                ca = cf.generateCertificate(caInput);
-                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-            } finally {
-                caInput.close();
-            }
-
-            // Create a KeyStore containing our trusted CAs
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
-
-            // Create a TrustManager that trusts the CAs in our KeyStore and system CA
-            UnifiedTrustManager trustManager = new UnifiedTrustManager(keyStore);
-
-            // Create an SSLContext that uses our TrustManager
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, new TrustManager[]{trustManager}, null);
-
-            // Tell the URLConnection to use a SocketFactory from our SSLContext
-            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Класс для хранения типа и десереализатора к этому типу.
