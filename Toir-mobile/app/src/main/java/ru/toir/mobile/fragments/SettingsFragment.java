@@ -55,6 +55,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         mainActivityConnector = getActivity();
         if (mainActivityConnector == null)
             return;
+
+        Preference updateAppButton = getPreferenceManager().findPreference("updateApp");
+        if (updateAppButton != null) {
+            updateAppButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    MainActivity.updateApk(mainActivityConnector);
+                    return true;
+                }
+            });
+        }
 /*
         LinearLayout root = (LinearLayout) mainActivityConnector.findViewById(android.R.id.list).getParent().getParent().getParent();
         bar = (AppBarLayout) LayoutInflater.from(mainActivityConnector).inflate(R.layout.toolbar_settings, root, false);

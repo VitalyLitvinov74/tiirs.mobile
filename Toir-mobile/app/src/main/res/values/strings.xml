@@ -271,4 +271,7 @@
     <string name="defect_status_non_processed">Не обработан</string>
 
     <string name="defect_level">Уровень дефекта</string>
+
+    <string name="update">Обновление</string>
+    <string name="not_set_server_address">Не указан адрес сервера в настройках приложения!</string>
 </resources>

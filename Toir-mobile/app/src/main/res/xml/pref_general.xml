@@ -72,4 +72,11 @@
             android:key="@string/telegram_chat_id"
             android:title="@string/telegram_chat_id_value" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:theme="@style/PreferenceScreen"
+        android:title="@string/update">
+        <Preference
+            android:key="updateApp"
+            android:title="@string/action_update" />
+    </PreferenceCategory>
 </PreferenceScreen>

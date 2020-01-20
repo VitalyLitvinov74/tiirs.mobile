@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -102,11 +101,11 @@ import ru.toir.mobile.rest.interfaces.IUserService;
  */
 public class
 ToirAPIFactory {
+    public static final X509TrustManager tm = getTm();
     private static final int CONNECT_TIMEOUT = 15;
     private static final int WRITE_TIMEOUT = 60;
     private static final int TIMEOUT = 60;
-    private static final X509TrustManager tm = getTm();
-    private static SSLSocketFactory sslsf = getSslsf();
+    public static SSLSocketFactory sslsf = getSslsf();
     private static final OkHttpClient CLIENT = new OkHttpClient()
             .newBuilder()
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
@@ -153,7 +152,7 @@ ToirAPIFactory {
             .sslSocketFactory(sslsf, tm)
             .build();
 
-    static SSLSocketFactory getSslsf() {
+    public static SSLSocketFactory getSslsf() {
         SSLSocketFactory value = null;
         SSLContext context;
 
@@ -170,7 +169,7 @@ ToirAPIFactory {
         return value;
     }
 
-    static public ToirAPIFactory.UnifiedTrustManager getTm() {
+    public static ToirAPIFactory.UnifiedTrustManager getTm() {
         InputStream inputStream1 = ToirApplication.qwvostokCA;
         InputStream inputStream2 = ToirApplication.sstalRootCA;
         InputStream inputStream3 = ToirApplication.sstalInternalCA;
@@ -189,7 +188,6 @@ ToirAPIFactory {
                 ca2 = cf.generateCertificate(caInput2);
                 ca3 = cf.generateCertificate(caInput3);
             } finally {
-                caInput1.close();
             }
 
             // Create a KeyStore containing our trusted CAs

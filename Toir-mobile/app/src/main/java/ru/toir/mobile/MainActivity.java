@@ -156,6 +156,34 @@ public class MainActivity extends AppCompatActivity {
         return new Locale(lang);
     }
 
+    public static void updateApk(Context context) {
+        ProgressDialog dialog = new ProgressDialog(context);
+        dialog.setMessage(context.getString(R.string.sync_data));
+        dialog.setIndeterminate(false);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(true);
+        dialog.setMax(100);
+        final Downloader downloaderTask = new Downloader(dialog);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                downloaderTask.cancel(true);
+            }
+        });
+        String fileName = "toir.apk";
+        String updateUrl = ToirApplication.serverUrl + "/app/" + fileName;
+        if (!ToirApplication.serverUrl.equals("")) {
+            File file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            File outputFile = new File(file, fileName);
+            downloaderTask.execute(updateUrl, outputFile.toString());
+            dialog.show();
+        } else {
+            Toast.makeText(context,
+                    context.getString(R.string.not_set_server_address), Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+
     /**
      * Инициализация приложения при запуске
      */
@@ -725,7 +753,7 @@ public class MainActivity extends AppCompatActivity {
                                 tr.replace(R.id.frame_container, ServiceFragment.newInstance());
                             } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
-                                updateApk();
+                                updateApk(MainActivity.this);
                             } else if (ident == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
                                 tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
@@ -841,7 +869,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        updateApk();
+        updateApk(MainActivity.this);
     }
 
     public void onActionAbout(MenuItem menuItem) {
@@ -920,6 +948,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    /* функция заполняет массив профилей - пользователей */
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -946,8 +976,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onKeyDown(keyCode, event);
     }
-
-    /* функция заполняет массив профилей - пользователей */
 
     public void fillProfileList() {
         //UsersDBAdapter users = new UsersDBAdapter(
@@ -1239,34 +1267,6 @@ public class MainActivity extends AppCompatActivity {
         if (!configuration.locale.equals(locale)) {
             configuration.setLocale(locale);
             resources.updateConfiguration(configuration, null);
-        }
-    }
-
-    public void updateApk() {
-        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
-        dialog.setMessage("Синхронизируем данные");
-        dialog.setIndeterminate(false);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setCancelable(true);
-        dialog.setMax(100);
-        final Downloader downloaderTask = new Downloader(dialog);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                downloaderTask.cancel(true);
-            }
-        });
-        String fileName = "toir.apk";
-        String updateUrl = ToirApplication.serverUrl + "/app/" + fileName;
-        if (!ToirApplication.serverUrl.equals("")) {
-            File file = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-            File outputFile = new File(file, fileName);
-            downloaderTask.execute(updateUrl, outputFile.toString());
-            dialog.show();
-        } else {
-            Toast.makeText(getApplicationContext(),
-                    "Не указан адрес сервера в настройках приложения!", Toast.LENGTH_LONG)
-                    .show();
         }
     }
 }
