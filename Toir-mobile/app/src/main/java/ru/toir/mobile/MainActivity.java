@@ -937,6 +937,11 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Нажмите \"назад\" ещё раз для выхода.", Toast.LENGTH_LONG)
                         .show();
                 isExitTimerStart = true;
+            } else if (currentFragment == FRAGMENT_SETTINGS) {
+                FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                currentFragment = FRAGMENT_USER;
+                tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
+                tr.commit();
             } else if (findViewById(R.id.loginButton) != null) {
                 return super.onKeyDown(keyCode, event);
             }
