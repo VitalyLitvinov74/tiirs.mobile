@@ -221,7 +221,7 @@
                 android:id="@+id/defect_level_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
-                android:layout_below="@+id/defect_text_user_label"
+                android:layout_below="@+id/defect_status_icon"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"

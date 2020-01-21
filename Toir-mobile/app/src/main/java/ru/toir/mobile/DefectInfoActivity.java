@@ -9,7 +9,9 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +40,7 @@ import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,6 +76,7 @@ public class DefectInfoActivity extends AppCompatActivity {
     private TextView tv_defect_text_date;
     private TextView tv_defect_text_status;
     private TextView tv_defect_comment;
+    private TextView tv_defect_text_level;
 
     private Context context;
 
@@ -103,6 +107,7 @@ public class DefectInfoActivity extends AppCompatActivity {
         tv_defect_text_status = findViewById(R.id.defect_text_status);
         tv_defect_comment = findViewById(R.id.defect_comment);
         tv_defect_video = findViewById(R.id.defect_video);
+        tv_defect_text_level = findViewById(R.id.defect_text_level);
         //fab_goto_equipment = findViewById(R.id.fab_goto_equipment);
 
         initView();
@@ -131,6 +136,9 @@ public class DefectInfoActivity extends AppCompatActivity {
             tv_defect_text_status.setText(R.string.defect_status_non_processed);
         }
         tv_defect_comment.setText(defect.getComment());
+        if (defect.getDefectLevel() != null) {
+            tv_defect_text_level.setText(defect.getDefectLevel().getTitle());
+        }
 
         findViewById(R.id.fab_add_photo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -415,6 +423,9 @@ public class DefectInfoActivity extends AppCompatActivity {
         if (mediaFile != null) {
             File path = getExternalFilesDir(mediaFile.getPath());
             String fileName = mediaFile.getName();
+            //new DownloadImageTask((ImageView) findViewById(R.id.imageView1))
+            //        .execute("http://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png");
+
             if (path != null) {
                 if (fileName.contains("jpg")) {
                     tv_defect_video.setVisibility(View.GONE);
@@ -436,6 +447,31 @@ public class DefectInfoActivity extends AppCompatActivity {
                     tv_defect_video.start();
                 }
             }
+        }
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
         }
     }
 }

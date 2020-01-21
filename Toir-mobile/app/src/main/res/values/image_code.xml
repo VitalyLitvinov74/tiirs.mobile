@@ -19,4 +19,5 @@
     <string name="icon_eye">&#xf06e;</string>
     <string name="icon_eye_closed">&#xf070;</string>
     <string name="icon_exclamation">&#xf12a;</string>
+    <string name="icon_bolt">&#xf0e7;</string>
 </resources>

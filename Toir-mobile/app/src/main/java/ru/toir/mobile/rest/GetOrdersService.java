@@ -98,8 +98,10 @@ public class GetOrdersService extends Service {
                 if (list != null && list.size() > 0) {
                     for (Defect defect : list) {
                         equipmentList.put(defect.getEquipment().getUuid(), defect.getEquipment());
+                        GetOrderAsyncTask.getMediaFile(defect.getUuid());
                         defect.setSent(true);
                     }
+
                     // сохраняем атрибуты
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();

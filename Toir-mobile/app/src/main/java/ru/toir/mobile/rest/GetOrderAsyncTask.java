@@ -34,6 +34,7 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.IToirDbObject;
+import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationTemplate;
@@ -102,6 +103,41 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         return localChangedAt < ((IToirDbObject) obj).getChangedAt().getTime();
     }
 
+    public static void getMediaFile(String entityUuid) {
+        Call<List<MediaFile>> mediaCall;
+        mediaCall = ToirAPIFactory.getMediaFileService().get(entityUuid);
+        try {
+            retrofit2.Response<List<MediaFile>> r = mediaCall.execute();
+            List<MediaFile> list = r.body();
+            if (list != null && list.size() > 0) {
+                for (MediaFile mediaFile : list) {
+                    String url = null;
+                    Call<String> mediaUrlCall;
+                    mediaUrlCall = ToirAPIFactory.getMediaFileService().getUrl(mediaFile.getUuid());
+                    try {
+                        retrofit2.Response<String> r1 = mediaUrlCall.execute();
+                        url = r1.body();
+                    } catch (Exception e) {
+                        Log.e(TAG, "Ошибка при получении медиа файла");
+                        e.printStackTrace();
+                    }
+                    if (url != null) {
+                        mediaFile.setPath(url);
+                    }
+                    mediaFile.setSent(true);
+                }
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                realm.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении медиа файла");
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected List<Orders> doInBackground(String[]... params) {
         // обновляем справочники
@@ -122,6 +158,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             if (list != null && list.size() > 0) {
                 for (Defect defect : list) {
                     equipmentList.put(defect.getEquipment().getUuid(), defect.getEquipment());
+                    getMediaFile(defect.getUuid());
                     defect.setSent(true);
                 }
                 // сохраняем атрибуты
