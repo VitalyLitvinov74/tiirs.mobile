@@ -428,6 +428,8 @@ public class DefectInfoActivity extends AppCompatActivity {
                 String filePath = mediaFile.getPath();
                 if (filePath.contains("storage")) {
                     filePath = ToirApplication.serverUrl + filePath;
+                    tv_defect_image.setVisibility(View.VISIBLE);
+                    tv_defect_image.setImageResource(R.drawable.loading);
                     new DownloadImageTask(tv_defect_image)
                             .execute(filePath);
                     return;
