@@ -275,4 +275,7 @@
     <string name="dialog_start_title">Начать выполнение</string>
     <string name="dialog_start">Начать</string>
     <string name="dialog_later">Отложить</string>
+
+    <string name="update">Обновление</string>
+    <string name="not_set_server_address">Не указан адрес сервера в настройках приложения!</string>
 </resources>

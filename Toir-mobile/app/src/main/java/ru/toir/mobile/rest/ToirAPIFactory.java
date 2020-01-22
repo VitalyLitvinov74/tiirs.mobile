@@ -17,10 +17,29 @@ import com.google.gson.JsonDeserializer;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+import java.security.cert.CertificateException;
 
 import retrofit2.Retrofit;
 import ru.toir.mobile.ToirApplication;
@@ -82,10 +101,11 @@ import ru.toir.mobile.rest.interfaces.IUserService;
  */
 public class
 ToirAPIFactory {
+    public static final X509TrustManager tm = getTm();
     private static final int CONNECT_TIMEOUT = 15;
     private static final int WRITE_TIMEOUT = 60;
     private static final int TIMEOUT = 60;
-
+    public static SSLSocketFactory sslsf = getSslsf();
     private static final OkHttpClient CLIENT = new OkHttpClient()
             .newBuilder()
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
@@ -129,7 +149,70 @@ ToirAPIFactory {
                     }
                 }
             })
+            .sslSocketFactory(sslsf, tm)
             .build();
+
+    public static SSLSocketFactory getSslsf() {
+        SSLSocketFactory value = null;
+        SSLContext context;
+
+        try {
+            context = SSLContext.getInstance("TLS");
+            context.init(null, new TrustManager[]{tm}, null);
+            value = context.getSocketFactory();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+    public static ToirAPIFactory.UnifiedTrustManager getTm() {
+        InputStream inputStream1 = ToirApplication.qwvostokCA;
+        InputStream inputStream2 = ToirApplication.sstalRootCA;
+        InputStream inputStream3 = ToirApplication.sstalInternalCA;
+        KeyStore keyStore = null;
+        ToirAPIFactory.UnifiedTrustManager trustManager = null;
+        try {
+            // Load CAs from an InputStream
+            // (could be from a resource or ByteArrayInputStream or ...)
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream caInput1 = new BufferedInputStream(inputStream1);
+            InputStream caInput2 = new BufferedInputStream(inputStream2);
+            InputStream caInput3 = new BufferedInputStream(inputStream3);
+            Certificate ca1, ca2, ca3;
+            try {
+                ca1 = cf.generateCertificate(caInput1);
+                ca2 = cf.generateCertificate(caInput2);
+                ca3 = cf.generateCertificate(caInput3);
+            } finally {
+            }
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca1", ca1);
+            keyStore.setCertificateEntry("ca2", ca2);
+            keyStore.setCertificateEntry("ca3", ca3);
+
+            trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return trustManager;
+    }
 
     @NonNull
     public static ITokenService getTokenService() {
@@ -453,4 +536,52 @@ ToirAPIFactory {
         }
     }
 
+    public static class UnifiedTrustManager implements X509TrustManager {
+        private X509TrustManager defaultTrustManager;
+        private X509TrustManager localTrustManager;
+
+        public UnifiedTrustManager(KeyStore localKeyStore) throws KeyStoreException {
+            try {
+                this.defaultTrustManager = createTrustManager(null);
+                this.localTrustManager = createTrustManager(localKeyStore);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private X509TrustManager createTrustManager(KeyStore store) throws NoSuchAlgorithmException, KeyStoreException {
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(store);
+            TrustManager[] trustManagers = tmf.getTrustManagers();
+            return (X509TrustManager) trustManagers[0];
+        }
+
+        @Override
+        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+            try {
+                defaultTrustManager.checkServerTrusted(chain, authType);
+            } catch (CertificateException ce) {
+                localTrustManager.checkServerTrusted(chain, authType);
+            }
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            try {
+                defaultTrustManager.checkClientTrusted(chain, authType);
+            } catch (CertificateException ce) {
+                localTrustManager.checkClientTrusted(chain, authType);
+            }
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            X509Certificate[] first = defaultTrustManager.getAcceptedIssuers();
+            X509Certificate[] second = localTrustManager.getAcceptedIssuers();
+            X509Certificate[] result = Arrays.copyOf(first, first.length + second.length);
+            System.arraycopy(second, 0, result, first.length, second.length);
+            return result;
+        }
+    }
 }
