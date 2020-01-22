@@ -29,6 +29,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import ru.toir.mobile.AuthorizedUser;
@@ -107,7 +108,8 @@ public class UserInfoFragment extends Fragment {
                     Location location = manager.getLastKnownLocation(provider);
                     if (statusOfGPS && location != null) {
                         user_status_gps.setChecked(true);
-                        String result = String.valueOf(location.getLongitude()) + ", " + String.valueOf(location.getLatitude());
+                        String result = String.format(Locale.ROOT, "%.4f", location.getLongitude()) +
+                                ", " + String.format(Locale.ROOT, "%.4f", location.getLatitude());
                         tv_user_gps.setText(result);
                     } else {
                         user_status_gps.setChecked(false);
