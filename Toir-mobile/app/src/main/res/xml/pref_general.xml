@@ -8,7 +8,7 @@
         android:theme="@style/PreferenceScreen"
         android:title="@string/pref_cat_main">
 
-        <EditTextPreference
+        <ru.toir.mobile.fragments.CustomEditTextPreference
             android:defaultValue="https://tapi.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_server_url_dialog_title"
             android:icon="@drawable/pref_server"
