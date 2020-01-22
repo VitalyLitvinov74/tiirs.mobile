@@ -423,10 +423,15 @@ public class DefectInfoActivity extends AppCompatActivity {
         if (mediaFile != null) {
             File path = getExternalFilesDir(mediaFile.getPath());
             String fileName = mediaFile.getName();
-            //new DownloadImageTask((ImageView) findViewById(R.id.imageView1))
-            //        .execute("http://java.sogeti.nl/JavaBlog/wp-content/uploads/2009/04/android_icon_256.png");
 
             if (path != null) {
+                String filePath = mediaFile.getPath();
+                if (filePath.contains("storage")) {
+                    filePath = ToirApplication.serverUrl + filePath;
+                    new DownloadImageTask(tv_defect_image)
+                            .execute(filePath);
+                    return;
+                }
                 if (fileName.contains("jpg")) {
                     tv_defect_video.setVisibility(View.GONE);
                     tv_defect_image.setVisibility(View.VISIBLE);
@@ -471,7 +476,9 @@ public class DefectInfoActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(null);
             bmImage.setImageBitmap(result);
+            bmImage.setVisibility(View.VISIBLE);
         }
     }
 }

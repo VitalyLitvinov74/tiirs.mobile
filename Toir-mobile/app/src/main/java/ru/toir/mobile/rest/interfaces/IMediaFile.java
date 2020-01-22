@@ -24,8 +24,8 @@ public interface IMediaFile {
     @GET("/media-file")
     Call<List<MediaFile>> get(@Query("entity") String entityUuid);
 
-    @GET("/media-file/url")
-    Call<String> getUrl(@Query("uuid") String medialFileUuid);
+    @GET("/media-file")
+    Call<String> getUrl(@Query("media_uuid") String mediaFileUuid, @Query("url") String url);
 
     @GET("/media-file")
     Call<List<MediaFile>> get(@Query("id[]") List<String> id, @Query("uuid[]") List<String> uuid);

@@ -67,6 +67,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ContragentsFragment;
 import ru.toir.mobile.fragments.DefectsFragment;

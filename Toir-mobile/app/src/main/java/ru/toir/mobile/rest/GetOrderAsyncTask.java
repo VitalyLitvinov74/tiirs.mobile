@@ -111,18 +111,16 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             List<MediaFile> list = r.body();
             if (list != null && list.size() > 0) {
                 for (MediaFile mediaFile : list) {
-                    String url = null;
-                    Call<String> mediaUrlCall;
-                    mediaUrlCall = ToirAPIFactory.getMediaFileService().getUrl(mediaFile.getUuid());
+                    Call<String> mediaFileCall;
+                    mediaFileCall = ToirAPIFactory.getMediaFileService().getUrl(mediaFile.getUuid(), "url");
                     try {
-                        retrofit2.Response<String> r1 = mediaUrlCall.execute();
-                        url = r1.body();
-                    } catch (Exception e) {
-                        Log.e(TAG, "Ошибка при получении медиа файла");
-                        e.printStackTrace();
-                    }
-                    if (url != null) {
+                        retrofit2.Response<String> r1 = mediaFileCall.execute();
+                        String url = r1.body();
+                        //if (mediaFile.getPath()==null)
                         mediaFile.setPath(url);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Ошибка при получении медиа url");
+                        e.printStackTrace();
                     }
                     mediaFile.setSent(true);
                 }
