@@ -1,6 +1,7 @@
 package ru.toir.mobile.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,10 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.EditTextPreferenceDialogFragmentCompat;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
@@ -17,6 +22,10 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceScreen;
 import android.util.Log;
+import android.util.Patterns;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -37,10 +46,13 @@ import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.rfid.RfidDriverBase;
-import ru.toir.mobile.utils.LoadTestData;
 import ru.toir.mobile.utils.MainFunctions;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
+
+    private static final String DIALOG_FRAGMENT_TAG =
+            "android.support.v7.preference.PreferenceFragment.DIALOG";
+
     private static final String TAG = "ToirSettings";
     private static final String BOT = "bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY";
     private static final int ACTIVITY_TELEGRAM = 1;
@@ -367,6 +379,25 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
+    @Override
+    public void onDisplayPreferenceDialog(Preference preference) {
+        // check if dialog is already showing
+        if (getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) {
+            return;
+        }
+
+        DialogFragment f = null;
+        if (preference instanceof CustomEditTextPreference) {
+            f = EditTextPreferenceDialog.newInstance(preference.getKey());
+        } else {
+            super.onDisplayPreferenceDialog(preference);
+        }
+        if (f != null) {
+            f.setTargetFragment(this, 0);
+            f.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+        }
+    }
+
     static class AsyncRequest extends AsyncTask<String, Integer, String> {
 
         private SettingsFragment.AsyncRequest.Listener listener;
@@ -429,6 +460,50 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         interface Listener {
             void onSuccess(String object);
+        }
+    }
+
+    public static class EditTextPreferenceDialog extends EditTextPreferenceDialogFragmentCompat {
+        public static EditTextPreferenceDialog newInstance(String key) {
+            final EditTextPreferenceDialog
+                    fragment = new EditTextPreferenceDialog();
+            final Bundle b = new Bundle(1);
+            b.putString(ARG_KEY, key);
+            fragment.setArguments(b);
+            return fragment;
+        }
+
+        @Override
+        protected void onBindDialogView(View view) {
+            super.onBindDialogView(view);
+        }
+
+        @Override
+        public void onResume() {
+            final DialogPreference preference = getPreference();
+            super.onResume();
+            final AlertDialog prefDialog = (AlertDialog) getDialog();
+            if (prefDialog != null) {
+                final EditText edit = prefDialog.findViewById(android.R.id.edit);
+                final PreferenceManager pmf = preference.getPreferenceManager();
+                final SharedPreferences spf = pmf.getDefaultSharedPreferences(this.getContext());
+                edit.setText(spf.getString(preference.getKey(), ""));
+                Button positiveButton = prefDialog.getButton(Dialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String text = edit.getText().toString();
+                        if (!Patterns.WEB_URL.matcher(text).matches() && !text.isEmpty()) {
+                            edit.setError("Не верный URL!");
+                        } else {
+                            edit.setError(null);
+                            spf.edit().putString(preference.getKey(), text).commit();
+                            ToirApplication.serverUrl = edit.getText().toString();
+                            dismiss();
+                        }
+                    }
+                });
+            }
         }
     }
 }
