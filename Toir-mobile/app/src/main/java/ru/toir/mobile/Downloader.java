@@ -16,9 +16,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import ru.toir.mobile.rest.ToirAPIFactory;
 
 public class Downloader extends AsyncTask<String, Integer, String> {
 
@@ -27,6 +30,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 
     public Downloader(ProgressDialog dialog) {
         this.dialog = dialog;
+        HttpsURLConnection.setDefaultSSLSocketFactory(ToirAPIFactory.sslsf);
     }
 
     public static boolean isAPK(File file) {
@@ -138,7 +142,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
             intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
             dialog.getContext().startActivity(intent);
         } else {
-            Toast.makeText(dialog.getContext(), "Ошибка при обновлении!", Toast.LENGTH_LONG).show();
+            Toast.makeText(dialog.getContext(), dialog.getContext().getString(R.string.update_error), Toast.LENGTH_LONG).show();
         }
     }
 
