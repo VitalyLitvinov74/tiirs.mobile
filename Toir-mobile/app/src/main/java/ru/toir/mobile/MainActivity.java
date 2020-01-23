@@ -1149,6 +1149,12 @@ public class MainActivity extends AppCompatActivity {
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             return lm != null && lm.isProviderEnabled(locationBestProvider);
         } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 111);
+                }
+            }
+
             return true;
         }
     }
