@@ -56,6 +56,7 @@ public class ObjectFragment extends Fragment {
     ArrayList<OverlayItem> aOverlayItemArray;
     Realm realmDB;
     private double curLatitude, curLongitude;
+    private int LastItemPosition = -1;
 
     public ObjectFragment() {
     }
@@ -156,16 +157,17 @@ public class ObjectFragment extends Fragment {
         objectsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                Objects object = objectAdapter.getItem(position);
-                if (object != null) {
-                    String object_uuid = object.getUuid();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("object_uuid", object_uuid);
-                    EquipmentsFragment equipmentsFragment = new EquipmentsFragment();
-                    equipmentsFragment.setArguments(bundle);
-                    //objectInfo.putExtra("object_uuid", object_uuid);
-                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, equipmentsFragment).commit();
+                // TODO связать нажатие в списке с картой: изменить цвет маркера
+                OverlayItem item = overlayItemArray.get(position);
+                // Get the new Drawable
+                Drawable marker = view.getResources().getDrawable(R.drawable.marker_equip);
+                item.setMarker(marker);
+                if (LastItemPosition >= 0) {
+                    OverlayItem item2 = overlayItemArray.get(LastItemPosition);
+                    marker = view.getResources().getDrawable(R.drawable.marker_equip);
+                    item2.setMarker(marker);
                 }
+                LastItemPosition = position;
             }
         });
 

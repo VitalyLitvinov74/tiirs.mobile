@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import ru.toir.mobile.BuildConfig;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
@@ -212,6 +213,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         String chat_id = sharedPref.getString(getString(R.string.telegram_chat_id), "0");
         Preference telegramChatId = (Preference) findPreference(getString(R.string.telegram_chat_id));
         telegramChatId.setTitle("Идентификатор чата " + chat_id);
+
+        //Preference checkTextTags = findPreference(getString(R.string.without_tags_mode));
+        //if (BuildConfig.BUILD_TYPE.equals("Debug"))
+        if (!BuildConfig.DEBUG) {
+            //checkTextTags.setVisible(false);
+        }
 
         Preference telegramPreference = findPreference(getString(R.string.receive_telegram));
         telegramPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

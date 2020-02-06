@@ -243,10 +243,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Equipment currentEquipment = equipment;
                 TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
-                if (defectDescription.getText().toString().equals("")) {
-                    return;
-                }
-
                 DefectType currentDefectType = null;
                 DefectLevel currentDefectLevel = null;
 
@@ -284,7 +280,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 defect.setDefectType(currentDefectType);
                 defect.setDefectLevel(currentDefectLevel);
                 defect.setProcess(false);
-                defect.setComment(defectDescription.getText().toString());
+                defect.setComment(defectDescription.getText().toString().concat(" "));
                 defect.setTask(null);
                 defect.setCreatedAt(date);
                 defect.setChangedAt(date);
@@ -665,6 +661,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         rootLayout = findViewById(R.id.coordinatorLayout);
 
+/*
         findViewById(R.id.fab_chg_eq_tag_id).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -743,6 +740,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 builder.create().show();
             }
         });
+*/
 
         //Floating Action Buttons
 /*
@@ -773,6 +771,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         });
 
+/*
         findViewById(R.id.fab_augmented_reality).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -782,7 +781,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 }
             }
         });
+*/
 
+/*
         if (BuildConfig.DEBUG) {
             findViewById(R.id.fab_read_tag_content).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -790,16 +791,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     readRFIDTag(equipment);
                 }
             });
-
-/*
             findViewById(R.id.fab_write_tag_content).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     writeRFIDTag(equipment);
                 }
             });
-*/
-        }
+        }*/
 
     }
 

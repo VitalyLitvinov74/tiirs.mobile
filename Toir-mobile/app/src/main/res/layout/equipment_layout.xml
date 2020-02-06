@@ -12,7 +12,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="?android:attr/actionBarSize"
         android:background="@color/larisaBlueColor"
         android:gravity="top"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -385,7 +385,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="10dp"
         android:src="@android:drawable/ic_dialog_alert"
         app:backgroundTint="@color/md_red_400"
@@ -396,43 +396,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="70dp"
         android:src="@android:drawable/ic_menu_edit"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_augmented_reality"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="130dp"
-        android:src="@android:drawable/ic_menu_view"
-        app:backgroundTint="@color/larisaBlueColor"
-        app:fabSize="normal" />
+    <!--
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_augmented_reality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="130dp"
+            android:src="@android:drawable/ic_menu_view"
+            app:backgroundTint="@color/larisaBlueColor"
+            app:fabSize="normal" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_read_tag_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="190dp"
-        android:src="@android:drawable/ic_input_get"
-        app:backgroundTint="@color/md_green_400"
-        app:fabSize="normal" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_read_tag_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="190dp"
+            android:src="@android:drawable/ic_input_get"
+            app:backgroundTint="@color/md_green_400"
+            app:fabSize="normal" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_chg_eq_tag_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="250dp"
-        android:src="@android:drawable/ic_menu_save"
-        app:backgroundTint="@color/larisaBlueColor"
-        app:fabSize="normal" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_chg_eq_tag_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="250dp"
+            android:src="@android:drawable/ic_menu_save"
+            app:backgroundTint="@color/larisaBlueColor"
+            app:fabSize="normal" />
+    -->
 
 </android.support.design.widget.CoordinatorLayout>

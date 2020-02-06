@@ -28,6 +28,7 @@ import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.db.realm.Contragent;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
@@ -190,6 +191,36 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         } catch (Exception e) {
             Log.e(TAG, "Ошибка при получении дефектов оборудования.");
             e.printStackTrace();
+        }
+
+        changedDate = ReferenceUpdate.lastChangedAsStr(Contragent.class.getSimpleName());
+        // запрашиваем контрагентов
+        Call<List<Contragent>> callContragent = ToirAPIFactory.getContragentService().get(changedDate);
+        List<Contragent> contragent;
+        try {
+            retrofit2.Response<List<Contragent>> response = callContragent.execute();
+            if (response.code() != 200) {
+                // сообщаем что произошло
+                message = "Ошибка получения контрагентов! Код ответа сервера:" + response.code();
+                return null;
+            }
+
+            contragent = response.body();
+            if (contragent == null) {
+                message = "Ошибка получения! Содержимого ответа нет.";
+            }
+            // сохраняем
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(contragent);
+            realm.commitTransaction();
+            realm.close();
+            ReferenceUpdate.saveReferenceData("Contragent", new Date());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Exception";
+            return null;
         }
 
         // запрашиваем наряды

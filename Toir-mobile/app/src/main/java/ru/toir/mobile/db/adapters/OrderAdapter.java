@@ -1,10 +1,17 @@
 package ru.toir.mobile.db.adapters;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.text.DateFormatSymbols;
@@ -27,8 +34,9 @@ import static java.lang.Long.valueOf;
  * @author olejek
  * Created by olejek on 12.09.16.
  */
-public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter, View.OnClickListener {
+public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
+    private Context mContext;
     private static final int TYPE_SEPARATOR = -1;
     private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
         @Override
@@ -39,9 +47,10 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     };
     private List<Long> separates = new ArrayList<>();
 
-    public OrderAdapter(RealmResults<Orders> data) {
+    public OrderAdapter(RealmResults<Orders> data, Context context) {
         super(data);
         makeSeparates();
+        mContext = context;
     }
 
     @Override
@@ -101,14 +110,14 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public View getView(int position, View convertView, final ViewGroup parent) {
+        final ViewHolder viewHolder;
         Date lDate;
         String sDate = "неизвестно";
         viewHolder = new ViewHolder();
         long type = separates.get(position);
         String textData;
-        switch ((int)type) {
+        switch ((int) type) {
             case TYPE_SEPARATOR:
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_item_divider, null);
                 viewHolder.title = convertView.findViewById(R.id.order_date_divider);
@@ -130,8 +139,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.title = convertView.findViewById(R.id.order_Name);
                 viewHolder.status = convertView.findViewById(R.id.order_status);
                 viewHolder.icon = convertView.findViewById(R.id.order_ImageStatus);
+                viewHolder.options = convertView.findViewById(R.id.order_options);
                 convertView.setTag(viewHolder);
-                Orders order = getItem(position);
+                final Orders order = getItem(position);
                 if (order == null) break;
                 OrderStatus orderStatus;
                 orderStatus = order.getOrderStatus();
@@ -140,8 +150,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                     sDate = new SimpleDateFormat("dd MM yyyy HH:mm", myDateFormatSymbols)
                             .format(lDate);
                     viewHolder.created.setText(sDate);
-                }
-                else {
+                } else {
                     viewHolder.created.setText(R.string.not_started);
                 }
 
@@ -204,24 +213,132 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         viewHolder.created.setText(textData);
                     }
                 }
+                viewHolder.options.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Display option menu
+                        PopupMenu popupMenu = new PopupMenu(mContext, viewHolder.options);
+                        popupMenu.inflate(R.menu.orders_options);
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.order_info:
+                                        showInformation(order, parent);
+                                        break;
+                                    case R.id.order_parts:
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return false;
+                            }
+                        });
+                        popupMenu.show();
+                    }
+                });
         }
         return convertView;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.order_ImageStatus:
-                break;
-            default:
-                break;
+    /**
+     * Диалог с общей информацией по наряду/задаче/этапу/операции
+     */
+    private void showInformation(Orders order, ViewGroup parent) {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+        //LayoutInflater inflater = mContext.getLayoutInflater();
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        TextView level, status, title, reason, author, worker, recieve, start, open, close, comment, verdict;
+        //View myView = inflater.inflate(R.layout.order_full_information, parent, false);
+        View myView = LayoutInflater.from(mContext).inflate(R.layout.order_full_information, parent, false);
+//        DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
+//            @Override
+//            public String[] getMonths() {
+//                return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
+//                        "июля", "августа", "сентября", "октября", "ноября", "декабря"};
+//            }
+//        };
+        String sDate;
+        level = myView.findViewById(R.id.order_dialog_level);
+        status = myView.findViewById(R.id.order_dialog_status);
+        title = myView.findViewById(R.id.order_dialog_title);
+        reason = myView.findViewById(R.id.order_dialog_reason);
+        author = myView.findViewById(R.id.order_dialog_author);
+        worker = myView.findViewById(R.id.order_dialog_worker);
+        recieve = myView.findViewById(R.id.order_dialog_recieve);
+        start = myView.findViewById(R.id.order_dialog_start);
+        open = myView.findViewById(R.id.order_dialog_open);
+        close = myView.findViewById(R.id.order_dialog_close);
+        comment = myView.findViewById(R.id.order_dialog_comment);
+        verdict = myView.findViewById(R.id.order_dialog_verdict);
+
+        if (order != null) {
+            if (order.getOrderLevel() != null) {
+                level.setText(order.getOrderLevel().getTitle());
+                ((GradientDrawable) level.getBackground()).setColor(Color.GREEN);
+            } else
+                level.setText(order.getOrderLevel().getTitle());
+            if (order.getOrderStatus() != null) {
+                status.setText(order.getOrderStatus().getTitle());
+                ((GradientDrawable) status.getBackground()).setColor(Color.BLUE);
+            } else {
+                status.setText(order.getOrderStatus().getTitle());
+            }
+            title.setText(mContext.getString(R.string.order_title, order.get_id(), order.getTitle()));
+            reason.setText(mContext.getString(R.string.order_reason, order.getReason()));
+            author.setText(mContext.getString(R.string.order_author, order.getAuthor().getName()));
+            worker.setText(mContext.getString(R.string.order_worker, order.getUser().getName()));
+            Date startDate = order.getStartDate();
+            if (startDate != null) {
+                sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                        .format(startDate);
+            } else {
+                sDate = "не назначен";
+            }
+
+            start.setText(mContext.getString(R.string.order_start, sDate));
+            Date receivDate = order.getReceivDate();
+            if (receivDate != null) {
+                sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                        .format(receivDate);
+            } else {
+                sDate = "не получен";
+            }
+
+            recieve.setText(mContext.getString(R.string.order_recieved, sDate));
+
+            Date openDate = order.getOpenDate();
+            if (openDate != null) {
+                sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                        .format(openDate);
+            } else {
+                sDate = "не начат";
+            }
+
+            open.setText(mContext.getString(R.string.order_open, sDate));
+
+            Date closeDate = order.getCloseDate();
+            if (closeDate != null) {
+                sDate = new SimpleDateFormat("dd MM yyyy HH:mm", Locale.ENGLISH)
+                        .format(closeDate);
+            } else {
+                sDate = "не закрыт";
+            }
+
+            close.setText(mContext.getString(R.string.order_close, sDate));
+            comment.setText(mContext.getString(R.string.order_comment, order.getComment()));
+            verdict.setText(mContext.getString(R.string.order_verdict, order.getOrderVerdict().getTitle()));
         }
+
+        dialog.setView(myView);
+        dialog.show();
     }
 
     private static class ViewHolder {
         TextView created;
         TextView title;
         TextView status;
+        TextView options;
         ImageView icon;
     }
 }

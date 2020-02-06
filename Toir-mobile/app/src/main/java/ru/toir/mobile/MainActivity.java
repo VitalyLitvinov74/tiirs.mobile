@@ -694,6 +694,7 @@ public class MainActivity extends AppCompatActivity {
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         taskPrimaryDrawerItem,
+/*
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_references)
                                 .withDescription(R.string.menu_additional)
@@ -708,6 +709,7 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_DOCS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+*/
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_objects)
                                 .withDescription(R.string.menu_objects_description)

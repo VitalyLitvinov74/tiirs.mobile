@@ -74,6 +74,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.EquipmentInfoActivity;
+import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
@@ -342,7 +343,7 @@ public class OrderFragment extends Fragment {
                 orders = query.sort("startDate", Sort.DESCENDING).findAll();
             }
 
-            orderAdapter = new OrderAdapter(orders);
+            orderAdapter = new OrderAdapter(orders, getContext());
             mainListView.setAdapter(orderAdapter);
         }
 
@@ -1936,94 +1937,6 @@ public class OrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), currentEquipment.getUuid());
-/*
-                final View addDefectLayout;
-                final Spinner defectTypeSpinner;
-                final DefectTypeAdapter defectTypeAdapter;
-                final Spinner defectLevelSpinner;
-                final DefectLevelAdapter defectLevelAdapter;
-
-                final Equipment equipment;
-                LayoutInflater inflater = getLayoutInflater();
-
-                addDefectLayout = inflater.inflate(R.layout.add_defect_dialog_2, null, false);
-                defectTypeSpinner = addDefectLayout.findViewById(R.id.spinner_defect_type);
-                defectLevelSpinner = addDefectLayout.findViewById(R.id.spinner_defect_level);
-
-                Realm realm = Realm.getDefaultInstance();
-                equipment = realm.where(Equipment.class).equalTo("uuid", currentEquipment.getUuid()).findFirst();
-                RealmResults<DefectType> defectType = realm.where(DefectType.class)
-                        .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid()).findAll();
-                defectTypeAdapter = new DefectTypeAdapter(defectType);
-                defectTypeSpinner.setAdapter(defectTypeAdapter);
-                realm.close();
-
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
-                builder.setTitle("Укажите дефект");
-                builder.setView(addDefectLayout);
-                builder.setIcon(R.drawable.ic_icon_warnings);
-                builder.setCancelable(false);
-                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                final android.support.v7.app.AlertDialog dialog = builder.create();
-                View.OnClickListener listener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
-                        DefectType currentDefectType = null;
-                        int position = defectTypeSpinner.getSelectedItemPosition();
-                        if (position != AdapterView.INVALID_POSITION) {
-                            currentDefectType = defectTypeAdapter.getItem(position);
-                        }
-
-                        Realm realm = Realm.getDefaultInstance();
-                        AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
-                        UUID uuid = UUID.randomUUID();
-                        Date date = new Date();
-
-                        realm.beginTransaction();
-
-                        long nextId = Defect.getLastId() + 1;
-//                        Defect defect = realm.createObject(Defect.class, nextId);
-                        Defect defect = new Defect();
-                        defect.set_id(nextId);
-                        defect.setUuid(uuid.toString().toUpperCase());
-                        defect.setUser(user);
-                        defect.setDate(date);
-                        defect.setEquipment(equipment);
-                        defect.setDefectLevel(currentDefectLevel);
-                        defect.setDefectType(currentDefectType);
-                        defect.setProcess(false);
-                        defect.setComment(defectDescription.getText().toString());
-                        defect.setTask(null);
-                        defect.setCreatedAt(date);
-                        defect.setChangedAt(date);
-                        realm.copyToRealmOrUpdate(defect);
-
-                        realm.commitTransaction();
-                        realm.close();
-                        dialog.dismiss();
-                    }
-                };
-                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-                if (defectType.size() > 0) {
-                    dialog.show();
-                } else {
-                    Toast.makeText(getContext(), "Нет не одного типа дефекта!", Toast.LENGTH_LONG).show();
-                }
-                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
-*/
             }
         });
 
@@ -2212,7 +2125,7 @@ public class OrderFragment extends Fragment {
 
         // так как обработчики пока одни на всё, ставим их один раз
         mainListView.setOnItemClickListener(mainListViewClickListener);
-        mainListView.setOnItemLongClickListener(infoListViewLongClickListener);
+        //mainListView.setOnItemLongClickListener(infoListViewLongClickListener);
 
         mainListView.setLongClickable(true);
 
@@ -2667,78 +2580,81 @@ public class OrderFragment extends Fragment {
         }
     }
 
+    public void checkClickItem(final int position) {
+        // находимся на "экране" нарядов
+        switch (Level) {
+            case ORDER_LEVEL:
+                if (orderAdapter != null) {
+                    selectedOrder = orderAdapter.getItem(position);
+                    if (selectedOrder != null) {
+                        // устанавливаем дату начала работы с нарядом
+                        if (selectedOrder.getStartDate() == null) {
+                            Realm realm = Realm.getDefaultInstance();
+                            realm.beginTransaction();
+                            selectedOrder.setStartDate(new Date());
+                            realm.commitTransaction();
+                        }
+
+                        fillListViewTasks(selectedOrder);
+                        Level = TASK_LEVEL;
+                        fab_camera.setVisibility(View.INVISIBLE);
+                        fab_check.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                break;
+
+            case TASK_LEVEL:
+                if (taskAdapter != null) {
+                    selectedTask = taskAdapter.getItem(position);
+                    if (selectedTask != null) {
+                        fillListViewStage(selectedTask);
+                        Level = STAGE_LEVEL;
+                        fab_camera.setVisibility(View.INVISIBLE);
+                        //fab_check.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                break;
+            case STAGE_LEVEL:
+                if (stageAdapter != null) {
+                    selectedStage = stageAdapter.getItem(position);
+                    if (selectedStage != null) {
+                        final String expectedTagId;
+                        currentEquipment = selectedStage.getEquipment();
+                        expectedTagId = currentEquipment.getTagId();
+                        boolean ask_tags = sp.getBoolean("without_tags_mode", true);
+                        if (!ask_tags && !expectedTagId.equals("")) {
+                            runRfidDialog(expectedTagId, STAGE_LEVEL);
+                        } else {
+                            fillListViewOperations(selectedStage);
+                            Level = OPERATION_LEVEL;
+                            //startOperations();
+                            askStartOperations();
+                        }
+                    }
+                }
+
+                break;
+
+            case OPERATION_LEVEL:
+                if (operationAdapter != null) {
+                    Operation selectedOperation = operationAdapter.getItem(position);
+                    if (selectedOperation != null) {
+                        operationAdapter.setItemVisibility(position,
+                                !operationAdapter.getItemVisibility(position));
+                        operationAdapter.notifyDataSetChanged();
+                    }
+                }
+                break;
+        }
+    }
+
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
-
         @Override
-        public void onItemClick(AdapterView<?> parent, View selectedItemView, int position, long id) {
+        public void onItemClick(final AdapterView<?> parent, View selectedItemView, final int position, long id) {
             // находимся на "экране" нарядов
-            switch (Level) {
-                case ORDER_LEVEL:
-                    if (orderAdapter != null) {
-                        selectedOrder = orderAdapter.getItem(position);
-                        if (selectedOrder != null) {
-                            // устанавливаем дату начала работы с нарядом
-                            if (selectedOrder.getStartDate() == null) {
-                                Realm realm = Realm.getDefaultInstance();
-                                realm.beginTransaction();
-                                selectedOrder.setStartDate(new Date());
-                                realm.commitTransaction();
-                            }
-
-                            fillListViewTasks(selectedOrder);
-                            Level = TASK_LEVEL;
-                            fab_camera.setVisibility(View.INVISIBLE);
-                            fab_check.setVisibility(View.INVISIBLE);
-                        }
-                    }
-
-                    break;
-
-                case TASK_LEVEL:
-                    if (taskAdapter != null) {
-                        selectedTask = taskAdapter.getItem(position);
-                        if (selectedTask != null) {
-                            fillListViewStage(selectedTask);
-                            Level = STAGE_LEVEL;
-                            fab_camera.setVisibility(View.INVISIBLE);
-                            //fab_check.setVisibility(View.INVISIBLE);
-                        }
-                    }
-
-                    break;
-
-                case STAGE_LEVEL:
-                    if (stageAdapter != null) {
-                        selectedStage = stageAdapter.getItem(position);
-                        if (selectedStage != null) {
-                            final String expectedTagId;
-                            currentEquipment = selectedStage.getEquipment();
-                            expectedTagId = currentEquipment.getTagId();
-                            boolean ask_tags = sp.getBoolean("without_tags_mode", true);
-                            if (!ask_tags && !expectedTagId.equals("")) {
-                                runRfidDialog(expectedTagId, STAGE_LEVEL);
-                            } else {
-                                fillListViewOperations(selectedStage);
-                                Level = OPERATION_LEVEL;
-                                //startOperations();
-                                askStartOperations();
-                            }
-                        }
-                    }
-
-                    break;
-
-                case OPERATION_LEVEL:
-                    if (operationAdapter != null) {
-                        Operation selectedOperation = operationAdapter.getItem(position);
-                        if (selectedOperation != null) {
-                            operationAdapter.setItemVisibility(position,
-                                    !operationAdapter.getItemVisibility(position));
-                            operationAdapter.notifyDataSetChanged();
-                        }
-                    }
-                    break;
-            }
+            checkClickItem(position);
         }
     }
 

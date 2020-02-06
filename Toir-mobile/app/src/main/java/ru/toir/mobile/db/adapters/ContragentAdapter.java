@@ -66,7 +66,6 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
             if (parent.getId() == R.id.crl_contragents_listView) {
                 convertView = inflater.inflate(R.layout.contragent_reference_item_layout, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = convertView.findViewById(R.id.cril_image);
                 viewHolder.name = convertView.findViewById(R.id.cril_title);
                 viewHolder.type = convertView.findViewById(R.id.cril_type);
                 viewHolder.phone = convertView.findViewById(R.id.cril_phone);
@@ -74,7 +73,6 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
             } else {
                 convertView = inflater.inflate(R.layout.contragent_reference_item_layout, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.icon = convertView.findViewById(R.id.cril_image);
                 viewHolder.name = convertView.findViewById(R.id.cril_title);
                 viewHolder.type = convertView.findViewById(R.id.cril_type);
                 viewHolder.phone = convertView.findViewById(R.id.cril_phone);
@@ -91,10 +89,7 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
                 viewHolder.name.setText(contragent.getName());
                 viewHolder.phone.setText(contragent.getPhone());
                 //viewHolder.description.setText(contragent.getDescription());
-                if (contragent.getContragentType()==2)
-                    viewHolder.type.setText("Исполнитель");
-                if (contragent.getContragentType()==1)
-                    viewHolder.type.setText("Клиент");
+                viewHolder.type.setText("Исполнитель");
             }
         }
         return convertView;
@@ -102,7 +97,6 @@ public class ContragentAdapter extends RealmBaseAdapter<Contragent> implements L
 
 
     private static class ViewHolder {
-        ImageView icon;
         TextView uuid;
         TextView name;
         TextView description;

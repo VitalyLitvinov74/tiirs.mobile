@@ -278,4 +278,9 @@
 
     <string name="update">Обновление</string>
     <string name="not_set_server_address">Не указан адрес сервера в настройках приложения!</string>
+    <string name="without_tags_mode">Не спрашивать текстовые теги</string>
+    <string name="menu_order_info">Информация о наряде</string>
+    <string name="menu_order_parts">Перечень запчастей</string>
+    <string name="menu_options">&#8942;</string>
+
 </resources>
