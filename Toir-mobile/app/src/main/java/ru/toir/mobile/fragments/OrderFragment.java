@@ -118,7 +118,7 @@ import static ru.toir.mobile.EquipmentInfoActivity.showDialogDefect2;
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
-public class OrderFragment extends Fragment {
+public class OrderFragment extends Fragment implements OrderAdapter.EventListener {
     private static final int ORDER_LEVEL = 0;
     private static final int TASK_LEVEL = 1;
     private static final int STAGE_LEVEL = 2;
@@ -213,7 +213,7 @@ public class OrderFragment extends Fragment {
     private String photoFilePath;
     private SharedPreferences sp;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
-    private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
+    //private ListViewLongClickListener infoListViewLongClickListener = new ListViewLongClickListener();
 
     private RfidDialog rfidDialog;
     private AtomicInteger taskCounter;
@@ -343,7 +343,7 @@ public class OrderFragment extends Fragment {
                 orders = query.sort("startDate", Sort.DESCENDING).findAll();
             }
 
-            orderAdapter = new OrderAdapter(orders, getContext());
+            orderAdapter = new OrderAdapter(orders, getContext(), this);
             mainListView.setAdapter(orderAdapter);
         }
 
@@ -2127,7 +2127,8 @@ public class OrderFragment extends Fragment {
         mainListView.setOnItemClickListener(mainListViewClickListener);
         //mainListView.setOnItemLongClickListener(infoListViewLongClickListener);
 
-        mainListView.setLongClickable(true);
+        //mainListView.setLongClickable(true);
+        //mainListView.setClickable(false);
 
         initView();
         return rootView;
@@ -2654,7 +2655,7 @@ public class OrderFragment extends Fragment {
         @Override
         public void onItemClick(final AdapterView<?> parent, View selectedItemView, final int position, long id) {
             // находимся на "экране" нарядов
-            checkClickItem(position);
+            //checkClickItem(position);
         }
     }
 

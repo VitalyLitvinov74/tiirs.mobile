@@ -1,14 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="#FAFAFA">
-
     <item
         android:id="@+id/order_info"
+        android:icon="@drawable/ic_info"
         android:orderInCategory="200"
         android:title="@string/menu_order_info" />
     <item
         android:id="@+id/order_parts"
         android:orderInCategory="201"
+        android:icon="@drawable/ic_icon_tools"
         android:title="@string/menu_order_parts" />
 </menu>
 

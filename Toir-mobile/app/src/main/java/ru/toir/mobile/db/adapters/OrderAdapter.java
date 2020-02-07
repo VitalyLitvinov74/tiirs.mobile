@@ -1,17 +1,23 @@
 package ru.toir.mobile.db.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormatSymbols;
@@ -21,10 +27,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.OrderLevel;
+import ru.toir.mobile.db.realm.OrderRepairPart;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 
@@ -37,6 +46,8 @@ import static java.lang.Long.valueOf;
 public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapter {
     public static final String TABLE_NAME = "Orders";
     private Context mContext;
+    EventListener listener;
+
     private static final int TYPE_SEPARATOR = -1;
     private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
         @Override
@@ -47,70 +58,15 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     };
     private List<Long> separates = new ArrayList<>();
 
-    public OrderAdapter(RealmResults<Orders> data, Context context) {
+    public OrderAdapter(RealmResults<Orders> data, Context context, EventListener listener) {
         super(data);
         makeSeparates();
         mContext = context;
+        this.listener = listener;
     }
 
     @Override
-    public void notifyDataSetChanged() {
-        makeSeparates();
-        super.notifyDataSetChanged();
-    }
-
-    private void makeSeparates() {
-        int i = 0;
-        int j = 0;
-        Date currentDate = new Date();
-        Date separateDate;
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
-        separates.clear();
-
-        if (adapterData != null) {
-            for (Orders order : adapterData) {
-                separateDate = order.getStartDate();
-                if (separateDate == null) {
-                    separateDate = new Date();
-                }
-
-                if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
-                    currentDate = separateDate;
-                    separates.add(i + j, valueOf(TYPE_SEPARATOR));
-                    j++;
-                    separates.add(i + j, valueOf(i));
-                } else {
-                    separates.add(i + j, valueOf(i));
-                }
-                i++;
-            }
-        }
-    }
-
-    @Override
-    public int getCount() {
-        return separates.size();
-    }
-
-    @Override
-    public Orders getItem(int position) {
-        Orders order = null;
-        long realId = separates.get(position);
-        if (realId != TYPE_SEPARATOR) {
-            if (adapterData != null) {
-                order = adapterData.get((int) realId);
-            }
-        }
-        return order;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return separates.get(position);
-    }
-
-    @Override
-    public View getView(int position, View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         final ViewHolder viewHolder;
         Date lDate;
         String sDate = "неизвестно";
@@ -140,6 +96,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.status = convertView.findViewById(R.id.order_status);
                 viewHolder.icon = convertView.findViewById(R.id.order_ImageStatus);
                 viewHolder.options = convertView.findViewById(R.id.order_options);
+                viewHolder.order_row = convertView.findViewById(R.id.order_row);
+                viewHolder.order_options = convertView.findViewById(R.id.order_option);
+
                 convertView.setTag(viewHolder);
                 final Orders order = getItem(position);
                 if (order == null) break;
@@ -213,11 +172,21 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         viewHolder.created.setText(textData);
                     }
                 }
-                viewHolder.options.setOnClickListener(new View.OnClickListener() {
+                viewHolder.order_row.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        listener.checkClickItem(position);
+                    }
+                });
+                viewHolder.order_options.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    @SuppressLint("RestrictedApi")
+                    public void onClick(View v) {
                         //Display option menu
+                        MenuBuilder menuBuilder = new MenuBuilder(mContext);
                         PopupMenu popupMenu = new PopupMenu(mContext, viewHolder.options);
+                        MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, menuBuilder, viewHolder.options);
+
                         popupMenu.inflate(R.menu.orders_options);
                         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                             @Override
@@ -227,6 +196,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                                         showInformation(order, parent);
                                         break;
                                     case R.id.order_parts:
+                                        showRepairParts(order, parent);
                                         break;
                                     default:
                                         break;
@@ -234,6 +204,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                                 return false;
                             }
                         });
+                        menuHelper.setForceShowIcon(true);
+                        menuHelper.show();
+
                         popupMenu.show();
                     }
                 });
@@ -241,23 +214,70 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         return convertView;
     }
 
+    @Override
+    public void notifyDataSetChanged() {
+        makeSeparates();
+        super.notifyDataSetChanged();
+    }
+
+    private void makeSeparates() {
+        int i = 0;
+        int j = 0;
+        Date currentDate = new Date();
+        Date separateDate;
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        separates.clear();
+
+        if (adapterData != null) {
+            for (Orders order : adapterData) {
+                separateDate = order.getStartDate();
+                if (separateDate == null) {
+                    separateDate = new Date();
+                }
+
+                if (!fmt.format(separateDate).equals(fmt.format(currentDate))) {
+                    currentDate = separateDate;
+                    separates.add(i + j, valueOf(TYPE_SEPARATOR));
+                    j++;
+                    separates.add(i + j, valueOf(i));
+                } else {
+                    separates.add(i + j, valueOf(i));
+                }
+                i++;
+            }
+        }
+    }
+
+    @Override
+    public int getCount() {
+        return separates.size();
+    }
+
+    @Override
+    public Orders getItem(int position) {
+        Orders order = null;
+        long realId = separates.get(position);
+        if (realId != TYPE_SEPARATOR) {
+            if (adapterData != null) {
+                order = adapterData.get((int) realId);
+            }
+        }
+        return order;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return separates.get(position);
+    }
+
     /**
      * Диалог с общей информацией по наряду/задаче/этапу/операции
      */
     private void showInformation(Orders order, ViewGroup parent) {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-        //LayoutInflater inflater = mContext.getLayoutInflater();
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         TextView level, status, title, reason, author, worker, recieve, start, open, close, comment, verdict;
-        //View myView = inflater.inflate(R.layout.order_full_information, parent, false);
         View myView = LayoutInflater.from(mContext).inflate(R.layout.order_full_information, parent, false);
-//        DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
-//            @Override
-//            public String[] getMonths() {
-//                return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
-//                        "июля", "августа", "сентября", "октября", "ноября", "декабря"};
-//            }
-//        };
         String sDate;
         level = myView.findViewById(R.id.order_dialog_level);
         status = myView.findViewById(R.id.order_dialog_status);
@@ -334,7 +354,33 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         dialog.show();
     }
 
+    /**
+     * Диалог с списком запчастей по наряду
+     */
+    private void showRepairParts(Orders order, ViewGroup parent) {
+        final Dialog dialog = new Dialog(mContext);
+        Realm realmDB;
+        RepairPartAdapter repairPartAdapter;
+        dialog.setContentView(R.layout.order_parts);
+        dialog.setTitle("Перечень запчастей");
+        ListView lv;
+        lv = dialog.findViewById(R.id.List);
+        realmDB = Realm.getDefaultInstance();
+        RealmResults<OrderRepairPart> orderRepairParts = realmDB.where(OrderRepairPart.class).
+                equalTo("order.uuid", order.getUuid()).findAll();
+        repairPartAdapter = new RepairPartAdapter(orderRepairParts);
+        lv.setAdapter(repairPartAdapter);
+        dialog.show();
+        realmDB.close();
+    }
+
+    public interface EventListener {
+        void checkClickItem(final int position);
+    }
+
     private static class ViewHolder {
+        RelativeLayout order_options;
+        RelativeLayout order_row;
         TextView created;
         TextView title;
         TextView status;

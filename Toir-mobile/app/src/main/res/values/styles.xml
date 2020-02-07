@@ -28,6 +28,8 @@
         <item name="colorControlNormal">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="popupMenuStyle">@style/popupMenuStyle</item>
+        <item name="android:actionMenuTextAppearance">@style/popupMenuStyle</item>
     </style>
 
     <style name="PreferenceScreen" parent="CustomTheme">
@@ -48,8 +50,10 @@
 	     <item name="android:popupBackground">#ffffff</item>
 	</style>
 
-    <style name="PopupMenuStyle" parent="android:Widget.Holo.Light.PopupMenu">
+    <style name="popupMenuStyle" parent="android:Widget.Holo.Light.PopupMenu">
         <item name="android:popupBackground">@android:color/white</item>
+        <item name="android:textColor">#FF01F0</item>
+        <item name="android:textSize">10sp</item>
     </style>
 
     <style name="FullscreenTheme" parent="MaterialDrawerTheme.Light.TranslucentStatus">
@@ -58,6 +62,12 @@
     <style name="checkBoxStyle" parent="MaterialDrawerTheme.Light">
         <item name="colorAccent">@color/larisaBlueColor</item>
         <item name="android:textColorSecondary">@color/larisaBlueColor</item>
+    </style>
+
+    <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
+        <item name="android:popupBackground">@android:color/white</item>
+        <item name="android:textColor">#FF01F0</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="ToolbarStyle">

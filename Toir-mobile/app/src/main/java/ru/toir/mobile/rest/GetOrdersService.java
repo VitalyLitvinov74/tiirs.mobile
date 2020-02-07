@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import io.realm.Realm;
 import okhttp3.ResponseBody;
@@ -36,10 +37,11 @@ import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationTemplate;
-import ru.toir.mobile.db.realm.OrderLevel;
+import ru.toir.mobile.db.realm.OrderRepairPart;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.ReferenceUpdate;
+import ru.toir.mobile.db.realm.RepairPart;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageTemplate;
 import ru.toir.mobile.db.realm.Task;
@@ -434,6 +436,10 @@ public class GetOrdersService extends Service {
             realm.close();
             addToJournal("Клиент успешно получил " + count + " нарядов");
 
+            for (Orders order : orders) {
+                getRepairParts(order.getUuid());
+            }
+
             // тестовая реализация штатного уведомления
             // собщаем количество полученных нарядов
             NotificationManager notificationManager = null;
@@ -508,6 +514,45 @@ public class GetOrdersService extends Service {
         }
 
         return START_STICKY;
+    }
+
+    private void getRepairParts(String orderUuid) {
+        Call<List<RepairPart>> partCall = ToirAPIFactory.getRepairPartService().getByOrderUuid(orderUuid);
+        try {
+            Realm realm = Realm.getDefaultInstance();
+            Orders order = realm.where(Orders.class).equalTo("uuid", orderUuid).findFirst();
+            long orderRepairPartCount = realm.where(OrderRepairPart.class).equalTo("order.uuid", orderUuid).count();
+            retrofit2.Response<List<RepairPart>> r = partCall.execute();
+            List<RepairPart> list = r.body();
+            if (list != null && list.size() > 0 && order != null) {
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                if (orderRepairPartCount == 0) {
+                    for (RepairPart repairPart : list) {
+                        long nextId = OrderRepairPart.getLastId() + 1;
+                        OrderRepairPart orderRepairPart = new OrderRepairPart();
+                        UUID uuid = UUID.randomUUID();
+                        orderRepairPart.set_id(nextId);
+                        orderRepairPart.setUuid(uuid.toString().toUpperCase());
+                        orderRepairPart.setOrder(order);
+                        orderRepairPart.setRepairPart(repairPart);
+                        // TODO решить как получать количество
+                        orderRepairPart.setQuantity(1);
+                        orderRepairPart.setCreatedAt(new Date());
+                        orderRepairPart.setChangedAt(new Date());
+
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(orderRepairPart);
+                        realm.commitTransaction();
+                    }
+                }
+            }
+            realm.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении запчастей наряда");
+            e.printStackTrace();
+        }
     }
 
     @Override
