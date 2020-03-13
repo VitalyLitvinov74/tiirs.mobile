@@ -1,21 +1,10 @@
 package ru.toir.mobile.rest;
 
-import okhttp3.Headers;
-import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import retrofit2.converter.gson.GsonConverterFactory;
-import ru.toir.mobile.AuthorizedUser;
-import ru.toir.mobile.BuildConfig;
-
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -26,6 +15,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -39,9 +29,17 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import java.security.cert.CertificateException;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.toir.mobile.AuthorizedUser;
+import ru.toir.mobile.BuildConfig;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
@@ -61,10 +59,11 @@ import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
 import ru.toir.mobile.rest.interfaces.IEquipmentType;
 import ru.toir.mobile.rest.interfaces.IFileDownload;
 import ru.toir.mobile.rest.interfaces.IGpsTrack;
+import ru.toir.mobile.rest.interfaces.IJournal;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
 import ru.toir.mobile.rest.interfaces.IMeasuredValue;
-import ru.toir.mobile.rest.interfaces.IMessage;
 import ru.toir.mobile.rest.interfaces.IMediaFile;
+import ru.toir.mobile.rest.interfaces.IMessage;
 import ru.toir.mobile.rest.interfaces.IObjectType;
 import ru.toir.mobile.rest.interfaces.IObjects;
 import ru.toir.mobile.rest.interfaces.IOperation;
@@ -79,12 +78,11 @@ import ru.toir.mobile.rest.interfaces.IOrderVerdict;
 import ru.toir.mobile.rest.interfaces.IOrders;
 import ru.toir.mobile.rest.interfaces.IRepairPart;
 import ru.toir.mobile.rest.interfaces.IRepairPartType;
-import ru.toir.mobile.rest.interfaces.IJournal;
+import ru.toir.mobile.rest.interfaces.IStage;
 import ru.toir.mobile.rest.interfaces.IStageStatus;
 import ru.toir.mobile.rest.interfaces.IStageTemplate;
 import ru.toir.mobile.rest.interfaces.IStageType;
 import ru.toir.mobile.rest.interfaces.IStageVerdict;
-import ru.toir.mobile.rest.interfaces.IStage;
 import ru.toir.mobile.rest.interfaces.ITaskStatus;
 import ru.toir.mobile.rest.interfaces.ITaskTemplate;
 import ru.toir.mobile.rest.interfaces.ITaskType;
@@ -157,9 +155,7 @@ ToirAPIFactory {
         SSLContext context;
 
         try {
-            context = SSLContext.getInstance("TLS");
-            context.init(null, new TrustManager[]{tm}, null);
-            value = context.getSocketFactory();
+            value = new TLSSocketFactory(new TrustManager[]{tm});
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (KeyManagementException e) {
@@ -173,6 +169,9 @@ ToirAPIFactory {
         InputStream inputStream1 = ToirApplication.qwvostokCA;
         InputStream inputStream2 = ToirApplication.sstalRootCA;
         InputStream inputStream3 = ToirApplication.sstalInternalCA;
+        InputStream inputStream4 = ToirApplication.sstalDigicert;
+        InputStream inputStream5 = ToirApplication.sstalDigicertRoot;
+        InputStream inputStream6 = ToirApplication.digicertsha2CA;
         KeyStore keyStore = null;
         ToirAPIFactory.UnifiedTrustManager trustManager = null;
         try {
@@ -182,11 +181,17 @@ ToirAPIFactory {
             InputStream caInput1 = new BufferedInputStream(inputStream1);
             InputStream caInput2 = new BufferedInputStream(inputStream2);
             InputStream caInput3 = new BufferedInputStream(inputStream3);
-            Certificate ca1, ca2, ca3;
+            InputStream caInput4 = new BufferedInputStream(inputStream4);
+            InputStream caInput5 = new BufferedInputStream(inputStream5);
+            InputStream caInput6 = new BufferedInputStream(inputStream6);
+            Certificate ca1, ca2, ca3, ca4, ca5, ca6;
             try {
                 ca1 = cf.generateCertificate(caInput1);
                 ca2 = cf.generateCertificate(caInput2);
                 ca3 = cf.generateCertificate(caInput3);
+                ca4 = cf.generateCertificate(caInput4);
+                ca5 = cf.generateCertificate(caInput5);
+                ca6 = cf.generateCertificate(caInput6);
             } finally {
             }
 
@@ -197,7 +202,9 @@ ToirAPIFactory {
             keyStore.setCertificateEntry("ca1", ca1);
             keyStore.setCertificateEntry("ca2", ca2);
             keyStore.setCertificateEntry("ca3", ca3);
-
+            keyStore.setCertificateEntry("ca4", ca4);
+            keyStore.setCertificateEntry("ca5", ca5);
+            keyStore.setCertificateEntry("ca6", ca6);
             trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
         } catch (CertificateException e) {
             e.printStackTrace();

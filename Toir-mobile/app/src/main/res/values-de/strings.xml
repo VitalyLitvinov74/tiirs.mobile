@@ -274,4 +274,6 @@
     <string name="update">Update</string>
     <string name="not_set_server_address">Appseinstellungen nicht angegeben!</string>
 
+    <string name="auth_error">Authentifizierung fehlgeschlagen</string>
+
 </resources>

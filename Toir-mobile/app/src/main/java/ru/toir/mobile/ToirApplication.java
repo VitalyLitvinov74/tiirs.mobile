@@ -22,6 +22,9 @@ public class ToirApplication extends Application {
     public static InputStream qwvostokCA;
     public static InputStream sstalRootCA;
     public static InputStream sstalInternalCA;
+    public static InputStream sstalDigicert;
+    public static InputStream sstalDigicertRoot;
+    public static InputStream digicertsha2CA;
 
     public static boolean isInternetOn(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -50,10 +53,13 @@ public class ToirApplication extends Application {
         qwvostokCA = getResources().openRawResource(R.raw.forqwvostok);
         sstalRootCA = getResources().openRawResource(R.raw.severstalroot);
         sstalInternalCA = getResources().openRawResource(R.raw.severstalinternal);
+        sstalDigicert = getResources().openRawResource(R.raw.digicertca);
+        sstalDigicertRoot = getResources().openRawResource(R.raw.digicertrootca);
+        digicertsha2CA = getResources().openRawResource(R.raw.digicertsha2secureserverca);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         serverUrl = preferences.getString(getString(R.string.serverUrl), null);
         if (serverUrl == null) {
-            String defaultUrl = "https://tapi.toir.tehnosber.ru";
+            String defaultUrl = "https://api.toir.toirus.ru";
             serverUrl = defaultUrl;
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             sp.edit().putString(getString(R.string.serverUrl), defaultUrl).apply();

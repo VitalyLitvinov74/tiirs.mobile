@@ -337,7 +337,8 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
                             if (response.code() != 200) {
-                                Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                                String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.auth_error);
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
 
                             AuthorizedUser authUser = AuthorizedUser.getInstance();
@@ -369,7 +370,8 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Call<User> userCall, Response<User> response) {
                                     if (response.code() != 200) {
-                                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                                        String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.toast_error_no_user);
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     }
 
                                     User user = response.body();
