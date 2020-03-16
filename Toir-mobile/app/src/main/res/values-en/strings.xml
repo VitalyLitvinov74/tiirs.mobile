@@ -278,4 +278,5 @@
     <string name="not_set_server_address">Server address not set in settings!</string>
 
     <string name="auth_error">Auth error</string>
+    <string name="no_internet">No Internet</string>
 </resources>
