@@ -276,4 +276,5 @@
     <string name="not_set_server_address">Не указан адрес сервера в настройках приложения!</string>
 
     <string name="auth_error">Ошибка аутентификации</string>
+    <string name="no_internet">Нет соединения с Интернетом</string>
 </resources>

@@ -297,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
                     // проверяем, есть соединение с инетом или нет
                     // если нет, искать по метке в локальной базе, к сети вообще не обращаться.
                     if (!ToirApplication.isInternetOn(getApplicationContext())) {
+                        Toast.makeText(getApplicationContext(), getText(R.string.no_internet), Toast.LENGTH_LONG).show();
                         // проверяем наличие пользователя в локальной базе
                         User user = realmDB.where(User.class)
                                 // !!!!!
