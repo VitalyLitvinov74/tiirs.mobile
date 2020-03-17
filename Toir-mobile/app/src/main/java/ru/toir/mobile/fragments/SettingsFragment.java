@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import ru.toir.mobile.BuildConfig;
 import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
@@ -279,6 +280,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 */
+
+        // в RELEASE сборке отключаем дополнительные настройки
+        if (!BuildConfig.DEBUG) {
+            Preference debugMode = getPreferenceManager().findPreference("debug_mode");
+            PreferenceScreen general = getPreferenceManager().getPreferenceScreen();
+            general.removePreference(debugMode);
+        }
     }
 
     void showRfidDriverScreen(String value) {

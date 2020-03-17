@@ -35,6 +35,7 @@
 
     <PreferenceCategory
         android:icon="@drawable/pref_check"
+        android:key="debug_mode"
         android:theme="@style/CustomTheme"
         android:title="@string/advanced_settings">
         <CheckBoxPreference
