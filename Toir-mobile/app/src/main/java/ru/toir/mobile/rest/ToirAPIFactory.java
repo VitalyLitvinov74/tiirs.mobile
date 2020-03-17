@@ -61,6 +61,8 @@ import ru.toir.mobile.rest.interfaces.IEquipmentStatus;
 import ru.toir.mobile.rest.interfaces.IEquipmentType;
 import ru.toir.mobile.rest.interfaces.IFileDownload;
 import ru.toir.mobile.rest.interfaces.IGpsTrack;
+import ru.toir.mobile.rest.interfaces.IInstruction;
+import ru.toir.mobile.rest.interfaces.IInstructionStageTemplate;
 import ru.toir.mobile.rest.interfaces.IMeasureType;
 import ru.toir.mobile.rest.interfaces.IMeasuredValue;
 import ru.toir.mobile.rest.interfaces.IMessage;
@@ -387,6 +389,16 @@ ToirAPIFactory {
     @NonNull
     public static IStageStatus getStageStatusService() {
         return getRetrofit().create(IStageStatus.class);
+    }
+
+    @NonNull
+    public static IInstructionStageTemplate getInstructionStageTemplate() {
+        return getRetrofit().create(IInstructionStageTemplate.class);
+    }
+
+    @NonNull
+    public static IInstruction getInstructionService() {
+        return getRetrofit().create(IInstruction.class);
     }
 
     @NonNull

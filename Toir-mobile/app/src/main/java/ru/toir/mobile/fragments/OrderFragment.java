@@ -78,6 +78,8 @@ import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
+import ru.toir.mobile.db.adapters.EquipmentAdapter;
+import ru.toir.mobile.db.adapters.InstructionAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationCancelAdapter;
 import ru.toir.mobile.db.adapters.OperationVerdictAdapter;
@@ -88,6 +90,8 @@ import ru.toir.mobile.db.adapters.StageCancelAdapter;
 import ru.toir.mobile.db.adapters.StageVerdictAdapter;
 import ru.toir.mobile.db.adapters.TaskAdapter;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.Instruction;
+import ru.toir.mobile.db.realm.InstructionStageTemplate;
 import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.MediaFile;
@@ -991,7 +995,10 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         // диалог для отмены операции
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        View mView = getLayoutInflater().inflate(R.layout.start_operations, null);
+        CheckBox mCheckBox = mView.findViewById(R.id.checkBox);
+        ListView list = mView.findViewById(R.id.instruction_listView);
         dialog.setTitle(R.string.dialog_start_title);
         dialog.setPositiveButton(R.string.dialog_start,
                 new DialogInterface.OnClickListener() {
@@ -1009,6 +1016,33 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         //stopOperations();
                     }
                 });
+        dialog.setView(mView);
+        final AlertDialog alertDialog = dialog.create();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+        RealmResults<InstructionStageTemplate> ist = realmDB.where(InstructionStageTemplate.class)
+                .equalTo("stageTemplate", selectedStage.getUuid())
+                .findAll();
+        List<String> stageTemplatesUuids = new ArrayList<>();
+        for (InstructionStageTemplate instructionStageTemplate : ist) {
+            stageTemplatesUuids.add(instructionStageTemplate.getInstruction().getUuid());
+        }
+        RealmResults<Instruction> instructions = realmDB.where(Instruction.class)
+                .in("uuid", stageTemplatesUuids.toArray(new String[]{}))
+                .findAll();
+
+        InstructionAdapter instructionAdapter = new InstructionAdapter(instructions);
+        list.setAdapter(instructionAdapter);
+        // TODO если инструкций нет, то скрыть надпись с чекбоксом и разрешить кнопку
+
+        mCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (((CheckBox) v).isChecked()) {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
+            }
+        });
         dialog.show();
     }
 
@@ -2072,7 +2106,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     if (activity == null) {
                         return;
                     }
-
 
                     String equipment_uuid = currentEquipment.getUuid();
                     Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);

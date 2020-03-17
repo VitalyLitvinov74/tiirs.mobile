@@ -52,9 +52,6 @@ import java.util.UUID;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.toir.mobile.db.adapters.DefectAdapter;
 import ru.toir.mobile.db.adapters.DefectLevelAdapter;
 import ru.toir.mobile.db.adapters.DefectTypeAdapter;
@@ -72,7 +69,6 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetDocumentationAsyncTask;
-import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
@@ -326,7 +322,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
         tv_equipment_uuid = findViewById(R.id.equipment_text_uuid);
         tv_equipment_position = findViewById(R.id.equipment_text_location);
-        tv_equipment_task_date = findViewById(R.id.equipment_text_date);
+        tv_equipment_task_date = findViewById(R.id.equipment_text_serial);
         tv_equipment_check_date = findViewById(R.id.equipment_text_date2);
         tv_equipment_image = findViewById(R.id.equipment_image);
         tv_equipment_listview = findViewById(R.id.list_view);
@@ -581,15 +577,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         }
 
-        Date date = equipment.getStartDate();
-        String startDate;
-        if (date != null) {
-            startDate = DateFormat.getDateTimeInstance().format(date);
-        } else {
-            startDate = "none";
+        //Date date = equipment.getStartDate();
+        //String startDate;
+        Date date;
+        String serial = equipment.getSerialNumber();
+        if (serial == null) {
+            serial = "отсутствует";
         }
 
-        tv_equipment_task_date.setText(startDate);
+        tv_equipment_task_date.setText(serial);
         /* tv_equipment_critical.setText("Критичность: "
                 + equipment.getCriticalType().getTitle());*/
 

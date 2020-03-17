@@ -285,4 +285,7 @@
     <string name="menu_order_parts">Repair parts list</string>
     <string name="menu_options">&#8942;</string>
 
+    <string name="serial_number">Serial number</string>
+    <string name="instructions_accept">I read all following instructions</string>
+
 </resources>

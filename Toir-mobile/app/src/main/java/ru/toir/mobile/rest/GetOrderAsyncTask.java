@@ -35,6 +35,8 @@ import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.EquipmentModel;
 import ru.toir.mobile.db.realm.IToirDbObject;
+import ru.toir.mobile.db.realm.Instruction;
+import ru.toir.mobile.db.realm.InstructionStageTemplate;
 import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
@@ -146,6 +148,8 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
 
         // список оборудования в полученных нарядах (для постройки списка документации)
         Map<String, Equipment> equipmentList = new HashMap<>();
+        ArrayList<String> stageTemplates = new ArrayList<>();
+        ArrayList<String> instructions = new ArrayList<>();
 
         // получаем список последних дефектов
         Call<List<Defect>> defectCall;
@@ -278,6 +282,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 for (Stage stage : stages) {
                     // урл изображения этапа задачи
                     StageTemplate stageTemplate = stage.getStageTemplate();
+                    stageTemplates.add(stageTemplate.getUuid());
                     basePathLocal = stageTemplate.getImageFilePath() + "/";
                     isNeedDownload = isNeedDownload(extDir, stageTemplate, basePathLocal);
                     if (isNeedDownload) {
@@ -423,6 +428,57 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             Log.e(TAG, "Ошибка при получении документации.");
             e.printStackTrace();
         }
+
+        // запрашиваем связки
+        Call<List<InstructionStageTemplate>> callIST = ToirAPIFactory.getInstructionStageTemplate()
+                .getByUuid(stageTemplates.toArray(new String[0]));
+        try {
+            retrofit2.Response<List<InstructionStageTemplate>> response = callIST.execute();
+            // добавляем файлы необходимые для загрузки в список
+            List<InstructionStageTemplate> list = response.body();
+            if (list != null) {
+                for (InstructionStageTemplate ist : list) {
+                    instructions.add(ist.getInstruction().getUuid());
+                }
+                // сохраняем информацию
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                realm.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении");
+            e.printStackTrace();
+        }
+
+        // получаем список документации для моделей оборудования в наряде
+        Call<List<Instruction>> instructionCall = ToirAPIFactory.getInstructionService().getByUuid(
+                instructions.toArray(new String[]{}));
+        try {
+            retrofit2.Response<List<Instruction>> r = instructionCall.execute();
+            // добавляем файлы необходимые для загрузки в список
+            List<Instruction> list = r.body();
+            if (list != null) {
+                for (Instruction instruction : list) {
+                    String localPath = instruction.getImageFilePath() + "/";
+                    if (isNeedDownload(extDir, instruction, localPath)) {
+                        String url = instruction.getImageFileUrl(userName) + "/";
+                        files.add(new FilePath(instruction.getPath(), url, localPath));
+                    }
+                }
+                // сохраняем информацию о доступной документации для оборудования
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                realm.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении документации.");
+            e.printStackTrace();
+        }
+
 
         Map<String, Set<String>> requestList = new HashMap<>();
         // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных

@@ -145,7 +145,7 @@
                 android:textColor="@color/larisaBlueColor" />
 
             <TextView
-                android:id="@+id/equipment_text_date"
+                android:id="@+id/equipment_text_serial"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_location_label"
@@ -159,11 +159,11 @@
                 android:id="@+id/equipment_text_date_label"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:layout_below="@+id/equipment_text_date"
+                android:layout_below="@+id/equipment_text_serial"
                 android:layout_toEndOf="@+id/equipment_date_icon"
                 android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
-                android:text="@string/regular_date"
+                android:text="@string/serial_number"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
