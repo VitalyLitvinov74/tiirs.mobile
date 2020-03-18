@@ -282,4 +282,5 @@
     <string name="menu_order_parts">Repair parts list</string>
     <string name="menu_options">&#8942;</string>
 
+    <string name="inventory_number">Inventory number: %1$s</string>
 </resources>

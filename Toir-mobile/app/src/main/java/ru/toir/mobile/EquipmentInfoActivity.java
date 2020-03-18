@@ -96,8 +96,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private TextView tv_equipment_id;
     private TextView tv_equipment_position;
     private ImageView tv_equipment_image;
-    private TextView tv_equipment_task_date;
-    private TextView tv_equipment_check_date;
+    private TextView tv_equipment_serial;
     private ListView tv_equipment_listview;
     private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
@@ -323,11 +322,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         tv_equipment_name = findViewById(R.id.equipment_text_name);
-        tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
+        //tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
         tv_equipment_uuid = findViewById(R.id.equipment_text_uuid);
         tv_equipment_position = findViewById(R.id.equipment_text_location);
-        tv_equipment_task_date = findViewById(R.id.equipment_text_date);
-        tv_equipment_check_date = findViewById(R.id.equipment_text_date2);
+        tv_equipment_serial = findViewById(R.id.equipment_text_date);
         tv_equipment_image = findViewById(R.id.equipment_image);
         tv_equipment_listview = findViewById(R.id.list_view);
         tv_equipment_docslistview = findViewById(R.id.equipment_documentation_listView);
@@ -566,8 +564,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tv_equipment_inventory.setText(textData);
         }
 
-        tv_equipment_id.setText(getString(R.string.id, equipment.getInventoryNumber()));
+        tv_equipment_id.setText(getString(R.string.inventory_number, equipment.getInventoryNumber()));
         tv_equipment_uuid.setText(equipment.getUuid());
+        tv_equipment_serial.setText(equipment.getSerialNumber());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
         if (equipment.getLatitude() > 0) {
             textData = String.valueOf(equipment.getLatitude()) + " / "
@@ -581,16 +580,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             }
         }
 
-        Date date = equipment.getStartDate();
+        /*Date date = equipment.getStartDate();
         String startDate;
         if (date != null) {
             startDate = DateFormat.getDateTimeInstance().format(date);
         } else {
             startDate = "none";
         }
-
         tv_equipment_task_date.setText(startDate);
-        /* tv_equipment_critical.setText("Критичность: "
+        tv_equipment_critical.setText("Критичность: "
                 + equipment.getCriticalType().getTitle());*/
 
         if (equipment.getEquipmentStatus() != null) {
@@ -599,24 +597,25 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tv_equipment_status.setText(getString(R.string.unknown));
         }
 
-        String sDate;
+        //String sDate;
         RealmResults<Stage> stages = realmDB.where(Stage.class).
                 equalTo("equipment.uuid", equipment.getUuid()).sort("endDate", Sort.DESCENDING).findAll();
         if (stages.size() > 2) {
             stages.subList(0, 2);
         }
 
+
         StageAdapter stageAdapter = new StageAdapter(stages);
-        if (stageAdapter.getCount() > 0) {
+/*        if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
             if (date != null) {
                 sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(date);
             } else {
                 sDate = "не обслуживалось";
             }
-
             tv_equipment_check_date.setText(sDate);
         }
+*/
 
         tv_equipment_listview.setAdapter(stageAdapter);
 

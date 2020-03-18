@@ -116,59 +116,22 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.title.setText(order.getTitle());
                 if (orderStatus != null) {
                     String orderStatusUuid = orderStatus.getUuid();
-                    String orderLevelUuid = order.getOrderLevel().getUuid();
                     viewHolder.status.setText(orderStatus.getTitle());
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
-                        viewHolder.icon.setImageResource(R.drawable.status_easy_receive);
-                        textData = sDate + " [" + "Получен" + "/" + "Низкая критичность" + "]";
-                        viewHolder.created.setText(textData);
-                    }
-
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && orderLevelUuid.equals(OrderLevel.Level.Level3)) {
-                        viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
-                        textData = sDate + " [" + "Получен" + "/" + "Средняя критичность" + "]";
-                        viewHolder.created.setText(textData);
-                    }
-
-                    if (orderStatusUuid.equals(OrderStatus.Status.NEW) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.NEW)) {
                         viewHolder.icon.setImageResource(R.drawable.status_high_receive);
-                        textData = sDate + " [" + "Получен" + "/" + "Высокая критичность" + "]";
+                        textData = sDate + " [" + "Получен" + "]";
                         viewHolder.created.setText(textData);
                     }
 
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
-                        viewHolder.icon.setImageResource(R.drawable.status_easy_work);
-                        textData = sDate + " [" + "В работе" + "/" + "Низкая критичность" + "]";
-                        viewHolder.created.setText(textData);
-                    }
-
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && orderLevelUuid.equals(OrderLevel.Level.Level3)) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK)) {
                         viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                        textData = sDate + " [" + "В работе" + "/" + "Средняя критичность" + "]";
+                        textData = sDate + " [" + "В работе" + "/" + "]";
                         viewHolder.created.setText(textData);
                     }
 
-                    if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
-                        viewHolder.icon.setImageResource(R.drawable.status_high_work);
-                        textData = sDate + " [" + "В работе" + "/" + "Высокая критичность" + "]";
-                        viewHolder.created.setText(textData);
-                    }
-
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && (orderLevelUuid.equals(OrderLevel.Level.Level1) || orderLevelUuid.equals(OrderLevel.Level.Level2))) {
+                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE)) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                        textData = sDate + " [" + "Выполнен" + "/" + "Низкая критичность" + "]";
-                        viewHolder.created.setText(textData);
-                    }
-
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && orderLevelUuid.equals(OrderLevel.Level.Level3)) {
-                        viewHolder.icon.setImageResource(R.drawable.status_mod_ready);
-                        textData = sDate + " [" + "Выполнен" + "/" + "Средняя критичность" + "]";
-                        viewHolder.created.setText(textData);
-                    }
-
-                    if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE) && (orderLevelUuid.equals(OrderLevel.Level.Level5) || orderLevelUuid.equals(OrderLevel.Level.Level4))) {
-                        viewHolder.icon.setImageResource(R.drawable.status_high_ready);
-                        textData = sDate + " [" + "Выполнен" + "/" + "Высокая критичность" + "]";
+                        textData = sDate + " [" + "Выполнен" + "/" + "]";
                         viewHolder.created.setText(textData);
                     }
                 }

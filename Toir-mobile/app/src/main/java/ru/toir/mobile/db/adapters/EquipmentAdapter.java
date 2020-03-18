@@ -11,22 +11,19 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
-import ru.toir.mobile.db.realm.CriticalType;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentStatus;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author koputo
- *         Created by koputo on 08.09.16.
+ * Created by koputo on 08.09.16.
  */
 public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements ListAdapter {
 
@@ -70,7 +67,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder = new ViewHolder();
                 viewHolder.icon = convertView.findViewById(R.id.eril_image_critical);
                 viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
-                viewHolder.criticalLevel = convertView.findViewById(R.id.eril_critical_level);
+                viewHolder.criticalTypeUuid = convertView.findViewById(R.id.eril_critical_level);
                 viewHolder.location = convertView.findViewById(R.id.eril_place);
                 viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
                 viewHolder.title = convertView.findViewById(R.id.eril_title);
@@ -80,8 +77,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder = new ViewHolder();
                 viewHolder.icon = convertView.findViewById(R.id.eril_image);
                 viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
-                viewHolder.criticalTypeUuid = convertView.findViewById(R.id.eril_critical);
-                //viewHolder.startDate = convertView.findViewById(R.id.eril_last_operation_date);
+                viewHolder.serialNumber = convertView.findViewById(R.id.eril_serial);
                 viewHolder.location = convertView.findViewById(R.id.eril_location);
                 viewHolder.equipmentModelUuid = convertView.findViewById(R.id.eril_type);
                 viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
@@ -135,20 +131,12 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                         viewHolder.location.setText(equipment.getLocation().getTitle());
                     }
 
-                    viewHolder.equipmentStatus.setText(context.getString(R.string.status, equipment.getEquipmentStatus().getTitle()));
-                    CriticalType criticalType = equipment.getCriticalType();
-                    if (criticalType != null) {
-                        viewHolder.criticalTypeUuid.setText(criticalType.getTitle());
-                        if (criticalType.isType1()) {
-                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.red));
-                        }
-
-                        if (criticalType.isType2()) {
-                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.md_deep_orange_300));
-                        }
-
-                        if (criticalType.isType3()) {
-                            viewHolder.criticalTypeUuid.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
+                    viewHolder.equipmentStatus.setText(equipment.getEquipmentStatus().getTitle());
+                    if (equipment.getEquipmentStatus().getUuid() != null) {
+                        if (equipment.getEquipmentStatus().getUuid().equals(EquipmentStatus.Status.WORK)) {
+                            viewHolder.equipmentStatus.setBackgroundColor(ContextCompat.getColor(context, R.color.green));
+                        } else {
+                            viewHolder.equipmentStatus.setBackgroundColor(ContextCompat.getColor(context, R.color.md_deep_orange_300));
                         }
                     }
 
@@ -178,8 +166,10 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
         TextView title;
         TextView location;
         TextView inventoryNumber;
+        TextView serialNumber;
         TextView criticalTypeUuid;
         TextView criticalLevel;
+        TextView status;
         //TextView startDate;
         TextView checkDate;
     }
