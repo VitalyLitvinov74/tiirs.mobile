@@ -125,13 +125,13 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
 
                     if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK)) {
                         viewHolder.icon.setImageResource(R.drawable.status_mod_work);
-                        textData = sDate + " [" + "В работе" + "/" + "]";
+                        textData = sDate + " [" + "В работе" + "]";
                         viewHolder.created.setText(textData);
                     }
 
                     if (orderStatusUuid.equals(OrderStatus.Status.COMPLETE)) {
                         viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
-                        textData = sDate + " [" + "Выполнен" + "/" + "]";
+                        textData = sDate + " [" + "Выполнен" + "]";
                         viewHolder.created.setText(textData);
                     }
                 }

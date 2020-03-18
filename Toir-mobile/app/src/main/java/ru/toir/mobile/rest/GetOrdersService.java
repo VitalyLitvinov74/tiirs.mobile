@@ -34,6 +34,8 @@ import ru.toir.mobile.db.realm.Documentation;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentAttribute;
 import ru.toir.mobile.db.realm.EquipmentModel;
+import ru.toir.mobile.db.realm.Instruction;
+import ru.toir.mobile.db.realm.InstructionStageTemplate;
 import ru.toir.mobile.db.realm.Objects;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationTemplate;
@@ -49,6 +51,7 @@ import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ReferenceFragment;
 
+import static ru.toir.mobile.rest.GetOrderAsyncTask.isNeedDownload;
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 
 /**
@@ -90,6 +93,8 @@ public class GetOrdersService extends Service {
 
             // список оборудования в полученных нарядах (для постройки списка документации)
             Map<String, Equipment> equipmentList = new HashMap<>();
+            ArrayList<String> stageTemplates = new ArrayList<>();
+            ArrayList<String> instructions = new ArrayList<>();
 
             // получаем список последних дефектов
             String changedDate = ReferenceUpdate.lastChangedAsStr(Defect.class.getSimpleName());
@@ -181,7 +186,7 @@ public class GetOrdersService extends Service {
                 // изображение пользователя создавшего наряд
                 User orderAuthor = order.getAuthor();
                 basePathLocal = orderAuthor.getImageFilePath() + "/";
-                isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, orderAuthor, basePathLocal);
+                isNeedDownload = isNeedDownload(extDir, orderAuthor, basePathLocal);
                 if (isNeedDownload) {
                     String url = orderAuthor.getImageFileUrl(userName) + "/";
                     files.add(new GetOrderAsyncTask.FilePath(orderAuthor.getImage(), url, basePathLocal));
@@ -192,7 +197,7 @@ public class GetOrdersService extends Service {
                     // урл изображения задачи
                     TaskTemplate taskTemplate = task.getTaskTemplate();
                     basePathLocal = taskTemplate.getImageFilePath() + "/";
-                    isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, taskTemplate, basePathLocal);
+                    isNeedDownload = isNeedDownload(extDir, taskTemplate, basePathLocal);
                     if (isNeedDownload) {
                         String url = taskTemplate.getImageFileUrl(userName) + "/";
                         files.add(new GetOrderAsyncTask.FilePath(taskTemplate.getImage(), url, basePathLocal));
@@ -202,8 +207,9 @@ public class GetOrdersService extends Service {
                     for (Stage stage : stages) {
                         // урл изображения этапа задачи
                         StageTemplate stageTemplate = stage.getStageTemplate();
+                        stageTemplates.add(stageTemplate.getUuid());
                         basePathLocal = stageTemplate.getImageFilePath() + "/";
-                        isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, stageTemplate, basePathLocal);
+                        isNeedDownload = isNeedDownload(extDir, stageTemplate, basePathLocal);
                         if (isNeedDownload) {
                             String url = stageTemplate.getImageFileUrl(userName) + "/";
                             files.add(new GetOrderAsyncTask.FilePath(stageTemplate.getImage(), url, basePathLocal));
@@ -213,7 +219,7 @@ public class GetOrdersService extends Service {
                         Equipment equipment = stage.getEquipment();
                         basePathLocal = equipment.getImageFilePath() + "/";
                         if (!equipment.getImage().equals("")) {
-                            isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, equipment, basePathLocal);
+                            isNeedDownload = isNeedDownload(extDir, equipment, basePathLocal);
                             if (isNeedDownload) {
                                 String url = equipment.getImageFileUrl(userName) + "/";
                                 files.add(new GetOrderAsyncTask.FilePath(equipment.getImage(), url, basePathLocal));
@@ -224,7 +230,7 @@ public class GetOrdersService extends Service {
                         EquipmentModel equipmentModel = stage.getEquipment().getEquipmentModel();
                         basePathLocal = equipmentModel.getImageFilePath() + "/";
                         if (!equipmentModel.getImage().equals("")) {
-                            isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, equipmentModel, basePathLocal);
+                            isNeedDownload = isNeedDownload(extDir, equipmentModel, basePathLocal);
                             if (isNeedDownload) {
                                 String url = equipmentModel.getImageFileUrl(userName) + "/";
                                 files.add(new GetOrderAsyncTask.FilePath(equipmentModel.getImage(), url, basePathLocal));
@@ -235,7 +241,7 @@ public class GetOrdersService extends Service {
                         Objects object = stage.getEquipment().getLocation();
                         if (object != null) {
                             basePathLocal = object.getImageFilePath() + "/";
-                            isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, object, basePathLocal);
+                            isNeedDownload = isNeedDownload(extDir, object, basePathLocal);
                             if (isNeedDownload) {
                                 String url = object.getImageFileUrl(userName) + "/";
                                 files.add(new GetOrderAsyncTask.FilePath(object.getImage(), url, basePathLocal));
@@ -250,7 +256,7 @@ public class GetOrdersService extends Service {
                             OperationTemplate operationTemplate = operation.getOperationTemplate();
                             basePathLocal = operationTemplate.getImageFilePath() + "/";
                             // урл изображения операции
-                            isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, operationTemplate, basePathLocal);
+                            isNeedDownload = isNeedDownload(extDir, operationTemplate, basePathLocal);
                             if (isNeedDownload) {
                                 String url = operationTemplate.getImageFileUrl(userName) + "/";
                                 files.add(new GetOrderAsyncTask.FilePath(operationTemplate.getImage(), url, basePathLocal));
@@ -326,7 +332,7 @@ public class GetOrdersService extends Service {
                 if (list != null) {
                     for (Documentation doc : list) {
                         String localPath = doc.getImageFilePath() + "/";
-                        if (GetOrderAsyncTask.isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
+                        if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                             String url = doc.getImageFileUrl(userName) + "/";
                             files.add(new GetOrderAsyncTask.FilePath(doc.getPath(), url, localPath));
                         }
@@ -354,7 +360,7 @@ public class GetOrdersService extends Service {
                 if (list != null) {
                     for (Documentation doc : list) {
                         String localPath = doc.getImageFilePath() + "/";
-                        if (GetOrderAsyncTask.isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
+                        if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                             String url = doc.getImageFileUrl(userName) + "/";
                             files.add(new GetOrderAsyncTask.FilePath(doc.getPath(), url, localPath));
                         }
@@ -438,6 +444,56 @@ public class GetOrdersService extends Service {
 
             for (Orders order : orders) {
                 getRepairParts(order.getUuid());
+            }
+
+            // запрашиваем связки
+            Call<List<InstructionStageTemplate>> callIST = ToirAPIFactory.getInstructionStageTemplate()
+                    .getByUuid(stageTemplates.toArray(new String[0]));
+            try {
+                retrofit2.Response<List<InstructionStageTemplate>> response = callIST.execute();
+                // добавляем файлы необходимые для загрузки в список
+                List<InstructionStageTemplate> list = response.body();
+                if (list != null) {
+                    for (InstructionStageTemplate ist : list) {
+                        instructions.add(ist.getInstruction().getUuid());
+                    }
+                    // сохраняем информацию
+                    realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(list);
+                    realm.commitTransaction();
+                    realm.close();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка при получении");
+                e.printStackTrace();
+            }
+
+            // получаем список документации для моделей оборудования в наряде
+            Call<List<Instruction>> instructionCall = ToirAPIFactory.getInstructionService().getByUuid(
+                    instructions.toArray(new String[]{}));
+            try {
+                retrofit2.Response<List<Instruction>> r = instructionCall.execute();
+                // добавляем файлы необходимые для загрузки в список
+                List<Instruction> list = r.body();
+                if (list != null) {
+                    for (Instruction instruction : list) {
+                        String localPath = instruction.getImageFilePath() + "/";
+                        if (isNeedDownload(extDir, instruction, localPath)) {
+                            String url = instruction.getImageFileUrl(userName) + "/";
+                            files.add(new GetOrderAsyncTask.FilePath(instruction.getPath(), url, localPath));
+                        }
+                    }
+                    // сохраняем информацию о доступной документации для оборудования
+                    realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(list);
+                    realm.commitTransaction();
+                    realm.close();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка при получении документации.");
+                e.printStackTrace();
             }
 
             // тестовая реализация штатного уведомления

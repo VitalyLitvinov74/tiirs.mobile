@@ -19,7 +19,6 @@
         android:id="@+id/eril_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:maxLines="1"
         android:textColor="#222222"
@@ -125,8 +124,8 @@
         android:textSize="14sp"
         android:layout_marginBottom="5dp"
         android:paddingBottom="5dp"
-        android:text="@string/status"
-        android:layout_toEndOf="@+id/eril_status" />
+        android:layout_toEndOf="@+id/eril_status"
+        android:text="@string/inventory_number" />
 
 
 </RelativeLayout>

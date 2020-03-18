@@ -51,7 +51,7 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/equipment_text_inventory"
+                android:id="@+id/equipment_text_model"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
                 android:layout_below="@+id/equipment_text_name"
@@ -68,7 +68,7 @@
                 android:layout_width="30dp"
                 android:layout_height="50dp"
                 android:textSize="20sp"
-                android:layout_below="@+id/equipment_text_inventory"
+                android:layout_below="@+id/equipment_text_model"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
@@ -79,7 +79,7 @@
                 android:id="@+id/equipment_text_uuid"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:layout_below="@+id/equipment_text_inventory"
+                android:layout_below="@+id/equipment_text_model"
                 android:layout_toEndOf="@+id/equipment_id_icon"
                 android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
@@ -87,7 +87,7 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/equipment_text_id"
+                android:id="@+id/equipment_text_inventory"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_uuid"
@@ -102,7 +102,7 @@
                 android:layout_width="30dp"
                 android:layout_height="50dp"
                 android:textSize="20sp"
-                android:layout_below="@+id/equipment_text_id"
+                android:layout_below="@+id/equipment_text_inventory"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
@@ -113,7 +113,7 @@
                 android:id="@+id/equipment_text_location"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
-                android:layout_below="@+id/equipment_text_id"
+                android:layout_below="@+id/equipment_text_inventory"
                 android:layout_toEndOf="@+id/equipment_location_icon"
                 android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
@@ -141,7 +141,7 @@
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
-                android:text="@string/icon_calendar"
+                android:text="@string/icon_tools"
                 android:textColor="@color/larisaBlueColor" />
 
             <TextView
@@ -150,9 +150,9 @@
                 android:layout_height="25dp"
                 android:layout_below="@+id/equipment_text_location_label"
                 android:layout_toEndOf="@+id/equipment_date_icon"
-                android:background="@color/larisaWhiteColor"
+                android:background="@color/larisaTextColorAWhite"
                 android:paddingStart="10dp"
-                android:textColor="@color/larisaWhiteColor"
+                android:textColor="@color/larisaTextColorBlack"
                 android:textSize="16sp" />
 
             <TextView

@@ -43,10 +43,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 import io.realm.Realm;
@@ -69,7 +66,6 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetDocumentationAsyncTask;
-import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
@@ -89,11 +85,11 @@ public class EquipmentInfoActivity extends AppCompatActivity {
     private static String equipment_uuid;
     private TextView tv_equipment_name;
     private TextView tv_equipment_inventory;
+    private TextView tv_equipment_serial;
     private TextView tv_equipment_uuid;
-    private TextView tv_equipment_id;
+    private TextView tv_equipment_model;
     private TextView tv_equipment_position;
     private ImageView tv_equipment_image;
-    private TextView tv_equipment_serial;
     private ListView tv_equipment_listview;
     private ListView tv_equipment_docslistview;
     private TextView tv_equipment_status;
@@ -319,15 +315,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         tv_equipment_name = findViewById(R.id.equipment_text_name);
-        //tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
+        tv_equipment_inventory = findViewById(R.id.equipment_text_inventory);
+        tv_equipment_serial = findViewById(R.id.equipment_text_serial);
+        tv_equipment_model = findViewById(R.id.equipment_text_model);
+
         tv_equipment_uuid = findViewById(R.id.equipment_text_uuid);
         tv_equipment_position = findViewById(R.id.equipment_text_location);
-        tv_equipment_serial = findViewById(R.id.equipment_text_date);
         tv_equipment_image = findViewById(R.id.equipment_image);
         tv_equipment_listview = findViewById(R.id.list_view);
         tv_equipment_docslistview = findViewById(R.id.equipment_documentation_listView);
         tv_equipment_status = findViewById(R.id.equipment_text_status);
-        tv_equipment_id = findViewById(R.id.equipment_text_id);
         tv_equipment_defects = findViewById(R.id.equipment_defects_listView);
 
         initView();
@@ -553,15 +550,15 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             return;
         }
 
-        EquipmentModel equipmentModel = equipment.getEquipmentModel();
         String textData;
+        EquipmentModel equipmentModel = equipment.getEquipmentModel();
         tv_equipment_name.setText(equipment.getTitle());
         if (equipmentModel != null) {
-            textData = getString(R.string.model, equipment.getEquipmentModel().getTitle()) + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle();
-            tv_equipment_inventory.setText(textData);
+            textData = equipment.getEquipmentModel().getTitle();// + " | " + equipment.getEquipmentModel().getEquipmentType().getTitle();
+            tv_equipment_model.setText(textData);
         }
 
-        tv_equipment_id.setText(getString(R.string.inventory_number, equipment.getInventoryNumber()));
+        tv_equipment_inventory.setText(getString(R.string.inventory_number, equipment.getInventoryNumber()));
         tv_equipment_uuid.setText(equipment.getUuid());
         tv_equipment_serial.setText(equipment.getSerialNumber());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
