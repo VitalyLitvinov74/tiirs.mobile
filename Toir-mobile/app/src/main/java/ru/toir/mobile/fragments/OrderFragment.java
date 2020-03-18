@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -997,7 +998,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         // диалог для отмены операции
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         View mView = getLayoutInflater().inflate(R.layout.start_operations, null);
-        CheckBox mCheckBox = mView.findViewById(R.id.checkBox);
+        final CheckBox mCheckBox = mView.findViewById(R.id.checkBox);
         ListView list = mView.findViewById(R.id.instruction_listView);
         dialog.setTitle(R.string.dialog_start_title);
         dialog.setPositiveButton(R.string.dialog_start,
@@ -1017,11 +1018,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     }
                 });
         dialog.setView(mView);
-        final AlertDialog alertDialog = dialog.create();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
         RealmResults<InstructionStageTemplate> ist = realmDB.where(InstructionStageTemplate.class)
-                .equalTo("stageTemplate", selectedStage.getUuid())
+                .equalTo("stageTemplate.uuid", selectedStage.getUuid())
                 .findAll();
         List<String> stageTemplatesUuids = new ArrayList<>();
         for (InstructionStageTemplate instructionStageTemplate : ist) {
@@ -1033,17 +1032,22 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
         InstructionAdapter instructionAdapter = new InstructionAdapter(instructions);
         list.setAdapter(instructionAdapter);
-        // TODO если инструкций нет, то скрыть надпись с чекбоксом и разрешить кнопку
-
+        AlertDialog dlg = dialog.create();
+        dlg.show();
+        final Button button = dlg.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (ist.size() == 0) {
+            mCheckBox.setVisibility(View.GONE);
+        } else {
+            button.setEnabled(false);
+        }
         mCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((CheckBox) v).isChecked()) {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                if (mCheckBox.isChecked()) {
+                    button.setEnabled(true);
                 }
             }
         });
-        dialog.show();
     }
 
     /**
@@ -2688,7 +2692,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         @Override
         public void onItemClick(final AdapterView<?> parent, View selectedItemView, final int position, long id) {
             // находимся на "экране" нарядов
-            //checkClickItem(position);
+            if (Level != ORDER_LEVEL)
+                checkClickItem(position);
         }
     }
 
