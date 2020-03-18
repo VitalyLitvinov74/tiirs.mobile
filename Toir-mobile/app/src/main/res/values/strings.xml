@@ -286,4 +286,5 @@
     <string name="serial_number">Серийный номер</string>
     <string name="instructions_accept">Я ознакомился со следующими инструкциями</string>
 
+    <string name="inventory_number">Инвентарный номер: %1$s</string>
 </resources>

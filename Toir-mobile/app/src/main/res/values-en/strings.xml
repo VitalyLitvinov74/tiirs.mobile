@@ -288,4 +288,5 @@
     <string name="serial_number">Serial number</string>
     <string name="instructions_accept">I read all following instructions</string>
 
+    <string name="inventory_number">Inventаr nummer: %1$s</string>
 </resources>

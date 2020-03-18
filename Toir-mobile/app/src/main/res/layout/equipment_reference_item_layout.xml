@@ -8,9 +8,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/status"
         android:src="@drawable/equipment_model_teplogenerator"
@@ -23,12 +21,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="5dp"
         android:maxLines="1"
         android:textColor="#222222"
         android:textSize="16sp"
         android:gravity="center_vertical"
-        android:layout_toRightOf="@+id/eril_image"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="5dp"
@@ -39,10 +35,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/eril_title"
-        android:layout_marginLeft="5dp"
         android:textColor="#222222"
         android:textSize="14sp"
-        android:layout_toRightOf="@+id/eril_image"
         android:text="@string/type"
         android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/eril_image" />
@@ -54,8 +48,6 @@
         android:textColor="#454545"
         android:textSize="14sp"
         android:maxLines="1"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/eril_type_label"
         android:layout_below="@+id/eril_title"
         android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/eril_type_label" />
@@ -64,14 +56,12 @@
         android:id="@+id/eril_inventory_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
         android:textColor="#454545"
         android:textSize="14sp"
         android:gravity="center_vertical"
         android:layout_below="@+id/eril_type_label"
         android:layout_toEndOf="@+id/eril_image"
-        android:layout_marginStart="5dp"
-        android:layout_toRightOf="@+id/eril_image" />
+        android:layout_marginStart="5dp" />
 
     <!--
         <TextView
@@ -107,15 +97,13 @@
         android:layout_below="@+id/eril_inventory_number"
         android:textColor="#454545"
         android:textSize="14sp"
-        android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
         android:paddingBottom="5dp"
-        android:layout_toRightOf="@+id/eril_image"
         android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/eril_image" />
 
     <TextView
-        android:id="@+id/eril_critical"
+        android:id="@+id/eril_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/eril_image"
@@ -129,7 +117,7 @@
         android:layout_marginBottom="5dp" />
 
     <TextView
-        android:id="@+id/eril_status"
+        android:id="@+id/eril_serial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/eril_image"
@@ -137,9 +125,8 @@
         android:textSize="14sp"
         android:layout_marginBottom="5dp"
         android:paddingBottom="5dp"
-        android:layout_toRightOf="@+id/eril_critical"
         android:text="@string/status"
-        android:layout_toEndOf="@+id/eril_critical" />
+        android:layout_toEndOf="@+id/eril_status" />
 
 
 </RelativeLayout>
