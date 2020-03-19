@@ -10,6 +10,8 @@ import io.realm.annotations.PrimaryKey;
  *         Created on 13.09.16.
  */
 public class TaskTemplate extends RealmObject implements IToirDbObject {
+    public static final String DEFAULT_TASK = "138C39D3-F0F0-443C-95E7-698A5CAC6E74";
+
     @PrimaryKey
     private long _id;
     private String uuid;

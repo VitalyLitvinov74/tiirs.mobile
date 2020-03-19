@@ -77,7 +77,7 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                 viewHolder = new ViewHolder();
                 viewHolder.icon = convertView.findViewById(R.id.eril_image);
                 viewHolder.equipmentStatus = convertView.findViewById(R.id.eril_status);
-                viewHolder.serialNumber = convertView.findViewById(R.id.equipment_text_serial);
+                viewHolder.serialNumber = convertView.findViewById(R.id.eril_serial);
                 viewHolder.location = convertView.findViewById(R.id.eril_location);
                 viewHolder.equipmentModelUuid = convertView.findViewById(R.id.eril_type);
                 viewHolder.inventoryNumber = convertView.findViewById(R.id.eril_inventory_number);
@@ -124,7 +124,14 @@ public class EquipmentAdapter extends RealmBaseAdapter<Equipment> implements Lis
                             }
                         }
                     }
-                    viewHolder.inventoryNumber.setText(context.getString(R.string.inventory_number, equipment.getInventoryNumber()));
+                    String inventoryNumber = context.getString(R.string.inventory_number, equipment.getInventoryNumber());
+                    viewHolder.inventoryNumber.setText(inventoryNumber);
+                    String serialNumber = context.getString(R.string.serial_number) + ": ";
+                    if (equipment.getSerialNumber() != null)
+                        serialNumber += equipment.getSerialNumber();
+                    else
+                        serialNumber += "-";
+                    viewHolder.serialNumber.setText(serialNumber);
                     viewHolder.equipmentModelUuid.setText(equipment.getEquipmentModel().getTitle());
                     if (equipment.getLocation() != null) {
                         viewHolder.location.setText(equipment.getLocation().getTitle());

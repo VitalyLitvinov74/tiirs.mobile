@@ -171,12 +171,12 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
             if (operationStatus != null) {
                 if (operationStatus.isNew()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
+                    viewHolder.verdict.setImageResource(R.drawable.status_high_receive);
                     viewHolder.status.setChecked(false);
                 }
 
                 if (operationStatus.isInWork()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_easy_work);
+                    viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
                     viewHolder.status.setChecked(false);
                 }
 

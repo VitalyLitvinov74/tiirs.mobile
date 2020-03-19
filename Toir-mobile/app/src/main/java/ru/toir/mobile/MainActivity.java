@@ -655,7 +655,7 @@ public class MainActivity extends AppCompatActivity {
         fillProfileList();
 
         PrimaryDrawerItem taskPrimaryDrawerItem = new PrimaryDrawerItem()
-                .withName(R.string.menu_tasks)
+                .withName(R.string.menu_orders)
                 .withDescription(getString(R.string.current_tasks))
                 .withIcon(GoogleMaterial.Icon.gmd_calendar)
                 .withIdentifier(FRAGMENT_TASKS)
@@ -709,7 +709,6 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_DOCS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
-*/
                         new PrimaryDrawerItem()
                                 .withName(R.string.menu_objects)
                                 .withDescription(R.string.menu_objects_description)
@@ -722,6 +721,14 @@ public class MainActivity extends AppCompatActivity {
                                 .withDescription(R.string.menu_client_reference)
                                 .withIcon(GoogleMaterial.Icon.gmd_accounts_alt)
                                 .withIdentifier(FRAGMENT_CONTRAGENTS)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+*/
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_defects)
+                                .withDescription(R.string.menu_defects)
+                                .withIcon(GoogleMaterial.Icon.gmd_wrench)
+                                .withIdentifier(FRAGMENT_DEFECTS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new DividerDrawerItem(),
@@ -781,6 +788,9 @@ public class MainActivity extends AppCompatActivity {
                             } else if (ident == FRAGMENT_OBJECTS) {
                                 currentFragment = FRAGMENT_OBJECTS;
                                 tr.replace(R.id.frame_container, ObjectFragment.newInstance());
+                            } else if (ident == FRAGMENT_DEFECTS) {
+                                currentFragment = FRAGMENT_DEFECTS;
+                                tr.replace(R.id.frame_container, DefectsFragment.newInstance());
                             } else if (ident == FRAGMENT_CONTRAGENTS) {
                                 currentFragment = FRAGMENT_CONTRAGENTS;
                                 tr.replace(R.id.frame_container, ContragentsFragment.newInstance());

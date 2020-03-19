@@ -1,72 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
     android:id="@+id/stage_linear_layout"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="6dip">
 
     <ImageView
         android:id="@+id/ts_ImageStatus"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:src="@drawable/status_easy_receive"
         android:layout_marginEnd="6dip"
-        android:contentDescription="@string/image_description" />
+        android:contentDescription="@string/image_description"
+        android:src="@drawable/status_easy_receive" />
 
     <TextView
         android:id="@+id/ts_Name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
+        android:layout_toEndOf="@id/ts_ImageStatus"
         android:background="@color/larisaTextColorAWhite"
-        android:textColor="@color/larisaBackColor"
         android:gravity="center_vertical"
         android:text="@string/description"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/ts_ImageStatus"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="14sp" />
 
     <TextView
         android:id="@+id/ts_Equipment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/ts_Name"
         android:layout_marginTop="0dip"
         android:layout_toEndOf="@+id/ts_ImageStatus"
         android:background="@color/larisaTextColorAWhite"
-        android:layout_below="@+id/ts_Name"
         android:ellipsize="marquee"
         android:text="@string/description"
-        android:textSize="12sp"
-        android:textColor="@color/larisaBackColor" />
+        android:textColor="@color/larisaTextColorABlack"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/ts_normative"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/ts_Equipment"
+        android:layout_marginTop="0dip"
+        android:layout_toEndOf="@+id/ts_ImageStatus"
+        android:background="@color/larisaTextColorAWhite"
+        android:ellipsize="marquee"
+        android:text="@string/normative"
+        android:textColor="@color/larisaTextColorABlack"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/ts_StartDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dip"
         android:layout_alignParentBottom="true"
+        android:layout_below="@+id/ts_normative"
+        android:layout_marginEnd="10dip"
+        android:layout_marginTop="0dip"
+        android:layout_toEndOf="@id/ts_ImageStatus"
         android:background="@color/larisaTextColorAWhite"
-        android:textColor="@color/larisaBackColor"
-        android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
         android:text="@string/not_started"
-        android:layout_marginEnd="10dip"
-        android:layout_toEndOf="@id/ts_ImageStatus"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/ts_divider"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dip"
         android:layout_alignParentBottom="true"
+        android:layout_below="@+id/ts_normative"
+        android:layout_marginTop="0dip"
+        android:layout_toEndOf="@id/ts_StartDate"
         android:background="@color/larisaTextColorAWhite"
-        android:textColor="@color/larisaBackColor"
-        android:layout_below="@+id/ts_Equipment"
         android:ellipsize="marquee"
         android:text="@string/tire"
-        android:layout_toEndOf="@id/ts_StartDate"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="12sp" />
 
     <TextView
@@ -74,15 +88,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/larisaTextColorAWhite"
-        android:textColor="@color/larisaBackColor"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/ts_normative"
+        android:layout_marginStart="10dip"
         android:layout_marginTop="0dip"
-        android:layout_below="@+id/ts_Equipment"
+        android:layout_toEndOf="@id/ts_divider"
+        android:background="@color/larisaTextColorAWhite"
         android:ellipsize="marquee"
         android:text="@string/not_finished"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="10dip"
-        android:layout_toEndOf="@id/ts_divider"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="12sp" />
 
 </RelativeLayout>

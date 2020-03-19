@@ -108,7 +108,7 @@
     <string name="menu_charts">Тест графиков</string>
     <string name="menu_equipment">Оборудование</string>
     <string name="menu_gps">Карта</string>
-    <string name="menu_tasks">Наряды</string>
+    <string name="menu_tasks">Задачи</string>
     <string name="menu_references">Справочники</string>
     <string name="menu_users">Пользователи</string>
     <string name="pref_lang">Язык интерфейса</string>

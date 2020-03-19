@@ -1,7 +1,6 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -17,9 +15,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Defect;
-import ru.toir.mobile.db.realm.MediaFile;
-
-import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
+import ru.toir.mobile.db.realm.DefectLevel;
 
 /**
  * @author olejek
@@ -93,12 +89,14 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                         viewHolder.title.setText(textData);
                         //viewHolder.title.setText("новый");
                     }
-                    if (defect.isProcess()) {
-                        viewHolder.image_status.setImageResource(R.drawable.status_easy_ready);
-                        viewHolder.status.setText(R.string.defect_status_processed);
-                    } else {
-                        viewHolder.status.setText(R.string.defect_status_non_processed);
+                    if (defect.getDefectLevel().getUuid().equals(DefectLevel.Level.TYPE_WARNING)) {
+                        viewHolder.image_status.setImageResource(R.drawable.status_mod_work);
                     }
+                    if (defect.getDefectLevel().getUuid().equals(DefectLevel.Level.TYPE_INFO)) {
+                        viewHolder.image_status.setImageResource(R.drawable.status_easy_work);
+                    }
+                    viewHolder.status.setText(defect.getDefectLevel().getTitle());
+
                     java.util.Date date = defect.getDate();
                     if (date != null) {
                         String sDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US)

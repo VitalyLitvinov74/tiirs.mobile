@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_height="match_parent"
     android:background="@color/larisaTextColorAWhite"
     android:padding="6dip">
 
@@ -18,16 +18,13 @@
 
     <TextView
         android:id="@+id/lv_firstLine"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_toEndOf="@id/lv_icon"
-        android:gravity="center_vertical"
-        android:paddingStart="5dp"
-        android:text="@string/description"
-        android:textColor="#333333"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/instruction_icon"
+        android:paddingTop="2dp"
+        android:text="@string/instructions_accept"
+        android:textColor="@color/larisaTextColorABlack"
         android:textSize="14sp" />
 
 </RelativeLayout> 

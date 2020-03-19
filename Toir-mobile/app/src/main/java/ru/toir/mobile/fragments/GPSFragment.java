@@ -1,6 +1,7 @@
 package ru.toir.mobile.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -21,12 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -37,16 +40,21 @@ import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import ru.toir.mobile.BuildConfig;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.EquipmentAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.Task;
@@ -61,7 +69,8 @@ public class GPSFragment extends Fragment {
     ArrayList<OverlayItem> aOverlayItemArray;
     Realm realmDB;
     private double curLatitude, curLongitude;
-    private int LastItemPosition = -1;
+    private Spinner typeSpinner;
+    private ListView equipmentListView;
 
     public GPSFragment() {
     }
@@ -87,14 +96,56 @@ public class GPSFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.gps_layout, container, false);
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
-        EquipmentAdapter equipmentAdapter;
-        ListView equipmentListView;
+        final EquipmentAdapter equipmentAdapter;
+        equipmentListView = rootView.findViewById(R.id.gps_listView);
 
         toolbar.setSubtitle(getString(R.string.menu_map));
         realmDB = Realm.getDefaultInstance();
-        RealmResults<Equipment> equipments; // = realmDB.where(Equipment.class).equalTo("uuid", "").findAll();
 
-//        User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        SpinnerListener spinnerListener = new SpinnerListener();
+        RealmResults<Equipment> equipments = realmDB.where(Equipment.class).findAll();
+        Set<String> equipmentTypeUuids = new HashSet<>();
+        for (Equipment item : equipments) {
+            equipmentTypeUuids.add(item.getEquipmentModel().getEquipmentType().getUuid());
+        }
+        RealmResults<EquipmentType> equipmentTypes = realmDB.where(EquipmentType.class)
+                .in("uuid", equipmentTypeUuids.toArray(new String[]{}))
+                .findAll();
+        typeSpinner = rootView.findViewById(R.id.simple_spinner);
+        EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentTypes);
+        typeSpinnerAdapter.notifyDataSetChanged();
+        typeSpinner.setAdapter(typeSpinnerAdapter);
+        typeSpinner.setOnItemSelectedListener(spinnerListener);
+
+        // создаём "пустой" адаптер для отображения списка оборудования
+        /*
+		equipmentAdapter = new SimpleCursorAdapter(getContext(),
+				R.layout.equipment_reference_item_layout, null, equipmentFrom,
+				equipmentTo, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		equipmentListView.setAdapter(equipmentAdapter);
+        */
+        // это нужно для отображения произвольных изображений и конвертации в
+        // строку дат
+        /*
+		equipmentAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+
+			@Override
+			public boolean setViewValue(View view, Cursor cursor,
+					int columnIndex) {
+
+				int viewId = view.getId();
+
+				if (viewId == R.id.eril_last_operation_date) {
+					long lDate = cursor.getLong(columnIndex);
+					String sDate = DataUtils.getDate(lDate, "dd.MM.yyyy HH:ss");
+					((TextView) view).setText(sDate);
+					return true;
+				}
+
+				return false;
+			}
+		});
+        */
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         int permission = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -116,23 +167,13 @@ public class GPSFragment extends Fragment {
 				gpsLog.append("Latitude:" + String.valueOf(location.getLatitude()) + "\n");
 				gpsLog.append("Longitude:" + String.valueOf(location.getLongitude()) + "\n");*/
             }
-            /*
-            else {
-                // нет не последняя, еще так можно
-                GPSDBAdapter gps = new GPSDBAdapter(new ToirDatabaseContext(
-                        getActivity().getApplicationContext()));
-                GpsTrack gpstrack = gps.getGPSByUuid(user.getUuid());
-                if (gpstrack != null) {
-                    curLatitude = Float.parseFloat(gpstrack.getLatitude());
-                    curLongitude = Float.parseFloat(gpstrack.getLongitude());
-                }
-            }
-            */
         }
 
         final MapView mapView = rootView.findViewById(R.id.gps_mapview);
+        OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(true);
+        //MAPQUESTOSM
         IMapController mapController = mapView.getController();
         mapController.setZoom(17);
         GeoPoint point2 = new GeoPoint(curLatitude, curLongitude);
@@ -144,12 +185,9 @@ public class GPSFragment extends Fragment {
                 new GeoPoint(curLatitude, curLongitude));
         aOverlayItemArray = new ArrayList<>();
         aOverlayItemArray.add(overlayItem);
-        ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<>(
+        final ItemizedIconOverlay<OverlayItem> aItemizedIconOverlay = new ItemizedIconOverlay<>(
                 getActivity().getApplicationContext(), aOverlayItemArray, null);
         mapView.getOverlays().add(aItemizedIconOverlay);
-
-        //!!!!
-        equipmentListView = rootView.findViewById(R.id.gps_listView);
 
         //orders = realmDB.where(Orders.class).equalTo("user.uuid", AuthorizedUser.getInstance().getUuid()).equalTo("orderStatusUuid",OrderStatus.Status.IN_WORK).findAll();
         RealmQuery<Equipment> q = realmDB.where(Equipment.class);
@@ -159,7 +197,7 @@ public class GPSFragment extends Fragment {
         waypoints.add(currentPoint);
 
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
-        List<Long> eqIdList = new ArrayList<>();
+        final List<Long> eqIdList = new ArrayList<>();
         for (Orders order : orders) {
             RealmList<Task> tasks = order.getTasks();
             for (Task task : tasks) {
@@ -195,12 +233,20 @@ public class GPSFragment extends Fragment {
             equipments = q.in("_id", eqIdList.toArray(new Long[]{})).findAll();
             equipmentAdapter = new EquipmentAdapter(equipments);
             equipmentListView.setAdapter(equipmentAdapter);
-        }
-
-        equipmentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                // TODO связать нажатие в списке с картой: изменить цвет маркера
+            equipmentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    Equipment equipment = equipmentAdapter.getItem(position);
+                    if (equipment != null) {
+                        GeoPoint point = new GeoPoint(equipment.getLatitude(), equipment.getLongitude());
+                        OverlayItem equipmentItem = new OverlayItem("We are here", "WAH",
+                                point);
+                        aItemizedIconOverlay.removeAllItems();
+                        aItemizedIconOverlay.addItem(equipmentItem);
+                        mapView.getController().animateTo(point);
+                    }
+                    // TODO связать нажатие в списке с картой: изменить цвет маркера
+/*
                 OverlayItem item = overlayItemArray.get(position);
                 // Get the new Drawable
                 Drawable marker = view.getResources().getDrawable(R.drawable.equipment_32);
@@ -211,10 +257,12 @@ public class GPSFragment extends Fragment {
                     marker = view.getResources().getDrawable(R.drawable.marker_equip);
                     item2.setMarker(marker);
                 }
+*/
 
-                LastItemPosition = position;
-            }
-        });
+                    //LastItemPosition = position;
+                }
+            });
+        }
         equipmentListView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -328,6 +376,43 @@ public class GPSFragment extends Fragment {
 
         EquipmentOverlayItem(String a, String b, GeoPoint p) {
             super(a, b, p);
+        }
+    }
+
+    private void FillListViewEquipments(String equipmentTypeUuid) {
+        RealmResults<Equipment> equipments;
+        if (equipmentTypeUuid != null) {
+            equipments = realmDB.where(Equipment.class)
+                    .equalTo("equipmentModel.equipmentType.uuid", equipmentTypeUuid)
+                    .findAll();
+        } else {
+            equipments = realmDB.where(Equipment.class).findAll();
+        }
+
+        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(equipments);
+        equipmentListView.setAdapter(equipmentAdapter);
+    }
+
+    private class SpinnerListener implements AdapterView.OnItemSelectedListener {
+        //boolean userSelect = false;
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parentView) {
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parentView,
+                                   View selectedItemView, int position, long id) {
+
+            String type = null;
+
+            EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
+            if (typeSelected != null) {
+                type = typeSelected.getUuid();
+                //if (typeSelected.get_id() == 1) type = null;
+            }
+
+            FillListViewEquipments(type);
         }
     }
 }

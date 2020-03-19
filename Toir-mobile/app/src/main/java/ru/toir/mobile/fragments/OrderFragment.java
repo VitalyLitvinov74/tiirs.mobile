@@ -75,11 +75,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.EquipmentInfoActivity;
-import ru.toir.mobile.MainActivity;
 import ru.toir.mobile.MeasureActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
-import ru.toir.mobile.db.adapters.EquipmentAdapter;
 import ru.toir.mobile.db.adapters.InstructionAdapter;
 import ru.toir.mobile.db.adapters.OperationAdapter;
 import ru.toir.mobile.db.adapters.OperationCancelAdapter;
@@ -107,6 +105,7 @@ import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
+import ru.toir.mobile.db.realm.TaskTemplate;
 import ru.toir.mobile.db.realm.TaskVerdict;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetOrderAsyncTask;
@@ -165,7 +164,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             if (operationAdapter != null && currentOperationPosition < operationAdapter.getCount()) {
                 currentOperation = operationAdapter.getItem(currentOperationPosition);
                 if (currentOperation != null && !currentOperation.isComplete()) {
-
                     TextView textTime;
                     long currentTime = System.currentTimeMillis();
                     textTime = getViewByPosition(currentOperationPosition, mainListView).findViewById(R.id.op_time);
@@ -181,32 +179,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             }
         }
 
-//        public View getViewByPosition(int pos, ListView listView) {
-//            final int firstListItemPosition = listView.getFirstVisiblePosition();
-//            final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
-//
-//            if (pos < firstListItemPosition || pos > lastListItemPosition ) {
-//                return listView.getAdapter().getView(pos, null, listView);
-//            } else {
-//                final int childIndex = pos - firstListItemPosition;
-//                return listView.getChildAt(childIndex);
-//            }
-//        }
-
         void firstLaunch() {
             Log.d(TAG, "Инициализация вьюх для отображения секунд...");
-//            CheckBox checkBox;
-//            OnCheckBoxClickListener listener = new OnCheckBoxClickListener();
-//            if (operationAdapter != null && mainListView != null) {
-//                int totalOperationCount = operationAdapter.getCount();
-//                    if (mainListView.getChildAt(i) != null) {
-//                        checkBox = mainListView.getChildAt(i).findViewById(R.id.operation_status);
-//                        checkBox.setOnClickListener(listener);
-//                    }
-//                }
-
             firstLaunch = false;
-//            }
         }
 
         @Override
@@ -413,7 +388,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         if (toolbar != null) {
-            toolbar.setSubtitle(getString(R.string.menu_stages));
+            toolbar.setSubtitle(getString(R.string.menu_tasks));
         }
 
         if (task.getStages() != null && task.getStages().size() > 0) {
@@ -422,7 +397,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             TextView tl_Header = activity.findViewById(R.id.tl_Header);
             if (tl_Header != null) {
                 tl_Header.setVisibility(View.VISIBLE);
-                tl_Header.setText(task.getTaskTemplate().getTitle());
+                tl_Header.setText(selectedOrder.getTitle());
             }
 
             ViewGroup.LayoutParams params = listLayout.getLayoutParams();
@@ -514,6 +489,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
                         // время начала работы (приступаем к первой операции и нехрен тормозить)
                         startTime = System.currentTimeMillis();
+                        if (currentOperation != null && currentOperation.getStartDate() != null) {
+                            startTime = currentOperation.getStartDate().getTime();
+                        }
                         Log.d(TAG, "Запуск таймера...");
                         taskTimer.start();
 
@@ -572,31 +550,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 //                        selectedOrder.setOrderStatus(OrderStatus.getObjectInWork(realm));
                     }
                 });
-            }
-        }
-    }
-
-    // Stop Operations----------------------------------------------------------------------------------------
-    // временная тестовая функция, которая возвращает операциям первоначальный вид для отладки
-    void stopOperations() {
-        int totalOperationCount = operationAdapter.getCount();
-        for (int i = 0; i < totalOperationCount; i++) {
-            final Operation operation = operationAdapter.getItem(i);
-            if (operation != null) {
-                if (operation.getOperationStatus() != null) {
-                    if (!operation.isNew()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                operation.setStartDate(null);
-                                operation.setEndDate(null);
-                                operation.setOperationStatus(OperationStatus.getObjectNew(realm));
-                            }
-                        });
-                    }
-                } else {
-                    Log.d(TAG, "Найдена операция с неинициализированным статусом");
-                }
             }
         }
     }
@@ -994,8 +947,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             // какое-то сообщение пользователю что не смогли показать диалог?
             return;
         }
+        if (!selectedStage.isNew()) {
+            startOperations();
+            return;
+        }
 
-        // диалог для отмены операции
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         View mView = getLayoutInflater().inflate(R.layout.start_operations, null);
         final CheckBox mCheckBox = mView.findViewById(R.id.checkBox);
@@ -1020,7 +976,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         dialog.setView(mView);
 
         RealmResults<InstructionStageTemplate> ist = realmDB.where(InstructionStageTemplate.class)
-                .equalTo("stageTemplate.uuid", selectedStage.getUuid())
+                .equalTo("stageTemplate.uuid", selectedStage.getStageTemplate().getUuid())
                 .findAll();
         List<String> stageTemplatesUuids = new ArrayList<>();
         for (InstructionStageTemplate instructionStageTemplate : ist) {
@@ -1045,6 +1001,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             public void onClick(View v) {
                 if (mCheckBox.isChecked()) {
                     button.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
                 }
             }
         });
@@ -1818,8 +1776,10 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             // перезапоминаем таймер
             startTime = currentTime;
         }
-
         goToNextOperation();
+        if (isAllOperationComplete(selectedStage)) {
+            closeLevel(Level, true);
+        }
     }
 
     public void goToNextOperation() {
@@ -2132,11 +2092,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "OrderFragment !!! back pressed!!!");
-                    if (Level == TASK_LEVEL || Level == 0) {
+                    if (Level == TASK_LEVEL || Level == 0 || Level == STAGE_LEVEL) {
                         initView();
                     }
 
-                    if (Level == STAGE_LEVEL) {
+                    if (Level == STAGE_LEVEL && false) {
                         Level = TASK_LEVEL;
                         fillListViewTasks(selectedOrder);
                     }
@@ -2527,9 +2487,10 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
             case TASK_LEVEL:
                 // если недоступен адаптер с задачами, сразу переходим на уровень нарядов
-                if (taskAdapter == null) {
-                    return closeLevel(ORDER_LEVEL, false);
-                }
+                // нет уровня задач теперь!
+                //if (taskAdapter == null) {
+                //return closeLevel(ORDER_LEVEL, false);
+                //}
 
                 // проверяем все ли задачи выполнены
                 if (isAllTaskComplete()) {
@@ -2599,6 +2560,14 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 fillListViewStage(selectedTask);
                 break;
             case TASK_LEVEL:
+                if (selectedOrder.getTasks() != null && selectedOrder.getTasks().size() > 0) {
+                    selectedTask = selectedOrder.getTasks().get(0);
+                    if (selectedTask != null && selectedTask.getUuid().equals(TaskTemplate.DEFAULT_TASK)) {
+                        fillListViewStage(selectedTask);
+                        Level = STAGE_LEVEL;
+                        fab_camera.setVisibility(View.INVISIBLE);
+                    }
+                }
                 fillListViewTasks(selectedOrder);
                 break;
             case ORDER_LEVEL:
@@ -2632,11 +2601,19 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                             selectedOrder.setStartDate(new Date());
                             realm.commitTransaction();
                         }
-
-                        fillListViewTasks(selectedOrder);
-                        Level = TASK_LEVEL;
-                        fab_camera.setVisibility(View.INVISIBLE);
-                        fab_check.setVisibility(View.INVISIBLE);
+                        if (selectedOrder.getTasks() != null && selectedOrder.getTasks().size() > 0) {
+                            selectedTask = selectedOrder.getTasks().get(0);
+                            if (selectedTask != null && selectedTask.getTaskTemplate().getUuid().equals(TaskTemplate.DEFAULT_TASK)) {
+                                fillListViewStage(selectedTask);
+                                Level = STAGE_LEVEL;
+                                fab_camera.setVisibility(View.INVISIBLE);
+                            } else {
+                                fillListViewTasks(selectedOrder);
+                                Level = TASK_LEVEL;
+                                fab_camera.setVisibility(View.INVISIBLE);
+                                fab_check.setVisibility(View.INVISIBLE);
+                            }
+                        }
                     }
                 }
 
@@ -2803,6 +2780,31 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             }
 
             return true;
+        }
+    }
+
+    // Stop Operations----------------------------------------------------------------------------------------
+    // временная тестовая функция, которая возвращает операциям первоначальный вид для отладки
+    void stopOperations() {
+        int totalOperationCount = operationAdapter.getCount();
+        for (int i = 0; i < totalOperationCount; i++) {
+            final Operation operation = operationAdapter.getItem(i);
+            if (operation != null) {
+                if (operation.getOperationStatus() != null) {
+                    if (!operation.isNew()) {
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                operation.setStartDate(null);
+                                operation.setEndDate(null);
+                                operation.setOperationStatus(OperationStatus.getObjectNew(realm));
+                            }
+                        });
+                    }
+                } else {
+                    Log.d(TAG, "Найдена операция с неинициализированным статусом");
+                }
+            }
         }
     }
 }

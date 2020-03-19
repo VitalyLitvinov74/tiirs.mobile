@@ -10,7 +10,7 @@
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        sothree:umanoPanelHeight="180dp"
+        sothree:umanoPanelHeight="280dp"
         sothree:umanoShadowHeight="4dp"
         sothree:umanoParallaxOffset="100dp"
         android:gravity="bottom">
@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="#03A9F4"
+            android:background="@color/larisaTextColorAWhite"
             android:id="@+id/dragView">
 
             <TextView
@@ -34,6 +34,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
                 android:background="@color/larisaBlueColor" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/back_spinner"
+                android:orientation="horizontal"
+                android:textColor="@color/larisaTextColorABlack">
+
+                <Spinner
+                    android:id="@+id/simple_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/imageView"
+                    android:layout_alignParentStart="false"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown"
+                    android:textColor="#457445" />
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/image_description"
+                    android:src="@drawable/ic_drop" />
+
+            </RelativeLayout>
 
             <ListView
                 android:id="@+id/gps_listView"
