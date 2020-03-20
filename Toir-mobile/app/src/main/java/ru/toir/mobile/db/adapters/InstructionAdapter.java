@@ -68,7 +68,7 @@ public class InstructionAdapter extends RealmBaseAdapter<Instruction> implements
                         final File file = new File(context.getExternalFilesDir(instruction.getImageFilePath()),
                                 instruction.getPath());
                         if (file.exists()) {
-                            Intent intent = EquipmentInfoActivity.showDocument(file, context);
+                            Intent intent = EquipmentInfoActivity.showDocument(file, context.getApplicationContext());
                             if (intent != null) {
                                 context.startActivity(intent);
                             }

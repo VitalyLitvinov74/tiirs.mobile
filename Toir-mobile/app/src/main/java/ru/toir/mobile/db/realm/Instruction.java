@@ -20,10 +20,6 @@ public class Instruction extends RealmObject implements IToirDbObject {
     private Date createdAt;
     private Date changedAt;
 
-    public static String getImageRoot() {
-        return "doc";
-    }
-
     public long get_id() {
         return _id;
     }
@@ -79,9 +75,8 @@ public class Instruction extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFilePath() {
-        String imageRoot = getImageRoot();
         String dir;
-        dir = imageRoot + "/" + "instructions";
+        dir = "instruction";
         return dir;
     }
 

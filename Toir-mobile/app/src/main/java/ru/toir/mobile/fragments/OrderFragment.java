@@ -102,6 +102,8 @@ import ru.toir.mobile.db.realm.OrderVerdict;
 import ru.toir.mobile.db.realm.Orders;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
+import ru.toir.mobile.db.realm.StageTemplate;
+import ru.toir.mobile.db.realm.StageType;
 import ru.toir.mobile.db.realm.StageVerdict;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskStatus;
@@ -122,7 +124,7 @@ import static ru.toir.mobile.EquipmentInfoActivity.showDialogDefect2;
 import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
-public class OrderFragment extends Fragment implements OrderAdapter.EventListener {
+public class OrderFragment extends Fragment implements OrderAdapter.EventListener, StageAdapter.EventListener, OperationAdapter.EventListener {
     private static final int ORDER_LEVEL = 0;
     private static final int TASK_LEVEL = 1;
     private static final int STAGE_LEVEL = 2;
@@ -392,7 +394,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         if (task.getStages() != null && task.getStages().size() > 0) {
-            stageAdapter = new StageAdapter(task.getStages().sort("_id"));
+            stageAdapter = new StageAdapter(task.getStages().sort("_id"), getContext(), this);
             mainListView.setAdapter(stageAdapter);
             TextView tl_Header = activity.findViewById(R.id.tl_Header);
             if (tl_Header != null) {
@@ -427,7 +429,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         if (stage.getOperations() != null && stage.getOperations().size() > 0) {
-            operationAdapter = new OperationAdapter(stage.getOperations().sort("_id"));
+            operationAdapter = new OperationAdapter(stage.getOperations().sort("_id"), getContext(), this);
             operationAdapter.setGBListener(gCBlistener);
             currentOperation = operationAdapter.getItem(0);
             mainListView.setAdapter(operationAdapter);
@@ -876,7 +878,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
      *
      * @param operation - операция для отмены
      */
-    private void closeOperationManual(final Operation operation, AdapterView<?> parent) {
+    public void closeOperationManual(final Operation operation, AdapterView<?> parent) {
 
         Activity activity = getActivity();
         if (activity == null) {
@@ -1013,8 +1015,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
      *
      * @param stage - этап для отмены
      */
-    private void closeStageManual(final Stage stage, AdapterView<?> parent) {
-
+    public void closeStageManual(final Stage stage, AdapterView<?> parent) {
         Activity activity = getActivity();
         if (activity == null) {
             // какое-то сообщение пользователю что не смогли показать диалог?
@@ -1026,6 +1027,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         LayoutInflater inflater = activity.getLayoutInflater();
         View myView = inflater.inflate(R.layout.operation_cancel_dialog, parent, false);
         final Spinner verdictSpinner;
+        final Realm realmDB = Realm.getDefaultInstance();
         // список вердиктов в выпадающем списке для выбора
         RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
                 // TODO: завести типы? сделать отдельный метод для выбрки вердиктов по типу этапа + "общие"?
@@ -1066,7 +1068,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     if (operation.getStartDate() == null) {
                         operation.setStartDate(new Date());
                     }
-
                     operation.setEndDate(new Date());
                 }
 
@@ -1087,6 +1088,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 });
         //operationTypeSpinner.setOnItemSelectedListener(new ReferenceSpinnerListener());
         dialog.show();
+        realmDB.close();
     }
 
     /**

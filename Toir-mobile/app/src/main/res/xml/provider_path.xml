@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <files-path
+        name="instructions"
+        path="instruction/" />
+    <external-path
+        name="instructions"
+        path="Android/data/ru.toir.mobile/files/instruction/" />
+    <files-path
         name="my_doc"
         path="doc/" />
     <external-path

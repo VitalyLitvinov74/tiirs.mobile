@@ -1,102 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/stage_linear_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:baselineAligned="false"
+    android:clickable="false"
+    android:orientation="horizontal"
     android:padding="6dip">
 
-    <ImageView
-        android:id="@+id/ts_ImageStatus"
+    <RelativeLayout
+        android:id="@+id/order_row"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_marginEnd="6dip"
-        android:contentDescription="@string/image_description"
-        android:src="@drawable/status_easy_receive" />
+        android:layout_marginEnd="10dp"
+        android:layout_weight="0.85">
 
-    <TextView
-        android:id="@+id/ts_Name"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_toEndOf="@id/ts_ImageStatus"
-        android:background="@color/larisaTextColorAWhite"
+        <ImageView
+            android:id="@+id/ts_ImageStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_marginEnd="6dip"
+            android:contentDescription="@string/image_description"
+            android:src="@drawable/status_easy_receive" />
+
+        <TextView
+            android:id="@+id/ts_Name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_toEndOf="@id/ts_ImageStatus"
+            android:background="@color/larisaTextColorAWhite"
+            android:gravity="center_vertical"
+            android:text="@string/description"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/ts_Equipment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ts_Name"
+            android:layout_marginTop="0dip"
+            android:layout_toEndOf="@+id/ts_ImageStatus"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/description"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/ts_normative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/ts_Equipment"
+            android:layout_marginTop="0dip"
+            android:layout_toEndOf="@+id/ts_ImageStatus"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/normative"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/ts_StartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/ts_normative"
+            android:layout_marginEnd="10dip"
+            android:layout_marginTop="0dip"
+            android:layout_toEndOf="@id/ts_ImageStatus"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/not_started"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/ts_divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/ts_normative"
+            android:layout_marginTop="0dip"
+            android:layout_toEndOf="@id/ts_StartDate"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/tire"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/ts_EndDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/ts_normative"
+            android:layout_marginStart="10dip"
+            android:layout_marginTop="0dip"
+            android:layout_toEndOf="@id/ts_divider"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/not_finished"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/stage_option"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.15"
         android:gravity="center_vertical"
-        android:text="@string/description"
-        android:textColor="@color/larisaTextColorABlack"
-        android:textSize="14sp" />
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
 
-    <TextView
-        android:id="@+id/ts_Equipment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ts_Name"
-        android:layout_marginTop="0dip"
-        android:layout_toEndOf="@+id/ts_ImageStatus"
-        android:background="@color/larisaTextColorAWhite"
-        android:ellipsize="marquee"
-        android:text="@string/description"
-        android:textColor="@color/larisaTextColorABlack"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/ts_normative"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/ts_Equipment"
-        android:layout_marginTop="0dip"
-        android:layout_toEndOf="@+id/ts_ImageStatus"
-        android:background="@color/larisaTextColorAWhite"
-        android:ellipsize="marquee"
-        android:text="@string/normative"
-        android:textColor="@color/larisaTextColorABlack"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/ts_StartDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/ts_normative"
-        android:layout_marginEnd="10dip"
-        android:layout_marginTop="0dip"
-        android:layout_toEndOf="@id/ts_ImageStatus"
-        android:background="@color/larisaTextColorAWhite"
-        android:ellipsize="marquee"
-        android:text="@string/not_started"
-        android:textColor="@color/larisaTextColorABlack"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/ts_divider"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/ts_normative"
-        android:layout_marginTop="0dip"
-        android:layout_toEndOf="@id/ts_StartDate"
-        android:background="@color/larisaTextColorAWhite"
-        android:ellipsize="marquee"
-        android:text="@string/tire"
-        android:textColor="@color/larisaTextColorABlack"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/ts_EndDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/ts_normative"
-        android:layout_marginStart="10dip"
-        android:layout_marginTop="0dip"
-        android:layout_toEndOf="@id/ts_divider"
-        android:background="@color/larisaTextColorAWhite"
-        android:ellipsize="marquee"
-        android:text="@string/not_finished"
-        android:textColor="@color/larisaTextColorABlack"
-        android:textSize="12sp" />
-
-</RelativeLayout>
+        <TextView
+            android:id="@+id/stage_options"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:text="@string/menu_options"
+            android:textAppearance="?android:textAppearanceLarge" />
+    </RelativeLayout>
+</LinearLayout>

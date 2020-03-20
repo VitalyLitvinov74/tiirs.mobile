@@ -48,6 +48,7 @@
 
     <style name="CMOptionsMenu">
 	     <item name="android:popupBackground">#ffffff</item>
+        <item name="android:textSize">8sp</item>
 	</style>
 
     <style name="popupMenuStyle" parent="android:Widget.Holo.Light.PopupMenu">
@@ -56,18 +57,17 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <style name="Popup" parent="MaterialDrawerTheme.Light">
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
+        <item name="android:textSize">8sp</item>
+    </style>
+
     <style name="FullscreenTheme" parent="MaterialDrawerTheme.Light.TranslucentStatus">
     </style>
 
     <style name="checkBoxStyle" parent="MaterialDrawerTheme.Light">
         <item name="colorAccent">@color/larisaBlueColor</item>
         <item name="android:textColorSecondary">@color/larisaBlueColor</item>
-    </style>
-
-    <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
-        <item name="android:popupBackground">@android:color/white</item>
-        <item name="android:textColor">#FF01F0</item>
-        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="ToolbarStyle">

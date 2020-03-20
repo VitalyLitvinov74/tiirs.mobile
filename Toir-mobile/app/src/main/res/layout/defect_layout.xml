@@ -273,7 +273,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="5dp"
-        android:src="@android:drawable/ic_menu_zoom"
+        android:src="@drawable/ic_info"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
 

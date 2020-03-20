@@ -599,7 +599,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
 
 
-        StageAdapter stageAdapter = new StageAdapter(stages);
+        StageAdapter stageAdapter = new StageAdapter(stages, context, null);
 /*        if (stageAdapter.getCount() > 0) {
             date = stages.get(0).getEndDate();
             if (date != null) {

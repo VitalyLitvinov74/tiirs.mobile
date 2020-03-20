@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import ru.toir.mobile.AuthorizedUser;
@@ -141,6 +143,22 @@ public class GetOrdersService extends Service {
                 e.printStackTrace();
             }
 
+            // Временно!! Загрузка пропущенных инструкций
+            String userName = user.getLogin();
+            // список файлов для загрузки
+            List<GetOrderAsyncTask.FilePath> files = new ArrayList<>();
+            Realm realm = Realm.getDefaultInstance();
+
+            List<Instruction> all_instructions = realm.where(Instruction.class).findAll();
+            all_instructions = realm.copyFromRealm(all_instructions);
+            for (Instruction instruction : all_instructions) {
+                String localPath = instruction.getImageFilePath() + "/";
+                if (isNeedDownload(extDir, instruction, localPath)) {
+                    String url = instruction.getImageFileUrl(userName) + "/";
+                    files.add(new GetOrderAsyncTask.FilePath(instruction.getPath(), url, localPath));
+                }
+            }
+
             // запрашиваем наряды
             Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(statusUuids);
             List<Orders> orders;
@@ -169,9 +187,6 @@ public class GetOrdersService extends Service {
                 return;
             }
 
-            String userName = user.getLogin();
-            // список файлов для загрузки
-            List<GetOrderAsyncTask.FilePath> files = new ArrayList<>();
             // строим список изображений для загрузки
             for (Orders order : orders) {
                 // если это не новый наряд, ставим флаг sent в true
@@ -286,7 +301,6 @@ public class GetOrdersService extends Service {
                     }
 
                     // сохраняем атрибуты
-                    Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();
@@ -310,7 +324,7 @@ public class GetOrdersService extends Service {
                     }
 
                     // сохраняем атрибуты
-                    Realm realm = Realm.getDefaultInstance();
+                    realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();
@@ -339,7 +353,7 @@ public class GetOrdersService extends Service {
                     }
 
                     // сохраняем информацию о доступной документации для оборудования
-                    Realm realm = Realm.getDefaultInstance();
+                    realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();
@@ -367,7 +381,7 @@ public class GetOrdersService extends Service {
                     }
 
                     // сохраняем информацию о доступной документации для оборудования
-                    Realm realm = Realm.getDefaultInstance();
+                    realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();
@@ -380,7 +394,7 @@ public class GetOrdersService extends Service {
 
             int count = orders.size();
             final List<String> uuids = new ArrayList<>();
-            Realm realm = Realm.getDefaultInstance();
+            realm = Realm.getDefaultInstance();
             realm.beginTransaction();
             // проставляем дату получения нарядов
             for (Orders order : orders) {
@@ -450,50 +464,6 @@ public class GetOrdersService extends Service {
             } catch (Exception e) {
                 Log.e(TAG, "Ошибка при получении документации.");
                 e.printStackTrace();
-            }
-
-            Map<String, Set<String>> requestList = new HashMap<>();
-            // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
-            for (GetOrderAsyncTask.FilePath item : files) {
-                String key = item.urlPath + item.fileName;
-                if (!requestList.containsKey(key)) {
-                    Set<String> list = new HashSet<>();
-                    list.add(item.localPath);
-                    requestList.put(key, list);
-                } else {
-                    requestList.get(key).add(item.localPath);
-                }
-            }
-
-            // загружаем файлы
-            for (String key : requestList.keySet()) {
-                Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
-                try {
-                    retrofit2.Response<ResponseBody> r = callFile.execute();
-                    ResponseBody trueImgBody = r.body();
-                    if (trueImgBody == null) {
-                        continue;
-                    }
-
-                    for (String localPath : requestList.get(key)) {
-                        String fileName = key.substring(key.lastIndexOf("/") + 1);
-                        File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
-                        if (!file.getParentFile().exists()) {
-                            if (!file.getParentFile().mkdirs()) {
-                                Log.e(TAG, "Не удалось создать папку " +
-                                        file.getParentFile().toString() +
-                                        " для сохранения файла изображения!");
-                                continue;
-                            }
-                        }
-
-                        FileOutputStream fos = new FileOutputStream(file);
-                        fos.write(trueImgBody.bytes());
-                        fos.close();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
 
             // тестовая реализация штатного уведомления

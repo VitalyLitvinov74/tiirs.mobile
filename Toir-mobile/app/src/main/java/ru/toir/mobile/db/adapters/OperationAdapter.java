@@ -1,13 +1,22 @@
 package ru.toir.mobile.db.adapters;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -23,6 +32,7 @@ import ru.toir.mobile.db.realm.MeasuredValue;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.fragments.OrderFragment;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
@@ -40,76 +50,22 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     private OrderFragment.OnCheckBoxClickListener gCBlistener;
 
-    public OperationAdapter(RealmResults<Operation> data) {
-        super(data);
-    }
-
     public void setGBListener(OrderFragment.OnCheckBoxClickListener l) {
         gCBlistener = l;
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-    }
+    private Context mContext;
+    private EventListener listener;
 
-    @Override
-    public int getCount() {
-        if (adapterData != null) {
-            if (adapterData.size() < MAX_OPERATIONS) {
-                return adapterData.size();
-            } else {
-                Log.d("System error", "Превышено максимальное число операций для одного этапа");
-                return MAX_OPERATIONS;
-            }
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public Operation getItem(int position) {
-        Operation operation;
-        if (adapterData != null) {
-            if (position < getCount()) {
-                operation = adapterData.get(position);
-                return operation;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        if (adapterData != null) {
-            return adapterData.get(position).get_id();
-        } else {
-            return 0;
-        }
-    }
-
-    public void setItemVisibility(int position, boolean visible) {
-        visibility[position] = visible;
-    }
-
-    public boolean getItemVisibility(int position) {
-        return visibility[position];
-    }
-
-    public void setItemEnable(int position, boolean enable) {
-        if (position < MAX_OPERATIONS) {
-            completed[position] = enable;
-        }
-    }
-
-    public boolean isItemEnabled(int position) {
-        return completed[position];
+    public OperationAdapter(RealmResults<Operation> data, Context context, EventListener listener) {
+        super(data);
+        mContext = context;
+        this.listener = listener;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
 
         if (adapterData == null) {
             return convertView;
@@ -134,15 +90,17 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.measure = convertView.findViewById(R.id.op_measure_label);
             viewHolder.measure_value = convertView.findViewById(R.id.op_measure_value);
             viewHolder.time = convertView.findViewById(R.id.op_time);
+            viewHolder.options = convertView.findViewById(R.id.operation_options);
             //viewHolder.image = convertView.findViewById(R.id.op_image);
             viewHolder.description_layout = convertView.findViewById(R.id.operation_description_layout);
+            viewHolder.operation_options = convertView.findViewById(R.id.operation_option);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         viewHolder.status.setOnClickListener(gCBlistener);
 
-        Operation operation = adapterData.get(position);
+        final Operation operation = adapterData.get(position);
         if (operation != null) {
             viewHolder.status.setEnabled(completed[position]);
 
@@ -218,6 +176,56 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
             realmDB.close();
 
+            if (listener != null) {
+                viewHolder.operation_options.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    @SuppressLint("RestrictedApi")
+                    public void onClick(View v) {
+                        //Display option menu
+                        MenuBuilder menuBuilder = new MenuBuilder(mContext);
+                        PopupMenu popupMenu = new PopupMenu(mContext, viewHolder.options);
+                        MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, menuBuilder, viewHolder.options);
+
+                        popupMenu.inflate(R.menu.stage_options);
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.stage_cancel:
+                                        if (operation.isNew() || operation.isInWork()) {
+                                            // показываем диалог изменения статуса
+                                            listener.closeOperationManual(operation, null);
+                                        } else {
+                                            // операция уже выполнена, изменить статус нельзя
+                                            // сообщаем об этом
+                                            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+                                            dialog.setTitle("Внимание!");
+                                            dialog.setMessage("Изменить статус операции нельзя!");
+                                            dialog.setPositiveButton(android.R.string.ok,
+                                                    new DialogInterface.OnClickListener() {
+
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    });
+                                            dialog.show();
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return false;
+                            }
+                        });
+                        menuHelper.setForceShowIcon(true);
+                        menuHelper.show();
+
+                        popupMenu.show();
+                    }
+                });
+            }
+
             OperationTemplate opTemplate = operation.getOperationTemplate();
 /*
             String imgPath = opTemplate.getImageFilePath();
@@ -240,6 +248,69 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         return convertView;
     }
 
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
+
+    @Override
+    public int getCount() {
+        if (adapterData != null) {
+            if (adapterData.size() < MAX_OPERATIONS) {
+                return adapterData.size();
+            } else {
+                Log.d("System error", "Превышено максимальное число операций для одного этапа");
+                return MAX_OPERATIONS;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public Operation getItem(int position) {
+        Operation operation;
+        if (adapterData != null) {
+            if (position < getCount()) {
+                operation = adapterData.get(position);
+                return operation;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (adapterData != null) {
+            return adapterData.get(position).get_id();
+        } else {
+            return 0;
+        }
+    }
+
+    public void setItemVisibility(int position, boolean visible) {
+        visibility[position] = visible;
+    }
+
+    public boolean getItemVisibility(int position) {
+        return visibility[position];
+    }
+
+    public void setItemEnable(int position, boolean enable) {
+        if (position < MAX_OPERATIONS) {
+            completed[position] = enable;
+        }
+    }
+
+    public boolean isItemEnabled(int position) {
+        return completed[position];
+    }
+
+    public interface EventListener {
+        void closeOperationManual(final Operation operation, AdapterView<?> parent);
+    }
+
     public static class ViewHolder {
         TextView title;
         CheckBox status;
@@ -254,5 +325,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         //ImageView image;
         LinearLayout linearLayout;
         RelativeLayout description_layout;
+        RelativeLayout operation_options;
+        TextView options;
     }
 }
