@@ -4,27 +4,38 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.toir.mobile.DefectInfoActivity;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.DefectAdapter;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.DefectType;
+import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rfid.RfidDialog;
+import ru.toir.mobile.rfid.RfidDriverBase;
 
 public class DefectsFragment extends Fragment {
     private static final String TAG;
@@ -38,6 +49,7 @@ public class DefectsFragment extends Fragment {
     private Spinner typeSpinner;
     private ListView defectListView;
     private String equipment_uuid;
+    private RfidDialog rfidDialog;
 
     public static DefectsFragment newInstance() {
         return new DefectsFragment();
@@ -55,8 +67,8 @@ public class DefectsFragment extends Fragment {
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.defects_layout, container, false);
-        Activity activity = getActivity();
+        final View rootView = inflater.inflate(R.layout.defects_layout, container, false);
+        final Activity activity = getActivity();
         if (activity == null) {
             return null;
         }
@@ -85,10 +97,86 @@ public class DefectsFragment extends Fragment {
         defectListView.setOnItemClickListener(new ListviewClickListener());
 
         FloatingActionButton addDefectButton = rootView.findViewById(R.id.fab_add_defect);
+        //  Было просто вызов окна, стал вызов чтения метки
+/*
         addDefectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), inflater, v.getContext(), equipment_uuid);
+            }
+        });
+*/
+
+        addDefectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Handler handler = new Handler(new Handler.Callback() {
+
+                    @Override
+                    public boolean handleMessage(Message msg) {
+                        Log.d(TAG, "Получили сообщение из драйвера.");
+                        if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                            final String tagId = ((String) msg.obj).substring(4);
+                            Log.d(TAG, tagId);
+                            Toast.makeText(getActivity(),
+                                    "Чтение метки успешно.", Toast.LENGTH_SHORT)
+                                    .show();
+                            Realm realm = Realm.getDefaultInstance();
+                            Equipment equipment = realm.where(Equipment.class)
+                                    .equalTo("tagId", tagId)
+                                    .findFirst();
+                            if (equipment != null) {
+                                EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid());
+                            } else {
+                                Call<Equipment> callGetByTagId = ToirAPIFactory.getEquipmentService()
+                                        .getByTagId(tagId);
+                                Callback<Equipment> callback = new Callback<Equipment>() {
+                                    @Override
+                                    public void onResponse(Call<Equipment> responseBodyCall, Response<Equipment> response) {
+                                        if (response.code() != 200) {
+                                            Toast.makeText(getContext(), response.message(), Toast.LENGTH_LONG).show();
+                                        }
+
+                                        Equipment equipment = response.body();
+                                        if (equipment != null) {
+                                            Realm realm = Realm.getDefaultInstance();
+                                            realm.beginTransaction();
+                                            realm.copyToRealmOrUpdate(equipment);
+                                            realm.commitTransaction();
+                                            realm.close();
+                                            EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid());
+                                        } else {
+                                            Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Equipment> responseBodyCall, Throwable t) {
+                                        Toast.makeText(getActivity(), getString(R.string.error_equipment_read_tag_error),
+                                                Toast.LENGTH_LONG).show();
+                                        t.printStackTrace();
+                                    }
+                                };
+                                callGetByTagId.enqueue(callback);
+                            }
+
+                            realm.close();
+                        } else {
+                            Toast.makeText(getActivity(), getString(R.string.error_read_tag),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // закрываем диалог
+                        rfidDialog.dismiss();
+                        return true;
+                    }
+                });
+
+                rfidDialog = new RfidDialog();
+                rfidDialog.setHandler(handler);
+                rfidDialog.readTagId();
+                rfidDialog.show(getActivity().getFragmentManager(), TAG);
             }
         });
 
