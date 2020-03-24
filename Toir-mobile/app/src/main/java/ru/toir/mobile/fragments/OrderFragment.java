@@ -1031,9 +1031,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         // список вердиктов в выпадающем списке для выбора
         RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
                 // TODO: завести типы? сделать отдельный метод для выбрки вердиктов по типу этапа + "общие"?
-                .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
-                .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E").or()
-                .equalTo("stageType.uuid", stage.getStageTemplate().getStageType().getUuid())
+                //.equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                //.equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E").or()
+                //.equalTo("stageType.uuid", stage.getStageTemplate().getStageType().getUuid())
                 .findAll();
         verdictSpinner = myView.findViewById(R.id.simple_spinner);
         StageVerdictAdapter stageVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
@@ -1523,10 +1523,10 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         final ListView listView = myView.findViewById(R.id.odc_list_view);
         CheckBox checkBoxAll = myView.findViewById(R.id.odc_main_status);
         final Spinner mainSpinner = myView.findViewById(R.id.simple_spinner);
-
+        // пока не будет универсальных вердиктов - показываем все
         RealmResults<StageVerdict> stageVerdicts = realmDB.where(StageVerdict.class)
-                .equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
-                .equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E")
+                //.equalTo("stageType.uuid", "7F7458E4-D3FE-4862-AEFF-1F6FD7D68B43").or()
+                //.equalTo("stageType.uuid", "4CC86857-9D7D-4EE2-A838-65CCC62FDD6E")
                 .findAll();
         final StageVerdictAdapter stageVerdictAdapter = new StageVerdictAdapter(stageVerdicts);
         stageVerdictAdapter.notifyDataSetChanged();
@@ -1547,6 +1547,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                             spinner = getViewByPosition(i, listView).findViewById(R.id.operation_verdict_spinner);
                             final StageVerdict stageVerdict = stageVerdictAdapter.getItem(spinner.getSelectedItemPosition());
                             final Stage stage = uncompleteStageList.get(i);
+
                             if (stage != null) {
                                 realmDB.executeTransaction(new Realm.Transaction() {
                                     @Override

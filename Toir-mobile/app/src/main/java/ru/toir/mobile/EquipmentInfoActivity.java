@@ -172,6 +172,8 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (equipment != null) {
             defectType = realm.where(DefectType.class)
                     .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid())
+                    .or()
+                    .isNull("equipmentType.uuid")
                     .findAll();
             equipmentLabel.setVisibility(View.INVISIBLE);
             equipmentSpinner.setVisibility(View.INVISIBLE);
@@ -254,33 +256,33 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     }
                 }
 
-                Realm realm = Realm.getDefaultInstance();
-                AuthorizedUser authUser = AuthorizedUser.getInstance();
-                User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
-                UUID uuid = UUID.randomUUID();
-                Date date = new Date();
+                if (currentDefectLevel != null && currentDefectType != null) {
+                    Realm realm = Realm.getDefaultInstance();
+                    AuthorizedUser authUser = AuthorizedUser.getInstance();
+                    User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                    UUID uuid = UUID.randomUUID();
+                    Date date = new Date();
+                    realm.beginTransaction();
+                    long nextId = Defect.getLastId() + 1;
+                    Defect defect = new Defect();
+                    defect.set_id(nextId);
+                    defect.setUuid(uuid.toString().toUpperCase());
+                    defect.setUser(user);
+                    defect.setDate(date);
+                    defect.setEquipment(currentEquipment);
+                    defect.setDefectType(currentDefectType);
+                    defect.setDefectLevel(currentDefectLevel);
+                    defect.setProcess(false);
+                    defect.setComment(defectDescription.getText().toString().concat(" "));
+                    defect.setTask(null);
+                    defect.setCreatedAt(date);
+                    defect.setChangedAt(date);
+                    realm.copyToRealmOrUpdate(defect);
 
-                realm.beginTransaction();
-
-                long nextId = Defect.getLastId() + 1;
-                Defect defect = new Defect();
-                defect.set_id(nextId);
-                defect.setUuid(uuid.toString().toUpperCase());
-                defect.setUser(user);
-                defect.setDate(date);
-                defect.setEquipment(currentEquipment);
-                defect.setDefectType(currentDefectType);
-                defect.setDefectLevel(currentDefectLevel);
-                defect.setProcess(false);
-                defect.setComment(defectDescription.getText().toString().concat(" "));
-                defect.setTask(null);
-                defect.setCreatedAt(date);
-                defect.setChangedAt(date);
-                realm.copyToRealmOrUpdate(defect);
-
-                realm.commitTransaction();
-                realm.close();
-                dialog.dismiss();
+                    realm.commitTransaction();
+                    realm.close();
+                    dialog.dismiss();
+                }
             }
         };
         dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);

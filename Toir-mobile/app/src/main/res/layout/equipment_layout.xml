@@ -35,7 +35,7 @@
                 android:layout_height="200dp"
                 android:layout_gravity="top"
                 android:contentDescription="@string/image_description"
-                android:src="@drawable/kotel" />
+                android:src="@drawable/no_image" />
 
             <TextView
                 android:id="@+id/equipment_text_name"
