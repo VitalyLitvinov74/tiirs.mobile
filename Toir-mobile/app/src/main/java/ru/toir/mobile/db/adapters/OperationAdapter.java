@@ -33,6 +33,7 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.Stage;
+import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.fragments.OrderFragment;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
@@ -127,23 +128,25 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.end_date.setText(R.string.not_finished);
             }
 
-            if (operationStatus != null) {
-                if (operationStatus.isNew()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_high_receive);
-                    viewHolder.status.setChecked(false);
+            if (operation.getOperationVerdict() != null) {
+                if (operation.getOperationVerdict().isCanceled()) {
+                    viewHolder.verdict.setImageResource(R.drawable.status_high_ready);
+                }
+                if (operation.getOperationVerdict().isNotDefined()) {
+                    viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
                 }
 
-                if (operationStatus.isInWork()) {
+                if (operation.getOperationVerdict().isUnComplete()) {
                     viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
-                    viewHolder.status.setChecked(false);
-                }
-
-                if (operationStatus.isComplete()) {
-                    viewHolder.status.setChecked(true);
-                    viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
-                    viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
                 }
             }
+            if (operationStatus.isComplete()) {
+                viewHolder.status.setChecked(true);
+                viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+            } else {
+                viewHolder.status.setChecked(false);
+            }
+
 
             if (!operation.getOperationVerdict().isNotDefined()) {
                 viewHolder.status.setEnabled(false);
@@ -174,8 +177,13 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.measure_value.setVisibility(View.GONE);
             }
 
+            Stage stage = realmDB.where(Stage.class).equalTo("uuid", operation.getStageUuid()).findFirst();
+            if (stage != null && !stage.isInWork()) {
+                viewHolder.operation_options.setVisibility(View.GONE);
+            } else {
+                viewHolder.operation_options.setVisibility(View.VISIBLE);
+            }
             realmDB.close();
-
             if (listener != null) {
                 viewHolder.operation_options.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -220,7 +228,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                         });
                         menuHelper.setForceShowIcon(true);
                         menuHelper.show();
-
                         popupMenu.show();
                     }
                 });

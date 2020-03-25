@@ -915,13 +915,17 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         if (operation.getStartDate() == null) {
                             operation.setStartDate(new Date());
                         }
-
                         operation.setEndDate(new Date());
+                        operationAdapter.notifyDataSetChanged();
                     }
                 });
 
                 // переходим на следующую операцию
-                goToNextOperation();
+                if (goToNextOperation()) {
+                    // все кончено, закрываем
+                    closeLevel(OPERATION_LEVEL, false);
+                }
+
 
                 // закрываем диалог
                 dialog.dismiss();
@@ -1072,6 +1076,13 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 }
 
                 realmDB.commitTransaction();
+                // TODO здесь должен быть алгоритм выставления вердикта наряда в зависимости от вердикта этапа
+                if (isAllStageComplete(selectedTask)) {
+                    OrderStatus orderStatusComplete = OrderStatus.getObjectComplete(realmDB);
+                    realmDB.beginTransaction();
+                    selectedOrder.setOrderStatus(orderStatusComplete);
+                    realmDB.commitTransaction();
+                }
 
                 // закрываем диалог
                 dialog.dismiss();
@@ -1785,7 +1796,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
     }
 
-    public void goToNextOperation() {
+    public boolean goToNextOperation() {
         boolean isMeasure = false;
 
         final Operation operationStarted;
@@ -1815,7 +1826,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             if (isMeasure) {
                 startMeasure();
             }
+            return false;
         }
+        return true;
     }
 
     private void startMeasure() {
@@ -2096,6 +2109,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "OrderFragment !!! back pressed!!!");
                     if (Level == TASK_LEVEL || Level == 0 || Level == STAGE_LEVEL) {
+                        Level = ORDER_LEVEL;
                         initView();
                     }
 
