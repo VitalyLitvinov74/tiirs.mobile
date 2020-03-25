@@ -122,7 +122,10 @@ public class DefectInfoActivity extends AppCompatActivity {
         equipment_uuid = defect.getEquipment().getUuid();
 
         tv_defect_text_name.setText("Дефект #".concat(String.valueOf(defect.get_id())));
-        tv_defect_text_type.setText(defect.getDefectType().getTitle());
+        if (defect.getDefectType() != null)
+            tv_defect_text_type.setText(defect.getDefectType().getTitle());
+        else
+            tv_defect_text_type.setText("не установлен");
         tv_equipment_text_uuid.setText(defect.getEquipment().getTitle());
         tv_defect_user_name.setText(defect.getUser().getName());
         if (defect.getDate() != null) {

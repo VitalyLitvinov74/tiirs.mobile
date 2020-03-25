@@ -34,7 +34,7 @@
     <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Справочники</string>
-    <string name="get_task">Получить наряд</string>
+    <string name="get_task">Получить задание</string>
     <string name="choose_tag">Выберите метку из меню</string>
     <string name="back">Назад</string>
     <string name="ok">ОК</string>
@@ -50,7 +50,7 @@
     <string name="gps_status">Состояние GPS</string>
     <string name="gprs_status">Связь GPRS</string>
     <string name="server_date_connect">Дата связи с сервером</string>
-    <string name="tasks_quantity">Статистика нарядов</string>
+    <string name="tasks_quantity">Статистика заданий</string>
     <string name="boss_contact">Контакт начальника</string>
     <string name="type">Модель:</string>
     <string name="service">Сервис:</string>
@@ -73,7 +73,7 @@
     <string name="status_title">Статус: </string>
     <string name="result_title">Результат: </string>
     <string name="step_image_descr">Изображение шага операции</string>
-    <string name="task_title">Наряд: </string>
+    <string name="task_title">Задание: </string>
     <string name="stat_status">Состояние:</string>
     <string name="operation">Операция:</string>
     <string name="operation_step_title">Шаг:</string>
@@ -174,7 +174,7 @@
     <string name="defect_user">Обнаружил </string>
 
     <string name="order_title">[#%1$d] %2$s</string>
-    <string name="order_author">Автор наряда: %1$s</string>
+    <string name="order_author">Автор задания: %1$s</string>
     <string name="order_worker">Исполнитель: %1$s</string>
     <string name="order_recieved">Получен: %1$s</string>
     <string name="order_start">Назначен на: %1$s</string>
@@ -183,10 +183,10 @@
     <string name="order_status">Статус: %1$s</string>
     <string name="order_verdict">Вердикт: %1$s</string>
     <string name="order_comment">Коментарий: %1$s</string>
-    <string name="order_reason">Основание наряда: %1$s</string>
+    <string name="order_reason">Основание задания: %1$s</string>
 
     <string name="send_order_comment">Коментарий</string>
-    <string name="send_order_author">Автор наряда</string>
+    <string name="send_order_author">Автор задания</string>
 
     <string name="rfid_settings">Настройки драйвера RFID</string>
     <string name="debug_nocheck_gps">Не проверять GPS</string>
@@ -200,7 +200,7 @@
     <string name="advanced_settings">Отображение и данные</string>
 
     <string name="menu_user">Исполнитель</string>
-    <string name="menu_orders">Наряды</string>
+    <string name="menu_orders">Задания</string>
     <string name="menu_map">Карта</string>
     <string name="menu_defects">Дефекты</string>
 
@@ -279,7 +279,7 @@
     <string name="update">Обновление</string>
     <string name="not_set_server_address">Не указан адрес сервера в настройках приложения!</string>
     <string name="without_tags_mode">Не спрашивать текстовые теги</string>
-    <string name="menu_order_info">Информация о наряде</string>
+    <string name="menu_order_info">Информация о задании</string>
     <string name="menu_order_parts">Перечень запчастей</string>
     <string name="menu_options">&#8942;</string>
 
