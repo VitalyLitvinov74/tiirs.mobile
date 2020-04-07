@@ -383,17 +383,16 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
     }
 
     // Stages----------------------------------------------------------------------------------------
-    private void fillListViewStage(Task task) {
+    private int fillListViewStage(Task task) {
         Activity activity = getActivity();
         if (activity == null) {
-            return;
-        }
-
-        if (toolbar != null) {
-            toolbar.setSubtitle(getString(R.string.menu_tasks));
+            return 0;
         }
 
         if (task.getStages() != null && task.getStages().size() > 0) {
+            if (toolbar != null) {
+                toolbar.setSubtitle(getString(R.string.menu_tasks));
+            }
             stageAdapter = new StageAdapter(task.getStages().sort("_id"), getContext(), this);
             mainListView.setAdapter(stageAdapter);
             TextView tl_Header = activity.findViewById(R.id.tl_Header);
@@ -411,6 +410,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             fab_equipmentInfo.setVisibility(View.INVISIBLE);
             fab_check.setVisibility(View.VISIBLE);
             fab_question.setVisibility(View.INVISIBLE);
+            return task.getStages().size();
+        } else {
+            Level = ORDER_LEVEL;
+            return 0;
+            //initView();
         }
     }
 
@@ -1085,7 +1089,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 }
 
                 // закрываем диалог
-                dialog.dismiss();
+                //dialog.dismiss();
             }
         };
 
@@ -2621,9 +2625,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         if (selectedOrder.getTasks() != null && selectedOrder.getTasks().size() > 0) {
                             selectedTask = selectedOrder.getTasks().get(0);
                             if (selectedTask != null && selectedTask.getTaskTemplate().getUuid().equals(TaskTemplate.DEFAULT_TASK)) {
-                                fillListViewStage(selectedTask);
-                                Level = STAGE_LEVEL;
-                                fab_camera.setVisibility(View.INVISIBLE);
+                                // если есть этапы
+                                if (fillListViewStage(selectedTask) > 0) {
+                                    Level = STAGE_LEVEL;
+                                    fab_camera.setVisibility(View.INVISIBLE);
+                                }
                             } else {
                                 fillListViewTasks(selectedOrder);
                                 Level = TASK_LEVEL;

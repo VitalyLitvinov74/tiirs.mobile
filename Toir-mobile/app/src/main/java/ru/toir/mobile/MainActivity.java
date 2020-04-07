@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
                                 .findFirst();
 
                         // в зависимости от результата либо дать работать, либо не дать
-                        if (user != null && user.isActive()) {
+                        if (user != null && user.isActive() == 1) {
                             isLogged = true;
                             //user_changed = true;
                             changeActiveProfile(user);
@@ -496,7 +496,7 @@ public class MainActivity extends AppCompatActivity {
                                     .findFirst();
 
                             // в зависимости от результата либо дать работать, либо не дать
-                            if (user != null && user.isActive()) {
+                            if (user != null && user.isActive() == 1) {
                                 isLogged = true;
                                 //user_changed = true;
                                 changeActiveProfile(user);
@@ -1064,16 +1064,16 @@ public class MainActivity extends AppCompatActivity {
                         realmDB.beginTransaction();
                         RealmResults<User> users = realmDB.where(User.class).findAll();
                         for (int i = 0; i < users.size(); i++) {
-                            users.get(i).setActive(false);
+                            users.get(i).setActive(0);
                         }
 
                         if (profilesList != null && profilesList.get(cnt) != null) {
-                            profilesList.get(cnt).setActive(true);
+                            profilesList.get(cnt).setActive(0);
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     getString(R.string.no_user_present), Toast.LENGTH_LONG).show();
                         }
-                        user.setActive(true);
+                        user.setActive(1);
                         realmDB.commitTransaction();
                     }
                 }

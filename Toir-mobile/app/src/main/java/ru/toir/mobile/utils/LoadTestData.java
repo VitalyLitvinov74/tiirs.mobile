@@ -266,7 +266,7 @@ public class LoadTestData {
                 profile.setType(1);
                 profile.setTagId("01234567");
                 profile.setWhoIs("Руководитель отдела ИТ");
-                profile.setActive(true);
+                profile.setActive(1);
                 profile.setContact("+79227000285 Иван");
             }
         });
@@ -283,7 +283,7 @@ public class LoadTestData {
                 profile.setType(2);
                 profile.setTagId("76543210");
                 profile.setWhoIs("Ведущий специалист");
-                profile.setActive(true);
+                profile.setActive(1);
                 profile.setContact("+79227000285 Иван");
             }
         });

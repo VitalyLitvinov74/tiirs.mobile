@@ -34,6 +34,7 @@ public class Defect extends RealmObject implements ISend {
     private Date changedAt;
     private boolean sent;
 
+
     public static long getLastId() {
         Realm realm = Realm.getDefaultInstance();
 

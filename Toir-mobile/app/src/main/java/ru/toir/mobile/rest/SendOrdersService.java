@@ -122,7 +122,7 @@ public class SendOrdersService extends Service {
 
                 // для того чтобы не отправлялись данные по выполняемым прямо сейчас нарядам
                 // дополнительно проверяем что наряд уже был отправлен
-                if (user.getUuid().equals(order.getUser().getUuid()) && order.isSent()) {
+                if (user.getUuid() != null && user.getUuid().equals(order.getUser().getUuid()) && order.isSent()) {
                     sendOldMeasuredValues.add(realm.copyFromRealm(measuredValue));
                 }
             }

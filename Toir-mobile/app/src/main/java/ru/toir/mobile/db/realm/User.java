@@ -18,7 +18,7 @@ public class User extends RealmObject implements IToirDbObject {
     private String pass;
     private int type;
     private String tagId;
-    private boolean active;
+    private int active;
     private String whoIs;
     private String image;
     private String contact;
@@ -86,11 +86,11 @@ public class User extends RealmObject implements IToirDbObject {
         this.tagId = tagId;
     }
 
-    public boolean isActive() {
+    public int isActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(int active) {
         this.active = active;
     }
 
