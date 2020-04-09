@@ -298,6 +298,7 @@ public class MainActivity extends AppCompatActivity {
                     // проверяем, есть соединение с инетом или нет
                     // если нет, искать по метке в локальной базе, к сети вообще не обращаться.
                     if (!ToirApplication.isInternetOn(getApplicationContext())) {
+                        Toast.makeText(getApplicationContext(), getText(R.string.no_internet), Toast.LENGTH_LONG).show();
                         // проверяем наличие пользователя в локальной базе
                         User user = realmDB.where(User.class)
                                 // !!!!!
@@ -338,7 +339,8 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
                             if (response.code() != 200) {
-                                Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                                String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.auth_error);
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
 
                             AuthorizedUser authUser = AuthorizedUser.getInstance();
@@ -370,7 +372,8 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Call<User> userCall, Response<User> response) {
                                     if (response.code() != 200) {
-                                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
+                                        String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.toast_error_no_user);
+                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                     }
 
                                     User user = response.body();
@@ -1193,6 +1196,12 @@ public class MainActivity extends AppCompatActivity {
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             return lm != null && lm.isProviderEnabled(locationBestProvider);
         } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 111);
+                }
+            }
+
             return true;
         }
     }
