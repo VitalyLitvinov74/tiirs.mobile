@@ -9,7 +9,7 @@
         android:title="@string/pref_cat_main">
 
         <ru.toir.mobile.fragments.CustomEditTextPreference
-            android:defaultValue="https://api.toir.toirus.ru"
+            android:defaultValue="https://tapi.toir.tehnosber.ru"
             android:dialogTitle="@string/pref_server_url_dialog_title"
             android:icon="@drawable/pref_server"
             android:key="@string/serverUrl"
