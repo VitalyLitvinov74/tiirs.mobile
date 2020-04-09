@@ -156,7 +156,7 @@
     <string name="choose_defect_category">Defect category</string>
     <string name="mistakes_category_all">All categories</string>
     <string name="mistakes_category_non_specific">Unspecific defect</string>
-    <string name="mistakes">Defects</string>
+    <string name="mistakes">Last defects</string>
 
     <string name="choose_defect_type">Defect type</string>
     <string name="choose_defect_level">Defect level</string>
@@ -276,7 +276,7 @@
     <string name="dialog_start">Start</string>
     <string name="dialog_later">Later</string>
 
-    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2020</string>
 
     <string name="update">Update</string>
     <string name="not_set_server_address">Server address not set in settings!</string>
@@ -289,4 +289,9 @@
     <string name="instructions_accept">I read all following instructions</string>
 
     <string name="inventory_number">Inventаr nummer: %1$s</string>
+
+    <string name="receive_new_orders">Receive new orders</string>
+    <string name="receive_completed_orders">Receive completed orders</string>
+    <string name="send_results">Send results</string>
+
 </resources>

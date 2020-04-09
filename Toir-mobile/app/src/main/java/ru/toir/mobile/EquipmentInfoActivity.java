@@ -595,11 +595,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         //String sDate;
         RealmResults<Stage> stages = realmDB.where(Stage.class).
-                equalTo("equipment.uuid", equipment.getUuid()).sort("endDate", Sort.DESCENDING).findAll();
-        if (stages.size() > 2) {
-            stages.subList(0, 2);
-        }
-
+                equalTo("equipment.uuid", equipment.getUuid()).
+                sort("endDate", Sort.DESCENDING).
+                limit(2).
+                findAll();
 
         StageAdapter stageAdapter = new StageAdapter(stages, context, null);
 /*        if (stageAdapter.getCount() > 0) {
@@ -617,10 +616,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         RealmResults<Defect> defects = realmDB.where(Defect.class)
                 .equalTo("equipment.uuid", equipment.getUuid())
-                .sort("date", Sort.DESCENDING).findAll();
-        if (defects.size() > 2) {
-            defects.subList(0, 2);
-        }
+                .sort("date", Sort.DESCENDING).limit(2).findAll();
 
         DefectAdapter defectAdapter = new DefectAdapter(defects);
         tv_equipment_defects.setAdapter(defectAdapter);

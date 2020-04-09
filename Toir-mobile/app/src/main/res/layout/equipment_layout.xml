@@ -312,7 +312,7 @@
                 android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider3"
                 android:background="@color/larisaTextColorAWhite"
-                android:text="@string/defects"
+                android:text="@string/mistakes"
                 android:gravity="center_vertical"
                 android:textColor="@color/larisaTextColor"
                 android:textSize="16sp"

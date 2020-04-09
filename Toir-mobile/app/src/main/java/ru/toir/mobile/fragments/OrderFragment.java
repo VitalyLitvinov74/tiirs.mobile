@@ -446,7 +446,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             TextView tl_Header = activity.findViewById(R.id.tl_Header);
             if (tl_Header != null) {
                 tl_Header.setVisibility(View.VISIBLE);
-                tl_Header.setText(stage.getStageTemplate().getTitle());
+                tl_Header.setText(selectedOrder.getTitle()
+                        .concat(" : ")
+                        .concat(stage.getStageTemplate().getTitle()));
             }
 
             fab_defect.setVisibility(View.VISIBLE);
@@ -455,8 +457,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             fab_check.setVisibility(View.VISIBLE);
             fab_question.setVisibility(View.INVISIBLE);
             //mainListView.setOnItemClickListener(mainListViewClickListener);
+        } else {
+            Level = STAGE_LEVEL;
         }
-
     }
 
     // Start Operations----------------------------------------------------------------------------------------
@@ -606,7 +609,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
     public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         // добавляем элемент меню для получения новых нарядов
-        MenuItem getTaskNew = menu.add("Получить новые наряды");
+        MenuItem getTaskNew = menu.add(getString(R.string.receive_new_orders));
         getTaskNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
             @Override
@@ -645,7 +648,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         });
 
         // добавляем элемент меню для получения "архивных" нарядов
-        MenuItem getTaskDone = menu.add("Получить сделанные наряды");
+        MenuItem getTaskDone = menu.add(getString(R.string.receive_completed_orders));
         getTaskDone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -688,7 +691,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         });
 
         // добавляем элемент меню для отправки результатов выполнения нарядов
-        MenuItem sendTaskResultMenu = menu.add("Отправить результаты");
+        MenuItem sendTaskResultMenu = menu.add(getString(R.string.send_results));
         MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
 
             @Override
@@ -926,8 +929,10 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
                 // переходим на следующую операцию
                 if (goToNextOperation()) {
-                    // все кончено, закрываем
-                    closeLevel(OPERATION_LEVEL, false);
+                    if (isAllOperationComplete(selectedStage)) {
+                        closeLevel(OPERATION_LEVEL, false);
+                        fillListView(ORDER_LEVEL);
+                    }
                 }
 
 
@@ -2662,7 +2667,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         currentEquipment = selectedStage.getEquipment();
                         expectedTagId = currentEquipment.getTagId();
                         boolean ask_tags = sp.getBoolean("without_tags_mode", true);
-                        if (!ask_tags && !expectedTagId.equals("")) {
+                        // только если новая
+                        if (!ask_tags && !expectedTagId.equals("") && selectedStage.getStageStatus().isNew()) {
                             runRfidDialog(expectedTagId, STAGE_LEVEL);
                         } else {
                             fillListViewOperations(selectedStage);

@@ -50,8 +50,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="255dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="210dp"
         android:src="@android:drawable/ic_dialog_alert"
         app:backgroundTint="@color/md_red_A700"
         app:fabSize="normal" />
@@ -61,8 +61,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="190dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="145dp"
         android:src="@drawable/cameraicon"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
@@ -72,8 +72,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="125dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="80dp"
         android:src="@drawable/ic_info"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />
@@ -94,8 +94,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="125dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="80dp"
         android:src="@android:drawable/ic_menu_help"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />

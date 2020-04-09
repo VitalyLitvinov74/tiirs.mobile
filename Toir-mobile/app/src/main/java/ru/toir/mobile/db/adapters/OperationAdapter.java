@@ -128,25 +128,26 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.end_date.setText(R.string.not_finished);
             }
 
-            if (operation.getOperationVerdict() != null) {
-                if (operation.getOperationVerdict().isCanceled()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_high_ready);
-                }
-                if (operation.getOperationVerdict().isNotDefined()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
-                }
-
-                if (operation.getOperationVerdict().isUnComplete()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
-                }
-            }
             if (operationStatus.isComplete()) {
                 viewHolder.status.setChecked(true);
-                viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+                if (operation.getOperationVerdict() != null && operation.getOperationVerdict().isComplete()) {
+                    viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
+                    viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+                } else {
+                    if (operation.getOperationVerdict().isCanceled()) {
+                        viewHolder.verdict.setImageResource(R.drawable.status_high_ready);
+                    }
+                    if (operation.getOperationVerdict().isNotDefined()) {
+                        viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
+                    }
+                    if (operation.getOperationVerdict().isUnComplete()) {
+                        viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
+                    }
+                }
+                viewHolder.status.setEnabled(false);
             } else {
                 viewHolder.status.setChecked(false);
             }
-
 
             if (!operation.getOperationVerdict().isNotDefined()) {
                 viewHolder.status.setEnabled(false);
@@ -181,7 +182,10 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             if (stage != null && !stage.isInWork()) {
                 viewHolder.operation_options.setVisibility(View.GONE);
             } else {
-                viewHolder.operation_options.setVisibility(View.VISIBLE);
+                if (operation.isInWork())
+                    viewHolder.operation_options.setVisibility(View.VISIBLE);
+                else
+                    viewHolder.operation_options.setVisibility(View.GONE);
             }
             realmDB.close();
             if (listener != null) {

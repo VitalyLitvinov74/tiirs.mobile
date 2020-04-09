@@ -212,7 +212,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         SharedPreferences sharedPref = mainActivityConnector.getSharedPreferences("messengers", Context.MODE_PRIVATE);
         String chat_id = sharedPref.getString(getString(R.string.telegram_chat_id), "0");
         Preference telegramChatId = (Preference) findPreference(getString(R.string.telegram_chat_id));
-        telegramChatId.setTitle("Идентификатор чата " + chat_id);
+        telegramChatId.setTitle(getString(R.string.telegram_chat_id) + chat_id);
 
         //Preference checkTextTags = findPreference(getString(R.string.without_tags_mode));
         //if (BuildConfig.BUILD_TYPE.equals("Debug"))

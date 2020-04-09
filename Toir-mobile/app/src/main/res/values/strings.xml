@@ -129,7 +129,7 @@
     <string name="sec">сек.</string>
     <string name="sec_with_value">%1$d сек.</string>
     <string name="input_value">введите данные</string>
-    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2020</string>
 
     <string name="gps_track">GPS трек</string>
     <string name="journal">Журнал</string>
@@ -153,7 +153,7 @@
 
     <string name="mistakes_category_all">Все категории</string>
     <string name="mistakes_category_non_specific">Без категории</string>
-    <string name="mistakes">Зафиксированные дефекты</string>
+    <string name="mistakes">Зафиксированные последние дефекты</string>
 
     <string name="choose_defect">Выберите дефект</string>
     <string name="add_new_defect">или введите новый</string>
@@ -287,4 +287,9 @@
     <string name="instructions_accept">Я ознакомился со следующими инструкциями</string>
 
     <string name="inventory_number">Инвентарный номер: %1$s</string>
+
+    <string name="receive_new_orders">Получить новые наряды</string>
+    <string name="receive_completed_orders">Получить сделанные наряды</string>
+    <string name="send_results">Отправить результаты</string>
+
 </resources>

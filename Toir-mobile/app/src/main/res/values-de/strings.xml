@@ -269,7 +269,7 @@
     <string name="defects_category_all">Alle categorien</string>
     <string name="defects_category_non_specific">Unbestimmten defekten</string>
 
-    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2019</string>
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2020</string>
 
     <string name="dialog_start_title">Arbeit start</string>
     <string name="dialog_start">Start</string>
@@ -286,4 +286,8 @@
     <string name="instructions_accept">Ich habe alle instructions geredet</string>
 
     <string name="inventory_number">Inventory number: %1$s</string>
+
+    <string name="receive_new_orders">Holen Sie sich neue Orders</string>
+    <string name="receive_completed_orders">Get Orders Made</string>
+    <string name="send_results">Ergebnisse senden</string>
 </resources>

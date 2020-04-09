@@ -466,6 +466,50 @@ public class GetOrdersService extends Service {
                 e.printStackTrace();
             }
 
+            Map<String, Set<String>> requestList = new HashMap<>();
+            // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
+            for (GetOrderAsyncTask.FilePath item : files) {
+                String key = item.urlPath + item.fileName;
+                if (!requestList.containsKey(key)) {
+                    Set<String> list = new HashSet<>();
+                    list.add(item.localPath);
+                    requestList.put(key, list);
+                } else {
+                    requestList.get(key).add(item.localPath);
+                }
+            }
+
+            // загружаем файлы
+            for (String key : requestList.keySet()) {
+                Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
+                try {
+                    retrofit2.Response<ResponseBody> r = call1.execute();
+                    ResponseBody trueImgBody = r.body();
+                    if (trueImgBody == null) {
+                        continue;
+                    }
+
+                    for (String localPath : requestList.get(key)) {
+                        String fileName = key.substring(key.lastIndexOf("/") + 1);
+                        File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
+                        if (!file.getParentFile().exists()) {
+                            if (!file.getParentFile().mkdirs()) {
+                                Log.e(TAG, "Не удалось создать папку " +
+                                        file.getParentFile().toString() +
+                                        " для сохранения файла изображения!");
+                                continue;
+                            }
+                        }
+
+                        FileOutputStream fos = new FileOutputStream(file);
+                        fos.write(trueImgBody.bytes());
+                        fos.close();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             // тестовая реализация штатного уведомления
             // собщаем количество полученных нарядов
             NotificationManager notificationManager = null;
