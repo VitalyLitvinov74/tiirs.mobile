@@ -286,6 +286,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 */
+
+        // в RELEASE сборке отключаем дополнительные настройки
+        if (!BuildConfig.DEBUG) {
+            Preference debugMode = getPreferenceManager().findPreference("debug_mode");
+            PreferenceScreen general = getPreferenceManager().getPreferenceScreen();
+            general.removePreference(debugMode);
+        }
     }
 
     void showRfidDriverScreen(String value) {
