@@ -1,5 +1,6 @@
 package ru.toir.mobile;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
@@ -155,13 +157,23 @@ public class Downloader extends AsyncTask<String, Integer, String> {
                 intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
                 context.startActivity(intent);
             } else {
+/*
+                ActivityCompat.requestPermissions(context,
+                        new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES},
+                        1);
+*/
+
                 Uri apk = FileProvider.getUriForFile(dialog.getContext(), dialog.getContext().getPackageName() + ".provider", outputFile);
                 Intent intent = new Intent(context, MainActivity.class);
                 //intent.setDataAndType(apk, "application/vnd.android" + ".package-archive");
-                intent.setData(apk);
-                intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
-                intent.setAction(Intent.ACTION_RUN);
+                intent.setDataAndType(apk, "application/vnd.android.package-archive");
+                intent.addCategory("android.intent.category.DEFAULT");
+                //intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+                intent.putExtra(Intent.ACTION_VIEW, true);
+                //intent.setAction(Intent.ACTION_RUN);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 try {
                     //context.startActivity(Intent.createChooser(intent, "Open File"));
                     context.startActivity(intent);

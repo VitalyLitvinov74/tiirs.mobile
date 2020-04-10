@@ -162,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void updateApk(Context context, Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (context.checkSelfPermission(Manifest.permission.REQUEST_INSTALL_PACKAGES) != PackageManager.PERMISSION_GRANTED) {
+                activity.requestPermissions(new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES}, 0);
+            }
+        }
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setMessage(context.getString(R.string.sync_data));
         dialog.setIndeterminate(false);
