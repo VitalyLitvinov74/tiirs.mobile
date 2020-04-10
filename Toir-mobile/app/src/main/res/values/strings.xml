@@ -295,4 +295,9 @@
     <string name="receive_completed_orders">Получить сделанные наряды</string>
     <string name="send_results">Отправить результаты</string>
 
+    <string name="lang_warning">Настройки поменяются только после перезагрузки приложения</string>
+    <string name="operation_cancel">Отмена операции</string>
+    <string name="stage_cancel_text">Вы пропустили одну или несколько задач. Укажите для них причину/вердикт.</string>
+    <string name="stage_cancel_error">Сменить статус нельзя!</string>
+    <string name="warning">Внимание!</string>
 </resources>

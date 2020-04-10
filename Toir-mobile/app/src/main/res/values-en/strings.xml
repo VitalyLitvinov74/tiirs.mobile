@@ -297,4 +297,9 @@
     <string name="receive_completed_orders">Receive completed orders</string>
     <string name="send_results">Send results</string>
 
+    <string name="lang_warning">Settings will change only after application reload</string>
+    <string name="operation_cancel">Cancel operation</string>
+    <string name="stage_cancel_text">You have missed one or more tasks. Indicate the reason / verdict for them</string>
+    <string name="stage_cancel_error">Cannot change status!</string>
+    <string name="warning">Warning!</string>
 </resources>

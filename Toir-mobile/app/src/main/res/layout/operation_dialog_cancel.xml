@@ -14,97 +14,41 @@
         android:tag="description"
         android:text="@string/operation_cancel_text"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="16sp" />
+        android:textColor="@color/larisaTextColorABlack"
+        android:textSize="12sp" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/back_spinner"
+        android:orientation="horizontal"
+        android:textColor="#333333">
 
-        <CheckBox
-            android:id="@+id/odc_main_status"
+        <Spinner
+            android:id="@+id/simple_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_alignParentStart="false"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center"
+            android:spinnerMode="dropdown"
+            android:textColor="#457445" />
+
+        <ImageView
+            android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:theme="@style/checkBoxStyle" />
-
-        <RelativeLayout
-            android:id="@+id/odc_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/odc_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:text="@string/select_all"
-                android:textSize="16sp" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/odc_title"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="3dp"
-                android:background="@drawable/back_spinner"
-                android:orientation="horizontal"
-                android:textColor="#333333">
-
-                <Spinner
-                    android:id="@+id/simple_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/imageView"
-                    android:layout_alignParentStart="false"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:gravity="center"
-                    android:spinnerMode="dropdown"
-                    android:textColor="#457445" />
-
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_drop" />
-
-            </RelativeLayout>
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/operation_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        android:background="#222222"
-        android:orientation="horizontal"
-        android:paddingTop="5dp"></LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/odc_listview_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <ListView
-            android:id="@+id/odc_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="#333333"
-            android:dividerHeight="1px"
-            android:scrollbarAlwaysDrawVerticalTrack="true"></ListView>
-
-    </LinearLayout>
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:contentDescription="@string/description"
+            android:src="@drawable/ic_drop" />
+    </RelativeLayout>
 
 </LinearLayout>

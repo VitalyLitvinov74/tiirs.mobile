@@ -36,6 +36,8 @@
         <item name="android:textColor">@color/larisaTextColorABlack</item>
         <item name="colorControlNormal">@color/larisaBlueColor</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="colorAccent">@color/larisaBlueColor</item>
+        <item name="android:textColorSecondary">@color/larisaBlueColor</item>
     </style>
 
     <style name="PreferenceCategory" parent="CustomTheme">

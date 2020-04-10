@@ -65,5 +65,4 @@ public class OrderVerdict extends RealmObject {
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
     }
-
 }

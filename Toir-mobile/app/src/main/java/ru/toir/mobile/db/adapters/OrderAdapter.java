@@ -36,6 +36,8 @@ import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderRepairPart;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Task;
+import ru.toir.mobile.db.realm.TaskVerdict;
 
 import static java.lang.Long.valueOf;
 
@@ -122,7 +124,6 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         textData = sDate + " [" + "Получен" + "]";
                         viewHolder.created.setText(textData);
                     }
-
                     if (orderStatusUuid.equals(OrderStatus.Status.IN_WORK)) {
                         viewHolder.icon.setImageResource(R.drawable.status_mod_work);
                         textData = sDate + " [" + "В работе" + "]";
@@ -133,6 +134,11 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
                         textData = sDate + " [" + "Выполнен" + "]";
                         viewHolder.created.setText(textData);
+                        if (!isAllTaskFullComplete(order)) {
+                            viewHolder.icon.setImageResource(R.drawable.status_high_ready);
+                            textData = sDate + " [" + "Выполнен с проблемами" + "]";
+                            viewHolder.created.setText(textData);
+                        }
                     }
                 }
                 viewHolder.order_row.setOnClickListener(new View.OnClickListener() {
@@ -349,5 +355,19 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         TextView status;
         TextView options;
         ImageView icon;
+    }
+
+    /**
+     * Проверяет все ли задачи в текущем наряде были выполнены без проблем
+     */
+    private boolean isAllTaskFullComplete(Orders order) {
+        boolean good = true;
+        List<Task> tasks = order.getTasks();
+        for (Task task : tasks) {
+            if (task.getTaskVerdict() != null && task.getTaskVerdict().getUuid().equals(TaskVerdict.Verdict.UN_COMPLETE)) {
+                good = false;
+            }
+        }
+        return good;
     }
 }

@@ -164,6 +164,8 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                         popupMenu.show();
                     }
                 });
+            } else {
+                viewHolder.stage_options.setVisibility(View.INVISIBLE);
             }
         }
         return convertView;

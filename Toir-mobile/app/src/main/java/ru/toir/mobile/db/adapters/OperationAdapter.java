@@ -130,27 +130,24 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
             if (operationStatus.isComplete()) {
                 viewHolder.status.setChecked(true);
-                if (operation.getOperationVerdict() != null && operation.getOperationVerdict().isComplete()) {
-                    viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
-                    viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
-                } else {
-                    if (operation.getOperationVerdict().isCanceled()) {
-                        viewHolder.verdict.setImageResource(R.drawable.status_high_ready);
-                    }
-                    if (operation.getOperationVerdict().isNotDefined()) {
-                        viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
-                    }
-                    if (operation.getOperationVerdict().isUnComplete()) {
-                        viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
-                    }
-                }
                 viewHolder.status.setEnabled(false);
             } else {
                 viewHolder.status.setChecked(false);
             }
-
-            if (!operation.getOperationVerdict().isNotDefined()) {
+            if (operation.getOperationVerdict() != null && !operation.getOperationVerdict().isNotDefined()) {
+                // этот вердикт на все кастомные случаи
+                viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
                 viewHolder.status.setEnabled(false);
+                if (operation.getOperationVerdict().isComplete()) {
+                    viewHolder.verdict.setImageResource(R.drawable.status_easy_ready);
+                    viewHolder.linearLayout.setBackgroundColor(parent.getContext().getResources().getColor(R.color.md_green_50));
+                }
+                if (operation.getOperationVerdict().isCanceled()) {
+                    viewHolder.verdict.setImageResource(R.drawable.status_high_ready);
+                }
+                if (operation.getOperationVerdict().isNotDefined()) {
+                    viewHolder.verdict.setImageResource(R.drawable.status_easy_receive);
+                }
             }
 
             viewHolder.description.setText(operation.getOperationTemplate().getDescription());
@@ -207,6 +204,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                                         if (operation.isNew() || operation.isInWork()) {
                                             // показываем диалог изменения статуса
                                             listener.closeOperationManual(operation, null);
+                                            viewHolder.status.setEnabled(false);
                                         } else {
                                             // операция уже выполнена, изменить статус нельзя
                                             // сообщаем об этом

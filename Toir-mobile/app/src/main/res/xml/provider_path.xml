@@ -18,4 +18,14 @@
     <external-path
         name="my_photo"
         path="Android/data/ru.toir.mobile/files/Pictures/" />
+    <files-path
+        name="users"
+        path="users/" />
+    <external-path
+        name="users"
+        path="Android/data/ru.toir.mobile/files/users/" />
+    <external-path
+        name="Download"
+        path="Android/data/ru.toir.mobile/files/Download/" />
+
 </paths>

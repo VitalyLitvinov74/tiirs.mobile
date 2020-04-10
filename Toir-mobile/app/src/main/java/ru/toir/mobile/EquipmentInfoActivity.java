@@ -215,7 +215,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         */
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Укажите дефект");
+        builder.setTitle(context.getString(R.string.choose_defect));
         builder.setView(addDefectLayout);
         builder.setIcon(R.drawable.ic_icon_warnings);
         builder.setCancelable(false);
@@ -801,7 +801,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         statusSpinner.setAdapter(equipmentStatusAdapter);
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Статус оборудования");
+        alert.setTitle(getString(R.string.status));
         alert.setView(alertLayout);
         alert.setIcon(R.drawable.ic_icon_tools);
         alert.setCancelable(false);

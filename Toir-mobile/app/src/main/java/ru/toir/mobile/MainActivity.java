@@ -1,6 +1,7 @@
 package ru.toir.mobile;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -86,6 +89,7 @@ import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.driver.RfidDriverNfc;
+import ru.toir.mobile.serverapi.IDownloadComplete;
 import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.utils.MainFunctions;
 
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         return new Locale(lang);
     }
 
-    public static void updateApk(Context context) {
+    public static void updateApk(Context context, Activity activity) {
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setMessage(context.getString(R.string.sync_data));
         dialog.setIndeterminate(false);
@@ -165,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCancelable(true);
         dialog.setMax(100);
         final Downloader downloaderTask = new Downloader(dialog);
+        downloaderTask.setContext(activity);
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -766,7 +771,7 @@ public class MainActivity extends AppCompatActivity {
                                 tr.replace(R.id.frame_container, ServiceFragment.newInstance());
                             } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
-                                updateApk(MainActivity.this);
+                                updateApk(getParent(), MainActivity.this);
                             } else if (ident == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
                                 tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
@@ -884,8 +889,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
             return;
         }
-
-        updateApk(MainActivity.this);
+        updateApk(this, MainActivity.this);
     }
 
     public void onActionAbout(MenuItem menuItem) {

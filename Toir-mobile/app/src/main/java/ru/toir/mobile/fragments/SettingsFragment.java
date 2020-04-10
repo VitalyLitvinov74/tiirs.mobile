@@ -74,7 +74,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             updateAppButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference arg0) {
-                    MainActivity.updateApk(mainActivityConnector);
+                    MainActivity.updateApk(mainActivityConnector.getParent(), mainActivityConnector);
                     return true;
                 }
             });
@@ -241,6 +241,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 String value = (String) newValue;
                 setLocale(value);
+                Toast.makeText(mainActivityConnector.getApplicationContext(),
+                        getString(R.string.lang_warning), Toast.LENGTH_LONG).show();
                 return true;
             }
         });
