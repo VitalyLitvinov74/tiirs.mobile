@@ -74,7 +74,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             updateAppButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference arg0) {
-                    MainActivity.updateApk(mainActivityConnector.getParent(), mainActivityConnector);
+                    MainActivity.updateApk(mainActivityConnector);
                     return true;
                 }
             });

@@ -1,14 +1,13 @@
 package ru.toir.mobile;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
@@ -20,26 +19,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import ru.toir.mobile.rest.ToirAPIFactory;
-import ru.toir.mobile.serverapi.IDownloadComplete;
 
 public class Downloader extends AsyncTask<String, Integer, String> {
 
     private ProgressDialog dialog;
     private File outputFile;
-    private Activity context;
-
-    public void setContext(Activity contextf) {
-        context = contextf;
-    }
 
     public Downloader(ProgressDialog dialog) {
         this.dialog = dialog;
@@ -149,39 +142,32 @@ public class Downloader extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+        Context context = dialog.getContext();
         dialog.dismiss();
         if (result == null && isAPK(outputFile)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
-                context.startActivity(intent);
-            } else {
-/*
-                ActivityCompat.requestPermissions(context,
-                        new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES},
-                        1);
-*/
+            Intent intent;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Uri apkUri = FileProvider.getUriForFile(context,
+                        context.getPackageName() + ".provider", outputFile);
+                intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                List<ResolveInfo> resInfoList = context.getPackageManager()
+                        .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 
-                Uri apk = FileProvider.getUriForFile(dialog.getContext(), dialog.getContext().getPackageName() + ".provider", outputFile);
-                Intent intent = new Intent(context, MainActivity.class);
-                //intent.setDataAndType(apk, "application/vnd.android" + ".package-archive");
-                intent.setDataAndType(apk, "application/vnd.android.package-archive");
-                intent.addCategory("android.intent.category.DEFAULT");
-                //intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
-                intent.putExtra(Intent.ACTION_VIEW, true);
-                //intent.setAction(Intent.ACTION_RUN);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                try {
-                    //context.startActivity(Intent.createChooser(intent, "Open File"));
-                    context.startActivity(intent);
-                } catch (Exception e) {
-                    Toast.makeText(dialog.getContext(), dialog.getContext().getString(R.string.update_error), Toast.LENGTH_LONG).show();
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    context.grantUriPermission(packageName, apkUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
+
+            } else {
+                intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
             }
-            //intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
+
+            context.startActivity(intent);
         } else {
             Toast.makeText(dialog.getContext(), dialog.getContext().getString(R.string.update_error), Toast.LENGTH_LONG).show();
         }

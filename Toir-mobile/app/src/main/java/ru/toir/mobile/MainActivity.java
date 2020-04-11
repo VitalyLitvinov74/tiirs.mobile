@@ -161,12 +161,14 @@ public class MainActivity extends AppCompatActivity {
         return new Locale(lang);
     }
 
-    public static void updateApk(Context context, Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context.checkSelfPermission(Manifest.permission.REQUEST_INSTALL_PACKAGES) != PackageManager.PERMISSION_GRANTED) {
-                activity.requestPermissions(new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES}, 0);
-            }
+    public static void updateApk(Activity context) {
+        if (ToirApplication.serverUrl.equals("")) {
+            Toast.makeText(context,
+                    context.getString(R.string.not_set_server_address), Toast.LENGTH_LONG)
+                    .show();
+            return;
         }
+
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setMessage(context.getString(R.string.sync_data));
         dialog.setIndeterminate(false);
@@ -174,25 +176,19 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCancelable(true);
         dialog.setMax(100);
         final Downloader downloaderTask = new Downloader(dialog);
-        downloaderTask.setContext(activity);
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 downloaderTask.cancel(true);
             }
         });
+
         String fileName = "toir.apk";
         String updateUrl = ToirApplication.serverUrl + "/app/" + fileName;
-        if (!ToirApplication.serverUrl.equals("")) {
-            File file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-            File outputFile = new File(file, fileName);
-            downloaderTask.execute(updateUrl, outputFile.toString());
-            dialog.show();
-        } else {
-            Toast.makeText(context,
-                    context.getString(R.string.not_set_server_address), Toast.LENGTH_LONG)
-                    .show();
-        }
+        File file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        File outputFile = new File(file, fileName);
+        downloaderTask.execute(updateUrl, outputFile.toString());
+        dialog.show();
     }
 
     /**
@@ -776,7 +772,7 @@ public class MainActivity extends AppCompatActivity {
                                 tr.replace(R.id.frame_container, ServiceFragment.newInstance());
                             } else if (ident == DRAWER_DOWNLOAD) {
                                 currentFragment = DRAWER_DOWNLOAD;
-                                updateApk(getParent(), MainActivity.this);
+                                updateApk(MainActivity.this);
                             } else if (ident == FRAGMENT_EQUIPMENT) {
                                 currentFragment = FRAGMENT_EQUIPMENT;
                                 tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
@@ -894,7 +890,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
             return;
         }
-        updateApk(this, MainActivity.this);
+
+        updateApk(MainActivity.this);
     }
 
     public void onActionAbout(MenuItem menuItem) {
