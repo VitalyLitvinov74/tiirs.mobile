@@ -100,7 +100,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                     stage.getStageTemplate().getNormative() / 1000);
             viewHolder.normative.setText(normative);
 
-            if (stageStatus != null && stage.getEquipment() != null && stage.getEquipment().getCriticalType() != null) {
+            if (stageStatus != null) {
                 if (stageStatus.isNew()) {
                     viewHolder.icon.setImageResource(R.drawable.status_high_receive);
                 }

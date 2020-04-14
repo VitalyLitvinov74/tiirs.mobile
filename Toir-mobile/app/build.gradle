@@ -90,6 +90,7 @@ prop.load(new FileInputStream("${rd}/local.properties"))
 def localRepo = prop.getProperty('localRepo')
 
 repositories {
+    google()
     jcenter()
     mavenCentral()
     maven {

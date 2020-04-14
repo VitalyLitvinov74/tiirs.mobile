@@ -33,7 +33,6 @@ import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.Stage;
-import ru.toir.mobile.db.realm.StageStatus;
 import ru.toir.mobile.fragments.OrderFragment;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
@@ -128,12 +127,14 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.end_date.setText(R.string.not_finished);
             }
 
-            if (operationStatus.isComplete()) {
+            if (operation.getStartDate() != null && operation.getEndDate() != null) {
                 viewHolder.status.setChecked(true);
                 viewHolder.status.setEnabled(false);
             } else {
                 viewHolder.status.setChecked(false);
             }
+
+
             if (operation.getOperationVerdict() != null && !operation.getOperationVerdict().isNotDefined()) {
                 // этот вердикт на все кастомные случаи
                 viewHolder.verdict.setImageResource(R.drawable.status_mod_work);
@@ -203,8 +204,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                                     case R.id.stage_cancel:
                                         if (operation.isNew() || operation.isInWork()) {
                                             // показываем диалог изменения статуса
-                                            listener.closeOperationManual(operation, null);
                                             viewHolder.status.setEnabled(false);
+                                            listener.closeOperationManual(operation, null);
                                         } else {
                                             // операция уже выполнена, изменить статус нельзя
                                             // сообщаем об этом
@@ -235,8 +236,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 });
             }
 
-            OperationTemplate opTemplate = operation.getOperationTemplate();
 /*
+            OperationTemplate opTemplate = operation.getOperationTemplate();
             String imgPath = opTemplate.getImageFilePath();
             String fileName = opTemplate.getImage();
             if (imgPath != null && fileName != null) {
