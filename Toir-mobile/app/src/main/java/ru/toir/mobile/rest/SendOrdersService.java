@@ -227,9 +227,9 @@ public class SendOrdersService extends Service {
         try {
             Uri uri = Uri.fromFile(path);
             String fileUuid = file.getUuid();
-            String formId = "file[" + fileUuid + "]";
+            String formId = "file";
 
-            list.add(prepareFilePart(formId, uri));
+            list.add(prepareFilePart("MediaFile[upload]", uri));
             list.add(MultipartBody.Part
                     .createFormData(formId + "[_id]", String.valueOf(file.get_id())));
             list.add(MultipartBody.Part
