@@ -1064,6 +1064,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         stage.setStageVerdict(verdict);
                         stage.setStartDate(new Date());
                         stage.setEndDate(new Date());
+                        if (selectedOrder.getOpenDate() == null) {
+                            selectedOrder.setOpenDate(new Date());
+                        }
                     }
                 });
 

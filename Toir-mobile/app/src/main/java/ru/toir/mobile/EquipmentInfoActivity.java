@@ -801,7 +801,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         statusSpinner.setAdapter(equipmentStatusAdapter);
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle(getString(R.string.status));
+        alert.setTitle(getString(R.string.status_title));
         alert.setView(alertLayout);
         alert.setIcon(R.drawable.ic_icon_tools);
         alert.setCancelable(false);
