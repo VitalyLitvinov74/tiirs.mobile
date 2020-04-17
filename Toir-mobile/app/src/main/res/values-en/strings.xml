@@ -284,7 +284,7 @@
     <string name="auth_error">Auth error</string>
     <string name="no_internet">No Internet</string>
     <string name="without_tags_mode">Don`t ask tags</string>
-    <string name="menu_order_info">Order info</string>
+    <string name="menu_order_info">Task info</string>
     <string name="menu_order_parts">Repair parts list</string>
     <string name="menu_options">&#8942;</string>
 

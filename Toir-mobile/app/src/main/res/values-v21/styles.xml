@@ -6,4 +6,16 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="popupMenuStyle" parent="CustomTheme">
+        <item name="android:popupBackground">@android:color/white</item>
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Popup" parent="CustomTheme">
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>

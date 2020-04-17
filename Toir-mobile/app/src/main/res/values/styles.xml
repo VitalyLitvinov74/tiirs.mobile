@@ -56,12 +56,12 @@
     <style name="popupMenuStyle" parent="CustomTheme">
         <item name="android:popupBackground">@android:color/white</item>
         <item name="android:textColor">@color/larisaTextColorABlack</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Popup" parent="CustomTheme">
         <item name="android:textColor">@color/larisaTextColorABlack</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="FullscreenTheme" parent="MaterialDrawerTheme.Light.TranslucentStatus">

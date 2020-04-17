@@ -1,9 +1,12 @@
 package ru.toir.mobile.db.adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -24,7 +27,9 @@ import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
+import ru.toir.mobile.StageInfoActivity;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
 
@@ -152,6 +157,21 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                                                     });
                                             dialog.show();
                                         }
+                                        break;
+                                    case R.id.equipment_info:
+                                        String equipment_uuid = stage.getEquipment().getUuid();
+                                        Intent equipmentInfo = new Intent(mContext, EquipmentInfoActivity.class);
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("equipment_uuid", equipment_uuid);
+                                        equipmentInfo.putExtras(bundle);
+                                        mContext.startActivity(equipmentInfo);
+                                        break;
+                                    case R.id.stage_info:
+                                        Intent stageInfo = new Intent(mContext, StageInfoActivity.class);
+                                        Bundle bundle_stage = new Bundle();
+                                        bundle_stage.putString("stage_uuid", stage.getUuid());
+                                        stageInfo.putExtras(bundle_stage);
+                                        mContext.startActivity(stageInfo);
                                         break;
                                     default:
                                         break;

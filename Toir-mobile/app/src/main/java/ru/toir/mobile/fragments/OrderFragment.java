@@ -1086,7 +1086,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 realmDB.commitTransaction();
                 // TODO здесь должен быть алгоритм выставления вердикта наряда в зависимости от вердикта этапа
                 closeLevel(STAGE_LEVEL, false);
-/*
                 if (isAllStageComplete(selectedTask)) {
                     OrderStatus orderStatusComplete = OrderStatus.getObjectComplete(realmDB);
                     realmDB.beginTransaction();
@@ -1106,7 +1105,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
                     }
                 }
-*/
 
                 // закрываем диалог
                 //dialog.dismiss();

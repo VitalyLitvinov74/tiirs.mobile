@@ -278,7 +278,7 @@
     <string name="update">Update</string>
     <string name="not_set_server_address">Appseinstellungen nicht angegeben!</string>
     <string name="without_tags_mode">Tags fragen nichts</string>
-    <string name="menu_order_info">Order info</string>
+    <string name="menu_order_info">Task info</string>
     <string name="menu_order_parts">Repair parts list</string>
     <string name="menu_options">&#8942;</string>
 

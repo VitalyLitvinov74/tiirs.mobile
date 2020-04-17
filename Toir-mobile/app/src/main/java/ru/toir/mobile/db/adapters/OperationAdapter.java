@@ -98,7 +98,9 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.status.setOnClickListener(gCBlistener);
+        if (listener != null) {
+            viewHolder.status.setOnClickListener(gCBlistener);
+        }
 
         final Operation operation = adapterData.get(position);
         if (operation != null) {
