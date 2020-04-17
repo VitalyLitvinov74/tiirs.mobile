@@ -53,15 +53,15 @@
         <item name="android:textSize">8sp</item>
 	</style>
 
-    <style name="popupMenuStyle" parent="android:Widget.Holo.Light.PopupMenu">
+    <style name="popupMenuStyle" parent="CustomTheme">
         <item name="android:popupBackground">@android:color/white</item>
-        <item name="android:textColor">#FF01F0</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/larisaTextColorABlack</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="Popup" parent="MaterialDrawerTheme.Light">
+    <style name="Popup" parent="CustomTheme">
         <item name="android:textColor">@color/larisaTextColorABlack</item>
-        <item name="android:textSize">8sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="FullscreenTheme" parent="MaterialDrawerTheme.Light.TranslucentStatus">

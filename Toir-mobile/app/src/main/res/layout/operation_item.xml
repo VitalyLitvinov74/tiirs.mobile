@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/image_description"
-            android:src="@drawable/status_easy_receive" />
+            android:src="@drawable/status_mod_receive" />
 
         <RelativeLayout
             android:id="@+id/operation_layout"

@@ -82,7 +82,6 @@ public class UserInfoFragment extends Fragment {
         ImageView user_image = view.findViewById(R.id.user_image);
         IconTextView call_image = view.findViewById(R.id.user_boss_contact);
         Switch user_status_gps = view.findViewById(R.id.user_status_gps_switch);
-        Switch user_status_gprs = view.findViewById(R.id.user_status_gprs_switch);
         TextView tv_user_date = view.findViewById(R.id.user_text_date);
         TextView tv_user_boss = view.findViewById(R.id.user_text_boss);
 
@@ -118,6 +117,7 @@ public class UserInfoFragment extends Fragment {
                 }
             }
 
+/*
             if (activity != null) {
                 ConnectivityManager cm = (ConnectivityManager) activity.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                 if (cm != null) {
@@ -135,6 +135,7 @@ public class UserInfoFragment extends Fragment {
                     }
                 }
             }
+*/
 
             if (user.getContact() != null) {
                 call_image.setOnClickListener(new View.OnClickListener() {

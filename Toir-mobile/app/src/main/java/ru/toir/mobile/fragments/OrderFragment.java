@@ -1085,12 +1085,28 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
                 realmDB.commitTransaction();
                 // TODO здесь должен быть алгоритм выставления вердикта наряда в зависимости от вердикта этапа
+                closeLevel(STAGE_LEVEL, false);
+/*
                 if (isAllStageComplete(selectedTask)) {
                     OrderStatus orderStatusComplete = OrderStatus.getObjectComplete(realmDB);
                     realmDB.beginTransaction();
                     selectedOrder.setOrderStatus(orderStatusComplete);
                     realmDB.commitTransaction();
+                    // если хотя бы одна задача не выполнена
+                    final TaskVerdict taskVerdict = TaskVerdict.getObjectUnComplete(realmDB);
+                    if (taskVerdict != null) {
+                        realmDB.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                selectedTask.setTaskVerdict(taskVerdict);
+                            }
+                        });
+                    }
+                    if (isAllTaskComplete()) {
+
+                    }
                 }
+*/
 
                 // закрываем диалог
                 //dialog.dismiss();
@@ -1524,6 +1540,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                                             stage.setStartDate(new Date());
                                         }
                                         stage.setEndDate(new Date());
+                                        if (selectedOrder.getOpenDate() == null) {
+                                            selectedOrder.setOpenDate(new Date());
+                                        }
 
                                         OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realm);
                                         OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realm);

@@ -102,7 +102,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
 
             if (stageStatus != null) {
                 if (stageStatus.isNew()) {
-                    viewHolder.icon.setImageResource(R.drawable.status_high_receive);
+                    viewHolder.icon.setImageResource(R.drawable.status_mod_receive);
                 }
                 if (stageStatus.isInWork()) {
                     viewHolder.icon.setImageResource(R.drawable.status_mod_work);
@@ -110,8 +110,9 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                 if ((!stageStatus.isNew() && !stageStatus.isInWork())) {
                     viewHolder.icon.setImageResource(R.drawable.status_easy_ready);
                 }
+                // не выполнен, но завершен
                 if ((stageStatus.isUnComplete())) {
-                    viewHolder.icon.setImageResource(R.drawable.status_high_work);
+                    viewHolder.icon.setImageResource(R.drawable.status_high_ready);
                 }
             }
 

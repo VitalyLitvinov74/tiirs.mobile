@@ -163,33 +163,10 @@
                 android:paddingTop="20dp" />
 
             <TextView
-                android:id="@+id/user_status_gprs"
-                android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:layout_below="@+id/user_divider"
-                android:background="@color/larisaTextColorAWhite"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:paddingStart="50dp"
-                android:text="@string/gprs_status"
-                android:textColor="@color/larisaTextColor"
-                android:textSize="18sp" />
-
-            <Switch
-                android:id="@+id/user_status_gprs_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_below="@+id/user_divider"
-                android:enabled="false"
-                android:gravity="center_vertical"
-                android:text=""
-                android:layout_alignEnd="@+id/user_status_gprs" />
-
-            <TextView
                 android:id="@+id/user_status_gps"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
-                android:layout_below="@+id/user_status_gprs"
+                android:layout_below="@+id/user_divider"
                 android:background="@color/larisaTextColorAWhite"
                 android:clickable="false"
                 android:paddingStart="50dp"
@@ -202,7 +179,7 @@
                 android:id="@+id/user_status_gps_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_below="@+id/user_status_gprs_switch"
+                android:layout_below="@+id/user_divider"
                 android:gravity="center_vertical"
                 android:text=""
                 android:layout_alignEnd="@+id/user_status_gps" />

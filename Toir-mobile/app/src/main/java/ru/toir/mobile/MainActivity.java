@@ -808,7 +808,6 @@ public class MainActivity extends AppCompatActivity {
                             } else if (ident == DRAWER_EXIT) {
                                 System.exit(0);
                             }
-
                             tr.commit();
                         }
 
