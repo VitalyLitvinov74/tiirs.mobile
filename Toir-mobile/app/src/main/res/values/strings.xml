@@ -284,7 +284,7 @@
     <string name="without_tags_mode">Не спрашивать текстовые теги</string>
     <string name="menu_order_info">Информация о задании</string>
     <string name="menu_order_parts">Перечень запчастей</string>
-    <string name="menu_options">&#8942;</string>
+    <string name="menu_options">&#xf142;</string>
 
     <string name="serial_number">Серийный номер</string>
     <string name="instructions_accept">Я ознакомился со следующими инструкциями</string>

@@ -119,10 +119,10 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp">
 
-        <TextView
+        <ru.toir.mobile.utils.IconTextView
             android:id="@+id/stage_options"
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:gravity="center_horizontal"
             android:text="@string/menu_options"
