@@ -1789,11 +1789,15 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     } else {
                         Toast.makeText(getContext(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                     }
+                } else if (message.what == RfidDriverBase.RESULT_RFID_CANCEL) {
+                    Log.d(TAG, "Отмена чтения метки.");
+                    Toast.makeText(getContext(), "Отмена чтения метки.", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d(TAG, "Ошибка чтения метки!");
                     Toast.makeText(getContext(), "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
                 }
 
+                rfidDialog.dismiss();
                 return false;
             }
         });
@@ -2706,6 +2710,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             return true;
         }
     }
+
     // временная тестовая функция, которая возвращает операциям первоначальный вид для отладки
     void stopOperations() {
         int totalOperationCount = operationAdapter.getCount();

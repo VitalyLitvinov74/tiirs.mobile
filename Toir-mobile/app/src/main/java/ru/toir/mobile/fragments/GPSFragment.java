@@ -1,7 +1,6 @@
 package ru.toir.mobile.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -71,6 +70,7 @@ public class GPSFragment extends Fragment {
     private double curLatitude, curLongitude;
     private Spinner typeSpinner;
     private ListView equipmentListView;
+    private EquipmentAdapter equipmentAdapter;
 
     public GPSFragment() {
     }
@@ -96,7 +96,6 @@ public class GPSFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.gps_layout, container, false);
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
-        final EquipmentAdapter equipmentAdapter;
         equipmentListView = rootView.findViewById(R.id.gps_listView);
 
         toolbar.setSubtitle(getString(R.string.menu_map));
@@ -389,7 +388,7 @@ public class GPSFragment extends Fragment {
             equipments = realmDB.where(Equipment.class).findAll();
         }
 
-        EquipmentAdapter equipmentAdapter = new EquipmentAdapter(equipments);
+        equipmentAdapter = new EquipmentAdapter(equipments);
         equipmentListView.setAdapter(equipmentAdapter);
     }
 
