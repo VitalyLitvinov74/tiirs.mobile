@@ -415,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                                         //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
 
                                         // получаем изображение пользователя
-                                        if (needDownloadImage) {
+                                        if (needDownloadImage && !fileName.equals("")) {
                                             String url = ToirApplication.serverUrl + "/" + user.getImageFileUrl(user.getLogin()) + "/" + user.getImage();
                                             Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
                                             callFile.enqueue(new Callback<ResponseBody>() {
