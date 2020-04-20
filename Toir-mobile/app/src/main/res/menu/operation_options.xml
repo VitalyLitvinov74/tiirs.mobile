@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#FAFAFA">
+    <item
+        android:id="@+id/stage_cancel"
+        android:icon="@drawable/ic_info"
+        android:orderInCategory="201"
+        android:title="@string/cancel" />
+</menu>
+

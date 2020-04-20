@@ -75,13 +75,15 @@
         android:paddingEnd="5dp"
         android:paddingStart="5dp">
 
-        <TextView
-            android:id="@+id/order_options"
+        <ru.toir.mobile.utils.IconTextView
+            android:id="@+id/options"
             android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_horizontal"
-            android:text="@string/menu_options"
-            android:textAppearance="?android:textAppearanceLarge" />
+            android:layout_height="25dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="@string/icon_menu"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="18sp" />
+
     </RelativeLayout>
 </LinearLayout>

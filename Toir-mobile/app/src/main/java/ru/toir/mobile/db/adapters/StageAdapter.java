@@ -61,8 +61,8 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
             //viewHolder.status = (TextView) convertView.findViewById(R.id.ts_Status);
             viewHolder.start_date = convertView.findViewById(R.id.ts_StartDate);
             viewHolder.end_date = convertView.findViewById(R.id.ts_EndDate);
-            viewHolder.options = convertView.findViewById(R.id.stage_options);
-            viewHolder.stage_options = convertView.findViewById(R.id.stage_option);
+            viewHolder.options = convertView.findViewById(R.id.options);
+            viewHolder.stage_option = convertView.findViewById(R.id.stage_option);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -122,7 +122,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
             }
 
             if (listener != null) {
-                viewHolder.stage_options.setOnClickListener(new View.OnClickListener() {
+                viewHolder.stage_option.setOnClickListener(new View.OnClickListener() {
                     @Override
                     @SuppressLint("RestrictedApi")
                     public void onClick(View v) {
@@ -186,7 +186,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                     }
                 });
             } else {
-                viewHolder.stage_options.setVisibility(View.INVISIBLE);
+                viewHolder.stage_option.setVisibility(View.INVISIBLE);
             }
         }
         return convertView;
@@ -223,7 +223,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
         TextView normative;
         TextView start_date;
         TextView end_date;
-        RelativeLayout stage_options;
+        RelativeLayout stage_option;
         TextView options;
     }
 }

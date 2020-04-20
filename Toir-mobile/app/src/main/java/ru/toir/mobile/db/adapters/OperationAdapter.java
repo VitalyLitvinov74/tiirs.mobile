@@ -90,10 +90,10 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.measure = convertView.findViewById(R.id.op_measure_label);
             viewHolder.measure_value = convertView.findViewById(R.id.op_measure_value);
             viewHolder.time = convertView.findViewById(R.id.op_time);
-            viewHolder.options = convertView.findViewById(R.id.operation_options);
+            viewHolder.options = convertView.findViewById(R.id.options);
             //viewHolder.image = convertView.findViewById(R.id.op_image);
             viewHolder.description_layout = convertView.findViewById(R.id.operation_description_layout);
-            viewHolder.operation_options = convertView.findViewById(R.id.operation_option);
+            viewHolder.operation_option = convertView.findViewById(R.id.operation_option);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
@@ -180,16 +180,16 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
             Stage stage = realmDB.where(Stage.class).equalTo("uuid", operation.getStageUuid()).findFirst();
             if (stage != null && !stage.isInWork()) {
-                viewHolder.operation_options.setVisibility(View.GONE);
+                viewHolder.operation_option.setVisibility(View.GONE);
             } else {
                 if (operation.isInWork())
-                    viewHolder.operation_options.setVisibility(View.VISIBLE);
+                    viewHolder.operation_option.setVisibility(View.VISIBLE);
                 else
-                    viewHolder.operation_options.setVisibility(View.GONE);
+                    viewHolder.operation_option.setVisibility(View.GONE);
             }
             realmDB.close();
             if (listener != null) {
-                viewHolder.operation_options.setOnClickListener(new View.OnClickListener() {
+                viewHolder.operation_option.setOnClickListener(new View.OnClickListener() {
                     @Override
                     @SuppressLint("RestrictedApi")
                     public void onClick(View v) {
@@ -198,7 +198,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                         PopupMenu popupMenu = new PopupMenu(mContext, viewHolder.options);
                         MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, menuBuilder, viewHolder.options);
 
-                        popupMenu.inflate(R.menu.stage_options);
+                        popupMenu.inflate(R.menu.operation_options);
                         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
@@ -337,7 +337,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         //ImageView image;
         LinearLayout linearLayout;
         RelativeLayout description_layout;
-        RelativeLayout operation_options;
+        RelativeLayout operation_option;
         TextView options;
     }
 }

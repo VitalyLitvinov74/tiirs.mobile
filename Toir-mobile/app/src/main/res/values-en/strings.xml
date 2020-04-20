@@ -58,7 +58,7 @@
     <string name="gprs_status">GPRS status</string>
     <string name="server_date_connect">Last connection date</string>
     <string name="tasks_quantity">Orders stats</string>
-    <string name="boss_contact">Chief contact</string>
+    <string name="boss_contact">Contact of the chief</string>
     <string name="type">Model:</string>
     <string name="service">Service:</string>
     <string name="critical">Critical:</string>
@@ -153,7 +153,7 @@
 
     <string name="choose_defect">Choose defect</string>
     <string name="add_new_defect">or input new</string>
-    <string name="choose_defect_category">Defect category</string>
+    <string name="choose_defect_category">Category of the defect</string>
     <string name="mistakes_category_all">All categories</string>
     <string name="mistakes_category_non_specific">Unspecific defect</string>
     <string name="mistakes">Last defects</string>
@@ -186,7 +186,7 @@
     <string name="order_reason">Order reason: %1$s</string>
 
     <string name="send_order_comment">Comment</string>
-    <string name="send_order_author">Order author</string>
+    <string name="send_order_author">Orders author</string>
 
     <string name="rfid_settings">RFID settings</string>
     <string name="debug_nocheck_gps">Don`t check GPS</string>
@@ -285,13 +285,13 @@
     <string name="no_internet">No Internet</string>
     <string name="without_tags_mode">Don`t ask tags</string>
     <string name="menu_order_info">Task info</string>
-    <string name="menu_order_parts">Repair parts list</string>
+    <string name="menu_order_parts">List of repair parts</string>
     <string name="menu_options">&#8942;</string>
 
     <string name="serial_number">Serial number</string>
     <string name="instructions_accept">I read all following instructions</string>
 
-    <string name="inventory_number">Inventаr nummer: %1$s</string>
+    <string name="inventory_number">Inventory number: %1$s</string>
 
     <string name="receive_new_orders">Receive new orders</string>
     <string name="receive_completed_orders">Receive completed orders</string>

@@ -97,9 +97,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.title = convertView.findViewById(R.id.order_Name);
                 viewHolder.status = convertView.findViewById(R.id.order_status);
                 viewHolder.icon = convertView.findViewById(R.id.order_ImageStatus);
-                viewHolder.options = convertView.findViewById(R.id.order_options);
+                viewHolder.options = convertView.findViewById(R.id.options);
                 viewHolder.order_row = convertView.findViewById(R.id.order_row);
-                viewHolder.order_options = convertView.findViewById(R.id.order_option);
+                viewHolder.order_option = convertView.findViewById(R.id.order_option);
 
                 convertView.setTag(viewHolder);
                 final Orders order = getItem(position);
@@ -147,7 +147,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                         listener.checkClickItem(position);
                     }
                 });
-                viewHolder.order_options.setOnClickListener(new View.OnClickListener() {
+                viewHolder.order_option.setOnClickListener(new View.OnClickListener() {
                     @Override
                     @SuppressLint("RestrictedApi")
                     public void onClick(View v) {
@@ -348,7 +348,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
     }
 
     private static class ViewHolder {
-        RelativeLayout order_options;
+        RelativeLayout order_option;
         RelativeLayout order_row;
         TextView created;
         TextView title;
