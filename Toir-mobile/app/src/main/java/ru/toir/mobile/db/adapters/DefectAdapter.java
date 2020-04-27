@@ -1,6 +1,7 @@
 package ru.toir.mobile.db.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -16,6 +18,9 @@ import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.DefectLevel;
+import ru.toir.mobile.db.realm.MediaFile;
+
+import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 /**
  * @author olejek
@@ -82,6 +87,7 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                 if (parent.getId() == R.id.spinner_defect_type) {
                     viewHolder.title.setText(defect.getComment());
                 } else {
+                    viewHolder.image_defect.setImageResource(R.drawable.no_image);
                     if (defect.getDefectType() != null) {
                         viewHolder.title.setText(defect.getDefectType().getTitle());
                     } else {
@@ -92,8 +98,8 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                     if (defect.getDefectLevel().getUuid().equals(DefectLevel.Level.TYPE_WARNING)) {
                         viewHolder.image_status.setImageResource(R.drawable.status_mod_work);
                     }
-                    if (defect.getDefectLevel().getUuid().equals(DefectLevel.Level.TYPE_INFO)) {
-                        viewHolder.image_status.setImageResource(R.drawable.status_easy_work);
+                    if (defect.getDefectLevel().getUuid().equals(DefectLevel.Level.TYPE_ALARM)) {
+                        viewHolder.image_status.setImageResource(R.drawable.status_high_work);
                     }
                     viewHolder.status.setText(defect.getDefectLevel().getTitle());
 
@@ -107,8 +113,6 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                     if (defect.getUser() != null) {
                         viewHolder.equipment.setText(defect.getEquipment().getTitle());
                     }
-                    // TODO 27_12_2019 При скролле криво отображаются миниатюры фото
-/*
                     MediaFile mediaFile = defect.getMediaFile();
                     if (mediaFile != null) {
                         File path = context.getExternalFilesDir(mediaFile.getPath());
@@ -121,7 +125,6 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                             }
                         }
                     }
-*/
                 }
             }
         }

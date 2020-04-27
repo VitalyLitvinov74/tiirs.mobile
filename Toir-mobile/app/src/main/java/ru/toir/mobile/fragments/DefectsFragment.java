@@ -55,6 +55,7 @@ public class DefectsFragment extends Fragment {
 
     private Realm realmDB;
     private boolean isInit;
+    private int first;
     private Spinner typeSpinner;
     private EquipmentTypeAdapter typeSpinnerAdapter;
     private ListView defectListView;
@@ -282,7 +283,12 @@ public class DefectsFragment extends Fragment {
             if (typeSelected != null) {
                 type = typeSelected.getUuid();
             }
-            FillListViewDefects(type);
+            // в первый заход мы строим полный список, второй это выбор по-умолчанию фильтра, его мы игнорируем
+            if (first > 0) {
+                FillListViewDefects(type);
+            } else {
+                first++;
+            }
         }
     }
 }

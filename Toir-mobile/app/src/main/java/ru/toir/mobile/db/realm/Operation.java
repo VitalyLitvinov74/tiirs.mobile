@@ -2,7 +2,9 @@ package ru.toir.mobile.db.realm;
 
 import java.util.Date;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.Sort;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -142,5 +144,15 @@ public class Operation extends RealmObject {
 
     public boolean isCanceled() {
         return getStatus().getUuid().equals(OperationStatus.Status.CANCELED);
+    }
+
+    public MediaFile getMediaFile() {
+        Realm realm = Realm.getDefaultInstance();
+        MediaFile mediaFile = realm.where(MediaFile.class)
+                .equalTo("entityUuid", this.uuid)
+                .sort("createdAt", Sort.DESCENDING)
+                .findFirst();
+        realm.close();
+        return mediaFile;
     }
 }

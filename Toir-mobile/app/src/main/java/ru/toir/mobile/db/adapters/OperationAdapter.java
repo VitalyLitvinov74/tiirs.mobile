@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.util.Log;
@@ -20,15 +21,18 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.realm.MeasuredValue;
+import ru.toir.mobile.db.realm.MediaFile;
 import ru.toir.mobile.db.realm.Operation;
 import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
@@ -65,6 +69,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Context context = parent.getContext();
         final ViewHolder viewHolder;
 
         if (adapterData == null) {
@@ -91,6 +96,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.measure_value = convertView.findViewById(R.id.op_measure_value);
             viewHolder.time = convertView.findViewById(R.id.op_time);
             viewHolder.options = convertView.findViewById(R.id.options);
+            viewHolder.imageViewOperation = convertView.findViewById(R.id.imageViewOperation);
             //viewHolder.image = convertView.findViewById(R.id.op_image);
             viewHolder.description_layout = convertView.findViewById(R.id.operation_description_layout);
             viewHolder.operation_option = convertView.findViewById(R.id.operation_option);
@@ -104,6 +110,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
         final Operation operation = adapterData.get(position);
         if (operation != null) {
+            viewHolder.imageViewOperation.setVisibility(View.GONE);
             viewHolder.status.setEnabled(completed[position]);
 
             int showMode = visibility[position] ? View.VISIBLE : View.GONE;
@@ -238,6 +245,20 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 });
             }
 
+            MediaFile mediaFile = operation.getMediaFile();
+            if (mediaFile != null) {
+                File path = context.getExternalFilesDir(mediaFile.getPath());
+                String fileName = mediaFile.getName();
+                if (path != null && fileName.contains("jpg")) {
+                    Bitmap bm = getResizedBitmap(path + File.separator,
+                            fileName, 200, 0, mediaFile.getChangedAt().getTime());
+                    if (bm != null) {
+                        viewHolder.imageViewOperation.setVisibility(View.VISIBLE);
+                        viewHolder.imageViewOperation.setImageBitmap(bm);
+                    }
+                }
+            }
+
 /*
             OperationTemplate opTemplate = operation.getOperationTemplate();
             String imgPath = opTemplate.getImageFilePath();
@@ -339,5 +360,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
         RelativeLayout description_layout;
         RelativeLayout operation_option;
         TextView options;
+        CircleImageView imageViewOperation;
     }
 }
