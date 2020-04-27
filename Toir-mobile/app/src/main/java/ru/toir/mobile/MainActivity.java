@@ -303,8 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // проверяем, есть соединение с инетом или нет
                     // если нет, искать по метке в локальной базе, к сети вообще не обращаться.
-                    //if (!ToirApplication.isInternetOn(getApplicationContext())) {
-                    if (true) {
+                    if (!ToirApplication.isInternetOn(getApplicationContext())) {
                         Toast.makeText(getApplicationContext(), getText(R.string.no_internet), Toast.LENGTH_LONG).show();
                         // проверяем наличие пользователя в локальной базе
                         User user = realmDB.where(User.class)
@@ -313,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
                                 .findFirst();
 
                         // в зависимости от результата либо дать работать, либо не дать
-                        if (user != null) {
+                        if (user != null && user.isActive() == 1) {
                             isLogged = true;
                             //user_changed = true;
                             changeActiveProfile(user);
