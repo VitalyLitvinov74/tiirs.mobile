@@ -21,10 +21,12 @@
 	    <color name="colorPrimaryLight">#C4C9E8</color>
 	    <color name="colorAccent">#02A8F3</color>
         <color name="colorSecondary">#EEEEEE</color>
-        <color name="larisaBlueColor">#1565c0</color>
-        <color name="larisaTextColor">#575757</color>
-        <color name="larisaTextColorABlack">#212121</color>
-	<color name="larisaBackColor">#1565c0</color>
+    <!--
+            <color name="larisaBlueColor">#1565c0</color>
+            <color name="larisaTextColor">#575757</color>
+            <color name="larisaTextColorABlack">#212121</color>
+        <color name="larisaBackColor">#1565c0</color>
+    -->
 
     <!--
         <color name="larisaBackColor">#09B3C7</color>
@@ -35,8 +37,13 @@
         <color name="larisaTextColorABlack">#191919</color>
         <color name="larisaBackColor">#00BFA5</color>
     -->
+    <color name="larisaBlueColor">#09B3C7</color>
+    <color name="larisaTextColor">#746767</color>
+    <color name="larisaTextColorABlack">#191919</color>
+    <color name="larisaBackColor">#00BFA5</color>
 
-	<color name="larisaTextColorAWhite">#FAFAFA</color>
+
+    <color name="larisaTextColorAWhite">#FAFAFA</color>
     <color name="larisaTextColorBlack">#000000</color>
     <color name="larisaWhiteColor">#FFFFFF</color>
 </resources>

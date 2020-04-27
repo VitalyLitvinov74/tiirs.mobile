@@ -117,11 +117,15 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
 
     private void releaseCamera() {
         if (mCamera != null) {
-            mCamera.cancelAutoFocus();
-            mCamera.setPreviewCallback(null);
-            mCamera.stopPreview();
-            mCamera.release();
-            mCamera = null;
+            try {
+                mCamera.cancelAutoFocus();
+                mCamera.setPreviewCallback(null);
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = null;
+            } catch (RuntimeException e) {
+                Log.d(TAG, "autofocus error");
+            }
         }
     }
 

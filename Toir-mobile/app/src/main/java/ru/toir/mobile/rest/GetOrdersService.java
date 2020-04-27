@@ -182,7 +182,7 @@ public class GetOrdersService extends Service {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                addToJournal("Exception");
+                addToJournal("Exception: ".concat(e.getMessage()));
                 finishService();
                 return;
             }
