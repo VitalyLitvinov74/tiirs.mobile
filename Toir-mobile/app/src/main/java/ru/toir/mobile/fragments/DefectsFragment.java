@@ -20,6 +20,12 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
@@ -30,9 +36,12 @@ import ru.toir.mobile.DefectInfoActivity;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.DefectAdapter;
+import ru.toir.mobile.db.adapters.DefectTypeAdapter;
+import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Equipment;
+import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
@@ -47,9 +56,11 @@ public class DefectsFragment extends Fragment {
     private Realm realmDB;
     private boolean isInit;
     private Spinner typeSpinner;
+    private EquipmentTypeAdapter typeSpinnerAdapter;
     private ListView defectListView;
     private String equipment_uuid;
     private RfidDialog rfidDialog;
+    private SpinnerListener spinnerListener;
 
     public static DefectsFragment newInstance() {
         return new DefectsFragment();
@@ -76,25 +87,11 @@ public class DefectsFragment extends Fragment {
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
         toolbar.setSubtitle(getString(R.string.menu_defects));
         realmDB = Realm.getDefaultInstance();
-
-        // обработчик для выпадающих списков у нас один
-        SpinnerListener spinnerListener = new SpinnerListener();
-        defectListView = rootView.findViewById(R.id.erl_defect_listView);
-
-/*
-        RealmResults<Defect> defects = realmDB.where(Defect.class).findAll();
-        Set<String> defectTypeUuids = new HashSet<>();
-        for (Defect item : defects) {
-            defectTypeUuids.add(item.getDefectType().getUuid());
-        }
-        RealmResults<DefectType> defectTypes = realmDB.where(DefectType.class).findAll();
         typeSpinner = rootView.findViewById(R.id.simple_spinner);
-        DefectTypeAdapter typeSpinnerAdapter = new DefectTypeAdapter(defectTypes);
-        typeSpinnerAdapter.notifyDataSetChanged();
-        typeSpinner.setAdapter(typeSpinnerAdapter);
-        typeSpinner.setOnItemSelectedListener(spinnerListener);
-*/
+        spinnerListener = new SpinnerListener();
+        defectListView = rootView.findViewById(R.id.erl_defect_listView);
         defectListView.setOnItemClickListener(new ListviewClickListener());
+        typeSpinner.setOnItemSelectedListener(spinnerListener);
 
         FloatingActionButton addDefectButton = rootView.findViewById(R.id.fab_add_defect);
         //  Было просто вызов окна, стал вызов чтения метки
@@ -189,23 +186,24 @@ public class DefectsFragment extends Fragment {
     }
 
     private void initView() {
+        // обработчик для выпадающих списков у нас один
         FillListViewDefects(null);
     }
 
-    private void FillListViewDefects(String defectTypeUuid) {
+    private void FillListViewDefects(String equipmentTypeUuid) {
         RealmResults<Defect> defects;
+        List<String> defectEquipmentTypeUuid = new ArrayList<>();
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             equipment_uuid = bundle.getString("equipment_uuid");
         }
-        if (defectTypeUuid != null) {
+        if (equipmentTypeUuid != null) {
             defects = realmDB.where(Defect.class)
-                    .equalTo("defectType.uuid", defectTypeUuid)
+                    .equalTo("equipment.equipmentModel.equipmentType.uuid", equipmentTypeUuid)
                     .sort("createdAt", Sort.DESCENDING)
                     .findAll();
             if (equipment_uuid != null) {
                 defects = realmDB.where(Defect.class).equalTo("equipment.uuid", equipment_uuid)
-                        .equalTo("defectType.uuid", defectTypeUuid)
                         .sort("createdAt", Sort.DESCENDING)
                         .findAll();
             }
@@ -217,6 +215,15 @@ public class DefectsFragment extends Fragment {
                         .sort("createdAt", Sort.DESCENDING)
                         .findAll();
             }
+            for (Defect item : defects) {
+                defectEquipmentTypeUuid.add(item.getEquipment().getEquipmentModel().getEquipmentType().getUuid());
+            }
+            RealmResults<EquipmentType> equipmentTypes = realmDB.where(EquipmentType.class)
+                    .in("uuid", defectEquipmentTypeUuid.toArray(new String[]{}))
+                    .findAll();
+            typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentTypes);
+            typeSpinnerAdapter.notifyDataSetChanged();
+            typeSpinner.setAdapter(typeSpinnerAdapter);
         }
 
         DefectAdapter defectAdapter = new DefectAdapter(defects);
@@ -271,7 +278,7 @@ public class DefectsFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parentView,
                                    View selectedItemView, int position, long id) {
             String type = null;
-            DefectType typeSelected = (DefectType) typeSpinner.getSelectedItem();
+            EquipmentType typeSelected = (EquipmentType) typeSpinner.getSelectedItem();
             if (typeSelected != null) {
                 type = typeSelected.getUuid();
             }
