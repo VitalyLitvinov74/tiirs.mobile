@@ -66,13 +66,15 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
                         return;
                     }
                 }
-
-                long next_id = GpsTrack.getLastId() + 1;
-                GpsTrack gpstrack = realmDB.createObject(GpsTrack.class, next_id);
-                gpstrack.setDate(new Date());
-                gpstrack.setUserUuid(uuid);
-                gpstrack.setLatitude(latitude);
-                gpstrack.setLongitude(longitude);
+                // примерно от Европы и до северных морей
+                if (latitude > 10.0 && longitude > 10.0) {
+                    long next_id = GpsTrack.getLastId() + 1;
+                    GpsTrack gpstrack = realmDB.createObject(GpsTrack.class, next_id);
+                    gpstrack.setDate(new Date());
+                    gpstrack.setUserUuid(uuid);
+                    gpstrack.setLatitude(latitude);
+                    gpstrack.setLongitude(longitude);
+                }
             }
         });
 

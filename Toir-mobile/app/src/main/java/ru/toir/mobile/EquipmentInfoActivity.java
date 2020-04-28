@@ -567,16 +567,12 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         tv_equipment_uuid.setText(equipment.getUuid());
         tv_equipment_serial.setText(equipment.getSerialNumber());
 //        tv_equipment_type.setText("Модель: " + equipment.getEquipmentModel().getTitle());
-        if (equipment.getLatitude() > 0) {
+        if (equipment.getLocation() != null) {
+/*
             textData = String.valueOf(equipment.getLatitude()) + " / "
                     + String.valueOf(equipment.getLongitude());
-            tv_equipment_position.setText(textData);
-        } else {
-            if (equipment.getLocation() != null) {
-                textData = String.valueOf(equipment.getLocation().getLatitude()) + " / "
-                        + String.valueOf(equipment.getLocation().getLongitude());
-                tv_equipment_position.setText(textData);
-            }
+*/
+            tv_equipment_position.setText(equipment.getLocation().getTitle());
         }
 
         /*Date date = equipment.getStartDate();
