@@ -143,7 +143,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         }
     }
 
-    public static void showDialogDefect2(ViewGroup parent, LayoutInflater inflater, Context context, String equipmentUuid) {
+    public static void showDialogDefect2(ViewGroup parent, LayoutInflater inflater, Context context, String equipmentUuid, final DefectAdapter defectAdapter) {
 
         final View addDefectLayout;
         final Spinner defectTypeSpinner;
@@ -282,6 +282,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                     realm.commitTransaction();
                     realm.close();
                     dialog.dismiss();
+                    if (defectAdapter != null) {
+                        defectAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         };
@@ -750,7 +753,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         findViewById(R.id.fab_add_defect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment_uuid);
+                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment_uuid, null);
                 //hideFAB();
             }
         });

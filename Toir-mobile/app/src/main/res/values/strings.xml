@@ -41,7 +41,7 @@
     <string name="make_photo">Снять</string>
     <string name="image_description">изображение</string>
     <string name="description"> </string>
-    <string name="id">Идентификатор: %1$s</string>
+    <string name="id">ID: %1$s</string>
     <string name="whois">Должность</string>
     <string name="current_location">Текущие координаты</string>
     <string name="no_gps_data">Нет данных GPS</string>

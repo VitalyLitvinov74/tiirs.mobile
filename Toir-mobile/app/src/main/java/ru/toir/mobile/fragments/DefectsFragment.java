@@ -1,7 +1,6 @@
 package ru.toir.mobile.fragments;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,11 +19,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -36,10 +32,8 @@ import ru.toir.mobile.DefectInfoActivity;
 import ru.toir.mobile.EquipmentInfoActivity;
 import ru.toir.mobile.R;
 import ru.toir.mobile.db.adapters.DefectAdapter;
-import ru.toir.mobile.db.adapters.DefectTypeAdapter;
 import ru.toir.mobile.db.adapters.EquipmentTypeAdapter;
 import ru.toir.mobile.db.realm.Defect;
-import ru.toir.mobile.db.realm.DefectType;
 import ru.toir.mobile.db.realm.Equipment;
 import ru.toir.mobile.db.realm.EquipmentType;
 import ru.toir.mobile.rest.ToirAPIFactory;
@@ -57,22 +51,13 @@ public class DefectsFragment extends Fragment {
     private boolean isInit;
     private int first;
     private Spinner typeSpinner;
-    private EquipmentTypeAdapter typeSpinnerAdapter;
     private ListView defectListView;
+    private DefectAdapter defectAdapter;
     private String equipment_uuid;
     private RfidDialog rfidDialog;
-    private SpinnerListener spinnerListener;
 
     public static DefectsFragment newInstance() {
         return new DefectsFragment();
-    }
-
-    private static void showDefectInfoActivity(Context context, String uuid) {
-        Intent defectInfo = new Intent(context, DefectInfoActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("defect_uuid", uuid);
-        defectInfo.putExtras(bundle);
-        context.startActivity(defectInfo);
     }
 
     @Override
@@ -89,7 +74,7 @@ public class DefectsFragment extends Fragment {
         toolbar.setSubtitle(getString(R.string.menu_defects));
         realmDB = Realm.getDefaultInstance();
         typeSpinner = rootView.findViewById(R.id.simple_spinner);
-        spinnerListener = new SpinnerListener();
+        SpinnerListener spinnerListener = new SpinnerListener();
         defectListView = rootView.findViewById(R.id.erl_defect_listView);
         defectListView.setOnItemClickListener(new ListviewClickListener());
         typeSpinner.setOnItemSelectedListener(spinnerListener);
@@ -124,7 +109,7 @@ public class DefectsFragment extends Fragment {
                                     .equalTo("tagId", tagId)
                                     .findFirst();
                             if (equipment != null) {
-                                EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid());
+                                EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid(), defectAdapter);
                             } else {
                                 Call<Equipment> callGetByTagId = ToirAPIFactory.getEquipmentService()
                                         .getByTagId(tagId);
@@ -142,7 +127,7 @@ public class DefectsFragment extends Fragment {
                                             realm.copyToRealmOrUpdate(equipment);
                                             realm.commitTransaction();
                                             realm.close();
-                                            EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid());
+                                            EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid(), defectAdapter);
                                         } else {
                                             Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
                                                     Toast.LENGTH_LONG).show();
@@ -222,12 +207,11 @@ public class DefectsFragment extends Fragment {
             RealmResults<EquipmentType> equipmentTypes = realmDB.where(EquipmentType.class)
                     .in("uuid", defectEquipmentTypeUuid.toArray(new String[]{}))
                     .findAll();
-            typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentTypes);
+            EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentTypes);
             typeSpinnerAdapter.notifyDataSetChanged();
             typeSpinner.setAdapter(typeSpinnerAdapter);
         }
-
-        DefectAdapter defectAdapter = new DefectAdapter(defects);
+        defectAdapter = new DefectAdapter(defects);
         defectListView.setAdapter(defectAdapter);
     }
 

@@ -1848,7 +1848,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         fab_defect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), currentEquipment.getUuid());
+                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), currentEquipment.getUuid(), null);
             }
         });
 

@@ -98,7 +98,7 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
             }
             if (stage.getEquipment() != null) {
                 String sn = stage.getEquipment().getSerialNumber();
-                if (sn != null) {
+                if (sn != null && !sn.equals("")) {
                     viewHolder.equipment.setText(stage.getEquipment().getTitle().concat(" [").concat(sn).concat("]"));
                 } else {
                     viewHolder.equipment.setText(stage.getEquipment().getTitle());
