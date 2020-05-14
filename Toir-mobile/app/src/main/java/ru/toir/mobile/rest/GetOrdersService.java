@@ -117,7 +117,7 @@ public class GetOrdersService extends Service {
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();
                     realm.close();
-
+                    // TODO наверное нужно убрать, не помню зачем поставил
                     ReferenceUpdate.saveReferenceData("Defect", new Date());
 
                     Intent intent = new Intent(context, MainActivity.class);
@@ -157,6 +157,31 @@ public class GetOrdersService extends Service {
                     String url = instruction.getImageFileUrl(userName) + "/";
                     files.add(new GetOrderAsyncTask.FilePath(instruction.getPath(), url, localPath));
                 }
+            }
+
+            // оборудование после последнего запроса
+            Date lastChangedDate = ReferenceUpdate.lastChanged(Equipment.class.getSimpleName());
+            Date oldDate = new Date(0);
+            if (!lastChangedDate.after(oldDate)) {
+                ReferenceUpdate.saveReferenceData(Equipment.class.getSimpleName(), new Date());
+            }
+            changedDate = ReferenceUpdate.lastChangedAsStr(Equipment.class.getSimpleName());
+            Call<List<Equipment>> equipmentCall;
+            equipmentCall = ToirAPIFactory.getEquipmentService().get(changedDate);
+            try {
+                retrofit2.Response<List<Equipment>> r = equipmentCall.execute();
+                List<Equipment> list = r.body();
+                if (list != null) {
+                    // сохраняем оборудование
+                    realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(list);
+                    realm.commitTransaction();
+                    realm.close();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка при получении оборудования.");
+                e.printStackTrace();
             }
 
             // запрашиваем наряды

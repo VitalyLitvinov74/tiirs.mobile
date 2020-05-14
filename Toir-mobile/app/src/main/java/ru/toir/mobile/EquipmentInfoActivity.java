@@ -66,19 +66,19 @@ import ru.toir.mobile.db.realm.EquipmentStatus;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.rest.GetDocumentationAsyncTask;
+import ru.toir.mobile.rest.SendEquipment;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.TagStructure;
 import ru.toir.mobile.utils.DataUtils;
 
+import static ru.toir.mobile.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
 public class EquipmentInfoActivity extends AppCompatActivity {
     private final static String TAG = "EquipmentInfoActivity";
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
-    //private static final int DIALOG_SET_DEFECT = 1;
-    //private static final int DIALOG_SET_STATUS = 2;
     CoordinatorLayout rootLayout;
 
     private Realm realmDB;
@@ -816,7 +816,12 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 equipment.setEquipmentStatus(equipmentStatusAdapter.getItem(statusSpinner.getSelectedItemPosition()));
+                equipment.setChangedAt(new Date());
                 realm.commitTransaction();
+                Equipment equipment1 = realm.copyFromRealm(equipment);
+                SendEquipment task = new SendEquipment(equipment1);
+                addToJournal("Отправляем оборудование на сервер");
+                task.execute(equipment);
                 realm.close();
             }
         });

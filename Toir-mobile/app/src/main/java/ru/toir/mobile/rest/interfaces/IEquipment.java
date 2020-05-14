@@ -2,9 +2,13 @@ package ru.toir.mobile.rest.interfaces;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
+import ru.toir.mobile.db.realm.Defect;
 import ru.toir.mobile.db.realm.Equipment;
 
 /**
@@ -37,4 +41,7 @@ public interface IEquipment {
 
     @GET("/equipment")
     Call<Equipment> getByTagId(@Query("tagId") String tagId);
+
+    @POST("/equipment/upload")
+    Call<ResponseBody> send(@Body Equipment equipment);
 }

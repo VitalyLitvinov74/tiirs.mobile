@@ -96,6 +96,7 @@
         android:layout_below="@+id/eril_inventory_number"
         android:textColor="#454545"
         android:textSize="14sp"
+        android:maxLines="1"
         android:layout_marginBottom="5dp"
         android:paddingBottom="5dp"
         android:layout_marginStart="5dp"
