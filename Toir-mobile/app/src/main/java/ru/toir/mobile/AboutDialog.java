@@ -37,9 +37,9 @@ class AboutDialog extends Dialog {
         } else {
             Html.fromHtml(readRawTextFile(R.raw.info));
         }
-        PackageInfo pInfo = null;
+        // PackageInfo pInfo = null;
         // вставил вручную, чтобы не заморачиваться с ребилдами
-        tv.setText(getContext().getString(R.string.program_version, "5.5"));
+        tv.setText(getContext().getString(R.string.program_version, "5.5.1"));
         Linkify.addLinks(tv, Linkify.ALL);
     }
 

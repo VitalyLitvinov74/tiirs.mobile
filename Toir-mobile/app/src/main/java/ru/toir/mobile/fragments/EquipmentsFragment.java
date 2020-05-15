@@ -100,6 +100,7 @@ public class EquipmentsFragment extends Fragment {
         }
         RealmResults<EquipmentType> equipmentTypes = realmDB.where(EquipmentType.class)
                 .in("uuid", equipmentTypeUuids.toArray(new String[]{}))
+                .sort("title")
                 .findAll();
         typeSpinner = rootView.findViewById(R.id.simple_spinner);
         EquipmentTypeAdapter typeSpinnerAdapter = new EquipmentTypeAdapter(equipmentTypes);
