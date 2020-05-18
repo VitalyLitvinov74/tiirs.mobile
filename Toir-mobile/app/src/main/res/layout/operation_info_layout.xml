@@ -37,11 +37,26 @@
             android:textColor="@color/larisaTextColorAWhite"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/tl_info"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:layout_below="@+id/tl_Header"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:background="@color/larisaTextColorAWhite"
+            android:gravity="center_vertical"
+            android:paddingStart="5dp"
+            android:text="@string/no_operations"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tl_Header"
+            android:layout_below="@+id/tl_info"
             android:layout_marginBottom="10dp"
             android:divider="#333333"
             android:dividerHeight="1px"

@@ -71,7 +71,11 @@ public class RepairPartAdapter extends RealmBaseAdapter<OrderRepairPart> impleme
 
         OrderRepairPart orderRepairPart = adapterData.get(position);
         if (orderRepairPart != null) {
-            viewHolder.title.setText(orderRepairPart.getRepairPart().getTitle());
+            String title = orderRepairPart.getRepairPart().getTitle();
+            if (orderRepairPart.getRepairPart().getCode() != null) {
+                title = title.concat(" [").concat(orderRepairPart.getRepairPart().getCode()).concat("]");
+            }
+            viewHolder.title.setText(title);
             viewHolder.type.setText(orderRepairPart.getRepairPart().getRepairPartType().getTitle());
         }
         convertView.setTag(viewHolder);

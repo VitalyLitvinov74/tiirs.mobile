@@ -302,4 +302,6 @@
     <string name="stage_cancel_text">You have missed one or more tasks. Indicate the reason / verdict for them</string>
     <string name="stage_cancel_error">Cannot change status!</string>
     <string name="warning">Warning!</string>
+
+    <string name="no_operations">No operations</string>
 </resources>

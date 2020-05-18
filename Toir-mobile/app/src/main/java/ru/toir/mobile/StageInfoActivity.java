@@ -30,6 +30,7 @@ public class StageInfoActivity extends AppCompatActivity {
     CoordinatorLayout rootLayout;
     private Realm realmDB;
     private TextView tv_stage_name;
+    private TextView tv_no_operation;
     private ListView tv_stage_listview;
     private Context context;
     private OperationAdapter operationAdapter;
@@ -62,13 +63,13 @@ public class StageInfoActivity extends AppCompatActivity {
 
         tv_stage_listview = findViewById(R.id.list_view);
         tv_stage_name = findViewById(R.id.tl_Header);
+        tv_no_operation = findViewById(R.id.tl_info);
         initView();
     }
 
     void setMainLayout(Bundle savedInstanceState) {
         setContentView(R.layout.operation_info_layout);
 
-        AccountHeader headerResult;
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
@@ -77,27 +78,6 @@ public class StageInfoActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setTitle(R.string.app_name);
-        }
-
-        // Create the AccountHeader
-        headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withHeaderBackground(R.drawable.login_header)
-                .withSavedInstance(savedInstanceState)
-                .build();
-
-        Drawer result = new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .withHasStableIds(true)
-                .withAccountHeader(headerResult)
-                .withSavedInstance(savedInstanceState)
-                .withShowDrawerOnFirstLaunch(true)
-                .build();
-
-        RecyclerViewCacheUtil.getInstance().withCacheSize(2).init(result);
-        if (savedInstanceState == null) {
-            result.setSelection(21, false);
         }
     }
 
@@ -112,6 +92,9 @@ public class StageInfoActivity extends AppCompatActivity {
         operationAdapter = new OperationAdapter(operations, context, null);
         tv_stage_listview.setAdapter(operationAdapter);
         tv_stage_listview.setOnItemClickListener(mainListViewClickListener);
+        if (operations.size() == 0) {
+            tv_no_operation.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

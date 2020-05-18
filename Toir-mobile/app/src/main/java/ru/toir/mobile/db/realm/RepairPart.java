@@ -14,6 +14,7 @@ public class RepairPart extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
+    private String code;
     private RepairPartType repairPartType;
     private Date createdAt;
     private Date changedAt;
@@ -66,4 +67,11 @@ public class RepairPart extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 }

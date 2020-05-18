@@ -298,4 +298,6 @@
     <string name="stage_cancel_text">Sie haben eine oder mehrere Aufgaben verpasst. Geben Sie den Grund / das Urteil für sie an.</string>
     <string name="stage_cancel_error">Sie können den Status nicht ändern!</string>
     <string name="warning">Achtung!</string>
+
+    <string name="no_operations">Keine operationen</string>
 </resources>
