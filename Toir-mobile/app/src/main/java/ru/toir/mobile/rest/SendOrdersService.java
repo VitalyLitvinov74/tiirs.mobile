@@ -55,6 +55,10 @@ public class SendOrdersService extends Service {
         @Override
         public void run() {
             AuthorizedUser user = AuthorizedUser.getInstance();
+            if (user == null) {
+                stopSelf();
+                return;
+            }
             boolean isValidUser = user.getLogin() != null && user.getToken() != null;
             if (!isValidUser) {
                 stopSelf();
@@ -328,17 +332,19 @@ public class SendOrdersService extends Service {
         try {
             retrofit2.Response response = call.execute();
             ResponseBody result = (ResponseBody) response.body();
-            if (response.isSuccessful()) {
+            if (response.isSuccessful() && result != null) {
                 JSONObject jObj = new JSONObject(result.string());
                 // при сохранении данных на сервере произошли ошибки
                 // данный флаг пока не используем
 //                boolean success = (boolean) jObj.get("success");
                 JSONArray data = (JSONArray) jObj.get("data");
-                for (int idx = 0; idx < data.length(); idx++) {
-                    JSONObject item = (JSONObject) data.get(idx);
-                    Long _id = Long.parseLong(item.get("_id").toString());
-                    String uuid = item.get("uuid").toString();
-                    idUuid.put(_id, uuid);
+                if (data != null) {
+                    for (int idx = 0; idx < data.length(); idx++) {
+                        JSONObject item = (JSONObject) data.get(idx);
+                        Long _id = Long.parseLong(item.get("_id").toString());
+                        String uuid = item.get("uuid").toString();
+                        idUuid.put(_id, uuid);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -381,17 +387,19 @@ public class SendOrdersService extends Service {
         try {
             retrofit2.Response response = call.execute();
             ResponseBody result = (ResponseBody) response.body();
-            if (response.isSuccessful()) {
+            if (response.isSuccessful() && result != null) {
                 JSONObject jObj = new JSONObject(result.string());
                 // при сохранении данных на сервере произошли ошибки
                 // данный флаг пока не используем
 //                boolean success = (boolean) jObj.get("success");
                 JSONArray data = (JSONArray) jObj.get("data");
-                for (int idx = 0; idx < data.length(); idx++) {
-                    JSONObject item = (JSONObject) data.get(idx);
-                    Long _id = Long.parseLong(item.get("_id").toString());
-                    String uuid = item.get("uuid").toString();
-                    idUuid.append(_id, uuid);
+                if (data != null) {
+                    for (int idx = 0; idx < data.length(); idx++) {
+                        JSONObject item = (JSONObject) data.get(idx);
+                        Long _id = Long.parseLong(item.get("_id").toString());
+                        String uuid = item.get("uuid").toString();
+                        idUuid.append(_id, uuid);
+                    }
                 }
             }
         } catch (Exception e) {
