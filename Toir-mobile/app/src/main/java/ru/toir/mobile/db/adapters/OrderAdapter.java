@@ -36,8 +36,10 @@ import ru.toir.mobile.db.realm.OrderLevel;
 import ru.toir.mobile.db.realm.OrderRepairPart;
 import ru.toir.mobile.db.realm.OrderStatus;
 import ru.toir.mobile.db.realm.Orders;
+import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.Task;
 import ru.toir.mobile.db.realm.TaskVerdict;
+import ru.toir.mobile.db.realm.Tool;
 
 import static java.lang.Long.valueOf;
 
@@ -166,6 +168,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                                         break;
                                     case R.id.order_parts:
                                         showRepairParts(order, parent);
+                                        break;
+                                    case R.id.order_tool:
+                                        showTool(order, parent);
                                         break;
                                     default:
                                         break;
@@ -331,7 +336,7 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
         Realm realmDB;
         RepairPartAdapter repairPartAdapter;
         dialog.setContentView(R.layout.order_parts);
-        dialog.setTitle("Перечень запчастей");
+        dialog.setTitle(mContext.getString(R.string.menu_order_parts));
         ListView lv;
         lv = dialog.findViewById(R.id.List);
         realmDB = Realm.getDefaultInstance();
@@ -339,6 +344,35 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 equalTo("order.uuid", order.getUuid()).findAll();
         repairPartAdapter = new RepairPartAdapter(orderRepairParts);
         lv.setAdapter(repairPartAdapter);
+        dialog.show();
+        realmDB.close();
+    }
+
+    /**
+     * Диалог с списком инструмента по наряду
+     */
+    private void showTool(Orders order, ViewGroup parent) {
+        final Dialog dialog = new Dialog(mContext);
+        Realm realmDB;
+        ToolAdapter toolAdapter;
+        dialog.setContentView(R.layout.order_tool);
+        dialog.setTitle(mContext.getString(R.string.menu_order_tool));
+        ListView lv;
+        lv = dialog.findViewById(R.id.List);
+        realmDB = Realm.getDefaultInstance();
+
+        ArrayList<Long> toolsIds = new ArrayList<>();
+        for (Task task : order.getTasks()){
+            for (Stage stage : task.getStages()){
+                for (Tool tool : stage.getTools()) {
+                    toolsIds.add(tool.get_id());
+                }
+            }
+        }
+
+        RealmResults<Tool> tools = realmDB.where(Tool.class).in("_id", toolsIds.toArray(new Long[]{})).findAll();
+        toolAdapter = new ToolAdapter(tools);
+        lv.setAdapter(toolAdapter);
         dialog.show();
         realmDB.close();
     }

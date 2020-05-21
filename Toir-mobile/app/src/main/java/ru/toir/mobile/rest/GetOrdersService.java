@@ -151,6 +151,8 @@ public class GetOrdersService extends Service {
 
             List<Instruction> all_instructions = realm.where(Instruction.class).findAll();
             all_instructions = realm.copyFromRealm(all_instructions);
+            realm.close();
+
             for (Instruction instruction : all_instructions) {
                 String localPath = instruction.getImageFilePath() + "/";
                 if (isNeedDownload(extDir, instruction, localPath)) {
@@ -326,6 +328,7 @@ public class GetOrdersService extends Service {
                     }
 
                     // сохраняем атрибуты
+                    realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();

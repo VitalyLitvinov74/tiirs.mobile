@@ -26,6 +26,7 @@ public class Stage extends RealmObject {
     private Date createdAt;
     private Date changedAt;
     private RealmList<Operation> operations;
+    private RealmList<Tool> tools;
 
     public long get_id() {
         return _id;
@@ -165,5 +166,13 @@ public class Stage extends RealmObject {
 
     public boolean isCanceled() {
         return getStatus().getUuid().equals(StageStatus.Status.CANCELED);
+    }
+
+    public RealmList<Tool> getTools() {
+        return tools;
+    }
+
+    public void setTools(RealmList<Tool> tools) {
+        this.tools = tools;
     }
 }

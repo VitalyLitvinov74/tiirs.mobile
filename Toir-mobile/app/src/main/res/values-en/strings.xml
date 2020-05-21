@@ -304,4 +304,5 @@
     <string name="warning">Warning!</string>
 
     <string name="no_operations">No operations</string>
+    <string name="menu_order_tool">Tools list</string>
 </resources>

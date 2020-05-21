@@ -10,5 +10,10 @@
         android:orderInCategory="201"
         android:icon="@drawable/ic_icon_tools"
         android:title="@string/menu_order_parts" />
+    <item
+        android:id="@+id/order_tool"
+        android:orderInCategory="201"
+        android:icon="@drawable/ic_icon_tools"
+        android:title="@string/menu_order_tool" />
 </menu>
 
