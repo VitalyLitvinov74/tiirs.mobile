@@ -57,6 +57,12 @@ import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
+import org.acra.ACRA;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.config.HttpSenderConfigurationBuilder;
+import org.acra.data.StringFormat;
+import org.acra.sender.HttpSender;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -561,6 +567,16 @@ public class MainActivity extends AppCompatActivity {
      */
     //@SuppressWarnings("deprecation")
     void setMainLayout(Bundle savedInstanceState) {
+        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this)
+                .setBuildConfigClass(BuildConfig.class)
+                .setReportFormat(StringFormat.JSON);
+        builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class)
+                .setUri("http://api.toirus.ru/crash?XDEBUG_SESSION_START=xdebug&token=".concat(authorizedUser.getToken()))
+                .setHttpMethod(HttpSender.Method.POST)
+                .setEnabled(true);
+        ACRA.init(this.getApplication(), builder);
+
         setContentView(R.layout.activity_main);
 //        SharedPreferences sp = PreferenceManager
 //                .getDefaultSharedPreferences(getApplicationContext());

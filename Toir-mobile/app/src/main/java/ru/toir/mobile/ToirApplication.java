@@ -70,5 +70,38 @@ public class ToirApplication extends Application {
 
         // инициализируем базу данных Realm
         ToirRealm.init(this);
+
+/*
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                handleUncaughtException(thread, ex);
+            }
+        });
+*/
     }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+    }
+
+/*
+    public void handleUncaughtException (Thread thread, Throwable e)
+    {
+        String stackTrace = Log.getStackTraceString(e);
+        String message = e.getMessage();
+
+        Intent intent = new Intent (Intent.ACTION_SEND);
+        intent.setType("message/rfc822");
+        intent.putExtra (Intent.EXTRA_EMAIL, new String[] {"olejek8@yandex.ru"});
+        intent.putExtra (Intent.EXTRA_SUBJECT, "Toirus crash log file");
+        intent.putExtra (Intent.EXTRA_TEXT, stackTrace);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // required when starting from Application
+        startActivity(intent);
+
+
+    }
+*/
+
 }
