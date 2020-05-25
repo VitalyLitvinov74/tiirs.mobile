@@ -214,6 +214,9 @@ public class DefectInfoActivity extends AppCompatActivity {
                     photoFilePath = file.getAbsolutePath();
                     currentEntityUuid = defect_uuid;
                     Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 60); // Duration in Seconds
+                    //intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1); // Quality
+                    intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 28000000L); // ~26MB
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                         startActivityForResult(intent, ACTIVITY_VIDEO);
                     } else {

@@ -193,14 +193,14 @@ public class GetOrdersService extends Service {
                 retrofit2.Response<List<Orders>> response = call.execute();
                 if (response.code() != 200) {
                     // сообщаем что произошло
-                    addToJournal("Ошибка получения нарядов! Код ответа сервера:" + response.code());
+                    //addToJournal("Ошибка получения нарядов! Код ответа сервера:" + response.code());
                     finishService();
                     return;
                 }
 
                 orders = response.body();
                 if (orders == null) {
-                    addToJournal("Ошибка получения нарядов! Содержимого ответа нет.");
+                    //addToJournal("Ошибка получения нарядов! Содержимого ответа нет.");
                     finishService();
                     return;
                 } else if (orders.size() == 0) {
