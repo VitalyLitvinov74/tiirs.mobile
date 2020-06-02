@@ -92,6 +92,7 @@ import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
 import ru.toir.mobile.rest.ForegroundService;
 import ru.toir.mobile.rest.ToirAPIFactory;
+import ru.toir.mobile.rest.ToirKeyStoreFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.driver.RfidDriverNfc;
@@ -572,7 +573,8 @@ public class MainActivity extends AppCompatActivity {
                 .setBuildConfigClass(BuildConfig.class)
                 .setReportFormat(StringFormat.JSON);
         builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class)
-                .setUri("http://api.toirus.ru/crash?XDEBUG_SESSION_START=xdebug&token=".concat(authorizedUser.getToken()))
+                .setKeyStoreFactoryClass(ToirKeyStoreFactory.class)
+                .setUri("https://api.toir.qwvostok.ru:4443/crash?XDEBUG_SESSION_START=xdebug&token=".concat(authorizedUser.getToken()).concat("&apiuser=").concat(authorizedUser.getLogin()))
                 .setHttpMethod(HttpSender.Method.POST)
                 .setEnabled(true);
         ACRA.init(this.getApplication(), builder);

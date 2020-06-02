@@ -1,5 +1,6 @@
 package ru.toir.mobile.rest;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -40,6 +41,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.toir.mobile.AuthorizedUser;
 import ru.toir.mobile.BuildConfig;
+import ru.toir.mobile.R;
 import ru.toir.mobile.ToirApplication;
 import ru.toir.mobile.deserializer.DateTypeDeserializer;
 import ru.toir.mobile.rest.interfaces.IAlertType;
@@ -168,6 +170,18 @@ ToirAPIFactory {
     }
 
     public static ToirAPIFactory.UnifiedTrustManager getTm() {
+        KeyStore keyStore = getKeyStore();
+        ToirAPIFactory.UnifiedTrustManager trustManager = null;
+        try {
+            trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+
+        return trustManager;
+    }
+
+    public static KeyStore getKeyStore() {
         InputStream inputStream1 = ToirApplication.qwvostokCA;
         InputStream inputStream2 = ToirApplication.sstalRootCA;
         InputStream inputStream3 = ToirApplication.sstalInternalCA;
@@ -175,7 +189,6 @@ ToirAPIFactory {
         InputStream inputStream5 = ToirApplication.sstalDigicertRoot;
         InputStream inputStream6 = ToirApplication.digicertsha2CA;
         KeyStore keyStore = null;
-        ToirAPIFactory.UnifiedTrustManager trustManager = null;
         try {
             // Load CAs from an InputStream
             // (could be from a resource or ByteArrayInputStream or ...)
@@ -207,7 +220,6 @@ ToirAPIFactory {
             keyStore.setCertificateEntry("ca4", ca4);
             keyStore.setCertificateEntry("ca5", ca5);
             keyStore.setCertificateEntry("ca6", ca6);
-            trustManager = new ToirAPIFactory.UnifiedTrustManager(keyStore);
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -220,7 +232,75 @@ ToirAPIFactory {
             e.printStackTrace();
         }
 
-        return trustManager;
+        return keyStore;
+    }
+
+    public static KeyStore getKeyStore(Context context) {
+        InputStream qwvostokCA;
+        InputStream sstalRootCA;
+        InputStream sstalInternalCA;
+        InputStream sstalDigicert;
+        InputStream sstalDigicertRoot;
+        InputStream digicertsha2CA;
+
+        qwvostokCA =  context.getResources().openRawResource(R.raw.forqwvostok);
+        sstalRootCA = context.getResources().openRawResource(R.raw.severstalroot);
+        sstalInternalCA = context.getResources().openRawResource(R.raw.severstalinternal);
+        sstalDigicert = context.getResources().openRawResource(R.raw.digicertca);
+        sstalDigicertRoot = context.getResources().openRawResource(R.raw.digicertrootca);
+        digicertsha2CA = context.getResources().openRawResource(R.raw.digicertsha2secureserverca);
+
+        InputStream inputStream1 = qwvostokCA;
+        InputStream inputStream2 = sstalRootCA;
+        InputStream inputStream3 = sstalInternalCA;
+        InputStream inputStream4 = sstalDigicert;
+        InputStream inputStream5 = sstalDigicertRoot;
+        InputStream inputStream6 = digicertsha2CA;
+        KeyStore keyStore = null;
+        try {
+            // Load CAs from an InputStream
+            // (could be from a resource or ByteArrayInputStream or ...)
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream caInput1 = new BufferedInputStream(inputStream1);
+            InputStream caInput2 = new BufferedInputStream(inputStream2);
+            InputStream caInput3 = new BufferedInputStream(inputStream3);
+            InputStream caInput4 = new BufferedInputStream(inputStream4);
+            InputStream caInput5 = new BufferedInputStream(inputStream5);
+            InputStream caInput6 = new BufferedInputStream(inputStream6);
+            Certificate ca1, ca2, ca3, ca4, ca5, ca6;
+            try {
+                ca1 = cf.generateCertificate(caInput1);
+                ca2 = cf.generateCertificate(caInput2);
+                ca3 = cf.generateCertificate(caInput3);
+                ca4 = cf.generateCertificate(caInput4);
+                ca5 = cf.generateCertificate(caInput5);
+                ca6 = cf.generateCertificate(caInput6);
+            } finally {
+            }
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca1", ca1);
+            keyStore.setCertificateEntry("ca2", ca2);
+            keyStore.setCertificateEntry("ca3", ca3);
+            keyStore.setCertificateEntry("ca4", ca4);
+            keyStore.setCertificateEntry("ca5", ca5);
+            keyStore.setCertificateEntry("ca6", ca6);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return keyStore;
     }
 
     @NonNull
