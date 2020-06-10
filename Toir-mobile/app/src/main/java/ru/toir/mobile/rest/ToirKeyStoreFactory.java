@@ -13,6 +13,6 @@ public class ToirKeyStoreFactory implements KeyStoreFactory {
     @Nullable
     @Override
     public KeyStore create(@NonNull Context context) {
-        return ToirAPIFactory.getKeyStore(context);
+        return ToirAPIFactory.getKeyStore();
     }
 }
