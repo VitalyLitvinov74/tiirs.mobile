@@ -1753,7 +1753,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
                     String[] tagIds = (String[]) message.obj;
                     if (tagIds == null) {
-                        Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        try {
+                            Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                        }
+
                         return false;
                     }
 
@@ -1787,14 +1791,23 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                             askStartOperations();
                         }
                     } else {
-                        Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        try {
+                            Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                        }
                     }
                 } else if (message.what == RfidDriverBase.RESULT_RFID_CANCEL) {
                     Log.d(TAG, "Отмена чтения метки.");
-                    Toast.makeText(getActivity(), "Отмена чтения метки.", Toast.LENGTH_SHORT).show();
+                    try {
+                        Toast.makeText(getActivity(), "Отмена чтения метки.", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                    }
                 } else {
                     Log.d(TAG, "Ошибка чтения метки!");
-                    Toast.makeText(getActivity(), "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                    try {
+                        Toast.makeText(getActivity(), "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                    }
                 }
 
                 rfidDialog.dismiss();

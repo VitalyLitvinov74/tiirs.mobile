@@ -101,9 +101,13 @@ public class DefectsFragment extends Fragment {
                         if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                             final String tagId = ((String) msg.obj).substring(4);
                             Log.d(TAG, tagId);
-                            Toast.makeText(getActivity(),
-                                    "Чтение метки успешно.", Toast.LENGTH_SHORT)
-                                    .show();
+                            try {
+                                Toast.makeText(getActivity(),
+                                        "Чтение метки успешно.", Toast.LENGTH_SHORT)
+                                        .show();
+                            } catch (Exception e) {
+                            }
+
                             Realm realm = Realm.getDefaultInstance();
                             Equipment equipment = realm.where(Equipment.class)
                                     .equalTo("tagId", tagId)
@@ -117,7 +121,10 @@ public class DefectsFragment extends Fragment {
                                     @Override
                                     public void onResponse(Call<Equipment> responseBodyCall, Response<Equipment> response) {
                                         if (response.code() != 200) {
-                                            Toast.makeText(getContext(), response.message(), Toast.LENGTH_LONG).show();
+                                            try {
+                                                Toast.makeText(getContext(), response.message(), Toast.LENGTH_LONG).show();
+                                            } catch (Exception e) {
+                                            }
                                         }
 
                                         Equipment equipment = response.body();
@@ -129,16 +136,22 @@ public class DefectsFragment extends Fragment {
                                             realm.close();
                                             EquipmentInfoActivity.showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment.getUuid(), defectAdapter);
                                         } else {
-                                            Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
-                                                    Toast.LENGTH_LONG).show();
+                                            try {
+                                                Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
+                                                        Toast.LENGTH_LONG).show();
+                                            } catch (Exception e) {
+                                            }
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(Call<Equipment> responseBodyCall, Throwable t) {
-                                        Toast.makeText(getActivity(), getString(R.string.error_equipment_read_tag_error),
-                                                Toast.LENGTH_LONG).show();
-                                        t.printStackTrace();
+                                        try {
+                                            Toast.makeText(getActivity(), getString(R.string.error_equipment_read_tag_error),
+                                                    Toast.LENGTH_LONG).show();
+                                            t.printStackTrace();
+                                        } catch (Exception e) {
+                                        }
                                     }
                                 };
                                 callGetByTagId.enqueue(callback);
@@ -146,8 +159,11 @@ public class DefectsFragment extends Fragment {
 
                             realm.close();
                         } else {
-                            Toast.makeText(getActivity(), getString(R.string.error_read_tag),
-                                    Toast.LENGTH_SHORT).show();
+                            try {
+                                Toast.makeText(getActivity(), getString(R.string.error_read_tag),
+                                        Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                            }
                         }
 
                         // закрываем диалог
