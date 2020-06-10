@@ -38,6 +38,7 @@ import ru.toir.mobile.db.realm.OperationStatus;
 import ru.toir.mobile.db.realm.OperationTemplate;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.fragments.OrderFragment;
+import ru.toir.mobile.utils.DataUtils;
 
 import static ru.toir.mobile.utils.RoundedImageView.getResizedBitmap;
 
@@ -160,13 +161,12 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.description.setText(operation.getOperationTemplate().getDescription());
             OperationTemplate operationTemplate;
             operationTemplate = operation.getOperationTemplate();
-            viewHolder.normative.setText(String.valueOf(operationTemplate.getNormative()));
+            viewHolder.normative.setText(DataUtils.getNormative(operationTemplate.getNormative()));
             Date startDate = operation.getStartDate();
             Date endDate = operation.getEndDate();
             if (startDate != null && endDate != null) {
                 int diffTime = (int) (endDate.getTime() - startDate.getTime());
-                viewHolder.time.setText(convertView.getContext().getString(R.string.sec_with_value,
-                        diffTime / 1000));
+                viewHolder.time.setText(DataUtils.getNormative(diffTime / 1000));
             }
 
             Realm realmDB = Realm.getDefaultInstance();

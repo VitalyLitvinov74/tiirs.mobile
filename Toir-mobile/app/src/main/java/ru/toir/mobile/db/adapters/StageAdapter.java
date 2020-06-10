@@ -31,6 +31,7 @@ import ru.toir.mobile.R;
 import ru.toir.mobile.StageInfoActivity;
 import ru.toir.mobile.db.realm.Stage;
 import ru.toir.mobile.db.realm.StageStatus;
+import ru.toir.mobile.utils.DataUtils;
 
 /**
  * @author olejek
@@ -105,8 +106,8 @@ public class StageAdapter extends RealmBaseAdapter<Stage> implements ListAdapter
                 }
             }
             String normative = convertView.getContext().getString(R.string.normative);
-            normative += " " + convertView.getContext().getString(R.string.sec_with_value,
-                    stage.getStageTemplate().getNormative() / 1000);
+            //normative += " " + convertView.getContext().getString(R.string.sec_with_value, stage.getStageTemplate().getNormative() / 1000);
+            normative += " " + DataUtils.getNormative(stage.getStageTemplate().getNormative());
             viewHolder.normative.setText(normative);
 
             if (stageStatus != null) {

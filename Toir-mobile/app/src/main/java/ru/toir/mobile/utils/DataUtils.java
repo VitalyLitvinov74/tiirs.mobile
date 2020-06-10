@@ -325,4 +325,11 @@ public class DataUtils {
         return bytes;
     }
 
+    public static String getNormative(long secs) {
+        if (secs <= 180)
+            return String.format(Locale.US, "%02dс.", secs);
+        if (secs < 3600)
+            return String.format(Locale.US, "%02dмин.%02dс.", secs / 60, secs % 60);
+        return String.format(Locale.US, "%02dч.%02dмин.", secs / 3600, (secs % 3600) / 60);
+    }
 }

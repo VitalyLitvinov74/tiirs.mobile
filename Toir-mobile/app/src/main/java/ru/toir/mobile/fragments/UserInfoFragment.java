@@ -141,8 +141,7 @@ public class UserInfoFragment extends Fragment {
                 call_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_CALL);
-                        intent.setData(Uri.parse("tel:" + user.getContact()));
+                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + user.getContact()));
                         startActivity(intent);
                     }
                 });
