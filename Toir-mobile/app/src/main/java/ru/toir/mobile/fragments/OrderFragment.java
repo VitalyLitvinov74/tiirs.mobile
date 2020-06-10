@@ -881,7 +881,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
      *
      * @param operation - операция для отмены
      */
-    public void closeOperationManual(final Operation operation, AdapterView<?> parent) {
+    public void closeOperationManual(final Operation operation, AdapterView<?> parent, int position) {
 
         Activity activity = getActivity();
         if (activity == null) {
@@ -919,6 +919,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                             operation.setStartDate(new Date());
                         }
                         operation.setEndDate(new Date());
+                        operationAdapter.setItemEnable(position, false);
                         operationAdapter.notifyDataSetChanged();
                     }
                 });
@@ -930,7 +931,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         fillListView(ORDER_LEVEL);
                     }
                 }
-
 
                 // закрываем диалог
                 dialog.dismiss();
@@ -2626,7 +2626,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 Operation operation = (Operation) parent.getItemAtPosition(position);
                 if (operation.isNew() || operation.isInWork()) {
                     // показываем диалог изменения статуса
-                    closeOperationManual(operation, parent);
+                    closeOperationManual(operation, parent, 0);
                 } else {
                     // операция уже выполнена, изменить статус нельзя
                     // сообщаем об этом

@@ -117,8 +117,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
             viewHolder.description_layout.setVisibility(showMode);
 
             String sDate;
-            OperationStatus operationStatus;
-            operationStatus = operation.getOperationStatus();
             viewHolder.title.setText(operation.getOperationTemplate().getTitle());
             Date lDate = operation.getStartDate();
             if (lDate != null && lDate.after(new Date(100000))) {
@@ -136,13 +134,12 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                 viewHolder.end_date.setText(R.string.not_finished);
             }
 
-            if (operation.getStartDate() != null && operation.getEndDate() != null) {
+            if ((operation.getStartDate() != null && operation.getEndDate() != null)) {
                 viewHolder.status.setChecked(true);
                 viewHolder.status.setEnabled(false);
             } else {
                 viewHolder.status.setChecked(false);
             }
-
 
             if (operation.getOperationVerdict() != null && !operation.getOperationVerdict().isNotDefined()) {
                 // этот вердикт на все кастомные случаи
@@ -213,8 +210,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                                     case R.id.stage_cancel:
                                         if (operation.isNew() || operation.isInWork()) {
                                             // показываем диалог изменения статуса
-                                            viewHolder.status.setEnabled(false);
-                                            listener.closeOperationManual(operation, null);
+                                            //viewHolder.status.setEnabled(false);
+                                            listener.closeOperationManual(operation, null, position);
                                         } else {
                                             // операция уже выполнена, изменить статус нельзя
                                             // сообщаем об этом
@@ -223,7 +220,6 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
                                             dialog.setMessage("Изменить статус операции нельзя!");
                                             dialog.setPositiveButton(android.R.string.ok,
                                                     new DialogInterface.OnClickListener() {
-
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
                                                             dialog.dismiss();
@@ -341,7 +337,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
     }
 
     public interface EventListener {
-        void closeOperationManual(final Operation operation, AdapterView<?> parent);
+        void closeOperationManual(final Operation operation, AdapterView<?> parent, int position);
     }
 
     public static class ViewHolder {

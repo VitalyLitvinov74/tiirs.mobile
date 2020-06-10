@@ -22,7 +22,7 @@
     <com.roughike.bottombar.BottomBar
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         app:bb_activeTabColor="@color/larisaTextColor"
         app:bb_inActiveTabColor="@color/larisaBlueColor"
         android:layout_alignParentBottom="true"

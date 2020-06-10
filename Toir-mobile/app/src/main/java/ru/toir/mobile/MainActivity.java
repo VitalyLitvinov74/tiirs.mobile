@@ -574,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
                 .setReportFormat(StringFormat.JSON);
         builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class)
                 .setKeyStoreFactoryClass(ToirKeyStoreFactory.class)
-                .setUri("https://api.toir.qwvostok.ru:4443/crash?XDEBUG_SESSION_START=xdebug&token=".concat(authorizedUser.getToken()).concat("&apiuser=").concat(authorizedUser.getLogin()))
+                .setUri(ToirApplication.serverUrl.concat("/crash?XDEBUG_SESSION_START=xdebug&token=").concat(authorizedUser.getToken()).concat("&apiuser=").concat(authorizedUser.getLogin()))
                 .setHttpMethod(HttpSender.Method.POST)
                 .setEnabled(true);
         ACRA.init(this.getApplication(), builder);
