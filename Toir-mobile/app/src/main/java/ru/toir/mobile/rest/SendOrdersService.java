@@ -103,7 +103,7 @@ public class SendOrdersService extends Service {
             // (не обязательно входящие в наряды которые сейчас отправляем)
             List<MeasuredValue> sendOldMeasuredValues = new ArrayList<>();
             RealmResults<MeasuredValue> oldMeasuredValues = realm.where(MeasuredValue.class)
-                    .equalTo("sent", false).findAll();
+                    .equalTo("sent", false).limit(10).findAll();
             for (MeasuredValue measuredValue : oldMeasuredValues) {
                 String stageUuid = measuredValue.getOperation().getStageUuid();
                 Stage stage = realm.where(Stage.class).equalTo("uuid", stageUuid)
@@ -140,7 +140,7 @@ public class SendOrdersService extends Service {
 
             // выбираем из базы все неотправленные атрибуты оборудования на сервер
             RealmResults<EquipmentAttribute> equipmentAttributes = realm.where(EquipmentAttribute.class)
-                    .equalTo("sent", false).findAll();
+                    .equalTo("sent", false).limit(10).findAll();
 
             if (equipmentAttributes.size() > 0) {
                 // отправляем атрибуты на сервер
@@ -163,7 +163,7 @@ public class SendOrdersService extends Service {
 
             // выбираем из базы все неотправленные дефекты
             RealmResults<Defect> defects = realm.where(Defect.class)
-                    .equalTo("sent", false).findAll();
+                    .equalTo("sent", false).limit(10).findAll();
 
             if (defects.size() > 0) {
                 // отправляем атрибуты на сервер

@@ -124,7 +124,7 @@ public class ForegroundService extends Service {
                 // получаем данные для отправки
                 Realm realm = Realm.getDefaultInstance();
                 RealmResults<GpsTrack> gpsItems = realm.where(GpsTrack.class)
-                        .equalTo("sent", false).findAll();
+                        .equalTo("sent", false).limit(10).findAll();
                 if (gpsItems.size() > 0) {
                     ids = new long[gpsItems.size()];
                     for (int i = 0; i < gpsItems.size(); i++) {
@@ -136,7 +136,7 @@ public class ForegroundService extends Service {
                 }
 
                 RealmResults<Journal> logItems = realm.where(Journal.class)
-                        .equalTo("sent", false).findAll();
+                        .equalTo("sent", false).limit(10).findAll();
                 if (logItems.size() > 0) {
                     ids = new long[logItems.size()];
                     for (int i = 0; i < logItems.size(); i++) {
@@ -201,6 +201,7 @@ public class ForegroundService extends Service {
 //                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK).or()
                         .equalTo("orderStatus.uuid", OrderStatus.Status.CANCELED)
                         .endGroup()
+                        .limit(10)
                         .findAll();
                 if (orders.size() == 0) {
                     Log.d(TAG, "Нет нарядов для отправки.");
