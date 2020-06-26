@@ -1099,7 +1099,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     getString(R.string.no_user_present), Toast.LENGTH_LONG).show();
                         }
-                        user.setActive(1);
+                        users.get(cnt).setActive(1);
                         realmDB.commitTransaction();
                     }
                 }
