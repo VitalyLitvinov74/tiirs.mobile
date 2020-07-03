@@ -10,6 +10,7 @@ public class AuthorizedUser {
     private String mTagId;
     private String mToken;
     private String mLogin;
+    private String organizationUuid;
 
     public static synchronized AuthorizedUser getInstance() {
         if (mInstance == null) {
@@ -83,5 +84,14 @@ public class AuthorizedUser {
         mTagId = null;
         mToken = null;
         mUuid = null;
+        organizationUuid = null;
+    }
+
+    public String getOrganizationUuid() {
+        return organizationUuid;
+    }
+
+    public void setOrganizationUuid(String organizationUuid) {
+        this.organizationUuid = organizationUuid;
     }
 }

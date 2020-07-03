@@ -46,6 +46,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -72,6 +74,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -81,7 +84,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.toir.mobile.db.realm.Defect;
+import ru.toir.mobile.db.ToirRealm;
 import ru.toir.mobile.db.realm.User;
 import ru.toir.mobile.fragments.ContragentsFragment;
 import ru.toir.mobile.fragments.DefectsFragment;
@@ -223,14 +226,11 @@ public class MainActivity extends AppCompatActivity {
         // обнуляем текущего активного пользователя
         AuthorizedUser.getInstance().reset();
 
-        if (!initDB()) {
-            // принудительное обновление приложения
-            finish();
-        }
-
         // запускаем сервис который будет в фоне заниматься получением/отправкой данных
-        Intent intent = new Intent(this, ForegroundService.class);
-        startService(intent);
+        // TODO: пересмотреть работу сервиса. отказаться от постоянной работы в фоне.
+        // пересмотреть работу с базой в той части, когда база с которой будем работать ещё не известна
+//        Intent intent = new Intent(this, ForegroundService.class);
+//        startService(intent);
     }
 
     @Override
@@ -295,6 +295,25 @@ public class MainActivity extends AppCompatActivity {
                         authUser.setToken(token.getAccessToken());
                         authUser.setLogin(token.getUserName());
                         MainActivity.initAcra(AuthorizedUser.getInstance(), app);
+
+                        // ищем локальную связь пользователя с базой
+                        SharedPreferences sp = PreferenceManager
+                                .getDefaultSharedPreferences(getApplicationContext());
+                        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
+                        Gson gson = new Gson();
+                        HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
+                                new TypeToken<HashMap<String, String>>() {
+                                }.getType());
+                        // TODO: искать базу пользователя нужно и по логину
+                        String dbName = usersDbLink.get(authUser.getTagId());
+                        if (dbName == null) {
+                            return;
+                        }
+
+                        // инициализируем базу пользователя
+                        ToirRealm.initDb(getApplicationContext(), dbName);
+                        realmDB = Realm.getDefaultInstance();
+
 
                         // запрашиваем актуальную информацию по пользователю
 //                        Call<User> call = ToirAPIFactory.getUserService().user();
@@ -416,17 +435,36 @@ public class MainActivity extends AppCompatActivity {
                     public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
                         String message = getString(R.string.toast_error_no_token_received);
                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        // ищем локальную связь пользователя с базой
+                        SharedPreferences sp = PreferenceManager
+                                .getDefaultSharedPreferences(getApplicationContext());
+                        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
+                        Gson gson = new Gson();
+                        HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
+                                new TypeToken<HashMap<String, String>>() {
+                                }.getType());
+                        // TODO: искать базу пользователя нужно и по логину
+                        String dbName = usersDbLink.get(authUser.getTagId());
+                        if (dbName == null) {
+                            return;
+                        }
+
+                        // инициализируем базу пользователя
+                        ToirRealm.initDb(getApplicationContext(), dbName);
+                        realmDB = Realm.getDefaultInstance();
 
                         // проверяем наличие пользователя в локальной базе
                         User user = realmDB.where(User.class)
-                                .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                                .equalTo("tagId", authUser.getTagId())
                                 .findFirst();
 
                         // в зависимости от результата либо дать работать, либо не дать
                         if (user != null && user.isActive() == 1) {
                             isLogged = true;
                             changeActiveProfile(user);
-                            AuthorizedUser.getInstance().setUuid(user.getUuid());
+                            authUser.setUuid(user.getUuid());
+                            authUser.setOrganizationUuid(user.getOrganization().getUuid());
                             addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
                         } else {
                             Toast.makeText(getApplicationContext(),
@@ -452,6 +490,7 @@ public class MainActivity extends AppCompatActivity {
             aUser.setTagId(savedInstanceState.getString("tagId"));
             aUser.setToken(savedInstanceState.getString("token"));
             aUser.setUuid(savedInstanceState.getString("userUuid"));
+            aUser.setOrganizationUuid(savedInstanceState.getString("organizationUuid"));
             aUser.setLogin(savedInstanceState.getString("userLogin"));
         }
 
@@ -464,36 +503,6 @@ public class MainActivity extends AppCompatActivity {
                 ShowSettings();
             }
         }
-    }
-
-    public boolean initDB() {
-        boolean success = false;
-        try {
-            //ToirRealm.init(this);
-            // получаем базу realm
-            realmDB = Realm.getDefaultInstance();
-            //LoadTestData.LoadAllTestData();
-            Log.d(TAG, "Realm DB schema version = " + realmDB.getVersion());
-            Log.d(TAG, "db.version=" + realmDB.getVersion());
-            if (realmDB.getVersion() == 0) {
-//                Toast toast = Toast.makeText(this, "База данных не актуальна!", Toast.LENGTH_LONG);
-//                toast.setGravity(Gravity.BOTTOM, 0, 0);
-//                toast.show();
-                success = true;
-            } else {
-                Toast toast = Toast.makeText(this, getString(R.string.toast_db_actual), Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.BOTTOM, 0, 0);
-                toast.show();
-                success = true;
-            }
-        } catch (Exception e) {
-            Toast toast = Toast.makeText(this, getString(R.string.toast_db_error),
-                    Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.BOTTOM, 0, 0);
-            toast.show();
-        }
-
-        return success;
     }
 
     /**
@@ -522,9 +531,28 @@ public class MainActivity extends AppCompatActivity {
                     // если нет, искать по метке в локальной базе, к сети вообще не обращаться.
                     if (!ToirApplication.isInternetOn(getApplicationContext())) {
                         Toast.makeText(getApplicationContext(), getText(R.string.no_internet), Toast.LENGTH_LONG).show();
+                        // ищем локальную связь пользователя с базой
+                        SharedPreferences sp = PreferenceManager
+                                .getDefaultSharedPreferences(getApplicationContext());
+                        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
+                        Gson gson = new Gson();
+                        HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
+                                new TypeToken<HashMap<String, String>>() {
+                                }.getType());
+                        // TODO: искать базу пользователя нужно и по логину
+                        String dbName = usersDbLink.get(tagId);
+                        if (dbName == null) {
+                            // TODO: внятное уведомление пользователю что он ещё ни разу не входил и нужен для этого инет
+                            rfidDialog.dismiss();
+                            return false;
+                        }
+
+                        // инициализируем базу пользователя
+                        ToirRealm.initDb(getApplicationContext(), dbName);
+                        realmDB = Realm.getDefaultInstance();
+
                         // проверяем наличие пользователя в локальной базе
                         User user = realmDB.where(User.class)
-                                // !!!!!
                                 .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
                                 .findFirst();
 
@@ -535,6 +563,7 @@ public class MainActivity extends AppCompatActivity {
                             changeActiveProfile(user);
 
                             AuthorizedUser.getInstance().setUuid(user.getUuid());
+                            AuthorizedUser.getInstance().setOrganizationUuid(user.getOrganization().getUuid());
                             addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
                             setMainLayout(savedInstance);
                         } else {
@@ -566,24 +595,51 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
 
+                            // ищем локальную связь пользователя с базой
+                            SharedPreferences sp = PreferenceManager
+                                    .getDefaultSharedPreferences(getApplicationContext());
+                            String usersDbLinkJson = sp.getString("usersDbLink", "[]");
+                            Gson gson = new Gson();
+                            HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
+                                    new TypeToken<HashMap<String, String>>() {
+                                    }.getType());
+
                             AuthorizedUser authUser = AuthorizedUser.getInstance();
                             TokenSrv token = response.body();
                             if (token != null) {
-
                                 authUser.setToken(token.getAccessToken());
                                 Toast.makeText(getApplicationContext(),
                                         getString(R.string.toast_token_received), Toast.LENGTH_SHORT).show();
                                 // Сохраняем login в AuthorizedUser для дальнейших запросв статики
                                 authUser.setLogin(token.getUserName());
+
+                                // Сохраняем связь пользователя с базой
+                                // TODO: сохранить связь пользователя с базой, сервер с токеном должен передать название базы
+                                // TODO: имя базы взять из ответа сервера
+                                usersDbLink.put(authUser.getTagId(), "dbXXXX");
+                                usersDbLink.put(token.getUserName(), "dbXXXX");
+                                usersDbLinkJson = gson.toJson(usersDbLink);
+                                sp.edit().putString("usersDbLink", usersDbLinkJson).apply();
+                                // инициализируем базу пользователя
+                                ToirRealm.initDb(getApplicationContext(), "dbXXXX");
+                                realmDB = Realm.getDefaultInstance();
                             } else {
                                 // Токен не получили, пытаемся найти пользователя в локальной базе
-                                Realm realm = Realm.getDefaultInstance();
-                                RealmResults<User> user = realm.where(User.class).equalTo("tagId",
+                                // TODO: искать базу пользователя нужно и по логину
+                                String dbName = usersDbLink.get(authUser.getTagId());
+                                if (dbName == null) {
+                                    // TODO: внятное уведомление пользователю что он ещё ни разу не входил а сервер не выдал токен
+                                    return;
+                                }
+
+                                // инициализируем базу пользователя
+                                ToirRealm.initDb(getApplicationContext(), dbName);
+                                realmDB = Realm.getDefaultInstance();
+                                RealmResults<User> user = realmDB.where(User.class).equalTo("tagId",
                                         authUser.getTagId()).findAll();
                                 if (user.size() == 1) {
                                     authUser.setLogin(user.first().getLogin());
                                 }
-                                realm.close();
                             }
 
                             // TODO: Если не получили инфу с сервера и из локальной базы - что делать?
@@ -627,6 +683,7 @@ public class MainActivity extends AppCompatActivity {
                                         // TODO: нужен метод для установки полей объекта из разных объектов (Token, User...)
                                         AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
                                         authorizedUser.setUuid(user.getUuid());
+                                        authorizedUser.setOrganizationUuid(user.getOrganization().getUuid());
                                         authorizedUser.setLogin(user.getLogin());
                                         addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
                                         //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
@@ -714,11 +771,29 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             // TODO реализовать проверку на то что пользователя нет на сервере
                             // токен не получен, сервер не ответил...
+                            AuthorizedUser authUser = AuthorizedUser.getInstance();
+                            SharedPreferences sp = PreferenceManager
+                                    .getDefaultSharedPreferences(getApplicationContext());
+                            String usersDbLinkJson = sp.getString("usersDbLink", "[]");
+                            Gson gson = new Gson();
+                            HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
+                                    new TypeToken<HashMap<String, String>>() {
+                                    }.getType());
+
+                            // TODO: искать базу пользователя нужно и по логину
+                            String dbName = usersDbLink.get(authUser.getTagId());
+                            if (dbName == null) {
+                                // TODO: внятное уведомление пользователю что он ещё ни разу не входил а сервер не выдал токен
+                                return;
+                            }
+
+                            // инициализируем базу пользователя
+                            ToirRealm.initDb(getApplicationContext(), dbName);
+                            realmDB = Realm.getDefaultInstance();
 
                             // проверяем наличие пользователя в локальной базе
                             User user = realmDB.where(User.class)
-                                    // !!!!!
-                                    .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                                    .equalTo("tagId", authUser.getTagId())
                                     .findFirst();
 
                             // в зависимости от результата либо дать работать, либо не дать
@@ -727,7 +802,8 @@ public class MainActivity extends AppCompatActivity {
                                 //user_changed = true;
                                 changeActiveProfile(user);
 
-                                AuthorizedUser.getInstance().setUuid(user.getUuid());
+                                authUser.setUuid(user.getUuid());
+                                authUser.setOrganizationUuid(user.getOrganization().getUuid());
                                 addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
                                 setMainLayout(savedInstance);
                             } else {
@@ -1183,6 +1259,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putString("tagId", authorizedUser.getTagId());
         outState.putString("token", authorizedUser.getToken());
         outState.putString("userUuid", authorizedUser.getUuid());
+        outState.putString("organizationUuid", authorizedUser.getOrganizationUuid());
         outState.putString("userLogin", authorizedUser.getLogin());
     }
 

@@ -22,6 +22,8 @@ public class TokenSrv {
     private String issued;
     @Expose
     private String expires;
+    @Expose
+    private String db;
 
     public class Type {
         public static final String LABEL = "label";
@@ -110,6 +112,20 @@ public class TokenSrv {
      */
     public void setExpires(String expires) {
         this.expires = expires;
+    }
+
+    /**
+     * @return Db name
+     */
+    public String getDb() {
+        return db;
+    }
+
+    /**
+     * @param db Db name
+     */
+    public void setDb(String db) {
+        this.db = db;
     }
 
     @Override

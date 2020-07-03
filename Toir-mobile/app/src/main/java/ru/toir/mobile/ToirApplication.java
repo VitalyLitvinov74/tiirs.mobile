@@ -7,9 +7,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 
+import com.facebook.stetho.Stetho;
+import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
+
 import java.io.InputStream;
 
-import ru.toir.mobile.db.ToirRealm;
+import io.realm.Realm;
 
 /**
  * @author Oleg Ivanov
@@ -68,8 +71,15 @@ public class ToirApplication extends Application {
         // инициализируем синглтон с данными о активном пользователе на уровне приложения
         AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
 
-        // инициализируем базу данных Realm
-        ToirRealm.init(this);
+        // инициализируем Realm
+        Realm.init(this);
+
+        // инициализируем интерфейс для отладки через Google Chrome
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+                        .build());
 
 /*
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

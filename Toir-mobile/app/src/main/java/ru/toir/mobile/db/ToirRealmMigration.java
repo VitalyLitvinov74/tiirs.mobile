@@ -43,6 +43,7 @@ import ru.toir.mobile.db.migration.Migration43;
 import ru.toir.mobile.db.migration.Migration44;
 import ru.toir.mobile.db.migration.Migration45;
 import ru.toir.mobile.db.migration.Migration46;
+import ru.toir.mobile.db.migration.Migration47;
 
 /**
  * @author Dmitriy Logachev
@@ -443,6 +444,11 @@ class ToirRealmMigration implements RealmMigration {
 
         if (oldVersion == 45) {
             new Migration46().migration(realm);
+            oldVersion++;
+        }
+
+        if (oldVersion == 46) {
+            new Migration47().migration(realm);
             oldVersion++;
         }
 
