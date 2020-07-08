@@ -1,6 +1,14 @@
 package ru.toir.mobile.db.realm;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.Date;
+import java.util.HashMap;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -166,5 +174,35 @@ public class User extends RealmObject implements IToirDbObject {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    /**
+     * Список связей пользователей с их базами.
+     *
+     * @param context Context
+     * @return HashMap
+     */
+    public static HashMap<String, String> getUsersDbLinks(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
+        return new Gson().fromJson(usersDbLinkJson, new TypeToken<HashMap<String, String>>() {
+        }.getType());
+    }
+
+    /**
+     * @param context Context
+     * @param login String User login or tagId
+     * @return String
+     */
+    public static String getUserDbName(Context context, String login) {
+        HashMap<String, String> usersDbLinks = getUsersDbLinks(context);
+        return usersDbLinks.get(login);
+    }
+
+    public static void saveUsersDbLinks(Context context, HashMap<String, String> usersDbLinks) {
+        Gson gson = new Gson();
+        String usersDbLinkJson = gson.toJson(usersDbLinks);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sp.edit().putString("usersDbLink", usersDbLinkJson).apply();
     }
 }

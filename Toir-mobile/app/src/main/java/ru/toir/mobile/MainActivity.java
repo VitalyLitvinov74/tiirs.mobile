@@ -18,7 +18,6 @@ import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,12 +30,10 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,8 +43,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -98,13 +93,11 @@ import ru.toir.mobile.fragments.ServiceFragment;
 import ru.toir.mobile.fragments.SettingsFragment;
 import ru.toir.mobile.fragments.UserInfoFragment;
 import ru.toir.mobile.gps.GPSListener;
-import ru.toir.mobile.rest.ForegroundService;
 import ru.toir.mobile.rest.ToirAPIFactory;
 import ru.toir.mobile.rest.ToirKeyStoreFactory;
 import ru.toir.mobile.rfid.RfidDialog;
 import ru.toir.mobile.rfid.RfidDriverBase;
 import ru.toir.mobile.rfid.driver.RfidDriverNfc;
-import ru.toir.mobile.serverapi.IDownloadComplete;
 import ru.toir.mobile.serverapi.TokenSrv;
 import ru.toir.mobile.utils.MainFunctions;
 
@@ -297,15 +290,8 @@ public class MainActivity extends AppCompatActivity {
                         MainActivity.initAcra(AuthorizedUser.getInstance(), app);
 
                         // ищем локальную связь пользователя с базой
-                        SharedPreferences sp = PreferenceManager
-                                .getDefaultSharedPreferences(getApplicationContext());
-                        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
-                        Gson gson = new Gson();
-                        HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
-                                new TypeToken<HashMap<String, String>>() {
-                                }.getType());
                         // TODO: искать базу пользователя нужно и по логину
-                        String dbName = usersDbLink.get(authUser.getTagId());
+                        String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
                         if (dbName == null) {
                             return;
                         }
@@ -437,15 +423,8 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                         AuthorizedUser authUser = AuthorizedUser.getInstance();
                         // ищем локальную связь пользователя с базой
-                        SharedPreferences sp = PreferenceManager
-                                .getDefaultSharedPreferences(getApplicationContext());
-                        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
-                        Gson gson = new Gson();
-                        HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
-                                new TypeToken<HashMap<String, String>>() {
-                                }.getType());
                         // TODO: искать базу пользователя нужно и по логину
-                        String dbName = usersDbLink.get(authUser.getTagId());
+                        String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
                         if (dbName == null) {
                             return;
                         }
@@ -532,15 +511,8 @@ public class MainActivity extends AppCompatActivity {
                     if (!ToirApplication.isInternetOn(getApplicationContext())) {
                         Toast.makeText(getApplicationContext(), getText(R.string.no_internet), Toast.LENGTH_LONG).show();
                         // ищем локальную связь пользователя с базой
-                        SharedPreferences sp = PreferenceManager
-                                .getDefaultSharedPreferences(getApplicationContext());
-                        String usersDbLinkJson = sp.getString("usersDbLink", "[]");
-                        Gson gson = new Gson();
-                        HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
-                                new TypeToken<HashMap<String, String>>() {
-                                }.getType());
                         // TODO: искать базу пользователя нужно и по логину
-                        String dbName = usersDbLink.get(tagId);
+                        String dbName = User.getUserDbName(getApplicationContext(), tagId);
                         if (dbName == null) {
                             // TODO: внятное уведомление пользователю что он ещё ни разу не входил и нужен для этого инет
                             rfidDialog.dismiss();
@@ -596,14 +568,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             // ищем локальную связь пользователя с базой
-                            SharedPreferences sp = PreferenceManager
-                                    .getDefaultSharedPreferences(getApplicationContext());
-                            String usersDbLinkJson = sp.getString("usersDbLink", "[]");
-                            Gson gson = new Gson();
-                            HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
-                                    new TypeToken<HashMap<String, String>>() {
-                                    }.getType());
-
+                            HashMap<String, String> usersDbLinks = User.getUsersDbLinks(getApplicationContext());
                             AuthorizedUser authUser = AuthorizedUser.getInstance();
                             TokenSrv token = response.body();
                             if (token != null) {
@@ -612,21 +577,24 @@ public class MainActivity extends AppCompatActivity {
                                         getString(R.string.toast_token_received), Toast.LENGTH_SHORT).show();
                                 // Сохраняем login в AuthorizedUser для дальнейших запросв статики
                                 authUser.setLogin(token.getUserName());
+                                // TODO: переименовать getUserName в getUserLogin
+                                authUser.setIdentity(token.getUserName());
 
-                                // Сохраняем связь пользователя с базой
-                                // TODO: сохранить связь пользователя с базой, сервер с токеном должен передать название базы
-                                // TODO: имя базы взять из ответа сервера
-                                usersDbLink.put(authUser.getTagId(), "dbXXXX");
-                                usersDbLink.put(token.getUserName(), "dbXXXX");
-                                usersDbLinkJson = gson.toJson(usersDbLink);
-                                sp.edit().putString("usersDbLink", usersDbLinkJson).apply();
-                                // инициализируем базу пользователя
-                                ToirRealm.initDb(getApplicationContext(), "dbXXXX");
-                                realmDB = Realm.getDefaultInstance();
+                                if (token.getDb() != null && !token.getDb().equals("")) {
+                                    // Сохраняем связь пользователя с базой
+                                    usersDbLinks.put(authUser.getTagId(), token.getDb());
+                                    usersDbLinks.put(token.getUserName(), token.getDb());
+                                    User.saveUsersDbLinks(getApplicationContext(), usersDbLinks);
+                                    // инициализируем базу пользователя
+                                    ToirRealm.initDb(getApplicationContext(), token.getDb());
+                                    realmDB = ToirRealm.getDefaultInstance();
+                                } else {
+                                    return;
+                                }
                             } else {
                                 // Токен не получили, пытаемся найти пользователя в локальной базе
                                 // TODO: искать базу пользователя нужно и по логину
-                                String dbName = usersDbLink.get(authUser.getTagId());
+                                String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
                                 if (dbName == null) {
                                     // TODO: внятное уведомление пользователю что он ещё ни разу не входил а сервер не выдал токен
                                     return;
@@ -772,16 +740,8 @@ public class MainActivity extends AppCompatActivity {
                             // TODO реализовать проверку на то что пользователя нет на сервере
                             // токен не получен, сервер не ответил...
                             AuthorizedUser authUser = AuthorizedUser.getInstance();
-                            SharedPreferences sp = PreferenceManager
-                                    .getDefaultSharedPreferences(getApplicationContext());
-                            String usersDbLinkJson = sp.getString("usersDbLink", "[]");
-                            Gson gson = new Gson();
-                            HashMap<String, String> usersDbLink = gson.fromJson(usersDbLinkJson,
-                                    new TypeToken<HashMap<String, String>>() {
-                                    }.getType());
-
                             // TODO: искать базу пользователя нужно и по логину
-                            String dbName = usersDbLink.get(authUser.getTagId());
+                            String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
                             if (dbName == null) {
                                 // TODO: внятное уведомление пользователю что он ещё ни разу не входил а сервер не выдал токен
                                 return;

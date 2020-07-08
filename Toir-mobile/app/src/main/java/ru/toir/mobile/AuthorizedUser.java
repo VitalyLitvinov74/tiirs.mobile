@@ -10,7 +10,9 @@ public class AuthorizedUser {
     private String mTagId;
     private String mToken;
     private String mLogin;
-    private String organizationUuid;
+    private String mOrganizationUuid;
+    private String mIdentity;
+    private boolean mIsLogged;
 
     public static synchronized AuthorizedUser getInstance() {
         if (mInstance == null) {
@@ -84,14 +86,32 @@ public class AuthorizedUser {
         mTagId = null;
         mToken = null;
         mUuid = null;
-        organizationUuid = null;
+        mOrganizationUuid = null;
+        mIdentity = null;
+        mIsLogged = false;
     }
 
     public String getOrganizationUuid() {
-        return organizationUuid;
+        return mOrganizationUuid;
     }
 
     public void setOrganizationUuid(String organizationUuid) {
-        this.organizationUuid = organizationUuid;
+        this.mOrganizationUuid = organizationUuid;
+    }
+
+    public String getIdentity() {
+        return mIdentity;
+    }
+
+    public void setIdentity(String identity) {
+        this.mIdentity = identity;
+    }
+
+    public boolean isLogged() {
+        return mIsLogged;
+    }
+
+    public void setLogged(boolean isLogged) {
+        this.mIsLogged = isLogged;
     }
 }

@@ -12,22 +12,29 @@ public class ToirRealm {
     // версия схемы базы данных приложения
     private static final int VERSION = 47;
 
-    public static boolean initDb(Context context, String dbName) {
+    public static void initDb(Context context, String dbName) {
         if (!dbName.contains(".realm")) {
             dbName += ".realm";
         }
 
+        // конфигурация базы
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name(dbName)
                 .schemaVersion(VERSION)
+                .migration(new ToirRealmMigration(context))
                 .build();
+        // устанавливаем конфигурацию базы
+        Realm.setDefaultConfiguration(realmConfig);
+    }
+
+    public static Realm getDefaultInstance() {
+        Realm realm = null;
         try {
-            Realm.migrateRealm(realmConfig, new ToirRealmMigration(context));
-            Realm.setDefaultConfiguration(realmConfig);
-            return true;
+            realm = Realm.getDefaultInstance();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return realm;
     }
 }
