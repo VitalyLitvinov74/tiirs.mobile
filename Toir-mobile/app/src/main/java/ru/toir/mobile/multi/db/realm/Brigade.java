@@ -15,6 +15,7 @@ public class Brigade extends RealmObject {
     private String uuid;
     private String title;
     private Contragent contragent;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -64,5 +65,13 @@ public class Brigade extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganizationUuid() {
+        return organization;
+    }
+
+    public void setOrganizationUuid(Organization organization) {
+        this.organization = organization;
     }
 }

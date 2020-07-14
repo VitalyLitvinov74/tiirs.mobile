@@ -15,6 +15,7 @@ public class Tool extends RealmObject {
     private String uuid;
     private String title;
     private ToolType toolType;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -66,4 +67,11 @@ public class Tool extends RealmObject {
         this.changedAt = changedAt;
     }
 
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
 }

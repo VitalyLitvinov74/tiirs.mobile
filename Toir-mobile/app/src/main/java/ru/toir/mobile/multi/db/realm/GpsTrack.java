@@ -16,6 +16,7 @@ public class GpsTrack extends RealmObject implements ISend {
     private String userUuid;
     private double latitude;
     private double longitude;
+    private Organization organization;
     private Date date;
     private boolean sent;
 
@@ -77,5 +78,13 @@ public class GpsTrack extends RealmObject implements ISend {
 
     public void setSent(boolean sent) {
         this.sent = sent;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

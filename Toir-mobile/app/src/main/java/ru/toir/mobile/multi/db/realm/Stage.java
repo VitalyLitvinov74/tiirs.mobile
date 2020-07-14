@@ -27,6 +27,7 @@ public class Stage extends RealmObject {
     private Date changedAt;
     private RealmList<Operation> operations;
     private RealmList<Tool> tools;
+    private Organization organization;
 
     public long get_id() {
         return _id;
@@ -174,5 +175,13 @@ public class Stage extends RealmObject {
 
     public void setTools(RealmList<Tool> tools) {
         this.tools = tools;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

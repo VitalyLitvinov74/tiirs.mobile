@@ -23,6 +23,7 @@ public class Operation extends RealmObject {
     private Date endDate;
     private int flowOrder;
     private String comment;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -154,5 +155,13 @@ public class Operation extends RealmObject {
                 .findFirst();
         realm.close();
         return mediaFile;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

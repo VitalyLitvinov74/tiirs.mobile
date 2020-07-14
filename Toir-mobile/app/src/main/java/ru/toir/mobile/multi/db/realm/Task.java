@@ -26,6 +26,7 @@ public class Task extends RealmObject {
     private Date createdAt;
     private Date changedAt;
     private RealmList<Stage> stages;
+    private Organization organization;
 
     public long get_id() {
         return _id;
@@ -165,5 +166,13 @@ public class Task extends RealmObject {
 
     public boolean isCanceled() {
         return getStatus().getUuid().equals(TaskStatus.Status.CANCELED);
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

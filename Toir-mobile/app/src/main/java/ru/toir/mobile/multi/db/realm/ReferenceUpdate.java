@@ -11,13 +11,14 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Dmitriy Logachev
- * Created by koputo on 26.01.17.
+ *         Created by koputo on 26.01.17.
  */
 
 public class ReferenceUpdate extends RealmObject {
     @PrimaryKey
     private String referenceName;
     private Date updateDate;
+    private Organization organization;
 
     public static Date lastChanged(String name) {
         Realm realm = Realm.getDefaultInstance();

@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 07.09.16.
+ *         Created on 07.09.16.
  */
 public class Message extends RealmObject implements ISend {
     @Index
@@ -22,6 +22,7 @@ public class Message extends RealmObject implements ISend {
     private Date date;
     private int status;
     private boolean sent;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -113,5 +114,13 @@ public class Message extends RealmObject implements ISend {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

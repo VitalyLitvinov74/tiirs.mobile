@@ -19,6 +19,7 @@ public class StageVerdict extends RealmObject {
     private Date createdAt;
     private Date changedAt;
     private StageType stageType;
+    private Organization organization;
 
     private static StageVerdict getVerdictObject(Realm realm, String verdictUuid) {
         return realm.where(StageVerdict.class)
@@ -96,6 +97,14 @@ public class StageVerdict extends RealmObject {
 
     public void setStageType(StageType stageType) {
         this.stageType = stageType;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public class Verdict {

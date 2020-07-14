@@ -21,6 +21,7 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     private OperationType operationType;
     private Date createdAt;
     private Date changedAt;
+    private Organization organization;
     private RealmList<OperationTool> operationTools;
     private RealmList<OperationRepairPart> operationRepairParts;
 
@@ -135,5 +136,13 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

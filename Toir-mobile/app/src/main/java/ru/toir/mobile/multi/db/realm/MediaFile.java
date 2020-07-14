@@ -17,6 +17,7 @@ public class MediaFile extends RealmObject implements IToirDbObject, ISend {
     private String path;
     private String name;
     private boolean sent;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -121,5 +122,13 @@ public class MediaFile extends RealmObject implements IToirDbObject, ISend {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

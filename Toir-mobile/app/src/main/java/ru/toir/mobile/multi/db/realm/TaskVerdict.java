@@ -17,6 +17,7 @@ public class TaskVerdict extends RealmObject {
     private String title;
     private TaskType taskType;
     private String icon;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -92,6 +93,14 @@ public class TaskVerdict extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public class Verdict {

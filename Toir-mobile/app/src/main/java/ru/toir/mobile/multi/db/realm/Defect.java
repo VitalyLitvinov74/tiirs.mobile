@@ -25,6 +25,7 @@ public class Defect extends RealmObject implements ISend {
     private boolean process;
     private String comment;
     private Task task;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
     private boolean sent;
@@ -156,5 +157,13 @@ public class Defect extends RealmObject implements ISend {
                 .findFirst();
         realm.close();
         return mediaFile;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

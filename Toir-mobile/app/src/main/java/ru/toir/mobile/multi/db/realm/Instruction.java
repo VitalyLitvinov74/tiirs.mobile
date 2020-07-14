@@ -7,7 +7,7 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * @author Olejek
- * Created on 10.09.16.
+ *         Created on 10.09.16.
  */
 public class Instruction extends RealmObject implements IToirDbObject {
     @PrimaryKey
@@ -17,6 +17,7 @@ public class Instruction extends RealmObject implements IToirDbObject {
     private String title;
     private String path;
     private int size;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -99,5 +100,13 @@ public class Instruction extends RealmObject implements IToirDbObject {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

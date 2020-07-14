@@ -20,6 +20,7 @@ public class Objects extends RealmObject implements IToirDbObject {
     private double latitude;
     private double longitude;
     private String photo;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -132,5 +133,13 @@ public class Objects extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

@@ -17,6 +17,7 @@ public class AttributeType extends RealmObject {
     private boolean refresh;
     private String units;
     private int type;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -95,6 +96,14 @@ public class AttributeType extends RealmObject {
             default:
                 return null;
         }
+    }
+
+    public Organization getOrganizationUuid() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public class Type {

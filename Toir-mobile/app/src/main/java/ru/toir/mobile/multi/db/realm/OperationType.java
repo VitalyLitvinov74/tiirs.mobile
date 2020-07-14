@@ -14,6 +14,7 @@ public class OperationType extends RealmObject {
     private long _id;
     private String uuid;
     private String title;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -59,6 +60,14 @@ public class OperationType extends RealmObject {
 
     public boolean isMeasure() {
         return uuid.equals(Type.MEASURE);
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public class Type {

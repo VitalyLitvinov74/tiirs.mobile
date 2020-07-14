@@ -17,6 +17,7 @@ public class EquipmentStage extends RealmObject {
     private String uuid;
     private Equipment equipment;
     private RealmList<StageOperation> stageOperations;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -66,5 +67,13 @@ public class EquipmentStage extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

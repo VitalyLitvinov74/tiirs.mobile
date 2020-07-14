@@ -16,6 +16,7 @@ public class EquipmentModel extends RealmObject implements IToirDbObject {
     private EquipmentType equipmentType;
     private String title;
     private String image;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -98,5 +99,13 @@ public class EquipmentModel extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

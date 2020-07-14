@@ -10,7 +10,7 @@ import io.realm.RealmConfiguration;
  */
 public class ToirRealm {
     // версия схемы базы данных приложения
-    private static final int VERSION = 47;
+    private static final int VERSION = 0;
 
     public static void initDb(Context context, String dbName) {
         if (!dbName.contains(".realm")) {

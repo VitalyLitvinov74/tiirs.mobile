@@ -13,6 +13,7 @@ public class OrderRepairPart extends RealmObject {
     private Orders order;
     private RepairPart repairPart;
     private int quantity;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -82,5 +83,13 @@ public class OrderRepairPart extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

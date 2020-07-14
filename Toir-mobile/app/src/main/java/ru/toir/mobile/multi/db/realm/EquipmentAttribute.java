@@ -21,6 +21,7 @@ public class EquipmentAttribute extends RealmObject implements ISend {
     private Date date;
     private String value;
     private boolean sent;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -107,5 +108,13 @@ public class EquipmentAttribute extends RealmObject implements ISend {
     @Override
     public void setSent(boolean sent) {
         this.sent = sent;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

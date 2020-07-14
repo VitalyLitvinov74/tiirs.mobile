@@ -26,6 +26,7 @@ public class Equipment extends RealmObject implements IToirDbObject {
     private float longitude;
     private String tagId;
     private String image;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -216,5 +217,13 @@ public class Equipment extends RealmObject implements IToirDbObject {
         }
 
         return file;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

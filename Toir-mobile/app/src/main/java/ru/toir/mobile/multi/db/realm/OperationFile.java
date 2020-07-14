@@ -21,6 +21,7 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
     private Operation operation;
     private String fileName;
     private boolean sent;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -138,5 +139,13 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
         realm.close();
 
         return stage;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

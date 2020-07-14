@@ -22,6 +22,7 @@ public class Contragent extends RealmObject {
     private String photo;
     private double latitude;
     private double longitude;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -127,5 +128,13 @@ public class Contragent extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

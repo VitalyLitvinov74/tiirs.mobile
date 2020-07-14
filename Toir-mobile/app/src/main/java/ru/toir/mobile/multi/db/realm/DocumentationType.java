@@ -15,6 +15,7 @@ public class DocumentationType extends RealmObject {
     private String uuid;
     private String title;
     private String icon;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -64,5 +65,13 @@ public class DocumentationType extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

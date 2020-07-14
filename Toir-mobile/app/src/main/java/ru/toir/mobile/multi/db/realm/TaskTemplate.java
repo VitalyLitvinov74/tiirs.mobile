@@ -20,6 +20,7 @@ public class TaskTemplate extends RealmObject implements IToirDbObject {
     private String image;
     private int normative;
     private TaskType taskType;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -118,5 +119,13 @@ public class TaskTemplate extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

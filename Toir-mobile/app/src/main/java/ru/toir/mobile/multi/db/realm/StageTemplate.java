@@ -18,6 +18,7 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
     private String image;
     private int normative;
     private StageType stageType;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -116,5 +117,13 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
     @Override
     public String getImageFileUrl(String userName) {
         return "/storage/" + userName + "/" + getImageFilePath();
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

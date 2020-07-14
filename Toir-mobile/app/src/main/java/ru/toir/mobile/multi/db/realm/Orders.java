@@ -35,6 +35,7 @@ public class Orders extends RealmObject implements ISend {
     private int updated;
     private RealmList<Task> tasks;
     private boolean sent;
+    private Organization organization;
 
     public long get_id() {
         return _id;
@@ -252,4 +253,11 @@ public class Orders extends RealmObject implements ISend {
         return orderStatus.getUuid().equals(OrderStatus.Status.CANCELED);
     }
 
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
 }

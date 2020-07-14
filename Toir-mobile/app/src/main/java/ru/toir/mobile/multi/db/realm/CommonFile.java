@@ -14,6 +14,7 @@ public class CommonFile extends RealmObject implements IToirDbObject {
     private String name;
     private String description;
     private boolean require;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -105,5 +106,13 @@ public class CommonFile extends RealmObject implements IToirDbObject {
 
     public void setRequire(boolean require) {
         this.require = require;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

@@ -17,6 +17,7 @@ public class OperationTool extends RealmObject {
     private String operationTemplateUuid;
     private Tool tool;
     private int quantity;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -74,5 +75,13 @@ public class OperationTool extends RealmObject {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

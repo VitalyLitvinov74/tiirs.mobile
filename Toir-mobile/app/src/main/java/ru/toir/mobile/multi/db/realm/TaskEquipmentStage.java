@@ -18,6 +18,7 @@ public class TaskEquipmentStage extends RealmObject {
     private TaskTemplate taskTemplate;
     private RealmList<EquipmentStage> equipmentStages;
     private String period;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -75,5 +76,13 @@ public class TaskEquipmentStage extends RealmObject {
 
     public void setChangedAt(Date changedAt) {
         this.changedAt = changedAt;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

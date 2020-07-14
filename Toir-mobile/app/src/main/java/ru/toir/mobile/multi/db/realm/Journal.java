@@ -16,6 +16,7 @@ public class Journal extends RealmObject implements ISend {
     private String description;
     private String userUuid;
     private Date date;
+    private Organization organization;
     private boolean sent;
 
     public static long getLastId() {
@@ -68,5 +69,13 @@ public class Journal extends RealmObject implements ISend {
 
     public void setSent(boolean sent) {
         this.sent = sent;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }

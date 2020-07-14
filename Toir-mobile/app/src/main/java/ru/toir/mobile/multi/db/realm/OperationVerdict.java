@@ -16,6 +16,7 @@ public class OperationVerdict extends RealmObject {
     private String uuid;
     private String title;
     private String icon;
+    private Organization organization;
     private Date createdAt;
     private Date changedAt;
 
@@ -103,6 +104,14 @@ public class OperationVerdict extends RealmObject {
 
     public boolean isCanceled() {
         return uuid.equals(Verdict.CANCELED);
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public class Verdict {
