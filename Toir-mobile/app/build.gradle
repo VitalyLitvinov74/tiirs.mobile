@@ -15,7 +15,7 @@ android {
         versionProps['VERSION_CODE']=code.toString()
 //        versionProps.store(versionPropsFile.newWriter(), null)
         defaultConfig {
-            applicationId "ru.toir.mobile"
+            applicationId "ru.toir.mobile.multi"
             minSdkVersion 17
             targetSdkVersion 27
             versionCode code

@@ -77,7 +77,7 @@
                 android:textColor="@color/larisaWhiteColor"
                 android:textSize="16sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_id_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
@@ -112,7 +112,7 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/defect_user_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
@@ -147,7 +147,7 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/defect_date_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
@@ -182,7 +182,7 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/defect_status_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
@@ -217,7 +217,7 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/defect_level_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"

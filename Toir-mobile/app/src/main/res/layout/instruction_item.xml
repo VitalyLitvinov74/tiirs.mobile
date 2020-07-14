@@ -5,7 +5,7 @@
     android:background="@color/larisaTextColorAWhite"
     android:padding="6dip">
 
-    <ru.toir.mobile.utils.IconTextView
+    <ru.toir.mobile.multi.utils.IconTextView
         android:id="@+id/instruction_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"

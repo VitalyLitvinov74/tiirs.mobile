@@ -4,39 +4,31 @@
 
 package ru.toir.mobile.robotest;
 
-import com.robotium.solo.Solo;
-import ru.toir.mobile.MainActivity;
-
-import android.preference.EditTextPreference;
 import android.test.ActivityInstrumentationTestCase2;
-
-import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Spinner;
 
-import ru.toir.mobile.*;
-import ru.toir.mobile.R;
-import ru.toir.mobile.fragments.EquipmentsFragment;
-import ru.toir.mobile.fragments.GPSFragment;
-import ru.toir.mobile.fragments.OrderFragment;
-import ru.toir.mobile.fragments.UserInfoFragment;
+import com.robotium.solo.Solo;
 
-public class AllActionTest extends ActivityInstrumentationTestCase2<MainActivity>{
+import ru.toir.mobile.multi.MainActivity;
+import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.ToirApplication;
+
+public class AllActionTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     private Solo solo;
+
     public AllActionTest() {
-        super("ru.toir.mobile",MainActivity.class);
+        super(ToirApplication.packageName, MainActivity.class);
     }
 
-    public void setUp()throws Exception{
-        solo=new Solo(getInstrumentation(),getActivity());
+    public void setUp() throws Exception {
+        solo = new Solo(getInstrumentation(), getActivity());
     }
 
-    public void testAttendance()throws Exception{
+    public void testAttendance() throws Exception {
         solo.waitForActivity("MainActivity", 2000);
         //View login_view = solo.getView(ru.toir.mobile.R.layout.login_layout);
-        //assertCurrentActivity("Desired View is not visible", ru.toir.mobile.MainActivity);
+        //assertCurrentActivity("Desired View is not visible", ru.toir.mobile.multi.MainActivity);
         //solo.pressSpinnerItem(ru.toir.mobile.R.id.);
         assertEquals("Это не экран входа", View.VISIBLE,
                 solo.getView(R.id.loginButton).getVisibility());
@@ -46,11 +38,11 @@ public class AllActionTest extends ActivityInstrumentationTestCase2<MainActivity
         solo.clickOnText("Основные");
         solo.clickOnText("Сервер системы");
         solo.clearEditText(0);
-        solo.enterText(0,"http://api.toir.tehnosber.ru!!");
+        solo.enterText(0, "http://api.toir.tehnosber.ru!!");
         solo.clickOnButton(0);
         solo.clickOnText("Сервер системы");
         solo.clearEditText(0);
-        solo.enterText(0,"http://api.toir.tehnosber.ru");
+        solo.enterText(0, "http://api.toir.tehnosber.ru");
         solo.clickOnButton(0);
         solo.clickOnText("Драйвер считывателя RFID");
         solo.clickInList(8);
@@ -59,7 +51,7 @@ public class AllActionTest extends ActivityInstrumentationTestCase2<MainActivity
 
         View view_login = solo.getView(R.id.loginButton);
         solo.clickOnView(view_login);
-        solo.pressSpinnerItem(0,2);
+        solo.pressSpinnerItem(0, 2);
         solo.clickOnButton(1);
 
         View view_order = solo.getView(R.id.menu_orders);
@@ -74,7 +66,7 @@ public class AllActionTest extends ActivityInstrumentationTestCase2<MainActivity
         solo.clickOnView(view_equipment);
         solo.waitForActivity("EquipmentsFragment", 2000);
 
-        View view_gps = solo.getView(R.id.menu_maps);
+        View view_gps = solo.getView(R.id.gps_mapview);
         solo.clickOnView(view_gps);
         solo.waitForActivity("GPSFragment", 2000);
 

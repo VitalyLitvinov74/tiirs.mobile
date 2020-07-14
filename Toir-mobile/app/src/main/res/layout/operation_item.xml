@@ -92,7 +92,7 @@
             android:paddingEnd="5dp"
             android:paddingStart="5dp">
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/options"
                 android:layout_width="20dp"
                 android:layout_height="25dp"
@@ -122,10 +122,10 @@
             android:id="@+id/op_description"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/imageViewOperation"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewOperation"
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#222222"
@@ -136,8 +136,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/op_description"
-            android:layout_toEndOf="@+id/imageViewOperation"
             android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewOperation"
             android:text="@string/normative"
             android:textColor="#222222"
             android:textSize="12sp" />
@@ -157,8 +157,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/op_normative_label"
-            android:layout_toEndOf="@+id/imageViewOperation"
             android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewOperation"
             android:text="@string/operation_time"
             android:textColor="#222222"
             android:textSize="12sp" />
@@ -188,8 +188,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/op_time_label"
-            android:layout_toEndOf="@+id/op_measure_label"
             android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_measure_label"
             android:textColor="#454545"
             android:textSize="12sp" />
 

@@ -63,17 +63,17 @@
                 android:textColor="#ffffff"
                 android:textSize="16sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_id_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
-                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_model"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:text="@string/icon_tags"
-                android:textColor="@color/larisaBlueColor" />
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_uuid"
@@ -97,17 +97,17 @@
                 android:textColor="@color/larisaTextColorBlack"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_location_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
-                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_inventory"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:text="@string/icon_map_marker"
-                android:textColor="@color/larisaBlueColor" />
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_location"
@@ -132,17 +132,17 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_date_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
-                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_location_label"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:text="@string/icon_tools"
-                android:textColor="@color/larisaBlueColor" />
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_serial"
@@ -167,17 +167,17 @@
                 android:textColor="@color/larisaTextColor"
                 android:textSize="14sp" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_status_icon"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
-                android:textSize="20sp"
                 android:layout_below="@+id/equipment_text_date_label"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:text="@string/icon_cogs"
-                android:textColor="@color/larisaBlueColor" />
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_status"
@@ -209,7 +209,7 @@
                 android:layout_below="@+id/equipment_text_status_label"
                 android:background="#777777" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_information_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
@@ -252,31 +252,31 @@
                 android:layout_below="@+id/list_view"
                 android:background="#777777" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_documentation_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:textSize="20sp"
                 android:layout_below="@+id/equipment_divider2"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:text="@string/icon_book"
-                android:textColor="@color/larisaBlueColor" />
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_documentation"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider2"
-                android:background="@color/larisaTextColorAWhite"
-                android:gravity="center_vertical"
-                android:text="@string/documentation"
-                android:textColor="@color/larisaTextColor"
-                android:textSize="16sp"
                 android:layout_marginEnd="15dp"
                 android:layout_toEndOf="@+id/equipment_documentation_icon"
-                android:paddingStart="10dp" />
+                android:background="@color/larisaTextColorAWhite"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:text="@string/documentation"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/equipment_documentation_listView"
@@ -294,30 +294,30 @@
                 android:layout_below="@+id/equipment_documentation_listView"
                 android:background="#777777" />
 
-            <ru.toir.mobile.utils.IconTextView
+            <ru.toir.mobile.multi.utils.IconTextView
                 android:id="@+id/equipment_defects_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:textSize="20sp"
                 android:layout_below="@+id/equipment_divider3"
                 android:layout_marginStart="10dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:text="@string/icon_bell"
-                android:textColor="@color/larisaBlueColor" />
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/equipment_text_defects"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_below="@+id/equipment_divider3"
-                android:background="@color/larisaTextColorAWhite"
-                android:text="@string/mistakes"
-                android:gravity="center_vertical"
-                android:textColor="@color/larisaTextColor"
-                android:textSize="16sp"
                 android:layout_toEndOf="@+id/equipment_defects_icon"
-                android:paddingStart="10dp" />
+                android:background="@color/larisaTextColorAWhite"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:text="@string/mistakes"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/equipment_defects_listView"
@@ -337,8 +337,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="5dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginEnd="5dp"
         android:src="@android:drawable/ic_dialog_alert"
         app:backgroundTint="@color/md_red_400"
         app:fabSize="normal" />
@@ -348,8 +348,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="5dp"
         android:layout_marginBottom="70dp"
+        android:layout_marginEnd="5dp"
         android:src="@android:drawable/ic_menu_edit"
         app:backgroundTint="@color/larisaBlueColor"
         app:fabSize="normal" />

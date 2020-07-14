@@ -13,8 +13,8 @@
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/larisaBlueColor"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:navigationIcon="?android:attr/homeAsUpIndicator"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="@string/action_settings" />
 
 </android.support.design.widget.AppBarLayout>

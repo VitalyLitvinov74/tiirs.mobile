@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.toir.mobile">
+    package="ru.toir.mobile.multi">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -108,7 +108,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="ru.toir.mobile.provider"
+            android:authorities="ru.toir.mobile.multi.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
