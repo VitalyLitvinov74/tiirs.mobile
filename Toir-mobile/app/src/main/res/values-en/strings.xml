@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ToiRus</string>
+    <string name="app_name">ToiRus(m)</string>
     <string name="action_settings">App settings</string>
     <string name="action_about">About</string>
     <string name="pleasePutTag">Bring tag</string>

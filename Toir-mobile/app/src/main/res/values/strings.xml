@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ТОиРУС</string>
+    <string name="app_name">ТОиРУС(m)</string>
     <string name="action_settings">Настройки приложения</string>
     <string name="action_about">О программе</string>
     <string name="pleasePutTag">Поднесите метку</string>

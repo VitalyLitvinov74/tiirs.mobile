@@ -1,6 +1,6 @@
 <?xml version = "1.0" encoding = "utf-8"?>
 <resources>
-    <string name="app_name">TOIRUS</string>
+    <string name="app_name">TOIRUS(m)</string>
     <string name="action_settings"> Anwendungseinstellungen </string>
     <string name="action_about">Info</string>
     <string name="pleasePutTag">Label</string>
