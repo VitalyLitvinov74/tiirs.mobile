@@ -197,8 +197,11 @@ public class EquipmentsFragment extends Fragment {
 
                             realm.close();
                         } else {
-                            Toast.makeText(getActivity(), getString(R.string.error_read_tag),
-                                    Toast.LENGTH_SHORT).show();
+                            try {
+                                Toast.makeText(getActivity(), getString(R.string.error_read_tag),
+                                        Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                            }
                         }
 
                         // закрываем диалог
