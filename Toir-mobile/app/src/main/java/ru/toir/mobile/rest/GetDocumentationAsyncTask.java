@@ -20,7 +20,7 @@ import ru.toir.mobile.ToirApplication;
 
 public class GetDocumentationAsyncTask extends AsyncTask<String, Void, String> {
 
-    private static final String TAG = GetOrderAsyncTask.class.getSimpleName();
+    private static final String TAG = GetDocumentationAsyncTask.class.getSimpleName();
     private ProgressDialog dialog;
     private File extDir;
 

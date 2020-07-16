@@ -2,10 +2,13 @@ package ru.toir.mobile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -13,6 +16,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Build;
@@ -162,6 +167,10 @@ public class MainActivity extends AppCompatActivity {
     private String locationBestProvider = LocationManager.GPS_PROVIDER;
     private boolean GPSPresent = false;
 
+    BroadcastReceiver networkReceiver;
+    BroadcastReceiver loginReceiver;
+    static String loginAction = "ru.toir.mobile.login";
+
     public static Locale getLocale(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String lang = sharedPreferences.getString("lang_key", "ru");
@@ -229,6 +238,207 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setLocale();
         savedInstance = savedInstanceState;
+
+        networkReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ConnectivityManager conn = (ConnectivityManager)
+                        context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (conn == null) {
+                    return;
+                }
+
+                boolean isConnected = false;
+                NetworkInfo netInfo = conn.getActiveNetworkInfo();
+                if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                    isConnected = netInfo.isConnected();
+                } else if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    isConnected = netInfo.isConnected();
+                }
+
+                if (isConnected && AuthorizedUser.getInstance().getToken() == null) {
+                    Intent loginIntent = new Intent(loginAction);
+                    sendBroadcast(loginIntent);
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(networkReceiver, filter);
+
+        loginReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final Application app = getApplication();
+                AuthorizedUser user = AuthorizedUser.getInstance();
+
+                if (user.getToken() != null && user.getTagId() != null) {
+                    return;
+                }
+
+                Call<TokenSrv> call = ToirAPIFactory.getTokenService()
+                        .getByLabel(user.getTagId(), TokenSrv.Type.LABEL);
+                call.enqueue(new Callback<TokenSrv>() {
+                    @Override
+                    public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
+                        if (response.code() != 200) {
+                            String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.auth_error);
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                        }
+
+                        AuthorizedUser authUser = AuthorizedUser.getInstance();
+                        TokenSrv token = response.body();
+                        if (token == null) {
+                            return;
+                        }
+
+                        isLogged = true;
+                        authUser.setToken(token.getAccessToken());
+                        authUser.setLogin(token.getUserName());
+                        MainActivity.initAcra(AuthorizedUser.getInstance(), app);
+
+                        // запрашиваем актуальную информацию по пользователю
+//                        Call<User> call = ToirAPIFactory.getUserService().user();
+//                        call.enqueue(new Callback<User>() {
+//                            @Override
+//                            public void onResponse(Call<User> userCall, Response<User> response) {
+//                                if (response.code() != 200) {
+//                                    String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.toast_error_no_user);
+//                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+//                                }
+//
+//                                User user = response.body();
+//                                if (user != null) {
+//                                    final String fileName = user.getImage();
+//                                    Realm realm = Realm.getDefaultInstance();
+//                                    // проверяем необходимость запрашивать файл изображения с сервера
+//                                    String tagId = AuthorizedUser.getInstance().getTagId();
+//                                    User localUser = realm.where(User.class).equalTo("tagId", tagId).findFirst();
+//                                    File localImageFile;
+//                                    boolean needDownloadImage = false;
+//                                    if (localUser != null) {
+//                                        Date serverDate = user.getChangedAt();
+//                                        Date localDate = localUser.getChangedAt();
+//                                        File fileDir = getExternalFilesDir(localUser.getImageFilePath() + "/");
+//                                        localImageFile = new File(fileDir, localUser.getImage());
+//                                        if (localDate.getTime() < serverDate.getTime() || !localImageFile.exists()) {
+//                                            needDownloadImage = true;
+//                                        }
+//                                    } else {
+//                                        needDownloadImage = true;
+//                                    }
+//
+//                                    realm.beginTransaction();
+//                                    realm.copyToRealmOrUpdate(user);
+//                                    realm.commitTransaction();
+//                                    isLogged = true;
+//                                    // TODO: нужен метод для установки полей объекта из разных объектов (Token, User...)
+//                                    AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
+//                                    authorizedUser.setUuid(user.getUuid());
+//                                    authorizedUser.setLogin(user.getLogin());
+//                                    addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
+//                                    //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
+//
+//                                    // получаем изображение пользователя
+//                                    if (needDownloadImage && !fileName.equals("")) {
+//                                        String url = ToirApplication.serverUrl + "/" + user.getImageFileUrl(user.getLogin()) + "/" + user.getImage();
+//                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
+//                                        callFile.enqueue(new Callback<ResponseBody>() {
+//                                            @Override
+//                                            public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
+//                                                ResponseBody fileBody = response.body();
+//                                                if (fileBody == null) {
+//                                                    return;
+//                                                }
+//
+//                                                File filePath = getExternalFilesDir("/" + User.getImageRoot());
+//                                                if (filePath == null) {
+//                                                    // нет доступа к внешнему накопителю
+//                                                    return;
+//                                                }
+//
+//                                                File file = new File(filePath, fileName);
+//                                                if (!file.getParentFile().exists()) {
+//                                                    if (!file.getParentFile().mkdirs()) {
+//                                                        return;
+//                                                    }
+//                                                }
+//
+//                                                try {
+//                                                    FileOutputStream fos = new FileOutputStream(file);
+//                                                    fos.write(fileBody.bytes());
+//                                                    fos.close();
+//                                                    // принудительно масштабируем изображение пользоваетеля
+//                                                    String path = filePath + File.separator;
+//                                                    Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
+//                                                    if (user_bitmap == null) {
+//                                                        // По какой-то причине не смогли получить
+//                                                        // уменьшенное изображение
+//                                                        Log.e(TAG, getString(R.string.toast_error_picture));
+//                                                    }
+//                                                } catch (Exception e) {
+//                                                    e.printStackTrace();
+//                                                }
+//                                            }
+//
+//                                            @Override
+//                                            public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
+//                                                t.printStackTrace();
+//                                            }
+//                                        });
+//                                    }
+//
+//                                    //user_changed = true;
+//                                    changeActiveProfile(user);
+//
+//                                    realm.close();
+//                                } else {
+//                                    String message = getString(R.string.toast_error_no_user);
+//                                    addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
+//                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+//                                }
+//
+//                                authorizationDialog.dismiss();
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<User> userCall, Throwable t) {
+//                                // сообщаем описание неудачи
+//                                // TODO нужен какой-то механизм уведомления о причине не успеха
+////                                    String message = bundle.getString(IServiceProvider.MESSAGE);
+//                                String message = getString(R.string.toast_error_no_user_received);
+//                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+//                                authorizationDialog.dismiss();
+//                            }
+//                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
+                        String message = getString(R.string.toast_error_no_token_received);
+                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+
+                        // проверяем наличие пользователя в локальной базе
+                        User user = realmDB.where(User.class)
+                                .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
+                                .findFirst();
+
+                        // в зависимости от результата либо дать работать, либо не дать
+                        if (user != null && user.isActive() == 1) {
+                            isLogged = true;
+                            changeActiveProfile(user);
+                            AuthorizedUser.getInstance().setUuid(user.getUuid());
+                            addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    getString(R.string.toast_error_no_access),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        };
+        filter = new IntentFilter(MainActivity.loginAction);
+        this.registerReceiver(loginReceiver, filter);
 
         // инициализация приложения
         init();
@@ -563,13 +773,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Устанавливам основной экран приложения
-     */
-    //@SuppressWarnings("deprecation")
-    void setMainLayout(Bundle savedInstanceState) {
-        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
-        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this)
+    static void initAcra(AuthorizedUser authorizedUser, Application application) {
+        String token = authorizedUser.getToken();
+        String login = authorizedUser.getLogin();
+        if (token == null || login == null) {
+            return;
+        }
+
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(application)
                 .setBuildConfigClass(BuildConfig.class)
                 .setReportFormat(StringFormat.JSON);
         builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class)
@@ -577,8 +788,16 @@ public class MainActivity extends AppCompatActivity {
                 .setUri(ToirApplication.serverUrl.concat("/crash?XDEBUG_SESSION_START=xdebug&token=").concat(authorizedUser.getToken()).concat("&apiuser=").concat(authorizedUser.getLogin()))
                 .setHttpMethod(HttpSender.Method.POST)
                 .setEnabled(true);
-        ACRA.init(this.getApplication(), builder);
+        ACRA.init(application, builder);
+    }
 
+    /**
+     * Устанавливам основной экран приложения
+     */
+    //@SuppressWarnings("deprecation")
+    void setMainLayout(Bundle savedInstanceState) {
+        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
+        MainActivity.initAcra(authorizedUser, this.getApplication());
         setContentView(R.layout.activity_main);
 //        SharedPreferences sp = PreferenceManager
 //                .getDefaultSharedPreferences(getApplicationContext());
@@ -1099,7 +1318,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     getString(R.string.no_user_present), Toast.LENGTH_LONG).show();
                         }
-                        user.setActive(1);
+                        users.get(cnt).setActive(1);
                         realmDB.commitTransaction();
                     }
                 }
@@ -1162,6 +1381,14 @@ public class MainActivity extends AppCompatActivity {
 
             _locationManager = null;
             _gpsListener = null;
+        }
+
+        if (networkReceiver != null) {
+            this.unregisterReceiver(networkReceiver);
+        }
+
+        if (loginReceiver != null) {
+            this.unregisterReceiver(loginReceiver);
         }
     }
 
