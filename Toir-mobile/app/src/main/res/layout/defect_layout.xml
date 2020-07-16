@@ -255,7 +255,7 @@
             <TextView
                 android:id="@+id/defect_comment"
                 android:layout_width="fill_parent"
-                android:layout_height="25dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/defect_text_level_label"
                 android:background="@color/larisaTextColorAWhite"
                 android:minLines="3"
