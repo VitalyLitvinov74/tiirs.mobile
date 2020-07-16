@@ -303,4 +303,9 @@
 
     <string name="no_operations">Нет операций</string>
     <string name="menu_order_tool">Перечень инструмента</string>
+
+    <string name="menu_calendar">Календарь</string>
+    <string name="menu_messages">Сообщения</string>
+    <string name="menu_calendar_description">Календарь заданий</string>
+    <string name="menu_messages_description">Внутренняя почта</string>
 </resources>

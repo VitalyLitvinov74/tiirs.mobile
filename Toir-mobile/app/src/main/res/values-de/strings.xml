@@ -301,4 +301,10 @@
 
     <string name="no_operations">Keine operationen</string>
     <string name="menu_order_tool">Werkzeugliste</string>
+
+    <string name="menu_calendar">Kalender</string>
+    <string name="menu_messages">Nachrichten</string>
+    <string name="menu_calendar_description">Orderkalender</string>
+    <string name="menu_messages_description">Interne Mail</string>
+
 </resources>

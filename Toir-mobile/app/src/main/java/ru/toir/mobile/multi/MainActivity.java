@@ -133,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_CONTRAGENTS = 17;
     private static final int FRAGMENT_DEFECTS = 18;
 
+    private static final int FRAGMENT_CALENDAR = 19;
+    private static final int FRAGMENT_MESSAGES = 20;
+
     private static final String TAG = "MainActivity";
     static String loginAction = ToirApplication.packageName + ".login";
     private static boolean isExitTimerStart = false;
@@ -1011,6 +1014,13 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_DEFECTS)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_calendar)
+                                .withDescription(R.string.menu_calendar_description)
+                                .withIcon(GoogleMaterial.Icon.gmd_calendar)
+                                .withIdentifier(FRAGMENT_CALENDAR)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName(R.string.service)
@@ -1074,6 +1084,9 @@ public class MainActivity extends AppCompatActivity {
                             } else if (ident == FRAGMENT_CONTRAGENTS) {
                                 currentFragment = FRAGMENT_CONTRAGENTS;
                                 tr.replace(R.id.frame_container, ContragentsFragment.newInstance());
+                            } else if (ident == FRAGMENT_CALENDAR) {
+                                currentFragment = FRAGMENT_CALENDAR;
+                                tr.replace(R.id.frame_container, CalendarFragment.newInstance());
                             } else if (ident == DRAWER_INFO) {
                                 startAboutDialog();
                             } else if (ident == DRAWER_EXIT) {
