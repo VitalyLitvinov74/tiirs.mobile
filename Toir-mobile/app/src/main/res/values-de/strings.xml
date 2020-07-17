@@ -307,4 +307,7 @@
     <string name="menu_calendar_description">Orderkalender</string>
     <string name="menu_messages_description">Interne Mail</string>
 
+    <string name="menu_receive">Empfangen</string>
+    <string name="menu_send">Geschickt</string>
+    <string name="menu_all">Alles</string>
 </resources>

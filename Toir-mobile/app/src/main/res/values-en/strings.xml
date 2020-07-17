@@ -310,4 +310,8 @@
     <string name="menu_messages">Messages</string>
     <string name="menu_calendar_description">Task calendar</string>
     <string name="menu_messages_description">Internal mail</string>
+
+    <string name="menu_receive">Receive</string>
+    <string name="menu_send">Send</string>
+    <string name="menu_all">All</string>
 </resources>

@@ -308,4 +308,8 @@
     <string name="menu_messages">Сообщения</string>
     <string name="menu_calendar_description">Календарь заданий</string>
     <string name="menu_messages_description">Внутренняя почта</string>
+
+    <string name="menu_receive">Входящие</string>
+    <string name="menu_send">Отправленные</string>
+    <string name="menu_all">Все</string>
 </resources>

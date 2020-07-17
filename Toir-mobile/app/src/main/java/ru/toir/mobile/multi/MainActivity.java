@@ -87,6 +87,7 @@ import ru.toir.mobile.multi.fragments.DefectsFragment;
 import ru.toir.mobile.multi.fragments.DocumentationFragment;
 import ru.toir.mobile.multi.fragments.EquipmentsFragment;
 import ru.toir.mobile.multi.fragments.GPSFragment;
+import ru.toir.mobile.multi.fragments.MessageFragment;
 import ru.toir.mobile.multi.fragments.ObjectFragment;
 import ru.toir.mobile.multi.fragments.OrderFragment;
 import ru.toir.mobile.multi.fragments.ReferenceFragment;
@@ -1015,6 +1016,13 @@ public class MainActivity extends AppCompatActivity {
                                 .withIdentifier(FRAGMENT_CALENDAR)
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.menu_messages)
+                                .withDescription(R.string.menu_messages_description)
+                                .withIcon(GoogleMaterial.Icon.gmd_account_box_mail)
+                                .withIdentifier(FRAGMENT_MESSAGES)
+                                .withSelectable(false)
+                                .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor)),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem()
                                 .withName(R.string.service)
@@ -1081,6 +1089,9 @@ public class MainActivity extends AppCompatActivity {
                             } else if (ident == FRAGMENT_CALENDAR) {
                                 currentFragment = FRAGMENT_CALENDAR;
                                 tr.replace(R.id.frame_container, CalendarFragment.newInstance());
+                            } else if (ident == FRAGMENT_MESSAGES) {
+                                currentFragment = FRAGMENT_MESSAGES;
+                                tr.replace(R.id.frame_container, MessageFragment.newInstance());
                             } else if (ident == DRAWER_INFO) {
                                 startAboutDialog();
                             } else if (ident == DRAWER_EXIT) {

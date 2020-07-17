@@ -123,4 +123,10 @@ public class Message extends RealmObject implements ISend {
     public void setOrganization(Organization organization) {
         this.organization = organization;
     }
+
+    public class Status {
+        public static final int MESSAGE_NEW = 0;
+        public static final int MESSAGE_READ = 1;
+        public static final int MESSAGE_DELETED = 2;
+    }
 }
