@@ -27,7 +27,9 @@ import io.realm.RealmResults;
 import ru.toir.mobile.multi.MainActivity;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.adapters.OrderAdapter;
+import ru.toir.mobile.multi.db.realm.OrderStatus;
 import ru.toir.mobile.multi.db.realm.Orders;
+import ru.toir.mobile.multi.utils.OneDayDecorator;
 
 public class CalendarFragment extends Fragment {
     MaterialCalendarView simpleCalendarView;
@@ -81,11 +83,20 @@ public class CalendarFragment extends Fragment {
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
         OrderAdapter orderAdapter = new OrderAdapter(orders, getContext(), null);
         ordersListView.setAdapter(orderAdapter);
-        Date newDate;
+        Date orderDate;
         simpleCalendarView.setDateSelected(new Date(), true);
         for (Orders order : orders) {
-            newDate = order.getStartDate();
-            simpleCalendarView.setDateSelected(newDate, true);
+            orderDate = order.getStartDate();
+            simpleCalendarView.setDateSelected(orderDate, true);
+            if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.COMPLETE)) {
+                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.green, orderDate));
+            }
+            if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.NEW)) {
+                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.gray, orderDate));
+            }
+            if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.IN_WORK)) {
+                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.larisaBlueColor, orderDate));
+            }
         }
     }
 

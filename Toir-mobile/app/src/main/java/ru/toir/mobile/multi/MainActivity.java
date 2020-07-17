@@ -81,6 +81,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.multi.db.ToirRealm;
 import ru.toir.mobile.multi.db.realm.User;
+import ru.toir.mobile.multi.fragments.CalendarFragment;
 import ru.toir.mobile.multi.fragments.ContragentsFragment;
 import ru.toir.mobile.multi.fragments.DefectsFragment;
 import ru.toir.mobile.multi.fragments.DocumentationFragment;
@@ -105,13 +106,6 @@ import static ru.toir.mobile.multi.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.multi.utils.RoundedImageView.getResizedBitmap;
 
 public class MainActivity extends AppCompatActivity {
-    //private static final int PROFILE_ADD = 1;
-    //private static final int PROFILE_SETTINGS = 2;
-    //private static final int FRAGMENT_CAMERA = 1;
-    //private static final int FRAGMENT_OTHER = 10;
-    //private static final int DRAWER_TASKS = 11;
-    //private static final int DRAWER_ONLINE = 15;
-
     private static final int MAX_USER_PROFILE = 10;
 
     private static final int NO_FRAGMENT = 0;
