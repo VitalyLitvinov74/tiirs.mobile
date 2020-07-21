@@ -31,10 +31,6 @@ public class MessageAdapter extends RealmBaseAdapter<Message> implements ListAda
         super(data);
     }
 
-    public MessageAdapter(RealmList<Message> data) {
-        super(data);
-    }
-
     @Override
     public Message getItem(int position) {
         if (adapterData != null) {

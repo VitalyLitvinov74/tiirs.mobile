@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -66,6 +68,21 @@ public class CalendarFragment extends Fragment {
 
         ordersListView = rootView.findViewById(R.id.trainings_listView);
         ordersListView.setOnItemClickListener(new ListviewClickListener());
+
+        //onDateLongClickListener
+        simpleCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                Fragment fr = OrderFragment.newInstance();
+                Bundle bundle = new Bundle();
+                bundle.putLong("dateSelected", date.getDate().getTime());
+                fr.setArguments(bundle);
+                FragmentTransaction fragmentTransaction = getActivity()
+                        .getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame_container, fr);
+                fragmentTransaction.commit();
+            }
+        });
 
         initView();
 

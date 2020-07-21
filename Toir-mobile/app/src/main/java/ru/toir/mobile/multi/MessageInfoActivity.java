@@ -2,6 +2,8 @@ package ru.toir.mobile.multi;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
@@ -9,12 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import io.realm.Realm;
-import io.realm.RealmResults;
-import ru.toir.mobile.multi.db.realm.Stage;
+import ru.toir.mobile.multi.db.realm.Message;
+import ru.toir.mobile.multi.db.realm.User;
+
+import static ru.toir.mobile.multi.utils.RoundedImageView.getResizedBitmap;
 
 public class MessageInfoActivity extends AppCompatActivity {
     private final static String TAG = "MessageInfo";
@@ -23,6 +31,10 @@ public class MessageInfoActivity extends AppCompatActivity {
     private Realm realmDB;
     private Context context;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
+    private ImageView image;
+    private TextView userFrom;
+    private TextView date;
+    private TextView text;
 
     /*
      * (non-Javadoc)
@@ -49,19 +61,21 @@ public class MessageInfoActivity extends AppCompatActivity {
         setMainLayout(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //tv_stage_listview = findViewById(R.id.list_view);
-        //tv_stage_name = findViewById(R.id.tl_Header);
-        //tv_no_operation = findViewById(R.id.tl_info);
+        image = findViewById(R.id.user_image);
+        userFrom = findViewById(R.id.user_from);
+        date = findViewById(R.id.date);
+        text = findViewById(R.id.text);
+
         initView();
     }
 
     void setMainLayout(Bundle savedInstanceState) {
-        setContentView(R.layout.operation_info_layout);
+        setContentView(R.layout.message_layout);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
-        toolbar.setSubtitle(R.string.menu_order_info);
+        toolbar.setSubtitle(R.string.menu_messages);
 
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -70,21 +84,27 @@ public class MessageInfoActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        final Stage stage = realmDB.where(Stage.class).equalTo("uuid", message_uuid).findFirst();
-        if (stage == null) {
+        final Message message = realmDB.where(Message.class).equalTo("uuid", message_uuid).findFirst();
+        if (message == null) {
             return;
         }
-/*
-        tv_stage_name.setText(stage.getStageTemplate().getTitle());
 
-        RealmResults<Operation> operations = stage.getOperations().sort("_id");
-        operationAdapter = new OperationAdapter(operations, context, null);
-        tv_stage_listview.setAdapter(operationAdapter);
-        tv_stage_listview.setOnItemClickListener(mainListViewClickListener);
-        if (operations.size() == 0) {
-            tv_no_operation.setVisibility(View.VISIBLE);
+        userFrom.setText(message.getFromUser().getName());
+        String path = context.getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
+        Bitmap user_bitmap = getResizedBitmap(path,
+                message.getFromUser().getImage(), 0, 70,
+                message.getFromUser().getChangedAt().getTime());
+        image.setImageBitmap(user_bitmap);
+        text.setText(message.getText());
+        String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(message.getDate());
+        date.setText(sDate);
+        if (message.getStatus() == Message.Status.MESSAGE_READ) {
+            userFrom.setTypeface(null, Typeface.NORMAL);
+            text.setTypeface(null, Typeface.NORMAL);
+        } else {
+            userFrom.setTypeface(null, Typeface.BOLD);
+            text.setTypeface(null, Typeface.BOLD);
         }
-*/
     }
 
     @Override
@@ -96,11 +116,6 @@ public class MessageInfoActivity extends AppCompatActivity {
     private class ListViewClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(final AdapterView<?> parent, View selectedItemView, final int position, long id) {
-/*
-            operationAdapter.setItemVisibility(position,
-                    !operationAdapter.getItemVisibility(position));
-            operationAdapter.notifyDataSetChanged();
-*/
         }
     }
 }

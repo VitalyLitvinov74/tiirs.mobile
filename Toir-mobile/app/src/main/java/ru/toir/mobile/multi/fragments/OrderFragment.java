@@ -314,6 +314,15 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 query.equalTo("orderStatus.uuid", orderStatus);
             }
 
+            Bundle bundle = getArguments();
+            if (bundle != null) {
+                Long daySelectedLong = bundle.getLong("dateSelected");
+                if (daySelectedLong > 0) {
+                    Long daySelectedEnd = daySelectedLong + 24 * 3600;
+                    query.greaterThanOrEqualTo("startDate", new Date(daySelectedLong));
+                    query.lessThan("startDate", new Date(daySelectedEnd));
+                }
+            }
             RealmResults<Orders> orders;
             if (orderByField != null) {
                 orders = query.sort(orderByField).findAll();
