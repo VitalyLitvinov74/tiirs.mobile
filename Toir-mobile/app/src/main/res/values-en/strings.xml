@@ -314,4 +314,6 @@
     <string name="menu_receive">Receive</string>
     <string name="menu_send">Send</string>
     <string name="menu_all">All</string>
+    <string name="accept_request">Accept Request</string>
+    <string name="accepted">Accepted</string>
 </resources>

@@ -312,4 +312,6 @@
     <string name="menu_receive">Входящие</string>
     <string name="menu_send">Отправленные</string>
     <string name="menu_all">Все</string>
+    <string name="accept_request">Согласовать</string>
+    <string name="accepted">Согласовано</string>
 </resources>

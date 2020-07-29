@@ -23,6 +23,7 @@ public class Message extends RealmObject implements ISend {
     private int status;
     private boolean sent;
     private Organization organization;
+    private int requestStatus;
     private Date createdAt;
     private Date changedAt;
 
@@ -122,6 +123,14 @@ public class Message extends RealmObject implements ISend {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    public int getRequestStatus() {
+        return requestStatus;
+    }
+
+    public void setRequestStatus(int requestStatus) {
+        this.requestStatus = requestStatus;
     }
 
     public class Status {

@@ -52,38 +52,37 @@
             android:textColor="@color/larisaTextColorABlack"
             android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/user_from"
-            android:layout_marginStart="5dp"
-            android:layout_toEndOf="@+id/user_image"
-            android:text="@string/description"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+        <!--
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/user_from"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:text="@string/description"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+        -->
 
         <TextView
             android:id="@+id/text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
+            android:layout_below="@+id/user_image"
             android:layout_marginStart="5dp"
             android:maxLines="10"
             android:textColor="#454545"
             android:textSize="14sp" />
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/request"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text"
+            android:text="@string/accept_request"
+            android:textColor="@color/larisaTextColorAWhite" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="60dp"
-        android:layout_marginEnd="15dp"
-        android:src="@drawable/ic_plus_white_36dp"
-        app:backgroundTint="@color/green"
-        app:fabSize="normal" />
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

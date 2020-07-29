@@ -5,17 +5,18 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -27,7 +28,6 @@ import static ru.toir.mobile.multi.utils.RoundedImageView.getResizedBitmap;
 public class MessageInfoActivity extends AppCompatActivity {
     private final static String TAG = "MessageInfo";
     private static String message_uuid;
-    CoordinatorLayout rootLayout;
     private Realm realmDB;
     private Context context;
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
@@ -35,6 +35,7 @@ public class MessageInfoActivity extends AppCompatActivity {
     private TextView userFrom;
     private TextView date;
     private TextView text;
+    private Button accept;
 
     /*
      * (non-Javadoc)
@@ -65,6 +66,7 @@ public class MessageInfoActivity extends AppCompatActivity {
         userFrom = findViewById(R.id.user_from);
         date = findViewById(R.id.date);
         text = findViewById(R.id.text);
+        accept = findViewById(R.id.request);
 
         initView();
     }
@@ -104,6 +106,28 @@ public class MessageInfoActivity extends AppCompatActivity {
         } else {
             userFrom.setTypeface(null, Typeface.BOLD);
             text.setTypeface(null, Typeface.BOLD);
+        }
+        if (message.getRequestStatus() == -1) {
+            accept.setVisibility(View.GONE);
+        }
+        if (message.getRequestStatus() == 0) {
+            accept.setVisibility(View.VISIBLE);
+            accept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    realmDB.beginTransaction();
+                    message.setRequestStatus(1);
+                    message.setChangedAt(new Date());
+                    realmDB.commitTransaction();
+                    accept.setText(R.string.accepted);
+                    accept.setBackgroundColor(getResources().getColor(R.color.green));
+                }
+            });
+        }
+        if (message.getRequestStatus() == 1) {
+            accept.setVisibility(View.VISIBLE);
+            accept.setText(R.string.accepted);
+            accept.setBackgroundColor(getResources().getColor(R.color.green));
         }
     }
 
