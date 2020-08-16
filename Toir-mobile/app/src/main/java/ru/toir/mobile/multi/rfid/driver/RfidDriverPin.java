@@ -1,14 +1,26 @@
 package ru.toir.mobile.multi.rfid.driver;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.db.realm.User;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
@@ -77,6 +89,56 @@ public class RfidDriverPin extends RfidDriverBase implements IRfidDriver {
     public View getView(LayoutInflater inflater, ViewGroup viewGroup) {
 
         View view = inflater.inflate(R.layout.rfid_dialog_pin, viewGroup);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(inflater.getContext());
+        String defaultLogin = sp.getString("defaultLogin", "");
+        ArrayList<String> adapterData = new ArrayList<>();
+        adapterData.add("Новый пользователь");
+        HashMap<String, String> loginList = User.getLoginList(inflater.getContext());
+        int idx = 1;
+        int defaultIdx = 0;
+        for (String login : loginList.keySet()) {
+            adapterData.add(loginList.get(login) + " (" + login + ")");
+            if (login.equals(defaultLogin)) {
+                defaultIdx = idx;
+            }
+
+            idx++;
+        }
+
+        Spinner loginSpinner = view.findViewById(R.id.rfid_dialog_pin_login_spinner);
+        SpinnerAdapter spinnerAdapter =
+                new ArrayAdapter<>(inflater.getContext(), android.R.layout.simple_spinner_dropdown_item, adapterData);
+        loginSpinner.setAdapter(spinnerAdapter);
+        loginSpinner.setSelection(defaultIdx);
+        AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                EditText et = adapterView.getRootView().findViewById(R.id.rfid_dialog_pin_login_input);
+                String selected = (String) adapterView.getItemAtPosition(i);
+                Log.d(TAG, selected);
+                Log.d(TAG, "idx: " + l);
+
+                if (l == 0) {
+                    et.setText("");
+                    et.setVisibility(View.VISIBLE);
+                } else {
+                    Pattern pattern = Pattern.compile("\\((.*)\\)");
+                    Matcher matcher = pattern.matcher(selected);
+                    if (matcher.find()) {
+                        et.setText(matcher.group(1));
+                        et.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                Log.d(TAG, "onNothingSelected");
+            }
+        };
+
+        loginSpinner.setOnItemSelectedListener(listener);
 
         Button ok = view.findViewById(R.id.rfid_dialog_text_button_OK);
         ok.setOnClickListener(v -> {

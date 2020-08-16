@@ -10,6 +10,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
+import java.util.HashMap;
 
 import io.realm.Realm;
 import okhttp3.ResponseBody;
@@ -56,6 +57,9 @@ public class GetUser extends BroadcastReceiver {
                     User localUser = realm.where(User.class)
                             .equalTo("login", authUser.getLogin())
                             .findFirst();
+                    if (localUser != null) {
+                        localUser = realm.copyFromRealm(localUser);
+                    }
 
                     // пинкод с сервера не передаём
                     // сохраняем хеш пинкода если пользователь получил токен
@@ -83,6 +87,11 @@ public class GetUser extends BroadcastReceiver {
                                 user.isActive() == 1 ? AuthLocal.ACCESS_ALLOWED : AuthLocal.ACCESS_DENIED);
                         context.sendBroadcast(extraActionIntent);
                     }
+
+                    // сохраняем информацию о пользователе в списке логинов для входа
+                    HashMap<String, String> loginList = User.getLoginList(context);
+                    loginList.put(user.getLogin(), user.getName());
+                    User.saveLoginList(context, loginList);
 
                     // тянем изображение пользователя если нужно
                     downloadUserImage(context, user, localUser);

@@ -1134,6 +1134,12 @@ public class MainActivity extends AppCompatActivity {
                     authorizationDialog.dismiss();
                     realmDB = Realm.getDefaultInstance();
                     setMainLayout(savedInstance);
+                    // сохраняем логин по умолчанию только для варианта с пинкодом
+                    if (authUser.loginType() == RfidDriverMsg.TYPE_LOGIN) {
+                        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                        sp.edit().putString("defaultLogin", authUser.getLogin()).apply();
+                    }
+
                     break;
                 case AuthLocal.ACCESS_DENIED:
                     authUser.reset();
