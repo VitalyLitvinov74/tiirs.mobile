@@ -18,9 +18,9 @@
         android:onClick="onActionAbout"
         android:orderInCategory="102"
         android:title="@string/action_about"/>
-    <item
-        android:id="@+id/btServer"
-        android:onClick="onActionBTServer"
-        android:title="@string/bluetooth_server"/>
+    <!--<item-->
+    <!--android:id="@+id/btServer"-->
+    <!--android:onClick="onActionBTServer"-->
+    <!--android:title="@string/bluetooth_server"/>-->
 </menu>
 

@@ -82,6 +82,7 @@ import ru.toir.mobile.multi.fragments.ServiceFragment;
 import ru.toir.mobile.multi.fragments.SettingsFragment;
 import ru.toir.mobile.multi.fragments.UserInfoFragment;
 import ru.toir.mobile.multi.gps.GPSListener;
+import ru.toir.mobile.multi.rest.ForegroundService;
 import ru.toir.mobile.multi.rest.ToirKeyStoreFactory;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
@@ -222,9 +223,8 @@ public class MainActivity extends AppCompatActivity {
 
         // запускаем сервис который будет в фоне заниматься получением/отправкой данных
         // TODO: пересмотреть работу сервиса. отказаться от постоянной работы в фоне.
-        // пересмотреть работу с базой в той части, когда база с которой будем работать ещё не известна
-//        Intent intent = new Intent(this, ForegroundService.class);
-//        startService(intent);
+        Intent intent = new Intent(this, ForegroundService.class);
+        startService(intent);
     }
 
     @Override
@@ -333,14 +333,14 @@ public class MainActivity extends AppCompatActivity {
                 // проверяем, есть соединение с инетом или нет
                 if (!ToirApplication.isInternetOn(getApplicationContext())) {
                     // соединения с инетом нет, аутентифицируем в локальной базе
-                    Intent result = new Intent("authLocal");
+                    Intent result = new Intent(AuthLocal.AUTH_LOCAL_ACTION);
                     sendBroadcast(result);
 
                     Toast.makeText(getApplicationContext(), getText(R.string.no_internet),
                             Toast.LENGTH_LONG).show();
                 } else {
                     // соединение с инетом есть, шлём запрос серверу
-                    Intent result = new Intent("getToken");
+                    Intent result = new Intent(GetToken.GET_TOKEN_ACTION);
                     sendBroadcast(result);
                 }
 

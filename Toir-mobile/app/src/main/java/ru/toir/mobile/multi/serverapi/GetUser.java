@@ -72,28 +72,16 @@ public class GetUser extends BroadcastReceiver {
                     authUser.setUuid(user.getUuid());
                     authUser.setOrganizationUuid(user.getOrganization().getUuid());
                     authUser.setLogin(user.getLogin());
-                    authUser.setServerLogged(true);
-                    authUser.setLocalLogged(true);
                     addToJournal("Пользователь " + user.getName() + " с uuid["
                             + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
 
-                    if (!authUser.isLocalLogged()) {
+                    // проверяем, пользователь уже работает или на экране входа
+                    if (!authUser.isLogged()) {
                         // "впускаем" пользователя если он активен
                         Intent extraActionIntent = new Intent(AuthLocal.LOG_IN_ACTION);
-                        extraActionIntent.putExtra("extraAction",
-                                user.isActive() == 1 ? "accessAllowed" : "accessDenied");
+                        extraActionIntent.putExtra(AuthLocal.EXTRA_ACTION_NAME,
+                                user.isActive() == 1 ? AuthLocal.ACCESS_ALLOWED : AuthLocal.ACCESS_DENIED);
                         context.sendBroadcast(extraActionIntent);
-                    } else {
-                        // если вошли локально без инета, токен получили позже,
-                        // проверяем, не отключили ли пользователя уже на сервере
-                        // !!! проверке излишняя т.к. пользователь не получит токен, т.к. на сервере
-                        // токены выдаются только активным пользователям
-                        if (user.isActive() != 1) {
-                            // принудительно разлогиниваем пользователя
-                            Intent extraActionIntent = new Intent(AuthLocal.LOG_IN_ACTION);
-                            extraActionIntent.putExtra("extraAction", "accessDenied");
-                            context.sendBroadcast(extraActionIntent);
-                        }
                     }
 
                     // тянем изображение пользователя если нужно
