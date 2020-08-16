@@ -69,7 +69,7 @@ public class TokenSrv {
     /**
      * @return The userName
      */
-    public String getUserName() {
+    public String getLogin() {
         return userName;
     }
 

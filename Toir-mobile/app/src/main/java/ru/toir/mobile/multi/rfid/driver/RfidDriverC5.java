@@ -2,15 +2,19 @@ package ru.toir.mobile.multi.rfid.driver;
 
 import android.hardware.uhf.magic.UHFCommandResult;
 import android.hardware.uhf.magic.reader;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 import ru.toir.mobile.multi.utils.DataUtils;
 
 /**
@@ -70,7 +74,8 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
                 result = reader.readTagId(timeOut);
                 if (result.result == reader.RESULT_SUCCESS) {
                     Log.d(TAG, result.data);
-                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, result.data).sendToTarget();
+                    RfidDriverMsg msg = RfidDriverMsg.tagMsg(result.data);
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
                 } else if (result.result == reader.RESULT_TIMEOUT) {
                     sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
                 } else {
@@ -102,23 +107,31 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
                 if (result.result == reader.RESULT_SUCCESS) {
                     if (tagIds.length == 0) {
-                        Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, mc.getFoundTagIds().toArray(new String[]{}));
-                        message.sendToTarget();
+                        Set<String> foundTags = mc.getFoundTagIds();
+                        if (foundTags.size() > 0) {
+                            List<RfidDriverMsg> msgs = new ArrayList<>();
+                            for (String tag : mc.getFoundTagIds()) {
+                                msgs.add(RfidDriverMsg.tagMsg(tag));
+                            }
+
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, msgs.toArray()).sendToTarget();
+                        } else {
+                            sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+                        }
                     } else {
                         String tmp = mc.getFoundTagId();
-                        Message message;
                         if (tmp != null) {
                             // нашли метку из переданного списка, возвращаем одно значение в массиве
-                            message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tmp});
+                            RfidDriverMsg msg = RfidDriverMsg.tagMsg(tmp);
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS,
+                                    new RfidDriverMsg[]{msg}).sendToTarget();
                         } else {
                             // если искали метку из списка и ни одной не нашли
-                            message = sHandler.obtainMessage(RESULT_RFID_TIMEOUT);
+                            sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
                         }
-
-                        message.sendToTarget();
                     }
                 } else {
-                    sHandler.obtainMessage(RESULT_RFID_CANCEL);
+                    sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
                 }
             }
         };

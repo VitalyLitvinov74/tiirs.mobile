@@ -6,7 +6,6 @@ import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -23,10 +22,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -57,7 +54,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.OnTabSelectListener;
 
 import org.acra.ACRA;
 import org.acra.config.CoreConfigurationBuilder;
@@ -66,19 +62,12 @@ import org.acra.data.StringFormat;
 import org.acra.sender.HttpSender;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.leolin.shortcutbadger.ShortcutBadger;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.toir.mobile.multi.db.ToirRealm;
 import ru.toir.mobile.multi.db.realm.User;
 import ru.toir.mobile.multi.fragments.ContragentsFragment;
@@ -93,15 +82,16 @@ import ru.toir.mobile.multi.fragments.ServiceFragment;
 import ru.toir.mobile.multi.fragments.SettingsFragment;
 import ru.toir.mobile.multi.fragments.UserInfoFragment;
 import ru.toir.mobile.multi.gps.GPSListener;
-import ru.toir.mobile.multi.rest.ToirAPIFactory;
 import ru.toir.mobile.multi.rest.ToirKeyStoreFactory;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverNfc;
-import ru.toir.mobile.multi.serverapi.TokenSrv;
+import ru.toir.mobile.multi.serverapi.GetToken;
+import ru.toir.mobile.multi.serverapi.GetUser;
+import ru.toir.mobile.multi.utils.AuthLocal;
 import ru.toir.mobile.multi.utils.MainFunctions;
 
-import static ru.toir.mobile.multi.utils.MainFunctions.addToJournal;
 import static ru.toir.mobile.multi.utils.RoundedImageView.getResizedBitmap;
 
 public class MainActivity extends AppCompatActivity {
@@ -134,30 +124,26 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_DEFECTS = 18;
 
     private static final String TAG = "MainActivity";
-    static String loginAction = ToirApplication.packageName + ".login";
     private static boolean isExitTimerStart = false;
     public int currentFragment = NO_FRAGMENT;
     Bundle savedInstance = null;
     int activeUserID = 0;
-    ProgressDialog mProgressDialog;
     BroadcastReceiver networkReceiver;
-    BroadcastReceiver loginReceiver;
-    private boolean isLogged = false;
+    BroadcastReceiver logInReceiver;
+    BroadcastReceiver authLocalReceiver;
+    BroadcastReceiver getTokenReceiver;
+    BroadcastReceiver getUserReceiver;
     private RfidDialog rfidDialog;
     private AccountHeader headerResult = null;
     private ArrayList<IProfile> iprofilelist;
-    private RealmResults<User> profilesList;
     private long users_id[];
     private int cnt = 0;
     private ProgressDialog authorizationDialog;
     private boolean splashShown = false;
     private Realm realmDB;
-    private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = new Drawer.OnDrawerItemClickListener() {
-        @Override
-        public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
-            Log.d(TAG, "onDrawerItemClick");
-            return false;
-        }
+    private Drawer.OnDrawerItemClickListener onDrawerItemClickListener = (view, i, iDrawerItem) -> {
+        Log.d(TAG, "onDrawerItemClick");
+        return false;
     };
     private LocationManager _locationManager;
     private GPSListener _gpsListener;
@@ -186,12 +172,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCancelable(true);
         dialog.setMax(100);
         final Downloader downloaderTask = new Downloader(dialog);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                downloaderTask.cancel(true);
-            }
-        });
+        dialog.setOnCancelListener(dialog1 -> downloaderTask.cancel(true));
 
         String fileName = "toir.apk";
         String updateUrl = ToirApplication.serverUrl + "/app/" + fileName;
@@ -235,6 +216,10 @@ public class MainActivity extends AppCompatActivity {
         // обнуляем текущего активного пользователя
         AuthorizedUser.getInstance().reset();
 
+        // просто принудительно инициализируем базу, в которой ни чего не будет
+        // база будет базой по умолчанию, пока не будет инициализирована рабочая база
+        ToirRealm.initDb(this, "default");
+
         // запускаем сервис который будет в фоне заниматься получением/отправкой данных
         // TODO: пересмотреть работу сервиса. отказаться от постоянной работы в фоне.
         // пересмотреть работу с базой в той части, когда база с которой будем работать ещё не известна
@@ -265,217 +250,33 @@ public class MainActivity extends AppCompatActivity {
                     isConnected = netInfo.isConnected();
                 }
 
-                if (isConnected && AuthorizedUser.getInstance().getToken() == null) {
-                    Intent loginIntent = new Intent(loginAction);
-                    sendBroadcast(loginIntent);
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                if (isConnected && authUser.isLocalLogged() && !authUser.isServerLogged()) {
+                    sendBroadcast(new Intent(GetToken.GET_TOKEN_ACTION));
                 }
             }
         };
+
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        this.registerReceiver(networkReceiver, filter);
+        registerReceiver(networkReceiver, filter);
 
-        loginReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                final Application app = getApplication();
-                AuthorizedUser user = AuthorizedUser.getInstance();
+        getTokenReceiver = new GetToken();
+        registerReceiver(getTokenReceiver, new IntentFilter(GetToken.GET_TOKEN_ACTION));
 
-                if (user.getToken() != null && user.getTagId() != null) {
-                    return;
-                }
+        authLocalReceiver = new AuthLocal();
+        registerReceiver(authLocalReceiver, new IntentFilter(AuthLocal.AUTH_LOCAL_ACTION));
 
-                Call<TokenSrv> call = ToirAPIFactory.getTokenService()
-                        .getByLabel(user.getTagId(), TokenSrv.Type.LABEL);
-                call.enqueue(new Callback<TokenSrv>() {
-                    @Override
-                    public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
-                        if (response.code() != 200) {
-                            String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.auth_error);
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                        }
+        logInReceiver = new LogIn();
+        registerReceiver(logInReceiver, new IntentFilter(AuthLocal.LOG_IN_ACTION));
 
-                        AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        TokenSrv token = response.body();
-                        if (token == null) {
-                            return;
-                        }
-
-                        isLogged = true;
-                        authUser.setToken(token.getAccessToken());
-                        authUser.setLogin(token.getUserName());
-                        MainActivity.initAcra(AuthorizedUser.getInstance(), app);
-
-                        // ищем локальную связь пользователя с базой
-                        // TODO: искать базу пользователя нужно и по логину
-                        String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
-                        if (dbName == null) {
-                            return;
-                        }
-
-                        // инициализируем базу пользователя
-                        ToirRealm.initDb(getApplicationContext(), dbName);
-                        realmDB = Realm.getDefaultInstance();
-
-
-                        // запрашиваем актуальную информацию по пользователю
-//                        Call<User> call = ToirAPIFactory.getUserService().user();
-//                        call.enqueue(new Callback<User>() {
-//                            @Override
-//                            public void onResponse(Call<User> userCall, Response<User> response) {
-//                                if (response.code() != 200) {
-//                                    String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.toast_error_no_user);
-//                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-//                                }
-//
-//                                User user = response.body();
-//                                if (user != null) {
-//                                    final String fileName = user.getImage();
-//                                    Realm realm = Realm.getDefaultInstance();
-//                                    // проверяем необходимость запрашивать файл изображения с сервера
-//                                    String tagId = AuthorizedUser.getInstance().getTagId();
-//                                    User localUser = realm.where(User.class).equalTo("tagId", tagId).findFirst();
-//                                    File localImageFile;
-//                                    boolean needDownloadImage = false;
-//                                    if (localUser != null) {
-//                                        Date serverDate = user.getChangedAt();
-//                                        Date localDate = localUser.getChangedAt();
-//                                        File fileDir = getExternalFilesDir(localUser.getImageFilePath() + "/");
-//                                        localImageFile = new File(fileDir, localUser.getImage());
-//                                        if (localDate.getTime() < serverDate.getTime() || !localImageFile.exists()) {
-//                                            needDownloadImage = true;
-//                                        }
-//                                    } else {
-//                                        needDownloadImage = true;
-//                                    }
-//
-//                                    realm.beginTransaction();
-//                                    realm.copyToRealmOrUpdate(user);
-//                                    realm.commitTransaction();
-//                                    isLogged = true;
-//                                    // TODO: нужен метод для установки полей объекта из разных объектов (Token, User...)
-//                                    AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
-//                                    authorizedUser.setUuid(user.getUuid());
-//                                    authorizedUser.setLogin(user.getLogin());
-//                                    addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-//                                    //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
-//
-//                                    // получаем изображение пользователя
-//                                    if (needDownloadImage && !fileName.equals("")) {
-//                                        String url = ToirApplication.serverUrl + "/" + user.getImageFileUrl(user.getLogin()) + "/" + user.getImage();
-//                                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
-//                                        callFile.enqueue(new Callback<ResponseBody>() {
-//                                            @Override
-//                                            public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
-//                                                ResponseBody fileBody = response.body();
-//                                                if (fileBody == null) {
-//                                                    return;
-//                                                }
-//
-//                                                File filePath = getExternalFilesDir("/" + User.getImageRoot());
-//                                                if (filePath == null) {
-//                                                    // нет доступа к внешнему накопителю
-//                                                    return;
-//                                                }
-//
-//                                                File file = new File(filePath, fileName);
-//                                                if (!file.getParentFile().exists()) {
-//                                                    if (!file.getParentFile().mkdirs()) {
-//                                                        return;
-//                                                    }
-//                                                }
-//
-//                                                try {
-//                                                    FileOutputStream fos = new FileOutputStream(file);
-//                                                    fos.write(fileBody.bytes());
-//                                                    fos.close();
-//                                                    // принудительно масштабируем изображение пользоваетеля
-//                                                    String path = filePath + File.separator;
-//                                                    Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
-//                                                    if (user_bitmap == null) {
-//                                                        // По какой-то причине не смогли получить
-//                                                        // уменьшенное изображение
-//                                                        Log.e(TAG, getString(R.string.toast_error_picture));
-//                                                    }
-//                                                } catch (Exception e) {
-//                                                    e.printStackTrace();
-//                                                }
-//                                            }
-//
-//                                            @Override
-//                                            public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
-//                                                t.printStackTrace();
-//                                            }
-//                                        });
-//                                    }
-//
-//                                    //user_changed = true;
-//                                    changeActiveProfile(user);
-//
-//                                    realm.close();
-//                                } else {
-//                                    String message = getString(R.string.toast_error_no_user);
-//                                    addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
-//                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-//                                }
-//
-//                                authorizationDialog.dismiss();
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Call<User> userCall, Throwable t) {
-//                                // сообщаем описание неудачи
-//                                // TODO нужен какой-то механизм уведомления о причине не успеха
-////                                    String message = bundle.getString(IServiceProvider.MESSAGE);
-//                                String message = getString(R.string.toast_error_no_user_received);
-//                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-//                                authorizationDialog.dismiss();
-//                            }
-//                        });
-                    }
-
-                    @Override
-                    public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
-                        String message = getString(R.string.toast_error_no_token_received);
-                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                        AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        // ищем локальную связь пользователя с базой
-                        // TODO: искать базу пользователя нужно и по логину
-                        String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
-                        if (dbName == null) {
-                            return;
-                        }
-
-                        // инициализируем базу пользователя
-                        ToirRealm.initDb(getApplicationContext(), dbName);
-                        realmDB = Realm.getDefaultInstance();
-
-                        // проверяем наличие пользователя в локальной базе
-                        User user = realmDB.where(User.class)
-                                .equalTo("tagId", authUser.getTagId())
-                                .findFirst();
-
-                        // в зависимости от результата либо дать работать, либо не дать
-                        if (user != null && user.isActive() == 1) {
-                            isLogged = true;
-                            changeActiveProfile(user);
-                            authUser.setUuid(user.getUuid());
-                            authUser.setOrganizationUuid(user.getOrganization().getUuid());
-                            addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    getString(R.string.toast_error_no_access),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-            }
-        };
-        filter = new IntentFilter(MainActivity.loginAction);
-        this.registerReceiver(loginReceiver, filter);
+        getUserReceiver = new GetUser();
+        registerReceiver(getUserReceiver, new IntentFilter(GetUser.GET_USER_ACTION));
 
         // инициализация приложения
         init();
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
         // this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        boolean isLogged = authUser.isLogged();
         Log.d(TAG, "onCreate:before read: isLogged=" + isLogged);
         if (savedInstanceState != null) {
             isLogged = savedInstanceState.getBoolean("isLogged");
@@ -504,312 +305,68 @@ public class MainActivity extends AppCompatActivity {
      *
      */
     public void startAuthorise() {
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        authUser.setLogged(false);
 
-        isLogged = false;
+        final Handler handler = new Handler(message -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
 
-        final Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-
-                Log.d(TAG, "Получили сообщение из драйвера.");
-
-                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    String tagId = (String) msg.obj;
-                    tagId = tagId.substring(4);
-                    final String tag = tagId;
-                    Log.d(TAG, tagId);
-
-                    AuthorizedUser.getInstance().setTagId(tagId);
-
-                    // проверяем, есть соединение с инетом или нет
-                    // если нет, искать по метке в локальной базе, к сети вообще не обращаться.
-                    if (!ToirApplication.isInternetOn(getApplicationContext())) {
-                        Toast.makeText(getApplicationContext(), getText(R.string.no_internet), Toast.LENGTH_LONG).show();
-                        // ищем локальную связь пользователя с базой
-                        // TODO: искать базу пользователя нужно и по логину
-                        String dbName = User.getUserDbName(getApplicationContext(), tagId);
-                        if (dbName == null) {
-                            // TODO: внятное уведомление пользователю что он ещё ни разу не входил и нужен для этого инет
-                            rfidDialog.dismiss();
-                            return false;
-                        }
-
-                        // инициализируем базу пользователя
-                        ToirRealm.initDb(getApplicationContext(), dbName);
-                        realmDB = Realm.getDefaultInstance();
-
-                        // проверяем наличие пользователя в локальной базе
-                        User user = realmDB.where(User.class)
-                                .equalTo("tagId", AuthorizedUser.getInstance().getTagId())
-                                .findFirst();
-
-                        // в зависимости от результата либо дать работать, либо не дать
-                        if (user != null && user.isActive() == 1) {
-                            isLogged = true;
-                            //user_changed = true;
-                            changeActiveProfile(user);
-
-                            AuthorizedUser.getInstance().setUuid(user.getUuid());
-                            AuthorizedUser.getInstance().setOrganizationUuid(user.getOrganization().getUuid());
-                            addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
-                            setMainLayout(savedInstance);
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    getString(R.string.toast_error_no_access),
-                                    Toast.LENGTH_LONG).show();
-                        }
-
-                        // закрываем диалог
-                        rfidDialog.dismiss();
-                        return true;
-                    }
-
-                    // показываем диалог входа
-                    authorizationDialog = new ProgressDialog(MainActivity.this);
-                    authorizationDialog.setMessage(getString(R.string.toast_enter));
-                    authorizationDialog.setIndeterminate(true);
-                    authorizationDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    authorizationDialog.setCancelable(false);
-                    authorizationDialog.show();
-
-                    // запрашиваем токен
-                    Call<TokenSrv> call = ToirAPIFactory.getTokenService().getByLabel(tagId, TokenSrv.Type.LABEL);
-                    call.enqueue(new Callback<TokenSrv>() {
-                        @Override
-                        public void onResponse(Call<TokenSrv> tokenSrvCall, Response<TokenSrv> response) {
-                            if (response.code() != 200) {
-                                String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.auth_error);
-                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                            }
-
-                            // ищем локальную связь пользователя с базой
-                            HashMap<String, String> usersDbLinks = User.getUsersDbLinks(getApplicationContext());
-                            AuthorizedUser authUser = AuthorizedUser.getInstance();
-                            TokenSrv token = response.body();
-                            if (token != null) {
-                                authUser.setToken(token.getAccessToken());
-                                Toast.makeText(getApplicationContext(),
-                                        getString(R.string.toast_token_received), Toast.LENGTH_SHORT).show();
-                                // Сохраняем login в AuthorizedUser для дальнейших запросв статики
-                                authUser.setLogin(token.getUserName());
-                                // TODO: переименовать getUserName в getUserLogin
-                                authUser.setIdentity(token.getUserName());
-
-                                if (token.getDb() != null && !token.getDb().equals("")) {
-                                    // Сохраняем связь пользователя с базой
-                                    usersDbLinks.put(authUser.getTagId(), token.getDb());
-                                    usersDbLinks.put(token.getUserName(), token.getDb());
-                                    User.saveUsersDbLinks(getApplicationContext(), usersDbLinks);
-                                    // инициализируем базу пользователя
-                                    ToirRealm.initDb(getApplicationContext(), token.getDb());
-                                    realmDB = ToirRealm.getDefaultInstance();
-                                } else {
-                                    return;
-                                }
-                            } else {
-                                // Токен не получили, пытаемся найти пользователя в локальной базе
-                                // TODO: искать базу пользователя нужно и по логину
-                                String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
-                                if (dbName == null) {
-                                    // TODO: внятное уведомление пользователю что он ещё ни разу не входил а сервер не выдал токен
-                                    return;
-                                }
-
-                                // инициализируем базу пользователя
-                                ToirRealm.initDb(getApplicationContext(), dbName);
-                                realmDB = Realm.getDefaultInstance();
-                                RealmResults<User> user = realmDB.where(User.class).equalTo("tagId",
-                                        authUser.getTagId()).findAll();
-                                if (user.size() == 1) {
-                                    authUser.setLogin(user.first().getLogin());
-                                }
-                            }
-
-                            // TODO: Если не получили инфу с сервера и из локальной базы - что делать?
-                            // ни запросы не сделать, ни логи отправить!
-
-                            // запрашиваем актуальную информацию по пользователю
-                            Call<User> call = ToirAPIFactory.getUserService().user();
-                            call.enqueue(new Callback<User>() {
-                                @Override
-                                public void onResponse(Call<User> userCall, Response<User> response) {
-                                    if (response.code() != 200) {
-                                        String message = response.message() != null && !response.message().isEmpty() ? response.message() : getString(R.string.toast_error_no_user);
-                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                                    }
-
-                                    User user = response.body();
-                                    if (user != null) {
-                                        final String fileName = user.getImage();
-                                        Realm realm = Realm.getDefaultInstance();
-                                        // проверяем необходимость запрашивать файл изображения с сервера
-                                        String tagId = AuthorizedUser.getInstance().getTagId();
-                                        User localUser = realm.where(User.class).equalTo("tagId", tagId).findFirst();
-                                        File localImageFile;
-                                        boolean needDownloadImage = false;
-                                        if (localUser != null) {
-                                            Date serverDate = user.getChangedAt();
-                                            Date localDate = localUser.getChangedAt();
-                                            File fileDir = getExternalFilesDir(localUser.getImageFilePath() + "/");
-                                            localImageFile = new File(fileDir, localUser.getImage());
-                                            if (localDate.getTime() < serverDate.getTime() || !localImageFile.exists()) {
-                                                needDownloadImage = true;
-                                            }
-                                        } else {
-                                            needDownloadImage = true;
-                                        }
-
-                                        realm.beginTransaction();
-                                        realm.copyToRealmOrUpdate(user);
-                                        realm.commitTransaction();
-                                        isLogged = true;
-                                        // TODO: нужен метод для установки полей объекта из разных объектов (Token, User...)
-                                        AuthorizedUser authorizedUser = AuthorizedUser.getInstance();
-                                        authorizedUser.setUuid(user.getUuid());
-                                        authorizedUser.setOrganizationUuid(user.getOrganization().getUuid());
-                                        authorizedUser.setLogin(user.getLogin());
-                                        addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте и получил токен");
-                                        //new MainFunctions().sendMessageToAMPQ(user, "messages", "user register", "info");
-
-                                        // получаем изображение пользователя
-                                        if (needDownloadImage && !fileName.equals("")) {
-                                            String url = ToirApplication.serverUrl + "/" + user.getImageFileUrl(user.getLogin()) + "/" + user.getImage();
-                                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
-                                            callFile.enqueue(new Callback<ResponseBody>() {
-                                                @Override
-                                                public void onResponse(Call<ResponseBody> responseBodyCall, Response<ResponseBody> response) {
-                                                    ResponseBody fileBody = response.body();
-                                                    if (fileBody == null) {
-                                                        return;
-                                                    }
-
-                                                    File filePath = getExternalFilesDir("/" + User.getImageRoot());
-                                                    if (filePath == null) {
-                                                        // нет доступа к внешнему накопителю
-                                                        return;
-                                                    }
-
-                                                    File file = new File(filePath, fileName);
-                                                    if (!file.getParentFile().exists()) {
-                                                        if (!file.getParentFile().mkdirs()) {
-                                                            return;
-                                                        }
-                                                    }
-
-                                                    try {
-                                                        FileOutputStream fos = new FileOutputStream(file);
-                                                        fos.write(fileBody.bytes());
-                                                        fos.close();
-                                                        // принудительно масштабируем изображение пользоваетеля
-                                                        String path = filePath + File.separator;
-                                                        Bitmap user_bitmap = getResizedBitmap(path, fileName, 0, 600, Long.MAX_VALUE);
-                                                        if (user_bitmap == null) {
-                                                            // По какой-то причине не смогли получить
-                                                            // уменьшенное изображение
-                                                            Log.e(TAG, getString(R.string.toast_error_picture));
-                                                        }
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onFailure(Call<ResponseBody> responseBodyCall, Throwable t) {
-                                                    t.printStackTrace();
-                                                }
-                                            });
-                                        }
-
-                                        setMainLayout(savedInstance);
-                                        //user_changed = true;
-                                        changeActiveProfile(user);
-
-                                        realm.close();
-                                    } else {
-                                        String message = getString(R.string.toast_error_no_user);
-                                        addToJournal("Информация о пользователе с ID " + tag + " не получена с сервера.");
-                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                                    }
-
-                                    authorizationDialog.dismiss();
-                                }
-
-                                @Override
-                                public void onFailure(Call<User> userCall, Throwable t) {
-                                    // сообщаем описание неудачи
-                                    // TODO нужен какой-то механизм уведомления о причине не успеха
-//                                    String message = bundle.getString(IServiceProvider.MESSAGE);
-                                    String message = getString(R.string.toast_error_no_user_received);
-                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                                    authorizationDialog.dismiss();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Call<TokenSrv> tokenSrvCall, Throwable t) {
-                            // TODO нужен какой-то механизм уведомления о причине не успеха
-                            // String message = bundle.getString(IServiceProvider.MESSAGE);
-                            String message = getString(R.string.toast_error_no_token_received);
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                            // TODO реализовать проверку на то что пользователя нет на сервере
-                            // токен не получен, сервер не ответил...
-                            AuthorizedUser authUser = AuthorizedUser.getInstance();
-                            // TODO: искать базу пользователя нужно и по логину
-                            String dbName = User.getUserDbName(getApplicationContext(), authUser.getTagId());
-                            if (dbName == null) {
-                                // TODO: внятное уведомление пользователю что он ещё ни разу не входил а сервер не выдал токен
-                                return;
-                            }
-
-                            // инициализируем базу пользователя
-                            ToirRealm.initDb(getApplicationContext(), dbName);
-                            realmDB = Realm.getDefaultInstance();
-
-                            // проверяем наличие пользователя в локальной базе
-                            User user = realmDB.where(User.class)
-                                    .equalTo("tagId", authUser.getTagId())
-                                    .findFirst();
-
-                            // в зависимости от результата либо дать работать, либо не дать
-                            if (user != null && user.isActive() == 1) {
-                                isLogged = true;
-                                //user_changed = true;
-                                changeActiveProfile(user);
-
-                                authUser.setUuid(user.getUuid());
-                                authUser.setOrganizationUuid(user.getOrganization().getUuid());
-                                addToJournal("Пользователь " + user.getName() + " с uuid[" + user.getUuid() + "] зарегистрировался на клиенте");
-                                setMainLayout(savedInstance);
-                            } else {
-                                Toast.makeText(getApplicationContext(),
-                                        getString(R.string.toast_error_no_access),
-                                        Toast.LENGTH_LONG).show();
-                            }
-
-                            authorizationDialog.dismiss();
-                        }
-                    });
+            if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                final RfidDriverMsg rfidData = (RfidDriverMsg) message.obj;
+                AuthorizedUser authUser1 = AuthorizedUser.getInstance();
+                authUser1.setLoginType(rfidData.getType());
+                String identifier;
+                String password;
+                if (rfidData.isTag()) {
+                    identifier = rfidData.getTagId();
+                    authUser1.setTagId(identifier);
                 } else {
-                    // по кодам из RFID можно показать более подробные сообщения
-                    Toast.makeText(getApplicationContext(),
-                            getString(R.string.toast_error_operation_canceled),
-                            Toast.LENGTH_SHORT).show();
+                    identifier = rfidData.getLogin();
+                    authUser1.setLogin(identifier);
+                    password = rfidData.getPassword();
+                    authUser1.setPassword(password);
                 }
 
-                // закрываем диалог
-                rfidDialog.dismiss();
-                //setEnabledLoginButton(true);
-                return true;
+                authUser1.setIdentity(identifier);
+                Log.d(TAG, identifier);
+
+                // проверяем, есть соединение с инетом или нет
+                if (!ToirApplication.isInternetOn(getApplicationContext())) {
+                    // соединения с инетом нет, аутентифицируем в локальной базе
+                    Intent result = new Intent("authLocal");
+                    sendBroadcast(result);
+
+                    Toast.makeText(getApplicationContext(), getText(R.string.no_internet),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    // соединение с инетом есть, шлём запрос серверу
+                    Intent result = new Intent("getToken");
+                    sendBroadcast(result);
+                }
+
+                // показываем диалог входа
+                authorizationDialog = new ProgressDialog(MainActivity.this);
+                authorizationDialog.setMessage(getString(R.string.toast_enter));
+                authorizationDialog.setIndeterminate(true);
+                authorizationDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                authorizationDialog.setCancelable(false);
+                authorizationDialog.show();
+            } else {
+                // по кодам из RFID можно показать более подробные сообщения
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.toast_error_operation_canceled),
+                        Toast.LENGTH_SHORT).show();
             }
+
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
         rfidDialog.readTagId();
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
-
     }
 
     /**
@@ -841,31 +398,28 @@ public class MainActivity extends AppCompatActivity {
 
         final BottomBar bottomBar = findViewById(R.id.bottomBar);
         assert bottomBar != null;
-        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
-            @Override
-            public void onTabSelected(@IdRes int tabId) {
-                FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-                switch (tabId) {
-                    case R.id.menu_user:
-                        currentFragment = FRAGMENT_USERS;
-                        tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
-                        break;
-                    case R.id.menu_orders:
-                        currentFragment = FRAGMENT_TASKS;
-                        tr.replace(R.id.frame_container, OrderFragment.newInstance());
-                        break;
-                    case R.id.menu_equipments:
-                        currentFragment = FRAGMENT_EQUIPMENT;
-                        tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
-                        break;
-                    case R.id.menu_defects:
-                        currentFragment = FRAGMENT_DEFECTS;
-                        tr.replace(R.id.frame_container, DefectsFragment.newInstance());
-                        break;
-                }
-
-                tr.commit();
+        bottomBar.setOnTabSelectListener(tabId -> {
+            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+            switch (tabId) {
+                case R.id.menu_user:
+                    currentFragment = FRAGMENT_USERS;
+                    tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
+                    break;
+                case R.id.menu_orders:
+                    currentFragment = FRAGMENT_TASKS;
+                    tr.replace(R.id.frame_container, OrderFragment.newInstance());
+                    break;
+                case R.id.menu_equipments:
+                    currentFragment = FRAGMENT_EQUIPMENT;
+                    tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
+                    break;
+                case R.id.menu_defects:
+                    currentFragment = FRAGMENT_DEFECTS;
+                    tr.replace(R.id.frame_container, DefectsFragment.newInstance());
+                    break;
             }
+
+            tr.commit();
         });
         int new_orders = MainFunctions.getActiveOrdersCount();
         if (new_orders > 0) {
@@ -898,36 +452,33 @@ public class MainActivity extends AppCompatActivity {
                 //.withHeaderBackground(R.drawable.header)
                 .withHeaderBackground(R.color.larisaBlueColor)
                 .withTextColor(ContextCompat.getColor(this, R.color.white))
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
-                        if (profile instanceof IDrawerItem) {
-                            int ident = profile.getIdentifier();
-                            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-                            Fragment fr;
-                            switch (ident) {
-                                default:
-                                    int profileId = profile.getIdentifier(); //-2
-                                    int profile_pos;
-                                    for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++) {
-                                        if (users_id[profile_pos] == profileId) {
-                                            break;
-                                        }
+                .withOnAccountHeaderListener((view, profile, current) -> {
+                    if (profile instanceof IDrawerItem) {
+                        int ident = profile.getIdentifier();
+                        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                        Fragment fr;
+                        switch (ident) {
+                            default:
+                                int profileId = profile.getIdentifier(); //-2
+                                int profile_pos;
+                                for (profile_pos = 0; profile_pos < iprofilelist.size(); profile_pos++) {
+                                    if (users_id[profile_pos] == profileId) {
+                                        break;
                                     }
+                                }
 
-                                    // инициализируем процесс авторизации при смене пользователя
-                                    startAuthorise();
-                                    currentFragment = FRAGMENT_USER;
-                                    fr = UserInfoFragment.newInstance();
-                                    tr.replace(R.id.frame_container, fr);
-                                    break;
-                            }
-
-                            tr.commit();
+                                // инициализируем процесс авторизации при смене пользователя
+                                startAuthorise();
+                                currentFragment = FRAGMENT_USER;
+                                fr = UserInfoFragment.newInstance();
+                                tr.replace(R.id.frame_container, fr);
+                                break;
                         }
 
-                        return false;
+                        tr.commit();
                     }
+
+                    return false;
                 })
                 .withSavedInstance(savedInstanceState)
                 .build();
@@ -1032,58 +583,55 @@ public class MainActivity extends AppCompatActivity {
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor))
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem != null) {
-                            int ident = drawerItem.getIdentifier();
-                            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-                            if (ident == FRAGMENT_CHARTS) {
-                                currentFragment = FRAGMENT_CHARTS;
-                                tr.replace(R.id.frame_container, ServiceFragment.newInstance());
-                            } else if (ident == DRAWER_DOWNLOAD) {
-                                currentFragment = DRAWER_DOWNLOAD;
-                                updateApk(MainActivity.this);
-                            } else if (ident == FRAGMENT_EQUIPMENT) {
-                                currentFragment = FRAGMENT_EQUIPMENT;
-                                tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
-                            } else if (ident == FRAGMENT_GPS) {
-                                currentFragment = FRAGMENT_GPS;
-                                tr.replace(R.id.frame_container, GPSFragment.newInstance());
-                            } else if (ident == FRAGMENT_TASKS) {
-                                currentFragment = FRAGMENT_TASKS;
-                                tr.replace(R.id.frame_container, OrderFragment.newInstance());
-                            } else if (ident == FRAGMENT_REFERENCES) {
-                                currentFragment = FRAGMENT_REFERENCES;
-                                tr.replace(R.id.frame_container, ReferenceFragment.newInstance());
-                            } else if (ident == FRAGMENT_DOCS) {
-                                currentFragment = FRAGMENT_DOCS;
-                                tr.replace(R.id.frame_container, DocumentationFragment.newInstance());
-                            } else if (ident == FRAGMENT_USERS) {
-                                currentFragment = FRAGMENT_USERS;
-                                tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
-                            } else if (ident == FRAGMENT_SERVICE) {
-                                currentFragment = FRAGMENT_SERVICE;
-                                tr.replace(R.id.frame_container, ServiceFragment.newInstance());
-                            } else if (ident == FRAGMENT_OBJECTS) {
-                                currentFragment = FRAGMENT_OBJECTS;
-                                tr.replace(R.id.frame_container, ObjectFragment.newInstance());
-                            } else if (ident == FRAGMENT_DEFECTS) {
-                                currentFragment = FRAGMENT_DEFECTS;
-                                tr.replace(R.id.frame_container, DefectsFragment.newInstance());
-                            } else if (ident == FRAGMENT_CONTRAGENTS) {
-                                currentFragment = FRAGMENT_CONTRAGENTS;
-                                tr.replace(R.id.frame_container, ContragentsFragment.newInstance());
-                            } else if (ident == DRAWER_INFO) {
-                                startAboutDialog();
-                            } else if (ident == DRAWER_EXIT) {
-                                System.exit(0);
-                            }
-                            tr.commit();
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerItem != null) {
+                        int ident = drawerItem.getIdentifier();
+                        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                        if (ident == FRAGMENT_CHARTS) {
+                            currentFragment = FRAGMENT_CHARTS;
+                            tr.replace(R.id.frame_container, ServiceFragment.newInstance());
+                        } else if (ident == DRAWER_DOWNLOAD) {
+                            currentFragment = DRAWER_DOWNLOAD;
+                            updateApk(MainActivity.this);
+                        } else if (ident == FRAGMENT_EQUIPMENT) {
+                            currentFragment = FRAGMENT_EQUIPMENT;
+                            tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
+                        } else if (ident == FRAGMENT_GPS) {
+                            currentFragment = FRAGMENT_GPS;
+                            tr.replace(R.id.frame_container, GPSFragment.newInstance());
+                        } else if (ident == FRAGMENT_TASKS) {
+                            currentFragment = FRAGMENT_TASKS;
+                            tr.replace(R.id.frame_container, OrderFragment.newInstance());
+                        } else if (ident == FRAGMENT_REFERENCES) {
+                            currentFragment = FRAGMENT_REFERENCES;
+                            tr.replace(R.id.frame_container, ReferenceFragment.newInstance());
+                        } else if (ident == FRAGMENT_DOCS) {
+                            currentFragment = FRAGMENT_DOCS;
+                            tr.replace(R.id.frame_container, DocumentationFragment.newInstance());
+                        } else if (ident == FRAGMENT_USERS) {
+                            currentFragment = FRAGMENT_USERS;
+                            tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
+                        } else if (ident == FRAGMENT_SERVICE) {
+                            currentFragment = FRAGMENT_SERVICE;
+                            tr.replace(R.id.frame_container, ServiceFragment.newInstance());
+                        } else if (ident == FRAGMENT_OBJECTS) {
+                            currentFragment = FRAGMENT_OBJECTS;
+                            tr.replace(R.id.frame_container, ObjectFragment.newInstance());
+                        } else if (ident == FRAGMENT_DEFECTS) {
+                            currentFragment = FRAGMENT_DEFECTS;
+                            tr.replace(R.id.frame_container, DefectsFragment.newInstance());
+                        } else if (ident == FRAGMENT_CONTRAGENTS) {
+                            currentFragment = FRAGMENT_CONTRAGENTS;
+                            tr.replace(R.id.frame_container, ContragentsFragment.newInstance());
+                        } else if (ident == DRAWER_INFO) {
+                            startAboutDialog();
+                        } else if (ident == DRAWER_EXIT) {
+                            System.exit(0);
                         }
-
-                        return false;
+                        tr.commit();
                     }
+
+                    return false;
                 })
                 .withSavedInstance(savedInstanceState)
                 .withShowDrawerOnFirstLaunch(true)
@@ -1108,11 +656,10 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_container, UserInfoFragment.newInstance()).commit();
 
-        if (activeUserID <= 0) {
-            // TODO: разобраться почему переменной не присваивается ни какое значение
+//        if (activeUserID <= 0) {
 //            Toast.makeText(getApplicationContext(),
 //                    getString(R.string.please_login), Toast.LENGTH_LONG).show();
-        }
+//        }
 
         //((ViewGroup) findViewById(R.id.frame_container)).addView(result.getSlider());
         //pager = (ViewPager) findViewById(R.id.pager);
@@ -1210,6 +757,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        boolean isLogged = authUser.isLogged();
         Log.d(TAG, "onSaveInstanceState: isLogged=" + isLogged);
         outState.putBoolean("isLogged", isLogged);
         outState.putBoolean("splashShown", splashShown);
@@ -1250,12 +799,7 @@ public class MainActivity extends AppCompatActivity {
                 return super.onKeyDown(keyCode, event);
             } else if (currentFragment == FRAGMENT_USERS) {
                 Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        isExitTimerStart = false;
-                    }
-                };
+                Runnable runnable = () -> isExitTimerStart = false;
                 handler.postDelayed(runnable, 5000);
                 Toast.makeText(this, "Нажмите \"назад\" ещё раз для выхода.", Toast.LENGTH_LONG)
                         .show();
@@ -1279,7 +823,7 @@ public class MainActivity extends AppCompatActivity {
         //UsersDBAdapter users = new UsersDBAdapter(
         //        new ToirDatabaseContext(getApplicationContext()));
         //User users = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findAll();
-        profilesList = realmDB.where(User.class).findAll();
+        RealmResults<User> profilesList = realmDB.where(User.class).findAll();
         cnt = 0;
         for (User item : profilesList) {
             addProfile(item);
@@ -1311,18 +855,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void refreshProfileList() {
-        //UsersDBAdapter users = new UsersDBAdapter(
-        //        new ToirDatabaseContext(getApplicationContext()));
-        profilesList = realmDB.where(User.class).findAll();
-        cnt = 0;
-        for (User item : profilesList) {
-            users_id[cnt] = item.get_id();
-            cnt = cnt + 1;
-            if (cnt > MAX_USER_PROFILE) break;
-        }
-    }
-
     public void startAboutDialog() {
         AboutDialog about = new AboutDialog(this);
         about.setTitle(getString(R.string.about));
@@ -1332,33 +864,6 @@ public class MainActivity extends AppCompatActivity {
     public void mOnClickMethod(View view) {
         Intent i = new Intent(MainActivity.this, PrefsActivity.class);
         startActivity(i);
-    }
-
-    public void changeActiveProfile(User user) {
-        if (iprofilelist != null) {
-            if (iprofilelist.size() > 0) {
-                for (cnt = 0; cnt < iprofilelist.size(); cnt++) {
-                    if (users_id[cnt] == user.get_id()) {
-                        headerResult.setActiveProfile(iprofilelist.get(cnt));
-
-                        realmDB.beginTransaction();
-                        RealmResults<User> users = realmDB.where(User.class).findAll();
-                        for (int i = 0; i < users.size(); i++) {
-                            users.get(i).setActive(0);
-                        }
-
-                        if (profilesList != null && profilesList.get(cnt) != null) {
-                            profilesList.get(cnt).setActive(0);
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    getString(R.string.no_user_present), Toast.LENGTH_LONG).show();
-                        }
-                        users.get(cnt).setActive(1);
-                        realmDB.commitTransaction();
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -1419,11 +924,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (networkReceiver != null) {
-            this.unregisterReceiver(networkReceiver);
+            unregisterReceiver(networkReceiver);
         }
 
-        if (loginReceiver != null) {
-            this.unregisterReceiver(loginReceiver);
+        if (logInReceiver != null) {
+            unregisterReceiver(logInReceiver);
+        }
+
+        if (authLocalReceiver != null) {
+            unregisterReceiver(authLocalReceiver);
+        }
+
+        if (getTokenReceiver != null) {
+            unregisterReceiver(getTokenReceiver);
+        }
+
+        if (getUserReceiver != null) {
+            unregisterReceiver(getUserReceiver);
         }
     }
 
@@ -1505,30 +1022,30 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onResume()");
         super.onResume();
 
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        boolean isLogged = authUser.isLogged();
         if (!splashShown) {
             // показываем приветствие
             setContentView(R.layout.start_screen);
 
             // запускаем таймер для показа экрана входа
             Handler h = new Handler();
-            h.postDelayed(new Runnable() {
-                public void run() {
-                    splashShown = true;
+            h.postDelayed(() -> {
+                splashShown = true;
 
-                    if (isLogged) {
-                        setMainLayout(savedInstance);
-                    } else {
-                        setContentView(R.layout.login_layout);
-                        ImageView iW = findViewById(R.id.login_header);
-                        if (iW != null) {
-                            SharedPreferences sp = PreferenceManager
-                                    .getDefaultSharedPreferences(getApplicationContext());
-                            String serverUrl = sp.getString(getString(R.string.serverUrl), "");
-                            if (serverUrl.contains("qwvostok"))
-                                iW.setImageResource(R.drawable.quarzwerke_logo_kt);
-                        }
-                        ShowSettings();
+                if (isLogged) {
+                    setMainLayout(savedInstance);
+                } else {
+                    setContentView(R.layout.login_layout);
+                    ImageView iW = findViewById(R.id.login_header);
+                    if (iW != null) {
+                        SharedPreferences sp = PreferenceManager
+                                .getDefaultSharedPreferences(getApplicationContext());
+                        String serverUrl = sp.getString(getString(R.string.serverUrl), "");
+                        if (serverUrl.contains("qwvostok"))
+                            iW.setImageResource(R.drawable.quarzwerke_logo_kt);
                     }
+                    ShowSettings();
                 }
             }, 3000);
         }
@@ -1546,24 +1063,21 @@ public class MainActivity extends AppCompatActivity {
         }
         ShowSettings();*/
 
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                boolean isRun = true;
-                while (isRun) {
-                    try {
-                        Thread.sleep(5000);
-                        if (!isSkipGPS()) {
-                            if (!isGpsOn()) {
-                                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivity(intent);
-                                Toast.makeText(getApplicationContext(), getString(R.string.gps_must_enabled),
-                                        Toast.LENGTH_SHORT).show();
-                            }
+        Runnable run = () -> {
+            boolean isRun = true;
+            while (isRun) {
+                try {
+                    Thread.sleep(5000);
+                    if (!isSkipGPS()) {
+                        if (!isGpsOn()) {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                            Toast.makeText(getApplicationContext(), getString(R.string.gps_must_enabled),
+                                    Toast.LENGTH_SHORT).show();
                         }
-                    } catch (Exception e) {
-                        isRun = false;
                     }
+                } catch (Exception e) {
+                    isRun = false;
                 }
             }
         };
@@ -1605,6 +1119,29 @@ public class MainActivity extends AppCompatActivity {
         if (!configuration.locale.equals(locale)) {
             configuration.setLocale(locale);
             resources.updateConfiguration(configuration, null);
+        }
+    }
+
+    private class LogIn extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String extraAction = intent.getStringExtra(AuthLocal.EXTRA_ACTION_NAME);
+            AuthorizedUser authUser = AuthorizedUser.getInstance();
+
+            switch (extraAction) {
+                case AuthLocal.ACCESS_ALLOWED:
+                    authUser.setLogged(true);
+                    authorizationDialog.dismiss();
+                    realmDB = Realm.getDefaultInstance();
+                    setMainLayout(savedInstance);
+                    break;
+                case AuthLocal.ACCESS_DENIED:
+                    authUser.reset();
+                    authorizationDialog.dismiss();
+                    setContentView(R.layout.login_layout);
+                    ShowSettings();
+                    break;
+            }
         }
     }
 }

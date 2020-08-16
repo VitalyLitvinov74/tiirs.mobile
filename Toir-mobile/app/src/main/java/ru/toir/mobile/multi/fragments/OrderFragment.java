@@ -114,6 +114,7 @@ import ru.toir.mobile.multi.rest.SendOrders;
 import ru.toir.mobile.multi.rest.ToirAPIFactory;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 import ru.toir.mobile.multi.utils.MainFunctions;
 
 import static ru.toir.mobile.multi.EquipmentInfoActivity.showDialogDefect2;
@@ -304,7 +305,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         User user = realmDB.where(User.class)
-                .equalTo("tagId", authUser.getTagId())
+                .equalTo("login", authUser.getLogin())
                 .findFirst();
         if (user == null) {
             Toast.makeText(activity, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
@@ -1750,9 +1751,14 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
                     // закрываем диалог
                     rfidDialog.dismiss();
+                    RfidDriverMsg[] rfidDriverMsgs = (RfidDriverMsg[]) message.obj;
+                    List<String> stringList = new ArrayList<>();
+                    for (RfidDriverMsg driverMsg : rfidDriverMsgs) {
+                        stringList.add(driverMsg.getTagId());
+                    }
 
-                    String[] tagIds = (String[]) message.obj;
-                    if (tagIds == null) {
+                    String[] tagIds = stringList.toArray(new String[]{});
+                    if (tagIds.length == 0) {
                         try {
                             Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
@@ -1761,7 +1767,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                         return false;
                     }
 
-                    String tagId = tagIds[0].substring(4);
+                    String tagId = tagIds[0];
                     Log.d(TAG, "Ид метки получили: " + tagId);
                     if (expectedTagUuid.equals(tagId)) {
                         boolean run_ar_content = false;
@@ -1951,7 +1957,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
                         Realm realm = Realm.getDefaultInstance();
                         AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                        User user = realm.where(User.class)
+                                .equalTo("login", authUser.getLogin())
+                                .findFirst();
                         UUID uuid = UUID.randomUUID();
                         Date date = new Date();
                         realm.beginTransaction();

@@ -13,6 +13,11 @@ public class AuthorizedUser {
     private String mOrganizationUuid;
     private String mIdentity;
     private boolean mIsLogged;
+    private boolean mIsServerLogged;
+    private boolean mIsLocalLogged;
+    private int mLoginType;
+    private String mPassword;
+    private String mDbName;
 
     public static synchronized AuthorizedUser getInstance() {
         if (mInstance == null) {
@@ -89,6 +94,11 @@ public class AuthorizedUser {
         mOrganizationUuid = null;
         mIdentity = null;
         mIsLogged = false;
+        mIsServerLogged = false;
+        mIsLocalLogged = false;
+        mLoginType = -1;
+        mPassword = null;
+        mDbName = null;
     }
 
     public String getOrganizationUuid() {
@@ -96,7 +106,7 @@ public class AuthorizedUser {
     }
 
     public void setOrganizationUuid(String organizationUuid) {
-        this.mOrganizationUuid = organizationUuid;
+        mOrganizationUuid = organizationUuid;
     }
 
     public String getIdentity() {
@@ -104,7 +114,7 @@ public class AuthorizedUser {
     }
 
     public void setIdentity(String identity) {
-        this.mIdentity = identity;
+        mIdentity = identity;
     }
 
     public boolean isLogged() {
@@ -112,6 +122,46 @@ public class AuthorizedUser {
     }
 
     public void setLogged(boolean isLogged) {
-        this.mIsLogged = isLogged;
+        mIsLogged = isLogged;
+    }
+
+    public boolean isLocalLogged() {
+        return mIsLocalLogged;
+    }
+
+    public void setLocalLogged(boolean isLocalLogged) {
+        mIsLocalLogged = isLocalLogged;
+    }
+
+    public int loginType() {
+        return mLoginType;
+    }
+
+    public void setLoginType(int loginType) {
+        mLoginType = loginType;
+    }
+
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public void setPassword(String password) {
+        mPassword = password;
+    }
+
+    public String getDbName() {
+        return mDbName;
+    }
+
+    public void setDbName(String dbName) {
+        mDbName = dbName;
+    }
+
+    public boolean isServerLogged() {
+        return mIsServerLogged;
+    }
+
+    public void setServerLogged(boolean isServerLogged) {
+        mIsServerLogged = isServerLogged;
     }
 }

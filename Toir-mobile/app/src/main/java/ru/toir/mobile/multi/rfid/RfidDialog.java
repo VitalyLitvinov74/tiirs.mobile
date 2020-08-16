@@ -72,7 +72,7 @@ public class RfidDialog extends DialogFragment {
 
         // получаем текущий драйвер считывателя
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity()
-                        .getApplicationContext());
+                .getApplicationContext());
         driverClassName = sp.getString(getActivity().getApplicationContext()
                 .getString(R.string.rfidDriverListPrefKey), null);
 
@@ -182,16 +182,16 @@ public class RfidDialog extends DialogFragment {
             case IntentIntegrator.REQUEST_CODE:
                 if (data != null) {
                     String result = data.getStringExtra("SCAN_RESULT");
-                    String tagId = "0000" + result;
                     if (result != null && !result.equals("")) {
+                        RfidDriverMsg msg = RfidDriverMsg.tagMsg("0000" + result);
                         // Так как в зависимости от вызванного метода разнится тип возвращаемиого результата,
                         // проверяем какой именно метод был вызван.
                         if (command == READER_COMMAND_READ_ID) {
                             message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-                            message.obj = tagId;
+                            message.obj = msg;
                         } else if (command == READER_COMMAND_READ_MULTI_ID) {
                             message.what = RfidDriverBase.RESULT_RFID_SUCCESS;
-                            message.obj = new String[]{tagId};
+                            message.obj = new RfidDriverMsg[]{msg};
                         } else {
                             message.what = RfidDriverBase.RESULT_RFID_READ_ERROR;
                         }

@@ -305,4 +305,9 @@
 
     <string name="no_operations">No operations</string>
     <string name="menu_order_tool">Tools list</string>
+    <string name="input_login_pin">Enter login and pin</string>
+    <string name="login_title">Login</string>
+    <string name="pin_title">PIN</string>
+
+    <string name="no_user_found">User not found</string>
 </resources>

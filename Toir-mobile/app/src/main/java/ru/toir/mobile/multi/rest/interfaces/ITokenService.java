@@ -17,5 +17,6 @@ public interface ITokenService {
 
     @FormUrlEncoded
     @POST("/token")
-    Call<TokenSrv> getByPassword(@Field("password") String tagId, @Field("grant_type") String garantType);
+    Call<TokenSrv> getByPassword(@Field("login") String login, @Field("password") String password,
+                                 @Field("grant_type") String garantType);
 }

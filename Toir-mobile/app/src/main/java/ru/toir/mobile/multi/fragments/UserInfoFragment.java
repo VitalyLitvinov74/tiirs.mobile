@@ -83,7 +83,10 @@ public class UserInfoFragment extends Fragment {
         TextView tv_user_date = view.findViewById(R.id.user_text_date);
         TextView tv_user_boss = view.findViewById(R.id.user_text_boss);
 
-        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        final User user = realmDB.where(User.class)
+                .equalTo("login", authUser.getLogin())
+                .findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {

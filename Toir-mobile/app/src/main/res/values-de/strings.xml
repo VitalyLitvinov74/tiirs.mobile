@@ -301,4 +301,9 @@
 
     <string name="no_operations">Keine operationen</string>
     <string name="menu_order_tool">Werkzeugliste</string>
+    <string name="input_login_pin">Geben Sie den Benutzernamen und die PIN ein</string>
+    <string name="login_title">Login</string>
+    <string name="pin_title">PIN</string>
+
+    <string name="no_user_found">Benutzer wurde nicht gefunden</string>
 </resources>

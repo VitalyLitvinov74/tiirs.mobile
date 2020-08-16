@@ -15,11 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 import ru.toir.mobile.multi.utils.ShellUtils;
 import ru.toir.mobile.multi.utils.ShellUtils.CommandResult;
 
@@ -105,7 +108,8 @@ public class RfidDriverP6300 extends RfidDriverBase {
                     }
 
                     Log.d(TAG, "EPC len = " + query_epc.epc.epc_len + ", tagId = " + sb.toString());
-                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, sb.toString()).sendToTarget();
+                    RfidDriverMsg msg = RfidDriverMsg.tagMsg(sb.toString());
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
                 } else {
                     Log.d(TAG, "EPC not readed...");
                     sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
@@ -143,7 +147,9 @@ public class RfidDriverP6300 extends RfidDriverBase {
                                     // останавливаем поток разбора ответов от считывателя
                                     CommandType.CommandOK = true;
                                     CommandType.CommandResend = false;
-                                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{readedTagId}).sendToTarget();
+                                    RfidDriverMsg msg = RfidDriverMsg.tagMsg(readedTagId);
+                                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, new RfidDriverMsg[]{msg})
+                                            .sendToTarget();
                                 }
                             }
                         } else {
@@ -170,11 +176,17 @@ public class RfidDriverP6300 extends RfidDriverBase {
                 }
 
                 if (!result && tagIds.length == 0) {
-//                    Bundle bundle = new Bundle();
-//                    bundle.putStringArray("result", foundTagIds.toArray(new String[]{}));
-                    Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, foundTagIds.toArray(new String[]{}));
-//                    message.setData(bundle);
-                    message.sendToTarget();
+                    if (foundTagIds.size() > 0) {
+                        List<RfidDriverMsg> msgs = new ArrayList<>();
+                        for (String tag : foundTagIds) {
+                            msgs.add(RfidDriverMsg.tagMsg(tag));
+                        }
+
+                        Message message = sHandler.obtainMessage(RESULT_RFID_SUCCESS, msgs.toArray());
+                        message.sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+                    }
                 } else {
                     sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
                 }

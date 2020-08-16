@@ -23,6 +23,7 @@ import ru.toir.mobile.multi.ToirApplication;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 
 /**
  * @author Dmitriy Logachev
@@ -119,12 +120,14 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
                 }
 
                 tagId = "0000" + tagId;
+                RfidDriverMsg msg = RfidDriverMsg.tagMsg(tagId);
                 switch (command) {
                     case RfidDialog.READER_COMMAND_READ_ID:
-                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
                         break;
                     case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, new RfidDriverMsg[]{msg})
+                                .sendToTarget();
                         break;
                     default:
                         sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();

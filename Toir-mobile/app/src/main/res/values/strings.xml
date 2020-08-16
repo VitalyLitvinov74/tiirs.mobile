@@ -303,4 +303,9 @@
 
     <string name="no_operations">Нет операций</string>
     <string name="menu_order_tool">Перечень инструмента</string>
+    <string name="input_login_pin">Введите логин и пин</string>
+    <string name="login_title">Логин</string>
+    <string name="pin_title">Пин</string>
+
+    <string name="no_user_found">Пользователь не найден</string>
 </resources>

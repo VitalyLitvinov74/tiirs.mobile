@@ -258,7 +258,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 if (currentDefectLevel != null && currentDefectType != null) {
                     Realm realm = Realm.getDefaultInstance();
                     AuthorizedUser authUser = AuthorizedUser.getInstance();
-                    User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
+                    User user = realm.where(User.class)
+                            .equalTo("login", authUser.getLogin())
+                            .findFirst();
                     UUID uuid = UUID.randomUUID();
                     Date date = new Date();
                     realm.beginTransaction();

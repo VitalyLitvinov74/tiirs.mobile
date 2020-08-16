@@ -39,6 +39,7 @@ import ru.toir.mobile.multi.db.realm.EquipmentType;
 import ru.toir.mobile.multi.rest.ToirAPIFactory;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 
 public class DefectsFragment extends Fragment {
     private static final String TAG;
@@ -99,7 +100,7 @@ public class DefectsFragment extends Fragment {
                     public boolean handleMessage(Message msg) {
                         Log.d(TAG, "Получили сообщение из драйвера.");
                         if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                            final String tagId = ((String) msg.obj).substring(4);
+                            final String tagId = ((RfidDriverMsg) msg.obj).getTagId();
                             Log.d(TAG, tagId);
                             try {
                                 Toast.makeText(getActivity(),
