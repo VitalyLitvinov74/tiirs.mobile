@@ -130,12 +130,12 @@ public class MainFunctions {
     //  функция возвращает путь до фотографии оборудования
     public static String getEquipmentImage(String path, Equipment equipment) {
         if (equipment != null) {
-            if (equipment.getImage() != null && equipment.getImage().length() > 5) {
-                return equipment.getImage();
+            if (equipment.getImageFileName() != null && equipment.getImageFileName().length() > 5) {
+                return equipment.getImageFileName();
             }
 
             if (equipment.getEquipmentModel() != null) {
-                return equipment.getEquipmentModel().getImage();
+                return equipment.getEquipmentModel().getImageFileName();
             }
         }
 

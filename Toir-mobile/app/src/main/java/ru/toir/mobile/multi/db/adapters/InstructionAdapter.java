@@ -12,6 +12,7 @@ import java.io.File;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.EquipmentInfoActivity;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.realm.Instruction;
@@ -62,16 +63,14 @@ public class InstructionAdapter extends RealmBaseAdapter<Instruction> implements
             instruction = adapterData.get(position);
             if (instruction != null) {
                 viewHolder.title.setText(instruction.getTitle());
-                viewHolder.title.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final File file = new File(context.getExternalFilesDir(instruction.getImageFilePath()),
-                                instruction.getPath());
-                        if (file.exists()) {
-                            Intent intent = EquipmentInfoActivity.showDocument(file, context.getApplicationContext());
-                            if (intent != null) {
-                                context.startActivity(intent);
-                            }
+                viewHolder.title.setOnClickListener(v -> {
+                    final File file = new File(context.getExternalFilesDir(
+                            instruction.getImageFilePath(AuthorizedUser.getInstance().getDbName())),
+                            instruction.getImageFileName());
+                    if (file.exists()) {
+                        Intent intent = EquipmentInfoActivity.showDocument(file, context.getApplicationContext());
+                        if (intent != null) {
+                            context.startActivity(intent);
                         }
                     }
                 });

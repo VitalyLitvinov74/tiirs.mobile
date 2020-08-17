@@ -134,14 +134,16 @@ public class GetUser extends BroadcastReceiver {
      */
     private void downloadUserImage(Context context, User serverUser, User localUser) {
 
-        final String fileName = serverUser.getImage();
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        final String fileName = serverUser.getImageFileName();
         File localImageFile;
         boolean needDownloadImage = false;
         if (localUser != null) {
             Date serverDate = serverUser.getChangedAt();
             Date localDate = localUser.getChangedAt();
-            File fileDir = context.getExternalFilesDir(localUser.getImageFilePath() + "/");
-            localImageFile = new File(fileDir, localUser.getImage());
+            File fileDir = context
+                    .getExternalFilesDir(localUser.getImageFilePath(authUser.getDbName()) + "/");
+            localImageFile = new File(fileDir, localUser.getImageFileName());
             if (localDate.getTime() < serverDate.getTime() || !localImageFile.exists()) {
                 needDownloadImage = true;
             }
@@ -153,7 +155,7 @@ public class GetUser extends BroadcastReceiver {
         if (needDownloadImage && !fileName.equals("")) {
             String url = ToirApplication.serverUrl + "/"
                     + serverUser.getImageFileUrl(serverUser.getLogin()) + "/"
-                    + serverUser.getImage();
+                    + serverUser.getImageFileName();
             Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
             callFile.enqueue(new Callback<ResponseBody>() {
                 @Override
@@ -163,7 +165,8 @@ public class GetUser extends BroadcastReceiver {
                         return;
                     }
 
-                    File filePath = context.getExternalFilesDir("/" + User.getImageRoot());
+                    File filePath = context.getExternalFilesDir("/"
+                            + serverUser.getImageFilePath(authUser.getDbName()));
                     if (filePath == null) {
                         // нет доступа к внешнему накопителю
                         return;

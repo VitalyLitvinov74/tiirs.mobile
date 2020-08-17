@@ -837,7 +837,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         Context context = getContext();
         if (context != null) {
             for (MediaFile item : mediaFiles) {
-                File extDir = context.getExternalFilesDir(item.getPath());
+                File extDir = context.getExternalFilesDir(item
+                        .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                 File mediaFile = new File(extDir, item.getName());
                 if (mediaFile.exists()) {
                     filesToSend.add(realmDB.copyFromRealm(item));
@@ -1341,7 +1342,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
                     mediaFile.setName(fileName.toString());
                     File picDir = activity.getApplicationContext()
-                            .getExternalFilesDir(mediaFile.getPath());
+                            .getExternalFilesDir(mediaFile
+                                    .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                     if (picDir == null) {
                         // какое-то сообщение пользователю что не смогли "сохранить" результат
                         // фотофиксации?

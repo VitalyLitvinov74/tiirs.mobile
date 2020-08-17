@@ -86,18 +86,18 @@ public class CommonFile extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
+    public String getImageFileName() {
         return name;
     }
 
     @Override
-    public String getImageFilePath() {
-        return path + '/' + name;
+    public String getImageFilePath(String dbName) {
+        return dbName + "/" + getImageRoot();
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return null;
+        return "/storage/" + userName + "/" + getImageRoot();
     }
 
     public boolean isRequire() {

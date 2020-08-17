@@ -718,8 +718,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onActionSettings(MenuItem menuItem) {
         Log.d(TAG, "onActionSettings");
-        //Intent i = new Intent(MainActivity.this, SettingsActivity.class);
-        //startActivity(i);
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         currentFragment = FRAGMENT_SETTINGS;
         SettingsFragment fragment = new SettingsFragment();
@@ -835,9 +833,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void addProfile(User item) {
         IProfile new_profile;
-        String path = getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
+        String path = getExternalFilesDir("/"
+                + (new User()).getImageFilePath(AuthorizedUser.getInstance().getDbName()))
+                + File.separator;
         if (item.getChangedAt() != null) {
-            Bitmap myBitmap = getResizedBitmap(path, item.getImage(), 0, 600, item.getChangedAt().getTime());
+            Bitmap myBitmap = getResizedBitmap(path, item.getImageFileName(),
+                    0, 600, item.getChangedAt().getTime());
             new_profile = new ProfileDrawerItem()
                     .withName(item.getName())
                     .withEmail(item.getLogin())

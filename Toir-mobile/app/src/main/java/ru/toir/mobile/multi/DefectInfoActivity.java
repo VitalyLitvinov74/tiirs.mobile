@@ -313,6 +313,7 @@ public class DefectInfoActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             // получаем штатными средствами последний снятый кадр в системе
@@ -337,7 +338,7 @@ public class DefectInfoActivity extends AppCompatActivity {
             mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
             mediaFile.setName(fileName.toString());
             File picDir = getApplicationContext()
-                    .getExternalFilesDir(mediaFile.getPath());
+                    .getExternalFilesDir(mediaFile.getImageFilePath(authUser.getDbName()));
             if (picDir == null) {
                 // какое-то сообщение пользователю что не смогли "сохранить" результат
                 // фотофиксации?
@@ -365,8 +366,10 @@ public class DefectInfoActivity extends AppCompatActivity {
             }
 
             try {
-                Bitmap tmpBitmap = getResizedBitmap(getExternalFilesDir(mediaFile.getPath()) + File.separator,
-                        mediaFile.getName(), 600, 0, mediaFile.getChangedAt().getTime());
+                Bitmap tmpBitmap = getResizedBitmap(getExternalFilesDir(mediaFile
+                                .getImageFilePath(authUser.getDbName()))
+                                + File.separator, mediaFile.getImageFileName(),
+                        600, 0, mediaFile.getChangedAt().getTime());
                 if (tmpBitmap != null) {
                     tv_defect_image.setImageBitmap(tmpBitmap);
                 }
@@ -428,11 +431,13 @@ public class DefectInfoActivity extends AppCompatActivity {
                 .sort("createdAt", Sort.DESCENDING)
                 .findFirst();
         if (mediaFile != null) {
-            File path = getExternalFilesDir(mediaFile.getPath());
-            String fileName = mediaFile.getName();
+            File path = getExternalFilesDir(mediaFile
+                    .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
+            String fileName = mediaFile.getImageFileName();
 
             if (path != null) {
                 String filePath = mediaFile.getPath();
+                // TODO: зачем эта проверка и откуда берётся storage в имени файла?
                 if (filePath.contains("storage")) {
                     filePath = ToirApplication.serverUrl + filePath;
                     tv_defect_image.setVisibility(View.VISIBLE);

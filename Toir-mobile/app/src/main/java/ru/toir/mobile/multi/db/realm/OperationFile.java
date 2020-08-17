@@ -106,26 +106,27 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
     }
 
     @Override
-    public String getImageFile() {
-        return getFileName();
+    public String getImageFileName() {
+        return fileName;
     }
 
     @Override
-    public String getImageFilePath() {
-        String imageRoot = getImageRoot();
+    public String getImageFilePath(String dbName) {
+//        String imageRoot = getImageRoot();
         String dir = null;
-        Stage stage = getStage();
+//        Stage stage = getStage();
 
-        if (stage != null) {
-            dir = imageRoot + '/' + getStage().getEquipment().getUuid();
-        }
+//        if (stage != null) {
+//            dir = imageRoot + '/' + getStage().getEquipment().getUuid();
+//        }
 
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+//        return "/storage/" + userName + "/" + getImageFilePath();
+        return null;
     }
 
     private Stage getStage() {

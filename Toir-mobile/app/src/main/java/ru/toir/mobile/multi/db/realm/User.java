@@ -35,6 +35,11 @@ public class User extends RealmObject implements IToirDbObject {
     private Date changedAt;
     private Organization organization;
 
+    /**
+     * Папка, относительно которой строится путь хранения файла.
+     *
+     * @return String
+     */
     public static String getImageRoot() {
         return "users";
     }
@@ -196,20 +201,20 @@ public class User extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getImage();
+    public String getImageFileName() {
+        return image;
     }
 
     @Override
-    public String getImageFilePath() {
+    public String getImageFilePath(String dbName) {
         String dir;
-        dir = getImageRoot();
+        dir = dbName + "/" + getImageRoot();
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + getImageRoot();
     }
 
     public Organization getOrganization() {

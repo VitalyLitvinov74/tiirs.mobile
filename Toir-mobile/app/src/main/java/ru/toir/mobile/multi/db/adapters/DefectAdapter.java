@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.realm.Defect;
 import ru.toir.mobile.multi.db.realm.DefectLevel;
@@ -115,11 +116,12 @@ public class DefectAdapter extends RealmBaseAdapter<Defect> implements ListAdapt
                     }
                     MediaFile mediaFile = defect.getMediaFile();
                     if (mediaFile != null) {
-                        File path = context.getExternalFilesDir(mediaFile.getPath());
+                        File path = context.getExternalFilesDir(mediaFile
+                                .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                         String fileName = mediaFile.getName();
                         if (path != null && fileName.contains("jpg")) {
-                            Bitmap bm = getResizedBitmap(path + File.separator,
-                                    fileName, 200, 0, mediaFile.getChangedAt().getTime());
+                            Bitmap bm = getResizedBitmap(path + File.separator, fileName,
+                                    200, 0, mediaFile.getChangedAt().getTime());
                             if (bm != null) {
                                 viewHolder.image_defect.setImageBitmap(bm);
                             }

@@ -99,24 +99,20 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getImage();
+    public String getImageFileName() {
+        return image;
     }
 
     @Override
-    public String getImageFilePath() {
-        String imageRoot = getImageRoot();
-        String typeUuid;
+    public String getImageFilePath(String dbName) {
         String dir;
-
-        typeUuid = stageType.getUuid();
-        dir = imageRoot + '/' + typeUuid;
+        dir = dbName + "/" + getImageRoot() + '/' + stageType.getUuid();
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + getImageRoot() + '/' + stageType.getUuid();
     }
 
     public Organization getOrganization() {

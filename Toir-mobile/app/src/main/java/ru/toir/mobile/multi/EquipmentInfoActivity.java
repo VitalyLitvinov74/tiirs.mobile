@@ -1011,8 +1011,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
             Documentation documentation = (Documentation) parent.getItemAtPosition(position);
 
-            final File file = new File(getExternalFilesDir(documentation.getImageFilePath()),
-                    documentation.getPath());
+            AuthorizedUser authUser = AuthorizedUser.getInstance();
+            final File file = new File(getExternalFilesDir(
+                    documentation.getImageFilePath(authUser.getDbName())),
+                    documentation.getImageFileName());
             if (file.exists()) {
                 Intent intent = showDocument(file, getApplicationContext());
                 if (intent != null) {
@@ -1039,16 +1041,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        // открываем загруженный документ (если он загрузился)
-                        if (file.exists()) {
-                            showDocument(file, getApplicationContext());
-                        } else {
-                            Toast.makeText(getBaseContext(), getString(R.string.cannot_upload_file),
-                                    Toast.LENGTH_LONG).show();
-                        }
+                dialog.setOnDismissListener(dialog1 -> {
+                    // открываем загруженный документ (если он загрузился)
+                    if (file.exists()) {
+                        showDocument(file, getApplicationContext());
+                    } else {
+                        Toast.makeText(getBaseContext(), getString(R.string.cannot_upload_file),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
                 dialog.show();
@@ -1057,7 +1056,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 GetDocumentationAsyncTask task = new GetDocumentationAsyncTask(dialog,
                         getBaseContext().getExternalFilesDir(""));
                 String userName = AuthorizedUser.getInstance().getLogin();
-                task.execute(documentation.getPath(), documentation.getImageFilePath(), documentation.getImageFileUrl(userName));
+                task.execute(documentation.getImageFileName(),
+                        documentation.getImageFilePath(authUser.getDbName()),
+                        documentation.getImageFileUrl(userName));
             }
         }
     }

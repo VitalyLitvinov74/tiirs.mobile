@@ -142,14 +142,18 @@ public class UserInfoFragment extends Fragment {
                 call_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + user.getContact()));
+                        Intent intent = new Intent(Intent.ACTION_DIAL,
+                                Uri.parse("tel:" + user.getContact()));
                         startActivity(intent);
                     }
                 });
             }
 
-            String path = getActivity().getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
-            Bitmap user_bitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
+            String path = getActivity().getExternalFilesDir("/"
+                    + user.getImageFilePath(authUser.getDbName()))
+                    + File.separator;
+            Bitmap user_bitmap = getResizedBitmap(path, user.getImageFileName(),
+                    0, 600, user.getChangedAt().getTime());
             if (user_bitmap != null) {
                 user_image.setImageBitmap(user_bitmap);
             }
