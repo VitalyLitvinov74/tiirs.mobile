@@ -103,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
     //private static final int DRAWER_TASKS = 11;
     //private static final int DRAWER_ONLINE = 15;
 
+    public static final String START_GET_TOKEN_TIMER = ToirApplication.packageName + ".startGetTokenTimer";
     private static final int MAX_USER_PROFILE = 10;
-
     private static final int NO_FRAGMENT = 0;
     private static final int FRAGMENT_CHARTS = 2;
     private static final int FRAGMENT_EQUIPMENT = 3;
@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_USER = 8;
     private static final int FRAGMENT_DOCS = 9;
     private static final int FRAGMENT_SETTINGS = 11;
-
     private static final int DRAWER_DOWNLOAD = 12;
     private static final int DRAWER_INFO = 13;
     private static final int DRAWER_EXIT = 14;
@@ -123,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_OBJECTS = 16;
     private static final int FRAGMENT_CONTRAGENTS = 17;
     private static final int FRAGMENT_DEFECTS = 18;
-
     private static final String TAG = "MainActivity";
     private static boolean isExitTimerStart = false;
     public int currentFragment = NO_FRAGMENT;
@@ -134,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver authLocalReceiver;
     BroadcastReceiver getTokenReceiver;
     BroadcastReceiver getUserReceiver;
+    BroadcastReceiver checkGetTokenTimerReceiver;
     private RfidDialog rfidDialog;
     private AccountHeader headerResult = null;
     private ArrayList<IProfile> iprofilelist;
@@ -151,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
     private Thread checkGPSThread;
     private String locationBestProvider = LocationManager.GPS_PROVIDER;
     private boolean GPSPresent = false;
+    private Handler checkGetTokenTimer;
 
     public static Locale getLocale(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -271,6 +271,9 @@ public class MainActivity extends AppCompatActivity {
 
         getUserReceiver = new GetUser();
         registerReceiver(getUserReceiver, new IntentFilter(GetUser.GET_USER_ACTION));
+
+        checkGetTokenTimerReceiver = new GetTokenTimerReceiver();
+        registerReceiver(checkGetTokenTimerReceiver, new IntentFilter(START_GET_TOKEN_TIMER));
 
         // инициализация приложения
         init();
@@ -669,16 +672,16 @@ public class MainActivity extends AppCompatActivity {
         //tabs.setViewPager(pager);
     }
 
-    /**
-     * Обработчик клика меню запуска блютус сервера
-     *
-     * @param menuItem - пункт меню
-     */
-    public void onActionBTServer(MenuItem menuItem) {
-        Log.d(TAG, "onActionBTServer");
-        Intent i = new Intent(MainActivity.this, BTServerActivity.class);
-        startActivity(i);
-    }
+//    /**
+//     * Обработчик клика меню запуска блютус сервера
+//     *
+//     * @param menuItem - пункт меню
+//     */
+//    public void onActionBTServer(MenuItem menuItem) {
+//        Log.d(TAG, "onActionBTServer");
+//        Intent i = new Intent(MainActivity.this, BTServerActivity.class);
+//        startActivity(i);
+//    }
 
     /**
      * Обработчик клика кнопки "Войти"
@@ -943,6 +946,10 @@ public class MainActivity extends AppCompatActivity {
         if (getUserReceiver != null) {
             unregisterReceiver(getUserReceiver);
         }
+
+        if (checkGetTokenTimerReceiver != null) {
+            unregisterReceiver(checkGetTokenTimerReceiver);
+        }
     }
 
     @Override
@@ -1149,6 +1156,49 @@ public class MainActivity extends AppCompatActivity {
                     ShowSettings();
                     break;
             }
+        }
+    }
+
+    private class GetTokenTimerReceiver extends BroadcastReceiver {
+        private static final int timeout = 60000;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // запускаем таймер для проверки наличия токена в ситуации когда связь есть а токен не получен
+            if (checkGetTokenTimer == null) {
+                new Handler().postDelayed(this::startCheckGetToken, timeout);
+            }
+        }
+
+        private void startCheckGetToken() {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "star check token");
+                    AuthorizedUser authUser = AuthorizedUser.getInstance();
+                    if (authUser.getToken() != null) {
+                        // токен уже есть, останавливаем проверку
+                        return;
+                    }
+
+                    if (!ToirApplication.isInternetOn(MainActivity.this)) {
+                        // связи нет, ни чего не делаем
+                        // взводим следующий запуск
+                        checkGetTokenTimer.postDelayed(this, timeout);
+                        return;
+                    }
+
+                    if (authUser.isLogged() && !authUser.isServerLogged()) {
+                        sendBroadcast(new Intent(GetToken.GET_TOKEN_ACTION));
+                    }
+
+                    // взводим следующий запуск
+                    checkGetTokenTimer.postDelayed(this, timeout);
+                }
+            };
+
+            checkGetTokenTimer = new Handler();
+            checkGetTokenTimer.postDelayed(runnable, timeout);
         }
     }
 }

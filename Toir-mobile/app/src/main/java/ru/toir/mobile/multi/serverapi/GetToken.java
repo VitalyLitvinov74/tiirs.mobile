@@ -11,6 +11,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.toir.mobile.multi.AuthorizedUser;
+import ru.toir.mobile.multi.MainActivity;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.ToirApplication;
 import ru.toir.mobile.multi.db.ToirRealm;
@@ -44,6 +45,8 @@ public class GetToken extends BroadcastReceiver {
                 int code = response.code();
                 if (code != 200) {
                     // токен не получили, аутентификация не прошла
+                    // стартуем таймер для получения токена
+                    context.sendBroadcast(new Intent(MainActivity.START_GET_TOKEN_TIMER));
                     if (!authUser.isLocalLogged()) {
                         // пытаемся аутентифицировать в локальной базе
                         Intent intent = new Intent(AuthLocal.AUTH_LOCAL_ACTION);
@@ -58,6 +61,9 @@ public class GetToken extends BroadcastReceiver {
                     TokenSrv token = response.body();
                     if (token == null) {
                         // токен не получили, аутентификация не прошла
+                        // стартуем таймер для получения токена
+                        context.sendBroadcast(new Intent(MainActivity.START_GET_TOKEN_TIMER));
+
                         if (!authUser.isLocalLogged()) {
                             // пытаемся аутентифицировать в локальной базе
                             Intent intent = new Intent(AuthLocal.AUTH_LOCAL_ACTION);
@@ -98,6 +104,8 @@ public class GetToken extends BroadcastReceiver {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                 // TODO реализовать проверку на то что пользователя нет на сервере
                 // токен не получен, сервер не ответил...
+                // стартуем таймер для получения токена
+                context.sendBroadcast(new Intent(MainActivity.START_GET_TOKEN_TIMER));
 
                 if (!authUser.isLocalLogged()) {
                     Intent nextActionIntent = new Intent(AuthLocal.AUTH_LOCAL_ACTION);
