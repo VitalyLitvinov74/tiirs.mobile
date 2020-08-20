@@ -15,6 +15,7 @@ import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
 import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 import ru.toir.mobile.multi.utils.DataUtils;
 
 /**
@@ -65,22 +66,19 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
     @Override
     public void readTagId() {
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                UHFCommandResult result;
+        Thread thread = new Thread(() -> {
+            UHFCommandResult result;
 
-                // запускаем поиск метки
-                result = reader.readTagId(timeOut);
-                if (result.result == reader.RESULT_SUCCESS) {
-                    Log.d(TAG, result.data);
-                    RfidDriverMsg msg = RfidDriverMsg.tagMsg(result.data);
-                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
-                } else if (result.result == reader.RESULT_TIMEOUT) {
-                    sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-                } else {
-                    sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
-                }
+            // запускаем поиск метки
+            result = reader.readTagId(timeOut);
+            if (result.result == reader.RESULT_SUCCESS) {
+                Log.d(TAG, result.data);
+                RfidDriverMsg msg = RfidDriverMsg.tagMsg(Tag.Type.TAG_TYPE_UHF + ":" + result.data);
+                sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
+            } else if (result.result == reader.RESULT_TIMEOUT) {
+                sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+            } else {
+                sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
             }
         });
         thread.start();
@@ -95,44 +93,44 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
      *               любая метка из переданного списка. Результат возвращается в obj в виде строки.
      */
     @Override
-    public void readMultiplyTagId(final String[] tagIds) {
+    public void readMultiplyTagId(String[] tagIds) {
+        for (int i = 0; i < tagIds.length; i++) {
+            tagIds[i] = Tag.getTagId(tagIds[i]);
+        }
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                UHFCommandResult result;
-                C5Callback mc = new C5Callback(tagIds);
-                result = reader.StartMultiInventory(5000, 0xFFFF, mc);
-                reader.stopMultiInventory();
+        Runnable runnable = () -> {
+            UHFCommandResult result;
+            C5Callback mc = new C5Callback(tagIds);
+            result = reader.StartMultiInventory(5000, 0xFFFF, mc);
+            reader.stopMultiInventory();
 
-                if (result.result == reader.RESULT_SUCCESS) {
-                    if (tagIds.length == 0) {
-                        Set<String> foundTags = mc.getFoundTagIds();
-                        if (foundTags.size() > 0) {
-                            List<RfidDriverMsg> msgs = new ArrayList<>();
-                            for (String tag : mc.getFoundTagIds()) {
-                                msgs.add(RfidDriverMsg.tagMsg(tag));
-                            }
-
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, msgs.toArray()).sendToTarget();
-                        } else {
-                            sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+            if (result.result == reader.RESULT_SUCCESS) {
+                if (tagIds.length == 0) {
+                    Set<String> foundTags = mc.getFoundTagIds();
+                    if (foundTags.size() > 0) {
+                        List<RfidDriverMsg> msgs = new ArrayList<>();
+                        for (String tag : mc.getFoundTagIds()) {
+                            msgs.add(RfidDriverMsg.tagMsg(tag));
                         }
+
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, msgs.toArray()).sendToTarget();
                     } else {
-                        String tmp = mc.getFoundTagId();
-                        if (tmp != null) {
-                            // нашли метку из переданного списка, возвращаем одно значение в массиве
-                            RfidDriverMsg msg = RfidDriverMsg.tagMsg(tmp);
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS,
-                                    new RfidDriverMsg[]{msg}).sendToTarget();
-                        } else {
-                            // если искали метку из списка и ни одной не нашли
-                            sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
-                        }
+                        sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
                     }
                 } else {
-                    sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+                    String tmp = mc.getFoundTagId();
+                    if (tmp != null) {
+                        // нашли метку из переданного списка, возвращаем одно значение в массиве
+                        RfidDriverMsg msg = RfidDriverMsg.tagMsg(Tag.Type.TAG_TYPE_UHF + ":" + tmp);
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS,
+                                new RfidDriverMsg[]{msg}).sendToTarget();
+                    } else {
+                        // если искали метку из списка и ни одной не нашли
+                        sHandler.obtainMessage(RESULT_RFID_TIMEOUT).sendToTarget();
+                    }
                 }
+            } else {
+                sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
             }
         };
 
@@ -167,6 +165,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
      */
     @Override
     public void readTagData(String password, String tagId, int memoryBank, int address, int count) {
+        tagId = Tag.getTagId(tagId);
         ReadDataFromTAG runnable = new ReadDataFromTAG(password, tagId, memoryBank, address, count);
         Thread thread = new Thread(runnable);
         thread.start();
@@ -179,7 +178,7 @@ public class RfidDriverC5 extends RfidDriverBase implements IRfidDriver {
 
     @Override
     public void writeTagData(String password, String tagId, int memoryBank, int address, String data) {
-
+        tagId = Tag.getTagId(tagId);
         WriteDataToTAG runnable = new WriteDataToTAG(password, tagId, memoryBank, address, data);
         Thread thread = new Thread(runnable);
         thread.start();

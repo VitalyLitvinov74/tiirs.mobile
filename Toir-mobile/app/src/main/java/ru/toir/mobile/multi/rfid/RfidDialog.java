@@ -188,7 +188,7 @@ public class RfidDialog extends DialogFragment {
                 if (data != null) {
                     String result = data.getStringExtra("SCAN_RESULT");
                     if (result != null && !result.equals("")) {
-                        RfidDriverMsg msg = RfidDriverMsg.tagMsg("0000" + result);
+                        RfidDriverMsg msg = RfidDriverMsg.tagMsg("0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + result);
                         // Так как в зависимости от вызванного метода разнится тип возвращаемиого результата,
                         // проверяем какой именно метод был вызван.
                         if (command == READER_COMMAND_READ_ID) {

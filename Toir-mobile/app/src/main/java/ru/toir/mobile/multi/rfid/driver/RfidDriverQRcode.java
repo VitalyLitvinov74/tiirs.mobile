@@ -24,6 +24,7 @@ import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
 import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 
 /**
  * @author Dmitriy Logachev
@@ -61,7 +62,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
                     if (lastScannedCode != null) {
                         Log.d(TAG, "прочитано: " + lastScannedCode);
                         scanText.setText(lastScannedCode);
-                        String tagId = "0000" + lastScannedCode;
+                        String tagId = "0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + lastScannedCode;
                         RfidDriverMsg msg = RfidDriverMsg.tagMsg(tagId);
                         switch (command) {
                             case RfidDialog.READER_COMMAND_READ_ID:

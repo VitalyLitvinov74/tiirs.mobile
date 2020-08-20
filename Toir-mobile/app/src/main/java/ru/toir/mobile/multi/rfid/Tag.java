@@ -25,6 +25,10 @@ public class Tag {
         tagId = "";
     }
 
+    public Tag(String tagId) {
+        loadData(tagId);
+    }
+
     public static boolean checkType(String type) {
         String[] types = new String[]{
                 Type.TAG_TYPE_PIN,
@@ -35,6 +39,17 @@ public class Tag {
         };
 
         return Arrays.asList(types).contains(type);
+    }
+
+    /**
+     * Метод возвращает tagId удаляя тип метки
+     *
+     * @param tagId Идентификатор метки в формате TYPE:ID
+     * @return id метки
+     */
+    public static String getTagId(String tagId) {
+        String[] split = tagId.split(":");
+        return split.length > 1 ? split[1] : tagId;
     }
 
     public boolean loadData(String tagIdStr) {

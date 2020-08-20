@@ -24,6 +24,7 @@ import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
 import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 
 /**
  * @author Dmitriy Logachev
@@ -43,12 +44,7 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
     private Activity activity;
     private BroadcastReceiver receiver;
     private Handler handler = new Handler();
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            sHandler.obtainMessage(RfidDriverBase.RESULT_RFID_TIMEOUT).sendToTarget();
-        }
-    };
+    private Runnable runnable = () -> sHandler.obtainMessage(RfidDriverBase.RESULT_RFID_TIMEOUT).sendToTarget();
 
     private static NdefRecord newTextRecord(String text, Locale locale, boolean encodeInUtf8) {
         byte[] langBytes = locale.getLanguage().getBytes(Charset.forName("US-ASCII"));
@@ -119,7 +115,7 @@ public class RfidDriverNfc extends RfidDriverBase implements IRfidDriver {
                     return;
                 }
 
-                tagId = "0000" + tagId;
+                tagId = "0000" + Tag.Type.TAG_TYPE_NFC + ":" + tagId;
                 RfidDriverMsg msg = RfidDriverMsg.tagMsg(tagId);
                 switch (command) {
                     case RfidDialog.READER_COMMAND_READ_ID:

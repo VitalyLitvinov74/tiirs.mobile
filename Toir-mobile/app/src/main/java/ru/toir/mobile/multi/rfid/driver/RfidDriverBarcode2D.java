@@ -17,6 +17,7 @@ import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
 import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 
 /**
  * @author olejek
@@ -77,7 +78,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
                         sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                     }
 
-                    String tagId = "0000" + s.toString();
+                    String tagId = "0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + s.toString();
                     RfidDriverMsg msg = RfidDriverMsg.tagMsg(tagId);
                     switch (command) {
                         case RfidDialog.READER_COMMAND_READ_ID:
@@ -153,7 +154,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
                     Log.d(TAG, tagId);
                     if (!tagId.equals("")) {
-                        tagId = "0000" + tagId;
+                        tagId = "0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + tagId;
                         RfidDriverMsg rfidDriverMsg = RfidDriverMsg.tagMsg(tagId);
                         sHandler.obtainMessage(RESULT_RFID_SUCCESS, rfidDriverMsg).sendToTarget();
                     } else {

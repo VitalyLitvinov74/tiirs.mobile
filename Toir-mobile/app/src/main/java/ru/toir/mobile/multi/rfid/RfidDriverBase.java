@@ -9,8 +9,6 @@ import android.preference.PreferenceScreen;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.toir.mobile.multi.rfid.driver.RfidDriverBarcode;
-import ru.toir.mobile.multi.rfid.driver.RfidDriverBarcode2D;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverC5;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverNfc;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverNull;
@@ -50,8 +48,8 @@ public abstract class RfidDriverBase implements IRfidDriver {
 
     static {
         List<String> tmpList = new ArrayList<>();
-        tmpList.add(RfidDriverBarcode.class.getCanonicalName());
-        tmpList.add(RfidDriverBarcode2D.class.getCanonicalName());
+//        tmpList.add(RfidDriverBarcode.class.getCanonicalName());
+//        tmpList.add(RfidDriverBarcode2D.class.getCanonicalName());
 //        tmpList.add(RfidDriverBluetooth.class.getCanonicalName());
         tmpList.add(RfidDriverNfc.class.getCanonicalName());
         tmpList.add(RfidDriverUHF.class.getCanonicalName());
