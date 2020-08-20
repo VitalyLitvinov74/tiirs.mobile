@@ -18,6 +18,7 @@ import ru.toir.mobile.multi.rfid.driver.RfidDriverP6300;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverPin;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverQRcode;
 import ru.toir.mobile.multi.rfid.driver.RfidDriverText;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverUHF;
 
 //import ru.toir.mobile.multi.rfid.driver.RfidDriverBluetooth;
 
@@ -43,6 +44,7 @@ public abstract class RfidDriverBase implements IRfidDriver {
     protected static final String TAG = "RfidDriverBase";
     // вместо ручного разбора dex файла создаём статический массив с именами классов драйверов
     private static final String[] driversClass;
+    private static final String[] uhfDriversClass;
     // Handler который будет обрабатывать сообщение от драйвера
 	protected static Handler sHandler;
 
@@ -51,14 +53,19 @@ public abstract class RfidDriverBase implements IRfidDriver {
         tmpList.add(RfidDriverBarcode.class.getCanonicalName());
         tmpList.add(RfidDriverBarcode2D.class.getCanonicalName());
 //        tmpList.add(RfidDriverBluetooth.class.getCanonicalName());
-        tmpList.add(RfidDriverC5.class.getCanonicalName());
         tmpList.add(RfidDriverNfc.class.getCanonicalName());
+        tmpList.add(RfidDriverUHF.class.getCanonicalName());
         tmpList.add(RfidDriverNull.class.getCanonicalName());
-        tmpList.add(RfidDriverP6300.class.getCanonicalName());
         tmpList.add(RfidDriverQRcode.class.getCanonicalName());
         tmpList.add(RfidDriverText.class.getCanonicalName());
         tmpList.add(RfidDriverPin.class.getCanonicalName());
         driversClass = tmpList.toArray(new String[0]);
+
+        tmpList.clear();
+        tmpList.add(RfidDriverNull.class.getCanonicalName());
+        tmpList.add(RfidDriverP6300.class.getCanonicalName());
+        tmpList.add(RfidDriverC5.class.getCanonicalName());
+        uhfDriversClass = tmpList.toArray(new String[0]);
     }
 
 	protected Context mContext;
@@ -88,8 +95,12 @@ public abstract class RfidDriverBase implements IRfidDriver {
         return driversClass;
     }
 
-	public void setHandler(Handler handler) {
-		sHandler = handler;
+    public static String[] getUhfDriversClass() {
+        return uhfDriversClass;
+    }
+
+    public void setHandler(Handler handler) {
+        sHandler = handler;
 	}
 
 	public void setContext(Context context) {

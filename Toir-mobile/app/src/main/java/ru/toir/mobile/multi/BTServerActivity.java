@@ -3,9 +3,11 @@ package ru.toir.mobile.multi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -206,29 +208,27 @@ public class BTServerActivity extends Activity {
      * Запускаем выполнение команды считать id метки.
      */
     private void readTagId() {
-        Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "Получили сообщение из драйвера.");
-                String tagId = null;
-                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    tagId = (String) msg.obj;
-                    Log.d(TAG, tagId);
-                }
-
-                // отправляем полученное значение клиенту
-                mBtRfidServer.answerReadId(tagId, msg.what);
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return true;
+        Handler handler = new Handler(msg -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
+            String tagId = null;
+            if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                tagId = (String) msg.obj;
+                Log.d(TAG, tagId);
             }
+
+            // отправляем полученное значение клиенту
+            mBtRfidServer.answerReadId(tagId, msg.what);
+
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.readTagId();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
+        rfidDialog.readTagId(driverClass);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 
@@ -241,29 +241,27 @@ public class BTServerActivity extends Activity {
      * @param count         Количество
      */
     private void readTagData(String password, int memoryBank, int address, int count) {
-        Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "Получили сообщение из драйвера.");
-                String data = null;
-                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    data = (String) msg.obj;
-                    Log.d(TAG, data);
-                }
-
-                // отправляем полученное значение клиенту
-                mBtRfidServer.answerReadData(RfidDialog.READER_COMMAND_READ_DATA, data, msg.what);
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return true;
+        Handler handler = new Handler(msg -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
+            String data = null;
+            if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                data = (String) msg.obj;
+                Log.d(TAG, data);
             }
+
+            // отправляем полученное значение клиенту
+            mBtRfidServer.answerReadData(RfidDialog.READER_COMMAND_READ_DATA, data, msg.what);
+
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.readTagData(password, memoryBank, address, count);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
+        rfidDialog.readTagData(driverClass, password, memoryBank, address, count);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 
@@ -277,29 +275,27 @@ public class BTServerActivity extends Activity {
      * @param count         Количество
      */
     private void readTagDataId(String password, String tagId, int memoryBank, int address, int count) {
-        Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "Получили сообщение из драйвера.");
-                String data = null;
-                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    data = (String) msg.obj;
-                    Log.d(TAG, data);
-                }
-
-                // отправляем полученное значение клиенту
-                mBtRfidServer.answerReadData(RfidDialog.READER_COMMAND_READ_DATA_ID, data, msg.what);
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return true;
+        Handler handler = new Handler(msg -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
+            String data = null;
+            if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                data = (String) msg.obj;
+                Log.d(TAG, data);
             }
+
+            // отправляем полученное значение клиенту
+            mBtRfidServer.answerReadData(RfidDialog.READER_COMMAND_READ_DATA_ID, data, msg.what);
+
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.readTagData(password, tagId, memoryBank, address, count);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
+        rfidDialog.readTagData(driverClass, password, tagId, memoryBank, address, count);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 
@@ -312,24 +308,22 @@ public class BTServerActivity extends Activity {
      * @param data       Данные
      */
     private void writeTagData(String password, int memoryBank, int address, String data) {
-        Handler handler = new Handler(new Handler.Callback() {
+        Handler handler = new Handler(msg -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
 
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "Получили сообщение из драйвера.");
+            // отправляем полученное значение клиенту
+            mBtRfidServer.answerWriteData(RfidDialog.READER_COMMAND_WRITE_DATA, msg.what);
 
-                // отправляем полученное значение клиенту
-                mBtRfidServer.answerWriteData(RfidDialog.READER_COMMAND_WRITE_DATA, msg.what);
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return true;
-            }
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.writeTagData(password, memoryBank, address, data);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
+        rfidDialog.writeTagData(driverClass, password, memoryBank, address, data);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 
@@ -343,24 +337,22 @@ public class BTServerActivity extends Activity {
      * @param data       Данные
      */
     private void writeTagDataId(String password, String tagId, int memoryBank, int address, String data) {
-        Handler handler = new Handler(new Handler.Callback() {
+        Handler handler = new Handler(msg -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
 
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "Получили сообщение из драйвера.");
+            // отправляем полученное значение клиенту
+            mBtRfidServer.answerWriteData(RfidDialog.READER_COMMAND_WRITE_DATA, msg.what);
 
-                // отправляем полученное значение клиенту
-                mBtRfidServer.answerWriteData(RfidDialog.READER_COMMAND_WRITE_DATA, msg.what);
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return true;
-            }
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.writeTagData(password, tagId, memoryBank, address, data);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
+        rfidDialog.writeTagData(driverClass, password, tagId, memoryBank, address, data);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 
@@ -368,24 +360,22 @@ public class BTServerActivity extends Activity {
      * Запускаем выполнение команды чтения множества меток.
      */
     private void readMultiTagId(String[] tagIds) {
-        Handler handler = new Handler(new Handler.Callback() {
+        Handler handler = new Handler(msg -> {
+            Log.d(TAG, "Получили сообщение из драйвера.");
 
-            @Override
-            public boolean handleMessage(Message msg) {
-                Log.d(TAG, "Получили сообщение из драйвера.");
+            // отправляем полученное значение клиенту
+            mBtRfidServer.answerReadTagIdMulti((String[]) msg.obj, msg.what);
 
-                // отправляем полученное значение клиенту
-                mBtRfidServer.answerReadTagIdMulti((String[]) msg.obj, msg.what);
-
-                // закрываем диалог
-                rfidDialog.dismiss();
-                return true;
-            }
+            // закрываем диалог
+            rfidDialog.dismiss();
+            return true;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.readMultiTagId(tagIds);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
+        rfidDialog.readMultiTagId(driverClass, tagIds);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 }

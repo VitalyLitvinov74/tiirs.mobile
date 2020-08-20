@@ -206,14 +206,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void init() {
 
-        // значение по умолчанию для драйвера rfid
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String optionValue = sp.getString(getString(R.string.rfidDriverListPrefKey), null);
-        if (optionValue == null) {
-            optionValue = ru.toir.mobile.multi.rfid.driver.RfidDriverQRcode.class.getCanonicalName();
-            sp.edit().putString(getString(R.string.rfidDriverListPrefKey), optionValue).apply();
-        }
-
         // обнуляем текущего активного пользователя
         AuthorizedUser.getInstance().reset();
 
@@ -291,6 +283,13 @@ public class MainActivity extends AppCompatActivity {
             aUser.setUuid(savedInstanceState.getString("userUuid"));
             aUser.setOrganizationUuid(savedInstanceState.getString("organizationUuid"));
             aUser.setLogin(savedInstanceState.getString("userLogin"));
+            aUser.setLogged(isLogged);
+            aUser.setIdentity(savedInstanceState.getString("identity"));
+            aUser.setServerLogged(savedInstanceState.getBoolean("isServerLogged"));
+            aUser.setLocalLogged(savedInstanceState.getBoolean("isLocalLogged"));
+            aUser.setLoginType(savedInstanceState.getInt("loginType"));
+            aUser.setPassword(savedInstanceState.getString("password"));
+            aUser.setDbName(savedInstanceState.getString("dbName"));
         }
 
         Log.d(TAG, "onCreate");
@@ -368,7 +367,10 @@ public class MainActivity extends AppCompatActivity {
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.readTagId();
+        Context context = getApplicationContext();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String driverClass = sp.getString(context.getString(R.string.default_login_rfid_driver_key), "");
+        rfidDialog.readTagId(driverClass);
         rfidDialog.show(getFragmentManager(), RfidDialog.TAG);
     }
 
@@ -769,6 +771,12 @@ public class MainActivity extends AppCompatActivity {
         outState.putString("userUuid", authorizedUser.getUuid());
         outState.putString("organizationUuid", authorizedUser.getOrganizationUuid());
         outState.putString("userLogin", authorizedUser.getLogin());
+        outState.putString("identity", authorizedUser.getIdentity());
+        outState.putBoolean("isServerLogged", authorizedUser.isServerLogged());
+        outState.putBoolean("isLocalLogged", authorizedUser.isLocalLogged());
+        outState.putInt("loginType", authorizedUser.loginType());
+        outState.putString("password", authorizedUser.getPassword());
+        outState.putString("dbName", authorizedUser.getDbName());
     }
 
     /*
@@ -887,7 +895,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         String serverUrl = sp.getString(getString(R.string.serverUrl), "");
-        String classPath = sp.getString(getString(R.string.rfidDriverListPrefKey), "");
+        String classPath = sp.getString(getString(R.string.default_rfid_driver_key), "");
         String driverName = RfidDriverBase.getDriverName(classPath);
         if (driverName == null) {
             driverName = getString(R.string.no_driver_select);

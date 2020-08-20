@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.EditTextPreferenceDialogFragmentCompat;
@@ -47,6 +48,8 @@ import ru.toir.mobile.multi.MainActivity;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.ToirApplication;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverPin;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverUHF;
 import ru.toir.mobile.multi.utils.MainFunctions;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
@@ -71,12 +74,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         Preference updateAppButton = getPreferenceManager().findPreference("updateApp");
         if (updateAppButton != null) {
-            updateAppButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference arg0) {
-                    MainActivity.updateApk(mainActivityConnector);
-                    return true;
-                }
+            updateAppButton.setOnPreferenceClickListener(arg0 -> {
+                MainActivity.updateApk(mainActivityConnector);
+                return true;
             });
         }
 /*
@@ -141,21 +141,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(mainActivityConnector.getApplicationContext());
 
-        this.findPreference(getString(R.string.serverUrl)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                ToirApplication.serverUrl = String.valueOf(newValue);
-                return true;
-            }
+        findPreference(getString(R.string.serverUrl))
+                .setOnPreferenceChangeListener((preference, newValue) -> {
+                    ToirApplication.serverUrl = String.valueOf(newValue);
+                    return true;
         });
 
         // получаем список драйверов
         String[] driverClassList = RfidDriverBase.getDriverClassList();
-        // строим список драйверов с именами и классами
         List<String> drvNames = new ArrayList<>();
         List<String> drvKeys = new ArrayList<>();
         String name;
 
+        // строим список драйверов с именами и классами для входа в приложение
         for (String classPath : driverClassList) {
             name = RfidDriverBase.getDriverName(classPath);
             if (name != null) {
@@ -164,54 +162,85 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         }
 
-        // элемент интерфейса со списком драйверов считывателей
-        ListPreference drvList = (ListPreference) findPreference(getResources().getString(R.string.rfidDriverListPrefKey));
+        // элемент интерфейса со списком драйверов считывателей для входа в приложение
+        ListPreference drvLoginList = (ListPreference) findPreference(getResources()
+                .getString(R.string.default_login_rfid_driver_key));
+        drvLoginList.setEntries(drvNames.toArray(new String[]{""}));
+        drvLoginList.setEntryValues(drvKeys.toArray(new String[]{""}));
+
+        // строим список драйверов с именами и классами для работы с оборудованием (PIN исключаем)
+        drvNames.clear();
+        drvKeys.clear();
+        for (String classPath : driverClassList) {
+            name = RfidDriverBase.getDriverName(classPath);
+            if (name != null && !classPath.equals(RfidDriverPin.class.getCanonicalName())) {
+                drvNames.add(name);
+                drvKeys.add(classPath);
+            }
+        }
+
+        // элемент интерфейса со списком драйверов считывателей для оборудования
+        ListPreference drvList = (ListPreference) findPreference(getResources()
+                .getString(R.string.default_rfid_driver_key));
+        drvList.setEntries(drvNames.toArray(new String[]{""}));
+        drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
+
+
+        // строим список драйверов с именами и классами для работы с UHF
+        driverClassList = RfidDriverBase.getUhfDriversClass();
+        drvNames.clear();
+        drvKeys.clear();
+        for (String classPath : driverClassList) {
+            name = RfidDriverBase.getDriverName(classPath);
+            if (name != null && !classPath.equals(RfidDriverUHF.class.getCanonicalName())) {
+                drvNames.add(name);
+                drvKeys.add(classPath);
+            }
+        }
+
+        // элемент интерфейса со списком драйверов считывателей для оборудования
+        ListPreference drvUhfList = (ListPreference) findPreference(getResources()
+                .getString(R.string.default_uhf_driver_key));
+        drvUhfList.setEntries(drvNames.toArray(new String[]{""}));
+        drvUhfList.setEntryValues(drvKeys.toArray(new String[]{""}));
 
         basicSettingScr = (PreferenceCategory) this.findPreference("preferenceBasicScreen");
         driverSettingScr = (PreferenceScreen) this.findPreference(getResources()
                 .getString(R.string.rfidDrvSettingKey));
 
-        // указываем названия и значения для элементов списка
-        drvList.setEntries(drvNames.toArray(new String[]{""}));
-        drvList.setEntryValues(drvKeys.toArray(new String[]{""}));
-
         // при изменении драйвера, включаем дополнительный экран с настройками драйвера
-        drvList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                String value = (String) newValue;
-                showRfidDriverScreen(value);
-                return true;
-            }
+        drvList.setOnPreferenceChangeListener((preference, newValue) -> {
+            String value = (String) newValue;
+            showRfidDriverScreen(value);
+            return true;
+        });
+        drvLoginList.setOnPreferenceChangeListener((preference, newValue) -> {
+            String value = (String) newValue;
+            showRfidDriverScreen(value);
+            return true;
         });
 
         // проверяем есть ли настройки у драйвера
         String currentDrv = preferences.getString(
-                getResources().getString(R.string.rfidDriverListPrefKey), null);
+                getResources().getString(R.string.default_rfid_driver_key), null);
         showRfidDriverScreen(currentDrv);
 
-        Preference button = this.findPreference(getString(R.string.load_test_data));
-        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                //LoadTestData.LoadAllTestData2();
-                return true;
-            }
+        Preference button = findPreference(getString(R.string.load_test_data));
+        button.setOnPreferenceClickListener(preference -> {
+            //LoadTestData.LoadAllTestData2();
+            return true;
         });
 
-        Preference button2 = this.findPreference(getString(R.string.delete_test_data));
-        button2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                //LoadTestData.DeleteSomeData();
-                return true;
-            }
+        Preference button2 = findPreference(getString(R.string.delete_test_data));
+        button2.setOnPreferenceClickListener(preference -> {
+            //LoadTestData.DeleteSomeData();
+            return true;
         });
 
         //https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
         SharedPreferences sharedPref = mainActivityConnector.getSharedPreferences("messengers", Context.MODE_PRIVATE);
         String chat_id = sharedPref.getString(getString(R.string.telegram_chat_id), "0");
-        Preference telegramChatId = (Preference) findPreference(getString(R.string.telegram_chat_id));
+        Preference telegramChatId = findPreference(getString(R.string.telegram_chat_id));
         telegramChatId.setTitle(getString(R.string.telegram_chat_id) + chat_id);
 
         //Preference checkTextTags = findPreference(getString(R.string.without_tags_mode));
@@ -221,34 +250,28 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
 
         Preference telegramPreference = findPreference(getString(R.string.receive_telegram));
-        telegramPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Toast.makeText(mainActivityConnector, "Пожалуйста отправьте любое сообщение боту toirus", Toast.LENGTH_SHORT).show();
-                Intent telegramIntent = new Intent(Intent.ACTION_VIEW);
-                telegramIntent.setData(Uri.parse("http://telegram.me/toirus_bot"));
-                //startActivity(telegramIntent);
-                startActivityForResult(telegramIntent, ACTIVITY_TELEGRAM);
-                return true;
-            }
+        telegramPreference.setOnPreferenceClickListener(preference -> {
+            Toast.makeText(mainActivityConnector, "Пожалуйста отправьте любое сообщение боту toirus", Toast.LENGTH_SHORT).show();
+            Intent telegramIntent = new Intent(Intent.ACTION_VIEW);
+            telegramIntent.setData(Uri.parse("http://telegram.me/toirus_bot"));
+            //startActivity(telegramIntent);
+            startActivityForResult(telegramIntent, ACTIVITY_TELEGRAM);
+            return true;
         });
 
-        // элемент интерфейса со списком драйверов считывателей
-        ListPreference langList = (ListPreference) this.findPreference(getResources().getString(
+        // элемент интерфейса с выбором языка приложения
+        ListPreference langList = (ListPreference) findPreference(getResources().getString(
                 R.string.langListKey));
-        langList.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                String value = (String) newValue;
-                setLocale(value);
-                Toast.makeText(mainActivityConnector.getApplicationContext(),
-                        getString(R.string.lang_warning), Toast.LENGTH_LONG).show();
-                return true;
-            }
+        langList.setOnPreferenceChangeListener((preference, newValue) -> {
+            String value = (String) newValue;
+            setLocale(value);
+            Toast.makeText(mainActivityConnector.getApplicationContext(),
+                    getString(R.string.lang_warning), Toast.LENGTH_LONG).show();
+            return true;
         });
 
-        Preference changeUrl = findPreference(getString(R.string.serverUrl));
 /*
+        Preference changeUrl = findPreference(getString(R.string.serverUrl));
         changeUrl.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -298,6 +321,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     void showRfidDriverScreen(String value) {
+        if (driverSettingScr == null) {
+            return;
+        }
+
         // проверяем есть ли настройки у драйвера
         if (value != null && isDriverSettingsScreen(value, driverSettingScr)) {
             basicSettingScr.addPreference(driverSettingScr);
@@ -352,21 +379,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             case ACTIVITY_TELEGRAM:
                 // https://api.telegram.org/bot489333537:AAFWzSpAuWl0v1KJ3sTQKYABpjY0ERgcIcY/getUpdates
                 AsyncRequest ar = new AsyncRequest();
-                ar.setListener(new AsyncRequest.Listener() {
-                    @Override
-                    public void onSuccess(String chat_id) {
-                        SharedPreferences sharedPreferences =
-                                mainActivityConnector.getSharedPreferences("messendgers",
-                                        Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(getResources().getString(R.string.telegram_chat_id), chat_id);
-                        editor.apply();
+                ar.setListener(chat_id -> {
+                    SharedPreferences sharedPreferences =
+                            mainActivityConnector.getSharedPreferences("messendgers",
+                                    Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(getResources().getString(R.string.telegram_chat_id), chat_id);
+                    editor.apply();
 
-                        String msg = "Система Тоирус привествует Вас!"
-                                + " Теперь Вы будете получать уведомления в этом чате"
-                                + " " + chat_id;
-                        new MainFunctions().sendMessageToTelegram(mainActivityConnector, msg);
-                    }
+                    String msg = "Система Тоирус привествует Вас!"
+                            + " Теперь Вы будете получать уведомления в этом чате"
+                            + " " + chat_id;
+                    new MainFunctions().sendMessageToTelegram(mainActivityConnector, msg);
                 });
                 ar.execute();
                 break;
@@ -398,7 +422,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
         // check if dialog is already showing
-        if (getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) {
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager != null && fragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) {
             return;
         }
 
@@ -500,23 +525,28 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             super.onResume();
             final AlertDialog prefDialog = (AlertDialog) getDialog();
             if (prefDialog != null) {
-                final EditText edit = prefDialog.findViewById(android.R.id.edit);
-                final PreferenceManager pmf = preference.getPreferenceManager();
-                final SharedPreferences spf = pmf.getDefaultSharedPreferences(this.getContext());
+                EditText edit = prefDialog.findViewById(android.R.id.edit);
+                if (edit == null) {
+                    return;
+                }
+
+                Context context = getContext();
+                if (context == null) {
+                    return;
+                }
+
+                SharedPreferences spf = PreferenceManager.getDefaultSharedPreferences(context);
                 edit.setText(spf.getString(preference.getKey(), ""));
                 Button positiveButton = prefDialog.getButton(Dialog.BUTTON_POSITIVE);
-                positiveButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String text = edit.getText().toString();
-                        if (!Patterns.WEB_URL.matcher(text).matches() && !text.isEmpty()) {
-                            edit.setError("Не верный URL!");
-                        } else {
-                            edit.setError(null);
-                            spf.edit().putString(preference.getKey(), text).commit();
-                            ToirApplication.serverUrl = edit.getText().toString();
-                            dismiss();
-                        }
+                positiveButton.setOnClickListener(v -> {
+                    String text = edit.getText().toString();
+                    if (!Patterns.WEB_URL.matcher(text).matches() && !text.isEmpty()) {
+                        edit.setError("Не верный URL!");
+                    } else {
+                        edit.setError(null);
+                        spf.edit().putString(preference.getKey(), text).apply();
+                        ToirApplication.serverUrl = edit.getText().toString();
+                        dismiss();
                     }
                 });
             }

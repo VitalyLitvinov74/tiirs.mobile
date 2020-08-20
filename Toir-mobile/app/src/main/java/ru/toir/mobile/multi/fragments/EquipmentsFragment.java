@@ -3,9 +3,10 @@ package ru.toir.mobile.multi.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -141,78 +142,73 @@ public class EquipmentsFragment extends Fragment {
         equipmentListView.setOnItemClickListener(new ListviewClickListener());
 
         FloatingActionButton readRfidButton = rootView.findViewById(R.id.fab_readRfid);
-        readRfidButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Handler handler = new Handler(new Handler.Callback() {
+        readRfidButton.setOnClickListener(v -> {
+            Handler handler = new Handler(msg -> {
+                Log.d(TAG, "Получили сообщение из драйвера.");
 
-                    @Override
-                    public boolean handleMessage(Message msg) {
-                        Log.d(TAG, "Получили сообщение из драйвера.");
+                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                    final String tagId = ((RfidDriverMsg) msg.obj).getTagId();
+                    Log.d(TAG, tagId);
+                    Toast.makeText(getActivity(),
+                            "Чтение метки успешно.", Toast.LENGTH_SHORT)
+                            .show();
+                    Realm realm = Realm.getDefaultInstance();
+                    Equipment equipment1 = realm.where(Equipment.class)
+                            .equalTo("tagId", tagId)
+                            .findFirst();
+                    if (equipment1 != null) {
+                        showEquipmentInfoActivity(getActivity(), equipment1.getUuid());
+                    } else {
+                        Call<Equipment> callGetByTagId = ToirAPIFactory.getEquipmentService()
+                                .getByTagId(tagId);
+                        Callback<Equipment> callback = new Callback<Equipment>() {
+                            @Override
+                            public void onResponse(Call<Equipment> responseBodyCall, Response<Equipment> response) {
+                                if (response.code() != 200) {
+                                    Toast.makeText(getContext(), response.message(), Toast.LENGTH_LONG).show();
+                                }
 
-                        if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                            final String tagId = ((RfidDriverMsg) msg.obj).getTagId();
-                            Log.d(TAG, tagId);
-                            Toast.makeText(getActivity(),
-                                    "Чтение метки успешно.", Toast.LENGTH_SHORT)
-                                    .show();
-                            Realm realm = Realm.getDefaultInstance();
-                            Equipment equipment = realm.where(Equipment.class)
-                                    .equalTo("tagId", tagId)
-                                    .findFirst();
-                            if (equipment != null) {
-                                showEquipmentInfoActivity(getActivity(), equipment.getUuid());
-                            } else {
-                                Call<Equipment> callGetByTagId = ToirAPIFactory.getEquipmentService()
-                                        .getByTagId(tagId);
-                                Callback<Equipment> callback = new Callback<Equipment>() {
-                                    @Override
-                                    public void onResponse(Call<Equipment> responseBodyCall, Response<Equipment> response) {
-                                        if (response.code() != 200) {
-                                            Toast.makeText(getContext(), response.message(), Toast.LENGTH_LONG).show();
-                                        }
-
-                                        Equipment equipment = response.body();
-                                        if (equipment != null) {
-                                            Realm realm = Realm.getDefaultInstance();
-                                            realm.beginTransaction();
-                                            realm.copyToRealmOrUpdate(equipment);
-                                            realm.commitTransaction();
-                                            realm.close();
-                                            showEquipmentInfoActivity(getActivity(), equipment.getUuid());
-                                        } else {
-                                            Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
-                                                    Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Equipment> responseBodyCall, Throwable t) {
-                                        Toast.makeText(getActivity(), getString(R.string.error_equipment_read_tag_error),
-                                                Toast.LENGTH_LONG).show();
-                                        t.printStackTrace();
-                                    }
-                                };
-                                callGetByTagId.enqueue(callback);
+                                Equipment equipment1 = response.body();
+                                if (equipment1 != null) {
+                                    Realm realm = Realm.getDefaultInstance();
+                                    realm.beginTransaction();
+                                    realm.copyToRealmOrUpdate(equipment1);
+                                    realm.commitTransaction();
+                                    realm.close();
+                                    showEquipmentInfoActivity(getActivity(), equipment1.getUuid());
+                                } else {
+                                    Toast.makeText(getActivity(), getString(R.string.error_equipment_not_found),
+                                            Toast.LENGTH_LONG).show();
+                                }
                             }
 
-                            realm.close();
-                        } else {
-                            Toast.makeText(getActivity(), getString(R.string.error_read_tag),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        // закрываем диалог
-                        rfidDialog.dismiss();
-                        return true;
+                            @Override
+                            public void onFailure(Call<Equipment> responseBodyCall, Throwable t) {
+                                Toast.makeText(getActivity(), getString(R.string.error_equipment_read_tag_error),
+                                        Toast.LENGTH_LONG).show();
+                                t.printStackTrace();
+                            }
+                        };
+                        callGetByTagId.enqueue(callback);
                     }
-                });
 
-                rfidDialog = new RfidDialog();
-                rfidDialog.setHandler(handler);
-                rfidDialog.readTagId();
-                rfidDialog.show(getActivity().getFragmentManager(), TAG);
-            }
+                    realm.close();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.error_read_tag),
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                // закрываем диалог
+                rfidDialog.dismiss();
+                return true;
+            });
+
+            rfidDialog = new RfidDialog();
+            rfidDialog.setHandler(handler);
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String driverClass = sp.getString(getActivity().getString(R.string.default_rfid_driver_key), "");
+            rfidDialog.readTagId(driverClass);
+            rfidDialog.show(getActivity().getFragmentManager(), TAG);
         });
 
         initView();

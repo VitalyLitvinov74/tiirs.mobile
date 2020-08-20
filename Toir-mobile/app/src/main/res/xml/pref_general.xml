@@ -16,14 +16,27 @@
             android:title="@string/pref_server_url" />
 
         <ListPreference
+            android:defaultValue="ru.shtrm.serviceman.rfid.driver.RfidDriverPin"
             android:icon="@drawable/pref_rfid"
-            android:key="@string/rfidDriverListPrefKey"
+            android:key="@string/default_login_rfid_driver_key"
+            android:title="@string/pref_login_rfid_driver" />
+
+        <ListPreference
+            android:defaultValue="ru.shtrm.serviceman.rfid.driver.RfidDriverQRcode"
+            android:icon="@drawable/pref_rfid"
+            android:key="@string/default_rfid_driver_key"
             android:title="@string/pref_rfid_driver" />
 
-        <PreferenceScreen
+        <ListPreference
+            android:defaultValue="ru.shtrm.serviceman.rfid.driver.RfidDriverNull"
             android:icon="@drawable/pref_rfid"
-            android:key="@string/rfidDrvSettingKey"
-            android:title="@string/rfid_settings" />
+            android:key="@string/default_uhf_driver_key"
+            android:title="@string/default_uhf_driver" />
+
+        <!--<PreferenceScreen-->
+        <!--android:icon="@drawable/pref_rfid"-->
+        <!--android:key="@string/rfidDrvSettingKey"-->
+        <!--android:title="@string/rfid_settings" />-->
 
         <ListPreference
             android:entries="@array/languages"

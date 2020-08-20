@@ -18,6 +18,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import java.lang.reflect.Constructor;
 
 import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverNull;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverUHF;
 
 /**
  * @author Dmitriy Logachev
@@ -46,6 +48,7 @@ public class RfidDialog extends DialogFragment {
     private String tagWriteData;
     private int tagReadCount;
     private String[] tagIds;
+    private String driverClassName;
 
     /*
      * проверка для защиты от повтороного выполнения комманды драйвера при
@@ -66,20 +69,22 @@ public class RfidDialog extends DialogFragment {
 
         super.onCreate(savedInstanceState);
 
-        String driverClassName;
 
         getDialog().setTitle("Считайте метку");
 
-        // получаем текущий драйвер считывателя
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity()
                 .getApplicationContext());
-        driverClassName = sp.getString(getActivity().getApplicationContext()
-                .getString(R.string.rfidDriverListPrefKey), null);
 
-        if (driverClassName == null) {
+        if (driverClassName == null || driverClassName.isEmpty()) {
             Toast.makeText(getActivity(), "Пожалуйста выберите драйвер в меню и укажите сервер!",
                     Toast.LENGTH_LONG).show();
             return null;
+        }
+
+        // если драйвер UHF, получаем реальный класс
+        if (driverClassName.equals(RfidDriverUHF.class.getCanonicalName())) {
+            driverClassName = sp.getString(getActivity().getApplicationContext()
+                    .getString(R.string.default_uhf_driver_key), RfidDriverNull.class.getCanonicalName());
         }
 
         // пытаемся получить класс драйвера
@@ -216,9 +221,11 @@ public class RfidDialog extends DialogFragment {
      * Чтение(поиск первой попавшейся метки) Id метки.
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param driverClass   driverClass
      */
-    public void readTagId() {
-
+    public void readTagId(String driverClass) {
+        driverClassName = driverClass;
         command = READER_COMMAND_READ_ID;
     }
 
@@ -227,9 +234,11 @@ public class RfidDialog extends DialogFragment {
      * Поиск всех меток в поле считывателя.
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param driverClass   driverClass
      */
-    public void readMultiTagId() {
-
+    public void readMultiTagId(String driverClass) {
+        driverClassName = driverClass;
         command = READER_COMMAND_READ_MULTI_ID;
         tagIds = new String[]{};
     }
@@ -239,9 +248,12 @@ public class RfidDialog extends DialogFragment {
      * Поиск всех меток в поле считывателя.
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param driverClass   driverClass
+     * @param id   id метки которую мы хотим считать
      */
-    public void readMultiTagId(String id) {
-
+    public void readMultiTagId(String driverClass, String id) {
+        driverClassName = driverClass;
         command = READER_COMMAND_READ_MULTI_ID;
         tagIds = new String[]{id};
     }
@@ -251,9 +263,12 @@ public class RfidDialog extends DialogFragment {
      * Поиск всех меток в поле считывателя.
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
+     *
+     * @param driverClass   driverClass
+     * @param ids   Список id меток которые мы хотим считать
      */
-    public void readMultiTagId(String[] ids) {
-
+    public void readMultiTagId(String driverClass, String[] ids) {
+        driverClassName = driverClass;
         command = READER_COMMAND_READ_MULTI_ID;
         tagIds = ids;
     }
@@ -264,14 +279,15 @@ public class RfidDialog extends DialogFragment {
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
      *
+     * @param driverClass   driverClass
      * @param password   password
      * @param id         tagId
      * @param memoryBank memoryBank
      * @param address    address
      * @param count      count
      */
-    public void readTagData(String password, String id, int memoryBank, int address, int count) {
-
+    public void readTagData(String driverClass, String password, String id, int memoryBank, int address, int count) {
+        driverClassName = driverClass;
         tagPassword = password;
         tagId = id;
         tagMemoryBank = memoryBank;
@@ -287,13 +303,14 @@ public class RfidDialog extends DialogFragment {
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
      *
+     * @param driverClass   driverClass
      * @param password   password
      * @param memoryBank memoryBank
      * @param address    address
      * @param count      count
      */
-    public void readTagData(String password, int memoryBank, int address, int count) {
-
+    public void readTagData(String driverClass, String password, int memoryBank, int address, int count) {
+        driverClassName = driverClass;
         tagPassword = password;
         tagMemoryBank = memoryBank;
         tagAddress = address;
@@ -308,14 +325,15 @@ public class RfidDialog extends DialogFragment {
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
      *
+     * @param driverClass   driverClass
      * @param password   password
      * @param id         id
      * @param memoryBank memoryBank
      * @param address    address
      * @param data       data
      */
-    public void writeTagData(String password, String id, int memoryBank, int address, String data) {
-
+    public void writeTagData(String driverClass, String password, String id, int memoryBank, int address, String data) {
+        driverClassName = driverClass;
         tagPassword = password;
         tagId = id;
         tagMemoryBank = memoryBank;
@@ -331,13 +349,14 @@ public class RfidDialog extends DialogFragment {
      * </p>
      * Устанавливаем команду которую нужно будет выполнить при старте диалога.
      *
+     * @param driverClass   driverClass
      * @param password   password
      * @param memoryBank memoryBank
      * @param address    address
      * @param data       data
      */
-    public void writeTagData(String password, int memoryBank, int address, String data) {
-
+    public void writeTagData(String driverClass, String password, int memoryBank, int address, String data) {
+        driverClassName = driverClass;
         tagPassword = password;
         tagMemoryBank = memoryBank;
         tagAddress = address;

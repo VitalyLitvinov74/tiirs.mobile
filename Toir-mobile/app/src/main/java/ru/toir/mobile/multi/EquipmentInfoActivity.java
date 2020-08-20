@@ -4,13 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
@@ -39,7 +40,6 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.RecyclerViewCacheUtil;
 
 import java.io.File;
@@ -167,7 +167,6 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         RealmResults<Equipment> equipmentList = realm.where(Equipment.class).findAll();
         equipmentAdapter = new EquipmentAdapter(equipmentList);
         equipment = realm.where(Equipment.class).equalTo("uuid", equipmentUuid).findFirst();
-        defectLevel = realm.where(DefectLevel.class).findAll();
         if (equipment != null) {
             defectType = realm.where(DefectType.class)
                     .equalTo("equipmentType.uuid", equipment.getEquipmentModel().getEquipmentType().getUuid())
@@ -218,74 +217,65 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         builder.setView(addDefectLayout);
         builder.setIcon(R.drawable.ic_icon_warnings);
         builder.setCancelable(false);
-        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
+        builder.setNegativeButton("Отмена", (dialog, which) -> {
         });
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
+        builder.setPositiveButton("OK", (dialog, which) -> {
         });
 
         final AlertDialog dialog = builder.create();
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Equipment currentEquipment = equipment;
-                TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
-                DefectType currentDefectType = null;
-                DefectLevel currentDefectLevel = null;
+        View.OnClickListener listener = v -> {
+            Equipment currentEquipment = equipment;
+            TextView defectDescription = addDefectLayout.findViewById(R.id.add_new_comment);
+            DefectType currentDefectType = null;
+            DefectLevel currentDefectLevel = null;
 
-                int position = defectTypeSpinner.getSelectedItemPosition();
+            int position = defectTypeSpinner.getSelectedItemPosition();
+            if (position != AdapterView.INVALID_POSITION) {
+                currentDefectType = defectTypeAdapter.getItem(position);
+            }
+            position = defectLevelSpinner.getSelectedItemPosition();
+            if (position != AdapterView.INVALID_POSITION) {
+                currentDefectLevel = defectLevelAdapter.getItem(position);
+            }
+
+            if (currentEquipment == null) {
+                position = equipmentSpinner.getSelectedItemPosition();
                 if (position != AdapterView.INVALID_POSITION) {
-                    currentDefectType = defectTypeAdapter.getItem(position);
+                    currentEquipment = equipmentAdapter.getItem(position);
                 }
-                position = defectLevelSpinner.getSelectedItemPosition();
-                if (position != AdapterView.INVALID_POSITION) {
-                    currentDefectLevel = defectLevelAdapter.getItem(position);
-                }
+            }
 
-                if (currentEquipment == null) {
-                    position = equipmentSpinner.getSelectedItemPosition();
-                    if (position != AdapterView.INVALID_POSITION) {
-                        currentEquipment = equipmentAdapter.getItem(position);
-                    }
-                }
+            if (currentDefectLevel != null && currentDefectType != null) {
+                Realm realm1 = Realm.getDefaultInstance();
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                User user = realm1.where(User.class)
+                        .equalTo("login", authUser.getLogin())
+                        .findFirst();
+                UUID uuid = UUID.randomUUID();
+                Date date = new Date();
+                realm1.beginTransaction();
+                long nextId = Defect.getLastId() + 1;
+                Defect defect = new Defect();
+                defect.set_id(nextId);
+                defect.setUuid(uuid.toString().toUpperCase());
+                defect.setUser(user);
+                defect.setDate(date);
+                defect.setEquipment(currentEquipment);
+                defect.setDefectType(currentDefectType);
+                defect.setDefectLevel(currentDefectLevel);
+                defect.setProcess(false);
+                defect.setComment(defectDescription.getText().toString().concat(" "));
+                defect.setTask(null);
+                defect.setCreatedAt(date);
+                defect.setChangedAt(date);
+                realm1.copyToRealmOrUpdate(defect);
 
-                if (currentDefectLevel != null && currentDefectType != null) {
-                    Realm realm = Realm.getDefaultInstance();
-                    AuthorizedUser authUser = AuthorizedUser.getInstance();
-                    User user = realm.where(User.class)
-                            .equalTo("login", authUser.getLogin())
-                            .findFirst();
-                    UUID uuid = UUID.randomUUID();
-                    Date date = new Date();
-                    realm.beginTransaction();
-                    long nextId = Defect.getLastId() + 1;
-                    Defect defect = new Defect();
-                    defect.set_id(nextId);
-                    defect.setUuid(uuid.toString().toUpperCase());
-                    defect.setUser(user);
-                    defect.setDate(date);
-                    defect.setEquipment(currentEquipment);
-                    defect.setDefectType(currentDefectType);
-                    defect.setDefectLevel(currentDefectLevel);
-                    defect.setProcess(false);
-                    defect.setComment(defectDescription.getText().toString().concat(" "));
-                    defect.setTask(null);
-                    defect.setCreatedAt(date);
-                    defect.setChangedAt(date);
-                    realm.copyToRealmOrUpdate(defect);
-
-                    realm.commitTransaction();
-                    realm.close();
-                    dialog.dismiss();
-                    if (defectAdapter != null) {
-                        defectAdapter.notifyDataSetChanged();
-                    }
+                realm1.commitTransaction();
+                realm1.close();
+                dialog.dismiss();
+                if (defectAdapter != null) {
+                    defectAdapter.notifyDataSetChanged();
                 }
             }
         };
@@ -362,22 +352,26 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("О программе").withDescription("Информация о версии").withIcon(FontAwesome.Icon.faw_info).withIdentifier(DRAWER_INFO).withSelectable(false),
-                        new PrimaryDrawerItem().withName("Выход").withIcon(FontAwesome.Icon.faw_undo).withIdentifier(DRAWER_EXIT).withSelectable(false)
+                        new PrimaryDrawerItem()
+                                .withName("О программе")
+                                .withDescription("Информация о версии")
+                                .withIcon(FontAwesome.Icon.faw_info)
+                                .withIdentifier(DRAWER_INFO).withSelectable(false),
+                        new PrimaryDrawerItem()
+                                .withName("Выход")
+                                .withIcon(FontAwesome.Icon.faw_undo)
+                                .withIdentifier(DRAWER_EXIT).withSelectable(false)
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem != null) {
-                            if (drawerItem.getIdentifier() == DRAWER_INFO) {
-                                startAboutDialog();
-                            } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
-                                System.exit(0);
-                            }
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerItem != null) {
+                        if (drawerItem.getIdentifier() == DRAWER_INFO) {
+                            startAboutDialog();
+                        } else if (drawerItem.getIdentifier() == DRAWER_EXIT) {
+                            System.exit(0);
                         }
-
-                        return false;
                     }
+
+                    return false;
                 })
                 .withSavedInstance(savedInstanceState)
                 .withShowDrawerOnFirstLaunch(true)
@@ -717,7 +711,7 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
                         rfidDialog = new RfidDialog();
                         rfidDialog.setHandler(handler);
-                        rfidDialog.readTagId();
+                        rfidDialog.readTagId(driverClass);
                         rfidDialog.show(getFragmentManager(), TAG);
                     }
                 };
@@ -747,20 +741,14 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         });
 */
 
-        findViewById(R.id.fab_add_defect).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), equipment_uuid, null);
-                //hideFAB();
-            }
+        findViewById(R.id.fab_add_defect).setOnClickListener(v -> {
+            showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(),
+                    equipment_uuid, null);
+            //hideFAB();
         });
 
-        findViewById(R.id.fab_change_equipment_status).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogStatus(equipment, (ViewGroup) v.getParent());
-            }
-        });
+        findViewById(R.id.fab_change_equipment_status)
+                .setOnClickListener(v -> showDialogStatus(equipment, (ViewGroup) v.getParent()));
 
 /*
         findViewById(R.id.fab_augmented_reality).setOnClickListener(new View.OnClickListener() {
@@ -805,26 +793,20 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         alert.setView(alertLayout);
         alert.setIcon(R.drawable.ic_icon_tools);
         alert.setCancelable(false);
-        alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
+        alert.setNegativeButton("Отмена", (dialog, which) -> {
         });
 
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                equipment.setEquipmentStatus(equipmentStatusAdapter.getItem(statusSpinner.getSelectedItemPosition()));
-                equipment.setChangedAt(new Date());
-                realm.commitTransaction();
-                Equipment equipment1 = realm.copyFromRealm(equipment);
-                SendEquipment task = new SendEquipment(equipment1);
-                addToJournal("Отправляем оборудование на сервер");
-                task.execute(equipment);
-                realm.close();
-            }
+        alert.setPositiveButton("OK", (dialog, which) -> {
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            equipment.setEquipmentStatus(equipmentStatusAdapter.getItem(statusSpinner.getSelectedItemPosition()));
+            equipment.setChangedAt(new Date());
+            realm.commitTransaction();
+            Equipment equipment1 = realm.copyFromRealm(equipment);
+            SendEquipment task = new SendEquipment(equipment1);
+            addToJournal("Отправляем оборудование на сервер");
+            task.execute(equipment);
+            realm.close();
         });
 
         TextView statusCurrent = alertLayout.findViewById(R.id.current_status);
@@ -858,30 +840,28 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             tag.start = 0x18191a1b;
             tag.end = 0x1c1d1e1f;
 
-            Handler handler = new Handler(new Handler.Callback() {
+            Handler handler = new Handler(msg -> {
+                Log.d(TAG, "Получили сообщение из драйвера.");
 
-                @Override
-                public boolean handleMessage(Message msg) {
-                    Log.d(TAG, "Получили сообщение из драйвера.");
-
-                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                        Toast.makeText(getApplicationContext(),
-                                "Запись метки удалась.", Toast.LENGTH_SHORT)
-                                .show();
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                                "Не удалось записать данные.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-
-                    // закрываем диалог
-                    rfidDialog.dismiss();
-                    return true;
+                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                    Toast.makeText(getApplicationContext(),
+                            "Запись метки удалась.", Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Не удалось записать данные.",
+                            Toast.LENGTH_SHORT).show();
                 }
+
+                // закрываем диалог
+                rfidDialog.dismiss();
+                return true;
             });
 
             rfidDialog = new RfidDialog();
             rfidDialog.setHandler(handler);
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
             // тестовые данные для примера
             String data = "0a0a0a0a";
             //data = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
@@ -891,16 +871,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             //byte[] byteData = tag.getBinary();
             //data = DataUtils.toHexString(byteData);
             // пишем в метку с id привязанным к оборудованию
-            // rfidDialog.writeTagData("00000000", equipment.getTag_id(),
+            // rfidDialog.writeTagData(driverClass, "00000000", equipment.getTag_id(),
             // RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
             // пишем в "известную" метку
-            // rfidDialog.writeTagData("00000000",
+            // rfidDialog.writeTagData(driverClass, "00000000",
             // "3000E2004000860902332580112D",
             // RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
             // пишем в "произовольную" метку, ту которую найдём первой
-//                        rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
+//                        rfidDialog.writeTagData(driverClass, "00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
             // пишем в "известную" метку
             data = "000102030405060708090A0B0C0D0E0F";
@@ -909,9 +889,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
             data += "303132333435363738393A3B3C3D3E3F";
             data = "FF050403020100FF";
 //                        data = "EFFE";
-//                        rfidDialog.writeTagData("00000000", equipment.getTagId(),
+//                        rfidDialog.writeTagData(driverClass, "00000000", equipment.getTagId(),
 //                                RfidDriverBase.MEMORY_BANK_USER, 0, data);
-            rfidDialog.writeTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
+            rfidDialog.writeTagData(driverClass, "00000000", RfidDriverBase.MEMORY_BANK_USER, 0, data);
 
             rfidDialog.show(getFragmentManager(), TAG);
 
@@ -922,55 +902,52 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         Log.d(TAG, "Считываем память метки.");
         if (equipment != null) {
             Log.d(TAG, "id метки оборудования: " + equipment.getTagId());
-            Handler handler = new Handler(new Handler.Callback() {
+            Handler handler = new Handler(msg -> {
+                Log.d(TAG, "Получили сообщение из драйвера.");
 
-                @Override
-                public boolean handleMessage(Message msg) {
-                    Log.d(TAG, "Получили сообщение из драйвера.");
-
-                    if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                        String tagData = (String) msg.obj;
-                        Log.d(TAG, tagData);
-                        if (tagData.length() / 2 == 64) {
-                            Toast.makeText(getApplicationContext(),
-                                    "Считывание метки успешно.\r\n" + tagData,
-                                    Toast.LENGTH_SHORT).show();
-                            TagStructure tag = new TagStructure();
-                            tag.parse(DataUtils.hexStringToByteArray(tagData));
-                            Log.d(TAG, "uuid = " + tag.uuid);
-                            Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
-                            Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
-                            Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
-                            Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
-                            Log.d(TAG, "phone = " + tag.phone);
-                        }
-                    } else {
-                        Log.d(TAG, "Ошибка чтения метки!");
+                if (msg.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                    String tagData = (String) msg.obj;
+                    Log.d(TAG, tagData);
+                    if (tagData.length() / 2 == 64) {
                         Toast.makeText(getApplicationContext(),
-                                "Ошибка чтения метки.", Toast.LENGTH_SHORT)
-                                .show();
+                                "Считывание метки успешно.\r\n" + tagData,
+                                Toast.LENGTH_SHORT).show();
+                        TagStructure tag = new TagStructure();
+                        tag.parse(DataUtils.hexStringToByteArray(tagData));
+                        Log.d(TAG, "uuid = " + tag.uuid);
+                        Log.d(TAG, "taskId = " + String.format("0x%08x", tag.taskId));
+                        Log.d(TAG, "taskTypeId = " + String.format("0x%08x", tag.taskTypeId));
+                        Log.d(TAG, "start = " + String.format("0x%08x", tag.start));
+                        Log.d(TAG, "end = " + String.format("0x%08x", tag.end));
+                        Log.d(TAG, "phone = " + tag.phone);
                     }
-
-
-                    // закрываем диалог
-                    rfidDialog.dismiss();
-                    return true;
+                } else {
+                    Log.d(TAG, "Ошибка чтения метки!");
+                    Toast.makeText(getApplicationContext(),
+                            "Ошибка чтения метки.", Toast.LENGTH_SHORT)
+                            .show();
                 }
+
+
+                // закрываем диалог
+                rfidDialog.dismiss();
+                return true;
             });
 
             rfidDialog = new RfidDialog();
             rfidDialog.setHandler(handler);
-
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            String driverClass = sp.getString(this.getString(R.string.default_rfid_driver_key), "");
             // читаем метку с конкретным id для теста
-            // rfidDialog.readTagData("0000000000", "3000E2004000860902332580112D",
+            // rfidDialog.readTagData(driverClass, "0000000000", "3000E2004000860902332580112D",
             // RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
             // читаем метку с id привязанным к оборудованию
-            rfidDialog.readTagData("00000000", equipment.getTagId(),
+            rfidDialog.readTagData(driverClass, "00000000", equipment.getTagId(),
                     RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
             // читаем "произовольную" метку, ту которую найдём первой
-//                        rfidDialog.readTagData("00000000", RfidDriverBase.MEMORY_BANK_USER, 0, 64);
+//                        rfidDialog.readTagData(driverClass, "00000000", RfidDriverBase.MEMORY_BANK_USER, 0, 64);
 
             rfidDialog.show(getFragmentManager(), TAG);
         }
@@ -988,16 +965,13 @@ public class EquipmentInfoActivity extends AppCompatActivity {
 
         // добавляем элемент меню для перехода к списку атрибутов оборудования
         MenuItem attributes = menu.add("Атрибуты");
-        MenuItem.OnMenuItemClickListener clickListener = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent equipmentInfo = new Intent(getApplicationContext(), EquipmentAttributeActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("equipment_uuid", equipment_uuid);
-                equipmentInfo.putExtras(bundle);
-                startActivity(equipmentInfo);
-                return true;
-            }
+        MenuItem.OnMenuItemClickListener clickListener = item -> {
+            Intent equipmentInfo = new Intent(getApplicationContext(), EquipmentAttributeActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("equipment_uuid", equipment_uuid);
+            equipmentInfo.putExtras(bundle);
+            startActivity(equipmentInfo);
+            return true;
         };
         attributes.setOnMenuItemClickListener(clickListener);
 
@@ -1033,14 +1007,9 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 dialog.setCancelable(false);
                 dialog.setButton(
                         DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(),
-                                        "Получение файла отменено",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        (dialog12, which) -> Toast.makeText(getApplicationContext(),
+                                "Получение файла отменено",
+                                Toast.LENGTH_SHORT).show());
                 dialog.setOnDismissListener(dialog1 -> {
                     // открываем загруженный документ (если он загрузился)
                     if (file.exists()) {

@@ -17,7 +17,8 @@
 
     <string name="pref_server_url">Systemserver</string>
     <string name="pref_server_url_dialog_title">Geben Sie die Systemserver-URL ein</string>
-    <string name="pref_rfid_driver">RFID-Lesertreiber</string>
+    <string name="pref_rfid_driver">RFID-Lesertreiber (equip.)</string>
+    <string name="pref_login_rfid_driver">RFID-Lesertreiber (auth)</string>
     <string name="login">Anmelden</string>
     <string name="init_success">Initialisierung erfolgreich</string>
     <string name="init_fail">Initialisierung fehlgeschlagen</string>
@@ -30,7 +31,6 @@
     <string name="read_15693">Tag lesen</string>
     <string name="write_15693">Tag schreiben</string>
     <string name="serverUrl">serverUrl</string>
-    <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Referenzen</string>
     <string name="get_task">Orders bekommen</string>
@@ -60,7 +60,7 @@
     <string name="documentation">Dokumentation</string>
     <string name="pleaseScanImg">Richten Sie die Kamera auf den Tag</string>
     <string name="scan_process">Scanvorgang</string>
-    <string name="empty"> </string>
+    <string name="empty"></string>
     <string name="order_send_message">Nachricht senden</string>
     <string name="created">Erstellt:</string>
     <string name="off">Deaktiviert:</string>
@@ -306,4 +306,9 @@
     <string name="pin_title">PIN</string>
 
     <string name="no_user_found">Benutzer wurde nicht gefunden</string>
+
+    <string name="default_rfid_driver_key">defaultRfidDriverKey</string>
+    <string name="default_login_rfid_driver_key">defaultLoginRfidDriverKey</string>
+    <string name="default_uhf_driver_key">defaultUHFDriverKey</string>
+    <string name="default_uhf_driver">RFID-Lesertreiber UHF</string>
 </resources>
