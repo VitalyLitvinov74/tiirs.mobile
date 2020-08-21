@@ -35,6 +35,11 @@ public class User extends RealmObject implements IToirDbObject {
     private Date changedAt;
     private Organization organization;
 
+    /**
+     * Папка, относительно которой строится путь хранения файла.
+     *
+     * @return String
+     */
     public static String getImageRoot() {
         return "users";
     }
@@ -67,6 +72,20 @@ public class User extends RealmObject implements IToirDbObject {
         String usersDbLinkJson = gson.toJson(usersDbLinks);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         sp.edit().putString("usersDbLink", usersDbLinkJson).apply();
+    }
+
+    public static HashMap<String, String> getLoginList(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String logins = sp.getString("loginList", "[]");
+        return new Gson().fromJson(logins, new TypeToken<HashMap<String, String>>() {
+        }.getType());
+    }
+
+    public static void saveLoginList(Context context, HashMap<String, String> logins) {
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(logins);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sp.edit().putString("loginList", jsonString).apply();
     }
 
     public long get_id() {
@@ -182,20 +201,20 @@ public class User extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getImage();
+    public String getImageFileName() {
+        return image;
     }
 
     @Override
-    public String getImageFilePath() {
+    public String getImageFilePath(String dbName) {
         String dir;
-        dir = getImageRoot();
+        dir = dbName + "/" + getImageRoot();
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + getImageRoot();
     }
 
     public Organization getOrganization() {

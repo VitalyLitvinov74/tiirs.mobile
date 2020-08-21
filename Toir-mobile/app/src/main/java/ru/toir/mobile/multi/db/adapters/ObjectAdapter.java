@@ -14,6 +14,7 @@ import java.io.File;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.realm.Objects;
 
@@ -75,8 +76,8 @@ public class ObjectAdapter extends RealmBaseAdapter<Objects> implements ListAdap
             if (object != null) {
                 viewHolder.title.setText(object.getTitle());
 
-                String imgPath = object.getImageFilePath();
-                String fileName = object.getImage();
+                String imgPath = object.getImageFilePath(AuthorizedUser.getInstance().getDbName());
+                String fileName = object.getImageFileName();
                 if (imgPath != null && fileName != null) {
                     File path = context.getExternalFilesDir(imgPath);
                     if (path != null) {

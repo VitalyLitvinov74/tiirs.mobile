@@ -110,18 +110,18 @@ public class MediaFile extends RealmObject implements IToirDbObject, ISend {
     }
 
     @Override
-    public String getImageFile() {
-        return path + '/' + name;
+    public String getImageFileName() {
+        return name;
     }
 
     @Override
-    public String getImageFilePath() {
-        return getImageRoot() + '/' + getImageFile();
+    public String getImageFilePath(String dbName) {
+        return dbName + "/" + path;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + path;
     }
 
     public Organization getOrganization() {

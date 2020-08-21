@@ -83,7 +83,10 @@ public class UserInfoFragment extends Fragment {
         TextView tv_user_date = view.findViewById(R.id.user_text_date);
         TextView tv_user_boss = view.findViewById(R.id.user_text_boss);
 
-        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        final User user = realmDB.where(User.class)
+                .equalTo("login", authUser.getLogin())
+                .findFirst();
         if (user == null) {
             Toast.makeText(getActivity(), "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
         } else {
@@ -139,14 +142,18 @@ public class UserInfoFragment extends Fragment {
                 call_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + user.getContact()));
+                        Intent intent = new Intent(Intent.ACTION_DIAL,
+                                Uri.parse("tel:" + user.getContact()));
                         startActivity(intent);
                     }
                 });
             }
 
-            String path = getActivity().getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
-            Bitmap user_bitmap = getResizedBitmap(path, user.getImage(), 0, 600, user.getChangedAt().getTime());
+            String path = getActivity().getExternalFilesDir("/"
+                    + user.getImageFilePath(authUser.getDbName()))
+                    + File.separator;
+            Bitmap user_bitmap = getResizedBitmap(path, user.getImageFileName(),
+                    0, 600, user.getChangedAt().getTime());
             if (user_bitmap != null) {
                 user_image.setImageBitmap(user_bitmap);
             }

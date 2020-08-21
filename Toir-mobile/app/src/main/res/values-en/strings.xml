@@ -17,7 +17,8 @@
 
     <string name="pref_server_url">System server</string>
     <string name="pref_server_url_dialog_title">Input server URL</string>
-    <string name="pref_rfid_driver">RFID driver</string>
+    <string name="pref_rfid_driver">RFID driver (equip.)</string>
+    <string name="pref_login_rfid_driver">RFID driver (auth)</string>
     <string name="login">Login</string>
     <string name="init_success">Initialization success</string>
     <string name="init_fail">Initialization failed</string>
@@ -29,7 +30,6 @@
     <string name="find">Find</string>
 
     <string name="serverUrl">serverUrl</string>
-    <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="title_activity_btserver">BTServerActivity</string>
     <string name="run_ar_content_key">run_ar_content_key</string>
@@ -305,6 +305,16 @@
 
     <string name="no_operations">No operations</string>
     <string name="menu_order_tool">Tools list</string>
+    <string name="input_login_pin">Enter login and pin</string>
+    <string name="login_title">Login</string>
+    <string name="pin_title">PIN</string>
+
+    <string name="no_user_found">User not found</string>
+
+    <string name="default_rfid_driver_key">defaultRfidDriverKey</string>
+    <string name="default_login_rfid_driver_key">defaultLoginRfidDriverKey</string>
+    <string name="default_uhf_driver_key">defaultUHFDriverKey</string>
+    <string name="default_uhf_driver">UHF driver</string>
 
     <string name="menu_calendar">Calendar</string>
     <string name="menu_messages">Messages</string>

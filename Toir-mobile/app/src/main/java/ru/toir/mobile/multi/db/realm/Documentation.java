@@ -108,13 +108,12 @@ public class Documentation extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getPath();
+    public String getImageFileName() {
+        return path;
     }
 
     @Override
-    public String getImageFilePath() {
-        String imageRoot = getImageRoot();
+    public String getImageFilePath(String dbName) {
         String typeUuid;
         String dir;
 
@@ -126,13 +125,22 @@ public class Documentation extends RealmObject implements IToirDbObject {
             return null;
         }
 
-        dir = imageRoot + '/' + typeUuid;
+        dir = dbName + "/" + getImageRoot() + '/' + typeUuid;
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        String typeUuid;
+        if (equipmentModel != null) {
+            typeUuid = equipmentModel.getUuid();
+        } else if (equipment.getEquipmentModel() != null) {
+            typeUuid = equipment.getEquipmentModel().getUuid();
+        } else {
+            return null;
+        }
+
+        return "/storage/" + userName + "/" + getImageRoot() + "/" + typeUuid;
     }
 
     public Organization getOrganization() {

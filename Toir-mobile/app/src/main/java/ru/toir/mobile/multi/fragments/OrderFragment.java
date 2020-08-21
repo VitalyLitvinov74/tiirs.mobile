@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -114,6 +113,8 @@ import ru.toir.mobile.multi.rest.SendOrders;
 import ru.toir.mobile.multi.rest.ToirAPIFactory;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 import ru.toir.mobile.multi.utils.MainFunctions;
 
 import static ru.toir.mobile.multi.EquipmentInfoActivity.showDialogDefect2;
@@ -304,7 +305,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         User user = realmDB.where(User.class)
-                .equalTo("tagId", authUser.getTagId())
+                .equalTo("login", authUser.getLogin())
                 .findFirst();
         if (user == null) {
             Toast.makeText(activity, "Нет такого пользователя!", Toast.LENGTH_SHORT).show();
@@ -486,12 +487,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     // меняем ее статус на в процессе
 //                    if (operation.isNew() || operation.isCanceled() || operation.isUnComplete()) {
                     if (operation.isNew()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                operation.setStartDate(new Date());
-                                operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
-                            }
+                        realmDB.executeTransaction(realm -> {
+                            operation.setStartDate(new Date());
+                            operation.setOperationStatus(OperationStatus.getObjectInWork(realm));
                         });
                     }
 
@@ -528,12 +526,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         if (selectedStage != null) {
             StageStatus stageStatus = selectedStage.getStageStatus();
             if (stageStatus != null && stageStatus.isNew()) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        selectedStage.setStartDate(new Date());
-                        selectedStage.setStageStatus(StageStatus.getObjectInWork(realm));
-                    }
+                realmDB.executeTransaction(realm -> {
+                    selectedStage.setStartDate(new Date());
+                    selectedStage.setStageStatus(StageStatus.getObjectInWork(realm));
                 });
             }
         }
@@ -542,12 +537,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         if (selectedTask != null) {
             TaskStatus taskStatus = selectedTask.getTaskStatus();
             if (taskStatus != null && taskStatus.isNew()) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        selectedTask.setStartDate(new Date());
-                        selectedTask.setTaskStatus(TaskStatus.getObjectInWork(realm));
-                    }
+                realmDB.executeTransaction(realm -> {
+                    selectedTask.setStartDate(new Date());
+                    selectedTask.setTaskStatus(TaskStatus.getObjectInWork(realm));
                 });
             }
         }
@@ -555,14 +547,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         // фиксируем начало работы над нарядом (если у него статус получен), меняем его статус на в процессе
         if (selectedOrder != null) {
             if (selectedOrder.isInWork() || selectedOrder.isUnComplete()) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        if (selectedOrder.getOpenDate() == null) {
-                            selectedOrder.setOpenDate(new Date());
-                        }
-//                        selectedOrder.setOrderStatus(OrderStatus.getObjectInWork(realm));
+                realmDB.executeTransaction(realm -> {
+                    if (selectedOrder.getOpenDate() == null) {
+                        selectedOrder.setOpenDate(new Date());
                     }
+//                        selectedOrder.setOrderStatus(OrderStatus.getObjectInWork(realm));
                 });
             }
         }
@@ -615,132 +604,101 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         super.onCreateOptionsMenu(menu, inflater);
         // добавляем элемент меню для получения новых нарядов
         MenuItem getTaskNew = menu.add(getString(R.string.receive_new_orders));
-        getTaskNew.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        getTaskNew.setOnMenuItemClickListener(item -> {
+            Log.d(TAG, "Получаем новые наряды.");
 
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(TAG, "Получаем новые наряды.");
-
-                if (!ToirApplication.isInternetOn(getContext())) {
-                    Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
-                    return true;
-                }
-
-                // создаём диалог
-                ProgressDialog dialog;
-                dialog = new ProgressDialog(getActivity());
-
-                // запускаем поток получения новых нарядов с сервера
-                getOrdersByStatus(OrderStatus.Status.NEW, dialog);
-
-                // показываем диалог получения нарядов
-                dialog.setMessage("Получаем наряды");
-                dialog.setIndeterminate(false);
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setCancelable(false);
-                dialog.setButton(
-                        DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getActivity(), "Получение нарядов отменено",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                dialog.show();
+            if (!ToirApplication.isInternetOn(getContext())) {
+                Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
                 return true;
             }
+
+            // создаём диалог
+            ProgressDialog dialog;
+            dialog = new ProgressDialog(getActivity());
+
+            // запускаем поток получения новых нарядов с сервера
+            getOrdersByStatus(OrderStatus.Status.NEW, dialog);
+
+            // показываем диалог получения нарядов
+            dialog.setMessage("Получаем наряды");
+            dialog.setIndeterminate(false);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setCancelable(false);
+            dialog.setButton(
+                    DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                    (dialog13, which) -> Toast.makeText(getActivity(), "Получение нарядов отменено",
+                            Toast.LENGTH_SHORT).show());
+            dialog.show();
+            return true;
         });
 
         // добавляем элемент меню для получения "архивных" нарядов
         MenuItem getTaskDone = menu.add(getString(R.string.receive_completed_orders));
-        getTaskDone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(TAG, "Получаем сделанные наряды.");
+        getTaskDone.setOnMenuItemClickListener(item -> {
+            Log.d(TAG, "Получаем сделанные наряды.");
 
-                if (!ToirApplication.isInternetOn(getContext())) {
-                    Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
-                    return true;
-                }
-
-                // запускаем поток получения выполненных, невыполненных, отменнённых нарядов с сервера
-                List<String> stUuids = new ArrayList<>();
-                stUuids.add(OrderStatus.Status.CANCELED);
-                stUuids.add(OrderStatus.Status.COMPLETE);
-                stUuids.add(OrderStatus.Status.UN_COMPLETE);
-
-                // создаём диалог
-                ProgressDialog dialog;
-                dialog = new ProgressDialog(getActivity());
-
-                getOrdersByStatus(stUuids, dialog);
-
-                // показываем диалог получения наряда
-                dialog.setMessage("Получаем наряды");
-                dialog.setIndeterminate(true);
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setCancelable(false);
-                dialog.setButton(
-                        DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getActivity(), "Получение нарядов отменено",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                dialog.show();
+            if (!ToirApplication.isInternetOn(getContext())) {
+                Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
                 return true;
             }
+
+            // запускаем поток получения выполненных, невыполненных, отменнённых нарядов с сервера
+            List<String> stUuids = new ArrayList<>();
+            stUuids.add(OrderStatus.Status.CANCELED);
+            stUuids.add(OrderStatus.Status.COMPLETE);
+            stUuids.add(OrderStatus.Status.UN_COMPLETE);
+
+            // создаём диалог
+            ProgressDialog dialog;
+            dialog = new ProgressDialog(getActivity());
+
+            getOrdersByStatus(stUuids, dialog);
+
+            // показываем диалог получения наряда
+            dialog.setMessage("Получаем наряды");
+            dialog.setIndeterminate(true);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setCancelable(false);
+            dialog.setButton(
+                    DialogInterface.BUTTON_NEGATIVE, "Отмена",
+                    (dialog14, which) -> Toast.makeText(getActivity(), "Получение нарядов отменено",
+                            Toast.LENGTH_SHORT).show());
+            dialog.show();
+            return true;
         });
 
         // добавляем элемент меню для отправки результатов выполнения нарядов
         MenuItem sendTaskResultMenu = menu.add(getString(R.string.send_results));
-        MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (!ToirApplication.isInternetOn(getContext())) {
-                    Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
-                    return true;
-                }
-
-                // проверяем наличие не законченных нарядов
-                RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
-                        .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
-                        .findAll();
-                int inWorkCount = ordersInWork.size();
-                if (inWorkCount > 0) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-
-                    dialog.setTitle(getString(R.string.warning));
-                    dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
-                            + "Отправить выполненные наряды?");
-                    dialog.setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    sendCompleteTask();
-                                    dialog.dismiss();
-                                }
-                            });
-                    dialog.setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    dialog.show();
-                } else {
-                    sendCompleteTask();
-                }
-
+        MenuItem.OnMenuItemClickListener listener = item -> {
+            if (!ToirApplication.isInternetOn(getContext())) {
+                Toast.makeText(getContext(), "Нет соединения с сетью", Toast.LENGTH_LONG).show();
                 return true;
             }
+
+            // проверяем наличие не законченных нарядов
+            RealmResults<Orders> ordersInWork = realmDB.where(Orders.class)
+                    .equalTo("orderStatus.uuid", OrderStatus.Status.IN_WORK)
+                    .findAll();
+            int inWorkCount = ordersInWork.size();
+            if (inWorkCount > 0) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+                dialog.setTitle(getString(R.string.warning));
+                dialog.setMessage("Есть " + inWorkCount + " наряда в процессе выполнения.\n"
+                        + "Отправить выполненные наряды?");
+                dialog.setPositiveButton(android.R.string.ok,
+                        (dialog1, which) -> {
+                            sendCompleteTask();
+                            dialog1.dismiss();
+                        });
+                dialog.setNegativeButton(android.R.string.cancel,
+                        (dialog12, which) -> dialog12.dismiss());
+                dialog.show();
+            } else {
+                sendCompleteTask();
+            }
+
+            return true;
         };
         sendTaskResultMenu.setOnMenuItemClickListener(listener);
     }
@@ -804,13 +762,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setCancelable(false);
         dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Отмена",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), "Отправка результатов отменена",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+                (dialog, which) -> Toast.makeText(getActivity(), "Отправка результатов отменена",
+                        Toast.LENGTH_SHORT).show());
         dialog.show();
 
         taskCounter = new AtomicInteger(3);
@@ -845,7 +798,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         Context context = getContext();
         if (context != null) {
             for (MediaFile item : mediaFiles) {
-                File extDir = context.getExternalFilesDir(item.getPath());
+                File extDir = context.getExternalFilesDir(item
+                        .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                 File mediaFile = new File(extDir, item.getName());
                 if (mediaFile.exists()) {
                     filesToSend.add(realmDB.copyFromRealm(item));
@@ -913,47 +867,35 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         dialog.setView(myView);
         dialog.setTitle(getString(R.string.operation_cancel));
 
-        DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                final OperationVerdict verdict = (OperationVerdict) operationVerdictSpinner.getSelectedItem();
-                // выставляем выбранный вердикт
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        operation.setOperationStatus(OperationStatus.getObjectUnComplete(realm));
-                        operation.setOperationVerdict(verdict);
-                        if (operation.getStartDate() == null) {
-                            operation.setStartDate(new Date());
-                        }
-                        operation.setEndDate(new Date());
-                        operationAdapter.setItemEnable(position, false);
-                        operationAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                // переходим на следующую операцию
-                if (goToNextOperation()) {
-                    if (isAllOperationComplete(selectedStage)) {
-                        closeLevel(OPERATION_LEVEL, false);
-                        fillListView(ORDER_LEVEL);
-                    }
+        DialogInterface.OnClickListener okListener = (dialog1, which) -> {
+            final OperationVerdict verdict = (OperationVerdict) operationVerdictSpinner.getSelectedItem();
+            // выставляем выбранный вердикт
+            realmDB.executeTransaction(realm -> {
+                operation.setOperationStatus(OperationStatus.getObjectUnComplete(realm));
+                operation.setOperationVerdict(verdict);
+                if (operation.getStartDate() == null) {
+                    operation.setStartDate(new Date());
                 }
+                operation.setEndDate(new Date());
+                operationAdapter.setItemEnable(position, false);
+                operationAdapter.notifyDataSetChanged();
+            });
 
-                // закрываем диалог
-                dialog.dismiss();
+            // переходим на следующую операцию
+            if (goToNextOperation()) {
+                if (isAllOperationComplete(selectedStage)) {
+                    closeLevel(OPERATION_LEVEL, false);
+                    fillListView(ORDER_LEVEL);
+                }
             }
+
+            // закрываем диалог
+            dialog1.dismiss();
         };
 
         dialog.setPositiveButton(android.R.string.ok, okListener);
         dialog.setNegativeButton(android.R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog12, which) -> dialog12.dismiss());
         //operationTypeSpinner.setOnItemSelectedListener(new ReferenceSpinnerListener());
         dialog.show();
     }
@@ -978,20 +920,14 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         ListView list = mView.findViewById(R.id.instruction_listView);
         dialog.setTitle(R.string.dialog_start_title);
         dialog.setPositiveButton(R.string.dialog_start,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        startOperations();
-                    }
+                (dialog1, which) -> {
+                    dialog1.dismiss();
+                    startOperations();
                 });
         dialog.setNegativeButton(android.R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        //stopOperations();
-                    }
+                (dialog12, which) -> {
+                    dialog12.dismiss();
+                    //stopOperations();
                 });
         dialog.setView(mView);
 
@@ -1016,14 +952,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         } else {
             button.setEnabled(false);
         }
-        mCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mCheckBox.isChecked()) {
-                    button.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                }
+        mCheckBox.setOnClickListener(v -> {
+            if (mCheckBox.isChecked()) {
+                button.setEnabled(true);
+            } else {
+                button.setEnabled(false);
             }
         });
     }
@@ -1060,74 +993,57 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
         dialog.setView(myView);
         dialog.setTitle("Отмена задачи");
-        DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                final StageVerdict verdict = (StageVerdict) verdictSpinner.getSelectedItem();
-                // выставляем выбранный статус
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        stage.setStageStatus(StageStatus.getObjectUnComplete(realm));
-                        stage.setStageVerdict(verdict);
-                        stage.setStartDate(new Date());
-                        stage.setEndDate(new Date());
-                        if (selectedOrder.getOpenDate() == null) {
-                            selectedOrder.setOpenDate(new Date());
-                        }
-                    }
-                });
-
-                List<Operation> operations = getUncompleteOperations(stage);
-                OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realmDB);
-                OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realmDB);
-                realmDB.beginTransaction();
-                for (Operation operation : operations) {
-                    operation.setOperationStatus(operationStatus);
-                    operation.setOperationVerdict(operationVerdict);
-                    if (operation.getStartDate() == null) {
-                        operation.setStartDate(new Date());
-                    }
-                    operation.setEndDate(new Date());
+        DialogInterface.OnClickListener okListener = (dialog1, which) -> {
+            final StageVerdict verdict = (StageVerdict) verdictSpinner.getSelectedItem();
+            // выставляем выбранный статус
+            realmDB.executeTransaction(realm -> {
+                stage.setStageStatus(StageStatus.getObjectUnComplete(realm));
+                stage.setStageVerdict(verdict);
+                stage.setStartDate(new Date());
+                stage.setEndDate(new Date());
+                if (selectedOrder.getOpenDate() == null) {
+                    selectedOrder.setOpenDate(new Date());
                 }
+            });
 
-                realmDB.commitTransaction();
-                // TODO здесь должен быть алгоритм выставления вердикта наряда в зависимости от вердикта этапа
-                closeLevel(STAGE_LEVEL, false);
-                if (isAllStageComplete(selectedTask)) {
-                    OrderStatus orderStatusComplete = OrderStatus.getObjectComplete(realmDB);
-                    realmDB.beginTransaction();
-                    selectedOrder.setOrderStatus(orderStatusComplete);
-                    realmDB.commitTransaction();
-                    // если хотя бы одна задача не выполнена
-                    final TaskVerdict taskVerdict = TaskVerdict.getObjectUnComplete(realmDB);
-                    if (taskVerdict != null) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                selectedTask.setTaskVerdict(taskVerdict);
-                            }
-                        });
-                    }
-                    if (isAllTaskComplete()) {
-
-                    }
+            List<Operation> operations = getUncompleteOperations(stage);
+            OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realmDB);
+            OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realmDB);
+            realmDB.beginTransaction();
+            for (Operation operation : operations) {
+                operation.setOperationStatus(operationStatus);
+                operation.setOperationVerdict(operationVerdict);
+                if (operation.getStartDate() == null) {
+                    operation.setStartDate(new Date());
                 }
-
-                // закрываем диалог
-                //dialog.dismiss();
+                operation.setEndDate(new Date());
             }
+
+            realmDB.commitTransaction();
+            // TODO здесь должен быть алгоритм выставления вердикта наряда в зависимости от вердикта этапа
+            closeLevel(STAGE_LEVEL, false);
+            if (isAllStageComplete(selectedTask)) {
+                OrderStatus orderStatusComplete = OrderStatus.getObjectComplete(realmDB);
+                realmDB.beginTransaction();
+                selectedOrder.setOrderStatus(orderStatusComplete);
+                realmDB.commitTransaction();
+                // если хотя бы одна задача не выполнена
+                final TaskVerdict taskVerdict = TaskVerdict.getObjectUnComplete(realmDB);
+                if (taskVerdict != null) {
+                    realmDB.executeTransaction(realm -> selectedTask.setTaskVerdict(taskVerdict));
+                }
+                if (isAllTaskComplete()) {
+
+                }
+            }
+
+            // закрываем диалог
+            //dialog.dismiss();
         };
 
         dialog.setPositiveButton(android.R.string.ok, okListener);
         dialog.setNegativeButton(android.R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog12, which) -> dialog12.dismiss());
         //operationTypeSpinner.setOnItemSelectedListener(new ReferenceSpinnerListener());
         dialog.show();
         realmDB.close();
@@ -1172,92 +1088,64 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         dialog.setMessage("Всем не законченным задачам будет установлен статус \"Не выполнена\""
                 + "\n" + "Закрыть наряд?");
 
-        dialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                /*
-                 * закрываем наряд, в зависимости от статуса выполнения
-                 * операции выставляем статус наряда
-                 */
-                for (final Task task : order.getTasks()) {
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            task.setTaskStatus(taskStatusUnComplete);
-                        }
-                    });
-                    for (final Stage stages : task.getStages()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                stages.setStageStatus(stageStatusUnComplete);
+        dialog.setPositiveButton(android.R.string.yes, (dialog1, which) -> {
+            /*
+             * закрываем наряд, в зависимости от статуса выполнения
+             * операции выставляем статус наряда
+             */
+            for (final Task task : order.getTasks()) {
+                realmDB.executeTransaction(realm -> task.setTaskStatus(taskStatusUnComplete));
+                for (final Stage stages : task.getStages()) {
+                    realmDB.executeTransaction(realm -> stages.setStageStatus(stageStatusUnComplete));
+                    for (final Operation operation : stages.getOperations()) {
+                        realmDB.executeTransaction(realm -> {
+                            operation.setOperationStatus(operationStatusUnComplete);
+                            if (operation.getStartDate() == null) {
+                                operation.setStartDate(new Date());
                             }
-                        });
-                        for (final Operation operation : stages.getOperations()) {
-                            realmDB.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    operation.setOperationStatus(operationStatusUnComplete);
-                                    if (operation.getStartDate() == null) {
-                                        operation.setStartDate(new Date());
-                                    }
 
-                                    operation.setEndDate(new Date());
-                                }
-                            });
-                        }
+                            operation.setEndDate(new Date());
+                        });
                     }
                 }
-
-                final OrderVerdict verdict = (OrderVerdict) orderVerdictSpinner.getSelectedItem();
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        order.setCloseDate(new Date());
-                        order.setUpdate(1);
-                        order.setOrderStatus(orderStatusUnComplete);
-                        order.setOrderVerdict(verdict);
-                    }
-                });
-                //fillListViewTask(null, null);
-                dialog.dismiss();
-
-                final String uuid = order.getUuid();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        // отправляем запрос на установку статуса COMPLETE на сервере
-                        // в случае не успеха, ни каких действий для повторной отправки
-                        // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
-                        Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setUnComplete(uuid);
-                        try {
-                            retrofit2.Response response = call.execute();
-                            if (response.code() != 200) {
-                                // TODO: нужно реализовать механизм повторной попытки установки статуса
-                                addToJournal("Не удалось отправить запрос на установку статуса нарядов UN_COMPLETE");
-                            } else {
-                                addToJournal("Успешно отправили статус для полученных нарядов UN_COMPLETE");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            addToJournal("Исключение при запросе на установку статуса нарядов UN_COMPLETE");
-                        }
-                    }
-                };
-                Thread thread = new Thread(runnable);
-                thread.start();
-
             }
+
+            final OrderVerdict verdict = (OrderVerdict) orderVerdictSpinner.getSelectedItem();
+            realmDB.executeTransaction(realm -> {
+                order.setCloseDate(new Date());
+                order.setUpdate(1);
+                order.setOrderStatus(orderStatusUnComplete);
+                order.setOrderVerdict(verdict);
+            });
+            //fillListViewTask(null, null);
+            dialog1.dismiss();
+
+            final String uuid = order.getUuid();
+            Runnable runnable = () -> {
+                // отправляем запрос на установку статуса COMPLETE на сервере
+                // в случае не успеха, ни каких действий для повторной отправки
+                // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
+                Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setUnComplete(uuid);
+                try {
+                    Response response = call.execute();
+                    if (response.code() != 200) {
+                        // TODO: нужно реализовать механизм повторной попытки установки статуса
+                        addToJournal("Не удалось отправить запрос на установку статуса нарядов UN_COMPLETE");
+                    } else {
+                        addToJournal("Успешно отправили статус для полученных нарядов UN_COMPLETE");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    addToJournal("Исключение при запросе на установку статуса нарядов UN_COMPLETE");
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+
         });
 
         dialog.setNegativeButton(android.R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog12, which) -> dialog12.dismiss());
         dialog.show();
     }
 
@@ -1349,7 +1237,8 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     mediaFile.setPath(MediaFile.getImageRoot() + "/" + format.format(mediaFile.getCreatedAt()));
                     mediaFile.setName(fileName.toString());
                     File picDir = activity.getApplicationContext()
-                            .getExternalFilesDir(mediaFile.getPath());
+                            .getExternalFilesDir(mediaFile
+                                    .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                     if (picDir == null) {
                         // какое-то сообщение пользователю что не смогли "сохранить" результат
                         // фотофиксации?
@@ -1442,60 +1331,46 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         dialog.setTitle(R.string.select_verdict);
         dialog.setView(myView);
         dialog.setPositiveButton(R.string.dialog_accept,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        for (int i = 0; i < uncompleteOperationList.size(); i++) {
-                            final OperationVerdict operationVerdict = operationVerdictAdapter.getItem(mainSpinner.getSelectedItemPosition());
-                            final Operation operation = uncompleteOperationList.get(i);
-                            if (operation != null) {
-                                realmDB.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        // TODO Если будем переделывать логику, то здесь меням статус обратно на "не выполнена"
-                                        operation.setOperationStatus(
-                                                OperationStatus.getObjectUnComplete(realm));
-                                        operation.setOperationVerdict(operationVerdict);
-                                        if (operation.getStartDate() == null) {
-                                            operation.setStartDate(new Date());
-                                        }
-                                        operation.setEndDate(new Date());
-                                    }
-                                });
-                            }
-                        }
-
-                        // устанавливаем статус для текущего этапа - "выполнен"
-                        if (selectedStage != null && !selectedStage.isComplete()) {
-                            realmDB.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    selectedStage.setStageStatus(StageStatus.getObjectUnComplete(realm));
-                                    selectedStage.setStageVerdict(StageVerdict.getObjectUnComplete(realm));
-                                    if (selectedStage.getStartDate() == null) {
-                                        selectedStage.setStartDate(new Date());
-                                    }
-                                    selectedStage.setEndDate(new Date());
+                (dialog1, which) -> {
+                    for (int i = 0; i < uncompleteOperationList.size(); i++) {
+                        final OperationVerdict operationVerdict1 = operationVerdictAdapter.getItem(mainSpinner.getSelectedItemPosition());
+                        final Operation operation = uncompleteOperationList.get(i);
+                        if (operation != null) {
+                            realmDB.executeTransaction(realm -> {
+                                // TODO Если будем переделывать логику, то здесь меням статус обратно на "не выполнена"
+                                operation.setOperationStatus(
+                                        OperationStatus.getObjectUnComplete(realm));
+                                operation.setOperationVerdict(operationVerdict1);
+                                if (operation.getStartDate() == null) {
+                                    operation.setStartDate(new Date());
                                 }
+                                operation.setEndDate(new Date());
                             });
                         }
-
-                        Log.d(TAG, "Остановка таймера...");
-                        taskTimer.cancel();
-                        firstLaunch = true;
-                        currentOperationPosition = 0;
-                        Level = closeLevel(OPERATION_LEVEL, false);
-                        fillListView(Level);
                     }
+
+                    // устанавливаем статус для текущего этапа - "выполнен"
+                    if (selectedStage != null && !selectedStage.isComplete()) {
+                        realmDB.executeTransaction(realm -> {
+                            selectedStage.setStageStatus(StageStatus.getObjectUnComplete(realm));
+                            selectedStage.setStageVerdict(StageVerdict.getObjectUnComplete(realm));
+                            if (selectedStage.getStartDate() == null) {
+                                selectedStage.setStartDate(new Date());
+                            }
+                            selectedStage.setEndDate(new Date());
+                        });
+                    }
+
+                    Log.d(TAG, "Остановка таймера...");
+                    taskTimer.cancel();
+                    firstLaunch = true;
+                    currentOperationPosition = 0;
+                    Level = closeLevel(OPERATION_LEVEL, false);
+                    fillListView(Level);
                 });
 
         dialog.setNegativeButton(R.string.dialog_cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog12, which) -> dialog12.dismiss());
         dialog.show();
     }
 
@@ -1529,75 +1404,61 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         dialog.setTitle(R.string.select_verdict);
         dialog.setView(myView);
         dialog.setPositiveButton(R.string.dialog_accept,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        for (int i = 0; i < uncompleteStageList.size(); i++) {
-                            final StageVerdict stageVerdict = stageVerdictAdapter.getItem(mainSpinner.getSelectedItemPosition());
-                            final Stage stage = uncompleteStageList.get(i);
-                            if (stage != null) {
-                                realmDB.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        // был статус "не выполнен"
-                                        stage.setStageStatus(
-                                                StageStatus.getObjectUnComplete(realm));
-                                        stage.setStageVerdict(stageVerdict);
-                                        if (stage.getStartDate() == null) {
-                                            stage.setStartDate(new Date());
-                                        }
-                                        stage.setEndDate(new Date());
-                                        if (selectedOrder.getOpenDate() == null) {
-                                            selectedOrder.setOpenDate(new Date());
-                                        }
+                (dialog1, which) -> {
+                    for (int i = 0; i < uncompleteStageList.size(); i++) {
+                        final StageVerdict stageVerdict = stageVerdictAdapter.getItem(mainSpinner.getSelectedItemPosition());
+                        final Stage stage = uncompleteStageList.get(i);
+                        if (stage != null) {
+                            realmDB.executeTransaction(realm -> {
+                                // был статус "не выполнен"
+                                stage.setStageStatus(
+                                        StageStatus.getObjectUnComplete(realm));
+                                stage.setStageVerdict(stageVerdict);
+                                if (stage.getStartDate() == null) {
+                                    stage.setStartDate(new Date());
+                                }
+                                stage.setEndDate(new Date());
+                                if (selectedOrder.getOpenDate() == null) {
+                                    selectedOrder.setOpenDate(new Date());
+                                }
 
-                                        OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realm);
-                                        OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realm);
-                                        List<Operation> operations = getUncompleteOperations(stage);
-                                        for (Operation operation : operations) {
-                                            // по тому, что установлена дата окончания мы понимаем, что ее уже завершили
-                                            if (operation.getEndDate() == null) {
-                                                operation.setOperationStatus(operationStatus);
-                                                operation.setOperationVerdict(operationVerdict);
-                                                operation.setEndDate(new Date());
-                                            }
-                                            if (operation.getStartDate() == null) {
-                                                operation.setStartDate(new Date());
-                                            }
-                                        }
+                                OperationStatus operationStatus = OperationStatus.getObjectUnComplete(realm);
+                                OperationVerdict operationVerdict = OperationVerdict.getObjectCanceled(realm);
+                                List<Operation> operations = getUncompleteOperations(stage);
+                                for (Operation operation : operations) {
+                                    // по тому, что установлена дата окончания мы понимаем, что ее уже завершили
+                                    if (operation.getEndDate() == null) {
+                                        operation.setOperationStatus(operationStatus);
+                                        operation.setOperationVerdict(operationVerdict);
+                                        operation.setEndDate(new Date());
                                     }
-                                });
-                            }
-                        }
-
-                        // устанавливаем статус для текущей задачи - выполнена
-                        if (selectedTask != null && !selectedTask.isComplete()) {
-                            realmDB.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    selectedTask.setTaskStatus(TaskStatus.getObjectComplete(realm));
-                                    // но вердикт нужен иной
-                                    selectedTask.setTaskVerdict(TaskVerdict.getObjectUnComplete(realm));
-                                    if (selectedTask.getStartDate() == null) {
-                                        selectedTask.setStartDate(new Date());
+                                    if (operation.getStartDate() == null) {
+                                        operation.setStartDate(new Date());
                                     }
-
-                                    selectedTask.setEndDate(new Date());
                                 }
                             });
                         }
-                        Level = closeLevel(STAGE_LEVEL, false);
-                        fillListView(Level);
                     }
+
+                    // устанавливаем статус для текущей задачи - выполнена
+                    if (selectedTask != null && !selectedTask.isComplete()) {
+                        realmDB.executeTransaction(realm -> {
+                            selectedTask.setTaskStatus(TaskStatus.getObjectComplete(realm));
+                            // но вердикт нужен иной
+                            selectedTask.setTaskVerdict(TaskVerdict.getObjectUnComplete(realm));
+                            if (selectedTask.getStartDate() == null) {
+                                selectedTask.setStartDate(new Date());
+                            }
+
+                            selectedTask.setEndDate(new Date());
+                        });
+                    }
+                    Level = closeLevel(STAGE_LEVEL, false);
+                    fillListView(Level);
                 });
 
         dialog.setNegativeButton(R.string.dialog_cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog12, which) -> dialog12.dismiss());
         dialog.show();
     }
 
@@ -1642,36 +1503,30 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         if (operationFinished != null && !operationFinished.isComplete()) {
 //            final OperationStatus operationStatus = OperationStatus.getObjectComplete(realmDB);
 //            final OperationVerdict operationVerdict = OperationVerdict.getObjectComplete(realmDB);
-            realmDB.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    operationFinished.setEndDate(new Date(currentTime));
-                    //operation.setStartDate(new Date(startTime));
-                    operationFinished.setOperationStatus(OperationStatus.getObjectComplete(realm));
-                    operationFinished.setOperationVerdict(OperationVerdict.getObjectComplete(realm));
-                }
+            realmDB.executeTransaction(realm -> {
+                operationFinished.setEndDate(new Date(currentTime));
+                //operation.setStartDate(new Date(startTime));
+                operationFinished.setOperationStatus(OperationStatus.getObjectComplete(realm));
+                operationFinished.setOperationVerdict(OperationVerdict.getObjectComplete(realm));
             });
 
             final String operationUuid = operationFinished.getUuid();
             final String statusUuid = OperationStatus.getObjectComplete(realmDB).getUuid();
             // уведомляем сервер о изменении статуса операции
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Call<Boolean> call = ToirAPIFactory.getOperationService()
-                            .setStatus(operationUuid, statusUuid);
-                    call.enqueue(new Callback<Boolean>() {
-                        @Override
-                        public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                            Log.d(TAG, "set status result = " + response.body());
-                        }
+            Thread t = new Thread(() -> {
+                Call<Boolean> call = ToirAPIFactory.getOperationService()
+                        .setStatus(operationUuid, statusUuid);
+                call.enqueue(new Callback<Boolean>() {
+                    @Override
+                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                        Log.d(TAG, "set status result = " + response.body());
+                    }
 
-                        @Override
-                        public void onFailure(Call<Boolean> call, Throwable t) {
-                            Log.d(TAG, "set status result failure!!!");
-                        }
-                    });
-                }
+                    @Override
+                    public void onFailure(Call<Boolean> call, Throwable t1) {
+                        Log.d(TAG, "set status result failure!!!");
+                    }
+                });
             });
             t.start();
 
@@ -1711,12 +1566,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             // меняем ее статус на "в процессе"
             operationStarted = operationAdapter.getItem(nextOperationPosition);
             if (operationStarted != null && !operationStarted.isComplete()) {
-                realmDB.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        operationStarted.setStartDate(new Date());
-                        operationStarted.setOperationStatus(OperationStatus.getObjectInWork(realm));
-                    }
+                realmDB.executeTransaction(realm -> {
+                    operationStarted.setStartDate(new Date());
+                    operationStarted.setOperationStatus(OperationStatus.getObjectInWork(realm));
                 });
 
                 isMeasure = operationStarted.getOperationTemplate().getOperationType().isMeasure();
@@ -1753,80 +1605,84 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         }
 
         Log.d(TAG, "Ожидаемая метка: " + expectedTagId);
-        Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message message) {
-                if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
-                    // закрываем диалог
-                    rfidDialog.dismiss();
+        Handler handler = new Handler(message -> {
+            if (message.what == RfidDriverBase.RESULT_RFID_SUCCESS) {
+                // закрываем диалог
+                rfidDialog.dismiss();
+                RfidDriverMsg[] rfidDriverMsgs = (RfidDriverMsg[]) message.obj;
+                List<String> stringList = new ArrayList<>();
+                for (RfidDriverMsg driverMsg : rfidDriverMsgs) {
+                    stringList.add(driverMsg.getTagId());
+                }
 
-                    String[] tagIds = (String[]) message.obj;
-                    if (tagIds == null) {
-                        try {
-                            Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-                        }
-
-                        return false;
-                    }
-
-                    String tagId = tagIds[0].substring(4);
-                    Log.d(TAG, "Ид метки получили: " + tagId);
-                    if (expectedTagUuid.equals(tagId)) {
-                        boolean run_ar_content = false;
-                        if (sp != null) {
-                            run_ar_content = sp.getBoolean("run_ar_content_key", false);
-                        }
-
-                        if (run_ar_content) {
-                            Intent intent = activity.getPackageManager()
-                                    .getLaunchIntentForPackage("ru.shtrm.toir");
-                            if (intent != null) {
-                                intent.putExtra("hardwareUUID", currentEquipment.getUuid());
-                                startActivity(intent);
-                            } else {
-                                Toast.makeText(getActivity(), "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        if (level == TASK_LEVEL) {
-                            fillListViewStage(selectedTask);
-                            Level = STAGE_LEVEL;
-                        }
-
-                        if (level == STAGE_LEVEL) {
-                            fillListViewOperations(selectedStage);
-                            Level = OPERATION_LEVEL;
-                            askStartOperations();
-                        }
-                    } else {
-                        try {
-                            Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-                        }
-                    }
-                } else if (message.what == RfidDriverBase.RESULT_RFID_CANCEL) {
-                    Log.d(TAG, "Отмена чтения метки.");
+                String[] tagIds = stringList.toArray(new String[]{});
+                if (tagIds.length == 0) {
                     try {
-                        Toast.makeText(getActivity(), "Отмена чтения метки.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
+
+                    return false;
+                }
+
+                String tagId = tagIds[0];
+                Log.d(TAG, "Ид метки получили: " + tagId);
+                if (expectedTagUuid.equals(tagId)) {
+                    boolean run_ar_content = false;
+                    if (sp != null) {
+                        run_ar_content = sp.getBoolean("run_ar_content_key", false);
+                    }
+
+                    if (run_ar_content) {
+                        Intent intent = activity.getPackageManager()
+                                .getLaunchIntentForPackage("ru.shtrm.toir");
+                        if (intent != null) {
+                            intent.putExtra("hardwareUUID", currentEquipment.getUuid());
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getActivity(), "Приложение ТОиР не установлено", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    if (level == TASK_LEVEL) {
+                        fillListViewStage(selectedTask);
+                        Level = STAGE_LEVEL;
+                    }
+
+                    if (level == STAGE_LEVEL) {
+                        fillListViewOperations(selectedStage);
+                        Level = OPERATION_LEVEL;
+                        askStartOperations();
+                    }
                 } else {
-                    Log.d(TAG, "Ошибка чтения метки!");
                     try {
-                        Toast.makeText(getActivity(), "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Не верное оборудование!", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
                 }
-
-                rfidDialog.dismiss();
-                return false;
+            } else if (message.what == RfidDriverBase.RESULT_RFID_CANCEL) {
+                Log.d(TAG, "Отмена чтения метки.");
+                try {
+                    Toast.makeText(getActivity(), "Отмена чтения метки.", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                }
+            } else {
+                Log.d(TAG, "Ошибка чтения метки!");
+                try {
+                    Toast.makeText(getActivity(), "Ошибка чтения метки.", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                }
             }
+
+            rfidDialog.dismiss();
+            return false;
         });
 
         rfidDialog = new RfidDialog();
         rfidDialog.setHandler(handler);
-        rfidDialog.readMultiTagId(expectedTagId);
+        Tag tag = new Tag(expectedTagId);
+        String driverClass = tag.getTagDriver(getContext());
+        rfidDialog.readMultiTagId(driverClass, expectedTagId);
         rfidDialog.show(activity.getFragmentManager(), TAG);
     }
 
@@ -1867,153 +1723,133 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
 
         fab_defect = rootView.findViewById(R.id.fab_defect);
         fab_defect.setVisibility(View.INVISIBLE);
-        fab_defect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), currentEquipment.getUuid(), null);
-            }
-        });
+        fab_defect.setOnClickListener(v -> showDialogDefect2((ViewGroup) v.getParent(), getLayoutInflater(), v.getContext(), currentEquipment.getUuid(), null));
 
-        fab_camera.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Context context = getContext();
-                if (context == null) {
+        fab_camera.setOnClickListener(v -> {
+            Context context = getContext();
+            if (context == null) {
+                return;
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_ACCESS);
                     return;
                 }
+            }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_ACCESS);
-                        return;
-                    }
+            File file = null;
+            try {
+                file = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            if (file != null) {
+                photoFilePath = file.getAbsolutePath();
+                switch (Level) {
+                    case OPERATION_LEVEL:
+                        currentEntityUuid = currentOperation.getUuid();
+                        break;
+                    default:
+                        currentEntityUuid = null;
+                        break;
                 }
-
-                File file = null;
-                try {
-                    file = createImageFile();
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                }
-                if (file != null) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    file = new File(Environment.getExternalStorageDirectory(), "image.jpg");
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            Uri.fromFile(file));
                     photoFilePath = file.getAbsolutePath();
-                    switch (Level) {
-                        case OPERATION_LEVEL:
-                            currentEntityUuid = currentOperation.getUuid();
-                            break;
-                        default:
-                            currentEntityUuid = null;
-                            break;
-                    }
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                        file = new File(Environment.getExternalStorageDirectory(), "image.jpg");
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(file));
-                        photoFilePath = file.getAbsolutePath();
+                    startActivityForResult(intent, ACTIVITY_PHOTO);
+                } else {
+                    Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         startActivityForResult(intent, ACTIVITY_PHOTO);
                     } else {
-                        Uri photoURI = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            startActivityForResult(intent, ACTIVITY_PHOTO);
-                        } else {
-                            requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
-                        }
+                        requestPermissions(new String[]{Manifest.permission.CAMERA}, ACTIVITY_PHOTO);
                     }
                 }
             }
         });
         fab_check.setOnClickListener(new SubmitOnClickListener());
-        fab_question.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final View addCommentLayout;
-                final TextView author;
-                LayoutInflater inflater = getLayoutInflater();
+        fab_question.setOnClickListener(v -> {
+            final View addCommentLayout;
+            final TextView author;
+            LayoutInflater inflater1 = getLayoutInflater();
 
-                addCommentLayout = inflater.inflate(R.layout.order_question, null, false);
-                author = addCommentLayout.findViewById(R.id.order_author);
-                author.setText(selectedOrder.getAuthor().getName());
+            addCommentLayout = inflater1.inflate(R.layout.order_question, null, false);
+            author = addCommentLayout.findViewById(R.id.order_author);
+            author.setText(selectedOrder.getAuthor().getName());
 
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
-                builder.setTitle("Cообщение автору");
-                builder.setView(addCommentLayout);
-                builder.setIcon(R.drawable.ic_icon_user);
-                builder.setCancelable(false);
-                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+            builder.setTitle("Cообщение автору");
+            builder.setView(addCommentLayout);
+            builder.setIcon(R.drawable.ic_icon_user);
+            builder.setCancelable(false);
+            builder.setNegativeButton("Отмена", (dialog, which) -> {
+            });
 
-                builder.setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
+            builder.setPositiveButton("Отправить", (dialog, which) -> {
+            });
 
-                final android.support.v7.app.AlertDialog dialog = builder.create();
-                View.OnClickListener listener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EditText orderComment = addCommentLayout.findViewById(R.id.order_comment);
+            final android.support.v7.app.AlertDialog dialog = builder.create();
+            View.OnClickListener listener = v1 -> {
+                EditText orderComment = addCommentLayout.findViewById(R.id.order_comment);
 
-                        Realm realm = Realm.getDefaultInstance();
-                        AuthorizedUser authUser = AuthorizedUser.getInstance();
-                        User user = realm.where(User.class).equalTo("tagId", authUser.getTagId()).findFirst();
-                        UUID uuid = UUID.randomUUID();
-                        Date date = new Date();
-                        realm.beginTransaction();
+                Realm realm = Realm.getDefaultInstance();
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                User user = realm.where(User.class)
+                        .equalTo("login", authUser.getLogin())
+                        .findFirst();
+                UUID uuid = UUID.randomUUID();
+                Date date = new Date();
+                realm.beginTransaction();
 
-                        long nextId = ru.toir.mobile.multi.db.realm.Message.getLastId() + 1;
-                        ru.toir.mobile.multi.db.realm.Message message = new ru.toir.mobile.multi.db.realm.Message();
-                        message.set_id(nextId);
-                        message.setUuid(uuid.toString().toUpperCase());
-                        message.setFromUser(user);
-                        message.setToUser(selectedOrder.getAuthor());
-                        message.setDate(date);
-                        message.setCreatedAt(date);
-                        message.setChangedAt(date);
-                        message.setStatus(0);
-                        message.setText(orderComment.getText().toString());
-                        //message.setTitle("Вопрос по наряду #".concat(String.valueOf(selectedOrder.get_id())));
-                        realm.copyToRealmOrUpdate(message);
-                        realm.commitTransaction();
-                        realm.close();
-                        // отправляем сообшения
-                        messageCounter = new AtomicInteger(3);
-                        RealmResults<ru.toir.mobile.multi.db.realm.Message> messages = realmDB
-                                .where(ru.toir.mobile.multi.db.realm.Message.class)
-                                .equalTo("sent", false)
-                                .findAll();
-                        sendMessages(realmDB.copyFromRealm(messages));
-                        dialog.dismiss();
-                    }
-                };
-                dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-                dialog.show();
-                dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
-            }
+                long nextId = ru.toir.mobile.multi.db.realm.Message.getLastId() + 1;
+                ru.toir.mobile.multi.db.realm.Message message = new ru.toir.mobile.multi.db.realm.Message();
+                message.set_id(nextId);
+                message.setUuid(uuid.toString().toUpperCase());
+                message.setFromUser(user);
+                message.setToUser(selectedOrder.getAuthor());
+                message.setDate(date);
+                message.setCreatedAt(date);
+                message.setChangedAt(date);
+                message.setStatus(0);
+                message.setText(orderComment.getText().toString());
+                //message.setTitle("Вопрос по наряду #".concat(String.valueOf(selectedOrder.get_id())));
+                realm.copyToRealmOrUpdate(message);
+                realm.commitTransaction();
+                realm.close();
+                // отправляем сообшения
+                messageCounter = new AtomicInteger(3);
+                RealmResults<ru.toir.mobile.multi.db.realm.Message> messages = realmDB
+                        .where(ru.toir.mobile.multi.db.realm.Message.class)
+                        .equalTo("sent", false)
+                        .findAll();
+                sendMessages(realmDB.copyFromRealm(messages));
+                dialog.dismiss();
+            };
+            dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+            dialog.show();
+            dialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(listener);
         });
 
         fab_equipmentInfo = rootView.findViewById(R.id.fab_equipmentInfo);
         fab_equipmentInfo.setVisibility(View.INVISIBLE);
-        fab_equipmentInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentEquipment != null) {
-                    Activity activity = getActivity();
-                    if (activity == null) {
-                        return;
-                    }
-
-                    String equipment_uuid = currentEquipment.getUuid();
-                    Intent equipmentInfo = new Intent(activity, EquipmentInfoActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("equipment_uuid", equipment_uuid);
-                    equipmentInfo.putExtras(bundle);
-                    activity.startActivity(equipmentInfo);
+        fab_equipmentInfo.setOnClickListener(v -> {
+            if (currentEquipment != null) {
+                Activity activity1 = getActivity();
+                if (activity1 == null) {
+                    return;
                 }
+
+                String equipment_uuid = currentEquipment.getUuid();
+                Intent equipmentInfo = new Intent(activity1, EquipmentInfoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("equipment_uuid", equipment_uuid);
+                equipmentInfo.putExtras(bundle);
+                activity1.startActivity(equipmentInfo);
             }
         });
 
@@ -2022,39 +1858,35 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
         setHasOptionsMenu(true);
         rootView.setFocusableInTouchMode(true);
         rootView.requestFocus();
-        rootView.setOnKeyListener(new View.OnKeyListener() {
-
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                    Log.d(TAG, "OrderFragment !!! back pressed!!!");
-                    if (Level == TASK_LEVEL || Level == 0 || Level == STAGE_LEVEL) {
-                        Level = ORDER_LEVEL;
-                        initView();
-                    }
-
-                    if (Level == STAGE_LEVEL && false) {
-                        Level = TASK_LEVEL;
-                        fillListViewTasks(selectedOrder);
-                    }
-
-                    if (Level == OPERATION_LEVEL) {
-                        taskTimer.cancel();
-                        firstLaunch = true;
-                        currentOperationPosition = 0;
-                        if (selectedTask != null) {
-                            fillListViewStage(selectedTask);
-                            Level = STAGE_LEVEL;
-                            fab_camera.setVisibility(View.INVISIBLE);
-                            //fab_check.setVisibility(View.INVISIBLE);
-                        }
-                    }
-
-                    return true;
+        rootView.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                Log.d(TAG, "OrderFragment !!! back pressed!!!");
+                if (Level == TASK_LEVEL || Level == 0 || Level == STAGE_LEVEL) {
+                    Level = ORDER_LEVEL;
+                    initView();
                 }
 
-                return false;
+                if (Level == STAGE_LEVEL && false) {
+                    Level = TASK_LEVEL;
+                    fillListViewTasks(selectedOrder);
+                }
+
+                if (Level == OPERATION_LEVEL) {
+                    taskTimer.cancel();
+                    firstLaunch = true;
+                    currentOperationPosition = 0;
+                    if (selectedTask != null) {
+                        fillListViewStage(selectedTask);
+                        Level = STAGE_LEVEL;
+                        fab_camera.setVisibility(View.INVISIBLE);
+                        //fab_check.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                return true;
             }
+
+            return false;
         });
 
         // так как обработчики пока одни на всё, ставим их один раз
@@ -2303,47 +2135,41 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 if (isAllOperationComplete(selectedStage)) {
                     // устанавливаем статус для текущего этапа - выполнен
                     if (selectedStage != null && !selectedStage.isComplete()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                StageStatus status;
-                                long totalOperationsOfStage = selectedStage.getOperations().size();
-                                long completeStatusOperationOfStage = realm.where(Operation.class)
-                                        .equalTo("stageUuid", selectedStage.getUuid())
-                                        .equalTo("operationStatus.uuid", OperationStatus.Status.COMPLETE)
-                                        .findAll()
-                                        .size();
-                                if (totalOperationsOfStage == completeStatusOperationOfStage) {
-                                    status = StageStatus.getObjectComplete(realm);
-                                } else {
-                                    status = StageStatus.getObjectUnComplete(realm);
-                                }
-
-                                selectedStage.setStageStatus(status);
-                                selectedStage.setEndDate(new Date());
+                        realmDB.executeTransaction(realm -> {
+                            StageStatus status;
+                            long totalOperationsOfStage = selectedStage.getOperations().size();
+                            long completeStatusOperationOfStage = realm.where(Operation.class)
+                                    .equalTo("stageUuid", selectedStage.getUuid())
+                                    .equalTo("operationStatus.uuid", OperationStatus.Status.COMPLETE)
+                                    .findAll()
+                                    .size();
+                            if (totalOperationsOfStage == completeStatusOperationOfStage) {
+                                status = StageStatus.getObjectComplete(realm);
+                            } else {
+                                status = StageStatus.getObjectUnComplete(realm);
                             }
+
+                            selectedStage.setStageStatus(status);
+                            selectedStage.setEndDate(new Date());
                         });
 
                         // пытаемся просигнализировать серверу что этап выполнен
                         final String stageUuid = selectedStage.getUuid();
                         final String statusUuid = StageStatus.getObjectComplete(realmDB).getUuid();
-                        Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Call<Boolean> call = ToirAPIFactory.getStageService()
-                                        .setStatus(stageUuid, statusUuid);
-                                call.enqueue(new Callback<Boolean>() {
-                                    @Override
-                                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                                        Log.d(TAG, "set status result = " + response.body());
-                                    }
+                        Thread t = new Thread(() -> {
+                            Call<Boolean> call = ToirAPIFactory.getStageService()
+                                    .setStatus(stageUuid, statusUuid);
+                            call.enqueue(new Callback<Boolean>() {
+                                @Override
+                                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                                    Log.d(TAG, "set status result = " + response.body());
+                                }
 
-                                    @Override
-                                    public void onFailure(Call<Boolean> call, Throwable t) {
-                                        Log.d(TAG, "set status result failure!!!");
-                                    }
-                                });
-                            }
+                                @Override
+                                public void onFailure(Call<Boolean> call, Throwable t1) {
+                                    Log.d(TAG, "set status result failure!!!");
+                                }
+                            });
                         });
                         t.start();
 
@@ -2373,12 +2199,9 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 // проверяем все ли этапы выполнены
                 if (isAllStageComplete(selectedTask)) {
                     // устанавливаем статус для текущей задачи - выполнена
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            selectedTask.setEndDate(new Date());
-                            selectedTask.setTaskStatus(TaskStatus.getObjectComplete(realm));
-                        }
+                    realmDB.executeTransaction(realm -> {
+                        selectedTask.setEndDate(new Date());
+                        selectedTask.setTaskStatus(TaskStatus.getObjectComplete(realm));
                     });
                     addToJournal("Закончено выполнение задачи "
                             + selectedTask.getTaskTemplate().getTitle() + "("
@@ -2387,34 +2210,26 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     // пытаемся просигнализировать серверу что этап выполнен
                     final String taskUuid = selectedTask.getUuid();
                     final String statusUuid = TaskStatus.getObjectComplete(realmDB).getUuid();
-                    Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Call<Boolean> call = ToirAPIFactory.getTasksService()
-                                    .setStatus(taskUuid, statusUuid);
-                            call.enqueue(new Callback<Boolean>() {
-                                @Override
-                                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                                    Log.d(TAG, "set status result = " + response.body());
-                                }
+                    Thread t = new Thread(() -> {
+                        Call<Boolean> call = ToirAPIFactory.getTasksService()
+                                .setStatus(taskUuid, statusUuid);
+                        call.enqueue(new Callback<Boolean>() {
+                            @Override
+                            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                                Log.d(TAG, "set status result = " + response.body());
+                            }
 
-                                @Override
-                                public void onFailure(Call<Boolean> call, Throwable t) {
-                                    Log.d(TAG, "set status result failure!!!");
-                                }
-                            });
-                        }
+                            @Override
+                            public void onFailure(Call<Boolean> call, Throwable t12) {
+                                Log.d(TAG, "set status result failure!!!");
+                            }
+                        });
                     });
                     t.start();
                     if (!isAllStageFullComplete(selectedTask)) {
                         final TaskVerdict taskVerdict = TaskVerdict.getObjectUnComplete(realmDB);
                         if (taskVerdict != null) {
-                            realmDB.executeTransaction(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    selectedTask.setTaskVerdict(taskVerdict);
-                                }
-                            });
+                            realmDB.executeTransaction(realm -> selectedTask.setTaskVerdict(taskVerdict));
                         }
                     }
                     // если все этапы в задаче завершены, переключаемся на список задач
@@ -2441,37 +2256,31 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                 // проверяем все ли задачи выполнены
                 if (isAllTaskComplete()) {
                     // устанавливаем статус для текущего наряда - выполнен
-                    realmDB.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            //  TODO в будущем решаем ставить ли здесь статус отличный от "выполнен", если что-то внутри наряда "не выполнено"
-                            selectedOrder.setCloseDate(new Date());
-                            selectedOrder.setOrderStatus(OrderStatus.getObjectComplete(realm));
-                        }
+                    realmDB.executeTransaction(realm -> {
+                        //  TODO в будущем решаем ставить ли здесь статус отличный от "выполнен", если что-то внутри наряда "не выполнено"
+                        selectedOrder.setCloseDate(new Date());
+                        selectedOrder.setOrderStatus(OrderStatus.getObjectComplete(realm));
                     });
                     addToJournal("Закончен наряд " + selectedOrder.getTitle() + "(" + selectedOrder.getUuid() + ")");
 
                     // отправляем сообщение о изменении статуса на сервер
                     final String uuid = selectedOrder.getUuid();
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            // отправляем запрос на установку статуса COMPLETE на сервере
-                            // в случае не успеха, ни каких действий для повторной отправки
-                            // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
-                            Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setComplete(uuid);
-                            try {
-                                retrofit2.Response response = call.execute();
-                                if (response.code() != 200) {
-                                    // TODO: нужно реализовать механизм повторной попытки установки статуса
-                                    addToJournal("Не удалось отправить запрос на установку статуса нарядов COMPLETE");
-                                } else {
-                                    addToJournal("Успешно отправили статус для полученных нарядов COMPLETE");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                addToJournal("Исключение при запросе на установку статуса нарядов COMPLETE");
+                    Runnable runnable = () -> {
+                        // отправляем запрос на установку статуса COMPLETE на сервере
+                        // в случае не успеха, ни каких действий для повторной отправки
+                        // не предпринимается (т.к. нет ни каких средств для фиксации этого события)
+                        Call<ResponseBody> call = ToirAPIFactory.getOrdersService().setComplete(uuid);
+                        try {
+                            Response response = call.execute();
+                            if (response.code() != 200) {
+                                // TODO: нужно реализовать механизм повторной попытки установки статуса
+                                addToJournal("Не удалось отправить запрос на установку статуса нарядов COMPLETE");
+                            } else {
+                                addToJournal("Успешно отправили статус для полученных нарядов COMPLETE");
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            addToJournal("Исключение при запросе на установку статуса нарядов COMPLETE");
                         }
                     };
                     Thread thread = new Thread(runnable);
@@ -2612,13 +2421,10 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             if (operation != null) {
                 if (operation.getOperationStatus() != null) {
                     if (!operation.isNew()) {
-                        realmDB.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                operation.setStartDate(null);
-                                operation.setEndDate(null);
-                                operation.setOperationStatus(OperationStatus.getObjectNew(realm));
-                            }
+                        realmDB.executeTransaction(realm -> {
+                            operation.setStartDate(null);
+                            operation.setEndDate(null);
+                            operation.setOperationStatus(OperationStatus.getObjectNew(realm));
                         });
                     }
                 } else {
@@ -2680,13 +2486,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     dialog.setTitle(getString(R.string.warning));
                     dialog.setMessage(getString(R.string.stage_cancel_error));
                     dialog.setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
+                            (dialog1, which) -> dialog1.dismiss());
                     dialog.show();
                 }
             } else if (Level == STAGE_LEVEL) {
@@ -2706,13 +2506,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                     dialog.setTitle(getString(R.string.warning));
                     dialog.setMessage(getString(R.string.stage_cancel_error));
                     dialog.setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
+                            (dialog12, which) -> dialog12.dismiss());
                     dialog.show();
                 }
             } else if (Level == ORDER_LEVEL) {
@@ -2733,16 +2527,11 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
                                 || order.getOrderStatus().getUuid().equals(OrderStatus.Status.UN_COMPLETE)) {
                             // наряд уже закрыт, изменить статус нельзя
                             // сообщаем об этом
-                            AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-                            dialog.setTitle(getString(R.string.warning));
-                            dialog.setMessage(getString(R.string.stage_cancel_error));
-                            dialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            dialog.show();
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle(getString(R.string.warning))
+                                    .setMessage(getString(R.string.stage_cancel_error))
+                                    .setPositiveButton(android.R.string.ok, (dialog13, which) -> dialog13.dismiss())
+                                    .show();
                         } else {
                             // наряд можно закрыть принудительно
                             closeOrderManual(order, parent);

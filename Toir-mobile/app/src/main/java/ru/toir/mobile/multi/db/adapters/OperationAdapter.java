@@ -30,6 +30,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.realm.MeasuredValue;
 import ru.toir.mobile.multi.db.realm.MediaFile;
@@ -240,7 +241,8 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 
             MediaFile mediaFile = operation.getMediaFile();
             if (mediaFile != null) {
-                File path = context.getExternalFilesDir(mediaFile.getPath());
+                File path = context.getExternalFilesDir(mediaFile
+                        .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                 String fileName = mediaFile.getName();
                 if (path != null && fileName.contains("jpg")) {
                     Bitmap bm = getResizedBitmap(path + File.separator,
@@ -255,7 +257,7 @@ public class OperationAdapter extends RealmBaseAdapter<Operation> implements Lis
 /*
             OperationTemplate opTemplate = operation.getOperationTemplate();
             String imgPath = opTemplate.getImageFilePath();
-            String fileName = opTemplate.getImage();
+            String fileName = opTemplate.getImageFileName();
             if (imgPath != null && fileName != null) {
                 File path = convertView.getContext().getExternalFilesDir(imgPath);
                 if (path != null) {

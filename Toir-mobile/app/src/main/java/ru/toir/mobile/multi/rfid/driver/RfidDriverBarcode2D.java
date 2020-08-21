@@ -16,6 +16,8 @@ import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 
 /**
  * @author olejek
@@ -64,23 +66,30 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
 
         // инициализируем текстовое поле ввода в которое по нажатии железной
         // кнопки будет введено считанное значение
-        EditText ed = (EditText) driverView.findViewById(R.id.catch2bbarcode);
+        EditText ed = driverView.findViewById(R.id.catch2bbarcode);
         if (ed != null) {
             ed.requestFocus();
             ed.addTextChangedListener(new TextWatcher() {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    String tagId = "0000" + s.toString();
+                    String tmpText = s.toString();
+                    if (tmpText.equals("")) {
+                        sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
+                    }
+
+                    String tagId = "0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + s.toString();
+                    RfidDriverMsg msg = RfidDriverMsg.tagMsg(tagId);
                     switch (command) {
                         case RfidDialog.READER_COMMAND_READ_ID:
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
                             break;
                         case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
+                            sHandler.obtainMessage(RESULT_RFID_SUCCESS, new RfidDriverMsg[]{msg})
+                                    .sendToTarget();
                             break;
                         default:
-                            sHandler.obtainMessage(RESULT_RFID_SUCCESS).sendToTarget();
+                            sHandler.obtainMessage(RESULT_RFID_READ_ERROR).sendToTarget();
                             break;
                     }
                 }
@@ -94,14 +103,8 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
                 }
             });
 
-            Button button = (Button) driverView.findViewById(R.id.cancelBar2DScan);
-            button.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
-                }
-            });
+            Button button = driverView.findViewById(R.id.cancelBar2DScan);
+            button.setOnClickListener(v -> sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget());
         }
 
         return driverView;
@@ -138,7 +141,7 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
                         tagId = (String) msg.obj;
                     } else {
                         if (driverView != null) {
-                            EditText ed = (EditText) driverView.findViewById(R.id.catch2bbarcode);
+                            EditText ed = driverView.findViewById(R.id.catch2bbarcode);
                             if (ed != null) {
                                 tagId = ed.getText().toString();
                             } else {
@@ -150,7 +153,14 @@ public class RfidDriverBarcode2D extends RfidDriverBase implements IRfidDriver {
                     }
 
                     Log.d(TAG, tagId);
-                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, "0000" + tagId).sendToTarget();
+                    if (!tagId.equals("")) {
+                        tagId = "0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + tagId;
+                        RfidDriverMsg rfidDriverMsg = RfidDriverMsg.tagMsg(tagId);
+                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, rfidDriverMsg).sendToTarget();
+                    } else {
+                        sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
+                    }
+
                     break;
                 }
                 case Scanner.BARCODE_NOREAD: {

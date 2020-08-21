@@ -23,6 +23,8 @@ import ru.toir.mobile.multi.camera.CameraPreview;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
+import ru.toir.mobile.multi.rfid.Tag;
 
 /**
  * @author Dmitriy Logachev
@@ -60,22 +62,26 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
                     if (lastScannedCode != null) {
                         Log.d(TAG, "прочитано: " + lastScannedCode);
                         scanText.setText(lastScannedCode);
-                        String tagId = "0000" + lastScannedCode;
+                        String tagId = "0000" + Tag.Type.TAG_TYPE_GRAPHIC_CODE + ":" + lastScannedCode;
+                        RfidDriverMsg msg = RfidDriverMsg.tagMsg(tagId);
                         switch (command) {
                             case RfidDialog.READER_COMMAND_READ_ID:
-                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
+                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
                                 break;
                             case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
+                                sHandler.obtainMessage(RESULT_RFID_SUCCESS, new RfidDriverMsg[]{msg})
+                                        .sendToTarget();
                                 break;
                             default:
                                 sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
                                 break;
                         }
+
                         releaseCamera();
                     }
                 }
             }
+
             camera.addCallbackBuffer(data);
         }
     };
@@ -155,13 +161,7 @@ public class RfidDriverQRcode extends RfidDriverBase implements IRfidDriver {
         View view = inflater.inflate(R.layout.qr_read, viewGroup);
 
         Button button = view.findViewById(R.id.cancelButton);
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
-            }
-        });
+        button.setOnClickListener(v -> sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget());
 
         preview = view.findViewById(R.id.cameraPreview);
         scanText = view.findViewById(R.id.code_from_bar);

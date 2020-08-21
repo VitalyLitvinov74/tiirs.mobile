@@ -18,7 +18,8 @@
 
     <string name="pref_server_url">Сервер системы</string>
     <string name="pref_server_url_dialog_title">Введите URL сервера системы</string>
-    <string name="pref_rfid_driver">Драйвер считывателя RFID</string>
+    <string name="pref_rfid_driver">Драйвер считывателя RFID (обор.)</string>
+    <string name="pref_login_rfid_driver">Драйвер считывателя RFID (вход)</string>
     <string name="login">Войти</string>
     <string name="init_success">Инициализация успешна</string>
     <string name="init_fail">Инициализация неудачна</string>
@@ -31,7 +32,6 @@
     <string name="read_15693">Считать метку</string>
     <string name="write_15693">Записать метку</string>
     <string name="serverUrl">serverUrl</string>
-    <string name="rfidDriverListPrefKey">rfidDriverListPrefKey</string>
     <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
     <string name="references">Справочники</string>
     <string name="get_task">Получить задание</string>
@@ -303,6 +303,16 @@
 
     <string name="no_operations">Нет операций</string>
     <string name="menu_order_tool">Перечень инструмента</string>
+    <string name="input_login_pin">Введите логин и пин</string>
+    <string name="login_title">Логин</string>
+    <string name="pin_title">Пин</string>
+
+    <string name="no_user_found">Пользователь не найден</string>
+
+    <string name="default_rfid_driver_key">defaultRfidDriverKey</string>
+    <string name="default_login_rfid_driver_key">defaultLoginRfidDriverKey</string>
+    <string name="default_uhf_driver_key">defaultUHFDriverKey</string>
+    <string name="default_uhf_driver">Драйвер UHF</string>
 
     <string name="menu_calendar">Календарь</string>
     <string name="menu_messages">Сообщения</string>

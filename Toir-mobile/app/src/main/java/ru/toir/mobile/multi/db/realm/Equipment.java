@@ -4,6 +4,7 @@ import java.util.Date;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import ru.toir.mobile.multi.AuthorizedUser;
 
 /**
  * @author Olejek
@@ -171,34 +172,31 @@ public class Equipment extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getImage();
+    public String getImageFileName() {
+        return image;
     }
 
     @Override
-    public String getImageFilePath() {
-        String imageRoot = getImageRoot();
-        String typeUuid;
+    public String getImageFilePath(String dbName) {
         String dir;
-
-        typeUuid = equipmentModel.getUuid();
-        dir = imageRoot + "/" + typeUuid;
+        dir = dbName + "/" + getImageRoot() + "/" + equipmentModel.getUuid();
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + getImageRoot() + "/" + equipmentModel.getUuid();
     }
 
     public String getAnyImageFilePath() {
         String dir = null;
+        String dbName = AuthorizedUser.getInstance().getDbName();
 
         if (!image.equals("")) {
-            dir = getImageFilePath();
+            dir = getImageFilePath(dbName);
         } else {
-            if (!equipmentModel.getImage().equals("")) {
-                dir = equipmentModel.getImageFilePath();
+            if (!equipmentModel.getImageFileName().equals("")) {
+                dir = equipmentModel.getImageFilePath(dbName);
             }
         }
 
@@ -209,10 +207,10 @@ public class Equipment extends RealmObject implements IToirDbObject {
         String file = null;
 
         if (!image.equals("")) {
-            file = getImage();
+            file = image;
         } else {
-            if (!equipmentModel.getImage().equals("")) {
-                file = equipmentModel.getImage();
+            if (!equipmentModel.getImageFileName().equals("")) {
+                file = equipmentModel.getImageFileName();
             }
         }
 

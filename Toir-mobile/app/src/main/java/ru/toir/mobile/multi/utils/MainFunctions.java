@@ -27,6 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyManagementException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.concurrent.BlockingDeque;
@@ -71,8 +72,10 @@ public class MainFunctions {
 
     public static void addToJournal(final String description) {
         Realm realmDB = Realm.getDefaultInstance();
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
         User user = realmDB.where(User.class)
-                .equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+                .equalTo("login", authUser.getLogin())
+                .findFirst();
         if (user != null) {
             realmDB.beginTransaction();
             Journal record = new Journal();
@@ -91,7 +94,10 @@ public class MainFunctions {
     public static int getActiveOrdersCount() {
         int count = 0;
         final Realm realmDB = Realm.getDefaultInstance();
-        final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        final User user = realmDB.where(User.class)
+                .equalTo("login", authUser.getLogin())
+                .findFirst();
         if (user != null) {
             count = realmDB.where(Orders.class)
                     .equalTo("user.uuid", user.getUuid())
@@ -124,13 +130,45 @@ public class MainFunctions {
     //  функция возвращает путь до фотографии оборудования
     public static String getEquipmentImage(String path, Equipment equipment) {
         if (equipment != null) {
-            if (equipment.getImage() != null && equipment.getImage().length() > 5) {
-                return equipment.getImage();
+            if (equipment.getImageFileName() != null && equipment.getImageFileName().length() > 5) {
+                return equipment.getImageFileName();
             }
 
             if (equipment.getEquipmentModel() != null) {
-                return equipment.getEquipmentModel().getImage();
+                return equipment.getEquipmentModel().getImageFileName();
             }
+        }
+
+        return null;
+    }
+
+    /**
+     * md5 hash
+     *
+     * @param string Строка
+     * @return String|null
+     */
+    public static String md5(final String string) {
+        final String MD5 = "MD5";
+        try {
+            MessageDigest digest = java.security.MessageDigest.getInstance(MD5);
+            digest.update(string.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuilder hexString = new StringBuilder();
+            for (byte byteMessageDigest : messageDigest) {
+                String hash = Integer.toHexString(0xFF & byteMessageDigest);
+                if (hash.length() < 2) {
+                    hexString.append("0").append(hash);
+                } else {
+                    hexString.append(hash);
+                }
+            }
+
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
 
         return null;

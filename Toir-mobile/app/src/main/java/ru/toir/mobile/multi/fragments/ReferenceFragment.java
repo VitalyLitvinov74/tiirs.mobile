@@ -92,445 +92,367 @@ public class ReferenceFragment extends Fragment {
      * Метод для обновления справочников необходимых для работы с нарядом.
      */
     public static void updateReferencesForOrders(final Context context) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final Date currentDate = new Date();
-                String changedDate;
-                String referenceName;
-                Realm realm = Realm.getDefaultInstance();
+        Runnable runnable = () -> {
+            AuthorizedUser authUser = AuthorizedUser.getInstance();
+            final Date currentDate = new Date();
+            String changedDate;
+            String referenceName;
+            Realm realm = Realm.getDefaultInstance();
 
-                // OrderLevel
-                referenceName = OrderLevel.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<OrderLevel>> response = ToirAPIFactory.getOrderLevelService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<OrderLevel> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+            // OrderLevel
+            referenceName = OrderLevel.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<OrderLevel>> response = ToirAPIFactory.getOrderLevelService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<OrderLevel> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // OrderStatus
+            referenceName = OrderStatus.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<OrderStatus>> response = ToirAPIFactory.getOrderStatusService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<OrderStatus> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // OrderVerdict
+            referenceName = OrderVerdict.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<OrderVerdict>> response = ToirAPIFactory.getOrderVerdictService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<OrderVerdict> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // TaskVerdict
+            referenceName = TaskVerdict.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<TaskVerdict>> response = ToirAPIFactory.getTaskVerdictService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<TaskVerdict> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // TaskStatus
+            referenceName = TaskStatus.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<TaskStatus>> response = ToirAPIFactory.getTaskStatusService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<TaskStatus> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // EquipmentStatus
+            referenceName = EquipmentStatus.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<EquipmentStatus>> response = ToirAPIFactory
+                        .getEquipmentStatusService().get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<EquipmentStatus> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // StageVerdict
+            referenceName = StageVerdict.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<StageVerdict>> response = ToirAPIFactory.getStageVerdictService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<StageVerdict> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // StageStatus
+            referenceName = StageStatus.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<StageStatus>> response = ToirAPIFactory.getStageStatusService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<StageStatus> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // OperationVerdict
+            referenceName = OperationVerdict.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<OperationVerdict>> response = ToirAPIFactory
+                        .getOperationVerdictService().get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<OperationVerdict> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // OperationStatus
+            referenceName = OperationStatus.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<OperationStatus>> response = ToirAPIFactory
+                        .getOperationStatusService().get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<OperationStatus> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // MeasureType
+            referenceName = MeasureType.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<MeasureType>> response = ToirAPIFactory.getMeasureTypeService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<MeasureType> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // AttributeType
+            referenceName = AttributeType.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<AttributeType>> response = ToirAPIFactory.getAttributeTypeService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<AttributeType> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // EquipmentAttribute
+            referenceName = EquipmentAttribute.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<EquipmentAttribute>> response = ToirAPIFactory.getEquipmentAttributeService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    // TODO: реализовать механизм проверки наличия изменённых данных локально
+                    // при необходимости отбрасывать данные с сервера
+                    List<EquipmentAttribute> list = response.body();
+                    if (list.size() > 0) {
+                        // сразу ставим флаг что они "отправлены", чтоб избежать их повторной отправки
+                        for (EquipmentAttribute item : list) {
+                            item.setSent(true);
+                        }
+
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // DefectType
+            referenceName = DefectType.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<DefectType>> response = ToirAPIFactory.getDefectTypeService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<DefectType> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // DefectLevel
+            referenceName = DefectLevel.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<DefectLevel>> response = ToirAPIFactory.getDefectLevelService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<DefectLevel> list = response.body();
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Documentation
+            referenceName = Documentation.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<Documentation>> response = ToirAPIFactory.getDocumentationService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<Documentation> list = response.body();
+                    List<FilePath> files = new ArrayList<>();
+                    File extDir = context.getExternalFilesDir("");
+                    AuthorizedUser user = AuthorizedUser.getInstance();
+                    String userName = user.getLogin();
+                    if (extDir == null) {
+                        throw new Exception("Unable get extDir!!!");
+                    }
+
+                    for (Documentation item : list) {
+                        String localPath = item.getImageFilePath(authUser.getDbName()) + "/";
+                        if (isNeedDownload(extDir, item, localPath, item.isRequired())) {
+                            String url = item.getImageFileUrl(userName) + "/";
+                            files.add(new FilePath(item.getImageFileName(), url, localPath));
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                // OrderStatus
-                referenceName = OrderStatus.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<OrderStatus>> response = ToirAPIFactory.getOrderStatusService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<OrderStatus> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+
+                    Map<String, Set<String>> requestList = new HashMap<>();
+                    // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
+                    for (FilePath item : files) {
+                        String key = item.urlPath + item.fileName;
+                        if (!requestList.containsKey(key)) {
+                            Set<String> listOfDoc = new HashSet<>();
+                            listOfDoc.add(item.localPath);
+                            requestList.put(key, listOfDoc);
+                        } else {
+                            requestList.get(key).add(item.localPath);
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                // OrderVerdict
-                referenceName = OrderVerdict.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<OrderVerdict>> response = ToirAPIFactory.getOrderVerdictService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<OrderVerdict> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // TaskVerdict
-                referenceName = TaskVerdict.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<TaskVerdict>> response = ToirAPIFactory.getTaskVerdictService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<TaskVerdict> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // TaskStatus
-                referenceName = TaskStatus.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<TaskStatus>> response = ToirAPIFactory.getTaskStatusService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<TaskStatus> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // EquipmentStatus
-                referenceName = EquipmentStatus.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<EquipmentStatus>> response = ToirAPIFactory
-                            .getEquipmentStatusService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<EquipmentStatus> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // StageVerdict
-                referenceName = StageVerdict.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<StageVerdict>> response = ToirAPIFactory.getStageVerdictService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<StageVerdict> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // StageStatus
-                referenceName = StageStatus.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<StageStatus>> response = ToirAPIFactory.getStageStatusService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<StageStatus> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // OperationVerdict
-                referenceName = OperationVerdict.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<OperationVerdict>> response = ToirAPIFactory
-                            .getOperationVerdictService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<OperationVerdict> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // OperationStatus
-                referenceName = OperationStatus.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<OperationStatus>> response = ToirAPIFactory
-                            .getOperationStatusService().get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<OperationStatus> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // MeasureType
-                referenceName = MeasureType.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<MeasureType>> response = ToirAPIFactory.getMeasureTypeService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<MeasureType> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // AttributeType
-                referenceName = AttributeType.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<AttributeType>> response = ToirAPIFactory.getAttributeTypeService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<AttributeType> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // EquipmentAttribute
-                referenceName = EquipmentAttribute.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<EquipmentAttribute>> response = ToirAPIFactory.getEquipmentAttributeService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        // TODO: реализовать механизм проверки наличия изменённых данных локально
-                        // при необходимости отбрасывать данные с сервера
-                        List<EquipmentAttribute> list = response.body();
-                        if (list.size() > 0) {
-                            // сразу ставим флаг что они "отправлены", чтоб избежать их повторной отправки
-                            for (EquipmentAttribute item : list) {
-                                item.setSent(true);
-                            }
-
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // DefectType
-                referenceName = DefectType.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<DefectType>> response = ToirAPIFactory.getDefectTypeService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<DefectType> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // DefectLevel
-                referenceName = DefectLevel.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<DefectLevel>> response = ToirAPIFactory.getDefectLevelService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<DefectLevel> list = response.body();
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // Documentation
-                referenceName = Documentation.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<Documentation>> response = ToirAPIFactory.getDocumentationService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<Documentation> list = response.body();
-                        List<FilePath> files = new ArrayList<>();
-                        File extDir = context.getExternalFilesDir("");
-                        AuthorizedUser user = AuthorizedUser.getInstance();
-                        String userName = user.getLogin();
-                        if (extDir == null) {
-                            throw new Exception("Unable get extDir!!!");
-                        }
-
-                        for (Documentation item : list) {
-                            String localPath = item.getImageFilePath() + "/";
-                            if (isNeedDownload(extDir, item, localPath, item.isRequired())) {
-                                String url = item.getImageFileUrl(userName) + "/";
-                                files.add(new FilePath(item.getPath(), url, localPath));
-                            }
-                        }
-
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-
-                        Map<String, Set<String>> requestList = new HashMap<>();
-                        // тестовый вывод для принятия решения о группировке файлов для минимизации количества загружаемых данных
-                        for (FilePath item : files) {
-                            String key = item.urlPath + item.fileName;
-                            if (!requestList.containsKey(key)) {
-                                Set<String> listOfDoc = new HashSet<>();
-                                listOfDoc.add(item.localPath);
-                                requestList.put(key, listOfDoc);
-                            } else {
-                                requestList.get(key).add(item.localPath);
-                            }
-                        }
-
-                        // загружаем файлы
-                        for (String key : requestList.keySet()) {
-                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
-                            try {
-                                retrofit2.Response<ResponseBody> r = callFile.execute();
-                                ResponseBody trueImgBody = r.body();
-                                if (trueImgBody == null) {
-                                    continue;
-                                }
-
-                                for (String localPath : requestList.get(key)) {
-                                    String fileName = key.substring(key.lastIndexOf("/") + 1);
-                                    File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
-                                    if (!file.getParentFile().exists()) {
-                                        if (!file.getParentFile().mkdirs()) {
-                                            Log.e(TAG, "Не удалось создать папку " +
-                                                    file.getParentFile().toString() +
-                                                    " для сохранения файла изображения!");
-                                            continue;
-                                        }
-                                    }
-
-                                    FileOutputStream fos = new FileOutputStream(file);
-                                    fos.write(trueImgBody.bytes());
-                                    fos.close();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // CommonFile
-                referenceName = CommonFile.class.getSimpleName();
-                changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
-                try {
-                    Response<List<CommonFile>> response = ToirAPIFactory.getCommonFileService()
-                            .get(changedDate).execute();
-                    if (response.isSuccessful()) {
-                        List<CommonFile> list = response.body();
-                        File extDir = context.getExternalFilesDir("");
-                        AuthorizedUser user = AuthorizedUser.getInstance();
-                        String userName = user.getLogin();
-                        if (extDir == null) {
-                            throw new Exception("Unable get extDir!!!");
-                        }
-
-                        for (CommonFile item : list) {
-                            String localPath = CommonFile.getImageRoot();
-                            item.setPath(localPath);
-                        }
-
-                        if (list.size() > 0) {
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(list);
-                            realm.commitTransaction();
-                            ReferenceUpdate.saveReferenceData(referenceName, currentDate);
-                        }
-
-                        // загружаем файлы
-                        for (CommonFile item : list) {
-                            if (!isNeedDownload(extDir, item, item.getPath(), item.isRequire())) {
+                    // загружаем файлы
+                    for (String key : requestList.keySet()) {
+                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(ToirApplication.serverUrl + key);
+                        try {
+                            Response<ResponseBody> r = callFile.execute();
+                            ResponseBody trueImgBody = r.body();
+                            if (trueImgBody == null) {
                                 continue;
                             }
 
-                            String url = null;
-                            Response<ToirAPIResponse> urlResponse = ToirAPIFactory.getCommonFileService()
-                                    .getUrl(item.getUuid()).execute();
-                            if (response.isSuccessful()) {
-                                ToirAPIResponse data = urlResponse.body();
-                                url = (String) data.getData();
-                                if (url == null || url.equals("")) {
-                                    continue;
-                                }
-
-                                url = ToirApplication.serverUrl + data.getData();
-                            }
-
-                            Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
-                            try {
-                                retrofit2.Response<ResponseBody> r = callFile.execute();
-                                ResponseBody trueImgBody = r.body();
-                                if (trueImgBody == null) {
-                                    continue;
-                                }
-
-                                File file = new File(extDir.getAbsolutePath() + '/' + item.getPath(), item.getName());
+                            for (String localPath : requestList.get(key)) {
+                                String fileName = key.substring(key.lastIndexOf("/") + 1);
+                                File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
                                 if (!file.getParentFile().exists()) {
                                     if (!file.getParentFile().mkdirs()) {
                                         Log.e(TAG, "Не удалось создать папку " +
                                                 file.getParentFile().toString() +
-                                                " для сохранения файла!");
+                                                " для сохранения файла изображения!");
                                         continue;
                                     }
                                 }
@@ -538,16 +460,93 @@ public class ReferenceFragment extends Fragment {
                                 FileOutputStream fos = new FileOutputStream(file);
                                 fos.write(trueImgBody.bytes());
                                 fos.close();
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-                realm.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+            // CommonFile
+            referenceName = CommonFile.class.getSimpleName();
+            changedDate = ReferenceUpdate.lastChangedAsStr(referenceName);
+            try {
+                Response<List<CommonFile>> response = ToirAPIFactory.getCommonFileService()
+                        .get(changedDate).execute();
+                if (response.isSuccessful()) {
+                    List<CommonFile> list = response.body();
+                    File extDir = context.getExternalFilesDir("");
+                    if (extDir == null) {
+                        throw new Exception("Unable get extDir!!!");
+                    }
+
+//                    for (CommonFile item : list) {
+//                        String localPath = CommonFile.getImageRoot();
+//                        item.setPath(localPath);
+//                    }
+
+                    if (list.size() > 0) {
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(list);
+                        realm.commitTransaction();
+                        ReferenceUpdate.saveReferenceData(referenceName, currentDate);
+                    }
+
+                    // загружаем файлы
+                    for (CommonFile item : list) {
+                        String localPath = item.getImageFilePath(authUser.getDbName());
+                        if (!isNeedDownload(extDir, item, localPath, item.isRequire())) {
+                            continue;
+                        }
+
+                        String url = null;
+                        Response<ToirAPIResponse> urlResponse = ToirAPIFactory.getCommonFileService()
+                                .getUrl(item.getUuid()).execute();
+                        if (response.isSuccessful()) {
+                            ToirAPIResponse data = urlResponse.body();
+                            url = (String) data.getData();
+                            if (url == null || url.equals("")) {
+                                continue;
+                            }
+
+                            url = ToirApplication.serverUrl + data.getData();
+                        }
+
+                        Call<ResponseBody> callFile = ToirAPIFactory.getFileDownload().get(url);
+                        try {
+                            Response<ResponseBody> r = callFile.execute();
+                            ResponseBody trueImgBody = r.body();
+                            if (trueImgBody == null) {
+                                continue;
+                            }
+
+                            File file = new File(extDir.getAbsolutePath() + '/'
+                                    + item.getImageFilePath(authUser.getDbName()),
+                                    item.getImageFileName());
+                            if (!file.getParentFile().exists()) {
+                                if (!file.getParentFile().mkdirs()) {
+                                    Log.e(TAG, "Не удалось создать папку " +
+                                            file.getParentFile().toString() +
+                                            " для сохранения файла!");
+                                    continue;
+                                }
+                            }
+
+                            FileOutputStream fos = new FileOutputStream(file);
+                            fos.write(trueImgBody.bytes());
+                            fos.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            realm.close();
         };
         Thread thread = new Thread(runnable);
         thread.start();
@@ -569,7 +568,7 @@ public class ReferenceFragment extends Fragment {
         }
 
         // есть ли локально файл
-        String fileName = ((IToirDbObject) obj).getImageFile();
+        String fileName = ((IToirDbObject) obj).getImageFileName();
         if (fileName != null) {
             File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
             if (!file.exists()) {

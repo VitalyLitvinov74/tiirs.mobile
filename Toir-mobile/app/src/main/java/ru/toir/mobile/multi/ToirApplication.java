@@ -13,6 +13,8 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 import java.io.InputStream;
 
 import io.realm.Realm;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverNull;
+import ru.toir.mobile.multi.rfid.driver.RfidDriverQRcode;
 
 /**
  * @author Oleg Ivanov
@@ -83,6 +85,23 @@ public class ToirApplication extends Application {
                         .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
                         .build());
 
+        String rfidLoginDriver = preferences.getString(getString(R.string.default_login_rfid_driver_key), null);
+        if (rfidLoginDriver == null || rfidLoginDriver.isEmpty()) {
+            preferences.edit().putString(getString(R.string.default_login_rfid_driver_key),
+                    RfidDriverQRcode.class.getCanonicalName()).apply();
+        }
+
+        String rfidDriver = preferences.getString(getString(R.string.default_rfid_driver_key), null);
+        if (rfidDriver == null || rfidDriver.isEmpty()) {
+            preferences.edit().putString(getString(R.string.default_rfid_driver_key),
+                    RfidDriverQRcode.class.getCanonicalName()).apply();
+        }
+
+        String uhfDriver = preferences.getString(getString(R.string.default_uhf_driver_key), null);
+        if (uhfDriver == null || uhfDriver.isEmpty()) {
+            preferences.edit().putString(getString(R.string.default_uhf_driver_key),
+                    RfidDriverNull.class.getCanonicalName()).apply();
+        }
 /*
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override

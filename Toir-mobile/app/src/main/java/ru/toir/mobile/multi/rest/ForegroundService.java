@@ -22,6 +22,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.ToirApplication;
 import ru.toir.mobile.multi.db.realm.GpsTrack;
 import ru.toir.mobile.multi.db.realm.Journal;
 import ru.toir.mobile.multi.db.realm.OrderStatus;
@@ -61,28 +62,13 @@ public class ForegroundService extends Service {
         startForeground(777, notification);
 
         // запуск отправки логов и координат на сервер
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startSendLog();
-            }
-        }, 0);
+        new Handler().postDelayed(this::startSendLog, 0);
 
         // запуск отправки результатов работы на сервер
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startSendResult();
-            }
-        }, 20000);
+        new Handler().postDelayed(this::startSendResult, 20000);
 
         // запуск получения нарядов с сервера
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startGetOrder();
-            }
-        }, 40000);
+        new Handler().postDelayed(this::startGetOrder, 40000);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -114,8 +100,16 @@ public class ForegroundService extends Service {
 
                 Log.d(TAG, "startSendLog()");
 
-                if (!isValidUser()) {
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                if (!authUser.isLocalLogged()) {
                     Log.d(TAG, "Нет активного пользователя для отправки логов и координат на сервер.");
+                    // взводим следующий запуск
+                    sendLog.postDelayed(this, START_INTERVAL);
+                    return;
+                }
+
+                if (!ToirApplication.isInternetOn(ForegroundService.this)) {
+                    // связи нет, ни чего не делаем
                     // взводим следующий запуск
                     sendLog.postDelayed(this, START_INTERVAL);
                     return;
@@ -124,11 +118,17 @@ public class ForegroundService extends Service {
                 // получаем данные для отправки
                 Realm realm = Realm.getDefaultInstance();
                 RealmResults<GpsTrack> gpsItems = realm.where(GpsTrack.class)
-                        .equalTo("sent", false).limit(10).findAll();
+                        .equalTo("sent", false)
+                        .equalTo("organization.uuid", authUser.getOrganizationUuid())
+                        .limit(10)
+                        .findAll();
                 if (gpsItems.size() > 0) {
                     ids = new long[gpsItems.size()];
                     for (int i = 0; i < gpsItems.size(); i++) {
-                        ids[i] = gpsItems.get(i).get_id();
+                        GpsTrack item = gpsItems.get(i);
+                        if (item != null) {
+                            ids[i] = item.get_id();
+                        }
                     }
 
                     bundle = new Bundle();
@@ -136,11 +136,17 @@ public class ForegroundService extends Service {
                 }
 
                 RealmResults<Journal> logItems = realm.where(Journal.class)
-                        .equalTo("sent", false).limit(10).findAll();
+                        .equalTo("sent", false)
+                        .equalTo("organization.uuid", authUser.getOrganizationUuid())
+                        .limit(10)
+                        .findAll();
                 if (logItems.size() > 0) {
                     ids = new long[logItems.size()];
                     for (int i = 0; i < logItems.size(); i++) {
-                        ids[i] = logItems.get(i).get_id();
+                        Journal item = logItems.get(i);
+                        if (item != null) {
+                            ids[i] = item.get_id();
+                        }
                     }
 
                     if (bundle == null) {
@@ -180,20 +186,28 @@ public class ForegroundService extends Service {
 
                 Log.d(TAG, "startSendResult()");
 
-                if (!isValidUser()) {
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                if (!authUser.isLocalLogged()) {
                     Log.d(TAG, "Нет активного пользователя для отправки нарядов на сервер.");
                     // взводим следующий запуск
                     sendResult.postDelayed(this, START_INTERVAL);
                     return;
                 }
 
+                if (!ToirApplication.isInternetOn(ForegroundService.this)) {
+                    // связи нет, ни чего не делаем
+                    // взводим следующий запуск
+                    sendResult.postDelayed(this, START_INTERVAL);
+                    return;
+                }
+
                 // получаем данные для отправки
-                AuthorizedUser user = AuthorizedUser.getInstance();
                 Realm realm = Realm.getDefaultInstance();
                 RealmResults<Orders> orders = realm.where(Orders.class)
                         .beginGroup()
-                        .equalTo("user.uuid", user.getUuid())
+                        .equalTo("user.uuid", authUser.getUuid())
                         .equalTo("sent", false)
+                        .equalTo("organization.uuid", authUser.getOrganizationUuid())
                         .endGroup()
                         .beginGroup()
                         .equalTo("orderStatus.uuid", OrderStatus.Status.COMPLETE).or()
@@ -209,7 +223,10 @@ public class ForegroundService extends Service {
                 } else {
                     ids = new long[orders.size()];
                     for (int i = 0; i < orders.size(); i++) {
-                        ids[i] = orders.get(i).get_id();
+                        Orders item = orders.get(i);
+                        if (item != null) {
+                            ids[i] = item.get_id();
+                        }
                     }
                 }
 
@@ -240,8 +257,16 @@ public class ForegroundService extends Service {
             public void run() {
                 Log.d(TAG, "startGetOrder()");
 
-                if (!isValidUser()) {
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                if (!authUser.isLocalLogged()) {
                     Log.d(TAG, "Нет активного пользователя для получения нарядов.");
+                    // взводим следующий запуск
+                    getOrder.postDelayed(this, START_INTERVAL);
+                    return;
+                }
+
+                if (!ToirApplication.isInternetOn(ForegroundService.this)) {
+                    // связи нет, ни чего не делаем
                     // взводим следующий запуск
                     getOrder.postDelayed(this, START_INTERVAL);
                     return;
@@ -266,13 +291,6 @@ public class ForegroundService extends Service {
         getOrder = new Handler();
         getOrder.postDelayed(runnable, START_INTERVAL);
     }
-
-    private boolean isValidUser() {
-        AuthorizedUser user = AuthorizedUser.getInstance();
-        boolean isValidUser = user.getLogin() != null && user.getToken() != null;
-        return isValidUser;
-    }
-
 
     @Nullable
     @Override

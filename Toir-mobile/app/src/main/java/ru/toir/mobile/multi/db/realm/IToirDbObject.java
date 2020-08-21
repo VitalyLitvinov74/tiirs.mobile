@@ -10,9 +10,9 @@ import java.util.Date;
 public interface IToirDbObject {
     String getUuid();
 
-    String getImageFile();
+    String getImageFileName();
 
-    String getImageFilePath();
+    String getImageFilePath(String dbName);
 
     String getImageFileUrl(String userName);
 

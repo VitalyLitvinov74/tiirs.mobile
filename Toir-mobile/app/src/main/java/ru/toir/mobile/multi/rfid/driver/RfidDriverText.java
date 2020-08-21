@@ -26,6 +26,7 @@ import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
+import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 import ru.toir.mobile.multi.utils.DataUtils;
 
 
@@ -153,38 +154,30 @@ public class RfidDriverText extends RfidDriverBase implements IRfidDriver {
 
         View view = inflater.inflate(R.layout.rfid_dialog_text, viewGroup);
 
-        Button ok = (Button) view.findViewById(R.id.rfid_dialog_text_button_OK);
-        ok.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "pressed OK");
-                Spinner spinner = (Spinner) v.getRootView().findViewById(R.id.rfid_dialog_text_spinner_lables);
-                String tagId = "0000" + spinner.getSelectedItem();
-                switch (command) {
-                    case RfidDialog.READER_COMMAND_READ_ID:
-                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, tagId).sendToTarget();
-                        break;
-                    case RfidDialog.READER_COMMAND_READ_MULTI_ID:
-                        sHandler.obtainMessage(RESULT_RFID_SUCCESS, new String[]{tagId}).sendToTarget();
-                        break;
-                    default:
-                        sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
-                }
+        Button ok = view.findViewById(R.id.rfid_dialog_text_button_OK);
+        ok.setOnClickListener(v -> {
+            Log.d(TAG, "pressed OK");
+            Spinner spinner = v.getRootView().findViewById(R.id.rfid_dialog_text_spinner_lables);
+            RfidDriverMsg msg = RfidDriverMsg.tagMsg("0000" + spinner.getSelectedItem());
+            switch (command) {
+                case RfidDialog.READER_COMMAND_READ_ID:
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, msg).sendToTarget();
+                    break;
+                case RfidDialog.READER_COMMAND_READ_MULTI_ID:
+                    sHandler.obtainMessage(RESULT_RFID_SUCCESS, new RfidDriverMsg[]{msg}).sendToTarget();
+                    break;
+                default:
+                    sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
             }
         });
 
-        Button cancel = (Button) view.findViewById(R.id.rfid_dialog_text_button_CANCEL);
-        cancel.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "pressed CANCEL");
-                sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
-            }
+        Button cancel = view.findViewById(R.id.rfid_dialog_text_button_CANCEL);
+        cancel.setOnClickListener(v -> {
+            Log.d(TAG, "pressed CANCEL");
+            sHandler.obtainMessage(RESULT_RFID_CANCEL).sendToTarget();
         });
 
-        Spinner spinner = (Spinner) view.findViewById(R.id.rfid_dialog_text_spinner_lables);
+        Spinner spinner = view.findViewById(R.id.rfid_dialog_text_spinner_lables);
         SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
                 inflater.getContext(), R.array.list,
                 android.R.layout.simple_spinner_dropdown_item);

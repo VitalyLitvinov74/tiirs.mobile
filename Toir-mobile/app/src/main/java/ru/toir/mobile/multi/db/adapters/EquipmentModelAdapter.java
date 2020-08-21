@@ -14,6 +14,7 @@ import java.io.File;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.realm.EquipmentModel;
 
@@ -87,17 +88,19 @@ public class EquipmentModelAdapter extends RealmBaseAdapter<EquipmentModel> impl
                         viewHolder.type.setText(equipmentModel.getEquipmentType().getTitle());
                     }
 
-                    if (equipmentModel.getImage() != null) {
-                        File path = context.getExternalFilesDir(equipmentModel.getImageFilePath());
+                    if (equipmentModel.getImageFileName() != null) {
+                        File path = context.getExternalFilesDir(equipmentModel
+                                .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
                         if (path != null) {
                             Bitmap image_bitmap = getResizedBitmap(
                                     path.toString() + File.separator,
-                                    equipmentModel.getImage(), 300, 0,
+                                    equipmentModel.getImageFileName(), 300, 0,
                                     equipmentModel.getChangedAt().getTime());
                             if (image_bitmap != null) {
                                 viewHolder.image.setImageBitmap(image_bitmap);
                             } else {
-                                viewHolder.image.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.no_image));
+                                viewHolder.image.setImageBitmap(BitmapFactory
+                                        .decodeResource(context.getResources(), R.drawable.no_image));
                             }
                         }
                     }

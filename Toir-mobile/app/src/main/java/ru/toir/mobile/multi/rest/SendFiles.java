@@ -24,6 +24,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.db.realm.MediaFile;
 
 /**
@@ -66,7 +67,9 @@ public class SendFiles extends AsyncTask<MediaFile[], Void, LongSparseArray<Stri
             List<MultipartBody.Part> list = new ArrayList<>();
 
             try {
-                File path = new File(extDir.getAbsolutePath() + '/' + file.getPath(), file.getName());
+                File path = new File(extDir.getAbsolutePath() + '/'
+                        + file.getImageFilePath(AuthorizedUser.getInstance().getDbName()),
+                        file.getImageFileName());
                 Uri uri = Uri.fromFile(path);
                 String fileUuid = file.getUuid();
                 String formId = "file[" + fileUuid + "]";

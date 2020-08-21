@@ -117,22 +117,20 @@ public class Objects extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getImage();
+    public String getImageFileName() {
+        return photo;
     }
 
     @Override
-    public String getImageFilePath() {
-        String imageRoot = getImageRoot();
+    public String getImageFilePath(String dbName) {
         String dir;
-
-        dir = imageRoot;
+        dir = dbName + "/" + getImageRoot();
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + getImageRoot();
     }
 
     public Organization getOrganization() {

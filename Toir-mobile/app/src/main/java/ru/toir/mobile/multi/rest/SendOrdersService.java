@@ -271,8 +271,9 @@ public class SendOrdersService extends Service {
         // запросы делаем по одному, т.к. может сложиться ситуация когда будет попытка отправить
         // объём данных превышающий ограничения на отправку POST запросом на сервере
         for (MediaFile file : files) {
-            File extDir = context.getExternalFilesDir(file.getPath());
-            File mediaFile = new File(extDir, file.getName());
+            File extDir = context.getExternalFilesDir(file
+                    .getImageFilePath(AuthorizedUser.getInstance().getDbName()));
+            File mediaFile = new File(extDir, file.getImageFileName());
             if (mediaFile.exists()) {
                 Call<ResponseBody> call = ToirAPIFactory.getMediaFileService()
                         .upload(descr, getMultipartBody(file, mediaFile));

@@ -21,6 +21,15 @@ public class Instruction extends RealmObject implements IToirDbObject {
     private Date createdAt;
     private Date changedAt;
 
+    /**
+     * Папка, относительно которой строится путь хранения файла.
+     *
+     * @return String
+     */
+    public static String getImageRoot() {
+        return "instruction";
+    }
+
     public long get_id() {
         return _id;
     }
@@ -70,20 +79,20 @@ public class Instruction extends RealmObject implements IToirDbObject {
     }
 
     @Override
-    public String getImageFile() {
-        return getPath();
+    public String getImageFileName() {
+        return path;
     }
 
     @Override
-    public String getImageFilePath() {
+    public String getImageFilePath(String dbName) {
         String dir;
-        dir = "instruction";
+        dir = dbName + "/" + getImageRoot();
         return dir;
     }
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageFilePath();
+        return "/storage/" + userName + "/" + getImageRoot();
     }
 
     public User getUser() {

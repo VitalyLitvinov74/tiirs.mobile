@@ -20,6 +20,7 @@ import java.io.File;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.EquipmentInfoActivity;
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.db.adapters.DocumentationAdapter;
@@ -130,8 +131,9 @@ public class DocumentationFragment extends Fragment {
             Context context = getContext();
             if (context != null) {
                 Documentation documentation = (Documentation) parentView.getItemAtPosition(position);
-                File file = new File(context.getExternalFilesDir(documentation.getImageFilePath()),
-                        documentation.getPath());
+                File file = new File(context.getExternalFilesDir(
+                        documentation.getImageFilePath(AuthorizedUser.getInstance().getDbName())),
+                        documentation.getImageFileName());
                 if (file.exists()) {
                     Intent intent = EquipmentInfoActivity.showDocument(file, getContext());
                     if (intent != null) {

@@ -92,7 +92,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
         }
 
         // есть ли локально файл
-        String fileName = ((IToirDbObject) obj).getImageFile();
+        String fileName = ((IToirDbObject) obj).getImageFileName();
         if (fileName != null) {
             File file = new File(extDir.getAbsolutePath() + '/' + localPath, fileName);
             if (!file.exists()) {
@@ -141,6 +141,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
 
     @Override
     protected List<Orders> doInBackground(String[]... params) {
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
         // обновляем справочники
         ReferenceFragment.updateReferencesForOrders(dialog.getContext());
 
@@ -271,11 +272,11 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
 
                 // урл изображения задачи
                 TaskTemplate taskTemplate = task.getTaskTemplate();
-                basePathLocal = taskTemplate.getImageFilePath() + "/";
+                basePathLocal = taskTemplate.getImageFilePath(authUser.getDbName()) + "/";
                 isNeedDownload = isNeedDownload(extDir, taskTemplate, basePathLocal);
                 if (isNeedDownload) {
                     String url = taskTemplate.getImageFileUrl(userName) + "/";
-                    files.add(new FilePath(taskTemplate.getImage(), url, basePathLocal));
+                    files.add(new FilePath(taskTemplate.getImageFileName(), url, basePathLocal));
                 }
 
                 List<Stage> stages = task.getStages();
@@ -283,43 +284,43 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     // урл изображения этапа задачи
                     StageTemplate stageTemplate = stage.getStageTemplate();
                     stageTemplates.add(stageTemplate.getUuid());
-                    basePathLocal = stageTemplate.getImageFilePath() + "/";
+                    basePathLocal = stageTemplate.getImageFilePath(authUser.getDbName()) + "/";
                     isNeedDownload = isNeedDownload(extDir, stageTemplate, basePathLocal);
                     if (isNeedDownload) {
                         String url = stageTemplate.getImageFileUrl(userName) + "/";
-                        files.add(new FilePath(stageTemplate.getImage(), url, basePathLocal));
+                        files.add(new FilePath(stageTemplate.getImageFileName(), url, basePathLocal));
                     }
 
                     // урл изображения оборудования
                     Equipment equipment = stage.getEquipment();
-                    basePathLocal = equipment.getImageFilePath() + "/";
-                    if (!equipment.getImage().equals("")) {
+                    basePathLocal = equipment.getImageFilePath(authUser.getDbName()) + "/";
+                    if (!equipment.getImageFileName().equals("")) {
                         isNeedDownload = isNeedDownload(extDir, equipment, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipment.getImageFileUrl(userName) + "/";
-                            files.add(new FilePath(equipment.getImage(), url, basePathLocal));
+                            files.add(new FilePath(equipment.getImageFileName(), url, basePathLocal));
                         }
                     }
 
                     // урл изображения модели оборудования
                     EquipmentModel equipmentModel = stage.getEquipment().getEquipmentModel();
-                    basePathLocal = equipmentModel.getImageFilePath() + "/";
-                    if (!equipmentModel.getImage().equals("")) {
+                    basePathLocal = equipmentModel.getImageFilePath(authUser.getDbName()) + "/";
+                    if (!equipmentModel.getImageFileName().equals("")) {
                         isNeedDownload = isNeedDownload(extDir, equipmentModel, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipmentModel.getImageFileUrl(userName) + "/";
-                            files.add(new FilePath(equipmentModel.getImage(), url, basePathLocal));
+                            files.add(new FilePath(equipmentModel.getImageFileName(), url, basePathLocal));
                         }
                     }
 
                     // урл изображения объекта где расположено оборудование
                     Objects object = stage.getEquipment().getLocation();
                     if (object != null) {
-                        basePathLocal = object.getImageFilePath() + "/";
+                        basePathLocal = object.getImageFilePath(authUser.getDbName()) + "/";
                         isNeedDownload = isNeedDownload(extDir, object, basePathLocal);
                         if (isNeedDownload) {
                             String url = object.getImageFileUrl(userName) + "/";
-                            files.add(new FilePath(object.getImage(), url, basePathLocal));
+                            files.add(new FilePath(object.getImageFileName(), url, basePathLocal));
                         }
                     }
 
@@ -329,12 +330,12 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     List<Operation> operations = stage.getOperations();
                     for (Operation operation : operations) {
                         OperationTemplate operationTemplate = operation.getOperationTemplate();
-                        basePathLocal = operationTemplate.getImageFilePath() + "/";
+                        basePathLocal = operationTemplate.getImageFilePath(authUser.getDbName()) + "/";
                         // урл изображения операции
                         isNeedDownload = isNeedDownload(extDir, operationTemplate, basePathLocal);
                         if (isNeedDownload) {
                             String url = operationTemplate.getImageFileUrl(userName) + "/";
-                            files.add(new FilePath(operationTemplate.getImage(), url, basePathLocal));
+                            files.add(new FilePath(operationTemplate.getImageFileName(), url, basePathLocal));
                         }
                     }
                 }
@@ -382,10 +383,10 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             List<Documentation> list = r.body();
             if (list != null) {
                 for (Documentation doc : list) {
-                    String localPath = doc.getImageFilePath() + "/";
+                    String localPath = doc.getImageFilePath(authUser.getDbName()) + "/";
                     if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                         String url = doc.getImageFileUrl(userName) + "/";
-                        files.add(new FilePath(doc.getPath(), url, localPath));
+                        files.add(new FilePath(doc.getImageFileName(), url, localPath));
                     }
                 }
 
@@ -410,10 +411,10 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             List<Documentation> list = r.body();
             if (list != null) {
                 for (Documentation doc : list) {
-                    String localPath = doc.getImageFilePath() + "/";
+                    String localPath = doc.getImageFilePath(authUser.getDbName()) + "/";
                     if (isNeedDownload(extDir, doc, localPath) && doc.isRequired()) {
                         String url = doc.getImageFileUrl(userName) + "/";
-                        files.add(new FilePath(doc.getPath(), url, localPath));
+                        files.add(new FilePath(doc.getImageFileName(), url, localPath));
                     }
                 }
 
@@ -461,10 +462,10 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             List<Instruction> list = r.body();
             if (list != null) {
                 for (Instruction instruction : list) {
-                    String localPath = instruction.getImageFilePath() + "/";
+                    String localPath = instruction.getImageFilePath(authUser.getDbName()) + "/";
                     if (isNeedDownload(extDir, instruction, localPath)) {
                         String url = instruction.getImageFileUrl(userName) + "/";
-                        files.add(new FilePath(instruction.getPath(), url, localPath));
+                        files.add(new FilePath(instruction.getImageFileName(), url, localPath));
                     }
                 }
                 // сохраняем информацию о доступной документации для оборудования
@@ -545,22 +546,22 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     // урл изображения оборудования
                     Equipment equipment = defect.getEquipment();
                     basePathLocal = equipment.getImageFilePath() + "/";
-                    if (!equipment.getImage().equals("")) {
+                    if (!equipment.getImageFileName().equals("")) {
                         isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, equipment, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipment.getImageFileUrl(userName) + "/";
-                            files.add(new GetOrderAsyncTask.FilePath(equipment.getImage(), url, basePathLocal));
+                            files.add(new GetOrderAsyncTask.FilePath(equipment.getImageFileName(), url, basePathLocal));
                         }
                     }
 
                     // урл изображения модели оборудования
                     EquipmentModel equipmentModel = defect.getEquipment().getEquipmentModel();
                     basePathLocal = equipmentModel.getImageFilePath() + "/";
-                    if (!equipmentModel.getImage().equals("")) {
+                    if (!equipmentModel.getImageFileName().equals("")) {
                         isNeedDownload = GetOrderAsyncTask.isNeedDownload(extDir, equipmentModel, basePathLocal);
                         if (isNeedDownload) {
                             String url = equipmentModel.getImageFileUrl(userName) + "/";
-                            files.add(new GetOrderAsyncTask.FilePath(equipmentModel.getImage(), url, basePathLocal));
+                            files.add(new GetOrderAsyncTask.FilePath(equipmentModel.getImageFileName(), url, basePathLocal));
                         }
                     }
                     // строим список оборудования
