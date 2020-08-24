@@ -9,10 +9,10 @@ import ru.toir.mobile.multi.rfid.RfidDriverBase;
 
 /**
  * @author Dmitriy Logachev
- *         <p>
- *         Драйвер считывателя RFID который ни чего не делает а выступает заглушкой для выбора
- *         реального драйвера UHF.
- *         </p>
+ * <p>
+ * Драйвер считывателя RFID который ни чего не делает а выступает заглушкой для выбора
+ * реального драйвера UHF.
+ * </p>
  */
 public class RfidDriverUHF extends RfidDriverBase {
     public static final String DRIVER_NAME = "UHF драйвер";

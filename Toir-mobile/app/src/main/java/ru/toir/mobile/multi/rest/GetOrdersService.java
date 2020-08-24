@@ -36,6 +36,7 @@ import ru.toir.mobile.multi.db.realm.EquipmentAttribute;
 import ru.toir.mobile.multi.db.realm.EquipmentModel;
 import ru.toir.mobile.multi.db.realm.Instruction;
 import ru.toir.mobile.multi.db.realm.InstructionStageTemplate;
+import ru.toir.mobile.multi.db.realm.Message;
 import ru.toir.mobile.multi.db.realm.Objects;
 import ru.toir.mobile.multi.db.realm.Operation;
 import ru.toir.mobile.multi.db.realm.OperationTemplate;
@@ -116,7 +117,7 @@ public class GetOrdersService extends Service {
                     realm.commitTransaction();
                     realm.close();
                     // TODO наверное нужно убрать, не помню зачем поставил
-                    ReferenceUpdate.saveReferenceData("Defect", new Date());
+                    //ReferenceUpdate.saveReferenceData("Defect", new Date());
 
                     Intent intent = new Intent(context, MainActivity.class);
                     intent.putExtra("action", "defectFragment");
@@ -138,6 +139,44 @@ public class GetOrdersService extends Service {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Ошибка при получении дефектов оборудования.");
+                e.printStackTrace();
+            }
+
+            // получаем сообщения
+            changedDate = ReferenceUpdate.lastChangedAsStr(Message.class.getSimpleName());
+            Call<List<Message>> messageCall = ToirAPIFactory.getMessageService().get(changedDate);
+            try {
+                retrofit2.Response<List<Message>> r = messageCall.execute();
+                List<Message> list = r.body();
+                if (list != null && list.size() > 0) {
+                    // сохраняем атрибуты
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(list);
+                    realm.commitTransaction();
+                    realm.close();
+                    ReferenceUpdate.saveReferenceData("Message", new Date());
+
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.putExtra("action", "messageFragment");
+                    intent.putExtra("count", list.size());
+                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    NotificationCompat.Builder nb = new NotificationCompat.Builder(context, "toir")
+                            .setSmallIcon(R.drawable.toir_notify)
+                            .setAutoCancel(true)
+                            .setTicker("Получены новые сообщения")
+                            .setContentText("Получено " + list.size() + " сообщений")
+                            .setContentIntent(PendingIntent.getActivity(context,
+                                    0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("Тоирус")
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+                    if (notificationManager != null)
+                        notificationManager.notify(1, nb.build());
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка при получении сообщений.");
                 e.printStackTrace();
             }
 

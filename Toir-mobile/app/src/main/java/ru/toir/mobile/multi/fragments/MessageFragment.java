@@ -14,8 +14,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.MessageInfoActivity;
 import ru.toir.mobile.multi.R;
@@ -55,10 +58,16 @@ public class MessageFragment extends Fragment {
         messageListView = rootView.findViewById(R.id.message_listView);
         TextView output_text = rootView.findViewById(R.id.output_text);
         TextView input_text = rootView.findViewById(R.id.input_text);
+        TextView output_count = rootView.findViewById(R.id.sent_count);
+        TextView input_count = rootView.findViewById(R.id.input_count);
 
         final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
-        RealmResults<Message> messages = realmDB.where(Message.class).equalTo("toUser", user.get_id()).findAll();
-
+        if (user != null) {
+            long sendMessagesCount = realmDB.where(Message.class).equalTo("toUser._id", user.get_id()).count();
+            long inputMessagesCount = realmDB.where(Message.class).equalTo("fromUser._id", user.get_id()).count();
+            output_count.setText(String.format(Locale.ENGLISH, "%d", sendMessagesCount));
+            input_count.setText(String.format(Locale.ENGLISH, "%d", inputMessagesCount));
+        }
         messageListView.setOnItemClickListener(new ListviewClickListener());
 
 /*
@@ -102,18 +111,21 @@ public class MessageFragment extends Fragment {
         final User user = realmDB.where(User.class).equalTo("tagId", AuthorizedUser.getInstance().getTagId()).findFirst();
         if (user != null) {
             messages = realmDB.where(Message.class)
-                    .equalTo("toUser", user.get_id())
+                    .equalTo("toUser._id", user.get_id())
                     .or()
-                    .equalTo("fromUser", user.get_id())
+                    .equalTo("fromUser._id", user.get_id())
+                    .sort("date", Sort.DESCENDING)
                     .findAll();
             if (type == 1) {
                 messages = realmDB.where(Message.class)
-                        .equalTo("toUser", user.get_id())
+                        .equalTo("toUser._id", user.get_id())
+                        .sort("date", Sort.DESCENDING)
                         .findAll();
             }
             if (type == 2) {
                 messages = realmDB.where(Message.class)
-                        .equalTo("fromUser", user.get_id())
+                        .equalTo("fromUser._id", user.get_id())
+                        .sort("date", Sort.DESCENDING)
                         .findAll();
             }
             MessageAdapter messageAdapter = new MessageAdapter(messages);

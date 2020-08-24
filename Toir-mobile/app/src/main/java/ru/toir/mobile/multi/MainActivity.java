@@ -608,62 +608,59 @@ public class MainActivity extends AppCompatActivity {
                                 .withSelectable(false)
                                 .withIconColor(ContextCompat.getColor(this, R.color.larisaBlueColor))
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem != null) {
-                            int ident = drawerItem.getIdentifier();
-                            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-                            if (ident == FRAGMENT_CHARTS) {
-                                currentFragment = FRAGMENT_CHARTS;
-                                tr.replace(R.id.frame_container, ServiceFragment.newInstance());
-                            } else if (ident == DRAWER_DOWNLOAD) {
-                                currentFragment = DRAWER_DOWNLOAD;
-                                updateApk(MainActivity.this);
-                            } else if (ident == FRAGMENT_EQUIPMENT) {
-                                currentFragment = FRAGMENT_EQUIPMENT;
-                                tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
-                            } else if (ident == FRAGMENT_GPS) {
-                                currentFragment = FRAGMENT_GPS;
-                                tr.replace(R.id.frame_container, GPSFragment.newInstance());
-                            } else if (ident == FRAGMENT_TASKS) {
-                                currentFragment = FRAGMENT_TASKS;
-                                tr.replace(R.id.frame_container, OrderFragment.newInstance());
-                            } else if (ident == FRAGMENT_REFERENCES) {
-                                currentFragment = FRAGMENT_REFERENCES;
-                                tr.replace(R.id.frame_container, ReferenceFragment.newInstance());
-                            } else if (ident == FRAGMENT_DOCS) {
-                                currentFragment = FRAGMENT_DOCS;
-                                tr.replace(R.id.frame_container, DocumentationFragment.newInstance());
-                            } else if (ident == FRAGMENT_USERS) {
-                                currentFragment = FRAGMENT_USERS;
-                                tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
-                            } else if (ident == FRAGMENT_SERVICE) {
-                                currentFragment = FRAGMENT_SERVICE;
-                                tr.replace(R.id.frame_container, ServiceFragment.newInstance());
-                            } else if (ident == FRAGMENT_OBJECTS) {
-                                currentFragment = FRAGMENT_OBJECTS;
-                                tr.replace(R.id.frame_container, ObjectFragment.newInstance());
-                            } else if (ident == FRAGMENT_DEFECTS) {
-                                currentFragment = FRAGMENT_DEFECTS;
-                                tr.replace(R.id.frame_container, DefectsFragment.newInstance());
-                            } else if (ident == FRAGMENT_CONTRAGENTS) {
-                                currentFragment = FRAGMENT_CONTRAGENTS;
-                                tr.replace(R.id.frame_container, ContragentsFragment.newInstance());
-                            } else if (ident == FRAGMENT_CALENDAR) {
-                                currentFragment = FRAGMENT_CALENDAR;
-                                tr.replace(R.id.frame_container, CalendarFragment.newInstance());
-                            } else if (ident == FRAGMENT_MESSAGES) {
-                                currentFragment = FRAGMENT_MESSAGES;
-                                tr.replace(R.id.frame_container, MessageFragment.newInstance());
-                            } else if (ident == DRAWER_INFO) {
-                                startAboutDialog();
-                            } else if (ident == DRAWER_EXIT) {
-                                System.exit(0);
-                            }
-                            tr.commit();
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerItem != null) {
+                        int ident = drawerItem.getIdentifier();
+                        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+                        if (ident == FRAGMENT_CHARTS) {
+                            currentFragment = FRAGMENT_CHARTS;
+                            tr.replace(R.id.frame_container, ServiceFragment.newInstance());
+                        } else if (ident == DRAWER_DOWNLOAD) {
+                            currentFragment = DRAWER_DOWNLOAD;
+                            updateApk(MainActivity.this);
+                        } else if (ident == FRAGMENT_EQUIPMENT) {
+                            currentFragment = FRAGMENT_EQUIPMENT;
+                            tr.replace(R.id.frame_container, EquipmentsFragment.newInstance());
+                        } else if (ident == FRAGMENT_GPS) {
+                            currentFragment = FRAGMENT_GPS;
+                            tr.replace(R.id.frame_container, GPSFragment.newInstance());
+                        } else if (ident == FRAGMENT_TASKS) {
+                            currentFragment = FRAGMENT_TASKS;
+                            tr.replace(R.id.frame_container, OrderFragment.newInstance());
+                        } else if (ident == FRAGMENT_REFERENCES) {
+                            currentFragment = FRAGMENT_REFERENCES;
+                            tr.replace(R.id.frame_container, ReferenceFragment.newInstance());
+                        } else if (ident == FRAGMENT_DOCS) {
+                            currentFragment = FRAGMENT_DOCS;
+                            tr.replace(R.id.frame_container, DocumentationFragment.newInstance());
+                        } else if (ident == FRAGMENT_USERS) {
+                            currentFragment = FRAGMENT_USERS;
+                            tr.replace(R.id.frame_container, UserInfoFragment.newInstance());
+                        } else if (ident == FRAGMENT_SERVICE) {
+                            currentFragment = FRAGMENT_SERVICE;
+                            tr.replace(R.id.frame_container, ServiceFragment.newInstance());
+                        } else if (ident == FRAGMENT_OBJECTS) {
+                            currentFragment = FRAGMENT_OBJECTS;
+                            tr.replace(R.id.frame_container, ObjectFragment.newInstance());
+                        } else if (ident == FRAGMENT_DEFECTS) {
+                            currentFragment = FRAGMENT_DEFECTS;
+                            tr.replace(R.id.frame_container, DefectsFragment.newInstance());
+                        } else if (ident == FRAGMENT_CONTRAGENTS) {
+                            currentFragment = FRAGMENT_CONTRAGENTS;
+                            tr.replace(R.id.frame_container, ContragentsFragment.newInstance());
+                        } else if (ident == FRAGMENT_CALENDAR) {
+                            currentFragment = FRAGMENT_CALENDAR;
+                            tr.replace(R.id.frame_container, CalendarFragment.newInstance());
+                        } else if (ident == FRAGMENT_MESSAGES) {
+                            currentFragment = FRAGMENT_MESSAGES;
+                            tr.replace(R.id.frame_container, MessageFragment.newInstance());
+                        } else if (ident == DRAWER_INFO) {
+                            startAboutDialog();
+                        } else if (ident == DRAWER_EXIT) {
+                            System.exit(0);
                         }
-
+                        tr.commit();
+                    }
                     return false;
                 })
                 .withSavedInstance(savedInstanceState)

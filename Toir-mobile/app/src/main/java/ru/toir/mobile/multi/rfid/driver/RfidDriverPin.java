@@ -29,9 +29,9 @@ import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 
 /**
  * @author Dmitriy Logachev
- *         <p>
- *         Драйвер считывателя RFID который "считывает" логин и PIN код.
- *         </p>
+ * <p>
+ * Драйвер считывателя RFID который "считывает" логин и PIN код.
+ * </p>
  */
 @SuppressWarnings("unused")
 public class RfidDriverPin extends RfidDriverBase implements IRfidDriver {

@@ -92,11 +92,14 @@ public class MessageInfoActivity extends AppCompatActivity {
         }
 
         userFrom.setText(message.getFromUser().getName());
-        String path = context.getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
+        AuthorizedUser authUser = AuthorizedUser.getInstance();
+        String path = message.getFromUser().getImageFilePath(authUser.getDbName()) + "/";
         Bitmap user_bitmap = getResizedBitmap(path,
                 message.getFromUser().getImage(), 0, 70,
                 message.getFromUser().getChangedAt().getTime());
-        image.setImageBitmap(user_bitmap);
+        if (user_bitmap != null) {
+            image.setImageBitmap(user_bitmap);
+        }
         text.setText(message.getText());
         String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(message.getDate());
         date.setText(sDate);

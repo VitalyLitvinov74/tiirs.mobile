@@ -38,6 +38,7 @@ import ru.toir.mobile.multi.db.realm.IToirDbObject;
 import ru.toir.mobile.multi.db.realm.Instruction;
 import ru.toir.mobile.multi.db.realm.InstructionStageTemplate;
 import ru.toir.mobile.multi.db.realm.MediaFile;
+import ru.toir.mobile.multi.db.realm.Message;
 import ru.toir.mobile.multi.db.realm.Objects;
 import ru.toir.mobile.multi.db.realm.Operation;
 import ru.toir.mobile.multi.db.realm.OperationTemplate;
@@ -172,7 +173,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 realm.commitTransaction();
                 realm.close();
 
-                ReferenceUpdate.saveReferenceData("Defect", new Date());
+                //ReferenceUpdate.saveReferenceData("Defect", new Date());
 
                 Intent intent = new Intent(dialog.getContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -226,6 +227,44 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
             e.printStackTrace();
             message = "Exception";
             return null;
+        }
+
+        // получаем сообщения
+        changedDate = ReferenceUpdate.lastChangedAsStr(Message.class.getSimpleName());
+        Call<List<Message>> messageCall = ToirAPIFactory.getMessageService().get(changedDate);
+        try {
+            retrofit2.Response<List<Message>> r = messageCall.execute();
+            List<Message> list = r.body();
+            if (list != null && list.size() > 0) {
+                // сохраняем атрибуты
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(list);
+                realm.commitTransaction();
+                realm.close();
+                ReferenceUpdate.saveReferenceData("Message", new Date());
+
+                Intent intent = new Intent(dialog.getContext(), MainActivity.class);
+                intent.putExtra("action", "messageFragment");
+                intent.putExtra("count", list.size());
+                NotificationManager notificationManager = (NotificationManager) dialog.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+                NotificationCompat.Builder nb = new NotificationCompat.Builder(dialog.getContext(), "toir")
+                        .setSmallIcon(R.drawable.toir_notify)
+                        .setAutoCancel(true)
+                        .setTicker("Получены новые сообщения")
+                        .setContentText("Получено " + list.size() + " сообщений")
+                        .setContentIntent(PendingIntent.getActivity(dialog.getContext(),
+                                0, intent, PendingIntent.FLAG_CANCEL_CURRENT))
+                        .setWhen(System.currentTimeMillis())
+                        .setContentTitle("Тоирус")
+                        .setDefaults(NotificationCompat.DEFAULT_ALL);
+                if (notificationManager != null)
+                    notificationManager.notify(1, nb.build());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка при получении сообщений.");
+            e.printStackTrace();
         }
 
         // запрашиваем наряды

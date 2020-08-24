@@ -75,7 +75,6 @@ public class GetToken extends BroadcastReceiver {
                         authUser.setDbName(token.getDb());
                         authUser.setLogin(token.getLogin());
                         authUser.setServerLogged(true);
-                        authUser.setLocalLogged(true);
 
                         // создаём локальную связь пользователя с базой
                         HashMap<String, String> usersDbLinks = User.getUsersDbLinks(context);
@@ -86,7 +85,7 @@ public class GetToken extends BroadcastReceiver {
                         if (!authUser.isLocalLogged()) {
                             ToirRealm.initDb(context, token.getDb());
                         }
-
+                        authUser.setLocalLogged(true);
                         Toast.makeText(context, context.getString(R.string.toast_token_received),
                                 Toast.LENGTH_SHORT).show();
 

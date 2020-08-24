@@ -10,15 +10,13 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import io.realm.RealmBaseAdapter;
-import io.realm.RealmList;
 import io.realm.RealmResults;
+import ru.toir.mobile.multi.AuthorizedUser;
 import ru.toir.mobile.multi.R;
-import ru.toir.mobile.multi.db.realm.User;
 import ru.toir.mobile.multi.db.realm.Message;
 
 import static ru.toir.mobile.multi.utils.RoundedImageView.getResizedBitmap;
@@ -71,11 +69,14 @@ public class MessageAdapter extends RealmBaseAdapter<Message> implements ListAda
             message = adapterData.get(position);
             if (message != null) {
                 viewHolder.user.setText(message.getFromUser().getName());
-                String path = context.getExternalFilesDir("/" + User.getImageRoot()) + File.separator;
+                AuthorizedUser authUser = AuthorizedUser.getInstance();
+                String path = message.getFromUser().getImageFilePath(authUser.getDbName()) + "/";
                 Bitmap user_bitmap = getResizedBitmap(path,
                         message.getFromUser().getImage(), 0, 70,
                         message.getFromUser().getChangedAt().getTime());
-                viewHolder.avatar.setImageBitmap(user_bitmap);
+                if (user_bitmap != null) {
+                    viewHolder.avatar.setImageBitmap(user_bitmap);
+                }
                 viewHolder.text.setText(message.getText());
                 String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(message.getDate());
                 viewHolder.date.setText(sDate);
