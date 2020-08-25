@@ -319,7 +319,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.EventListene
             if (bundle != null) {
                 Long daySelectedLong = bundle.getLong("dateSelected");
                 if (daySelectedLong > 0) {
-                    Long daySelectedEnd = daySelectedLong + 24 * 3600;
+                    Long daySelectedEnd = daySelectedLong + 24 * 3600 * 1000;
                     query.greaterThanOrEqualTo("startDate", new Date(daySelectedLong));
                     query.lessThan("startDate", new Date(daySelectedEnd));
                 }

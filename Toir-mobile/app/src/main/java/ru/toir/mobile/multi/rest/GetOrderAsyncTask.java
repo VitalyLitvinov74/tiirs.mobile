@@ -643,9 +643,12 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                     if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.NEW)) {
                         uuids.add(order.getUuid());
                         // устанавливаем статус "В работе"
-                        OrderStatus inWorkStatus = realm.where(OrderStatus.class)
-                                .equalTo("uuid", OrderStatus.Status.IN_WORK).findFirst();
-                        order.setOrderStatus(inWorkStatus);
+                        // 25.08.2020 но только если дата уже наступила
+                        if (order.getStartDate().before(new Date())) {
+                            OrderStatus inWorkStatus = realm.where(OrderStatus.class)
+                                    .equalTo("uuid", OrderStatus.Status.IN_WORK).findFirst();
+                            order.setOrderStatus(inWorkStatus);
+                        }
                     }
                 }
 

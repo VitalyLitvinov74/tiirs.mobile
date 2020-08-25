@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,10 +17,12 @@ import android.widget.ListView;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateLongClickListener;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SELECTION_MODE_NONE;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -38,6 +39,7 @@ public class CalendarFragment extends Fragment {
     private Realm realmDB;
     private Context mainActivityConnector = null;
     private ListView ordersListView;
+    private OrderAdapter orderAdapter;
 
     public static CalendarFragment newInstance() {
         return new CalendarFragment();
@@ -67,21 +69,23 @@ public class CalendarFragment extends Fragment {
         realmDB = Realm.getDefaultInstance();
 
         ordersListView = rootView.findViewById(R.id.trainings_listView);
-        ordersListView.setOnItemClickListener(new ListviewClickListener());
+        ordersListView.setOnItemClickListener(new ListViewClickListener());
 
         //onDateLongClickListener
-        simpleCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                Fragment fr = OrderFragment.newInstance();
-                Bundle bundle = new Bundle();
-                bundle.putLong("dateSelected", date.getDate().getTime());
-                fr.setArguments(bundle);
-                FragmentTransaction fragmentTransaction = getActivity()
-                        .getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame_container, fr);
-                fragmentTransaction.commit();
-            }
+        simpleCalendarView.setOnDateLongClickListener((OnDateLongClickListener) (widget, date) -> {
+            Fragment fr = OrderFragment.newInstance();
+            Bundle bundle = new Bundle();
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(date.getDate().getTime());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            bundle.putLong("dateSelected", cal.getTimeInMillis());
+            fr.setArguments(bundle);
+            FragmentTransaction fragmentTransaction = getActivity()
+                    .getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame_container, fr);
+            fragmentTransaction.commit();
         });
 
         initView();
@@ -98,7 +102,7 @@ public class CalendarFragment extends Fragment {
 
     private void FillListViewOrders() {
         RealmResults<Orders> orders = realmDB.where(Orders.class).findAll();
-        OrderAdapter orderAdapter = new OrderAdapter(orders, getContext(), null);
+        orderAdapter = new OrderAdapter(orders, getContext(), null);
         ordersListView.setAdapter(orderAdapter);
         Date orderDate;
         simpleCalendarView.setDateSelected(new Date(), true);
@@ -112,7 +116,7 @@ public class CalendarFragment extends Fragment {
                 simpleCalendarView.addDecorator(new OneDayDecorator(R.color.gray, orderDate));
             }
             if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.IN_WORK)) {
-                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.larisaBlueColor, orderDate));
+                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.md_yellow_600, orderDate));
             }
         }
     }
@@ -140,13 +144,29 @@ public class CalendarFragment extends Fragment {
             onDestroyView();
     }
 
-    private class ListviewClickListener implements
-            AdapterView.OnItemClickListener {
+    /*
+        private class ListviewClickListener implements
+                AdapterView.OnItemClickListener {
 
+            @Override
+            public void onItemClick(AdapterView<?> parentView,
+                                    View selectedItemView, int position, long id) {
+                Orders order = (Orders) parentView.getItemAtPosition(position);
+                if (order != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("uuid", order.getUuid());
+                    OrderFragment orderFragment = OrderFragment.newInstance();
+                    orderFragment.setArguments(bundle);
+                    ((MainActivity) mainActivityConnector).getSupportFragmentManager().beginTransaction().
+                            replace(R.id.frame_container, orderFragment).commit();
+                }
+            }
+        }
+    */
+    private class ListViewClickListener implements AdapterView.OnItemClickListener {
         @Override
-        public void onItemClick(AdapterView<?> parentView,
-                                View selectedItemView, int position, long id) {
-            Orders order = (Orders) parentView.getItemAtPosition(position);
+        public void onItemClick(final AdapterView<?> parent, View selectedItemView, final int position, long id) {
+            Orders order = orderAdapter.getItem(position);
             if (order != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString("uuid", order.getUuid());
@@ -157,5 +177,4 @@ public class CalendarFragment extends Fragment {
             }
         }
     }
-
 }

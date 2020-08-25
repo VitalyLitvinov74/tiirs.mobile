@@ -142,7 +142,9 @@ public class OrderAdapter extends RealmBaseAdapter<Orders> implements ListAdapte
                 viewHolder.order_row.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        listener.checkClickItem(position);
+                        if (listener != null) {
+                            listener.checkClickItem(position);
+                        }
                     }
                 });
                 viewHolder.order_option.setOnClickListener(new View.OnClickListener() {
