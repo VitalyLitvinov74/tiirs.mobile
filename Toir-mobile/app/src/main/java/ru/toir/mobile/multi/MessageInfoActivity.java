@@ -33,6 +33,8 @@ public class MessageInfoActivity extends AppCompatActivity {
     private ListViewClickListener mainListViewClickListener = new ListViewClickListener();
     private ImageView image;
     private TextView userFrom;
+    private TextView request;
+    private TextView userTo;
     private TextView date;
     private TextView text;
     private Button accept;
@@ -64,9 +66,11 @@ public class MessageInfoActivity extends AppCompatActivity {
 
         image = findViewById(R.id.user_image);
         userFrom = findViewById(R.id.user_from);
+        userTo = findViewById(R.id.user_to);
         date = findViewById(R.id.date);
         text = findViewById(R.id.text);
         accept = findViewById(R.id.request);
+        request = findViewById(R.id.request_message);
 
         initView();
     }
@@ -92,6 +96,7 @@ public class MessageInfoActivity extends AppCompatActivity {
         }
 
         userFrom.setText(message.getFromUser().getName());
+        userTo.setText(message.getToUser().getName());
         AuthorizedUser authUser = AuthorizedUser.getInstance();
         String path = message.getFromUser().getImageFilePath(authUser.getDbName()) + "/";
         Bitmap user_bitmap = getResizedBitmap(path,
@@ -103,15 +108,9 @@ public class MessageInfoActivity extends AppCompatActivity {
         text.setText(message.getText());
         String sDate = new SimpleDateFormat("dd.MM.yyyy HH:ss", Locale.US).format(message.getDate());
         date.setText(sDate);
-        if (message.getStatus() == Message.Status.MESSAGE_READ) {
-            userFrom.setTypeface(null, Typeface.NORMAL);
-            text.setTypeface(null, Typeface.NORMAL);
-        } else {
-            userFrom.setTypeface(null, Typeface.BOLD);
-            text.setTypeface(null, Typeface.BOLD);
-        }
         if (message.getRequestStatus() == -1) {
             accept.setVisibility(View.GONE);
+            request.setVisibility(View.GONE);
         }
         if (message.getRequestStatus() == 0) {
             accept.setVisibility(View.VISIBLE);
@@ -131,6 +130,12 @@ public class MessageInfoActivity extends AppCompatActivity {
             accept.setVisibility(View.VISIBLE);
             accept.setText(R.string.accepted);
             accept.setBackgroundColor(getResources().getColor(R.color.green));
+        }
+        if (message.getStatus() == Message.Status.MESSAGE_NEW) {
+            realmDB.beginTransaction();
+            message.setStatus(Message.Status.MESSAGE_READ);
+            message.setChangedAt(new Date());
+            realmDB.commitTransaction();
         }
     }
 

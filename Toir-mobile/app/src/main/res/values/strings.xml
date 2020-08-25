@@ -324,4 +324,8 @@
     <string name="menu_all">Все</string>
     <string name="accept_request">Согласовать</string>
     <string name="accepted">Согласовано</string>
+
+    <string name="from">От: </string>
+    <string name="to">Кому: </string>
+    <string name="request">Заявка</string>
 </resources>

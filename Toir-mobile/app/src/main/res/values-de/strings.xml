@@ -322,4 +322,8 @@
     <string name="menu_all">Alles</string>
     <string name="accept_request">Vereinbaren</string>
     <string name="accepted">Einverstanden</string>
+
+    <string name="from">Von: </string>
+    <string name="to">Zu: </string>
+    <string name="request">Request</string>
 </resources>

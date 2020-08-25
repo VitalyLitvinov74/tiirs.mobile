@@ -326,4 +326,8 @@
     <string name="menu_all">All</string>
     <string name="accept_request">Accept Request</string>
     <string name="accepted">Accepted</string>
+
+    <string name="from">From: </string>
+    <string name="to">To: </string>
+    <string name="request">Request</string>
 </resources>
