@@ -297,10 +297,13 @@ public class GetOrdersService extends Service {
                                     url, basePathLocal));
                         }
 
+                        String fileName;
+
                         // урл изображения оборудования
                         Equipment equipment = stage.getEquipment();
                         basePathLocal = equipment.getImageFilePath(authUser.getDbName()) + "/";
-                        if (!equipment.getImageFileName().equals("")) {
+                        fileName = equipment.getImageFileName();
+                        if (fileName != null && !fileName.equals("")) {
                             isNeedDownload = isNeedDownload(extDir, equipment, basePathLocal);
                             if (isNeedDownload) {
                                 String url = equipment.getImageFileUrl(userName) + "/";
@@ -312,7 +315,8 @@ public class GetOrdersService extends Service {
                         // урл изображения модели оборудования
                         EquipmentModel equipmentModel = stage.getEquipment().getEquipmentModel();
                         basePathLocal = equipmentModel.getImageFilePath(authUser.getDbName()) + "/";
-                        if (!equipmentModel.getImageFileName().equals("")) {
+                        fileName = equipmentModel.getImageFileName();
+                        if (fileName != null && !fileName.equals("")) {
                             isNeedDownload = isNeedDownload(extDir, equipmentModel, basePathLocal);
                             if (isNeedDownload) {
                                 String url = equipmentModel.getImageFileUrl(userName) + "/";
