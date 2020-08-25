@@ -3,7 +3,6 @@ package ru.toir.mobile.multi;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,14 +13,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
 import ru.toir.mobile.multi.db.realm.Message;
-import ru.toir.mobile.multi.db.realm.User;
 
 import static ru.toir.mobile.multi.utils.RoundedImageView.getResizedBitmap;
 

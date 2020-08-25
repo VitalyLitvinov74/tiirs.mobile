@@ -105,13 +105,13 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:layout_toEndOf="@+id/user_image"
-            android:background="@drawable/rounded_badge_green"
+            android:background="@drawable/rounded_badge_blue"
             android:gravity="start"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/request"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/larisaTextColorBlack"
+            android:textColor="@color/larisaTextColorAWhite"
             android:textSize="14sp" />
 
         <!--
@@ -143,6 +143,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/text"
             android:text="@string/accept_request"
+            android:background="@color/larisaBlueColor"
             android:textColor="@color/larisaTextColorAWhite" />
 
     </RelativeLayout>

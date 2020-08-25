@@ -116,8 +116,7 @@ public class GetOrdersService extends Service {
                     realm.copyToRealmOrUpdate(list);
                     realm.commitTransaction();
                     realm.close();
-                    // TODO наверное нужно убрать, не помню зачем поставил
-                    //ReferenceUpdate.saveReferenceData("Defect", new Date());
+                    ReferenceUpdate.saveReferenceData("Defect", new Date());
 
                     Intent intent = new Intent(context, MainActivity.class);
                     intent.putExtra("action", "defectFragment");

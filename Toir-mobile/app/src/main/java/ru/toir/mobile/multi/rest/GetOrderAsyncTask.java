@@ -173,7 +173,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 realm.commitTransaction();
                 realm.close();
 
-                //ReferenceUpdate.saveReferenceData("Defect", new Date());
+                ReferenceUpdate.saveReferenceData("Defect", new Date());
 
                 Intent intent = new Intent(dialog.getContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
