@@ -25,14 +25,18 @@
         <item name="windowActionModeOverlay">true</item>
 	    <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
 	    <item name="android:windowActionBarOverlay">true</item>
-        <item name="colorControlNormal">@color/larisaBlueColor</item>
+        <item name="colorControlNormal">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="popupMenuStyle">@style/popupMenuStyle</item>
         <item name="android:actionMenuTextAppearance">@style/popupMenuStyle</item>
     </style>
 
-    <style name="PreferenceScreen" parent="CustomTheme">
+    <style name="CustomPrefsTheme" parent="CustomTheme">
+        <item name="colorControlNormal">@color/larisaBlueColor</item>
+    </style>
+
+    <style name="PreferenceScreen" parent="CustomPrefsTheme">
         <item name="android:textColor">@color/larisaTextColorABlack</item>
         <item name="colorControlNormal">@color/larisaBlueColor</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
@@ -40,7 +44,7 @@
         <item name="android:textColorSecondary">@color/larisaBlueColor</item>
     </style>
 
-    <style name="PreferenceCategory" parent="CustomTheme">
+    <style name="PreferenceCategory" parent="CustomPrefsTheme">
         <item name="android:textColor">@color/larisaTextColorABlack</item>
     </style>
 
