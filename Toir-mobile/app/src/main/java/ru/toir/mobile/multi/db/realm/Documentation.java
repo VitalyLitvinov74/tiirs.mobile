@@ -109,7 +109,11 @@ public class Documentation extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileName() {
-        return path;
+        if(path == null) {
+            return "";
+        } else {
+            return path;
+        }
     }
 
     @Override

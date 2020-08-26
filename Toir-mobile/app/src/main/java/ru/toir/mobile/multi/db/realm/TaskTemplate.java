@@ -102,7 +102,11 @@ public class TaskTemplate extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileName() {
-        return image;
+        if(image == null) {
+            return "";
+        } else {
+            return image;
+        }
     }
 
     @Override

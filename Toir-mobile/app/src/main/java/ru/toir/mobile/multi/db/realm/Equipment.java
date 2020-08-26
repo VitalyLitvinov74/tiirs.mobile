@@ -173,7 +173,11 @@ public class Equipment extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileName() {
-        return image;
+        if(image == null) {
+            return "";
+        } else {
+            return image;
+        }
     }
 
     @Override
@@ -192,7 +196,7 @@ public class Equipment extends RealmObject implements IToirDbObject {
         String dir = null;
         String dbName = AuthorizedUser.getInstance().getDbName();
 
-        if (image != null && !image.equals("")) {
+        if (!image.equals("")) {
             dir = getImageFilePath(dbName);
         } else {
             String modelImage = equipmentModel.getImageFileName();
@@ -207,11 +211,11 @@ public class Equipment extends RealmObject implements IToirDbObject {
     public String getAnyImage() {
         String file = null;
 
-        if (image != null && !image.equals("")) {
+        if (!image.equals("")) {
             file = image;
         } else {
             String modelImage = equipmentModel.getImageFileName();
-            if (modelImage != null && !modelImage.equals("")) {
+            if (!modelImage.equals("")) {
                 file = equipmentModel.getImageFileName();
             }
         }

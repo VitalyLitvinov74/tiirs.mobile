@@ -107,7 +107,11 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
 
     @Override
     public String getImageFileName() {
-        return fileName;
+        if(fileName == null) {
+            return "";
+        } else {
+            return fileName;
+        }
     }
 
     @Override

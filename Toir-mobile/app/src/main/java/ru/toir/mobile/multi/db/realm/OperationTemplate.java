@@ -103,7 +103,11 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileName() {
-        return image;
+        if(image == null) {
+            return "";
+        } else {
+            return image;
+        }
     }
 
     public RealmList<OperationTool> getOperationTools() {
