@@ -1,6 +1,11 @@
 package ru.toir.mobile.multi.utils;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
@@ -8,14 +13,16 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
 import java.util.Date;
 
+import ru.toir.mobile.multi.R;
+
 public class OneDayDecorator implements DayViewDecorator {
 
     private Date date;
-    private int color;
+    private Drawable drawable;
 
-    public OneDayDecorator(int color, Date date) {
-        this.color = color;
+    public OneDayDecorator(Date date, Drawable drawable) {
         this.date = date;
+        this.drawable = drawable;
     }
 
     @Override
@@ -25,6 +32,7 @@ public class OneDayDecorator implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
-        view.addSpan(new ForegroundColorSpan(color));
+        view.setSelectionDrawable(drawable);
+        //view.setBackgroundDrawable(drawable);
     }
 }

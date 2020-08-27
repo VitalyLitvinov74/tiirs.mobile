@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -108,15 +109,21 @@ public class CalendarFragment extends Fragment {
         simpleCalendarView.setDateSelected(new Date(), true);
         for (Orders order : orders) {
             orderDate = order.getStartDate();
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(orderDate.getTime());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            orderDate = cal.getTime();
             simpleCalendarView.setDateSelected(orderDate, true);
             if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.COMPLETE)) {
-                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.green, orderDate));
+                simpleCalendarView.addDecorator(new OneDayDecorator(orderDate, ContextCompat.getDrawable(mainActivityConnector, R.drawable.order_complete)));
             }
             if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.NEW)) {
-                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.gray, orderDate));
+                simpleCalendarView.addDecorator(new OneDayDecorator(orderDate, ContextCompat.getDrawable(mainActivityConnector, R.drawable.order_new)));
             }
             if (order.getOrderStatus().getUuid().equals(OrderStatus.Status.IN_WORK)) {
-                simpleCalendarView.addDecorator(new OneDayDecorator(R.color.md_yellow_600, orderDate));
+                simpleCalendarView.addDecorator(new OneDayDecorator(orderDate, ContextCompat.getDrawable(mainActivityConnector, R.drawable.order_progress)));
             }
         }
     }
