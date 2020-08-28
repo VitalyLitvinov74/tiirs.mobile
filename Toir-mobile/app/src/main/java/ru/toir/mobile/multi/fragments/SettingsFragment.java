@@ -42,6 +42,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import ru.toir.mobile.multi.BuildConfig;
 import ru.toir.mobile.multi.MainActivity;
@@ -69,6 +70,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         addPreferencesFromResource(R.xml.pref_general);
 
         mainActivityConnector = getActivity();
+        // Set custom style for FragmentTransaction
+        Objects.requireNonNull(getContext()).getTheme().applyStyle(R.style.CustomPrefsTheme, true);
         if (mainActivityConnector == null)
             return;
 
