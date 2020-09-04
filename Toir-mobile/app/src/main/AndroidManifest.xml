@@ -82,6 +82,7 @@
         <activity
             android:name=".PrefsActivity"
             android:label="@string/app_name"
+            android:theme="@style/CustomPrefsTheme"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

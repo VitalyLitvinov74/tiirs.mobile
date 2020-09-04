@@ -87,7 +87,11 @@ public class CommonFile extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileName() {
-        return name;
+        if(name == null) {
+            return "";
+        } else {
+            return name;
+        }
     }
 
     @Override

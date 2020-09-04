@@ -118,7 +118,11 @@ public class Objects extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileName() {
-        return photo;
+        if(photo == null) {
+            return "";
+        } else {
+            return photo;
+        }
     }
 
     @Override

@@ -19,7 +19,7 @@ android {
             minSdkVersion 17
             targetSdkVersion 27
             versionCode code
-            //multiDexEnabled true
+            multiDexEnabled true
             versionName "${versionMajor}.${versionMinor}." + String.format("%03d", code)
             signingConfig signingConfigs.debug
         }

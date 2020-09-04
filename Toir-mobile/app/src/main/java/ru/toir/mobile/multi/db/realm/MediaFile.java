@@ -111,7 +111,11 @@ public class MediaFile extends RealmObject implements IToirDbObject, ISend {
 
     @Override
     public String getImageFileName() {
-        return name;
+        if(name == null) {
+            return "";
+        } else {
+            return name;
+        }
     }
 
     @Override
