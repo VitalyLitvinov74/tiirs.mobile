@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".DefectInfoActivity"
+    tools:ignore="RtlSymmetry">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/larisaBlueColor"
+        android:gravity="top"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/larisaTextColorAWhite"
+        android:scrollbars="vertical">
+
+        <RelativeLayout
+            android:id="@+id/defect_info_common"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/defect_media"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/defect_image"
+                    android:layout_width="fill_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="top"
+                    android:contentDescription="@string/image_description"
+                    android:src="@drawable/no_image"
+                    android:visibility="gone" />
+
+                <VideoView
+                    android:id="@+id/defect_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="top|center" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/defect_text_name"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:layout_below="@+id/defect_media"
+                android:adjustViewBounds="true"
+                android:background="@color/larisaBlueColor"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:scaleType="centerCrop"
+                android:textColor="@color/larisaWhiteColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/defect_text_type"
+                android:layout_width="fill_parent"
+                android:layout_height="30dp"
+                android:layout_below="@+id/defect_text_name"
+                android:adjustViewBounds="true"
+                android:background="@color/larisaBlueColor"
+                android:paddingBottom="10dp"
+                android:paddingStart="15dp"
+                android:scaleType="centerCrop"
+                android:textColor="@color/larisaWhiteColor"
+                android:textSize="16sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_id_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/defect_text_type"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tags"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_uuid"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_type"
+                android:layout_toEndOf="@+id/equipment_id_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_id"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_uuid"
+                android:layout_toEndOf="@+id/equipment_id_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/equipment_title"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/defect_user_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_id"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_user"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/defect_user_name"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_id"
+                android:layout_toEndOf="@+id/defect_user_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/defect_text_user_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_user_name"
+                android:layout_toEndOf="@+id/defect_user_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/defect_user"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/defect_date_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/defect_text_user_label"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_calendar"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/defect_text_date"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_user_label"
+                android:layout_toEndOf="@+id/defect_date_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/defect_text_date_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_date"
+                android:layout_toEndOf="@+id/defect_date_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/defect_date"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/defect_status_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/defect_text_date_label"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tools"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/defect_text_status"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_date_label"
+                android:layout_toEndOf="@+id/defect_status_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/defect_text_status_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_status"
+                android:layout_toEndOf="@+id/defect_status_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/current_status"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/defect_level_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/defect_status_icon"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_exclamation"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/defect_text_level"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_status_label"
+                android:layout_toEndOf="@+id/defect_level_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/defect_text_level_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/defect_text_level"
+                android:layout_toEndOf="@+id/defect_level_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/defect_level"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/defect_comment"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/defect_text_level_label"
+                android:background="@color/larisaTextColorAWhite"
+                android:minLines="3"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_goto_equipment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="5dp"
+        android:src="@drawable/ic_info"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="5dp"
+        android:src="@android:drawable/ic_menu_camera"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="150dp"
+        android:layout_marginEnd="5dp"
+        android:src="@android:drawable/ic_media_play"
+        app:backgroundTint="@color/colorPrimary"
+        app:fabSize="normal" />
+
+</android.support.design.widget.CoordinatorLayout>

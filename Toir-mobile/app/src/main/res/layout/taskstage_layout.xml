@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tl_Header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dip"
+            android:background="@color/larisaBlueColor"
+            android:gravity="center_vertical"
+            android:paddingStart="5dip"
+            android:text="@string/description"
+            android:textColor="@color/larisaWhiteColor"
+            android:textSize="16sp" />
+
+        <ListView
+            android:id="@+id/tsl_taskstage_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+
+</LinearLayout>

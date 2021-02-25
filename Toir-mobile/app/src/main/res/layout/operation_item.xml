@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/operation_linear_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/operation_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:theme="@style/checkBoxStyle" />
+
+        <ImageView
+            android:id="@+id/operation_verdict"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/image_description"
+            android:src="@drawable/status_mod_receive" />
+
+        <RelativeLayout
+            android:id="@+id/operation_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/operation_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text=""
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/operation_startDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/operation_title"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:text=""
+                android:textColor="#333333"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/operation_divider"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/operation_title"
+                android:layout_marginTop="0dip"
+                android:layout_toEndOf="@id/operation_startDate"
+                android:background="#FAFAFA"
+                android:text="@string/tire"
+                android:textColor="#454545"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/operation_endDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/operation_title"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/operation_divider"
+                android:text=""
+                android:textColor="#333333"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/operation_option"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.1"
+            android:gravity="center_vertical"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp">
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/options"
+                android:layout_width="20dp"
+                android:layout_height="25dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_menu"
+                android:textColor="@color/larisaTextColorABlack"
+                android:textSize="18sp" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/operation_description_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageViewOperation"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical"
+            android:src="@color/colorPrimary"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/op_description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewOperation"
+            android:gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#222222"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/op_normative_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/op_description"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewOperation"
+            android:text="@string/normative"
+            android:textColor="#222222"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/op_normative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/op_description"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_normative_label"
+            android:textColor="#454545"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/op_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/op_normative_label"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewOperation"
+            android:text="@string/operation_time"
+            android:textColor="#222222"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/op_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/op_normative"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_time_label"
+            android:textColor="#454545"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/op_measure_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/op_time_label"
+            android:layout_marginStart="5dp"
+            android:text="@string/measure_label"
+            android:textColor="#222222"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/op_measure_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/op_time_label"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/op_measure_label"
+            android:textColor="#454545"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:id="@+id/twf_resultButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical"></LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>

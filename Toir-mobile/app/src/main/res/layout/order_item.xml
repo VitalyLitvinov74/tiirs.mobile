@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:clickable="false"
+    android:orientation="horizontal"
+    android:padding="6dip">
+
+    <RelativeLayout
+        android:id="@+id/order_row"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_marginEnd="10dp"
+        android:layout_weight="0.9">
+
+        <ImageView
+            android:id="@+id/order_ImageStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_marginEnd="6dip"
+            android:contentDescription="@string/image_description"
+            android:src="@drawable/status_easy_receive" />
+
+        <TextView
+            android:id="@+id/order_Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_toEndOf="@id/order_ImageStatus"
+            android:background="@color/larisaTextColorAWhite"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="@string/description"
+            android:textColor="#454545"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/order_Create"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/order_Name"
+            android:layout_marginTop="5dip"
+            android:layout_toEndOf="@id/order_ImageStatus"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/description"
+            android:textColor="#454545"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/order_status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/order_Name"
+            android:layout_marginStart="10dip"
+            android:layout_marginTop="5dip"
+            android:layout_toEndOf="@id/order_Create"
+            android:background="@color/larisaTextColorAWhite"
+            android:ellipsize="marquee"
+            android:text="@string/description"
+            android:textColor="#454545"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/order_option"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.1"
+        android:gravity="center_vertical"
+        android:paddingEnd="5dp"
+        android:paddingStart="5dp">
+
+        <ru.toir.mobile.multi.utils.IconTextView
+            android:id="@+id/options"
+            android:layout_width="20dp"
+            android:layout_height="25dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="@string/icon_menu"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+</LinearLayout>

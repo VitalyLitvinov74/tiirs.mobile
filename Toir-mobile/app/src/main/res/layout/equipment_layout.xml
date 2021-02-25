@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".EquipmentInfoActivity"
+    tools:ignore="RtlSymmetry">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/larisaBlueColor"
+        android:gravity="top"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/larisaTextColorAWhite"
+        android:scrollbars="vertical">
+
+        <RelativeLayout
+            android:id="@+id/equipment_info_common"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/equipment_image"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="top"
+                android:contentDescription="@string/image_description"
+                android:src="@drawable/no_image" />
+
+            <TextView
+                android:id="@+id/equipment_text_name"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:layout_below="@+id/equipment_image"
+                android:adjustViewBounds="true"
+                android:background="@color/larisaBlueColor"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:scaleType="centerCrop"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_model"
+                android:layout_width="fill_parent"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_text_name"
+                android:adjustViewBounds="true"
+                android:background="@color/larisaBlueColor"
+                android:paddingBottom="10dp"
+                android:paddingStart="15dp"
+                android:scaleType="centerCrop"
+                android:textColor="#ffffff"
+                android:textSize="16sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_id_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_model"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tags"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_uuid"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_model"
+                android:layout_toEndOf="@+id/equipment_id_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_inventory"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_uuid"
+                android:layout_toEndOf="@+id/equipment_id_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_location_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_inventory"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_map_marker"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_location"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_inventory"
+                android:layout_toEndOf="@+id/equipment_location_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_location_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_location"
+                android:layout_toEndOf="@+id/equipment_location_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/menu_equipment_map"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_date_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_location_label"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tools"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_serial"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_location_label"
+                android:layout_toEndOf="@+id/equipment_date_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_date_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_serial"
+                android:layout_toEndOf="@+id/equipment_date_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/serial_number"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_status_icon"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/equipment_text_date_label"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_cogs"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_status"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_date_label"
+                android:layout_toEndOf="@+id/equipment_status_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:textColor="@color/larisaTextColorBlack"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_status_label"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/equipment_text_status"
+                android:layout_toEndOf="@+id/equipment_status_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:paddingStart="10dp"
+                android:text="@string/current_status"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="14sp" />
+
+            <View
+                android:id="@+id/equipment_divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/equipment_text_status_label"
+                android:background="#777777" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_information_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_divider1"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_tools"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_operation_list"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_divider1"
+                android:layout_marginEnd="15dp"
+                android:layout_toEndOf="@+id/equipment_information_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:text="@string/operation_list"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="16sp" />
+
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_operation_list"
+                android:layout_marginBottom="10dp"
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp" />
+
+            <View
+                android:id="@+id/equipment_divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/list_view"
+                android:background="#777777" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_documentation_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_divider2"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_book"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_documentation"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_divider2"
+                android:layout_marginEnd="15dp"
+                android:layout_toEndOf="@+id/equipment_documentation_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:text="@string/documentation"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="16sp" />
+
+            <ListView
+                android:id="@+id/equipment_documentation_listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_documentation"
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp" />
+
+            <View
+                android:id="@+id/equipment_divider3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/equipment_documentation_listView"
+                android:background="#777777" />
+
+            <ru.toir.mobile.multi.utils.IconTextView
+                android:id="@+id/equipment_defects_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_divider3"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/icon_bell"
+                android:textColor="@color/larisaBlueColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/equipment_text_defects"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_below="@+id/equipment_divider3"
+                android:layout_toEndOf="@+id/equipment_defects_icon"
+                android:background="@color/larisaTextColorAWhite"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:text="@string/mistakes"
+                android:textColor="@color/larisaTextColor"
+                android:textSize="16sp" />
+
+            <ListView
+                android:id="@+id/equipment_defects_listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/equipment_text_defects"
+                android:divider="#333333"
+                android:dividerHeight="1px"
+                android:paddingBottom="10dp" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_defect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="5dp"
+        android:src="@android:drawable/ic_dialog_alert"
+        app:backgroundTint="@color/md_red_400"
+        app:fabSize="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_change_equipment_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="70dp"
+        android:layout_marginEnd="5dp"
+        android:src="@android:drawable/ic_menu_edit"
+        app:backgroundTint="@color/larisaBlueColor"
+        app:fabSize="normal" />
+
+    <!--
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_augmented_reality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="130dp"
+            android:src="@android:drawable/ic_menu_view"
+            app:backgroundTint="@color/larisaBlueColor"
+            app:fabSize="normal" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_read_tag_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="190dp"
+            android:src="@android:drawable/ic_input_get"
+            app:backgroundTint="@color/md_green_400"
+            app:fabSize="normal" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_chg_eq_tag_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="250dp"
+            android:src="@android:drawable/ic_menu_save"
+            app:backgroundTint="@color/larisaBlueColor"
+            app:fabSize="normal" />
+    -->
+
+</android.support.design.widget.CoordinatorLayout>

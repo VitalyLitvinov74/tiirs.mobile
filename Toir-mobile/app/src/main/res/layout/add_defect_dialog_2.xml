@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:id="@+id/defect_type_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/choose_defect_type"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/larisaTextColorABlack" />
+
+    <Spinner
+        android:id="@+id/spinner_defect_type"
+        style="@android:style/Widget.Holo.Light.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/defect_type_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/defect_level_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_defect_type"
+        android:text="@string/choose_defect_level"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/larisaTextColorABlack" />
+
+    <Spinner
+        android:id="@+id/spinner_defect_level"
+        style="@android:style/Widget.Holo.Light.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/defect_level_label"
+        android:layout_marginTop="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/equipment_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_defect_level"
+        android:text="@string/equipment_title"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/larisaTextColorABlack" />
+
+    <Spinner
+        android:id="@+id/spinner_equipment"
+        style="@android:style/Widget.Holo.Light.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/equipment_label"
+        android:layout_marginTop="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/add_new_comment_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_equipment"
+        android:text="@string/defect_description"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/larisaTextColorABlack" />
+
+    <EditText
+        android:id="@+id/add_new_comment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/add_new_comment_label"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:lines="5"
+        android:maxLines="5"
+        android:minLines="3"
+        android:paddingTop="20dp"
+        android:scrollbars="vertical" />
+
+</RelativeLayout>

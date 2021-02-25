@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ТОиРУС(m)</string>
+    <string name="action_settings">Настройки приложения</string>
+    <string name="action_about">О программе</string>
+    <string name="pleasePutTag">Поднесите метку</string>
+    <string name="readTag">Считать</string>
+    <string name="cancel">Отмена</string>
+    <string name="action_update">Обновить приложение</string>
+    <string name="pref_cat_main">Основные</string>
+    <string name="pref_cat_rfid">Настройки устройства</string>
+    <string name="pref_cat_show">Настройки отображения</string>
+    <string name="pref_debug_mode">Отладочный режим</string>
+    <string name="pref_autonome_mode">Работать автономно</string>
+    <string name="load_test_data">Загрузить тестовые данные</string>
+    <string name="delete_test_data">Удалить справочники</string>
+
+    <string name="pref_server_url">Сервер системы</string>
+    <string name="pref_server_url_dialog_title">Введите URL сервера системы</string>
+    <string name="pref_rfid_driver">Драйвер считывателя RFID (обор.)</string>
+    <string name="pref_login_rfid_driver">Драйвер считывателя RFID (вход)</string>
+    <string name="login">Войти</string>
+    <string name="init_success">Инициализация успешна</string>
+    <string name="init_fail">Инициализация неудачна</string>
+    <string name="find_fail">Метка не найдена</string>
+    <string name="read_fail">Чтение закончилось неудачей</string>
+    <string name="write_15693_fail">Запись закончилась неудачей</string>
+    <string name="write_15693_success">Запись успешна</string>
+    <string name="init">Инициализировать</string>
+    <string name="find">Найти</string>
+    <string name="read_15693">Считать метку</string>
+    <string name="write_15693">Записать метку</string>
+    <string name="serverUrl">serverUrl</string>
+    <string name="rfidDrvSettingKey">rfidDrvSettingKey</string>
+    <string name="references">Справочники</string>
+    <string name="get_task">Получить задание</string>
+    <string name="choose_tag">Выберите метку из меню</string>
+    <string name="back">Назад</string>
+    <string name="ok">ОК</string>
+    <string name="make_photo">Снять</string>
+    <string name="image_description">изображение</string>
+    <string name="description"> </string>
+    <string name="id">ID: %1$s</string>
+    <string name="whois">Должность</string>
+    <string name="current_location">Текущие координаты</string>
+    <string name="no_gps_data">Нет данных GPS</string>
+    <string name="current_status">Текущий статус</string>
+    <string name="operation_list">Список последних задач</string>
+    <string name="gps_status">Состояние GPS</string>
+    <string name="gprs_status">Связь GPRS</string>
+    <string name="server_date_connect">Дата связи с сервером</string>
+    <string name="tasks_quantity">Статистика заданий</string>
+    <string name="boss_contact">Контакт начальника</string>
+    <string name="type">Модель:</string>
+    <string name="service">Сервис:</string>
+    <string name="critical">Критичность:</string>
+    <string name="last_date">Дата обслуживания</string>
+    <string name="regular_date">Следующая поверка</string>
+    <string name="last_result">Результат обслуживания:</string>
+    <string name="documentation">Документация</string>
+    <string name="pleaseScanImg">Наведите камеру на код</string>
+    <string name="scan_process">Процесс сканирования</string>
+    <string name="empty"></string>
+    <string name="order_send_message">Отправить сообщение</string>
+    <string name="created">Создан: </string>
+    <string name="off">Отключен: </string>
+    <string name="status">Статус: %1$s</string>
+    <string name="closed">Закрыт: </string>
+    <string name="operation_status_title">Статус операции</string>
+    <string name="equipment_title">Оборудование:</string>
+    <string name="operation_title">Операция:</string>
+    <string name="status_title">Статус: </string>
+    <string name="result_title">Результат: </string>
+    <string name="step_image_descr">Изображение шага операции</string>
+    <string name="task_title">Задание: </string>
+    <string name="stat_status">Состояние:</string>
+    <string name="operation">Операция:</string>
+    <string name="operation_step_title">Шаг:</string>
+    <string name="additional_information">Дополнительная информация</string>
+    <string name="operation_step_descr_title">Описание шага обслуживания</string>
+    <string name="operation_status_change_title">Изменить статус операции</string>
+    <string name="operation_choose_status">Выберите статус завершения операции</string>
+    <string name="divider"> | </string>
+    <string name="num500">500</string>
+    <string name="application_full_name">Мобильный ТОиР</string>
+    <string name="open_documentation">Открыть документацию</string>
+    <string name="bluetooth_server">Bluetooth сервер</string>
+    <string name="title_activity_btserver">BTServerActivity</string>
+
+    <string name="profile_tagid">Метка карточки</string>
+    <string name="profile_add_name">Имя пользователя</string>
+    <string name="profile_image">Изображение аватар</string>
+
+    <string name="profile_type">Тип пользователя</string>
+    <string name="profile_whois">Должность</string>
+    <string name="profile_login">Логин</string>
+    <string name="profile_password">Пароль</string>
+    <string name="profile_submit_button">Добавить</string>
+    <string name="profile_edit_button">Изменить</string>
+    <string name="profile_submit_delete">Удалить пользователя</string>
+    <string name="driver">Драйвер</string>
+    <string name="update_server">Сервер обновления</string>
+    <string name="system_server">Сервер системы</string>
+
+    <string name="menu">Сменить настройки</string>
+    <string name="menu_camera">Тест камеры</string>
+    <string name="menu_charts">Тест графиков</string>
+    <string name="menu_equipment">Оборудование</string>
+    <string name="menu_gps">Карта</string>
+    <string name="menu_tasks">Задачи</string>
+    <string name="menu_references">Справочники</string>
+    <string name="menu_users">Пользователи</string>
+    <string name="pref_lang">Язык интерфейса</string>
+
+    <string name="profile_type_administrator">Администратор</string>
+    <string name="profile_type_engeneer">Пользователь</string>
+    <string name="profile_whois_shef">Начальник</string>
+    <string name="profile_whois_engeneer">Инженер</string>
+
+    <string name="image_status_equipment">изображение статуса оборудования</string>
+    <string name="normative">Норматив: </string>
+    <string name="finish_stage">Закончить</string>
+    <string name="measure">Измерить</string>
+    <string name="measure_label">Последнее измерение:</string>
+    <string name="measure_description">Проведите измерение необходимой величины и внесите показания в форму ниже. Также вы можете просмотреть динамику изменения за последние несколько обследований.</string>
+    <string name="operation_time">Время операции:</string>
+    <string name="tire"> - </string>
+    <string name="sec">сек.</string>
+    <string name="sec_with_value">%1$d сек.</string>
+    <string name="input_value">введите данные</string>
+    <string name="program_version">ТОИР МК v%1$s\n ООО "ТЭС" /\n ООО "ЧИЦ" \n (toirus.ru) (&#169;) 2020</string>
+
+    <string name="gps_track">GPS трек</string>
+    <string name="journal">Журнал</string>
+    <string name="toirSettings">Настройки приложения</string>
+
+    <string name="dialog_accept">Принять</string>
+    <string name="dialog_cancel">Отменить</string>
+    <string name="select_all">Выбрать все</string>
+    <string name="operation_cancel_text">Вы пропустили одну или несколько операций. Укажите для них причину/вердикт.</string>
+
+    <string name="run_ar_content">Запуск AR-контента</string>
+    <string name="run_ar_content_key">run_ar_content_key</string>
+    <string name="pref_debug_mode_key">debug_mode</string>
+    <string name="pref_autonome_mode_key">auto_mode</string>
+    <string name="not_started">не начинался</string>
+    <string name="not_finished">не закончен</string>
+    <string name="dont_ask_text_tags">Не спрашивать текстовые теги</string>
+    <string name="ask_text_tags_key">without_tags_mode</string>
+    <string name="model">Модель: %1$s</string>
+    <string name="langListKey">lang_key</string>
+
+    <string name="mistakes_category_all">Все категории</string>
+    <string name="mistakes_category_non_specific">Без категории</string>
+    <string name="mistakes">Зафиксированные последние дефекты</string>
+
+    <string name="choose_defect">Выберите дефект</string>
+    <string name="add_new_defect">или введите новый</string>
+    <string name="choose_defect_category">Категория дефекта</string>
+    <string name="choose_defect_type">Тип дефекта</string>
+    <string name="choose_defect_level">Уровень дефекта</string>
+    <string name="defects_category_all">Все категории</string>
+    <string name="defects_category_non_specific">Не специфические дефекты</string>
+    <string name="action_save">Записать</string>
+    <string name="new_status">Сменить статус на</string>
+    <string name="contragents">Клиенты</string>
+    <string name="input_contragents_name">Введите название клиента</string>
+
+    <string name="client_type">Тип контрагента: $1$s</string>
+    <string name="client_phone">Телефон: %1$s</string>
+
+    <string name="defects">Зафиксированные дефекты</string>
+    <string name="defect_user">Обнаружил </string>
+
+    <string name="order_title">[#%1$d] %2$s</string>
+    <string name="order_author">Автор задания: %1$s</string>
+    <string name="order_worker">Исполнитель: %1$s</string>
+    <string name="order_recieved">Получен: %1$s</string>
+    <string name="order_start">Назначен на: %1$s</string>
+    <string name="order_open">Начат: %1$s</string>
+    <string name="order_close">Закрыт: %1$s</string>
+    <string name="order_status">Статус: %1$s</string>
+    <string name="order_verdict">Вердикт: %1$s</string>
+    <string name="order_comment">Коментарий: %1$s</string>
+    <string name="order_reason">Основание задания: %1$s</string>
+
+    <string name="send_order_comment">Коментарий</string>
+    <string name="send_order_author">Автор задания</string>
+
+    <string name="rfid_settings">Настройки драйвера RFID</string>
+    <string name="debug_nocheck_gps">Не проверять GPS</string>
+    <string name="receive_telegram">Оповещать через Telegram</string>
+    <string name="receive_viber">Оповещать через Viber</string>
+    <string name="telegram_chat_id">Идентификатор чата</string>
+    <string name="telegram_chat_id_value">Идентификатор чата 0</string>
+    <string name="defect_description">Описание дефекта</string>
+
+    <string name="driver_text">Текстовый драйвер</string>
+    <string name="advanced_settings">Отображение и данные</string>
+
+    <string name="menu_user">Исполнитель</string>
+    <string name="menu_orders">Задания</string>
+    <string name="menu_map">Карта</string>
+    <string name="menu_defects">Дефекты</string>
+
+    <string name="menu_user_description">Информация о пользователе</string>
+    <string name="menu_equipment_description">Справочник оборудования</string>
+    <string name="menu_equipment_map">Расположение оборудования</string>
+    <string name="menu_additional">Дополнительно</string>
+    <string name="menu_documentation">Документация</string>
+    <string name="menu_on_equipment">на оборудование</string>
+    <string name="menu_objects">Объекты</string>
+    <string name="menu_objects_description">Здания и сооружения</string>
+    <string name="menu_client_reference">Справочник контрагентов</string>
+    <string name="menu_journal_track">Журнал и gps трек</string>
+    <string name="menu_about_app">О программе</string>
+    <string name="menu_information">Информация о версии</string>
+    <string name="menu_exit">Выход</string>
+
+    <string name="toast_db_actual">База данных актуальна!</string>
+    <string name="toast_db_error">Не удалось открыть/обновить базу данных!</string>
+    <string name="toast_enter">Вход в систему</string>
+    <string name="toast_token_received">Токен получен</string>
+    <string name="toast_error_picture">Не удалось получить масштабированное изображение</string>
+    <string name="toast_error_no_user">Информация о пользователе не получена с сервера</string>
+    <string name="toast_error_no_user_received">Просто не получили пользователя</string>
+    <string name="toast_error_no_token_received">Просто не получили токен</string>
+    <string name="toast_error_no_access">Нет доступа</string>
+    <string name="toast_error_operation_canceled">Операция прервана</string>
+
+    <string name="subtitle_repair">Обслуживание и ремонт</string>
+    <string name="current_tasks">Текущие задания</string>
+    <string name="sync_data">Синхронизируем данные</string>
+    <string name="please_login">Пожалуйста зарегистрируйтесь</string>
+    <string name="no_driver_select">Драйвер не выбран</string>
+    <string name="no_user_present">Непредвиденная ошибка: нет такого пользователя</string>
+    <string name="gps_must_enabled">GPS должен быть включен</string>
+    <string name="no_url_for_update">Не указан URL для обновления!</string>
+
+    <string name="change_attribute">Изменение атрибута</string>
+    <string name="download_update">Загрузка обновления</string>
+    <string name="update_error">Ошибка при обновлении!</string>
+    <string name="unknown">неизвестен</string>
+    <string name="device_has_no_gps">Устройство не оборудовано приёмником GPS!</string>
+    <string name="cannot_upload_file">Файл не удалось загрузить</string>
+    <string name="measure_values">Измерение параметров</string>
+
+    <string name="menu_stages">Этапы задач</string>
+    <string name="menu_operations">Операции</string>
+    <string name="error_equipment_not_found">Оборудование не найдено</string>
+    <string name="error_equipment_read_tag_error">Ошибка при запросе оборудования</string>
+    <string name="error_read_tag">Не удалось считать метку</string>
+    <string name="menu_service">Сервис</string>
+    <string name="menu_references_update">Обновить справочники</string>
+    <string name="references_update">"Получаем справочники"</string>
+    <string name="references_update_canceled">"Обновление справочников отменено"</string>
+    <string name="references_update_success">"Справочники обновлены"</string>
+
+    <string name="lang_ru_text">Русский</string>
+    <string name="lang_de_text">Deutsch</string>
+    <string name="lang_en_text">English</string>
+
+    <string name="lang_ru">ru</string>
+    <string name="lang_de">de</string>
+    <string name="lang_en">en</string>
+
+    <string name="select_verdict">Укажите вердикт</string>
+    <string name="defect_date">Дата фиксации дефекта</string>
+    <string name="defect_status_processed">Обработан</string>
+    <string name="defect_status_non_processed">Не обработан</string>
+
+    <string name="defect_level">Уровень дефекта</string>
+
+    <string name="dialog_start_title">Начать выполнение</string>
+    <string name="dialog_start">Начать</string>
+    <string name="dialog_later">Отложить</string>
+
+    <string name="update">Обновление</string>
+    <string name="not_set_server_address">Не указан адрес сервера в настройках приложения!</string>
+
+    <string name="auth_error">Ошибка аутентификации</string>
+    <string name="no_internet">Нет соединения с Интернетом</string>
+    <string name="without_tags_mode">Не спрашивать текстовые теги</string>
+    <string name="menu_order_info">Информация о задании</string>
+    <string name="menu_order_parts">Перечень запчастей</string>
+    <string name="menu_options">&#xf142;</string>
+
+    <string name="serial_number">Серийный номер</string>
+    <string name="instructions_accept">Я ознакомился со следующими инструкциями</string>
+
+    <string name="inventory_number">Инвентарный номер: %1$s</string>
+
+    <string name="receive_new_orders">Получить новые наряды</string>
+    <string name="receive_completed_orders">Получить сделанные наряды</string>
+    <string name="send_results">Отправить результаты</string>
+
+    <string name="lang_warning">Настройки поменяются только после перезагрузки приложения</string>
+    <string name="operation_cancel">Отмена операции</string>
+    <string name="stage_cancel_text">Вы пропустили одну или несколько задач. Укажите для них причину/вердикт.</string>
+    <string name="stage_cancel_error">Сменить статус нельзя!</string>
+    <string name="warning">Внимание!</string>
+
+    <string name="no_operations">Нет операций</string>
+    <string name="menu_order_tool">Перечень инструмента</string>
+    <string name="input_login_pin">Введите логин и пин</string>
+    <string name="login_title">Логин</string>
+    <string name="pin_title">Пин</string>
+
+    <string name="no_user_found">Пользователь не найден</string>
+
+    <string name="default_rfid_driver_key">defaultRfidDriverKey</string>
+    <string name="default_login_rfid_driver_key">defaultLoginRfidDriverKey</string>
+    <string name="default_uhf_driver_key">defaultUHFDriverKey</string>
+    <string name="default_uhf_driver">Драйвер UHF</string>
+
+    <string name="menu_calendar">Календарь</string>
+    <string name="menu_messages">Сообщения</string>
+    <string name="menu_calendar_description">Календарь заданий</string>
+    <string name="menu_messages_description">Внутренняя почта</string>
+
+    <string name="menu_receive">Входящие</string>
+    <string name="menu_send">Отправленные</string>
+    <string name="menu_all">Все</string>
+    <string name="accept_request">Согласовать</string>
+    <string name="accepted">Согласовано</string>
+
+    <string name="from">От: </string>
+    <string name="to">Кому: </string>
+    <string name="request">Заявка</string>
+</resources>

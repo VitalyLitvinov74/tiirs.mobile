@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:icon="@drawable/pref_basic"
+        android:key="preferenceBasicScreen"
+        android:theme="@style/PreferenceScreen"
+        android:title="@string/pref_cat_main">
+
+        <ru.toir.mobile.multi.fragments.CustomEditTextPreference
+            android:defaultValue="https://tapi.toir.tehnosber.ru"
+            android:dialogTitle="@string/pref_server_url_dialog_title"
+            android:icon="@drawable/pref_server"
+            android:key="@string/serverUrl"
+            android:title="@string/pref_server_url" />
+
+        <ListPreference
+            android:defaultValue="ru.shtrm.serviceman.rfid.driver.RfidDriverPin"
+            android:icon="@drawable/pref_rfid"
+            android:key="@string/default_login_rfid_driver_key"
+            android:title="@string/pref_login_rfid_driver" />
+
+        <ListPreference
+            android:defaultValue="ru.shtrm.serviceman.rfid.driver.RfidDriverQRcode"
+            android:icon="@drawable/pref_rfid"
+            android:key="@string/default_rfid_driver_key"
+            android:title="@string/pref_rfid_driver" />
+
+        <ListPreference
+            android:defaultValue="ru.shtrm.serviceman.rfid.driver.RfidDriverNull"
+            android:icon="@drawable/pref_rfid"
+            android:key="@string/default_uhf_driver_key"
+            android:title="@string/default_uhf_driver" />
+
+        <!--<PreferenceScreen-->
+        <!--android:icon="@drawable/pref_rfid"-->
+        <!--android:key="@string/rfidDrvSettingKey"-->
+        <!--android:title="@string/rfid_settings" />-->
+
+        <ListPreference
+            android:entries="@array/languages"
+            android:entryValues="@array/language_values"
+            android:icon="@drawable/pref_lang"
+            android:key="@string/langListKey"
+            android:title="@string/pref_lang" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:icon="@drawable/pref_check"
+        android:key="debug_mode"
+        android:title="@string/advanced_settings">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_debug_mode_key"
+            android:title="@string/pref_debug_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_autonome_mode_key"
+            android:title="@string/pref_autonome_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/run_ar_content_key"
+            android:title="@string/run_ar_content" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="without_tags_mode"
+            android:title="@string/dont_ask_text_tags" />
+        <Preference
+            android:key="@string/load_test_data"
+            android:title="@string/load_test_data" />
+        <Preference
+            android:key="@string/delete_test_data"
+            android:title="@string/delete_test_data" />
+        <CheckBoxPreference
+            android:key="@string/debug_nocheck_gps"
+            android:title="@string/debug_nocheck_gps" />
+        <CheckBoxPreference
+            android:key="@string/receive_telegram"
+            android:title="@string/receive_telegram" />
+        <CheckBoxPreference
+            android:key="@string/receive_viber"
+            android:title="@string/receive_viber" />
+        <Preference
+            android:key="@string/telegram_chat_id"
+            android:title="@string/telegram_chat_id_value" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:theme="@style/PreferenceScreen"
+        android:title="@string/update">
+        <Preference
+            android:key="updateApp"
+            android:title="@string/action_update" />
+    </PreferenceCategory>
+</PreferenceScreen>

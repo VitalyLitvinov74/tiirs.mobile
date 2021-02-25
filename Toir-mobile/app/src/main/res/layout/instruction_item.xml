@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:background="@color/larisaTextColorAWhite"
+    android:padding="6dip">
+
+    <ru.toir.mobile.multi.utils.IconTextView
+        android:id="@+id/instruction_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="10dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:text="@string/icon_book"
+        android:textColor="@color/larisaBlueColor"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/lv_firstLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/instruction_icon"
+        android:paddingTop="2dp"
+        android:text="@string/instructions_accept"
+        android:textColor="@color/larisaTextColorABlack"
+        android:textSize="14sp" />
+
+</RelativeLayout> 

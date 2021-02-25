@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="profile_type">
+        <item>@string/profile_type_administrator</item>
+        <item>@string/profile_type_engeneer</item>
+    </string-array>
+    <string-array name="profile_whois">
+        <item>@string/profile_whois_shef</item>
+        <item>@string/profile_whois_engeneer</item>
+    </string-array>
+    <string-array name="defects_category">
+        <item>@string/defects_category_all</item>
+        <item>@string/defects_category_non_specific</item>
+    </string-array>
+    <string-array name="languages">
+        <item>@string/lang_ru_text</item>
+        <item>@string/lang_de_text</item>
+        <item>@string/lang_en_text</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>@string/lang_ru</item>
+        <item>@string/lang_de</item>
+        <item>@string/lang_en</item>
+    </string-array>
+</resources>

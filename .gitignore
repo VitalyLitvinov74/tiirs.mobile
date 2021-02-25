@@ -1,0 +1,15 @@
+.metadata
+appcompat_v7
+Toir-mobile/bin
+Toir-mobile/gen
+Toir-mobile-test/bin
+Toir-mobile-test/gen
+Toir-mobile-test/build
+c5lib/bin
+c5lib/gen
+c5lib/obj
+c5lib/libs/armeabi
+c5lib/build
+*.iml
+.idea
+.gradle

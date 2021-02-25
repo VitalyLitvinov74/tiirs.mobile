@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/larisaBlueColor"
+        android:gravity="top"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:textColor="@color/larisaTextColorABlack">
+
+        <ImageView
+            android:id="@+id/user_image"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:contentDescription="@string/description"
+            android:src="@drawable/no_image" />
+
+        <TextView
+            android:id="@+id/from_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/user_image"
+            android:gravity="start"
+            android:text="@string/from"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/larisaTextColorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/user_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/from_label"
+            android:gravity="start"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/larisaTextColorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
+            android:gravity="end"
+            android:text="@string/last_date"
+            android:textColor="@color/larisaTextColorABlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/to_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/date"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/user_image"
+            android:gravity="start"
+            android:text="@string/to"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/larisaTextColorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/user_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/date"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/to_label"
+            android:gravity="start"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/larisaTextColorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/request_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/to_label"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/user_image"
+            android:background="@drawable/rounded_badge_blue"
+            android:gravity="start"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="@string/request"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/larisaTextColorAWhite"
+            android:textSize="14sp" />
+
+        <!--
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/user_from"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:text="@string/description"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+        -->
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_image"
+            android:layout_marginStart="5dp"
+            android:maxLines="10"
+            android:textColor="#454545"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/request"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text"
+            android:text="@string/accept_request"
+            android:background="@color/larisaBlueColor"
+            android:textColor="@color/larisaTextColorAWhite" />
+
+    </RelativeLayout>
+</RelativeLayout>
