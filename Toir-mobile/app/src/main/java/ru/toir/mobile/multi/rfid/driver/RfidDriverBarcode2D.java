@@ -1,6 +1,5 @@
 package ru.toir.mobile.multi.rfid.driver;
 
-import android.hardware.barcode.Scanner;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -13,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.c5lib.lib.src.main.java.android.hardware.barcode.Scanner;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;

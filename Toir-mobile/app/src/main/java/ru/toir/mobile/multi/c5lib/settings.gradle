@@ -1,0 +1,3 @@
+package ru.toir.mobile.multi.c5lib
+
+include ':lib'

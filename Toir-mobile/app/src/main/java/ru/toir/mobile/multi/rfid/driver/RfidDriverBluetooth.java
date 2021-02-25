@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.SharedPreferences;
-import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,6 +27,7 @@ import java.util.Set;
 
 import ru.toir.mobile.multi.R;
 import ru.toir.mobile.multi.bluetooth.BTRfidServer;
+import ru.toir.mobile.multi.c5lib.lib.src.main.java.android.hardware.uhf.magic.reader;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;

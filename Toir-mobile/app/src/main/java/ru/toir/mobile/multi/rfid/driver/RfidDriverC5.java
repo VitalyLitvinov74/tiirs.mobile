@@ -1,7 +1,6 @@
 package ru.toir.mobile.multi.rfid.driver;
 
-import android.hardware.uhf.magic.UHFCommandResult;
-import android.hardware.uhf.magic.reader;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.c5lib.lib.src.main.java.android.hardware.uhf.magic.UHFCommandResult;
+import ru.toir.mobile.multi.c5lib.lib.src.main.java.android.hardware.uhf.magic.reader;
 import ru.toir.mobile.multi.rfid.IRfidDriver;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
 import ru.toir.mobile.multi.rfid.RfidDriverMsg;

@@ -1,11 +1,12 @@
 package ru.toir.mobile.multi.rfid.driver;
 
-import android.hardware.uhf.magic.IMultiInventoryCallback;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import ru.toir.mobile.multi.c5lib.lib.src.main.java.android.hardware.uhf.magic.IMultiInventoryCallback;
 
 /**
  * @author Dmitriy Logachev

@@ -1,14 +1,6 @@
 package ru.toir.mobile.multi.rfid.driver;
 
-import android.hardware.p6300.jni.Linuxc;
-import android.hardware.p6300.uhf.api.CommandType;
-import android.hardware.p6300.uhf.api.MultiLableCallBack;
-import android.hardware.p6300.uhf.api.Multi_query_epc;
-import android.hardware.p6300.uhf.api.Query_epc;
-import android.hardware.p6300.uhf.api.ShareData;
-import android.hardware.p6300.uhf.api.Tags_data;
-import android.hardware.p6300.uhf.api.UHF;
-import android.hardware.p6300.uhf.api.Ware;
+
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +13,15 @@ import java.util.List;
 import java.util.Set;
 
 import ru.toir.mobile.multi.R;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.jni.Linuxc;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.CommandType;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.MultiLableCallBack;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.Multi_query_epc;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.Query_epc;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.ShareData;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.Tags_data;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.UHF;
+import ru.toir.mobile.multi.p6300.lib.src.main.java.android.hardware.p6300.uhf.api.Ware;
 import ru.toir.mobile.multi.rfid.RfidDriverBase;
 import ru.toir.mobile.multi.rfid.RfidDriverMsg;
 import ru.toir.mobile.multi.rfid.Tag;

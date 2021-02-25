@@ -3,7 +3,6 @@ package ru.toir.mobile.multi.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.hardware.uhf.magic.reader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import ru.toir.mobile.multi.c5lib.lib.src.main.java.android.hardware.uhf.magic.reader;
 import ru.toir.mobile.multi.rfid.RfidDialog;
 
 /**

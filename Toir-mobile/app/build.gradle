@@ -21,7 +21,7 @@ android {
             versionCode code
             multiDexEnabled true
             versionName "${versionMajor}.${versionMinor}." + String.format("%03d", code)
-            signingConfig signingConfigs.debug
+//            signingConfig signingConfigs.debug
         }
     }
     else {
@@ -35,7 +35,7 @@ android {
         def rootDir = property('rootDir')
         Properties properties = new Properties()
         properties.load(new FileInputStream("${rootDir}/local.properties"))
-        debug {
+        /*debug {
             // это сделано для того, чтоб не прибивать приложение вместе с базой
             // при установке release версии приложения
             storeFile file(properties.getProperty('STORE_FILE'))
@@ -48,18 +48,18 @@ android {
             storePassword properties.getProperty('STORE_PASSWORD')
             keyAlias properties.getProperty('KEY_ALIAS')
             keyPassword properties.getProperty('KEY_PASSWORD')
-        }
+        }*/
     }
 
     buildTypes {
         debug {
             minifyEnabled false
-            signingConfig signingConfigs.debug
+//            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false
             proguardFiles.add(file('proguard-rules.pro'))
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
 
@@ -102,9 +102,9 @@ repositories {
     maven {
         url 'https://jitpack.io'
     }
-    maven {
-        url "file://${localRepo}"
-    }
+//    maven {
+//        url "file://${localRepo}"
+//    }
 }
 
 dependencies {
@@ -114,8 +114,8 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v2.1.0'
     implementation 'org.osmdroid:osmdroid-android:5.5:release@aar'
     implementation 'me.dm7.barcodescanner:zbar:1.8.3'
-    implementation 'android.hardware:uhf-tools:1.0@aar'
-    implementation 'android.hardware.p6300:p6300uart:1.0@aar'
+//    implementation 'android.hardware:uhf-tools:1.0@aar'
+//    implementation 'android.hardware.p6300:p6300uart:1.0@aar'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.mikepenz:iconics-core:2.5.5@aar'
     implementation 'com.android.support:recyclerview-v7:27.1.0'

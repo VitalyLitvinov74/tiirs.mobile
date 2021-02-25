@@ -1,0 +1,3 @@
+package ru.toir.mobile.multi.p6300
+
+include ':lib'
