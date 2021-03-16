@@ -66,7 +66,7 @@ public class ToirApplication extends Application {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         serverUrl = preferences.getString(getString(R.string.serverUrl), null);
         if (serverUrl == null) {
-            String defaultUrl = "https://api.toir.toirus.ru";
+            String defaultUrl = "https://api.demo.tiirs.ru";
             serverUrl = defaultUrl;
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             sp.edit().putString(getString(R.string.serverUrl), defaultUrl).apply();
