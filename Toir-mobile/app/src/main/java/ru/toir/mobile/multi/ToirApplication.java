@@ -1,5 +1,6 @@
 package ru.toir.mobile.multi;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -32,6 +33,7 @@ public class ToirApplication extends Application {
     public static InputStream sstalDigicert;
     public static InputStream sstalDigicertRoot;
     public static InputStream digicertsha2CA;
+    public static Context context;
 
     public static boolean isInternetOn(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -57,6 +59,7 @@ public class ToirApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		context = getBaseContext();
         qwvostokCA = getResources().openRawResource(R.raw.forqwvostok);
         sstalRootCA = getResources().openRawResource(R.raw.severstalroot);
         sstalInternalCA = getResources().openRawResource(R.raw.severstalinternal);
@@ -66,7 +69,7 @@ public class ToirApplication extends Application {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         serverUrl = preferences.getString(getString(R.string.serverUrl), null);
         if (serverUrl == null) {
-            String defaultUrl = "https://api.demo.tiirs.ru";
+            String defaultUrl = "https://api.toirus-dev.severstal.com/";
             serverUrl = defaultUrl;
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             sp.edit().putString(getString(R.string.serverUrl), defaultUrl).apply();

@@ -54,6 +54,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
+            debuggable false
 //            signingConfig signingConfigs.debug
         }
         release {
@@ -144,6 +145,7 @@ dependencies {
     implementation 'com.roughike:bottom-bar:2.3.1'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.github.MKergall:osmbonuspack:6.0'
+    implementation 'com.readystatesoftware.chuck:library:1.1.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.powermock:powermock-module-junit4:1.6.2'
     testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.2'
@@ -159,4 +161,5 @@ dependencies {
     }
     implementation 'com.github.prolificinteractive:material-calendarview:1.6.0'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
+
 }

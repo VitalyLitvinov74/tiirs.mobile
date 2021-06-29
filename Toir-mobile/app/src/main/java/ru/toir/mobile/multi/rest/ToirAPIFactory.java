@@ -1,10 +1,12 @@
 package ru.toir.mobile.multi.rest;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
+import com.readystatesoftware.chuck.ChuckInterceptor;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -98,13 +100,13 @@ import ru.toir.mobile.multi.rest.interfaces.IUserService;
  * @author Dmitriy Logachev
  *         Created by koputo on 15.09.16.
  */
-public class
-ToirAPIFactory {
+public class ToirAPIFactory {
     public static final X509TrustManager tm = getTm();
     private static final int CONNECT_TIMEOUT = 15;
     private static final int WRITE_TIMEOUT = 60;
     private static final int TIMEOUT = 60;
     public static SSLSocketFactory sslsf = getSslsf();
+
     private static final OkHttpClient CLIENT = new OkHttpClient()
             .newBuilder()
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
@@ -148,6 +150,7 @@ ToirAPIFactory {
                     }
                 }
             })
+            .addInterceptor(new ChuckInterceptor(ToirApplication.context))
             .sslSocketFactory(sslsf, tm)
             .build();
 
