@@ -119,7 +119,10 @@ public class ToirAPIFactory {
                     Headers origHeaders = origRequest.headers();
                     AuthorizedUser user = AuthorizedUser.getInstance();
                     Headers newHeaders = origHeaders.newBuilder()
-                            .add("Authorization", user.getBearer()).build();
+                            .add(
+                                    "accessToken",
+                                    user.getBearer()
+                            ).build();
 
                     Request.Builder requestBuilder = origRequest.newBuilder().headers(newHeaders);
                     String login = user.getLogin();

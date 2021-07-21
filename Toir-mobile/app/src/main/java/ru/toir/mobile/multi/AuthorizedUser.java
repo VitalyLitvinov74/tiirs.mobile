@@ -80,7 +80,10 @@ public class AuthorizedUser {
      * @return The bearer
      */
     public String getBearer() {
-        return "bearer " + mToken;
+        if(mToken == null){
+            return "no token";
+        }
+        return mToken;
     }
 
     /**
