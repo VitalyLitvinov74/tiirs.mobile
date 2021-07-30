@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     //private static final int DRAWER_ONLINE = 15;
 
     public static final String START_GET_TOKEN_TIMER = ToirApplication.packageName + ".startGetTokenTimer";
-    private static final int MAX_USER_PROFILE = 10;
+    private static final int MAX_USER_PROFILE = 100;
     private static final int NO_FRAGMENT = 0;
     private static final int FRAGMENT_CHARTS = 2;
     private static final int FRAGMENT_EQUIPMENT = 3;
