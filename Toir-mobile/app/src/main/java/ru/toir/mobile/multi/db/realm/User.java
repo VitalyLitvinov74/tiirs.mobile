@@ -218,7 +218,7 @@ public class User extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageRoot();
+        return "/storage/db/"  + getImageRoot();
     }
 
     public Organization getOrganization() {
