@@ -135,7 +135,7 @@ public class OperationTemplate extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/db/"  + getImageRoot() + "/" + operationType.getUuid();
+        return "/storage/" + userName + "/" + getImageRoot() + "/" + operationType.getUuid();
     }
 
     public Organization getOrganization() {

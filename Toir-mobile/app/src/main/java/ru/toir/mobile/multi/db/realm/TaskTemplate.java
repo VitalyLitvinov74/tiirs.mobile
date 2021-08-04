@@ -118,7 +118,7 @@ public class TaskTemplate extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/db/"  + getImageRoot() + '/' + taskType.getUuid();
+        return "/storage/" + userName + "/" + getImageRoot() + '/' + taskType.getUuid();
     }
 
     public Organization getOrganization() {

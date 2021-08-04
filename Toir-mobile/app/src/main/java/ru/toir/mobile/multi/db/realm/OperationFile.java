@@ -129,7 +129,7 @@ public class OperationFile extends RealmObject implements IToirDbObject, ISend {
 
     @Override
     public String getImageFileUrl(String userName) {
-//        return "/storage/db/"  + getImageFilePath();
+//        return "/storage/" + userName + "/" + getImageFilePath();
         return null;
     }
 
