@@ -116,7 +116,7 @@ public class StageTemplate extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageRoot() + '/' + stageType.getUuid();
+        return "storage/db/" + getImageRoot() + '/' + stageType.getUuid();
     }
 
     public Organization getOrganization() {

@@ -218,7 +218,7 @@ public class User extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageRoot();
+        return "storage/db/" + getImageRoot();
     }
 
     public Organization getOrganization() {
@@ -227,5 +227,26 @@ public class User extends RealmObject implements IToirDbObject {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "_id=" + _id +
+                ", uuid='" + uuid + '\'' +
+                ", name='" + name + '\'' +
+                ", login='" + login + '\'' +
+                ", pass='" + pass + '\'' +
+                ", type=" + type +
+                ", tagId='" + tagId + '\'' +
+                ", active=" + active +
+                ", whoIs='" + whoIs + '\'' +
+                ", image='" + image + '\'' +
+                ", contact='" + contact + '\'' +
+                ", connectionDate=" + connectionDate +
+                ", createdAt=" + createdAt +
+                ", changedAt=" + changedAt +
+                ", organization=" + organization +
+                '}';
     }
 }

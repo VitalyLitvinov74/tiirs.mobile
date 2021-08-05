@@ -12,21 +12,21 @@ import ru.toir.mobile.multi.db.realm.OperationStatus;
  *         Created by koputo on 05.10.16.
  */
 public interface IOperationStatus {
-    @GET("/operation-status")
+    @GET("/api/operation-status")
     Call<List<OperationStatus>> get();
 
-    @GET("/operation-status")
+    @GET("/api/operation-status")
     Call<List<OperationStatus>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/operation-status")
+    @GET("/api/operation-status")
     Call<List<OperationStatus>> getById(@Query("id") String id);
 
-    @GET("/operation-status")
+    @GET("/api/operation-status")
     Call<List<OperationStatus>> getById(@Query("id[]") String[] id);
 
-    @GET("/operation-status")
+    @GET("/api/operation-status")
     Call<List<OperationStatus>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/operation-status")
+    @GET("/api/operation-status")
     Call<List<OperationStatus>> getByUuid(@Query("uuid[]") String[] uuid);
 }

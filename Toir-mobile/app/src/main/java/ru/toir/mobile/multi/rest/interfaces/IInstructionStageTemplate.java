@@ -8,21 +8,21 @@ import retrofit2.http.Query;
 import ru.toir.mobile.multi.db.realm.InstructionStageTemplate;
 
 public interface IInstructionStageTemplate {
-    @GET("/instruction-stage-template")
+    @GET("/api/instruction-stage-template")
     Call<List<InstructionStageTemplate>> get();
 
-    @GET("/instruction-stage-template")
+    @GET("/api/instruction-stage-template")
     Call<List<InstructionStageTemplate>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/instruction-stage-template")
+    @GET("/api/instruction-stage-template")
     Call<List<InstructionStageTemplate>> getById(@Query("id") String id);
 
-    @GET("/instruction-stage-template")
+    @GET("/api/instruction-stage-template")
     Call<List<InstructionStageTemplate>> getById(@Query("id") String[] id);
 
-    @GET("/instruction-stage-template")
+    @GET("/api/instruction-stage-template")
     Call<List<InstructionStageTemplate>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/instruction-stage-template")
+    @GET("/api/instruction-stage-template")
     Call<List<InstructionStageTemplate>> getByUuid(@Query("uuid") String[] uuid);
 }

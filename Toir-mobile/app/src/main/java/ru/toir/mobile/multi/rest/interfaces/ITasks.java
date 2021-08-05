@@ -14,24 +14,24 @@ import ru.toir.mobile.multi.db.realm.Task;
  */
 
 public interface ITasks {
-    @GET("/task")
+    @GET("/api/task")
     Call<List<Task>> get();
 
-    @GET("/task")
+    @GET("/api/task")
     Call<List<Task>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/task")
+    @GET("/api/task")
     Call<List<Task>> getById(@Query("id") String id);
 
-    @GET("/task")
+    @GET("/api/task")
     Call<List<Task>> getById(@Query("id[]") String[] id);
 
-    @GET("/task")
+    @GET("/api/task")
     Call<List<Task>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/task")
+    @GET("/api/task")
     Call<List<Task>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @POST("/task/set-status")
+    @POST("/api/task/set-status")
     Call<Boolean> setStatus(@Query("uuid") String uuid, @Query("statusUuid") String statusUuid);
 }

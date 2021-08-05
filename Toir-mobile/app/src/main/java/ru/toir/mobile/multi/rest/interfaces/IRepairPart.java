@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.RepairPart;
  */
 
 public interface IRepairPart {
-    @GET("/repair-part")
+    @GET("/api/repair-part")
     Call<List<RepairPart>> get();
 
-    @GET("/repair-part")
+    @GET("/api/repair-part")
     Call<List<RepairPart>> get(@Query("changedAfter") String changedAfter);
 
-    //@GET("/repair-part")
+    //@GET("/api/repair-part")
     //Call<List<RepairPart>> getById(@Query("id") String id);
 
-    //@GET("/repair-part")
+    //@GET("/api/repair-part")
     //Call<List<RepairPart>> getById(@Query("id[]") String[] id);
 
-    @GET("/repair-part")
+    @GET("/api/repair-part")
     Call<List<RepairPart>> getByOrderUuid(@Query("uuid") String uuid);
 
-    @GET("/repair-part")
+    @GET("/api/repair-part")
     Call<List<RepairPart>> getByUuid(@Query("uuid[]") String[] uuid);
 }

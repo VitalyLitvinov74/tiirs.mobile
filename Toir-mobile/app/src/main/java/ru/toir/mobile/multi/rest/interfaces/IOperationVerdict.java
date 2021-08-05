@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.OperationVerdict;
  */
 
 public interface IOperationVerdict {
-    @GET("/operation-verdict")
+    @GET("/api/operation-verdict")
     Call<List<OperationVerdict>> get();
 
-    @GET("/operation-verdict")
+    @GET("/api/operation-verdict")
     Call<List<OperationVerdict>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/operation-verdict")
+    @GET("/api/operation-verdict")
     Call<List<OperationVerdict>> getById(@Query("id") String id);
 
-    @GET("/operation-verdict")
+    @GET("/api/operation-verdict")
     Call<List<OperationVerdict>> getById(@Query("id[]") String[] id);
 
-    @GET("/operation-verdict")
+    @GET("/api/operation-verdict")
     Call<List<OperationVerdict>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/operation-verdict")
+    @GET("/api/operation-verdict")
     Call<List<OperationVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }

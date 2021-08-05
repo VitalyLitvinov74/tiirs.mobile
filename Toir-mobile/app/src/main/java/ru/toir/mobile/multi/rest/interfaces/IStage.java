@@ -14,24 +14,24 @@ import ru.toir.mobile.multi.db.realm.Stage;
  */
 
 public interface IStage {
-    @GET("/stage")
+    @GET("/api/stage")
     Call<List<Stage>> get();
 
-    @GET("/stage")
+    @GET("/api/stage")
     Call<List<Stage>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/stage")
+    @GET("/api/stage")
     Call<List<Stage>> getById(@Query("id") String id);
 
-    @GET("/stage")
+    @GET("/api/stage")
     Call<List<Stage>> getById(@Query("id[]") String[] id);
 
-    @GET("/stage")
+    @GET("/api/stage")
     Call<List<Stage>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/stage")
+    @GET("/api/stage")
     Call<List<Stage>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @POST("/stage/set-status")
+    @POST("/api/stage/set-status")
     Call<Boolean> setStatus(@Query("uuid") String uuid, @Query("statusUuid") String statusUuid);
 }

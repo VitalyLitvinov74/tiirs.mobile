@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.TaskTemplate;
  */
 
 public interface ITaskTemplate {
-    @GET("/task-template")
+    @GET("/api/task-template")
     Call<List<TaskTemplate>> get();
 
-    @GET("/task-template")
+    @GET("/api/task-template")
     Call<List<TaskTemplate>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/task-template")
+    @GET("/api/task-template")
     Call<List<TaskTemplate>> getById(@Query("id") String id);
 
-    @GET("/task-template")
+    @GET("/api/task-template")
     Call<List<TaskTemplate>> getById(@Query("id[]") String[] id);
 
-    @GET("/task-template")
+    @GET("/api/task-template")
     Call<List<TaskTemplate>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/task-template")
+    @GET("/api/task-template")
     Call<List<TaskTemplate>> getByUuid(@Query("uuid[]") String[] uuid);
 }

@@ -8,21 +8,21 @@ import retrofit2.http.Query;
 import ru.toir.mobile.multi.db.realm.DefectLevel;
 
 public interface IDefectLevel {
-    @GET("/defect-level")
+    @GET("/api/defect-level")
     Call<List<DefectLevel>> get();
 
-    @GET("/defect-level")
+    @GET("/api/defect-level")
     Call<List<DefectLevel>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/defect-level")
+    @GET("/api/defect-level")
     Call<List<DefectLevel>> getById(@Query("id") String id);
 
-    @GET("/defect-level")
+    @GET("/api/defect-level")
     Call<List<DefectLevel>> getById(@Query("id[]") String[] id);
 
-    @GET("/defect-level")
+    @GET("/api/defect-level")
     Call<List<DefectLevel>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/defect-level")
+    @GET("/api/defect-level")
     Call<List<DefectLevel>> getByUuid(@Query("uuid[]") String[] uuid);
 }

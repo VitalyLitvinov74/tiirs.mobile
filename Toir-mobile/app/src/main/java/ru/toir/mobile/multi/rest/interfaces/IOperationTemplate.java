@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.OperationTemplate;
  */
 
 public interface IOperationTemplate {
-    @GET("/operation-template")
+    @GET("/api/operation-template")
     Call<List<OperationTemplate>> get();
 
-    @GET("/operation-template")
+    @GET("/api/operation-template")
     Call<List<OperationTemplate>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/operation-template")
+    @GET("/api/operation-template")
     Call<List<OperationTemplate>> getById(@Query("id") String id);
 
-    @GET("/operation-template")
+    @GET("/api/operation-template")
     Call<List<OperationTemplate>> getById(@Query("id[]") String[] id);
 
-    @GET("/operation-template")
+    @GET("/api/operation-template")
     Call<List<OperationTemplate>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/operation-template")
+    @GET("/api/operation-template")
     Call<List<OperationTemplate>> getByUuid(@Query("uuid[]") String[] uuid);
 }

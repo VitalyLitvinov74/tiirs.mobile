@@ -12,22 +12,22 @@ import ru.toir.mobile.multi.db.realm.EquipmentType;
  *         Created by koputo on 05.10.16.
  */
 public interface IEquipmentType {
-    @GET("/equipment-type")
+    @GET("/api/equipment-type")
     Call<List<EquipmentType>> get();
 
-    @GET("/equipment-type")
+    @GET("/api/equipment-type")
     Call<List<EquipmentType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/equipment-type")
+    @GET("/api/equipment-type")
     Call<List<EquipmentType>> getById(@Query("id") String id);
 
-    @GET("/equipment-type")
+    @GET("/api/equipment-type")
     Call<List<EquipmentType>> getById(@Query("id[]") String[] id);
 
-    @GET("/equipment-type")
+    @GET("/api/equipment-type")
     Call<List<EquipmentType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/equipment-type")
+    @GET("/api/equipment-type")
     Call<List<EquipmentType>> getByUuid(@Query("uuid[]") String[] uuid);
 
 }

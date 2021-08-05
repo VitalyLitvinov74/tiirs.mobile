@@ -15,18 +15,18 @@ import ru.toir.mobile.multi.db.realm.MediaFile;
 
 public interface IMediaFile {
     @Multipart
-    @POST("/media-file/upload")
+    @POST("/api/media-file/upload")
     Call<ResponseBody> upload(@Part("descr") RequestBody descr, @Part List<MultipartBody.Part> files);
 
-    @GET("/media-file")
+    @GET("/api/media-file")
     Call<List<MediaFile>> get();
 
-    @GET("/media-file")
+    @GET("/api/media-file")
     Call<List<MediaFile>> get(@Query("entity") String entityUuid);
 
-    @GET("/media-file")
+    @GET("/api/media-file")
     Call<String> getUrl(@Query("media_uuid") String mediaFileUuid, @Query("url") String url);
 
-    @GET("/media-file")
+    @GET("/api/media-file")
     Call<List<MediaFile>> get(@Query("id[]") List<String> id, @Query("uuid[]") List<String> uuid);
 }

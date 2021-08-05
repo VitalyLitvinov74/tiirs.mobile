@@ -20,15 +20,15 @@ import ru.toir.mobile.multi.db.realm.OperationFile;
 
 public interface IOperationFile {
     @Multipart
-    @POST("/operation-file/upload")
+    @POST("/api/operation-file/upload")
     Call<ResponseBody> upload(@Part("descr") RequestBody descr, @Part List<MultipartBody.Part> files);
 
-    @GET("/operation-file")
+    @GET("/api/operation-file")
     Call<List<OperationFile>> get();
 
-    @GET("/operation-file")
+    @GET("/api/operation-file")
     Call<List<OperationFile>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/operation-file")
+    @GET("/api/operation-file")
     Call<List<OperationFile>> get(@Query("id[]") List<String> id, @Query("uuid[]") List<String> uuid);
 }

@@ -144,7 +144,7 @@ public class Documentation extends RealmObject implements IToirDbObject {
             return null;
         }
 
-        return "/storage/" + userName + "/" + getImageRoot() + "/" + typeUuid;
+        return "storage/db/" + getImageRoot() + "/" + typeUuid;
     }
 
     public Organization getOrganization() {

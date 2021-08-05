@@ -65,6 +65,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -158,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean GPSPresent = false;
     private Handler checkGetTokenTimer;
 
+
     public static Locale getLocale(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String lang = sharedPreferences.getString("lang_key", "ru");
@@ -201,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 .setReportFormat(StringFormat.JSON);
         builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class)
                 .setKeyStoreFactoryClass(ToirKeyStoreFactory.class)
-                .setUri(ToirApplication.serverUrl.concat("/crash?XDEBUG_SESSION_START=xdebug&token=").concat(authorizedUser.getToken()).concat("&apiuser=").concat(authorizedUser.getLogin()))
+                .setUri(ToirApplication.serverUrl.concat("crash?XDEBUG_SESSION_START=xdebug&token=").concat(authorizedUser.getToken()).concat("&apiuser=").concat(authorizedUser.getLogin()))
                 .setHttpMethod(HttpSender.Method.POST)
                 .setEnabled(true);
         ACRA.init(application, builder);
@@ -853,13 +855,25 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    private RealmResults<User> profilesList = null;
+
     public void fillProfileList() {
         //UsersDBAdapter users = new UsersDBAdapter(
         //        new ToirDatabaseContext(getApplicationContext()));
         //User users = realmDB.where(User.class).equalTo("tagId",AuthorizedUser.getInstance().getTagId()).findAll();
-        RealmResults<User> profilesList = realmDB.where(User.class).findAll();
+
+        if(profilesList==null && realmDB!=null)
+            profilesList = realmDB.where(User.class).findAll();
+
+        if(profilesList==null)
+        {
+            Log.e(TAG, "not initialized user profile list");
+            return;
+        }
+
         cnt = 0;
         for (User item : profilesList) {
+            Log.d(TAG, "user: "+item);
             addProfile(item);
             users_id[cnt] = item.get_id();
             cnt = cnt + 1;

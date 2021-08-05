@@ -12,21 +12,21 @@ import ru.toir.mobile.multi.db.realm.DocumentationType;
  *         Created by koputo on 05.10.16.
  */
 public interface IDocumentationType {
-    @GET("/documentation-type")
+    @GET("/api/documentation-type")
     Call<List<DocumentationType>> get();
 
-    @GET("/documentation-type")
+    @GET("/api/documentation-type")
     Call<List<DocumentationType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/documentation-type")
+    @GET("/api/documentation-type")
     Call<List<DocumentationType>> getById(@Query("id") String id);
 
-    @GET("/documentation-type")
+    @GET("/api/documentation-type")
     Call<List<DocumentationType>> getById(@Query("id[]") String[] id);
 
-    @GET("/documentation-type")
+    @GET("/api/documentation-type")
     Call<List<DocumentationType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/documentation-type")
+    @GET("/api/documentation-type")
     Call<List<DocumentationType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

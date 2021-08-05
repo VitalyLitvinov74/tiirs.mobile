@@ -38,11 +38,11 @@ public class AllActionTest extends ActivityInstrumentationTestCase2<MainActivity
         solo.clickOnText("Основные");
         solo.clickOnText("Сервер системы");
         solo.clearEditText(0);
-        solo.enterText(0, "http://api.toir.tehnosber.ru!!");
+        solo.enterText(0, "http://toir.tehnosber.ru/api!!");
         solo.clickOnButton(0);
         solo.clickOnText("Сервер системы");
         solo.clearEditText(0);
-        solo.enterText(0, "http://api.toir.tehnosber.ru");
+        solo.enterText(0, "http://toir.tehnosber.ru/api");
         solo.clickOnButton(0);
         solo.clickOnText("Драйвер считывателя RFID");
         solo.clickInList(8);

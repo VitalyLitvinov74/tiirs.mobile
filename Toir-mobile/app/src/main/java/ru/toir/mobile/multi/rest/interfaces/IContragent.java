@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.Contragent;
  */
 
 public interface IContragent {
-    @GET("/clients")
+    @GET("/api/clients")
     Call<List<Contragent>> get();
 
-    @GET("/clients")
+    @GET("/api/clients")
     Call<List<Contragent>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/clients")
+    @GET("/api/clients")
     Call<List<Contragent>> getById(@Query("id") String id);
 
-    @GET("/clients")
+    @GET("/api/clients")
     Call<List<Contragent>> getById(@Query("id[]") String[] id);
 
-    @GET("/clients")
+    @GET("/api/clients")
     Call<List<Contragent>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/clients")
+    @GET("/api/clients")
     Call<List<Contragent>> getByUuid(@Query("uuid[]") String[] uuid);
 }

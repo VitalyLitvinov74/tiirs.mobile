@@ -14,6 +14,6 @@ import ru.toir.mobile.multi.db.realm.GpsTrack;
  */
 
 public interface IGpsTrack {
-    @POST("/gpstrack/create")
+    @POST("/api/gpstrack/create")
     Call<ResponseBody> send(@Body List<GpsTrack> data);
 }

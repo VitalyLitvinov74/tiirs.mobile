@@ -14,6 +14,6 @@ import ru.toir.mobile.multi.db.realm.Journal;
  */
 
 public interface IJournal {
-    @POST("/journal/create")
+    @POST("/api/journal/create")
     Call<ResponseBody> send(@Body List<Journal> data);
 }

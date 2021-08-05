@@ -13,33 +13,33 @@ import ru.toir.mobile.multi.db.realm.Documentation;
  */
 
 public interface IDocumentation {
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> get();
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getById(@Query("id") String id);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getById(@Query("id") String[] id);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getByUuid(@Query("uuid") String[] uuid);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getByEquipment(@Query("equipment") String uuid);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getByEquipment(@Query("equipment[]") String[] uuid);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel") String uuid);
 
-    @GET("/documentation")
+    @GET("/api/documentation")
     Call<List<Documentation>> getByEquipmentModel(@Query("equipmentModel[]") String[] uuid);
 }

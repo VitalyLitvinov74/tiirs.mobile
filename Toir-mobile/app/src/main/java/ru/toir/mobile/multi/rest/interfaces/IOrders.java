@@ -15,48 +15,48 @@ import ru.toir.mobile.multi.db.realm.Orders;
  *         Created by koputo on 17.10.16.
  */
 public interface IOrders {
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> get();
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> getById(@Query("id") String id);
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> getById(@Query("id[]") String[] id);
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> getByStatus(@Query("status") String status);
 
-    @GET("/orders")
+    @GET("/api/orders")
     Call<List<Orders>> getByStatus(@Query("status[]") List<String> status);
 
-    @POST("/orders/results")
+    @POST("/api/orders/results")
     Call<ResponseBody> send(@Body List<Orders> orders);
 
-    @POST("/orders/in-work")
+    @POST("/api/orders/in-work")
     Call<ResponseBody> setInWork(@Body String uuid);
 
-    @POST("/orders/in-work")
+    @POST("/api/orders/in-work")
     Call<ResponseBody> setInWork(@Body List<String> uuid);
 
-    @POST("/orders/complete")
+    @POST("/api/orders/complete")
     Call<ResponseBody> setComplete(@Body String uuid);
 
-    @POST("/orders/complete")
+    @POST("/api/orders/complete")
     Call<ResponseBody> setComplete(@Body List<String> uuid);
 
-    @POST("/orders/un-complete")
+    @POST("/api/orders/un-complete")
     Call<ResponseBody> setUnComplete(@Body String uuid);
 
-    @POST("/orders/un-complete")
+    @POST("/api/orders/un-complete")
     Call<ResponseBody> setUnComplete(@Body List<String> uuid);
 }

@@ -9,6 +9,6 @@ import ru.toir.mobile.multi.db.realm.User;
  *         Created by koputo on 15.09.16.
  */
 public interface IUserService {
-    @GET("/account/me")
+    @GET("/api/account/me")
     Call<User> user();
 }

@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.AttributeType;
  */
 
 public interface IAttributeType {
-    @GET("/attribute-type")
+    @GET("/api/attribute-type")
     Call<List<AttributeType>> get();
 
-    @GET("/attribute-type")
+    @GET("/api/attribute-type")
     Call<List<AttributeType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/attribute-type")
+    @GET("/api/attribute-type")
     Call<List<AttributeType>> getById(@Query("id") String id);
 
-    @GET("/attribute-type")
+    @GET("/api/attribute-type")
     Call<List<AttributeType>> getById(@Query("id[]") String[] id);
 
-    @GET("/attribute-type")
+    @GET("/api/attribute-type")
     Call<List<AttributeType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/attribute-type")
+    @GET("/api/attribute-type")
     Call<List<AttributeType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

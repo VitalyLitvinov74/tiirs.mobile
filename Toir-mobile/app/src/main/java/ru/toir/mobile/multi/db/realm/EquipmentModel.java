@@ -98,7 +98,7 @@ public class EquipmentModel extends RealmObject implements IToirDbObject {
 
     @Override
     public String getImageFileUrl(String userName) {
-        return "/storage/" + userName + "/" + getImageRoot() + '/' + equipmentType.getUuid();
+        return "storage/db/" + getImageRoot() + '/' + equipmentType.getUuid();
     }
 
     public Organization getOrganization() {

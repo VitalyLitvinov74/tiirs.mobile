@@ -16,31 +16,31 @@ import ru.toir.mobile.multi.db.realm.Equipment;
  */
 
 public interface IEquipment {
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<List<Equipment>> get();
 
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<List<Equipment>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<List<Equipment>> getById(@Query("id") String id);
 
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<List<Equipment>> getById(@Query("id[]") String[] id);
 
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<List<Equipment>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<List<Equipment>> getByUuid(@Query("uuid[]") String[] uuid);
 
     // TODO: заменить на POST !!!!
-    @GET("/equipment/set-tag")
+    @GET("/api/equipment/set-tag")
     Call<Boolean> setTagId(@Query("uuid") String uuid, @Query("tagId") String tagId);
 
-    @GET("/equipment")
+    @GET("/api/equipment")
     Call<Equipment> getByTagId(@Query("tagId") String tagId);
 
-    @POST("/equipment/upload")
+    @POST("/api/equipment/upload")
     Call<ResponseBody> send(@Body Equipment equipment);
 }

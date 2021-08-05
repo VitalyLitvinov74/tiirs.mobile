@@ -14,24 +14,24 @@ import ru.toir.mobile.multi.db.realm.Operation;
  */
 
 public interface IOperation {
-    @GET("/operation")
+    @GET("/api/operation")
     Call<List<Operation>> get();
 
-    @GET("/operation")
+    @GET("/api/operation")
     Call<List<Operation>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/operation")
+    @GET("/api/operation")
     Call<List<Operation>> getById(@Query("id") String id);
 
-    @GET("/operation")
+    @GET("/api/operation")
     Call<List<Operation>> getById(@Query("id[]") String[] id);
 
-    @GET("/operation")
+    @GET("/api/operation")
     Call<List<Operation>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/operation")
+    @GET("/api/operation")
     Call<List<Operation>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @POST("/operation/set-status")
+    @POST("/api/operation/set-status")
     Call<Boolean> setStatus(@Query("uuid") String uuid, @Query("statusUuid") String statusUuid);
 }

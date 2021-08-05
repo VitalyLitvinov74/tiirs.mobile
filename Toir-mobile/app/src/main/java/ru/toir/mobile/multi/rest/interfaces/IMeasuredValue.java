@@ -16,18 +16,18 @@ import ru.toir.mobile.multi.db.realm.MeasuredValue;
  */
 
 public interface IMeasuredValue {
-    @GET("/measured-value")
+    @GET("/api/measured-value")
     Call<List<MeasuredValue>> get();
 
-    @GET("/measured-value")
+    @GET("/api/measured-value")
     Call<List<MeasuredValue>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/measured-value")
+    @GET("/api/measured-value")
     Call<List<MeasuredValue>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/measured-value")
+    @GET("/api/measured-value")
     Call<List<MeasuredValue>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @POST("/measured-value/upload-measured-value")
+    @POST("/api/measured-value/upload-measured-value")
     Call<ResponseBody> send(@Body List<MeasuredValue> values);
 }

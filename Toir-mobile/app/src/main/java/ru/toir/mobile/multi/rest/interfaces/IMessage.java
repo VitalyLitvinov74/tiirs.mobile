@@ -16,18 +16,18 @@ import ru.toir.mobile.multi.db.realm.Message;
  */
 
 public interface IMessage {
-    @GET("/message")
+    @GET("/api/message")
     Call<List<Message>> get();
 
-    @GET("/message")
+    @GET("/api/message")
     Call<List<Message>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/message")
+    @GET("/api/message")
     Call<List<Message>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/message")
+    @GET("/api/message")
     Call<List<Message>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @POST("/message/upload-message")
+    @POST("/api/message/upload-message")
     Call<ResponseBody> send(@Body List<Message> values);
 }

@@ -12,11 +12,11 @@ import ru.toir.mobile.multi.serverapi.TokenSrv;
  */
 public interface ITokenService {
     @FormUrlEncoded
-    @POST("/token")
+    @POST("/api/token")
     Call<TokenSrv> getByLabel(@Field("label") String tagId, @Field("grant_type") String garantType);
 
     @FormUrlEncoded
-    @POST("/token")
+    @POST("/api/token")
     Call<TokenSrv> getByPassword(@Field("login") String login, @Field("password") String password,
                                  @Field("grant_type") String garantType);
 }

@@ -30,7 +30,7 @@ public class GetDocumentationAsyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        String url = ToirApplication.serverUrl + "/" + params[2] + "/" + params[0];
+        String url = ToirApplication.serverUrl + params[2] + "/" + params[0];
         Call<ResponseBody> call1 = ToirAPIFactory.getFileDownload().get(url);
         try {
             retrofit2.Response<ResponseBody> r = call1.execute();

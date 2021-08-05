@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.OrderLevel;
  */
 
 public interface IOrderLevel {
-    @GET("/order-level")
+    @GET("/api/order-level")
     Call<List<OrderLevel>> get();
 
-    @GET("/order-level")
+    @GET("/api/order-level")
     Call<List<OrderLevel>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/order-level")
+    @GET("/api/order-level")
     Call<List<OrderLevel>> getById(@Query("id") String id);
 
-    @GET("/order-level")
+    @GET("/api/order-level")
     Call<List<OrderLevel>> getById(@Query("id[]") String[] id);
 
-    @GET("/order-level")
+    @GET("/api/order-level")
     Call<List<OrderLevel>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/order-level")
+    @GET("/api/order-level")
     Call<List<OrderLevel>> getByUuid(@Query("uuid[]") String[] uuid);
 }

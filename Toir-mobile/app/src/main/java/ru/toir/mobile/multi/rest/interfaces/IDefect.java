@@ -16,30 +16,30 @@ import ru.toir.mobile.multi.db.realm.Defect;
  */
 
 public interface IDefect {
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> get();
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> getByEquipment(@Query("equipment") String uuid);
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> getByEquipment(@Query("equipment[]") String[] uuid);
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> getByEquipment(@Query("equipment") String uuid, @Query("changedAfter") String changedAfter);
 
-    @GET("/defect")
+    @GET("/api/defect")
     Call<List<Defect>> getByEquipment(@Query("equipment[]") String[] uuid, @Query("changedAfter") String changedAfter);
 
-    @POST("/defect/upload")
+    @POST("/api/defect/upload")
     Call<ResponseBody> send(@Body List<Defect> values);
 }

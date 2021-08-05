@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.CriticalType;
  */
 public interface ICriticalType {
 
-    @GET("/critical-type")
+    @GET("/api/critical-type")
     Call<List<CriticalType>> get();
 
-    @GET("/critical-type")
+    @GET("/api/critical-type")
     Call<List<CriticalType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/critical-type")
+    @GET("/api/critical-type")
     Call<List<CriticalType>> getById(@Query("id") String id);
 
-    @GET("/critical-type")
+    @GET("/api/critical-type")
     Call<List<CriticalType>> getById(@Query("id[]") String[] id);
 
-    @GET("/critical-type")
+    @GET("/api/critical-type")
     Call<List<CriticalType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/critical-type")
+    @GET("/api/critical-type")
     Call<List<CriticalType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

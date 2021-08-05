@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.StageType;
  */
 
 public interface IStageType {
-    @GET("/stage-type")
+    @GET("/api/stage-type")
     Call<List<StageType>> get();
 
-    @GET("/stage-type")
+    @GET("/api/stage-type")
     Call<List<StageType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/stage-type")
+    @GET("/api/stage-type")
     Call<List<StageType>> getById(@Query("id") String id);
 
-    @GET("/stage-type")
+    @GET("/api/stage-type")
     Call<List<StageType>> getById(@Query("id[]") String[] id);
 
-    @GET("/stage-type")
+    @GET("/api/stage-type")
     Call<List<StageType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/stage-type")
+    @GET("/api/stage-type")
     Call<List<StageType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

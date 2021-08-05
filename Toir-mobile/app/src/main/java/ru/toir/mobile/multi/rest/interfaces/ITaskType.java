@@ -13,21 +13,21 @@ import ru.toir.mobile.multi.db.realm.TaskType;
  */
 
 public interface ITaskType {
-    @GET("/task-type")
+    @GET("/api/task-type")
     Call<List<TaskType>> get();
 
-    @GET("/task-type")
+    @GET("/api/task-type")
     Call<List<TaskType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/task-type")
+    @GET("/api/task-type")
     Call<List<TaskType>> getById(@Query("id") String id);
 
-    @GET("/task-type")
+    @GET("/api/task-type")
     Call<List<TaskType>> getById(@Query("id[]") String[] id);
 
-    @GET("/task-type")
+    @GET("/api/task-type")
     Call<List<TaskType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/task-type")
+    @GET("/api/task-type")
     Call<List<TaskType>> getByUuid(@Query("uuid[]") String[] uuid);
 }

@@ -12,22 +12,22 @@ import ru.toir.mobile.multi.db.realm.ObjectType;
  *         Created by koputo on 05.10.16.
  */
 public interface IObjectType {
-    @GET("/object-type")
+    @GET("/api/object-type")
     Call<List<ObjectType>> get();
 
-    @GET("/object-type")
+    @GET("/api/object-type")
     Call<List<ObjectType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/object-type")
+    @GET("/api/object-type")
     Call<List<ObjectType>> getById(@Query("id") String id);
 
-    @GET("/object-type")
+    @GET("/api/object-type")
     Call<List<ObjectType>> getById(@Query("id[]") String[] id);
 
-    @GET("/object-type")
+    @GET("/api/object-type")
     Call<List<ObjectType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/object-type")
+    @GET("/api/object-type")
     Call<List<ObjectType>> getByUuid(@Query("uuid[]") String[] uuid);
 
 }

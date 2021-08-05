@@ -126,14 +126,16 @@ public class EquipmentInfoActivity extends AppCompatActivity {
         if (mt.hasExtension(extension)) {
             String mimeType = mt.getMimeTypeFromExtension(extension);
             Intent target = new Intent(Intent.ACTION_VIEW);
-            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            target.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             target.setType(mimeType);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 target.setData(Uri.fromFile(file));
             } else {
+                Log.d(TAG," Try open file: "+file.getAbsolutePath());
+                target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 Uri doc = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
                 target.setData(doc);
-                target.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
             }
 
             return Intent.createChooser(target, "Open File");
@@ -1013,8 +1015,10 @@ public class EquipmentInfoActivity extends AppCompatActivity {
                 dialog.setOnDismissListener(dialog1 -> {
                     // открываем загруженный документ (если он загрузился)
                     if (file.exists()) {
+                        Log.d(TAG, "-----------FILE PATH: "+file.getAbsolutePath());
                         showDocument(file, getApplicationContext());
                     } else {
+                        Log.d(TAG, "-----------FILE NOT LOAD-------------: ");
                         Toast.makeText(getBaseContext(), getString(R.string.cannot_upload_file),
                                 Toast.LENGTH_LONG).show();
                     }

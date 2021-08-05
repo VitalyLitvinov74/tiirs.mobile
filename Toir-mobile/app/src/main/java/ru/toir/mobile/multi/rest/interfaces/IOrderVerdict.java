@@ -13,22 +13,22 @@ import ru.toir.mobile.multi.db.realm.OrderVerdict;
  */
 
 public interface IOrderVerdict {
-    @GET("/order-verdict")
+    @GET("/api/order-verdict")
     Call<List<OrderVerdict>> get();
 
-    @GET("/order-verdict")
+    @GET("/api/order-verdict")
     Call<List<OrderVerdict>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/order-verdict")
+    @GET("/api/order-verdict")
     Call<List<OrderVerdict>> getById(@Query("id") String id);
 
-    @GET("/order-verdict")
+    @GET("/api/order-verdict")
     Call<List<OrderVerdict>> getById(@Query("id[]") String[] id);
 
-    @GET("/order-verdict")
+    @GET("/api/order-verdict")
     Call<List<OrderVerdict>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/order-verdict")
+    @GET("/api/order-verdict")
     Call<List<OrderVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }
 

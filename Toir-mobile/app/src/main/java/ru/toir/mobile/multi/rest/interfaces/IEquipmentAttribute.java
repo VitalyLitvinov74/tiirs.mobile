@@ -16,24 +16,24 @@ import ru.toir.mobile.multi.db.realm.EquipmentAttribute;
  */
 
 public interface IEquipmentAttribute {
-    @GET("/equipment-attribute")
+    @GET("/api/equipment-attribute")
     Call<List<EquipmentAttribute>> get();
 
-    @GET("/equipment-attribute")
+    @GET("/api/equipment-attribute")
     Call<List<EquipmentAttribute>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/equipment-attribute")
+    @GET("/api/equipment-attribute")
     Call<List<EquipmentAttribute>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/equipment-attribute")
+    @GET("/api/equipment-attribute")
     Call<List<EquipmentAttribute>> getByUuid(@Query("uuid[]") String[] uuid);
 
-    @GET("/equipment-attribute")
+    @GET("/api/equipment-attribute")
     Call<List<EquipmentAttribute>> getByEquipment(@Query("equipment") String uuid);
 
-    @GET("/equipment-attribute")
+    @GET("/api/equipment-attribute")
     Call<List<EquipmentAttribute>> getByEquipment(@Query("equipment[]") String[] uuid);
 
-    @POST("/equipment-attribute/upload")
+    @POST("/api/equipment-attribute/upload")
     Call<ResponseBody> send(@Body List<EquipmentAttribute> values);
 }

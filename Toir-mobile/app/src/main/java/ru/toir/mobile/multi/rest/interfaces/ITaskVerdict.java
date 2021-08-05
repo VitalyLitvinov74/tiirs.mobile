@@ -12,21 +12,21 @@ import ru.toir.mobile.multi.db.realm.TaskVerdict;
  *         Created by koputo on 01.02.17.
  */
 public interface ITaskVerdict {
-    @GET("/task-verdict")
+    @GET("/api/task-verdict")
     Call<List<TaskVerdict>> get();
 
-    @GET("/task-verdict")
+    @GET("/api/task-verdict")
     Call<List<TaskVerdict>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/task-verdict")
+    @GET("/api/task-verdict")
     Call<List<TaskVerdict>> getById(@Query("id") String id);
 
-    @GET("/task-verdict")
+    @GET("/api/task-verdict")
     Call<List<TaskVerdict>> getById(@Query("id[]") String[] id);
 
-    @GET("/task-verdict")
+    @GET("/api/task-verdict")
     Call<List<TaskVerdict>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/task-verdict")
+    @GET("/api/task-verdict")
     Call<List<TaskVerdict>> getByUuid(@Query("uuid[]") String[] uuid);
 }

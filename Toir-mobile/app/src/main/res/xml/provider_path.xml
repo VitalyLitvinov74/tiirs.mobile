@@ -5,26 +5,26 @@
         path="instruction/" />
     <external-path
         name="instructions"
-        path="Android/data/ru.toir.mobile.multi/files/instruction/" />
+        path="Android/data/ru.toir.mobile.multi/files/db/instruction/" />
     <files-path
         name="my_doc"
         path="doc/" />
     <external-path
         name="my_doc"
-        path="Android/data/ru.toir.mobile.multi/files/doc/" />
+        path="Android/data/ru.toir.mobile.multi/files/db/doc/" />
     <files-path
         name="my_photo"
         path="Pictures/" />
     <external-path
         name="my_photo"
-        path="Android/data/ru.toir.mobile.multi/files/Pictures/" />
+        path="Android/data/ru.toir.mobile.multi/files/db/Pictures/" />
     <files-path
         name="users"
         path="users/" />
     <external-path
         name="users"
-        path="Android/data/ru.toir.mobile.multi/files/users/" />
+        path="Android/data/ru.toir.mobile.multi/files/db/users/" />
     <external-path
         name="Download"
-        path="Android/data/ru.toir.mobile.multi/files/Download/" />
+        path="Android/data/ru.toir.mobile.multi/files/db/Download/" />
 </paths>

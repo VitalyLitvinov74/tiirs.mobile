@@ -2,6 +2,7 @@ package ru.toir.mobile.multi.rest;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -115,6 +116,7 @@ public class ToirAPIFactory {
             .addInterceptor(new Interceptor() {
                 @Override
                 public Response intercept(Chain chain) throws IOException {
+                    Log.d("DEBUG", "--------------URL: "+chain.request().url().toString());
                     Request origRequest = chain.request();
                     Headers origHeaders = origRequest.headers();
                     AuthorizedUser user = AuthorizedUser.getInstance();

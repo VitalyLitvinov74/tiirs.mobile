@@ -12,21 +12,21 @@ import ru.toir.mobile.multi.db.realm.DefectType;
  *         Created by olejek on 15.05.17.
  */
 public interface IDefectType {
-    @GET("/defect-type")
+    @GET("/api/defect-type")
     Call<List<DefectType>> get();
 
-    @GET("/defect-type")
+    @GET("/api/defect-type")
     Call<List<DefectType>> get(@Query("changedAfter") String changedAfter);
 
-    @GET("/defect-type")
+    @GET("/api/defect-type")
     Call<List<DefectType>> getById(@Query("id") String id);
 
-    @GET("/defect-type")
+    @GET("/api/defect-type")
     Call<List<DefectType>> getById(@Query("id[]") String[] id);
 
-    @GET("/defect-type")
+    @GET("/api/defect-type")
     Call<List<DefectType>> getByUuid(@Query("uuid") String uuid);
 
-    @GET("/defect-type")
+    @GET("/api/defect-type")
     Call<List<DefectType>> getByUuid(@Query("uuid[]") String[] uuid);
 }
