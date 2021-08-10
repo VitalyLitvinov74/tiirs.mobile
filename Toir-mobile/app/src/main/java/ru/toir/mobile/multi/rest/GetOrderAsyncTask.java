@@ -269,6 +269,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
 
         // запрашиваем наряды
         Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(args);
+        Log.d(TAG, "get order call: "+ call.request().url().toString()+" args: "+args);
         List<Orders> result;
         try {
             retrofit2.Response<List<Orders>> response = call.execute();
@@ -283,6 +284,7 @@ public class GetOrderAsyncTask extends AsyncTask<String[], Integer, List<Orders>
                 message = "Ошибка получения нарядов! Содержимого ответа нет.";
                 return null;
             } else if (result.size() == 0) {
+                Log.d(TAG, "respose order call: "+ response.message()+" headers: "+response.headers().toString()+" body: "+response.body().toString());
                 return result;
             }
         } catch (Exception e) {
