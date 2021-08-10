@@ -3,8 +3,13 @@ package ru.toir.mobile.multi.gps;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
+import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -15,21 +20,41 @@ import static java.lang.Math.abs;
 
 public class GPSListener implements LocationListener, GpsStatus.Listener {
 
+
+    private static final String TAG = "GPSListener";
     private String userUuid = null;
     private Location prevLocation = null;
+    private LocalDateTime lastLocationUpdate = null;
     @Override
     public void onGpsStatusChanged(int event) {
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        if (prevLocation != null) {
+        if (prevLocation != null && isTimeUpdateExpired()) {
             if (abs(prevLocation.getLatitude() - location.getLatitude()) > 0.001 || abs(prevLocation.getLongitude() - location.getLongitude()) > 0.001)
                 RecordGPSData(location.getLatitude(), location.getLongitude());
         }
         if (location != null) {
             prevLocation = location;
             //RecordGPSData(location.getLatitude(), location.getLongitude());
+        }
+        else
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                lastLocationUpdate = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+            }
+    }
+
+    public boolean isTimeUpdateExpired()
+    {
+        Log.d(TAG, "Check location update exired: "+lastLocationUpdate);
+        if(lastLocationUpdate==null || Build.VERSION.SDK_INT <= Build.VERSION_CODES.O)
+            return true;
+        if(lastLocationUpdate.isBefore(LocalDateTime.now(ZoneId.of("Europe/Moscow")).minusMinutes(1)))
+            return true;
+        else {
+            Log.d(TAG, "Location update not exired: "+lastLocationUpdate);
+            return false;
         }
     }
 
@@ -46,6 +71,10 @@ public class GPSListener implements LocationListener, GpsStatus.Listener {
     }
 
     private void RecordGPSData(Double Latitude, Double Longitude) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            lastLocationUpdate = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+        }
+
         final Realm realmDB = Realm.getDefaultInstance();
         final Double latitude = Latitude;
         final Double longitude = Longitude;
