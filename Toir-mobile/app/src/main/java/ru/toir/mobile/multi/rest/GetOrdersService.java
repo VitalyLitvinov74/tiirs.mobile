@@ -225,6 +225,7 @@ public class GetOrdersService extends Service {
 
             // запрашиваем наряды
             Call<List<Orders>> call = ToirAPIFactory.getOrdersService().getByStatus(statusUuids);
+            Log.d(TAG, "get order call: "+ call.request().url().toString()+" args: "+statusUuids);
             List<Orders> orders;
             try {
                 retrofit2.Response<List<Orders>> response = call.execute();
@@ -236,6 +237,7 @@ public class GetOrdersService extends Service {
                 }
 
                 orders = response.body();
+                Log.d(TAG, "respose order call: "+ response.message()+" headers: "+response.headers().toString()+" body: "+response.body().toString());
                 if (orders == null) {
                     //addToJournal("Ошибка получения нарядов! Содержимого ответа нет.");
                     finishService();
